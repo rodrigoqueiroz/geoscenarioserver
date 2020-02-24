@@ -74,10 +74,10 @@ def main():
     sim_vehicles = {}
     #TODO: change starting state to location in sim coordinate
     vid = 0
-    v1 = SV(id = vid, start_state = [0,14,0, 2,0,0]) #50km/h
+    v1 = SV(id = vid, start_state = [0.0,14.0,0.0, 2.0,0.0,0.0]) #14 +- 50km/h
     #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
-    #v1.setbehavior(btree=BT_STOP) 
-    v1.setbehavior(btree=BT_VELKEEPING) 
+    v1.setbehavior(btree=BT_STOP) 
+    #v1.setbehavior(btree=BT_VELKEEPING) 
     sim_vehicles[vid] = v1
 
     #v2 = SV(id = 1, start_state = [100,10,0, 2,0,0]) 
@@ -87,7 +87,7 @@ def main():
     #sim_vehicles[id] = v3
 
     #Test params
-    MAX_SIM_TIME = 50.0
+    MAX_SIM_TIME = 100.0
     area = 100.0  #animation length in m
     sim_time = 0
     time_step = 1

@@ -11,8 +11,8 @@ from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
 from pymoo.model.problem import Problem
 from GSOptProblem import GSOptProblem
-import GSChecker
-import simulationmsg_pb2
+import gsc/GSChecker
+import msg/simulationmsg_pb2
 
 class GSServer(Problem):
 

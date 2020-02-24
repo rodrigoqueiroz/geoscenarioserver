@@ -15,7 +15,7 @@ TARGET_VELOCITY = 30.0 / 3.6 #=8.3m/s      #HV target speed [m/s]
 TS_SAMP = 5.0 / 3.6  # ~1.38 m/s        #HV target speed sampling [m/s]
 VELOCITY_STEP = 6
 MAX_VELOCITY = 50 / 3.6
-MIN_VELOCITY = 10 / 3.6
+MIN_VELOCITY = 40 / 3.6
 
 MAX_ACCEL = 2.0
 EXPECTED_ACC_IN_ONE_SEC = 1     # m/s

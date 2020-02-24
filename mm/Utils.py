@@ -10,21 +10,12 @@ from matplotlib import pyplot as plt
 import uuid
 import numpy as np
 
-
+#logistic: returns a value between 0 and 1 within the range 0 to infinity
 def logistic(x):
-    """
-    A function that returns a value between 0 and 1 for x in the 
-    range [0, infinity] and -1 to 1 for x in the range [-infinity, infinity].
-
-    Useful for cost functions.
-    """
     return 2.0 / (1 + exp(-x)) - 1.0
 
+#Returns a function of time f with given coefficients for a polynomial
 def to_equation(coefficients):
-    """
-    Takes the coefficients of a polynomial and creates a function of
-    time from them.
-    """
     def f(t):
         total = 0.0
         for i, coef in enumerate(coefficients): 
@@ -32,21 +23,15 @@ def to_equation(coefficients):
         return total
     return f
 
+#Calculates derivative of a polynomial and returns coefficients.
 def differentiate(coefficients):
-    """
-    Calculates the derivative of a polynomial and returns
-    the corresponding coefficients.
-    """
-    new_cos = []
-    for deg, prev_co in enumerate(coefficients[1:]):
-        new_cos.append((deg+1) * prev_co)
-    return new_cos
+    der_coef = []
+    for deg, prev_coef in enumerate(coefficients[1:]):
+        der_coef.append((deg+1) * prev_coef)
+    return der_coef
 
-#
 #Calculates the closest distance to any vehicle during a trajectory.
-#
 def nearest_approach_to_any_vehicle(traj, vehicles):
-    
     closest = 999999
     for v in vehicles.values():
         d = nearest_approach(traj,v)

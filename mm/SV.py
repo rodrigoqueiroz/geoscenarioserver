@@ -82,42 +82,48 @@ class SV(object):
         
 
     def plan(self,vehicles):
+        
         #Road Config
         #todo: Get road attributes from laneletmap. Hardcoding now.
         lane_conf = LaneConfig(30,4,0)
 
         #Behaviour layer
+        replan = False
         if (self.btree==BT_VELKEEPING):
             maneuver = M_VELKEEPING
-            mlk_config = MLaneKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
+            mlk_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
+            replan = True
         elif (self.btree==BT_FOLLOW):
             maneuver = M_FOLLOW
             mfo_config = MFollowConfig( (FL_MIN_TIME, FL_MAX_TIME), 4, 40)
+            replan = True
         elif (self.btree==BT_STOP):
             maneuver = M_STOP
             mst_config = MStopConfig(time_range = (VK_MIN_TIME,VK_MAX_TIME))
+            replan = True
         
-        
+        self.btree==BT_PARKED
 
         #Micro maneuver layer
-        start_state = [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
-        if (maneuver==M_STOP):
-            candidates, best = plan_stop(start_state, mst_config, lane_conf, 200, vehicles, None) 
-        elif (maneuver==M_VELKEEPING):
-            candidates, best = plan_velocity_keeping(start_state, mlk_config, lane_conf, vehicles, None) 
-        elif (maneuver==M_FOLLOW):
-            candidates, best = plan_following(start_state, mfo_config, lane_conf, self.target_id, vehicles)
+        if (replan):
+            start_state = [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
+            if (maneuver==M_STOP):
+                candidates, best = plan_stop(start_state, mst_config, lane_conf, 200, vehicles, None) 
+            elif (maneuver==M_VELKEEPING):
+                candidates, best = plan_velocity_keeping(start_state, mlk_config, lane_conf, vehicles, None) 
+            elif (maneuver==M_FOLLOW):
+                candidates, best = plan_following(start_state, mfo_config, lane_conf, self.target_id, vehicles)
 
-        #if (maneuver==LANECHNAGE):
-        #    best = ST_LaneChange(hv.start_state, goal_state, T) #returns tuple (s[], d[], t)
-        #if (maneuver==CUTIN):
-        #    best = ST_CutIn( hv.start_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
-        #    candidates, best  = OT_CutIn( hv.start_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
-        
-        if (best):
-            self.trajectory = best
-        if (candidates):
-            self.cand_trajectories = candidates
+            #if (maneuver==LANECHNAGE):
+            #    best = ST_LaneChange(hv.start_state, goal_state, T) #returns tuple (s[], d[], t)
+            #if (maneuver==CUTIN):
+            #    best = ST_CutIn( hv.start_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
+            #    candidates, best  = OT_CutIn( hv.start_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
+            
+            if (best):
+                self.trajectory = best
+            if (candidates):
+                self.cand_trajectories = candidates
         
         
 
@@ -129,9 +135,12 @@ class SV(object):
             new_s = s_eq(time_step)
             new_d = d_eq(time_step)
             self.s_pos = new_s
-            #self.s_vel = new_s[1]
-            #self.s_acc = new_s[2]
             self.d_pos = new_d
+
+            s_vel_coef = differentiate(self.trajectory[0])
+            s_vel_eq = to_equation(s_vel_coef)
+            self.s_vel = s_vel_eq(time_step)
+
             #self.d_vel = new_d[1]
             #self.d_acc = new_d[2]
             #hv.start_state[0] = new_s
@@ -143,16 +152,17 @@ class SV(object):
         circle1 = plt.Circle((self.s_pos, self.d_pos), self.radius, color='b', fill=False)
         gca.add_artist(circle1)
         #label = "id {} | state[{}m, {}m/s, {}m/ss] ".format(self.id,self.s_pos, self.s_vel,self.s_acc)
-        label = "id{}| [ {} , {} , {} ] ".format(self.id,self.s_pos, self.s_vel,self.s_acc)
+        label = "id{}| [ {:.3} , {:.3} , {:.3} ] ".format(self.id, self.s_pos, self.s_vel, self.s_acc)
 
 
         gca.text(self.s_pos, self.d_pos+1.5, label, style='italic')
 
-        if (self.cand_trajectories):
-            plot_multi_trajectory(self.cand_trajectories,self.trajectory, None, False, False)
+        #if (self.cand_trajectories):
+            #plot_multi_trajectory(self.cand_trajectories,self.trajectory, None, False, False)
         
         if (self.trajectory):        
             plot_trajectory(self.trajectory[0], self.trajectory[1], self.trajectory[2],'blue')
+            #plot_single_trajectory(self.trajectory, None, False, True)
 
         
 

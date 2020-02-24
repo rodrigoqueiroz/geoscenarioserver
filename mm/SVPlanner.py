@@ -27,7 +27,7 @@ class MStopConfig():
         self.deceleration_range = deceleration_range
         self.min_distance = min_distance
         
-class MLaneKeepingConfig():
+class MVelKeepingConfig():
     def __init__(self, vel_range, time_range ):
         self.vel_range = vel_range
         self.time_range = time_range
@@ -37,6 +37,8 @@ class MFollowConfig():
         self.time_range = time_range
         self.time_gap = time_gap
         self.distance = distance
+        self.min_distance  = 50.0 #min distance to collision [meters]
+        self.min_ttc = 10.0 #min time to collision [seconds]
 
 class MLaneChangeConfig():
     def __init__(self, time_range, time_gap, distance):
@@ -144,30 +146,35 @@ def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None,
         #longitudinal movement: goal is to keep velocity
             for vel in np.arange(min_vel, max_vel, vel_step):
                 s_target = [0,0,0]
-                s_target[2] = s_start[2]    # keep acceleratiion (?)
-                s_target[1] = vel           # target velocity
-                s_target[0] = s_start[0] + (vel * t) + s_start[2] * t**2 / 2.0   #predicted position
+                s_target[0] = 0     # pos is not relevant. Will solve a quartial polynomial instead
+                s_target[1] = vel   # target velocity
+                s_target[2] = 0     # acc
+                #s_target[0] = s_start[0] + (vel * t) + s_start[2] * t**2 / 2.0   #predicted position
+                
                 #lateral movement
                 for di in np.arange(min_d, max_d, d_step):
                     d_target = [di,0,0] 
                     #add target
                     target_set.append((s_target,d_target,t))
-            
+    
+    
     #fit jerk optimal trajectory between two points in s and d per goal
     trajectories = []
     for target in target_set:
         s_target, d_target, t = target
         s_coef = quartic_polynomial_solver(s_start, s_target, t)
         d_coef = quintic_polynomial_solver(d_start, d_target, t)
-        trajectories.append(tuple([s_coef, d_coef, t, target]))
+        trajectories.append(tuple([s_coef, d_coef, t]))
+        print(s_target)
+        print(d_target)
+        print(t)
 
     #evaluate and select "best" trajectory    
-    #best = min(trajectories, key=lambda tr: follow_cost(tr, T, vehicles))
-    best = min(trajectories, key=lambda tr: follow_cost(tr, vehicles))
+    #best = min(trajectories, key=lambda tr: velocity_keeping_cost(tr, T, vehicles))
+    best = min(trajectories, key=lambda tr: velocity_keeping_cost(tr, vehicles))
    
     #return trajectories and best
     return trajectories, best
-
 
 #Vehicle Following
 #Moving target point, requiring a certain temporal safety distance 
@@ -217,7 +224,7 @@ def plan_following(start_state, man_config, lane_config, target_v_id, vehicles =
         s_target, d_target, t = target
         s_coef = quartic_polynomial_solver(s_start, s_target, t)
         d_coef = quintic_polynomial_solver(d_start, d_target, t)
-        trajectories.append(tuple([s_coef, d_coef, t, target]))
+        trajectories.append(tuple([s_coef, d_coef, t]))
 
     #evaluate and select "best" trajectory    
     best = min(trajectories, key=lambda tr: follow_cost(tr, vehicles))
@@ -268,7 +275,7 @@ def plan_lanechange(start_state, vehicles, obstacles = None):
         s_target, d_target, t = target
         s_coef = quartic_polynomial_solver(s_start, s_target, t)
         d_coef = quintic_polynomial_solver(d_start, d_target, t)
-        trajectories.append(tuple([s_coef, d_coef, t, target]))
+        trajectories.append(tuple([s_coef, d_coef, t]))
 
     #evaluate and select "best" trajectory    
     best = min(trajectories, key=lambda tr: follow_cost(tr, T, vehicles))
@@ -317,7 +324,7 @@ def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var
         s_goal, d_goal, t = goal
         s_coef = QuinticPolynomialTrajectory(s_start, s_goal, t)
         d_coef = QuinticPolynomialTrajectory(d_start, d_goal, t)
-        trajectories.append(tuple([s_coef, d_coef, t, goal]))
+        trajectories.append(tuple([s_coef, d_coef, t]))
 
     #evaluate and select "best" trajectory    
     
@@ -420,7 +427,7 @@ def quartic_polynomial_solver(start, end, T):
 #=== SAMPLE
 
 #retunrs a perturbed version of the goal. 
-#TODO: change
+#TODO: adapt
 def perturb_goal(goal_s, goal_d):
     new_s_goal = []
     for mu, sig in zip(goal_s, SIGMA_S):
