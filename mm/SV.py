@@ -7,6 +7,8 @@
 from matplotlib import pyplot as plt
 from Utils import *
 from SVPlanner import *
+from shared_mem.SVSharedMemory import *
+import math
 
 
 #BTree #todo: pytrees
@@ -25,6 +27,7 @@ M_CUTIN = 2
 M_FOLLOW = 3
 M_STOP = 4
 
+# A Simulated Vehicle
 class SV(object):
     
     def __init__(self, id, start_state):
@@ -62,6 +65,9 @@ class SV(object):
         self.local_path = []
         self.frenet_path = []
         #todo: change start and goal state to sim frame
+
+        # TODO: init with ids?
+        self.sm = SVSharedMemory()
        
     
     def setbehavior(self, btree, target_id = None, goal_pos = None):
@@ -77,10 +83,20 @@ class SV(object):
         if (self.trajectory):
             self.execute(time)
 
+            # TODO: some transformation out of frenet frame
+            # trajectory is (s_coefs, d_coefs, t)
+            self.x = to_equation(self.trajectory[0])(self.trajectory[2])
+            self.y = to_equation(self.trajectory[1])(self.trajectory[2])
+
+            # print([self.x, self.y])
+            # Write the position and yaw to shared memory
+            self.sm.write([self.x, self.y, self.z], self.yaw)
+
         print('plan')
         self.plan(vehicles)
         
 
+    # TODO: this is being slow?
     def plan(self,vehicles):
         
         #Road Config
@@ -102,7 +118,7 @@ class SV(object):
             mst_config = MStopConfig(time_range = (VK_MIN_TIME,VK_MAX_TIME))
             replan = True
         
-        self.btree==BT_PARKED
+        # self.btree==BT_PARKED
 
         #Micro maneuver layer
         if (replan):
@@ -126,7 +142,7 @@ class SV(object):
                 self.cand_trajectories = candidates
         
         
-
+    # called every tick, before planning
     def execute(self,time_step):
         #Consume trajectory at given time
         if (self.trajectory):
