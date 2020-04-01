@@ -8,9 +8,16 @@ SEM_KEY_BASE = 346565
 class SVSharedMemory(object):
     
     def __init__(self, id):
+<<<<<<< caef339bafebe1405b044f732cde3ebeab3e0723
         # TODO: error handling for failing to create shm & sem
         self.shm_key = SHM_KEY_BASE + id
         self.sem_key = SEM_KEY_BASE + id
+=======
+        # TODO: unique keys per instance and pass them to unreal
+        # TODO: error handling for failing to create shm & sem
+        self.shm_key = 123456 + id
+        self.sem_key = 346565 + id
+>>>>>>> multiple vehicles
 
         # create a semaphore for this memory
         self.sem = sysv_ipc.Semaphore(self.sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
@@ -27,9 +34,16 @@ class SVSharedMemory(object):
                 position:       [x, y, z]
                 orientation:    [pitch, yaw, roll]
         """
+<<<<<<< caef339bafebe1405b044f732cde3ebeab3e0723
 
         writestr = "{} {} {} {} {} {} {} {} {} {}".format(vid,x,y,z,yaw,x_vel,y_vel,steer,tick_count, delta_time)
         print("Shared Memory write {}".format(writestr))
+=======
+        writestr = "{} {} {} {} {} {}".format(
+            position[0], position[1], position[2],
+            0, 0, yaw)
+        # print(writestr)
+>>>>>>> multiple vehicles
         self.sem.acquire(timeout=0)
         self.shm.write(writestr.encode('ascii'))
         self.sem.release()
