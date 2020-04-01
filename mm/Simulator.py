@@ -76,7 +76,7 @@ def main():
     sim_vehicles = {}
     #TODO: change starting state to location in sim coordinate
     vid = 0
-    v1 = SV(id = vid, start_state = [0.0,14.0,0.0, 10.0,0.0,0.0]) #14 +- 50km/h
+    v1 = SV(id = vid, start_state = [0.0,28.0,0.0, 10.0,0.0,0.0]) #14 +- 50km/h
     #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
     # v1.setbehavior(btree=BT_STOP) 
     v1.setbehavior(btree=BT_VELKEEPING)
