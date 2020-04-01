@@ -82,7 +82,6 @@ def main():
     v1.setbehavior(btree=BT_VELKEEPING)
     sim_vehicles[vid] = v1
     
-    # TODO: ask how d works, and if every vehicle will have its own transform out of frenet
     vid = 1
     v2 = SV(id = vid, start_state = [0.0,14.0,0.0, 0.0,0.0,0.0]) #14 +- 50km/h
     v2.setbehavior(btree=BT_VELKEEPING)
