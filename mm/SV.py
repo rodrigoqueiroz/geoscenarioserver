@@ -67,7 +67,7 @@ class SV(object):
         #todo: change start and goal state to sim frame
 
         # TODO: init with ids?
-        self.sm = SVSharedMemory()
+        self.sm = SVSharedMemory(self.id)
        
     
     def setbehavior(self, btree, target_id = None, goal_pos = None):
@@ -88,7 +88,7 @@ class SV(object):
             self.x = to_equation(self.trajectory[0])(self.trajectory[2])
             self.y = to_equation(self.trajectory[1])(self.trajectory[2])
 
-            # print([self.x, self.y])
+            print([self.sm.shm_key, self.x, self.y])
             # Write the position and yaw to shared memory
             self.sm.write([self.x, self.y, self.z], self.yaw)
 

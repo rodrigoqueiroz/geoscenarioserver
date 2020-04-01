@@ -165,9 +165,9 @@ def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None,
         s_coef = quartic_polynomial_solver(s_start, s_target, t)
         d_coef = quintic_polynomial_solver(d_start, d_target, t)
         trajectories.append(tuple([s_coef, d_coef, t]))
-        print(s_target)
-        print(d_target)
-        print(t)
+        # print(s_target)
+        # print(d_target)
+        # print(t)
 
     #evaluate and select "best" trajectory    
     #best = min(trajectories, key=lambda tr: velocity_keeping_cost(tr, T, vehicles))
