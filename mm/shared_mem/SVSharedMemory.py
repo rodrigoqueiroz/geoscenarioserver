@@ -5,11 +5,11 @@ import sysv_ipc
 # an external simulator 
 class SVSharedMemory(object):
     
-    def __init__(self):
+    def __init__(self, id):
         # TODO: unique keys per instance and pass them to unreal
         # TODO: error handling for failing to create shm & sem
-        self.shm_key = 15432
-        self.sem_key = 16789
+        self.shm_key = 123456 + id
+        self.sem_key = 346565 + id
 
         # create a semaphore for this memory
         self.sem = sysv_ipc.Semaphore(self.sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
@@ -24,8 +24,7 @@ class SVSharedMemory(object):
                 position:       [x, y, z]
                 orientation:    [pitch, yaw, roll]
         """
-
-        writestr = "{},{},{},{},{},{}".format(
+        writestr = "{} {} {} {} {} {}".format(
             position[0], position[1], position[2],
             0, 0, yaw)
         # print(writestr)
