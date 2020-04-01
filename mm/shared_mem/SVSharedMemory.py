@@ -1,15 +1,16 @@
 import sysv_ipc
 
+SHM_KEY_BASE = 123456
+SEM_KEY_BASE = 346565
 
 # Class defining shared memory structure used to sync with
 # an external simulator 
 class SVSharedMemory(object):
     
     def __init__(self, id):
-        # TODO: unique keys per instance and pass them to unreal
         # TODO: error handling for failing to create shm & sem
-        self.shm_key = 123456 + id
-        self.sem_key = 346565 + id
+        self.shm_key = SHM_KEY_BASE + id
+        self.sem_key = SEM_KEY_BASE + id
 
         # create a semaphore for this memory
         self.sem = sysv_ipc.Semaphore(self.sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
