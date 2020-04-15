@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #rqueiroz@gsd.uwaterloo.ca
 # --------------------------------------------
-# SIMULATED HUMAN VEHICLE AND FRENET PATH
+# SIMULATED HUMAN CONTROLLED VEHICLE AND FRENET PATH
 # --------------------------------------------
 
 from matplotlib import pyplot as plt
@@ -21,11 +21,11 @@ BT_CUTIN = 5  #reach and cut in a specific target
 
 
 #maneuvers
-M_VELKEEPING = 0
-M_LANECHANGE = 1
-M_CUTIN = 2
-M_FOLLOW = 3
-M_STOP = 4
+M_VELKEEPING = 1
+M_LANECHANGE = 2
+M_CUTIN = 3
+M_FOLLOW = 4
+M_STOP = 5
 
 # A Simulated Vehicle
 class SV(object):
@@ -33,9 +33,7 @@ class SV(object):
     def __init__(self, id, start_state):
         #id
         self.id = id
-        #vehicle stats
-        self.radius = 1.0
-
+       
         #Mission in sim frame
         self.xgoal = 0
         self.ygoal = 0
@@ -68,7 +66,12 @@ class SV(object):
 
         # TODO: init with ids?
         self.sm = SVSharedMemory()
-       
+    
+    
+    def get_stats(self):
+        vehicle_state =  [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
+        return self.id, vehicle_state, self.trajectory, self.cand_trajectories
+    
     
     def setbehavior(self, btree, target_id = None, goal_pos = None):
         """ btree: is the root behavior tree. By default, the tree is velocity keeping.
@@ -80,7 +83,27 @@ class SV(object):
         self.target_id = target_id
 
     def tick(self,time,vehicles):
+        #Execution
+        self.execution(time)
+
+        #Road Config
+        #todo: Get road attributes from laneletmap. Hardcoding now.
+        lane_conf = LaneConfig(30,4,0)
+
+        #Behavior Planning Layer
+        maneuver,m_config = self.behavior(time, lane_conf, vehicles)
+
+        #Motion Planning Layer
+        if (maneuver):
+            #print('plan')
+            self.plan_maneuver(maneuver,m_config,lane_conf,vehicles)
+        
+        #Other Actions
+        #TODO: Intention (e.g., turn signal)        
+    
+    def execution(self,time):  
         if (self.trajectory):
+            #print('exect traj')
             self.execute(time)
 
             # TODO: some transformation out of frenet frame
@@ -88,58 +111,46 @@ class SV(object):
             self.x = to_equation(self.trajectory[0])(self.trajectory[2])
             self.y = to_equation(self.trajectory[1])(self.trajectory[2])
 
-            # print([self.x, self.y])
+            # print([self.x, self.y])      
+
+            #Update Pose
             # Write the position and yaw to shared memory
             self.sm.write([self.x, self.y, self.z], self.yaw)
 
-        print('plan')
-        self.plan(vehicles)
-        
-
-    # TODO: this is being slow?
-    def plan(self,vehicles):
-        
-        #Road Config
-        #todo: Get road attributes from laneletmap. Hardcoding now.
-        lane_conf = LaneConfig(30,4,0)
-
-        #Behaviour layer
-        replan = False
+    def behavior(self,time,lane_conf,vehicles):
+        #TODO: add BTrees and return either a Maneuver or Action
+        maneuver = None
         if (self.btree==BT_VELKEEPING):
             maneuver = M_VELKEEPING
-            mlk_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
-            replan = True
+            m_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
         elif (self.btree==BT_FOLLOW):
             maneuver = M_FOLLOW
-            mfo_config = MFollowConfig( (FL_MIN_TIME, FL_MAX_TIME), 4, 40)
-            replan = True
+            m_config = MFollowConfig( (FL_MIN_TIME, FL_MAX_TIME), 4, 40)
         elif (self.btree==BT_STOP):
             maneuver = M_STOP
-            mst_config = MStopConfig(time_range = (VK_MIN_TIME,VK_MAX_TIME))
-            replan = True
-        
-        # self.btree==BT_PARKED
+            m_config = MStopConfig(time_range = (VK_MIN_TIME,VK_MAX_TIME))
+        #self.btree==BT_PARKED
+        return maneuver, m_config
 
+    def plan_maneuver(self,maneuver,m_config,lane_conf,vehicles):
         #Micro maneuver layer
-        if (replan):
-            start_state = [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
-            if (maneuver==M_STOP):
-                candidates, best = plan_stop(start_state, mst_config, lane_conf, 200, vehicles, None) 
-            elif (maneuver==M_VELKEEPING):
-                candidates, best = plan_velocity_keeping(start_state, mlk_config, lane_conf, vehicles, None) 
-            elif (maneuver==M_FOLLOW):
-                candidates, best = plan_following(start_state, mfo_config, lane_conf, self.target_id, vehicles)
-
-            #if (maneuver==LANECHNAGE):
-            #    best = ST_LaneChange(hv.start_state, goal_state, T) #returns tuple (s[], d[], t)
-            #if (maneuver==CUTIN):
-            #    best = ST_CutIn( hv.start_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
-            #    candidates, best  = OT_CutIn( hv.start_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
-            
-            if (best):
-                self.trajectory = best
-            if (candidates):
-                self.cand_trajectories = candidates
+        start_state = [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
+        if (maneuver==M_STOP):
+            candidates, best = plan_stop(start_state, m_config, lane_conf, 200, vehicles, None) 
+        elif (maneuver==M_VELKEEPING):
+            candidates, best = plan_velocity_keeping(start_state, m_config, lane_conf, vehicles, None) 
+        elif (maneuver==M_FOLLOW):
+            scandidates, best = plan_following(start_state, m_config, lane_conf, self.target_id, vehicles)
+        #if (maneuver==LANECHNAGE):
+        #    best = ST_LaneChange(hv.start_state, goal_state, T) #returns tuple (s[], d[], t)
+        #if (maneuver==CUTIN):
+        #    best = ST_CutIn( hv.start_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
+        #    candidates, best  = OT_CutIn( hv.start_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
+        
+        if (best):
+            self.trajectory = best
+        if (candidates):
+            self.cand_trajectories = candidates
         
         
     # called every tick, before planning
@@ -162,27 +173,25 @@ class SV(object):
             #hv.start_state[0] = new_s
             #hv.start_state[3] = new_d
 
-    def plot(self):
-        gca = plt.gca()
-        plt.plot( self.s_pos, self.d_pos, "v")
-        circle1 = plt.Circle((self.s_pos, self.d_pos), self.radius, color='b', fill=False)
-        gca.add_artist(circle1)
-        #label = "id {} | state[{}m, {}m/s, {}m/ss] ".format(self.id,self.s_pos, self.s_vel,self.s_acc)
-        label = "id{}| [ {:.3} , {:.3} , {:.3} ] ".format(self.id, self.s_pos, self.s_vel, self.s_acc)
+  
+
+    # def plot(self):
+    #     gca = plt.gca()
+    #     plt.plot( self.s_pos, self.d_pos, "v")
+    #     circle1 = plt.Circle((self.s_pos, self.d_pos), self.radius, color='b', fill=False)
+    #     gca.add_artist(circle1)
+    #     #label = "id {} | state[{}m, {}m/s, {}m/ss] ".format(self.id,self.s_pos, self.s_vel,self.s_acc)
+    #     label = "id{}| [ {:.3} , {:.3} , {:.3} ] ".format(self.id, self.s_pos, self.s_vel, self.s_acc)
 
 
-        gca.text(self.s_pos, self.d_pos+1.5, label, style='italic')
+    #     gca.text(self.s_pos, self.d_pos+1.5, label, style='italic')
 
-        #if (self.cand_trajectories):
-            #plot_multi_trajectory(self.cand_trajectories,self.trajectory, None, False, False)
+    #     #if (self.cand_trajectories):
+    #         #plot_multi_trajectory(self.cand_trajectories,self.trajectory, None, False, False)
         
-        if (self.trajectory):        
-            plot_trajectory(self.trajectory[0], self.trajectory[1], self.trajectory[2],'blue')
-            #plot_single_trajectory(self.trajectory, None, False, True)
-
-        
-
-        
+    #     if (self.trajectory):        
+    #         plot_trajectory(self.trajectory[0], self.trajectory[1], self.trajectory[2],'blue')
+    #         #plot_single_trajectory(self.trajectory, None, False, True)
 
       
     def state_in(self, t):

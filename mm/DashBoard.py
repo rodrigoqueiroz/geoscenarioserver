@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 #rqueiroz@gsd.uwaterloo.ca
 # ---------------------------------------------
-# TRAJECTORY PLOTS
+# Dashboard Classs and Trajectory Plots
+# TODO: Add individual vehicle views
+# TODO: Add multiple charts per vehicle
+# TODO: Add data table
+# TODO: Flag to save chart to file under certain conditions.
 # --------------------------------------------
 
 from math import sqrt, exp
@@ -10,14 +14,84 @@ import uuid
 import numpy as np
 import random
 import time
+import tkinter
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from Constants import *
 from Utils import *
 from Vehicle import *
 
+class DashBoard(object):
+
+    def __init__(self):
+        self.tk = None
+        self.canvas = None
+
+    def create(self,width = 10, height = 4, road_length = 100):
+        self.tk = tkinter.Tk()
+        self.road_length = road_length/2   #length in [m]
+        plt_fig = plt.gcf()
+        plt_fig.set_size_inches(width,height,forward=True)
+        self.canvas = FigureCanvasTkAgg(plt_fig, self.tk) #must be after resize
+        self.canvas.get_tk_widget().pack()
+        #myCanvas = tkinter.Canvas(tkroot, bg="white", height=600, width=600)
+        #myCanvas.pack()
+
+    def update(self,sim_vehicles,centerplot_veh_id):
+        if not self.tk:
+            return
+            s
+        #canvas.get_tk_widget().delete("all")s
+        plt.cla()               #clear axes 
+        #plt.clf()              #clear figures
+        plt.grid(True)
+        plot_road()
+        #Center plot around main vehicle
+        plt.xlim(sim_vehicles[centerplot_veh_id].s_pos - self.road_length, sim_vehicles[centerplot_veh_id].s_pos + self.road_length)
+        #plt.ylim(0,10)s
+        for i in sim_vehicles:
+            vid, vehicle_state, trajectory, cand_trajectories = sim_vehicles[i].get_stats()
+            plot_vehicle(vid, vehicle_state, trajectory, cand_trajectories)
+        #plt.pause(0.00001)
+        self.canvas.draw()
+        self.tk.update() 
+        #self.tkroot.mainloop() #blocks UI
+
+        #if (tofile):
+        #    unique_filename = str(uuid.uuid4())[:8] 
+        #    plt.savefig('plots/mtplot_'+ unique_filename + '.png')
+        #    plot_sd(best)
+        #    unique_filename = str(uuid.uuid4()) [:8]
+        #    plt.savefig('plots/sdplot_'+unique_filename+'.png')s
+
+    def quit(self):
+        if  self.tk:
+            self.tk.quit()
+
+def plot_vehicle(vid, vehicle_state, traj, cand_trajectories):
+    s_pos = vehicle_state[0]
+    s_vel = vehicle_state[1]
+    s_acc = vehicle_state[2]
+    d_pos = vehicle_state[3]
+    d_vel = vehicle_state[4]
+    d_acc = vehicle_state[5]
+    radius = 1.0
+    gca = plt.gca()
+    plt.plot( s_pos, d_pos, "v")
+    circle1 = plt.Circle((s_pos, d_pos), radius, color='b', fill=False)
+    gca.add_artist(circle1)
+    label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, s_pos, s_vel, s_acc)
+
+    gca.text(s_pos, d_pos+1.5, label, style='italic')
+
+    if (cand_trajectories):
+        for t in cand_trajectories:
+            plot_trajectory(t[0], t[1], t[2], 'grey')
+    if (traj):        
+        plot_trajectory(traj[0], traj[1], traj[2],'blue')
+    
+    
 
 def plot_road(tcolor='grey'):
-    fig = plt.gcf()
-    fig.set_size_inches(12,4,forward=True)
     #0 lines
     plt.axhline(0, color="black") 
     plt.axvline(0, color="black")
@@ -30,7 +104,6 @@ def plot_road(tcolor='grey'):
     plt.ylabel('D')
     #plt.xlim(hv.start_state[0] - area,  hv.start_state[0] + area)
     #plt.title("v(m/s):" + str(c_speed * 3.6)[0:4])
-
 
 
 def plot_single_trajectory(trajectory, vehicles=None, show=True, tofile=False):
@@ -113,7 +186,7 @@ def plot_vehicles(vehicles,T, tcolor='grey'):
 
 
 def plot_trajectory(s_coef, d_coef, T,tcolor='grey'):
-   
+
     s_eq = to_equation(s_coef)
     d_eq = to_equation(d_coef)
     X = []
@@ -126,7 +199,7 @@ def plot_trajectory(s_coef, d_coef, T,tcolor='grey'):
 
     #plot trajectory curve
     plt.plot(X,Y,color=tcolor)
-  
+
 def plot_sd(trajectory):
 
     s_coef = trajectory[0]
@@ -176,7 +249,7 @@ def plot_sd(trajectory):
     fig = plt.gcf()
     fig.set_size_inches(10,5)
     
-   
+
 
 def plot_curve(coef, T, ylabel,xlabel):
     #layout

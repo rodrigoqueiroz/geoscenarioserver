@@ -3,7 +3,7 @@
 # ---------------------------------------------
 # CONFIGURABLE CONSTANTS
 # --------------------------------------------
-#TODO: get road attributes from a map
+# TODO: get road attributes from a map
 
 #ROAD
 ROAD_W_STEP = 1                   #Road width sampling step [m]

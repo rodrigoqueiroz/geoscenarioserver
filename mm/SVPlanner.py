@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-# ---------------------------------------------
+#rqueiroz@gsd.uwaterloo.ca
+# --------------------------------------------
 # GEOSCENARIO SIMULATION VEHICLE PLANNER
 # --------------------------------------------
-__author__ = "Rodrigo Queiroz"
-__email__ = "rqueiroz@gsd.uwaterloo.ca"
 
 import numpy as np
 import random
 from CostFunctions import *
 from Constants import *
-from Plots import *
 from Utils import *
 
 #todo: add all config structs and default values (CONSTAMTS) to a separate file
@@ -119,7 +117,7 @@ def plan_stop(start_state, man_config, lane_config, target_pos , vehicles = None
 #Driving with no vehicle directly ahead
 #No target point, but needs to adapt to a desired velocity
 def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None, obstacles = None):
-    print ('Maneuver: Velocity Keeping')
+    #print ('Maneuver: Velocity Keeping')
 
     s_start = start_state[:3]
     d_start = start_state[3:]
@@ -165,9 +163,9 @@ def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None,
         s_coef = quartic_polynomial_solver(s_start, s_target, t)
         d_coef = quintic_polynomial_solver(d_start, d_target, t)
         trajectories.append(tuple([s_coef, d_coef, t]))
-        print(s_target)
-        print(d_target)
-        print(t)
+        #print(s_target)
+        #print(d_target)
+        #print(t)
 
     #evaluate and select "best" trajectory    
     #best = min(trajectories, key=lambda tr: velocity_keeping_cost(tr, T, vehicles))
@@ -352,7 +350,6 @@ def plan_single_lanechange(start_state, goal_state, T):
     s_coeffs = QuinticPolynomialTrajectory(s_start, s_goal, T)
     d_coeffs = QuinticPolynomialTrajectory(d_start, d_goal, T)
     trajectory = tuple([s_coeffs, d_coeffs, T])
-    #plot_single_trajectory(trajectory, None, False,True)
     return trajectory
 
 
