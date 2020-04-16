@@ -32,7 +32,7 @@ struct ShmInfo
 };
 
 UCLASS()
-class GEOSCENARIO_API ASimulatedVehicle : public AActor
+class VEHICLEMANEUVER_API ASimulatedVehicle : public AActor
 {
     GENERATED_BODY()
     

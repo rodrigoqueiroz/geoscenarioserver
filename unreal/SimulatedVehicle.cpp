@@ -23,7 +23,7 @@ ASimulatedVehicle::ASimulatedVehicle()
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-    PrimaryActorTick.TickInterval = 0.1f;
+    PrimaryActorTick.TickInterval = 0.0f;
     mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BaseMesh"));
     mesh->SetupAttachment(RootComponent);
     
@@ -37,6 +37,9 @@ ASimulatedVehicle::ASimulatedVehicle()
     // {
     //  BaseMesh->SetStaticMesh(BaseMeshAsset.Object);
     // }
+
+    shmInfo.shm_key = 15432;
+    shmInfo.sem_key = 16789;
 }
 void ASimulatedVehicle::Init()
 {

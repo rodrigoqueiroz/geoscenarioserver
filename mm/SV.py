@@ -7,6 +7,7 @@
 from matplotlib import pyplot as plt
 from Utils import *
 from SVPlanner import *
+from TickSync import TickSync
 from shared_mem.SVSharedMemory import *
 import math
 
@@ -40,8 +41,15 @@ class SV(object):
 
         #Planning
         lookahead_dist = 0
-        self.trajectory = None #[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]]
-        self.cand_trajectories = None #plotting only
+        self.trajectory = None          #coefs + total time[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]] 
+        self.trajectory_time = 0        #consumed time
+        self.cand_trajectories = None   #plotting only
+        self.s_eq = None
+        self.s_vel_eq = None
+        self.s_acc_eq = None
+        self.d_eq = None
+        self.d_vel_eq = None
+        self.d_acc_eq = None
 
         #state in sim frame / sync with simulator
         self.x = 0
@@ -63,6 +71,10 @@ class SV(object):
         self.local_path = []
         self.frenet_path = []
         #todo: change start and goal state to sim frame
+        
+        self.sync_bt = TickSync(rate=0.5, block=False, verbose=True, label="BT")
+        self.sync_mm = TickSync(rate=0.5, block=False, verbose=True, label="MM")
+        
 
         # TODO: init with ids?
         self.sm = SVSharedMemory()
@@ -82,42 +94,52 @@ class SV(object):
         self.btree = btree
         self.target_id = target_id
 
-    def tick(self,time,vehicles):
-        #Execution
-        self.execution(time)
+    def tick(self,delta_time,vehicles):
+        #Execution TICK (every tick)
+        if (self.trajectory):
+            self.trajectory_time += delta_time
+            self.compute_new_pose(self.trajectory_time)
 
         #Road Config
         #todo: Get road attributes from laneletmap. Hardcoding now.
         lane_conf = LaneConfig(30,4,0)
-
-        #Behavior Planning Layer
-        maneuver,m_config = self.behavior(time, lane_conf, vehicles)
-
-        #Motion Planning Layer
-        if (maneuver):
-            #print('plan')
-            self.plan_maneuver(maneuver,m_config,lane_conf,vehicles)
+   
+        #BT Tick
+        if self.sync_bt.tick():
+            maneuver,m_config = self.plan_behavior(lane_conf, vehicles)
         
-        #Other Actions
-        #TODO: Intention (e.g., turn signal)        
+        #Motion Planning Tick
+        if self.sync_mm.tick():
+            if (maneuver):
+                self.plan_maneuver(maneuver,m_config,lane_conf,vehicles)
+        
+        #Other Actions (e.g., turn signal)        
     
-    def execution(self,time):  
-        if (self.trajectory):
-            #print('exect traj')
-            self.execute(time)
 
-            # TODO: some transformation out of frenet frame
-            # trajectory is (s_coefs, d_coefs, t)
-            self.x = to_equation(self.trajectory[0])(self.trajectory[2])
-            self.y = to_equation(self.trajectory[1])(self.trajectory[2])
+    #Consume trajectory based on a given time and update pose
+    #Optimized with pre computed derivatives and equations
+    def compute_new_pose(self,time):
+        self.s_pos = self.s_eq(time)
+        self.s_vel = self.s_vel_eq(time)
+        self.s_acc = self.s_acc_eq(time)
+        self.d_pos = self.d_eq(time)
+        self.d_vel = self.d_vel_eq(time)
+        self.d_acc = self.d_acc_eq(time)
 
-            # print([self.x, self.y])      
+        # TODO: some transformation out of frenet frame
+        # trajectory is (s_coefs, d_coefs, t)
+        #self.x = to_equation(self.trajectory[0])(self.trajectory[2])
+        #self.y = to_equation(self.trajectory[1])(self.trajectory[2])
+        self.x = self.s_pos * 10
+        self.y = self.d_pos * 10
 
-            #Update Pose
-            # Write the position and yaw to shared memory
-            self.sm.write([self.x, self.y, self.z], self.yaw)
+        #print([self.x, self.y])      
+        
+        #Update ShM Pose
+        # Write the position and yaw to shared memory
+        self.sm.write([self.x, self.y, self.z], self.yaw)
 
-    def behavior(self,time,lane_conf,vehicles):
+    def plan_behavior(self,lane_conf,vehicles):
         #TODO: add BTrees and return either a Maneuver or Action
         maneuver = None
         if (self.btree==BT_VELKEEPING):
@@ -133,6 +155,8 @@ class SV(object):
         return maneuver, m_config
 
     def plan_maneuver(self,maneuver,m_config,lane_conf,vehicles):
+        vehicle_state =  [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
+        print('Plan Maneuver, State {}'.format(vehicle_state[0],vehicle_state[1],vehicle_state[2],vehicle_state[3],vehicle_state[4],vehicle_state[5]))
         #Micro maneuver layer
         start_state = [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
         if (maneuver==M_STOP):
@@ -140,59 +164,36 @@ class SV(object):
         elif (maneuver==M_VELKEEPING):
             candidates, best = plan_velocity_keeping(start_state, m_config, lane_conf, vehicles, None) 
         elif (maneuver==M_FOLLOW):
-            scandidates, best = plan_following(start_state, m_config, lane_conf, self.target_id, vehicles)
+            candidates, best = plan_following(start_state, m_config, lane_conf, self.target_id, vehicles)
         #if (maneuver==LANECHNAGE):
         #    best = ST_LaneChange(hv.start_state, goal_state, T) #returns tuple (s[], d[], t)
         #if (maneuver==CUTIN):
         #    best = ST_CutIn( hv.start_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
         #    candidates, best  = OT_CutIn( hv.start_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
         
+
+        
         if (best):
-            self.trajectory = best
-        if (candidates):
-            self.cand_trajectories = candidates
-        
-        
-    # called every tick, before planning
-    def execute(self,time_step):
-        #Consume trajectory at given time
-        if (self.trajectory):
-            s_eq = to_equation(self.trajectory[0]) 
-            d_eq = to_equation(self.trajectory[1]) 
-            new_s = s_eq(time_step)
-            new_d = d_eq(time_step)
-            self.s_pos = new_s
-            self.d_pos = new_d
+            self.set_new_trajectory(best,candidates)
 
-            s_vel_coef = differentiate(self.trajectory[0])
-            s_vel_eq = to_equation(s_vel_coef)
-            self.s_vel = s_vel_eq(time_step)
-
-            #self.d_vel = new_d[1]
-            #self.d_acc = new_d[2]
-            #hv.start_state[0] = new_s
-            #hv.start_state[3] = new_d
-
-  
-
-    # def plot(self):
-    #     gca = plt.gca()
-    #     plt.plot( self.s_pos, self.d_pos, "v")
-    #     circle1 = plt.Circle((self.s_pos, self.d_pos), self.radius, color='b', fill=False)
-    #     gca.add_artist(circle1)
-    #     #label = "id {} | state[{}m, {}m/s, {}m/ss] ".format(self.id,self.s_pos, self.s_vel,self.s_acc)
-    #     label = "id{}| [ {:.3} , {:.3} , {:.3} ] ".format(self.id, self.s_pos, self.s_vel, self.s_acc)
-
-
-    #     gca.text(self.s_pos, self.d_pos+1.5, label, style='italic')
-
-    #     #if (self.cand_trajectories):
-    #         #plot_multi_trajectory(self.cand_trajectories,self.trajectory, None, False, False)
-        
-    #     if (self.trajectory):        
-    #         plot_trajectory(self.trajectory[0], self.trajectory[1], self.trajectory[2],'blue')
-    #         #plot_single_trajectory(self.trajectory, None, False, True)
-
+    def set_new_trajectory(self,trajectory, candidates):
+            self.trajectory = trajectory
+            self.trajectory_time = 0 
+            #Pre Computer derivatives and Equations
+            #S
+            s_coef = trajectory[0]
+            self.s_eq = to_equation(s_coef) 
+            s_vel_coef = differentiate(s_coef)
+            self.s_vel_eq = to_equation(s_vel_coef)
+            s_acc_coef = differentiate(s_vel_coef)
+            self.s_acc_eq = to_equation(s_acc_coef)
+            #D
+            d_coef = trajectory[1]
+            self.d_eq = to_equation(d_coef) 
+            d_vel_coef = differentiate(d_coef)
+            self.d_vel_eq = to_equation(d_vel_coef)
+            d_acc_coef = differentiate(d_vel_coef)
+            self.d_acc_eq = to_equation(d_acc_coef)
       
     def state_in(self, t):
         if (self.trajectory):

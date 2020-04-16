@@ -17,9 +17,7 @@ from TickSync import TickSync
 if __name__ == "__main__":
 
     #SIM CONFIG
-    timeout = 60.0              #timeout in [s]
-    frequence_rate = 1          #tick and frame frequence[hz]
-    show_dashboard = True      #plot vehicles and trajectories. Optional when running with Ureal engine.
+    show_dashboard = False       #plot vehicles and trajectories. Optional when running with Ureal engine.
     publish_pose_shm = True     #write vehicle Pose in shared memory for Unreal Engine
     centerplot_veh_id = 0
     #
@@ -45,20 +43,24 @@ if __name__ == "__main__":
     dashboard = DashBoard()
     if (show_dashboard):
         dashboard.create()
+
+    sync_global   = TickSync(rate=30, block=True, verbose=True, label="EX") #Global Tick blocks if too fasst
+    sync_global.set_timeout(60)  #timeout in [s]s
+    
     print ('SIMULATION START')
-    tsync =  TickSync(frequence_rate,timeout,True)
-    while tsync.tick():
+    while sync_global.tick():
         try:
-            #Sync Ego Pose
-            #TODO
+            #TODO: Update Ego Pose
+
             #Update Dynamic Agents
             for svid in sim_vehicles:
-                sim_vehicles[svid].tick(tsync.tick_delta_time, sim_vehicles)
-            #Dashboard
+                sim_vehicles[svid].tick(sync_global.tick_delta_time, sim_vehicles)
+            
+            #Update Dashboard (if visible)
             dashboard.update(sim_vehicles,centerplot_veh_id)
         except KeyboardInterrupt:
             break
-
+        
     #END
     dashboard.quit()
     if(publish_pose_shm):

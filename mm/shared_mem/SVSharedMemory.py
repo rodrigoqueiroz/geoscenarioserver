@@ -1,4 +1,4 @@
-from sysv_ipc import *
+import sysv_ipc
 
 
 # Class defining shared memory structure used to sync with
@@ -8,13 +8,15 @@ class SVSharedMemory(object):
     def __init__(self):
         # TODO: unique keys per instance and pass them to unreal
         # TODO: error handling for failing to create shm & sem
-        self.shm_key = 123456
-        self.sem_key = 346565
+        self.shm_key = 15432
+        self.sem_key = 16789
 
         # create a semaphore for this memory
-        self.sem = Semaphore(self.sem_key, flags=IPC_CREAT, initial_value=1)
-        self.shm = SharedMemory(self.shm_key, flags=IPC_CREAT, size=1024)
-
+        self.sem = sysv_ipc.Semaphore(self.sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
+        print("ShM semaphore created")
+        self.shm = sysv_ipc.SharedMemory(self.shm_key, flags= sysv_ipc.IPC_CREAT,  mode=int(str(666), 8), size=1024)
+        print("ShM memory created")
+        
 
     def write(self, position, yaw):
         """ Writes a string to the shared memory
