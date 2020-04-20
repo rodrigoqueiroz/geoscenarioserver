@@ -79,9 +79,10 @@ class SV(object):
         self.sync_bt = TickSync(rate=0.5, block=False, verbose=True, label="BT")
         self.sync_mm = TickSync(rate=0.5, block=False, verbose=True, label="MM")
         
-
-        # TODO: init with ids?
-        self.sm = SVSharedMemory()
+        # Id's are used to distinguish between shared memory for different vehicles
+        # In the future we might want to use one shared memory for all vehicles
+        # to make it easier to manage.
+        self.sm = SVSharedMemory(self.id)
     
     
     def get_stats(self):
@@ -119,7 +120,7 @@ class SV(object):
                 self.plan_maneuver(maneuver,m_config,lane_conf,vehicles)
         
         #Other Actions (e.g., turn signal)        
-    
+
 
     #Consume trajectory based on a given time and update pose
     #Optimized with pre computed derivatives and equations

@@ -18,7 +18,6 @@ class SVSharedMemory(object):
         self.shm = sysv_ipc.SharedMemory(self.shm_key, flags= sysv_ipc.IPC_CREAT,  mode=int(str(666), 8), size=1024)
         print("ShM memory created")
         
-
     
     def write(self,vid,x,y,z,yaw,x_vel,y_vel, steer, tick_count,delta_time):
     
