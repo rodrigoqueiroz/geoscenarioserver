@@ -20,14 +20,14 @@ class SVSharedMemory(object):
         
 
     def write(self, position, yaw):
-        """ Writes a string to the shared memory
+        """ Writes a string to the shared memory in the format
+            "<x> <y> <z> <yaw>"
             Params:
                 position:       [x, y, z]
                 orientation:    [pitch, yaw, roll]
         """
-        writestr = "{} {} {} {} {} {}".format(
-            position[0], position[1], position[2],
-            0, 0, yaw)
+        writestr = "{} {} {} {}".format(
+            position[0], position[1], position[2], yaw)
         # print(writestr)
         self.sem.acquire(timeout=0)
         self.shm.write(writestr.encode('ascii'))
