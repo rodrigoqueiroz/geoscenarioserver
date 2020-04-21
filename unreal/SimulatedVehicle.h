@@ -6,7 +6,7 @@
 // --------------------------------------------
 #pragma once
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include <sys/sem.h>
 #include <sys/types.h>
 #include "SimulatedVehicle.generated.h"
@@ -31,15 +31,39 @@ struct ShmInfo
     struct sembuf v = {0, 1, SEM_UNDO};                 // release
 };
 
+struct VehicleState{
+    int id = 0;
+    float x = 0;
+    float y = 0;
+    float z = 0;
+    float yaw = 0;
+    //float pitch = 0;
+    //float roll = 0;
+    float x_vel = 0;
+    float y_vel = 0;
+    float steer = 0;
+    FVector location;
+    FVector rotation;
+};
+
+struct FrameStat{
+    int tick_count = 0;
+    float delta_time = 0;
+};
+
 UCLASS()
-class VEHICLEMANEUVER_API ASimulatedVehicle : public AActor
+class VEHICLEMANEUVER_API ASimulatedVehicle : public APawn
 {
     GENERATED_BODY()
+
+    FrameStat frame_stat;
+    FrameStat server_frame_stat;
+    VehicleState vehicle_state;
     
 public: 
     // Sets default values for this actor's properties
     ASimulatedVehicle();
-    void Init();
+    //void Init();
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -48,7 +72,7 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
     ShmInfo shmInfo;
-    class USkeletalMeshComponent *mesh;
-    // class USkeletalMesh *MeshContainer;
+    //class USkeletalMeshComponent *mesh;
+    UStaticMeshComponent *mesh;
     
 };

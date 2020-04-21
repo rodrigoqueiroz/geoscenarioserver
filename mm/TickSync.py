@@ -12,7 +12,7 @@ import datetime
 import time
 
 class TickSync():
-    def __init__(self, rate = 10, block = 10, verbose = False, label = ""):
+    def __init__(self, rate = 30, block = False, verbose = False, label = ""):
         #config
         self.timeout = None
         self.tick_rate = rate
@@ -48,7 +48,8 @@ class TickSync():
             #Update globals
             self.tick_count+=1
             self.sim_time = 0.0
-            self.print('TICK {}: #1 START'.format(self.label))
+            self.print('{:05.2f}s {} Tick {:3}# START'.
+                    format(self.sim_time,self.label,self.tick_count))
             return True
         else:
             #Can tick? Preliminary numbers:
@@ -79,7 +80,8 @@ class TickSync():
                 self.print('{} TIMEOUT: {:.3}s'.format(self.label,self.sim_time))
                 return False
 
-        self.print('TICK {}: #{} +{:.3}s, drift{:.3}, T{:.3}s '.format(self.label,self.tick_count, self.tick_delta_time, self.tick_drift,self.sim_time))
+        self.print('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
+                    format(self.sim_time,self.label,self.tick_count, self.tick_delta_time, self.expected_tick_duration, self.tick_drift))
         return True
 
 

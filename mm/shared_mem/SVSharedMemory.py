@@ -18,20 +18,37 @@ class SVSharedMemory(object):
         print("ShM memory created")
         
 
-    def write(self, position, yaw):
+    
+    def write(self,vid,x,y,z,yaw,x_vel,y_vel, steer, tick_count,delta_time):
+    
         """ Writes a string to the shared memory
             Params:
                 position:       [x, y, z]
                 orientation:    [pitch, yaw, roll]
         """
 
-        writestr = "{},{},{},{},{},{}".format(
-            position[0], position[1], position[2],
-            0, 0, yaw)
-        # print(writestr)
+        writestr = "{} {} {} {} {} {} {} {} {} {}".format(vid,x,y,z,yaw,x_vel,y_vel,steer,tick_count, delta_time)
+        print("Shared Memory write {}".format(writestr))
         self.sem.acquire(timeout=0)
         self.shm.write(writestr.encode('ascii'))
         self.sem.release()
+
+    # def write(self, position, yaw):
+    
+    #     """ Writes a string to the shared memory
+    #         Params:
+    #             position:       [x, y, z]
+    #             orientation:    [pitch, yaw, roll]
+    #     """
+
+    #     writestr = "{},{},{},{},{},{}".format(
+    #         position[0], position[1], position[2],
+    #         0, 0, yaw)
+    #     # print(writestr)
+    #     self.sem.acquire(timeout=0)
+    #     self.shm.write(writestr.encode('ascii'))
+    #     self.sem.release()
+
     
     def __del__(self):
         self.shm.detach()

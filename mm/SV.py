@@ -52,12 +52,16 @@ class SV(object):
         self.d_acc_eq = None
 
         #state in sim frame / sync with simulator
+        self.last_x = 0
+        self.write_count = 0
         self.x = 0
         self.y = 0
         self.z = 0
         self.yaw = 0
         self.vel = 0
         self.acc = 0
+        self.x_vel = 0
+        self.y_vel = 0
         #state in moving frenet frame
         self.s_pos = start_state[0]
         self.s_vel = start_state[1]
@@ -94,11 +98,12 @@ class SV(object):
         self.btree = btree
         self.target_id = target_id
 
-    def tick(self,delta_time,vehicles):
+    def tick(self, sync_global, vehicles):
         #Execution TICK (every tick)
         if (self.trajectory):
-            self.trajectory_time += delta_time
-            self.compute_new_pose(self.trajectory_time)
+            self.trajectory_time += sync_global.tick_delta_time
+            self.compute_vehicle_state(self.trajectory_time)
+            self.write_vehicle_state(sync_global.tick_count, sync_global.tick_delta_time)
 
         #Road Config
         #todo: Get road attributes from laneletmap. Hardcoding now.
@@ -118,26 +123,36 @@ class SV(object):
 
     #Consume trajectory based on a given time and update pose
     #Optimized with pre computed derivatives and equations
-    def compute_new_pose(self,time):
+    def compute_vehicle_state(self,time):
         self.s_pos = self.s_eq(time)
         self.s_vel = self.s_vel_eq(time)
         self.s_acc = self.s_acc_eq(time)
         self.d_pos = self.d_eq(time)
         self.d_vel = self.d_vel_eq(time)
         self.d_acc = self.d_acc_eq(time)
-
-        # TODO: some transformation out of frenet frame
-        # trajectory is (s_coefs, d_coefs, t)
-        #self.x = to_equation(self.trajectory[0])(self.trajectory[2])
-        #self.y = to_equation(self.trajectory[1])(self.trajectory[2])
-        self.x = self.s_pos * 10
-        self.y = self.d_pos * 10
-
-        #print([self.x, self.y])      
         
-        #Update ShM Pose
-        # Write the position and yaw to shared memory
-        self.sm.write([self.x, self.y, self.z], self.yaw)
+        self.x = round((self.s_pos * 100))
+        self.y = round((self.d_pos * 100))
+        #self.z = ?
+
+        self.x_vel = self.s_vel
+        self.y_vel = self.y_vel
+
+        #self.yaw = ?
+        self.steering_angle = 0
+
+    def write_vehicle_state(self,tick_count, delta_time):
+        #TODO: extract this method to Simulator file, where all vehicles are written at the same time
+        #Write Vehicle State and Tick stats in ShM 
+        #self.sm.write([self.x, float(self.write_count), self.z], self.yaw)
+        self.sm.write(self.id, 
+                        self.x, self.y, self.z, 
+                        self.yaw, self.x_vel, self.y_vel, self.steering_angle,
+                        tick_count, delta_time)
+
+        #print([self.x, self.y],round(self.s_vel,2), (self.x - self.last_x), self.write_count)
+        #self.last_x = self.x
+
 
     def plan_behavior(self,lane_conf,vehicles):
         #TODO: add BTrees and return either a Maneuver or Action
@@ -171,15 +186,13 @@ class SV(object):
         #    best = ST_CutIn( hv.start_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
         #    candidates, best  = OT_CutIn( hv.start_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
         
-
-        
         if (best):
             self.set_new_trajectory(best,candidates)
 
     def set_new_trajectory(self,trajectory, candidates):
             self.trajectory = trajectory
             self.trajectory_time = 0 
-            #Pre Computer derivatives and Equations
+            #Pre-compute derivatives and equations for execution
             #S
             s_coef = trajectory[0]
             self.s_eq = to_equation(s_coef) 

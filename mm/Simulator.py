@@ -17,16 +17,20 @@ from TickSync import TickSync
 if __name__ == "__main__":
 
     #SIM CONFIG
-    show_dashboard = False       #plot vehicles and trajectories. Optional when running with Ureal engine.
+    TIMEOUT = 30                #timeout in [s]s
+    FRAME_RATE = 60             #Global tick rate
+    show_dashboard = False      #plot vehicles and trajectories. Optional when running with Ureal engine.
     publish_pose_shm = True     #write vehicle Pose in shared memory for Unreal Engine
     centerplot_veh_id = 0
     #
+    sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=False, label="EX")
+    sync_global.set_timeout(TIMEOUT)  
 
     # PROBLEM SETUP
     #Sim HV
     sim_vehicles = {}
     #TODO: change starting state to location in sim coordinate
-    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 2.0,0.0,0.0]) #14 +- 50km/h
+    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 3.0,0.0,0.0]) #14 +- 50km/h
     #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
     #v1.setbehavior(btree=BT_STOP) 
     v1.setbehavior(btree=BT_VELKEEPING) 
@@ -44,8 +48,7 @@ if __name__ == "__main__":
     if (show_dashboard):
         dashboard.create()
 
-    sync_global   = TickSync(rate=30, block=True, verbose=True, label="EX") #Global Tick blocks if too fasst
-    sync_global.set_timeout(60)  #timeout in [s]s
+    
     
     print ('SIMULATION START')
     while sync_global.tick():
@@ -54,7 +57,7 @@ if __name__ == "__main__":
 
             #Update Dynamic Agents
             for svid in sim_vehicles:
-                sim_vehicles[svid].tick(sync_global.tick_delta_time, sim_vehicles)
+                sim_vehicles[svid].tick(sync_global, sim_vehicles)
             
             #Update Dashboard (if visible)
             dashboard.update(sim_vehicles,centerplot_veh_id)
@@ -68,3 +71,4 @@ if __name__ == "__main__":
 
     print('SIMULATION END')
     #plt.show() #This function blocks UI. Use with caution
+    
