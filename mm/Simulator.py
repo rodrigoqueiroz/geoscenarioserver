@@ -13,6 +13,7 @@ from Constants import *
 from DashBoard import *
 from SV import *
 from TickSync import TickSync
+import threading
 
 if __name__ == "__main__":
 
@@ -23,44 +24,50 @@ if __name__ == "__main__":
     publish_pose_shm = True     #write vehicle Pose in shared memory for Unreal Engine
     centerplot_veh_id = 0
     #
-    sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=False, label="EX")
+    sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=True, label="EX")
     sync_global.set_timeout(TIMEOUT)  
 
     # PROBLEM SETUP
-    #Sim HV
+    #Single Sim HV
     sim_vehicles = {}
-    #TODO: change starting state to location in sim coordinate
-    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 3.0,0.0,0.0]) #14 +- 50km/h
-    #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
+    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 1.0,0.0,0.0]) #14 +- 50km/h #TODO: change starting state to location in sim coordinate
+    v1.set_behavior_root(btree=BT_VELKEEPING) 
     #v1.setbehavior(btree=BT_STOP) 
-    v1.setbehavior(btree=BT_VELKEEPING) 
     sim_vehicles[0] = v1
 
-    #v2 = SV(id = 1, start_state = [100,10,0, 2,0,0]) 
-    #v2.setbehavior(btree=BT_VELKEEPING) 
+    #multiple vehicles
+    #v2 = SV(id = 1, start_state = [100.0,10.0,0.0, 2.0,0.0,0.0])
+    #v1.set_behavior_root(btree=BT_FOLLOW, target_id=0)
     #sim_vehicles[1] = v2
-    
     #v3 = SV(id,[0,10,0, 2,0,0]) 
+    #v3.set_behavior_root(btree=BT_VELKEEPING) 
     #sim_vehicles[id] = v3
     
-    #SIM EXECUTION
     dashboard = DashBoard()
     if (show_dashboard):
         dashboard.create()
-
     
-    
+    #SIM EXECUTION
     print ('SIMULATION START')
+    for svid in sim_vehicles:
+        #sim_vehicles[svid].set_environment()
+        sim_vehicles[svid].start_vehicle()
+
     while sync_global.tick():
         try:
             #TODO: Update Ego Pose
 
             #Update Dynamic Agents
             for svid in sim_vehicles:
-                sim_vehicles[svid].tick(sync_global, sim_vehicles)
+                sim_vehicles[svid].tick(sync_global.tick_count, sync_global.tick_delta_time)
             
             #Update Dashboard (if visible)
             dashboard.update(sim_vehicles,centerplot_veh_id)
+
+            #Write Shared Memory
+            if(publish_pose_shm):
+                pass
+
         except KeyboardInterrupt:
             break
         
@@ -70,5 +77,3 @@ if __name__ == "__main__":
         pass
 
     print('SIMULATION END')
-    #plt.show() #This function blocks UI. Use with caution
-    

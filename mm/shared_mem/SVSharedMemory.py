@@ -28,7 +28,7 @@ class SVSharedMemory(object):
         """
 
         writestr = "{} {} {} {} {} {} {} {} {} {}".format(vid,x,y,z,yaw,x_vel,y_vel,steer,tick_count, delta_time)
-        print("Shared Memory write {}".format(writestr))
+        #print("Shared Memory write {}".format(writestr))
         self.sem.acquire(timeout=0)
         self.shm.write(writestr.encode('ascii'))
         self.sem.release()

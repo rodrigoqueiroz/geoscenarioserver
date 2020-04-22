@@ -1,0 +1,38 @@
+LogPakFile: Display: Found Pak file ../../../VehicleManeuver/Content/Paks/VehicleManeuver-MacNoEditor.pak attempting to mount.
+LogPakFile: Display: Mounting pak file ../../../VehicleManeuver/Content/Paks/VehicleManeuver-MacNoEditor.pak.
+LogStreaming: Display: Async Loading initialized: Event Driven Loader: true, Async Loading Thread: false, Async Post Load: true
+LogHAL: Display: Platform has ~ 16 GB [17179869184 / 17179869184 / 16], which maps to Larger [LargestMinGB=32, LargerMinGB=12, DefaultMinGB=8, SmallerMinGB=6, SmallestMinGB=0)
+LogMetal: Display:     Adapter Name: AMD Radeon Pro 555X
+LogMetal: Display:   Driver Version: AMDRadeonX4000 3.5.5 21975 (internal:3.5.5, unified:3.5.5)
+LogMetal: Display:      Driver Date: 2020-01-23 14:19:54 +0000
+LogMetal: Display:           Vendor: AMD
+LogMetal: Display:       Vendor ID: 4098
+LogMetal: Display:       Device ID: 26607
+LogMetal: Display:       VRAM (MB): 4096
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogStreaming: Display: Flushing async loaders.
+LogInit: Display: Game Engine Initialized.
+LogInit: Display: Starting Game.
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogTemp: Error: Connecting to Server...
+LogTemp: Warning: Connected to GeoScenario Server
+LogTemp: Error: SHM [ id=0 x=170.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.35 y_vel=0.00 steer=0.00 ] tick=102 delta_time= 0.021
+LogTemp: Error: SHM [ id=0 x=170.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.35 y_vel=0.00 steer=0.00 ] tick=102 delta_time= 0.021
+LogTemp: Error: SHM [ id=0 x=170.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.35 y_vel=0.00 steer=0.00 ] tick=102 delta_time= 0.021
+LogTemp: Error: SHM [ id=0 x=170.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.35 y_vel=0.00 steer=0.00 ] tick=102 delta_time= 0.021
+LogTemp: Error: SHM [ id=0 x=170.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.35 y_vel=0.00 steer=0.00 ] tick=102 delta_time= 0.021
+LogTemp: Error: SHM [ id=0 x=170.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.35 y_vel=0.00 steer=0.00 ] tick=102 delta_time= 0.021
+LogTemp: Error: SHM [ id=0 x=210.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.66 y_vel=0.00 steer=0.00 ] tick=103 delta_time= 0.159
+LogTemp: Error: SHM [ id=0 x=214.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.69 y_vel=0.00 steer=0.00 ] tick=104 delta_time= 0.018
+LogTemp: Error: SHM [ id=0 x=219.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.73 y_vel=0.00 steer=0.00 ] tick=105 delta_time= 0.017
+LogTemp: Error: SHM [ id=0 x=224.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.76 y_vel=0.00 steer=0.00 ] tick=106 delta_time= 0.019
+LogTemp: Error: SHM [ id=0 x=230.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.80 y_vel=0.00 steer=0.00 ] tick=107 delta_time= 0.020
+LogTemp: Error: SHM [ id=0 x=230.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.80 y_vel=0.00 steer=0.00 ] tick=107 delta_time= 0.020
+LogTemp: Error: SHM [ id=0 x=235.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.84 y_vel=0.00 steer=0.00 ] tick=108 delta_time= 0.020
+LogTemp: Error: SHM [ id=0 x=241.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.87 y_vel=0.00 steer=0.00 ] tick=109 delta_time= 0.020
+LogTemp: Error: SHM [ id=0 x=246.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.91 y_vel=0.00 steer=0.00 ] tick=110 delta_time= 0.018
+LogTemp: Error: SHM [ id=0 x=252.00 y=300.00 z=0.00 yaw=0.00 x_vel=2.94 y_vel=0.00 steer=0.00 ] tick=111 delta_time= 0.019
