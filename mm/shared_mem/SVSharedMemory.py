@@ -20,9 +20,8 @@ class SVSharedMemory(object):
     
 
     def write_vehicle_stats(self, tick_count, delta_time, simulated_vehicles):
-        write_str = ""
         # write tick count and deltatime
-        write_str += "{} {}\n".format(tick_count, delta_time)
+        write_str = "{} {}\n".format(tick_count, delta_time)
 
         # write vehicle states
         for svid in simulated_vehicles:
