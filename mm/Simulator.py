@@ -13,6 +13,8 @@ from Constants import *
 from DashBoard import *
 from SV import *
 from TickSync import TickSync
+from shared_mem.SVSharedMemory import *
+
 
 if __name__ == "__main__":
 
@@ -24,11 +26,14 @@ if __name__ == "__main__":
     centerplot_veh_id = 0
     #
     sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=False, label="EX")
-    sync_global.set_timeout(TIMEOUT)  
+    sync_global.set_timeout(TIMEOUT)
+
+    # SHARED MEMORY SETUP
+    shared_memory = SVSharedMemory()
 
     # PROBLEM SETUP
     #Sim HV
-    sim_vehicles = {}
+    sim_vehicles = {} # should this be []?
     #TODO: change starting state to location in sim coordinate
     v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 3.0,0.0,0.0]) #14 +- 50km/h
     #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
@@ -42,13 +47,12 @@ if __name__ == "__main__":
     
     #v3 = SV(id,[0,10,0, 2,0,0]) 
     #sim_vehicles[id] = v3
-    
+
     #SIM EXECUTION
     dashboard = DashBoard()
     if (show_dashboard):
         dashboard.create()
 
-    
     
     print ('SIMULATION START')
     while sync_global.tick():
@@ -59,6 +63,9 @@ if __name__ == "__main__":
             for svid in sim_vehicles:
                 sim_vehicles[svid].tick(sync_global, sim_vehicles)
             
+            # Write out simulator state
+            shared_memory.write_vehicle_stats(sync_global.tick_count, sync_global.tick_delta_time, sim_vehicles)
+
             #Update Dashboard (if visible)
             dashboard.update(sim_vehicles,centerplot_veh_id)
         except KeyboardInterrupt:

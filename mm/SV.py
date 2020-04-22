@@ -8,7 +8,6 @@ from matplotlib import pyplot as plt
 from Utils import *
 from SVPlanner import *
 from TickSync import TickSync
-from shared_mem.SVSharedMemory import *
 import math
 
 
@@ -58,6 +57,7 @@ class SV(object):
         self.y = 0
         self.z = 0
         self.yaw = 0
+        self.steering_angle = 0
         self.vel = 0
         self.acc = 0
         self.x_vel = 0
@@ -78,17 +78,16 @@ class SV(object):
         
         self.sync_bt = TickSync(rate=0.5, block=False, verbose=True, label="BT")
         self.sync_mm = TickSync(rate=0.5, block=False, verbose=True, label="MM")
-        
-        # Id's are used to distinguish between shared memory for different vehicles
-        # In the future we might want to use one shared memory for all vehicles
-        # to make it easier to manage.
-        self.sm = SVSharedMemory(self.id)
     
     
     def get_stats(self):
         vehicle_state =  [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
         return self.id, vehicle_state, self.trajectory, self.cand_trajectories
     
+    def get_sim_state(self):
+        position = [self.x, self.y, self.z]
+        velocity = [self.x_vel, self.y_vel]
+        return self.id, position, velocity, self.yaw, self.steering_angle
     
     def setbehavior(self, btree, target_id = None, goal_pos = None):
         """ btree: is the root behavior tree. By default, the tree is velocity keeping.
@@ -104,7 +103,7 @@ class SV(object):
         if (self.trajectory):
             self.trajectory_time += sync_global.tick_delta_time
             self.compute_vehicle_state(self.trajectory_time)
-            self.write_vehicle_state(sync_global.tick_count, sync_global.tick_delta_time)
+            # self.write_vehicle_state(sync_global.tick_count, sync_global.tick_delta_time)
 
         #Road Config
         #todo: Get road attributes from laneletmap. Hardcoding now.
@@ -141,18 +140,6 @@ class SV(object):
 
         #self.yaw = ?
         self.steering_angle = 0
-
-    def write_vehicle_state(self,tick_count, delta_time):
-        #TODO: extract this method to Simulator file, where all vehicles are written at the same time
-        #Write Vehicle State and Tick stats in ShM 
-        #self.sm.write([self.x, float(self.write_count), self.z], self.yaw)
-        self.sm.write(self.id, 
-                        self.x, self.y, self.z, 
-                        self.yaw, self.x_vel, self.y_vel, self.steering_angle,
-                        tick_count, delta_time)
-
-        #print([self.x, self.y],round(self.s_vel,2), (self.x - self.last_x), self.write_count)
-        #self.last_x = self.x
 
 
     def plan_behavior(self,lane_conf,vehicles):
