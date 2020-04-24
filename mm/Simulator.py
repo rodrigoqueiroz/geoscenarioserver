@@ -13,6 +13,7 @@ from Constants import *
 from DashBoard import *
 from SV import *
 from TickSync import TickSync
+from shared_mem.SVSharedMemory import *
 import threading
 
 if __name__ == "__main__":
@@ -24,30 +25,33 @@ if __name__ == "__main__":
     publish_pose_shm = True     #write vehicle Pose in shared memory for Unreal Engine
     centerplot_veh_id = 0
     #
-    sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=True, label="EX")
-    sync_global.set_timeout(TIMEOUT)  
+    sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=False, label="EX")
+    sync_global.set_timeout(TIMEOUT)
+
+    # SHARED MEMORY SETUP
+    shared_memory = SVSharedMemory()
 
     # PROBLEM SETUP
-    #Single Sim HV
-    sim_vehicles = {}
-    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 1.0,0.0,0.0]) #14 +- 50km/h #TODO: change starting state to location in sim coordinate
-    v1.set_behavior_root(btree=BT_VELKEEPING) 
-    #v1.setbehavior(btree=BT_STOP) 
+    #Sim HV
+    sim_vehicles = {} # should this be []?
+    #TODO: change starting state to location in sim coordinate
+    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 3.0,0.0,0.0]) #14 +- 50km/h
+    #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
+    #v1.setbehavior(btree=BT_STOP)
+    v1.setbehavior(btree=BT_VELKEEPING)
     sim_vehicles[0] = v1
-
-    #multiple vehicles
-    #v2 = SV(id = 1, start_state = [100.0,10.0,0.0, 2.0,0.0,0.0])
-    #v1.set_behavior_root(btree=BT_FOLLOW, target_id=0)
-    #sim_vehicles[1] = v2
-    #v3 = SV(id,[0,10,0, 2,0,0]) 
-    #v3.set_behavior_root(btree=BT_VELKEEPING) 
-    #sim_vehicles[id] = v3
+    
+    v2 = SV(id = 1, start_state = [100,10,0, 2.0,0,0])
+    v2.setbehavior(btree=BT_VELKEEPING)
+    sim_vehicles[1] = v2
+    
     
     dashboard = DashBoard()
     if (show_dashboard):
         dashboard.create()
     
     #SIM EXECUTION
+
     print ('SIMULATION START')
     for svid in sim_vehicles:
         #sim_vehicles[svid].set_environment()
@@ -61,6 +65,9 @@ if __name__ == "__main__":
             for svid in sim_vehicles:
                 sim_vehicles[svid].tick(sync_global.tick_count, sync_global.tick_delta_time)
             
+            # Write out simulator state
+            shared_memory.write_vehicle_stats(sync_global.tick_count, sync_global.tick_delta_time, sim_vehicles)
+
             #Update Dashboard (if visible)
             dashboard.update(sim_vehicles,centerplot_veh_id)
 

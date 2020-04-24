@@ -1,53 +1,40 @@
 import sysv_ipc
 
+SHM_KEY = 123456
+SEM_KEY = 346565
 
 # Class defining shared memory structure used to sync with
 # an external simulator 
 class SVSharedMemory(object):
     
     def __init__(self):
-        # TODO: unique keys per instance and pass them to unreal
         # TODO: error handling for failing to create shm & sem
-        self.shm_key = 15432
-        self.sem_key = 16789
+        self.shm_key = SHM_KEY
+        self.sem_key = SEM_KEY
 
         # create a semaphore for this memory
         self.sem = sysv_ipc.Semaphore(self.sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
         print("ShM semaphore created")
         self.shm = sysv_ipc.SharedMemory(self.shm_key, flags= sysv_ipc.IPC_CREAT,  mode=int(str(666), 8), size=1024)
         print("ShM memory created")
-        
 
-    
-    def write(self,vid,x,y,z,yaw,x_vel,y_vel, steer, tick_count,delta_time):
-    
-        """ Writes a string to the shared memory
-            Params:
-                position:       [x, y, z]
-                orientation:    [pitch, yaw, roll]
-        """
 
-        writestr = "{} {} {} {} {} {} {} {} {} {}".format(vid,x,y,z,yaw,x_vel,y_vel,steer,tick_count, delta_time)
-        #print("Shared Memory write {}".format(writestr))
+    def write_vehicle_stats(self, tick_count, delta_time, simulated_vehicles):
+        # write tick count and deltatime
+        write_str = "{} {}\n".format(tick_count, delta_time)
+
+        # write vehicle states
+        for svid in simulated_vehicles:
+            vid, position, velocity, yaw, steering_angle = simulated_vehicles[svid].get_sim_state()
+            write_str += "{} {} {} {} {} {} {} {}\n".format(
+                vid, position[0], position[1], position[2],
+                yaw, velocity[0], velocity[1], steering_angle)
+
         self.sem.acquire(timeout=0)
-        self.shm.write(writestr.encode('ascii'))
+        self.shm.write(write_str.encode('ascii'))
         self.sem.release()
 
-    # def write(self, position, yaw):
-    
-    #     """ Writes a string to the shared memory
-    #         Params:
-    #             position:       [x, y, z]
-    #             orientation:    [pitch, yaw, roll]
-    #     """
-
-    #     writestr = "{},{},{},{},{},{}".format(
-    #         position[0], position[1], position[2],
-    #         0, 0, yaw)
-    #     # print(writestr)
-    #     self.sem.acquire(timeout=0)
-    #     self.shm.write(writestr.encode('ascii'))
-    #     self.sem.release()
+        print("Shared Memory write\n{}".format(write_str))
 
     
     def __del__(self):

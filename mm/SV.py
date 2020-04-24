@@ -9,7 +9,6 @@ from matplotlib import pyplot as plt
 from Utils import *
 from SVPlanner import *
 from TickSync import TickSync
-from shared_mem.SVSharedMemory import *
 import math
 import threading
 
@@ -49,6 +48,7 @@ class SV(object):
         self.y = 0
         self.z = 0
         self.yaw = 0
+        self.steering_angle = 0
         self.vel = 0
         self.acc = 0
         self.x_vel = 0
@@ -60,13 +60,16 @@ class SV(object):
         self.d_pos = start_state[3]
         self.d_vel = start_state[4]
         self.d_acc = start_state[5]
-
-        self.sm = SVSharedMemory()
-    
+  
     def get_stats(self):
         vehicle_state =  [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
         return self.id, vehicle_state, self.trajectory, self.cand_trajectories
 
+    def get_sim_state(self):
+        position = [self.x, self.y, self.z]
+        velocity = [self.x_vel, self.y_vel]
+        return self.id, position, velocity, self.yaw, self.steering_angle
+    
     def set_behavior_root(self, btree, target_id = None, goal_pos = None):
         """ btree: is the root behavior tree. By default, the tree is velocity keeping.
             target: can be used in many subtrees to force a maneuver towards one specific vehicle. 
@@ -95,13 +98,15 @@ class SV(object):
         if (self.trajectory):
             self.trajectory_time += delta_time
             self.compute_vehicle_state(self.trajectory_time)
-            self.write_vehicle_state(tick_count, delta_time)
+
+         
+
+        #Road Config
+        #todo: Get road attributes from laneletmap. Hardcoding now.
+        lane_conf = LaneConfig(30,4,0)
         
         vehicle_state =  [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
         
-        #Road Config
-        #todo: Get road attributes from laneletmap. Hardcoding now.
-        lane_config = LaneConfig(30,4,0)
 
         #Dynamic Traffic: Vehicles/Pedestrians/Animals/Obstacles
         trafic_state = None #TODO
@@ -137,18 +142,6 @@ class SV(object):
 
         #self.yaw = ?
         self.steering_angle = 0
-
-    def write_vehicle_state(self,tick_count, delta_time):
-        #TODO: extract this method to Simulator file, where all vehicles are written at the same time
-        #Write Vehicle State and Tick stats in ShM 
-        #self.sm.write([self.x, float(self.write_count), self.z], self.yaw)
-        self.sm.write(self.id, 
-                        self.x, self.y, self.z, 
-                        self.yaw, self.x_vel, self.y_vel, self.steering_angle,
-                        tick_count, delta_time)
-
-        #print([self.x, self.y],round(self.s_vel,2), (self.x - self.last_x), self.write_count)
-        #self.last_x = self.x
 
 
     def set_new_trajectory(self, trajectory, candidates = None):
