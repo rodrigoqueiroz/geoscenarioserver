@@ -9,7 +9,7 @@
 ROAD_W_STEP = 1                   #Road width sampling step [m]
 
 #HV PARAMS
-VEHICLE_RADIUS = 1.0                    #vehicle as a circle to simplify collision math
+VEHICLE_RADIUS = 1.0              #vehicle as a circle to simplify collision math and lane boundary checks
 
 TARGET_VELOCITY = 30.0 / 3.6 #=8.3m/s      #HV target speed [m/s] 
 TS_SAMP = 5.0 / 3.6  # ~1.38 m/s        #HV target speed sampling [m/s]
@@ -45,10 +45,4 @@ SIGMA_S = [10.0, 2.0, 1.0] # s, s_d, s_dd
 SIGMA_D = [0.5, 0.5, 0.5]
 SIGMA_T = 2.0
 
-#Struct:
-    #plantime
-    #time goal
-    #min / max / time goal
-    # s var
-    # d var
-    # n samples for pos s and d
+EXPECTED_OFFSET_PER_SEC = 20.0

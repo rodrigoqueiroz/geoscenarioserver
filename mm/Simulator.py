@@ -14,7 +14,7 @@ from DashBoard import *
 from SV import *
 from TickSync import TickSync
 from shared_mem.SVSharedMemory import *
-
+import threading
 
 if __name__ == "__main__":
 
@@ -45,29 +45,36 @@ if __name__ == "__main__":
     v2.setbehavior(btree=BT_VELKEEPING)
     sim_vehicles[1] = v2
     
-    #v3 = SV(id,[0,10,0, 2,0,0]) 
-    #sim_vehicles[id] = v3
-
-    #SIM EXECUTION
+    
     dashboard = DashBoard()
     if (show_dashboard):
         dashboard.create()
-
     
+    #SIM EXECUTION
+
     print ('SIMULATION START')
+    for svid in sim_vehicles:
+        #sim_vehicles[svid].set_environment()
+        sim_vehicles[svid].start_vehicle()
+
     while sync_global.tick():
         try:
             #TODO: Update Ego Pose
 
             #Update Dynamic Agents
             for svid in sim_vehicles:
-                sim_vehicles[svid].tick(sync_global, sim_vehicles)
+                sim_vehicles[svid].tick(sync_global.tick_count, sync_global.tick_delta_time)
             
             # Write out simulator state
             shared_memory.write_vehicle_stats(sync_global.tick_count, sync_global.tick_delta_time, sim_vehicles)
 
             #Update Dashboard (if visible)
             dashboard.update(sim_vehicles,centerplot_veh_id)
+
+            #Write Shared Memory
+            if(publish_pose_shm):
+                pass
+
         except KeyboardInterrupt:
             break
         
@@ -77,5 +84,3 @@ if __name__ == "__main__":
         pass
 
     print('SIMULATION END')
-    #plt.show() #This function blocks UI. Use with caution
-    

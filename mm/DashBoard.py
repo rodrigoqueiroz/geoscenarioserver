@@ -86,11 +86,10 @@ def plot_vehicle(vid, vehicle_state, traj, cand_trajectories):
     if (cand_trajectories):
         for t in cand_trajectories:
             plot_trajectory(t[0], t[1], t[2], 'grey')
+    
     if (traj):        
         plot_trajectory(traj[0], traj[1], traj[2],'blue')
     
-    
-
 def plot_road(tcolor='grey'):
     #0 lines
     plt.axhline(0, color="black") 

@@ -6,9 +6,119 @@
 
 import numpy as np
 import random
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
+import threading, queue
 from CostFunctions import *
+import itertools
 from Constants import *
 from Utils import *
+import datetime
+import time
+from TickSync import TickSync
+
+#BTree #todo: pytrees
+BT_PARKED = 0 #default, car is stopped
+BT_DRIVE = 1  #follow a route with normal driving. Can switch to follow, or stop
+BT_STOP = 2
+BT_VELKEEPING = 3
+BT_FOLLOW = 4 #follow a specific target
+BT_CUTIN = 5  #reach and cut in a specific target
+
+#maneuvers
+M_VELKEEPING = 1
+M_LANECHANGE = 2
+M_CUTIN = 3
+M_FOLLOW = 4
+M_STOP = 5
+
+class SVPlanner(object):
+
+    def __init__(self,map_server):
+        self.q_snapshot = queue.LifoQueue()
+        self.q_plan = queue.LifoQueue()
+        self.planning_thread = None
+        self.map_server = map_server
+    
+    def start_planner(self):
+        self.planning_thread = threading.Thread(target=self.planner_thread,args=(self.q_snapshot, self.q_plan))
+        self.planning_thread.setDaemon(True)
+        self.planning_thread.start()
+    
+    def update_snapshot(self,vehicle_state,lane_config, trafic_state):
+        snapshot = tuple([vehicle_state,lane_config, trafic_state])
+        self.q_snapshot.put(snapshot)
+    
+    def get_plan(self):
+        try:
+            #LIFO, will get the most recent plan, raise if empty
+            plan = self.q_plan.get_nowait() 
+            return plan
+        except:
+            #print('MT nothing at plan')
+            return None
+        
+    def planner_thread(self,q_snapshot, q_plan):
+        print('PLANNER THREAD START')
+        sync_planner = TickSync(rate=2, block=True, verbose=True, label="PT")
+        sync_planner
+        while sync_planner.tick():
+            #print('PLANNER TICK')
+            #run planner
+            try:
+                #with q_snapshot.mutex:
+                snapshot = q_snapshot.get_nowait() #LIFO, will get the most recent. needs to clear it out
+            except:
+                #print('PT nothing at q snapshot')
+                continue
+            
+            if (snapshot):
+                #print('snapshot found')
+                vehicle_state,lane_config, trafic_state = snapshot
+                #BTree Tick
+                man_key=M_VELKEEPING
+                man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
+                #BTree Tick
+                if (man_key):
+                    #replan maneuver
+                    best, cand = self.plan_maneuver(man_key, man_config, vehicle_state, lane_config, trafic_state)
+                    man_key = None
+                    #print('PT write on q plan')
+                    q_plan.put(tuple([best, cand]))
+        print('PLANNER THREAD END')
+                
+    def plan_behavior(self, vehicle_state, lane_config, trafic_state):
+        man_key = None
+        if (self.btree==BT_VELKEEPING):
+            man_key = M_VELKEEPING
+            m_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
+        elif (self.btree==BT_FOLLOW):
+            man_key = M_FOLLOW
+            m_config = MFollowConfig( (FL_MIN_TIME, FL_MAX_TIME), 4, 40)
+        elif (self.btree==BT_STOP):
+            man_key = M_STOP
+            m_config = MStopConfig(time_range = (VK_MIN_TIME,VK_MAX_TIME))
+        #self.btree==BT_PARKED
+        return man_key, m_config
+
+
+    def plan_maneuver(self,man_key, man_config, vehicle_state, lane_config, trafic_state):
+        vehicles = None
+        #Micro maneuver layer
+        if (man_key==M_STOP):
+            best, trajectories  = plan_stop(vehicle_state, man_config, lane_config, 200, vehicles, None) 
+        elif (man_key==M_VELKEEPING):
+            best, trajectories  = plan_velocity_keeping(vehicle_state, man_config, lane_config, vehicles, None) 
+        elif (man_key==M_FOLLOW):
+            best, trajectories  = plan_following(vehicle_state, man_config, lane_config, self.target_id, vehicles)
+        #elif (man_key==LANECHANGE):
+            #best = ST_LaneChange(vehicle_state, goal_state, T) #returns tuple (s[], d[], t)
+        #elif (man_key==CUTIN):
+            #candidates, best = ST_CutIn( vehicle_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
+            #candidates, best  = OT_CutIn( vehicle_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
+        
+        return best, trajectories
+
 
 #todo: add all config structs and default values (CONSTAMTS) to a separate file
 class LaneConfig():
@@ -50,17 +160,16 @@ class MCutInConfig():
         self.time_gap = time_gap
         self.distance = distance
         self.delta = delta
-        
-
-
-
 
 #===MICRO MANEUVERS===s
 
-#Stop
-#Stop can be a stop request by time and/or distance from current pos.
-#Or optionally have a specific target position to stop (stop line, before an object, etc).
+
 def plan_stop(start_state, man_config, lane_config, target_pos , vehicles = None, obstacles = None ):
+    """
+    STOP
+    Stop can be a stop request by time and/or distance from current pos.
+    Or optionally have a specific target position to stop (stop line, before an object, etc).
+    """
     print ('PLAN STOP')
     if (start_state[0] >= target_pos):
         print ('Stop target position is too close: {}'.format(target_pos - start_state[0]))
@@ -113,12 +222,14 @@ def plan_stop(start_state, man_config, lane_config, target_pos , vehicles = None
     return trajectories, best
 
 
-#Velocity Keeping
-#Driving with no vehicle directly ahead
-#No target point, but needs to adapt to a desired velocity
 def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None, obstacles = None):
-    #print ('Maneuver: Velocity Keeping')
-
+    """
+    VELOCITY KEEPING
+    Driving with no vehicle directly ahead
+    No target point, but needs to adapt to a desired velocity
+    """
+    print ('Maneuver: Velocity Keeping')
+    
     s_start = start_state[:3]
     d_start = start_state[3:]
 
@@ -132,12 +243,12 @@ def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None,
     max_vel = man_config.vel_range[1]
     vel_step = VELOCITY_STEP 
     #road
-    min_d = lane_config.right_boundary
-    max_d = lane_config.left_boundary
+    min_d = lane_config.right_boundary + VEHICLE_RADIUS
+    max_d = lane_config.left_boundary - VEHICLE_RADIUS
     d_step = ROAD_W_STEP
     
     #
-    target_set = []
+    target_state_set = []
     
     #generates alternative targets
     for t in np.arange(min_t, max_t, t_step):
@@ -150,35 +261,50 @@ def plan_velocity_keeping(start_state, man_config, lane_config, vehicles = None,
                 #s_target[0] = s_start[0] + (vel * t) + s_start[2] * t**2 / 2.0   #predicted position
                 
                 #lateral movement
-                for di in np.arange(min_d, max_d, d_step):
+                for di in np.linspace(min_d, max_d,5):
+                    #(min_d, max_d, d_step):
                     d_target = [di,0,0] 
                     #add target
-                    target_set.append((s_target,d_target,t))
-    
-    
-    #fit jerk optimal trajectory between two points in s and d per goal
-    trajectories = []
-    for target in target_set:
-        s_target, d_target, t = target
-        s_coef = quartic_polynomial_solver(s_start, s_target, t)
-        d_coef = quintic_polynomial_solver(d_start, d_target, t)
-        trajectories.append(tuple([s_coef, d_coef, t]))
-        #print(s_target)
-        #print(d_target)
-        #print(t)
-
-    #evaluate and select "best" trajectory    
-    #best = min(trajectories, key=lambda tr: velocity_keeping_cost(tr, T, vehicles))
-    best = min(trajectories, key=lambda tr: velocity_keeping_cost(tr, vehicles))
+                    target_state_set.append((s_target,d_target,t))
    
-    #return trajectories and best
-    return trajectories, best
+    #find trajectories
+    trajectories = []
 
-#Vehicle Following
-#Moving target point, requiring a certain temporal safety distance 
-#to the vehicle ahead (constant time gap law).
-#Predict leading vehicle (assume constant acceleration)
+    trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))  #zip two arrays for the pool.map
+    
+    #calculate costs
+    #now = datetime.datetime.now()
+    best = min(trajectories, key=lambda x: velocity_keeping_cost(x, lane_config, vehicles))
+    #print( (datetime.datetime.now() - now).total_seconds() )
+
+    """
+    #Multi Thread approach:
+    pool = ThreadPool(4)
+    trajectories = pool.starmap(find_trajectory, zip(itertools.repeat(start_state), target_state_set)
+    pool.close()
+    pool.join()
+    
+    pool = ThreadPool(4)
+    #trajectories_cost = map(velocity_keeping_cost,zip(trajectories,itertools.repeat(vehicles))) #ST
+    trajectories_cost = pool.map(velocity_keeping_cost, zip(trajectories,itertools.repeat(vehicles)))
+    trajectories_cost = list(trajectories_cost)
+    pool.close()
+    pool.join()
+    trajectories_cost = list(trajectories_cost)
+    best_cost = min(trajectories_cost, key=lambda t: t[1])
+    best = best_cost[0]
+    """
+    
+    #return trajectories and best
+    return  best, list(trajectories)
+
+ 
 def plan_following(start_state, man_config, lane_config, target_v_id, vehicles = None, obstacles = None):
+    """ 
+    Vehicle Following
+    Moving target point, requiring a certain temporal safety distance to the vehicle ahead (constant time gap law).
+    Predict leading vehicle (assume constant acceleration)
+    """
     print ('Maneuver: Follow vehicle')
 
     s_start = start_state[:3]
@@ -232,10 +358,10 @@ def plan_following(start_state, man_config, lane_config, target_v_id, vehicles =
 
 
 
-#Free Lane Change
 
 def plan_lanechange(start_state, vehicles, obstacles = None):
     """
+    Free Lane Change
     Changing lanes with no vehicles around (no vehicle affecting the lane change)
     """
     print ('Maneuver: Lane Change')
@@ -281,9 +407,11 @@ def plan_lanechange(start_state, vehicles, obstacles = None):
     #return trajectories and best
     return trajectories, best
 
-#Cut-in Lane Change
 
 def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var_pos = False, obstacles = None):
+    """
+    Cut-in Lane Change
+    """ 
     s_start = start_state[:3]
     d_start = start_state[3:]
     
@@ -335,9 +463,10 @@ def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var
     return trajectories, best
 
 
-#Single Trajectory (No optimization)
 def plan_single_lanechange(start_state, goal_state, T):
-    
+    """
+    Single Trajectory (No optimization)
+    """
     #generate a single goal
     s_start = start_state[:3]
     d_start = start_state[3:]
@@ -375,6 +504,25 @@ def plan_single_cutin(start_state, T, delta, vehicles,  target_v_id,):
 
 #===POLYNOMIAL FITTING===
 
+
+def find_trajectory(traj_bounds):
+    """ 
+    Fits a jerk optimal trajectory between two points in s and d.
+    Returns a tuple representing the trajectory in the form of polynomial coefficients: 
+    s_coef for quartic polynomial (longtudinal), d_coef for quintic polynomial (lateral), and time in [s].
+    """
+    unzip_traj_bounds = list(traj_bounds) 
+    start_state = unzip_traj_bounds[0]
+    target_state = unzip_traj_bounds[1]
+    #print(start_state)
+    #print(target)
+
+    s_target, d_target, t = target_state
+    s_start = start_state[:3]
+    d_start = start_state[3:]
+    s_coef = quartic_polynomial_solver(s_start, s_target, t)
+    d_coef = quintic_polynomial_solver(d_start, d_target, t)
+    return tuple([s_coef, d_coef, t])
 
 def quintic_polynomial_solver(start, end, T):
     """
@@ -421,11 +569,13 @@ def quartic_polynomial_solver(start, end, T):
     alphas = np.concatenate([np.array([a_0, a_1, a_2]), a_3_4])
     return alphas
 
-#=== SAMPLE
+#=== SAMPLING
 
-#retunrs a perturbed version of the goal. 
-#TODO: adapt
 def perturb_goal(goal_s, goal_d):
+    """
+    #returns a perturbed version of the goal. 
+    #TODO: adapt to new format
+    """
     new_s_goal = []
     for mu, sig in zip(goal_s, SIGMA_S):
         new_s_goal.append(random.gauss(mu, sig))
@@ -435,65 +585,3 @@ def perturb_goal(goal_s, goal_d):
         new_d_goal.append(random.gauss(mu, sig))
         
     return tuple([new_s_goal, new_d_goal])
-
-
-
-#deprecated #todelete
-""" def OT_LaneChange(s_start, d_start, T, predictions, delta, target_vehicle):
-    
-    target = predictions[target_vehicle]
-    
-    # generate alternative goals in Time and Position
-    #all_goals = []
-    #timestep = 0.5
-    #t = T - 4 * timestep
-    #while t <= T + 4 * timestep:
-    #    target_state = np.array(target.state_in(t)) + np.array(delta)
-    #    goal_s = target_state[:3]
-    #    goal_d = target_state[3:]
-    #    goals = [(goal_s, goal_d, t)]
-    #    for _ in range(N_SAMPLES):
-    #        perturbed = perturb_goal(goal_s, goal_d)
-    #        goals.append((perturbed[0], perturbed[1], t))
-    #    all_goals += goals
-    #    t += timestep
-    #    print ('Goal (' + str(t) +')' )
-
-    # generate alternative goals in Time Only
-    all_goals = []
-    timestep = 0.5
-    t = T - 4 * timestep
-    while t <= T + 4 * timestep:
-        target_state = np.array(target.state_in(t)) + np.array(delta)
-        goal_s = target_state[:3]
-        goal_d = target_state[3:]
-        goals = [(goal_s, goal_d, t)]
-        all_goals += goals
-        t += timestep
-        print ('Goal (' + str(t) +')' )
-
-    #generate a single goal
-    #all_goals = []
-    #target_state = np.array(target.state_in(T)) + np.array(delta)
-    #goal_s = target_state[:3]
-    #goal_d = target_state[3:]
-    #all_goals = [(goal_s, goal_d, T)]
-    #print ('Goal (' + str(T) +'):')
-    #print  all_goals
-    
-    # find best trajectory
-    trajectories = []
-    for goal in all_goals:
-        s_goal, d_goal, t = goal
-        s_coefficients = QuinticPolynomialTrajectory(s_start, s_goal, t)
-        d_coefficients = QuinticPolynomialTrajectory(d_start, d_goal, t)
-        trajectories.append(tuple([s_coefficients, d_coefficients, t]))
-    
-    best = min(trajectories, key=lambda tr: calculate_cost(tr, target_vehicle, delta, T, predictions, WEIGHTED_COST_FUNCTIONS))
-    #calculate again just to show in the terminal
-    calculate_cost(best, target_vehicle, delta, T, predictions, WEIGHTED_COST_FUNCTIONS, verbose=True)
-    show_trajectory(best[0], best[1], best[2], target_vehicle)
-    for t in trajectories:
-        show_trajectory(t[0], t[1], t[2])
-    return best
- """

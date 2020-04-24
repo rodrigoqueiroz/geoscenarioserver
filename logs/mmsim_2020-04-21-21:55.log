@@ -1,0 +1,114 @@
+ShM semaphore created
+ShM memory created
+SIMULATION START
+00.00s BT Tick   1# START
+Maneuver: Velocity Keeping
+00.50s BT Tick   2# +0.504 e0.500 d0.004 
+Maneuver: Velocity Keeping
+01.11s BT Tick   3# +0.602 e0.500 d0.102 
+Maneuver: Velocity Keeping
+01.67s BT Tick   4# +0.560 e0.500 d0.060 
+Maneuver: Velocity Keeping
+02.21s BT Tick   5# +0.541 e0.500 d0.041 
+Maneuver: Velocity Keeping
+02.76s BT Tick   6# +0.550 e0.500 d0.050 
+Maneuver: Velocity Keeping
+03.30s BT Tick   7# +0.548 e0.500 d0.048 
+Maneuver: Velocity Keeping
+03.80s BT Tick   8# +0.500 e0.500 d0.000 
+Maneuver: Velocity Keeping
+04.37s BT Tick   9# +0.562 e0.500 d0.062 
+Maneuver: Velocity Keeping
+04.93s BT Tick  10# +0.567 e0.500 d0.067 
+Maneuver: Velocity Keeping
+05.52s BT Tick  11# +0.583 e0.500 d0.083 
+Maneuver: Velocity Keeping
+06.09s BT Tick  12# +0.574 e0.500 d0.074 
+Maneuver: Velocity Keeping
+06.65s BT Tick  13# +0.562 e0.500 d0.062 
+Maneuver: Velocity Keeping
+07.22s BT Tick  14# +0.562 e0.500 d0.062 
+Maneuver: Velocity Keeping
+07.82s BT Tick  15# +0.600 e0.500 d0.100 
+Maneuver: Velocity Keeping
+08.38s BT Tick  16# +0.568 e0.500 d0.068 
+Maneuver: Velocity Keeping
+08.99s BT Tick  17# +0.605 e0.500 d0.105 
+Maneuver: Velocity Keeping
+09.51s BT Tick  18# +0.517 e0.500 d0.017 
+Maneuver: Velocity Keeping
+10.09s BT Tick  19# +0.579 e0.500 d0.079 
+Maneuver: Velocity Keeping
+10.68s BT Tick  20# +0.595 e0.500 d0.095 
+Maneuver: Velocity Keeping
+11.26s BT Tick  21# +0.582 e0.500 d0.082 
+Maneuver: Velocity Keeping
+11.86s BT Tick  22# +0.599 e0.500 d0.099 
+Maneuver: Velocity Keeping
+12.45s BT Tick  23# +0.585 e0.500 d0.085 
+Maneuver: Velocity Keeping
+13.05s BT Tick  24# +0.601 e0.500 d0.101 
+Maneuver: Velocity Keeping
+13.59s BT Tick  25# +0.542 e0.500 d0.042 
+Maneuver: Velocity Keeping
+14.11s BT Tick  26# +0.516 e0.500 d0.016 
+Maneuver: Velocity Keeping
+14.72s BT Tick  27# +0.617 e0.500 d0.117 
+Maneuver: Velocity Keeping
+15.32s BT Tick  28# +0.597 e0.500 d0.097 
+Maneuver: Velocity Keeping
+15.85s BT Tick  29# +0.532 e0.500 d0.032 
+Maneuver: Velocity Keeping
+16.45s BT Tick  30# +0.595 e0.500 d0.095 
+Maneuver: Velocity Keeping
+17.05s BT Tick  31# +0.603 e0.500 d0.103 
+Maneuver: Velocity Keeping
+17.67s BT Tick  32# +0.616 e0.500 d0.116 
+Maneuver: Velocity Keeping
+18.18s BT Tick  33# +0.512 e0.500 d0.012 
+Maneuver: Velocity Keeping
+18.69s BT Tick  34# +0.513 e0.500 d0.013 
+Maneuver: Velocity Keeping
+19.22s BT Tick  35# +0.523 e0.500 d0.023 
+Maneuver: Velocity Keeping
+19.73s BT Tick  36# +0.510 e0.500 d0.010 
+Maneuver: Velocity Keeping
+20.25s BT Tick  37# +0.521 e0.500 d0.021 
+Maneuver: Velocity Keeping
+20.86s BT Tick  38# +0.617 e0.500 d0.117 
+Maneuver: Velocity Keeping
+21.37s BT Tick  39# +0.502 e0.500 d0.002 
+Maneuver: Velocity Keeping
+21.87s BT Tick  40# +0.502 e0.500 d0.002 
+Maneuver: Velocity Keeping
+22.40s BT Tick  41# +0.532 e0.500 d0.032 
+Maneuver: Velocity Keeping
+22.91s BT Tick  42# +0.508 e0.500 d0.008 
+Maneuver: Velocity Keeping
+23.42s BT Tick  43# +0.510 e0.500 d0.010 
+Maneuver: Velocity Keeping
+23.94s BT Tick  44# +0.526 e0.500 d0.026 
+Maneuver: Velocity Keeping
+24.47s BT Tick  45# +0.524 e0.500 d0.024 
+Maneuver: Velocity Keeping
+25.00s BT Tick  46# +0.531 e0.500 d0.031 
+Maneuver: Velocity Keeping
+25.50s BT Tick  47# +0.500 e0.500 d0.000 
+Maneuver: Velocity Keeping
+26.00s BT Tick  48# +0.503 e0.500 d0.003 
+Maneuver: Velocity Keeping
+26.52s BT Tick  49# +0.515 e0.500 d0.015 
+Maneuver: Velocity Keeping
+27.05s BT Tick  50# +0.529 e0.500 d0.029 
+Maneuver: Velocity Keeping
+27.56s BT Tick  51# +0.516 e0.500 d0.016 
+Maneuver: Velocity Keeping
+28.07s BT Tick  52# +0.509 e0.500 d0.009 
+Maneuver: Velocity Keeping
+28.57s BT Tick  53# +0.502 e0.500 d0.002 
+Maneuver: Velocity Keeping
+29.11s BT Tick  54# +0.541 e0.500 d0.041 
+Maneuver: Velocity Keeping
+29.62s BT Tick  55# +0.503 e0.500 d0.003 
+Maneuver: Velocity Keeping
+SIMULATION END

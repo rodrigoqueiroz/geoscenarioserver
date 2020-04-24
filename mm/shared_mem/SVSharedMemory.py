@@ -17,7 +17,7 @@ class SVSharedMemory(object):
         print("ShM semaphore created")
         self.shm = sysv_ipc.SharedMemory(self.shm_key, flags= sysv_ipc.IPC_CREAT,  mode=int(str(666), 8), size=1024)
         print("ShM memory created")
-    
+
 
     def write_vehicle_stats(self, tick_count, delta_time, simulated_vehicles):
         # write tick count and deltatime

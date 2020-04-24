@@ -1,0 +1,65 @@
+LogPakFile: Display: Found Pak file ../../../VehicleManeuver/Content/Paks/VehicleManeuver-MacNoEditor.pak attempting to mount.
+LogPakFile: Display: Mounting pak file ../../../VehicleManeuver/Content/Paks/VehicleManeuver-MacNoEditor.pak.
+LogStreaming: Display: Async Loading initialized: Event Driven Loader: true, Async Loading Thread: false, Async Post Load: true
+LogHAL: Display: Platform has ~ 16 GB [17179869184 / 17179869184 / 16], which maps to Larger [LargestMinGB=32, LargerMinGB=12, DefaultMinGB=8, SmallerMinGB=6, SmallestMinGB=0)
+LogMetal: Display:     Adapter Name: AMD Radeon Pro 555X
+LogMetal: Display:   Driver Version: AMDRadeonX4000 3.5.5 21975 (internal:3.5.5, unified:3.5.5)
+LogMetal: Display:      Driver Date: 2020-01-23 14:19:54 +0000
+LogMetal: Display:           Vendor: AMD
+LogMetal: Display:       Vendor ID: 4098
+LogMetal: Display:       Device ID: 26607
+LogMetal: Display:       VRAM (MB): 4096
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogStreaming: Display: Flushing async loaders.
+LogInit: Display: Game Engine Initialized.
+LogInit: Display: Starting Game.
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogMetal: Display: Got a bulk data texture, with 1 mips
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+
+LogTemp: Error: Connecting to Server...
+LogTemp: Error: Error getting semaphore ID
+

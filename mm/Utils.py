@@ -30,31 +30,6 @@ def differentiate(coefficients):
         der_coef.append((deg+1) * prev_coef)
     return der_coef
 
-#Calculates the closest distance to any vehicle during a trajectory.
-def nearest_approach_to_any_vehicle(traj, vehicles):
-    closest = 999999
-    for v in vehicles.values():
-        d = nearest_approach(traj,v)
-        if d < closest:
-            closest = d
-    return closest
-
-def nearest_approach(traj, vehicle):
-    closest = 999999
-    s_,d_,T = traj
-    s = to_equation(s_)
-    d = to_equation(d_)
-    for i in range(100):
-        t = float(i) / 100 * T
-        cur_s = s(t)
-        cur_d = d(t)
-        targ_s, _, _, targ_d, _, _ = vehicle.state_in(t)
-        dist = sqrt((cur_s-targ_s)**2 + (cur_d-targ_d)**2)
-        if dist < closest:
-            closest = dist
-    return closest
-
-
 
 def get_f_and_N_derivatives(coeffs, N=3):
     functions = [to_equation(coeffs)]
