@@ -36,13 +36,13 @@ if __name__ == "__main__":
     sim_vehicles = {} # should this be []?
     #TODO: change starting state to location in sim coordinate
     v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 3.0,0.0,0.0]) #14 +- 50km/h
-    #v1.setbehavior(btree=BT_FOLLOW, target_id=1)
-    #v1.setbehavior(btree=BT_STOP)
-    v1.setbehavior(btree=BT_VELKEEPING)
+    #v1.set_behavior_root(btree=BT_FOLLOW, target_id=1)
+    #v1.set_behavior_root(btree=BT_STOP)
+    v1.set_behavior_root(btree=BT_VELKEEPING)
     sim_vehicles[0] = v1
     
-    v2 = SV(id = 1, start_state = [100,10,0, 2.0,0,0])
-    v2.setbehavior(btree=BT_VELKEEPING)
+    v2 = SV(id = 1, start_state = [0.0,0.0,0, 2.0,0,0])
+    v2.set_behavior_root(btree=BT_VELKEEPING)
     sim_vehicles[1] = v2
     
     

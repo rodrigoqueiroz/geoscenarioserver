@@ -99,11 +99,9 @@ class SV(object):
             self.trajectory_time += delta_time
             self.compute_vehicle_state(self.trajectory_time)
 
-         
-
         #Road Config
         #todo: Get road attributes from laneletmap. Hardcoding now.
-        lane_conf = LaneConfig(30,4,0)
+        lane_config = LaneConfig(30,4,0)
         
         vehicle_state =  [self.s_pos, self.s_vel, self.s_acc, self.d_pos, self.d_vel, self.d_acc]
         
