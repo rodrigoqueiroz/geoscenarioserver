@@ -39,7 +39,7 @@ class DashBoard(object):
     def update(self,sim_vehicles,centerplot_veh_id):
         if not self.tk:
             return
-            s
+
         #canvas.get_tk_widget().delete("all")s
         plt.cla()               #clear axes 
         #plt.clf()              #clear figures
