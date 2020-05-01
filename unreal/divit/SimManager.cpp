@@ -33,14 +33,6 @@ void ASimManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Spawn sim vehicles
-	// FVector location = {0.0, 0.0, 110.0};
-	// for (const auto& svInfo : sim_vehicles) {
-	// 	ASimulatedVehicle *sv = (ASimulatedVehicle*)GetWorld()->SpawnActor(ASimulatedVehicle::StaticClass(), &location);
-	// 	sv->Init();
-	// 	sim_vehicles.Add(sv);
-	// }
-
     frameStat = FrameStat();
 	serverFrameStat = FrameStat();
 
@@ -96,11 +88,11 @@ void ASimManager::Tick(float DeltaTime)
 		iss >> tick_count >> delta_time;
 		UE_LOG(LogTemp, Error, TEXT("SHM [ tick = %d delta_time = %.3f"), tick_count, delta_time);
 		while (iss >> vid) {
-			// UE_LOG(LogTemp, Error, TEXT("logging %d"), vid);
 			float x, y, z, yaw, x_vel, y_vel, steer;
 			iss >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
 
 			VehicleState *vstate = sim_vehicle_states.Find(vid);
+			// spawn SV actor if it doesn't exist
 			if (!vstate) {
 				sim_vehicle_states.Add(vid, VehicleState());
 				vstate = sim_vehicle_states.Find(vid);
@@ -124,11 +116,9 @@ void ASimManager::Tick(float DeltaTime)
 
 			vstate->location = FVector(x,y,z);
 
-
 			UE_LOG(LogTemp, Error, TEXT("Vehicle [ id=%d x=%.2f y=%.2f z=%.2f yaw=%.2f x_vel=%.2f y_vel=%.2f steer=%.2f ] tick=%d delta_time= %.3f"), 
 												vid, x,     y,     z,     yaw,     x_vel,     y_vel,     steer,       tick_count, delta_time);
 		}
-
 		
 		serverFrameStat.tick_count = tick_count;
 		serverFrameStat.delta_time = delta_time;
