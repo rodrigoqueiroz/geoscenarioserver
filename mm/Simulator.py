@@ -14,6 +14,7 @@ from DashBoard import *
 from SV import *
 from TickSync import TickSync
 from shared_mem.SVSharedMemory import *
+from shared_mem.EgoSharedMemory import *
 import threading
 
 if __name__ == "__main__":
@@ -30,6 +31,8 @@ if __name__ == "__main__":
 
     # SHARED MEMORY SETUP
     shared_memory = SVSharedMemory()
+    # TODO: make ego's own SharedMemory class?
+    ego_shared_memory = EgoSharedMemory()
 
     # PROBLEM SETUP
     #Sim HV
@@ -60,6 +63,8 @@ if __name__ == "__main__":
     while sync_global.tick():
         try:
             #TODO: Update Ego Pose
+            if ego_shared_memory.is_connected:
+                ego_shared_memory.read_memory()
 
             #Update Dynamic Agents
             for svid in sim_vehicles:
@@ -74,7 +79,8 @@ if __name__ == "__main__":
             #Write Shared Memory
             if(publish_pose_shm):
                 pass
-
+        
+        # TODO is this necessary?
         except KeyboardInterrupt:
             break
         

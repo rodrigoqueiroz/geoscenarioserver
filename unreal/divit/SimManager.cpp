@@ -194,16 +194,17 @@ void ASimManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	shmdt(shmInfo.shm);
 
 	// destroy Ego's shared mem
-	if (semctl(shmInfo.sem_id, IPC_RMID, 0) < 0) {
+	// TODO: put destroy and create functions inside the struct?
+	if (semctl(egoShmInfo.sem_id, IPC_RMID, 0) < 0) {
 		UE_LOG(LogTemp, Error, TEXT("Error destroying semaphore\n"));
 		return;
 	}
 
-	if (shmdt(shmInfo.shm) < 0) {
+	if (shmdt(egoShmInfo.shm) < 0) {
 		UE_LOG(LogTemp, Error, TEXT("Error detaching Ego shared memory\n"));
 		return;
 	}
-	if (shmctl(shmInfo.shm_id, IPC_RMID, 0) < 0) {
+	if (shmctl(egoShmInfo.shm_id, IPC_RMID, 0) < 0) {
 		UE_LOG(LogTemp, Error, TEXT("Error destroying Ego shared memory\n"));
 		return;
 	}
