@@ -65,124 +65,20 @@ void ASimManager::Tick(float DeltaTime)
     frameStat.delta_time = DeltaTime;
 	//UE_LOG(LogTemp, Error, TEXT("SimVehicle Actor Tick=%d DeltaTime=%f"), frame_stat.tick_count, frame_stat.delta_time);
 
-	if (isConnected && shmInfo.shm_id > 0) {
-		// SHM ACQUIRE
-		if (semop(shmInfo.sem_id, &(shmInfo.p), 1) < 0) {
-			UE_LOG(LogTemp, Error, TEXT("Cannot p semaphore\n"));
-			return;
-		}
-
-		// SHM READ
-		std::istringstream iss{shmInfo.shm};
-		float delta_time;
-		int tick_count;
-		int vid;
-
-		// SHM RELEASE
-		if (semop(shmInfo.sem_id, &(shmInfo.v), 1) < 0) {
-			UE_LOG(LogTemp, Error, TEXT("Cannot v semaphore\n"));
-			return;
-		}
-		
-		// TODO: a more robust way to read in from shared mem
-		iss >> tick_count >> delta_time;
-		UE_LOG(LogTemp, Error, TEXT("SHM [ tick = %d delta_time = %.3f"), tick_count, delta_time);
-		while (iss >> vid) {
-			float x, y, z, yaw, x_vel, y_vel, steer;
-			iss >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
-
-			VehicleState *vstate = sim_vehicle_states.Find(vid);
-			// spawn SV actor if it doesn't exist
-			if (!vstate) {
-				sim_vehicle_states.Add(vid, VehicleState());
-				vstate = sim_vehicle_states.Find(vid);
-
-				FVector location = {0.0, 0.0, 110.0};
-				ASimulatedVehicle *sv = (ASimulatedVehicle*)GetWorld()->SpawnActor(ASimulatedVehicle::StaticClass(), &location);
-				sv->Init();
-				sv->manager = this;
-				sv->id = vid;
-				sim_vehicles.Add(sv);
-			}
-
-			vstate->id = vid;
-			vstate->x = x;
-			vstate->y = y;
-			vstate->z = z;
-			vstate->yaw = yaw;
-			vstate->x_vel = x_vel;
-			vstate->y_vel = y_vel;
-			vstate->steer = steer;
-
-			vstate->location = FVector(x,y,z);
-
-			UE_LOG(LogTemp, Error, TEXT("Vehicle [ id=%d x=%.2f y=%.2f z=%.2f yaw=%.2f x_vel=%.2f y_vel=%.2f steer=%.2f ] tick=%d delta_time= %.3f"), 
-												vid, x,     y,     z,     yaw,     x_vel,     y_vel,     steer,       tick_count, delta_time);
-		}
-		
-		serverFrameStat.tick_count = tick_count;
-		serverFrameStat.delta_time = delta_time;
-	}
+	ReadSVState(DeltaTime);
 
 	// Output what's in the memory
 	// UE_LOG(LogTemp, Error, TEXT("Shared memory %d: %s"), shmInfo.shm_key, iss.str().c_str());
 
-	// if (server_frame_stat.tick_count == tick_count){
-	// 	//same tick, no new state
-	// 	//Predict new state based on Unreal tick time
-	// 	vehicle_state.x  = vehicle_state.x + (vehicle_state.x_vel * DeltaTime);
-	// 	vehicle_state.y  = vehicle_state.y + (vehicle_state.y_vel * DeltaTime);
-	// }
-	// else {
-	// 	vehicle_state.id = vid;
-	// 	vehicle_state.x = x;
-	// 	vehicle_state.y = y;
-	// 	vehicle_state.z = z;
-	// 	vehicle_state.yaw = yaw;
-	// 	vehicle_state.x_vel = x_vel;
-	// 	vehicle_state.y_vel = y_vel;
-	// 	vehicle_state.steer = steer;
-	// }
+
 
 
 	//Update Actor
 	//With Interpolation
-	//vehicle_state.location = FMath::VInterpTo(GetActorLocation(),vehicle_state.location, DeltaTime, 1.0f); //Current, Target, Time since last tick, Interp Speed
 	
 	// bool moved = SetActorLocation(vehicle_state.location);
 
-	// Write out Ego position
-	if (ego) {
-		FVector frenetLocation = ego->GetActorLocation() * 0.01f;
-		frenetLocation[2] = 0.0f;
-		std::stringstream oss;
-		oss << frenetLocation[0] << " " << frenetLocation[1] << " " << frenetLocation[2] << '\n';
-		
-		// write to shm
-		if (semop(egoShmInfo.sem_id, &(egoShmInfo.p), 1) < 0) {
-			UE_LOG(LogTemp, Error, TEXT("Cannot p Ego semaphore\n"));
-			perror("p error: ");
-			return;
-		}
-		strcpy(egoShmInfo.shm, oss.str().c_str());
-		if (semop(egoShmInfo.sem_id, &(egoShmInfo.v), 1) < 0) {
-			UE_LOG(LogTemp, Error, TEXT("Cannot v Ego semaphore\n"));
-			return;
-		}
-
-		// read it back
-		if (semop(egoShmInfo.sem_id, &(egoShmInfo.p), 1) < 0) {
-			// UE_LOG(LogTemp, Error, TEXT("Cannot p semaphore\n"));
-			return;
-		}
-		const char *s = egoShmInfo.shm;
-		FString fs = s;
-		UE_LOG(LogTemp, Error, TEXT("Ego Shared memory %d: %s"), egoShmInfo.shm_key, *fs);
-		if (semop(egoShmInfo.sem_id, &(egoShmInfo.v), 1) < 0) {
-			UE_LOG(LogTemp, Error, TEXT("Cannot v semaphore\n"));
-			return;
-		}
-	}
+	WriteEgoState();
 
 }
 
@@ -243,6 +139,83 @@ void ASimManager::AttemptConnection()
 	return;
 }
 
+
+void ASimManager::ReadSVState(float deltaTime)
+{
+	if (!isConnected || shmInfo.shm_id < 0) {
+		return;
+	}
+
+	// SHM ACQUIRE
+	if (semop(shmInfo.sem_id, &(shmInfo.p), 1) < 0) {
+		UE_LOG(LogTemp, Error, TEXT("Cannot p semaphore\n"));
+		return;
+	}
+
+	// SHM READ
+	std::istringstream iss{shmInfo.shm};
+
+	// SHM RELEASE
+	if (semop(shmInfo.sem_id, &(shmInfo.v), 1) < 0) {
+		UE_LOG(LogTemp, Error, TEXT("Cannot v semaphore\n"));
+		return;
+	}
+	
+	// Parse data and update SV actors
+	float server_delta_time;
+	int server_tick_count;
+	int vid;
+	iss >> server_tick_count >> server_delta_time;
+	UE_LOG(LogTemp, Error, TEXT("SHM [ tick = %d server_delta_time = %.3f"), server_tick_count, server_delta_time);
+	
+	while (iss >> vid) {
+		// TODO: a more robust way to read in from shared mem
+		float x, y, z, yaw, x_vel, y_vel, steer;
+		iss >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
+
+		VehicleState *vstate = sim_vehicle_states.Find(vid);
+		// spawn SV actor if it doesn't exist
+		if (!vstate) {
+			sim_vehicle_states.Add(vid, VehicleState());
+			vstate = sim_vehicle_states.Find(vid);
+
+			// spawn actor
+			FVector location = {0.0, 0.0, 110.0};
+			ASimulatedVehicle *sv = (ASimulatedVehicle*)GetWorld()->SpawnActor(ASimulatedVehicle::StaticClass(), &location);
+			sv->Init();
+			sv->manager = this;
+			sv->id = vid;
+			sim_vehicles.Add(vid, sv);
+		}
+
+		if (serverFrameStat.tick_count == server_tick_count) {
+			//same tick, no new state
+			//Predict new state based on Unreal tick time
+			vstate->x  = vstate->x + (vstate->x_vel * deltaTime);
+			vstate->y  = vstate->y + (vstate->y_vel * deltaTime);
+		} else {
+			vstate->id = vid;
+			vstate->x = x;
+			vstate->y = y;
+			vstate->z = z;
+			vstate->yaw = yaw;
+			vstate->x_vel = x_vel;
+			vstate->y_vel = y_vel;
+			vstate->steer = steer;
+		}
+
+		vstate->location = FVector(vstate->x, vstate->y, vstate->z);
+		vstate->location = FMath::VInterpTo(sim_vehicles[vid]->GetActorLocation(), vstate->location, deltaTime, 1.0f);
+
+		UE_LOG(LogTemp, Error, TEXT("Vehicle [ id=%d x=%.2f y=%.2f z=%.2f yaw=%.2f x_vel=%.2f y_vel=%.2f steer=%.2f ] tick=%d server_delta_time= %.3f"), 
+											vid, x,     y,     z,     yaw,     x_vel,     y_vel,     steer,       server_tick_count, server_delta_time);
+	}
+	
+	serverFrameStat.tick_count = server_tick_count;
+	serverFrameStat.delta_time = server_delta_time;
+}
+
+
 void ASimManager::CreateEgoSharedMemory()
 {
 	egoShmInfo = ShmInfo{EGO_SHM_KEY, EGO_SEM_KEY};
@@ -270,5 +243,45 @@ void ASimManager::CreateEgoSharedMemory()
 		perror("attach error: ");
 		return;
 	}
+}
+
+
+void ASimManager::WriteEgoState()
+{
+	if (!ego || egoShmInfo.shm_id < 0) {
+		return;
+	}
+
+	// Write out Ego position
+	FVector frenetLocation = ego->GetActorLocation() * 0.01f;
+	frenetLocation[2] = 0.0f;
+	std::stringstream oss;
+	oss << frenetLocation[0] << " " << frenetLocation[1] << " " << frenetLocation[2] << '\n';
+	
+	// write to shm
+	if (semop(egoShmInfo.sem_id, &(egoShmInfo.p), 1) < 0) {
+		UE_LOG(LogTemp, Error, TEXT("Cannot p Ego semaphore\n"));
+		perror("p error: ");
+		return;
+	}
+	strcpy(egoShmInfo.shm, oss.str().c_str());
+	if (semop(egoShmInfo.sem_id, &(egoShmInfo.v), 1) < 0) {
+		UE_LOG(LogTemp, Error, TEXT("Cannot v Ego semaphore\n"));
+		return;
+	}
+
+	// read it back
+	if (semop(egoShmInfo.sem_id, &(egoShmInfo.p), 1) < 0) {
+		// UE_LOG(LogTemp, Error, TEXT("Cannot p semaphore\n"));
+		return;
+	}
+	const char *s = egoShmInfo.shm;
+	FString fs = s;
+	// UE_LOG(LogTemp, Error, TEXT("Ego Shared memory %d: %s"), egoShmInfo.shm_key, *fs);
+	if (semop(egoShmInfo.sem_id, &(egoShmInfo.v), 1) < 0) {
+		UE_LOG(LogTemp, Error, TEXT("Cannot v semaphore\n"));
+		return;
+	}
+
 }
 

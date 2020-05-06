@@ -67,11 +67,9 @@ class SHMTEST_API ASimManager : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ASimManager();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
@@ -82,6 +80,12 @@ public:
 	void CreateEgoSharedMemory();
 	FTimerHandle ConnectionTimerHandler;
 
+	// Read and update state of all sim vehicles from shared memory.
+	void ReadSVState(float deltaTime);
+	
+	// Write Ego pose to shared memory.
+	void WriteEgoState();
+
 	ShmInfo shmInfo;
 	FrameStat frameStat;
     FrameStat serverFrameStat;
@@ -89,7 +93,7 @@ public:
 
 	ShmInfo egoShmInfo;
 
-	TArray<ASimulatedVehicle*> sim_vehicles;
+	TMap<uint16_t, ASimulatedVehicle*> sim_vehicles;
 	TMap<uint16_t, VehicleState> sim_vehicle_states;
 
 	AEgo *ego;
