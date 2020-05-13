@@ -87,7 +87,7 @@ def plot_vehicle(vid, vehicle_state, traj, cand_trajectories):
     plt.plot( s_pos, d_pos, "v")
     circle1 = plt.Circle((s_pos, d_pos), radius, color='b', fill=False)
     gca.add_artist(circle1)
-    label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, s_pos, s_vel, s_acc)
+    label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, float(s_pos), float(s_vel), float(s_acc))
 
     gca.text(s_pos, d_pos+1.5, label, style='italic')
 
