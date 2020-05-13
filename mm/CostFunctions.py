@@ -11,6 +11,7 @@
 import numpy as np
 from Utils import *
 from Constants import *
+from ManeuverConfig import *
 
 # FEASIBILITY
 
@@ -65,7 +66,7 @@ def velocity_keeping_cost(trajectory, lane_config, vehicles):
     #KD * ds
 
     total_cost = sum(C)
-    #print("TOTAL COST: " + str(total_cost) + " " + str(C))
+    #print("TOTAL COST: {}".format(total_cost))
     return total_cost
 
 def follow_cost(trajectory, vehicles):
@@ -216,6 +217,7 @@ def lateral_lane_offset_cost(traj,lane_config):
     central_d = (lane_config.left_boundary - lane_config.right_boundary)/2
     
     d_eq = to_equation(d_coef)
+    target_d = d_eq(T)
     total_offset = 0
 
     dt = float(T) / 100.0
@@ -229,7 +231,8 @@ def lateral_lane_offset_cost(traj,lane_config):
     offset_per_second = total_offset / T
     #print("offset_per_second {:.2f}".format(offset_per_second) )
     cost = logistic(offset_per_second/EXPECTED_OFFSET_PER_SEC)
-    #print("total cost is {:.2f}".format(cost) )
+    
+    #print("total lateral offset cost is {:.2f} for target {:.2f}".format(cost,target_d) )
     return cost
     
 

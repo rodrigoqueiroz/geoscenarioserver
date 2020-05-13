@@ -36,21 +36,29 @@ class DashBoard(object):
         #myCanvas = tkinter.Canvas(tkroot, bg="white", height=600, width=600)
         #myCanvas.pack()
 
-    def update(self,sim_vehicles,centerplot_veh_id):
+    def update(self,traffic,centerplot_veh_id):
         if not self.tk:
             return
-            s
+            
         #canvas.get_tk_widget().delete("all")s
         plt.cla()               #clear axes 
         #plt.clf()              #clear figures
         plt.grid(True)
         plot_road()
-        #Center plot around main vehicle
-        plt.xlim(sim_vehicles[centerplot_veh_id].s_pos - self.road_length, sim_vehicles[centerplot_veh_id].s_pos + self.road_length)
-        #plt.ylim(0,10)s
-        for i in sim_vehicles:
-            vid, vehicle_state, trajectory, cand_trajectories = sim_vehicles[i].get_stats()
-            plot_vehicle(vid, vehicle_state, trajectory, cand_trajectories)
+        
+        
+        for vid in traffic.vehicles:
+            #vid, vehicle_state, trajectory, cand_trajectories = traffic.vehicles[i].get_stats()
+            vehicle = traffic.vehicles[vid]
+            vehicle_frenet_state = np.concatenate([ vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y()])
+            plot_vehicle(vid, vehicle_frenet_state, vehicle.trajectory, vehicle.cand_trajectories)
+            #Center plot around main vehicle
+            x_lim_a = self.road_length / 2
+            if (vid == centerplot_veh_id):
+                plt.xlim(vehicle.vehicle_state.x -  x_lim_a , vehicle.vehicle_state.x + self.road_length)
+                plt.ylim(0,10)
+            plt.gca().set_aspect('equal', adjustable='box')
+                
         #plt.pause(0.00001)
         self.canvas.draw()
         self.tk.update() 
@@ -83,9 +91,9 @@ def plot_vehicle(vid, vehicle_state, traj, cand_trajectories):
 
     gca.text(s_pos, d_pos+1.5, label, style='italic')
 
-    if (cand_trajectories):
-        for t in cand_trajectories:
-            plot_trajectory(t[0], t[1], t[2], 'grey')
+    #if (cand_trajectories):
+    #    for t in cand_trajectories:
+    #        plot_trajectory(t[0], t[1], t[2], 'grey')
     
     if (traj):        
         plot_trajectory(traj[0], traj[1], traj[2],'blue')

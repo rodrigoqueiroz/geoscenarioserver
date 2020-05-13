@@ -34,7 +34,7 @@ class SVSharedMemory(object):
         self.shm.write(write_str.encode('ascii'))
         self.sem.release()
 
-        print("Shared Memory write\n{}".format(write_str))
+        #print("Shared Memory write\n{}".format(write_str))
 
     
     def __del__(self):

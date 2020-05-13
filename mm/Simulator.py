@@ -6,71 +6,48 @@
 # Problem Setup and Simulation Loop
 # --------------------------------------------
 
-import numpy as np
-import random
-from CostFunctions import *
-from Constants import *
-from DashBoard import *
-from SV import *
 from TickSync import TickSync
-from shared_mem.SVSharedMemory import *
-import threading
+from DashBoard import *
+from SimTraffic import *
 
 if __name__ == "__main__":
-
     #SIM CONFIG
-    TIMEOUT = 30                #timeout in [s]s
-    FRAME_RATE = 60             #Global tick rate
-    show_dashboard = False      #plot vehicles and trajectories. Optional when running with Ureal engine.
-    publish_pose_shm = True     #write vehicle Pose in shared memory for Unreal Engine
-    centerplot_veh_id = 0
+    TIMEOUT = 20               #timeout in [s]
+    FRAME_RATE = 30            #Global tick rate
+    show_dashboard = True      #plot vehicles and trajectories. Optional when running with Ureal engine.
+    publish_pose_shm = True    #write vehicle Pose in shared memory for Unreal Engine
+    centerplot_veh_id = 1
     #
     sync_global   = TickSync(rate=FRAME_RATE, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
 
-    # SHARED MEMORY SETUP
-    shared_memory = SVSharedMemory()
-
     # PROBLEM SETUP
-    #Sim HV
-    sim_vehicles = {} # should this be []?
-    #TODO: change starting state to location in sim coordinate
-    v1 = SV(id = 0, start_state = [0.0,0.0,0.0, 3.0,0.0,0.0]) #14 +- 50km/h
-    #v1.set_behavior_root(btree=BT_FOLLOW, target_id=1)
-    #v1.set_behavior_root(btree=BT_STOP)
-    v1.set_behavior_root(btree=BT_VELKEEPING)
-    sim_vehicles[0] = v1
+    #TODO: Load problem setup GeoScenario XML file (using GSParser)
+    traffic = SimTraffic()
+    traffic.set_map("laneletmap.osm")
+    traffic.add_vehicle(1, [0.0,0.0,0.0, 1.0,0.0,0.0], BT_VELKEEPING)
+    traffic.add_vehicle(2, [15.0,0.0,0.0, 7.0,0.0,0.0], BT_VELKEEPING)
+    traffic.add_vehicle(3, [20.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
+    #traffic.add_vehicle(4, [-10.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
     
-    v2 = SV(id = 1, start_state = [0.0,0.0,0, 2.0,0,0])
-    v2.set_behavior_root(btree=BT_VELKEEPING)
-    sim_vehicles[1] = v2
-    
-    
+    #GUI
     dashboard = DashBoard()
     if (show_dashboard):
         dashboard.create()
     
     #SIM EXECUTION
-
     print ('SIMULATION START')
-    for svid in sim_vehicles:
-        #sim_vehicles[svid].set_environment()
-        sim_vehicles[svid].start_vehicle()
-
+    traffic.start()
     while sync_global.tick():
         try:
-            #TODO: Update Ego Pose
-
-            #Update Dynamic Agents
-            for svid in sim_vehicles:
-                sim_vehicles[svid].tick(sync_global.tick_count, sync_global.tick_delta_time)
-            
-            # Write out simulator state
-            shared_memory.write_vehicle_stats(sync_global.tick_count, sync_global.tick_delta_time, sim_vehicles)
-
+            #Update Traffic
+            traffic.tick(
+                sync_global.tick_count, 
+                sync_global.tick_delta_time,
+                sync_global.sim_time
+            )
             #Update Dashboard (if visible)
-            dashboard.update(sim_vehicles,centerplot_veh_id)
-
+            dashboard.update(traffic, centerplot_veh_id)
             #Write Shared Memory
             if(publish_pose_shm):
                 pass
