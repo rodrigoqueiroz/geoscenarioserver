@@ -31,7 +31,6 @@ if __name__ == "__main__":
 
     # SHARED MEMORY SETUP
     shared_memory = SVSharedMemory()
-    # TODO: make ego's own SharedMemory class?
     ego_shared_memory = EgoSharedMemory()
 
     # PROBLEM SETUP
