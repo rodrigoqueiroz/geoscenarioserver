@@ -7,10 +7,10 @@ SEM_KEY = 346565
 # an external simulator 
 class SVSharedMemory(object):
     
-    def __init__(self):
+    def __init__(self, shm_key=SHM_KEY, sem_key=SEM_KEY):
         # TODO: error handling for failing to create shm & sem
-        self.shm_key = SHM_KEY
-        self.sem_key = SEM_KEY
+        self.shm_key = shm_key
+        self.sem_key = sem_key
 
         # create a semaphore for this memory
         self.sem = sysv_ipc.Semaphore(self.sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
@@ -20,6 +20,9 @@ class SVSharedMemory(object):
 
 
     def write_vehicle_stats(self, tick_count, delta_time, simulated_vehicles):
+        """ Writes to shared memory pose data for each SV in simulated vehicles.
+            @param simulated_vehicles:      dictionary of type <int, SV>
+        """
         # write tick count and deltatime
         write_str = "{} {}\n".format(tick_count, delta_time)
 
@@ -34,7 +37,7 @@ class SVSharedMemory(object):
         self.shm.write(write_str.encode('ascii'))
         self.sem.release()
 
-        #print("Shared Memory write\n{}".format(write_str))
+        # print("Shared Memory write\n{}".format(write_str))
 
     
     def __del__(self):
