@@ -24,15 +24,23 @@ class SimTraffic(object):
         self.static_objects = {}
         self.laneletmap = None
         #External Sim (Unreal) ShM
-        self.shared_memory = None
+        self.sim_client_shm = None
         #Internal ShM
         self.traffic_state_sharr = None
     
-    def add_vehicle(self, vid, start_state, btree_root):
-        v = SV(vid, start_state)
-        v.set_behavior_root(btree_root)
+    def add_vehicle(self, vid, name, start_state, btree_root, target = None, goal_x = None, goal_y = None):
+        v = SV(vid, name, start_state, 1.0)
+        v.set_behavior_root(btree_root, target)
+        self.vehicles[vid] = v
+    
+    def add_remote_vehicle(self, vid, name, start_state):
+        v = Vehicle(vid, name, start_state, 1.0)
+        v.is_remote = True
         self.vehicles[vid] = v
 
+    def set_map(self, laneletmap):
+        self.laneletmap = laneletmap
+    
     def set_map(self, laneletmap):
         self.laneletmap = laneletmap
 
@@ -44,13 +52,17 @@ class SimTraffic(object):
 
         #Start Vehicles
         for vid in self.vehicles:
-            #if SV
-            self.vehicles[vid].start_planner(
-                nv,
-                self.laneletmap,
-                self.traffic_state_sharr )
+            vehicle = self.vehicles[vid]
+            if vehicle.is_remote:  
+                vehicle.start_remote()
+            else: #SV
+                vehicle.start_planner(nv,self.laneletmap,self.traffic_state_sharr )
             #if not, start remote 
     
+    def stop_all(self):
+        for vid in self.vehicles:
+            self.vehicles[vid].stop()
+
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
         #Update Dynamic Agents
@@ -97,8 +109,9 @@ class SimTraffic(object):
 
         #Shm for external Simulator (Unreal)
         #Write out simulator state
-        if  (self.shared_memory):
-            self.shared_memory.write_vehicle_stats(tick_count, delta_time, self.vehicles)
+        if (self.sim_client_shm):
+            self.sim_client_shm.write_vehicle_stats(tick_count, delta_time, self.vehicles)
+
             
     def __del__(self):
         pass

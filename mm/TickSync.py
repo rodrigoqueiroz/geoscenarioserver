@@ -2,32 +2,32 @@
 #rqueiroz@gsd.uwaterloo.ca
 # ---------------------------------------------
 # TickSync
-# Syncronize main simulation loop based on a given frame rate.
-# Higher rate requires more processing capabilities. Can't avoid drift.
-# TODO: Add feature to dynamically adjust rate and increase frame time to avoid drift.
-# TODO: Add feature to run with sim time only (> real time simulations)
+# Syncronize simulation loop based on a given frequency (frame-rate).
+# Higher rate allows smoother trajectories and more precise metrics and collisions,
+# but requires more processing capabilities. Can't avoid drift if hardware is slow.
 # --------------------------------------------
 
 import datetime
 import time
 
 class TickSync():
-    def __init__(self, rate = 30, block = False, verbose = False, label = ""):
+    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = ""):
         #config
         self.timeout = None
         self.tick_rate = rate
         self.expected_tick_duration = 1.0/rate
+        self.realtime = realtime
         self.block = block
         self.verbose = verbose
         self.label = label
         #global
+        self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
         self.tick_count = 0
-        self.sim_start_time = None
-        self.sim_time = 0                       #Total simulation time since start()
+        self.sim_time = 0.0                 #Total simulation time since start() [s]
         #per tick
-        self.tick_delta_time = None             #Diff since previous tick (or frame time)
-        self.tick_start_time = None
-        self.tick_drift = 0
+        self._tick_start_clock = None       #sim time when tick started [s] 
+        self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
+        self.drift = 0.0                    #diff between expected tick time and actual time caused by lag
     
     def set_timeout(self,timeout):
         self.timeout = timeout
@@ -37,14 +37,13 @@ class TickSync():
             print(msg)
 
     def tick(self):
-
         now = datetime.datetime.now()
-
+        #First Tick
         if (self.tick_count==0): 
             #First Tick is special:
-            self.sim_start_time = now
-            self.tick_delta_time = 0.0
-            self.tick_start_time = now
+            self._sim_start_clock = now
+            self.delta_time = 0.0
+            self._tick_start_clock = now
             #Update globals
             self.tick_count+=1
             self.sim_time = 0.0
@@ -53,7 +52,7 @@ class TickSync():
             return True
         else:
             #Can tick? Preliminary numbers:
-            diff_tick = (now - self.tick_start_time).total_seconds()                #diff from previous tick
+            diff_tick = (now - self._tick_start_clock).total_seconds()                #diff from previous tick
             drift =  diff_tick - self.expected_tick_duration                        #diff from expected time
             if (drift<0):
                 #Too fast. Need to chill.
@@ -63,17 +62,14 @@ class TickSync():
                 else:
                     #self.print('skip {:.3}'.format(drift))
                     return False            #return false to skip
-        
         #Can proceed tick: on time or late (drift):
         now = datetime.datetime.now()    #update after wake up
-        self.tick_delta_time = (now - self.tick_start_time).total_seconds()         #diff from previous tick
-        self.tick_drift = self.tick_delta_time - self.expected_tick_duration        #diff from expected time
-        self.tick_start_time = now
-        
+        self.delta_time = (now - self._tick_start_clock).total_seconds()         #diff from previous tick
+        self.drift = self.delta_time - self.expected_tick_duration        #diff from expected time
+        self._tick_start_clock = now
         #Update globals
-        self.sim_time = (now - self.sim_start_time).total_seconds()
+        self.sim_time = (now - self._sim_start_clock).total_seconds()
         self.tick_count+=1
-
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
@@ -81,7 +77,7 @@ class TickSync():
                 return False
 
         self.print('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
-                    format(self.sim_time,self.label,self.tick_count, self.tick_delta_time, self.expected_tick_duration, self.tick_drift))
+                    format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         return True
 
 

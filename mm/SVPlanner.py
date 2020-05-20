@@ -47,6 +47,13 @@ class SVPlanner(object):
         self._process = Process(target=self.run_planner_process, args=(self._traffic_state_sharr, self._mplan_sharr ), daemon = True)  
         self._process.start()
     
+    def stop(self):
+       pass 
+       #print("Planner Process Join")
+        #if (self._process):
+            #self._process.join()
+
+    
     def get_plan(self):
         plan = MotionPlan()
         self._mplan_sharr.acquire() #<=========LOCK
@@ -67,7 +74,7 @@ class SVPlanner(object):
     def run_planner_process(self, traffic_state_sharr, mplan_sharr ):
         print('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         
-        sync_planner = TickSync(rate=self.PLANNER_RATE, block=True, verbose=True, label="PP")
+        sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=True, label="PP")
         traffic_state = None
         
         while sync_planner.tick():
@@ -128,4 +135,5 @@ class SVPlanner(object):
 
 
     def __del__(self):
-        pass
+        if self._process:
+            self._process.join()
