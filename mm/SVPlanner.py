@@ -24,7 +24,6 @@ BT_VELKEEPING = 3
 BT_FOLLOW = 4 #follow a specific target
 BT_CUTIN = 5  #reach and cut in a specific target
 
-
 class SVPlanner(object):
     def __init__(self, vid, nvehicles, laneletmap , traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
         #MainProcess space:
