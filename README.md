@@ -2,6 +2,7 @@
 Includes: GeoScenario Parser, Checker, Maneuver Models, and Scenario Optimization modules.
 
 ### Dependencies (python3)
+- python 3.8
 - numpy
 - matplotlib
 - python3-tk
