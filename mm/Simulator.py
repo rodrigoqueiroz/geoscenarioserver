@@ -10,11 +10,13 @@ from TickSync import TickSync
 from DashBoard import *
 from SimTraffic import *
 
+from LaneletTest import *
+
 if __name__ == "__main__":
     #SIM CONFIG
     TIMEOUT = 30               #timeout in [s]
     FRAME_RATE = 30            #Global tick rate
-    show_dashboard = True      #plot vehicles and trajectories. Optional when running with Ureal engine.
+    show_dashboard = False      #plot vehicles and trajectories. Optional when running with Ureal engine.
     centerplot_veh_id = 1
     #
     sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=True, label="EX")
@@ -28,6 +30,10 @@ if __name__ == "__main__":
     traffic.add_vehicle( 1, 'V1', [15.0,0.0,0.0, 7.0,0.0,0.0], BT_VELKEEPING)
     #traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
     #traffic.add_vehicle( 3, 'V3', [-10.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
+
+    lt = LaneletTest()
+
+    exit(1)
     
     #GUI / Debug screen
     dashboard = DashBoard()
