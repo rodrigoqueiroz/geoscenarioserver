@@ -40,9 +40,6 @@ class SimTraffic(object):
 
     def set_map(self, laneletmap):
         self.laneletmap = laneletmap
-    
-    def set_map(self, laneletmap):
-        self.laneletmap = laneletmap
 
     def start(self):
         nv = len(self.vehicles)

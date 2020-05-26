@@ -76,15 +76,16 @@ class SVPlanner(object):
         traffic_state = None
         
         while sync_planner.tick():
+            # header is tick_count, delta_time and sim_time
             vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
-            
             #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
             vehicle_frenet_state = np.concatenate([ vehicle_state.get_X(), vehicle_state.get_Y()])
             print('Plan at time {} and FRENET STATE:'.format(state_time))
             print(vehicle_frenet_state)
             
             #Access lane config based on vehicle_state
+            #TODO: retrieve lane state from lanelet map ?
             lane_config = self.read_map(vehicle_frenet_state)
 
             #BTree Tick

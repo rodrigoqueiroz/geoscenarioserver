@@ -20,7 +20,7 @@ class Vehicle(object):
     def __init__(self, vid, name, start_state, radius, model = None):
         #id
         self.vid = vid
-        #state
+        #start state in sim frame
         self.vehicle_state = VehicleState()
         self.vehicle_state.x = start_state[0]
         self.vehicle_state.x_vel = start_state[1]
