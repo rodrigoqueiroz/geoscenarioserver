@@ -8,6 +8,7 @@
 from dataclasses import dataclass
 import numpy as np
 
+# question - is this all in cartesian?
 @dataclass
 class VehicleState:
     VECTORSIZE = 9

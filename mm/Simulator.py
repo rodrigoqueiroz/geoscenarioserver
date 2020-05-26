@@ -22,16 +22,18 @@ if __name__ == "__main__":
     sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=True, label="EX")
     sync_global.set_timeout(TIMEOUT)
 
+    # test class for parsing and holding map
+    test_map = LaneletTest()
+
     # PROBLEM SETUP
     # Problem setup can be defined directly, or using GeoScenario XML files (GSParser)
     traffic = SimTraffic()
-    traffic.set_map('laneletmap.osm')
+    traffic.set_map(test_map)
    #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     traffic.add_vehicle( 1, 'V1', [15.0,0.0,0.0, 7.0,0.0,0.0], BT_VELKEEPING)
     #traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
     #traffic.add_vehicle( 3, 'V3', [-10.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
 
-    lt = LaneletTest()
 
     exit(1)
     
