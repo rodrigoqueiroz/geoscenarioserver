@@ -5,15 +5,16 @@
 # --------------------------------------------
 #TODO: configurable weights (as constants?)
 #TODO: add alternative total cost functions for agressive maneuvers leading to crash
-#TODO: add distance to central lane cost
 #TODO: add driver error to cost
+#TODO: Add cost to change trajectory (to make keeping the same trajectory easier)
+#TODO: Add traj feasibility check
 
 import numpy as np
 from Utils import *
 from Constants import *
 from ManeuverConfig import *
 
-# FEASIBILITY
+#=============================== FEASIBILITY
 
 def check_trajectory(trajectory, vehicles, allow_near_collision):
     #TODO: adjust to support near collision under certain conditions 
@@ -21,200 +22,91 @@ def check_trajectory(trajectory, vehicles, allow_near_collision):
         return False
     return True
 
-
-#MANEUVER COST
-#Stopping should avoid change in long acceleration
-def stop_cost(trajectory, vehicles):
+#=============================== MANEUVER COST
+def velocity_keeping_cost(trajectory, mconfig:MVelKeepConfig, lane_config, vehicles, obstacles):
     total_cost = 0
     C = []
-    C.append(99 * collision_cost(trajectory, vehicles))
-    C.append(1 * total_jerk_cost(trajectory))
-    C.append(1 * max_acc_cost(trajectory))
-    C.append(1 * total_acc_cost(trajectory))
-    #c.append(1 * time_cost(trajectory, goal_t))
-    #c.append(1 * total_lat_jerk_cost(trajectory))
-    #c.append(1 * max_lat_jerk_cost(trajectory))
-    
-    
-    #TODO: Add cost to center line distance
-    #TODO: Add cost to change trajectory (to make keeping the same trajectory easier)
-
-    #KD * tfp.d[-1]**2
-    #ds = (TARGET_SPEED - tfp.s_d[-1])**2
-    #KD * ds
-
+    C.append(1 * time_cost(trajectory, mconfig.time.value))
+    C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
+    #C.append(1 * total_lat_jerk_cost(trajectory))
+    #C.append(1 * max_lat_jerk_cost(trajectory))
+    #C.append(1 * max_acc_cost(trajectory))
+    #C.append(1 * total_acc_cost(trajectory))
+    #C.append(99 * collision_cost(trajectory, vehicles))
     total_cost = sum(C)
-    #print("TOTAL COST: " + str(total_cost) + " " + str(C))
     return total_cost
 
-def velocity_keeping_cost(trajectory, lane_config, vehicles):
+def follow_cost(trajectory, mconfig:MFollowConfig, lane_config, vehicles, obstacles):
     total_cost = 0
     C = []
+    C.append(1 * time_cost(trajectory, mconfig.time.value))
+    C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
+    #C.append(1 * total_lat_jerk_cost(trajectory))
+    #C.append(1 * max_lat_jerk_cost(trajectory))
+    #C.append(1 * max_acc_cost(trajectory))
+    #C.append(1 * total_acc_cost(trajectory))
     #C.append(99 * collision_cost(trajectory, vehicles))
+    total_cost = sum(C)
+    return total_cost
+
+def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, lane_config, vehicles, obstacles):
+    total_cost = 0
+    C = []
+    C.append(1 * time_cost(trajectory, mconfig.time.value))
+    C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
     #C.append(1 * time_cost(trajectory, goal_t))
     #C.append(1 * total_lat_jerk_cost(trajectory))
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
+    #C.append(3 * collision_cost(trajectory, vehicles))
+    total_cost = sum(C)
+    return total_cost
+
+def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config, vehicles, obstacles):
+    total_cost = 0
+    C = []
+    C.append(1 * time_cost(trajectory, mconfig.time.value))
     C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    
-    #TODO: Add cost to center line distance
-    #TODO: Add cost to change trajectory (to make keeping the same trajectory easier)
-
-    #KD * tfp.d[-1]**2
-    #ds = (TARGET_SPEED - tfp.s_d[-1])**2
-    #KD * ds
-
-    total_cost = sum(C)
-    #print("TOTAL COST: {}".format(total_cost))
-    return total_cost
-
-def follow_cost(trajectory, vehicles):
-    total_cost = 0
-    C = []
-    C.append(99 * collision_cost(trajectory, vehicles))
     #C.append(1 * time_cost(trajectory, goal_t))
-    C.append(1 * total_lat_jerk_cost(trajectory))
-    C.append(1 * max_lat_jerk_cost(trajectory))
-    C.append(1 * max_acc_cost(trajectory))
-    C.append(1 * total_acc_cost(trajectory))
-    
-    #TODO: Add cost to center line distance
-    #TODO: Add cost to change trajectory (to make keeping the same trajectory easier)
-
-    #KD * tfp.d[-1]**2
-    #ds = (TARGET_SPEED - tfp.s_d[-1])**2
-    #KD * ds
-
+    #C.append(1 * total_jerk_cost(trajectory))
+    #C.append(1 * max_jerk_cost(trajectory))
+    #C.append(1 * max_acc_cost(trajectory))
+    #C.append(1 * total_acc_cost(trajectory))
+    #C.append(3 * collision_cost(trajectory, vehicles))
     total_cost = sum(C)
-    #print("TOTAL FL COST: " + str(total_cost) + " " + str(C))
     return total_cost
 
-
-def cutin_cost(trajectory, goal_t, vehicles):
+#Stopping should avoid change in long acceleration
+def stop_cost(trajectory, mconfig, lane_config, vehicles, obstacles):
     total_cost = 0
     C = []
-    C.append(3 * collision_cost(trajectory, vehicles))
-    C.append(1 * time_cost(trajectory, goal_t))
-    C.append(1 * total_jerk_cost(trajectory))
-    C.append(1 * max_jerk_cost(trajectory))
-    C.append(1 * max_acc_cost(trajectory))
-    C.append(1 * total_acc_cost(trajectory))
+    C.append(1 * time_cost(trajectory, mconfig.time.value))
+    C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
+    #C.append(1 * total_jerk_cost(trajectory))
+    #C.append(1 * max_acc_cost(trajectory))
+    #C.append(1 * total_acc_cost(trajectory))
+    #C.append(1 * time_cost(trajectory, goal_t))
+    #C.append(1 * total_lat_jerk_cost(trajectory))
+    #C.append(1 * max_lat_jerk_cost(trajectory))
+    #C.append(99 * collision_cost(trajectory, vehicles))
     total_cost = sum(C)
-    #print("TOTAL CI COST: " + str(total_cost) + " " + str(C))
+    #print("TOTAL COST: " + str(total_cost) + " " + str(C))
     return total_cost
-
-def lanechange_cost(trajectory, goal_t, vehicles):
-    total_cost = 0
-    C = []
-    C.append(3 * collision_cost(trajectory, vehicles))
-    C.append(1 * time_cost(trajectory, goal_t))
-    C.append(1 * total_jerk_cost(trajectory))
-    C.append(1 * max_jerk_cost(trajectory))
-    C.append(1 * max_acc_cost(trajectory))
-    C.append(1 * total_acc_cost(trajectory))
-    total_cost = sum(C)
-    #print("TOTAL LC COST: " + str(total_cost) + " " + str(C))
-    return total_cost
+#=============================== INDIVIDUAL COST FUNCTIONS
 
 
-# INDIVIDUAL COST FUNCTIONS
+def time_cost(trajectory, target_t):
+    #Penalizes trajectories longer or shorter than target time.
+    _, _, t = trajectory
+    diff =  float(abs(t-target_t))
+    return logistic( diff / target_t)
 
-#Penalizes trajectories longer or shorter than target time
-def time_cost(trajectory, T):
-    s, d, t = trajectory
-    return logistic(float(abs(t-T)) / T)
-
-
-#Jerk
-def total_jerk_cost(traj):
-    s, d, T = traj
-    s_d = differentiate(s)
-    s_dd = differentiate(s_d)
-    jerk = to_equation(differentiate(s_dd))
-    total_jerk = 0
-    dt = float(T) / 100.0
-    for i in range(100):
-        t = dt * i
-        j = jerk(t)
-        total_jerk += abs(j*dt)
-    jerk_per_second = total_jerk / T
-    return logistic(jerk_per_second / EXPECTED_JERK_IN_ONE_SEC )
-
-def max_jerk_cost(traj):
-    s, d, T = traj
-    s_d = differentiate(s)
-    s_d = differentiate(s_d)
-    jerk = differentiate(s_dd)
-    jerk = to_equation(jerk)
-    all_jerks = [jerk(float(T)/100 * i) for i in range(100)]
-    max_jerk = max(all_jerks, key=abs)
-    if abs(max_jerk) > MAX_JERK: return 1
-    else: return 0
-
-
-def total_lat_jerk_cost(trajectory):
-    _, d, T = trajectory
-    d_d = differentiate(d)
-    d_dd = differentiate(d_d)
-    jerk = to_equation(differentiate(d_dd))
-    total_jerk = 0
-    dt = float(T) / 100.0
-    for i in range(100):
-        t = dt * i
-        j = jerk(t)
-        total_jerk += abs(j*dt)
-    jerk_per_second = total_jerk / T
-    return logistic(jerk_per_second / EXPECTED_JERK_IN_ONE_SEC )
-
-def max_lat_jerk_cost(trajectory):
-    _, d, T = trajectory
-    d_d = differentiate(d)
-    d_dd = differentiate(d_d)
-    jerk = differentiate(d_dd)
-    jerk = to_equation(jerk)
-    all_jerks = [jerk(float(T)/100 * i) for i in range(100)]
-    max_jerk = max(all_jerks, key=abs)
-    if abs(max_jerk) > MAX_JERK: return 1
-    else: return 0
-
-
-#Acc
-def total_acc_cost(trajectory):
-    s, d, T = trajectory
-    s_dot = differentiate(s)
-    s_d_dot = differentiate(s_dot)
-    a = to_equation(s_d_dot)
-    total_acc = 0
-    dt = float(T) / 100.0
-    for i in range(100):
-        t = dt * i
-        acc = a(t)
-        total_acc += abs(acc*dt)
-    acc_per_second = total_acc / T
-    
-    return logistic(acc_per_second / EXPECTED_ACC_IN_ONE_SEC )
-    
-def max_acc_cost(trajectory):
-    s, d, T = trajectory
-    s_dot = differentiate(s)
-    s_d_dot = differentiate(s_dot)
-    a = to_equation(s_d_dot)
-    all_accs = [a(float(T)/100 * i) for i in range(100)]
-    max_acc = max(all_accs, key=abs)
-    if abs(max_acc) > MAX_ACCEL: return 1
-    else: return 0
-
-
-
-"""
-Lane offset. 
-Penalizes distance from lane center during the entire trajectory.
-Not suitable for Lane Change
-"""
 def lateral_lane_offset_cost(traj,lane_config):
+    #Penalizes distance from lane center during the entire trajectory.
+    #Not suitable for Lane Change
     _, d_coef, T = traj
-    central_d = (lane_config.left_boundary - lane_config.right_boundary)/2
+    central_d = (lane_config.left_bound - lane_config.right_bound)/2
     
     d_eq = to_equation(d_coef)
     target_d = d_eq(T)
@@ -234,26 +126,133 @@ def lateral_lane_offset_cost(traj,lane_config):
     
     #print("total lateral offset cost is {:.2f} for target {:.2f}".format(cost,target_d) )
     return cost
+
+
+def effic_cost(trajectory,target_vel):
+    #Penalizes lower average velocity.
+    s, _, T = trajectory
+    vel_coef = differentiate(s)
+    vel_eq = to_equation(vel_coef)
+    dt = float(T) / 100.0
+    for ti in range(100):
+        total += vel_eq(ti)
+    avg_vel = float(total) / 100
+    return logistic( (target_vel - avg_vel) / avg_vel)
+
+#Jerk
+
+def total_long_jerk_cost(trajectory):
+    s, _, T = trajectory
+    s_d = differentiate(s)
+    s_dd = differentiate(s_d)
+    jerk = to_equation(differentiate(s_dd))
+    total_jerk = 0
+    dt = float(T) / 100.0
+    for i in range(100):
+        t = dt * i
+        j = jerk(t)
+        total_jerk += abs(j*dt)
+    jerk_per_second = total_jerk / T
+    return logistic(jerk_per_second / EXPECTED_JERK_PER_SEC )
+
+
+def max_long_jerk_cost(trajectory):
+    s, _, T = trajectory
+    s_d = differentiate(s)
+    s_d = differentiate(s_d)
+    jerk = differentiate(s_dd)
+    jerk = to_equation(jerk)
+    all_jerks = [jerk(float(T)/100 * i) for i in range(100)]
+    max_jerk = max(all_jerks, key=abs)
+    if abs(max_jerk) > MAX_JERK: return 1
+    else: return 0
+
+def total_lat_jerk_cost(trajectory):
+    _, d, T = trajectory
+    d_d = differentiate(d)
+    d_dd = differentiate(d_d)
+    jerk = to_equation(differentiate(d_dd))
+    total_jerk = 0
+    dt = float(T) / 100.0
+    for i in range(100):
+        t = dt * i
+        j = jerk(t)
+        total_jerk += abs(j*dt)
+    jerk_per_second = total_jerk / T
+    return logistic(jerk_per_second / EXPECTED_JERK_PER_SEC)
+
+def max_lat_jerk_cost(trajectory):
+    _, d, T = trajectory
+    d_d = differentiate(d)
+    d_dd = differentiate(d_d)
+    jerk = differentiate(d_dd)
+    jerk = to_equation(jerk)
+    all_jerks = [jerk(float(T)/100 * i) for i in range(100)]
+    max_jerk = max(all_jerks, key=abs)
+    if abs(max_jerk) > MAX_JERK: return 1
+    else: return 0
+
+#Acc
+def total_acc_cost(trajectory):
+    s, d, T = trajectory
+    s_dot = differentiate(s)
+    s_d_dot = differentiate(s_dot)
+    a = to_equation(s_d_dot)
+    total_acc = 0
+    dt = float(T) / 100.0
+    for i in range(100):
+        t = dt * i
+        acc = a(t)
+        total_acc += abs(acc*dt)
+    acc_per_second = total_acc / T
     
+    return logistic(acc_per_second / EXPECTED_ACC_PER_SEC )
+    
+def max_acc_cost(trajectory):
+    s, d, T = trajectory
+    s_dot = differentiate(s)
+    s_d_dot = differentiate(s_dot)
+    a = to_equation(s_d_dot)
+    all_accs = [a(float(T)/100 * i) for i in range(100)]
+    max_acc = max(all_accs, key=abs)
+    if abs(max_acc) > MAX_ACCEL: return 1
+    else: return 0
 
-#Penalizes lower average speeds.
-def effic_cost(trajectory,vehicles):
-    s, _, t = trajectory
-    s = to_equation(s)
-    avg_v = float(s(t)) / t
-    return logistic(2*float(targ_v - avg_v) / avg_v)
+
+#Penalizes collision
+def collision_cost(trajectory, vehicles):
+    if (vehicles == None):
+        return 0.0
+    nearest = nearest_approach_to_any_vehicle(trajectory, vehicles)
+    if nearest < 2*VEHICLE_RADIUS: return 1.0
+    else : return 0.0
 
 
+#Calculates the closest distance to any vehicle during a trajectory.
+def nearest_approach_to_any_vehicle(trajectory, vehicles):
+    closest = 999999
+    for v in vehicles.values():
+        d = nearest_approach(trajectory,v)
+        if d < closest:
+            closest = d
+    return closest
+
+def nearest_approach(trajectory, vehicle):
+    closest = 999999
+    s_,d_,T = trajectory
+    s = to_equation(s_)
+    d = to_equation(d_)
+    for i in range(100):
+        t = float(i) / 100 * T
+        cur_s = s(t)
+        cur_d = d(t)
+        targ_s, _, _, targ_d, _, _ = vehicle.state_in(t)
+        dist = sqrt((cur_s-targ_s)**2 + (cur_d-targ_d)**2)
+        if dist < closest:
+            closest = dist
+    return closest
 
 #CHECK:
-def time_diff_cost(traj, target_vehicle, delta, T, predictions):
-    """
-    Penalizes trajectories that span a duration which is longer or 
-    shorter than the duration requested.
-    """
-    _, _, t = traj
-    return logistic(float(abs(t-T)) / T)
-
 def s_diff_cost(traj, target_vehicle, delta, T, predictions):
     """
     Penalizes trajectories whose s coordinate (and derivatives) 
@@ -302,81 +301,6 @@ def buffer_cost(traj, target_vehicle, delta, T, predictions):
     """
     nearest = nearest_approach_to_any_vehicle(traj, predictions)
     return logistic(2*VEHICLE_RADIUS / nearest)
-    
-def stays_on_road_cost(traj, target_vehicle, delta, T, predictions):
-    pass
 
-def exceeds_speed_limit_cost(traj, target_vehicle, delta, T, predictions):
-    pass
-
-def efficiency_cost(traj, target_vehicle, delta, T, predictions):
-    """
-    Rewards high average speeds.
-    """
-    s, _, t = traj
-    s = to_equation(s)
-    avg_v = float(s(t)) / t
-    targ_s, _, _, _, _, _ = predictions[target_vehicle].state_in(t)
-    targ_v = float(targ_s) / t
-    return logistic(2*float(targ_v - avg_v) / avg_v)
-
-def total_acc_cost(traj):
-    s, d, T = traj
-    s_dot = differentiate(s)
-    s_d_dot = differentiate(s_dot)
-    a = to_equation(s_d_dot)
-    total_acc = 0
-    dt = float(T) / 100.0
-    for i in range(100):
-        t = dt * i
-        acc = a(t)
-        total_acc += abs(acc*dt)
-    acc_per_second = total_acc / T
-    
-    return logistic(acc_per_second / EXPECTED_ACC_IN_ONE_SEC )
-    
-def max_acc_cost(traj):
-    s, d, T = traj
-    s_dot = differentiate(s)
-    s_d_dot = differentiate(s_dot)
-    a = to_equation(s_d_dot)
-    all_accs = [a(float(T)/100 * i) for i in range(100)]
-    max_acc = max(all_accs, key=abs)
-    if abs(max_acc) > MAX_ACCEL: return 1
-    else: return 0
-    
-
-#Penalizes collision
-def collision_cost(trajectory, vehicles):
-    if (vehicles == None):
-        return 0.0
-    nearest = nearest_approach_to_any_vehicle(trajectory, vehicles)
-    if nearest < 2*VEHICLE_RADIUS: return 1.0
-    else : return 0.0
-
-
-#Calculates the closest distance to any vehicle during a trajectory.
-def nearest_approach_to_any_vehicle(traj, vehicles):
-    closest = 999999
-    for v in vehicles.values():
-        d = nearest_approach(traj,v)
-        if d < closest:
-            closest = d
-    return closest
-
-def nearest_approach(traj, vehicle):
-    closest = 999999
-    s_,d_,T = traj
-    s = to_equation(s_)
-    d = to_equation(d_)
-    for i in range(100):
-        t = float(i) / 100 * T
-        cur_s = s(t)
-        cur_d = d(t)
-        targ_s, _, _, targ_d, _, _ = vehicle.state_in(t)
-        dist = sqrt((cur_s-targ_s)**2 + (cur_d-targ_d)**2)
-        if dist < closest:
-            closest = dist
-    return closest
 
 

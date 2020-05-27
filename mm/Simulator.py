@@ -9,29 +9,23 @@
 from TickSync import TickSync
 from DashBoard import *
 from SimTraffic import *
+from Constants import *
 
 if __name__ == "__main__":
-    #SIM CONFIG
-    TIMEOUT = 30               #timeout in [s]
-    FRAME_RATE = 30            #Global tick rate
-    show_dashboard = True      #plot vehicles and trajectories. Optional when running with Ureal engine.
-    centerplot_veh_id = 1
-    #
-    sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=True, label="EX")
+    sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
-
     # PROBLEM SETUP
     # Problem setup can be defined directly, or using GeoScenario XML files (GSParser)
     traffic = SimTraffic()
     traffic.set_map('laneletmap.osm')
-   #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-    traffic.add_vehicle( 1, 'V1', [15.0,0.0,0.0, 7.0,0.0,0.0], BT_VELKEEPING)
-    #traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
-    #traffic.add_vehicle( 3, 'V3', [-10.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
+    #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    traffic.add_vehicle( 1, 'V1', [0.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_vehicle( 2, 'V2', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_vehicle( 3, 'V3', [80.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
     
     #GUI / Debug screen
     dashboard = DashBoard()
-    if (show_dashboard):
+    if (SHOW_DASHBOARD):
         dashboard.create()
     
     #SIM EXECUTION START
@@ -46,7 +40,7 @@ if __name__ == "__main__":
                 sync_global.sim_time
             )
             #Update Dashboard (if visible)
-            dashboard.update(traffic, centerplot_veh_id)
+            dashboard.update(traffic, PLOT_VID)
         except KeyboardInterrupt:
             break
         

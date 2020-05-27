@@ -20,7 +20,7 @@ from TickSync import TickSync
 BT_PARKED = 0 #default, car is stopped
 BT_DRIVE = 1  #follow a route with normal driving. Can switch to follow, or stop
 BT_STOP = 2
-BT_VELKEEPING = 3
+BT_VELKEEP = 3
 BT_FOLLOW = 4 #follow a specific target
 BT_CUTIN = 5  #reach and cut in a specific target
 
@@ -57,7 +57,6 @@ class SVPlanner(object):
         plan = MotionPlan()
         self._mplan_sharr.acquire() #<=========LOCK
         plan.set_plan_vector(self._mplan_sharr[:])
-        #TODO: clean after reading, or keep it for dashboard?
         self._mplan_sharr.release() #<=========RELEASE
         if (plan.t == 0): #if not valid
             return None
@@ -79,40 +78,73 @@ class SVPlanner(object):
         while sync_planner.tick():
             vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
-            #Access lane config based on vehicle_state
-            #TODO: retrieve lane state from map
-            lane_config = LaneConfig(30,4,0)
+            
             #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
             vehicle_frenet_state = np.concatenate([ vehicle_state.get_X(), vehicle_state.get_Y()])
             print('Plan at time {} and FRENET STATE:'.format(state_time))
             print(vehicle_frenet_state)
             
+            #Access lane config based on vehicle_state
+            lane_config = self.read_map(vehicle_frenet_state)
+
             #BTree Tick
-            man_key=M_VELKEEPING
-            man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME))
+            mkey, mconfig = self.behavior_tick(vehicle_frenet_state)
+            #if man_key == M_LANECHANGE:
+            #    lane_config = LaneConfig(1,30,4,0) #standard
+
             #Maneuver Tick
-            if (man_key):
+            if (mkey):
                 #replan maneuver
-                traj, cand = plan_maneuver( man_key, 
-                                            man_config, 
+                traj, cand = plan_maneuver( mkey, 
+                                            mconfig, 
                                             vehicle_frenet_state, 
                                             lane_config, 
                                             traffic_state)
                 man_key = None
-                plan = MotionPlan()
-                plan.set_trajectory(traj[0],traj[1],traj[2])
-                plan.t_start = state_time
-                #write motion plan
-                mplan_sharr.acquire() #<=========LOCK
-                mplan_sharr[:] = plan.get_plan_vector()
-                #print('Writting Sh Data VP')
-                #print(mplan_sharr)
-                mplan_sharr.release() #<=========RELEASE
+                self.write_motion_plan(mplan_sharr, traj, cand, state_time)
 
         print('PLANNER PROCESS END')
         shm_vs.close()
         shm_vp.close()
     
+    def read_map(self, frenet_state):
+        #TODO: retrieve lane state from map
+        #hardcoding now
+        lower_lane_config = LaneConfig(1,30,4,0)
+        upper_lane_config = LaneConfig(2,30,8,4)
+        lower_lane_config.set_left_lane(upper_lane_config)
+        
+        d_pos = frenet_state[3]
+        if ( 0 <= d_pos < 4):
+            return lower_lane_config
+        if ( 4 <= d_pos <= 8):
+            return upper_lane_config
+
+    
+    def behavior_tick(self,frenet_state):
+        #TODO: retrieve decision from BTree
+        #hardcoding now
+        mkey=M_VELKEEP
+        mconfig = MVelKeepConfig()
+        
+        s_pos = frenet_state[0]
+        d_pos = frenet_state[3]
+        if (self.vid ==1): #lane changing vehicle
+            if 0 <= s_pos < 20:
+                mkey=M_VELKEEP
+                mconfig = MVelKeepConfig()
+            if 20 <= s_pos < 70:
+                mkey=M_LANESWERVE
+                mconfig = MLaneSwerveConfig(target_lid=2)
+            #if 40 <= s_pos <80:
+                #print('200 300')
+            #    man_key=M_LANECHANGE
+            #    man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
+            #if 80 <= s_pos:
+            #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
+            #man_key=M_LANECHANGE
+            #man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
+        return mkey, mconfig, 
 
     def read_traffic_state(self, traffic_state_sharr):
         nv = self.nvehicles
@@ -131,6 +163,19 @@ class SVPlanner(object):
                 vehicle_state.set_state_vector(sv)
         traffic_state_sharr.release() #<=========RELEASE
         return vehicle_state, header_vector
+
+    def write_motion_plan(self, mplan_sharr, traj, cand, state_time):
+        if not traj:
+            return
+        plan = MotionPlan()
+        plan.set_trajectory(traj[0],traj[1],traj[2])
+        plan.t_start = state_time
+        #write motion plan
+        mplan_sharr.acquire() #<=========LOCK
+        mplan_sharr[:] = plan.get_plan_vector()
+        #print('Writting Sh Data VP')
+        #print(mplan_sharr)
+        mplan_sharr.release() #<=========RELEASE
 
 
     def __del__(self):
