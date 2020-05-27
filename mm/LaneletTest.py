@@ -57,7 +57,7 @@ class LaneletTest(object):
         LaneletTest.plot_ll(ll)
         plt.plot(testpt.x, testpt.y, 'bo')
         plt.show()
-    
+
 
     def get_occupying_lanelet(self, x, y):
         point = BasicPoint2d(x, y)
@@ -99,10 +99,16 @@ class LaneletTest(object):
         arc_coords = toArcCoordinates(ConstLineString2d(ref_path), pt)
         return arc_coords.length, arc_coords.distance
     
+
     @staticmethod
     def frenet_to_sim_frame(lanelet, s, d):
         ref_path = lanelet.centerline
         
+        arclen = 0
         for p, q in pairwise(ref_path):
-            print((p.x,q.x))
+            pq = distance(p, q)
+            print(pq)
+            if arclen < s < arclen + pq:
+                pass
+            print((p.x, p.y, q.x, q.y))
 
