@@ -19,6 +19,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from Constants import *
 from Utils import *
 from Vehicle import *
+from Constants import *
 
 class DashBoard(object):
 
@@ -57,7 +58,8 @@ class DashBoard(object):
             if (vid == centerplot_veh_id):
                 plt.xlim(vehicle.vehicle_state.x -  x_lim_a , vehicle.vehicle_state.x + self.road_length)
                 plt.ylim(0,10)
-            plt.gca().set_aspect('equal', adjustable='box')
+            if (CHART_ASPECT_EQUAL):
+                plt.gca().set_aspect('equal', adjustable='box')
                 
         #plt.pause(0.00001)
         self.canvas.draw()
