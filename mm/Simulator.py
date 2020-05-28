@@ -13,6 +13,8 @@ from Constants import *
 
 from LaneletTest import *
 
+from LaneletTest import *
+
 if __name__ == "__main__":
     sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)

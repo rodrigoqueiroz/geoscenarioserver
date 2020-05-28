@@ -156,5 +156,3 @@ class LaneletTest(object):
         normal = np.array([-1 * tangent[1], tangent[0]])
         point_in_cart = point_on_ls + normal*d
         return point_in_cart[0], point_in_cart[1]
-
-
