@@ -5,6 +5,7 @@ from lanelet2.projection import UtmProjector
 
 from matplotlib import pyplot as plt
 from itertools import tee
+import numpy as np
 
 
 def get_test_ll():
@@ -17,6 +18,9 @@ def pairwise(iterable):
     next(j, None)
     return zip(i, j)
 
+def normalize(v):
+    norm = np.linalg.norm(v)
+    return v / norm if norm > 0 else v
 
 
 class LaneletTest(object):
@@ -36,27 +40,30 @@ class LaneletTest(object):
         # for pt in nearestll.rightBound:
         #     print(pt)
         
-        llid = 44992
+        llid = 45166
         # every layer is like a list with overlaoded [] like a map
         ll = self.lanelet_map.laneletLayer[llid]
 
         # testpt = BasicPoint2d(1125, 557)
         # testpt = BasicPoint2d(10, 557)
-        testpt = BasicPoint2d(ll.leftBound[0].x, ll.leftBound[0].y)
+        testpt = BasicPoint2d(ll.centerline[0].x, ll.centerline[0].y)
         # print(inside(ll, testpt))
         # corresponding_ll = self.get_occupying_lanelet(testpt.x, testpt.y)
         # print(corresponding_ll)
 
         # print(distance(testpt, BasicPoint2d(ll.centerline[0].x, ll.centerline[0].y)))
         # print(distance(ConstLineString2d(ll.centerline), Point2d(getId(), testpt.x, testpt.y)))
-        print(LaneletTest.sim_to_frenet_frame(ll, testpt))
+        # print(testpt)
+        # s, d = LaneletTest.sim_to_frenet_frame(ll, testpt.x, testpt.y)
+        # print((s, d))
+        # x, y = LaneletTest.frenet_to_sim_frame(ll, s, d)
+        # print((x, y))
 
-        LaneletTest.frenet_to_sim_frame(ll, 0.2465, 1.53)
 
         # plot the lanelet points for sanity testing
-        LaneletTest.plot_ll(ll)
-        plt.plot(testpt.x, testpt.y, 'bo')
-        plt.show()
+        # plt.plot(testpt.x, testpt.y, 'bo')
+        # LaneletTest.plot_ll(ll)
+        # plt.show()
 
 
     def get_occupying_lanelet(self, x, y):
@@ -72,7 +79,7 @@ class LaneletTest(object):
         print([ll.id for ll in intersecting_lls])
 
         # use routing or some other information to determine which lanelet we are in
-        return intersecting_lls[-2]
+        return intersecting_lls[0]
 
 
     @staticmethod
@@ -85,10 +92,11 @@ class LaneletTest(object):
             [pt.x for pt in lanelet.centerline],
             [pt.y for pt in lanelet.centerline],
             'go')
+        plt.show()
     
     
     @staticmethod
-    def sim_to_frenet_frame(lanelet, pt):
+    def sim_to_frenet_frame(lanelet, x, y):
         """ pt is a BasicPoint2d, change that later
         """
         # ref path can be something else once this fn is moved out
@@ -96,19 +104,36 @@ class LaneletTest(object):
 
         # toArcCoordinates does not interpolate beyond or before ref_path
         # so when it goes over, it's time to switch to a new ref path?
-        arc_coords = toArcCoordinates(ConstLineString2d(ref_path), pt)
+        arc_coords = toArcCoordinates(ConstLineString2d(ref_path), BasicPoint2d(x, y))
         return arc_coords.length, arc_coords.distance
-    
+
 
     @staticmethod
     def frenet_to_sim_frame(lanelet, s, d):
         ref_path = lanelet.centerline
         
+        point_on_ls = None
+        tangent = None
         arclen = 0
         for p, q in pairwise(ref_path):
-            pq = distance(p, q)
-            print(pq)
-            if arclen < s < arclen + pq:
-                pass
-            print((p.x, p.y, q.x, q.y))
+            pq = np.array([q.x - p.x, q.y - p.y])
+            dist = np.linalg.norm(pq)
+
+            if arclen <= s <= arclen + dist:
+                delta_s = s - arclen
+                tangent = normalize(pq)
+                point_on_ls = np.array([p.x, p.y]) + tangent * delta_s
+                break
+            
+            arclen += dist
+            # print((p.x, p.y, q.x, q.y))
+        
+        if point_on_ls is None:
+            print("s is outside the lanelet")
+            return None, None
+        
+        normal = np.array([-1 * tangent[1], tangent[0]])
+        point_in_cart = point_on_ls + normal*d
+        return point_in_cart[0], point_in_cart[1]
+
 

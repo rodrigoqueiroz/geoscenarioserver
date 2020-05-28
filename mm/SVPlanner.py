@@ -15,6 +15,7 @@ from Utils import *
 from ManeuverModels import *
 from VehicleState import *
 from TickSync import TickSync
+from LaneletTest import LaneletTest
 
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
@@ -79,8 +80,17 @@ class SVPlanner(object):
             # header is tick_count, delta_time and sim_time
             vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
+            
+            #Access lane config based on vehicle_state
+            #TODO: retrieve lane state from lanelet map
+            cur_ll = self.laneletmap.get_occupying_lanelet(vehicle_state.x, vehicle_state.y)
+            
             #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
-            vehicle_frenet_state = np.concatenate([ vehicle_state.get_X(), vehicle_state.get_Y()])
+            frenet_pos = LaneletTest.sim_to_frenet_frame(cur_ll, vehicle_state.x, vehicle_state.y)
+            vehicle_frenet_state = np.concatenate([
+                [frenet_pos[0], vehicle_state.x_vel, vehicle_state.x_acc],
+                [frenet_pos[1], vehicle_state.y_vel, vehicle_state.y_acc]
+            ])
             print('Plan at time {} and FRENET STATE:'.format(state_time))
             print(vehicle_frenet_state)
             

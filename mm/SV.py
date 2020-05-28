@@ -13,6 +13,7 @@ from SVPlanner import *
 from TickSync import TickSync
 from VehicleState import *
 from shared_mem.EgoSharedMemory import *
+from LaneletTest import LaneletTest
 
 
 # Vehicle base class for remote control or simulation.
@@ -127,6 +128,7 @@ class SV(Vehicle):
             If a planner is started, the vehicle can't have a remote.
             Use either option (start_planner or start_remote).
         """
+        self.lanelet_map = laneletmap # move this to init?
         self.is_remote = False
         self.sv_planner = SVPlanner(self.vid, nvehicles, laneletmap ,traffic_state_sharr)
         self.sv_planner.start()
@@ -160,10 +162,13 @@ class SV(Vehicle):
             if (time>self.trajectory[2]): #exceed total traj time
                 return
 
-            self.vehicle_state.x = self.s_eq(time)
+            cur_ll = self.lanelet_map.get_occupying_lanelet(self.vehicle_state.x, self.vehicle_state.y)
+            x, y = LaneletTest.frenet_to_sim_frame(cur_ll, self.s_eq(time), self.d_eq(time))
+
+            self.vehicle_state.x = x
             self.vehicle_state.x_vel = self.s_vel_eq(time)
             self.vehicle_state.x_acc = self.s_acc_eq(time)
-            self.vehicle_state.y = self.d_eq(time)
+            self.vehicle_state.y = y
             self.vehicle_state.y_vel = self.d_vel_eq(time)
             self.vehicle_state.y_acc = self.d_acc_eq(time)
             #sanity check
