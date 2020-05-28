@@ -26,12 +26,14 @@ if __name__ == "__main__":
     traffic.set_map(test_map)
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     # adding vehicle at the start of a lanelet
-    traffic.add_vehicle( 1, 'V1', [1164,0.0,0.0, 549.19,0.0,0.0], BT_VELKEEPING)
-    #traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
-    #traffic.add_vehicle( 3, 'V3', [-10.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEPING)
+    traffic.add_vehicle( 1, 'V1', [1164,0.0,0.0, 549.19,0.0,0.0], BT_VELKEEP)
+    # test location
+    # traffic.add_vehicle( 1, 'V1', [0,0.0,0.0, 0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_vehicle( 3, 'V3', [-10.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
 
-    ll = test_map.get_occupying_lanelet(1164, 549.19)
-    print(ll)
+    # ll = test_map.get_occupying_lanelet(1164, 549.19)
+    # print(ll)
     # test_map.plot_ll(ll)
     # exit(1)
     

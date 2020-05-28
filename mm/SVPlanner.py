@@ -81,10 +81,7 @@ class SVPlanner(object):
             vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
             
-            #Access lane config based on vehicle_state
-            #TODO: retrieve lane state from lanelet map
             cur_ll = self.laneletmap.get_occupying_lanelet(vehicle_state.x, vehicle_state.y)
-            
             #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
             frenet_pos = LaneletTest.sim_to_frenet_frame(cur_ll, vehicle_state.x, vehicle_state.y)
             vehicle_frenet_state = np.concatenate([
@@ -92,11 +89,10 @@ class SVPlanner(object):
                 [frenet_pos[1], vehicle_state.y_vel, vehicle_state.y_acc]
             ])
             print('Plan at time {} and FRENET STATE:'.format(state_time))
-            print(vehicle_frenet_state)
+            print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
             
             #Access lane config based on vehicle_state
-            #TODO: retrieve lane state from lanelet map ?
-            lane_config = self.read_map(vehicle_frenet_state)
+            lane_config = self.read_map(vehicle_state, vehicle_frenet_state)
 
             #BTree Tick
             mkey, mconfig = self.behavior_tick(vehicle_frenet_state)
@@ -118,18 +114,28 @@ class SVPlanner(object):
         shm_vs.close()
         shm_vp.close()
     
-    def read_map(self, frenet_state):
-        #TODO: retrieve lane state from map
+    def read_map(self, cart_state, frenet_state):
+        # retrieve lane state from map
+        cur_ll = self.laneletmap.get_occupying_lanelet(cart_state.x, cart_state.y)
+        lower_lane_width = LaneletTest.get_lane_width(cur_ll, frenet_state[0])
+        # NOTE: this assumes only one lane. /2 to center it on its centerline
+        # planner seems to keep a distance of 2 from right bound, maybe because width is less that 4?
+        # TODO: width needs to be converted to left and right bound positions
+        lower_lane_config = LaneConfig(1, 30, lower_lane_width / 2, lower_lane_width / -2)
+        print("lane width: " + str(lower_lane_config.left_bound))
         #hardcoding now
-        lower_lane_config = LaneConfig(1,30,4,0)
-        upper_lane_config = LaneConfig(2,30,8,4)
-        lower_lane_config.set_left_lane(upper_lane_config)
+        # LaneConfig(id, velocity, leftbound, rightbound)
+        # lower_lane_config = LaneConfig(1,30,4,0)
+        # upper_lane_config = LaneConfig(2,30,8,4)
+        # lower_lane_config.set_left_lane(upper_lane_config)
         
-        d_pos = frenet_state[3]
-        if ( 0 <= d_pos < 4):
-            return lower_lane_config
-        if ( 4 <= d_pos <= 8):
-            return upper_lane_config
+        return lower_lane_config
+        # TODO: support multiple lanes
+        # d_pos = frenet_state[3]
+        # if ( 0 <= d_pos < 4):
+        #     return lower_lane_config
+        # if ( 4 <= d_pos <= 8):
+        #     return upper_lane_config
 
     
     def behavior_tick(self,frenet_state):
@@ -138,23 +144,24 @@ class SVPlanner(object):
         mkey=M_VELKEEP
         mconfig = MVelKeepConfig()
         
-        s_pos = frenet_state[0]
-        d_pos = frenet_state[3]
-        if (self.vid ==1): #lane changing vehicle
-            if 0 <= s_pos < 20:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig()
-            if 20 <= s_pos < 70:
-                mkey=M_LANESWERVE
-                mconfig = MLaneSwerveConfig(target_lid=2)
-            #if 40 <= s_pos <80:
-                #print('200 300')
-            #    man_key=M_LANECHANGE
-            #    man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
-            #if 80 <= s_pos:
-            #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
-            #man_key=M_LANECHANGE
-            #man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
+        # TODO: commenting out to test with a straight path
+        # s_pos = frenet_state[0]
+        # d_pos = frenet_state[3]
+        # if (self.vid ==1): #lane changing vehicle
+        #     if 0 <= s_pos < 20:
+        #         mkey=M_VELKEEP
+        #         mconfig = MVelKeepConfig()
+        #     if 20 <= s_pos < 70:
+        #         mkey=M_LANESWERVE
+        #         mconfig = MLaneSwerveConfig(target_lid=2)
+        #     #if 40 <= s_pos <80:
+        #         #print('200 300')
+        #     #    man_key=M_LANECHANGE
+        #     #    man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
+        #     #if 80 <= s_pos:
+        #     #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
+        #     #man_key=M_LANECHANGE
+        #     #man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
         return mkey, mconfig, 
 
     def read_traffic_state(self, traffic_state_sharr):

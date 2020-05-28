@@ -1,6 +1,6 @@
 import lanelet2
 from lanelet2.core import AttributeMap, getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, ConstPoint2d, LineString3d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, LaneletMap, createMapFromLanelets
-from lanelet2.geometry import distance, intersects2d, boundingBox2d, to2D, inside, toArcCoordinates
+from lanelet2.geometry import distance, intersects2d, boundingBox2d, to2D, inside, toArcCoordinates, project
 from lanelet2.projection import UtmProjector
 
 from matplotlib import pyplot as plt
@@ -47,6 +47,7 @@ class LaneletTest(object):
         # testpt = BasicPoint2d(1125, 557)
         # testpt = BasicPoint2d(10, 557)
         testpt = BasicPoint2d(ll.centerline[0].x, ll.centerline[0].y)
+        # print(LaneletTest.get_lane_width(ll, 0))
         # print(inside(ll, testpt))
         # corresponding_ll = self.get_occupying_lanelet(testpt.x, testpt.y)
         # print(corresponding_ll)
@@ -72,18 +73,23 @@ class LaneletTest(object):
         # get all intersecting lanelets using a trivial bounding box
         searchbox = BoundingBox2d(point, point)
         intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
-        if len(intersecting_lls) == 0:
-            return None
+        # commenting cause this fn doesn't work yet
+        # if len(intersecting_lls) == 0:
+        #     return None
         
-        intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
-        print([ll.id for ll in intersecting_lls])
+        # intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+        # print([ll.id for ll in intersecting_lls])
 
         # use routing or some other information to determine which lanelet we are in
-        return intersecting_lls[0]
+        
+
+        return self.lanelet_map.laneletLayer[45166]
 
 
     @staticmethod
     def plot_ll(lanelet):
+        """ Plots the bounds of the lanelet on the current pyplot
+        """
         xs = [pt.x for pt in lanelet.rightBound] + [pt.x for pt in lanelet.leftBound]
         ys = [pt.y for pt in lanelet.rightBound] + [pt.y for pt in lanelet.leftBound]
         
@@ -92,12 +98,27 @@ class LaneletTest(object):
             [pt.x for pt in lanelet.centerline],
             [pt.y for pt in lanelet.centerline],
             'go')
-        plt.show()
+    
+
+    @staticmethod
+    def get_lane_width(lanelet, s):
+        """ Two ways to do this: project the point onto leftbound and rightbound and add their distances
+            OR intersect the centerline normal at s with leftbound and rightbound.
+            Either way the width would be discontinuous as you move along s.
+            TODO: do we actually need average/min lane width over some lookahead time?
+            @param s:   length along the lanelet centerline
+        """
+        x, y = LaneletTest.sim_to_frenet_frame(lanelet, s, 0)
+        point_on_centerline = BasicPoint2d(x, y)
+        # project on left and right bounds
+        point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
+        point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)
+        return distance(point_on_leftbound, point_on_rightbound)
     
     
     @staticmethod
     def sim_to_frenet_frame(lanelet, x, y):
-        """ pt is a BasicPoint2d, change that later
+        """ TODO: need to transform heading?
         """
         # ref path can be something else once this fn is moved out
         ref_path = lanelet.centerline

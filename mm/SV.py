@@ -176,6 +176,12 @@ class SV(Vehicle):
             #    diff = self.vehicle_state.x - self.last_x
             #    print ('ERROR: X went backwards. Diff: {:.2}'.format(diff))
             #self.last_x = self.vehicle_state.x
+    
+
+    def get_frenet_state(self):
+        ll = self.lanelet_map.get_occupying_lanelet(self.vehicle_state.x, self.vehicle_state.y)
+        s, d = LaneletTest.sim_to_frenet_frame(ll, self.vehicle_state.x, self.vehicle_state.y)
+        return [s, self.vehicle_state.x_vel, self.vehicle_state.x_acc, d, self.vehicle_state.y_vel, self.vehicle_state.y_acc] # not np array
 
 
     def set_new_motion_plan(self, plan, sim_time):
