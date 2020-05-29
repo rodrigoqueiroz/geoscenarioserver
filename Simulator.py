@@ -19,9 +19,10 @@ if __name__ == "__main__":
     traffic = SimTraffic()
     traffic.set_map('laneletmap.osm')
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-    traffic.add_vehicle( 1, 'V1', [0.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
-    #traffic.add_vehicle( 2, 'V2', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
-    #traffic.add_vehicle( 3, 'V3', [80.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    traffic.add_vehicle( 1, 'V1', [00.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_vehicle( 3, 'V3', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    
     
     #GUI / Debug screen
     dashboard = DashBoard()

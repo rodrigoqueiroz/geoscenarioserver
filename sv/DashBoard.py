@@ -1,10 +1,6 @@
 #rqueiroz@gsd.uwaterloo.ca
 # ---------------------------------------------
 # Dashboard Classs and Trajectory Plots
-# TODO: Add individual vehicle views
-# TODO: Add multiple charts per vehicle
-# TODO: Add data table
-# TODO: Flag to save chart to file under certain conditions.
 # --------------------------------------------
 
 from math import sqrt, exp
@@ -24,13 +20,14 @@ class DashBoard(object):
         self.tk = None
         self.canvas = None
 
-    def create(self,width = 10, height = 4, road_length = 100):
+    def create(self,width = 10, height = 4, road_length = 120):
         self.tk = tkinter.Tk()
         self.road_length = road_length/2   #length in [m]
         plt_fig = plt.gcf()
         plt_fig.set_size_inches(width,height,forward=True)
         self.canvas = FigureCanvasTkAgg(plt_fig, self.tk) #must be after resize
         self.canvas.get_tk_widget().pack()
+        
         #myCanvas = tkinter.Canvas(tkroot, bg="white", height=600, width=600)
         #myCanvas.pack()
 

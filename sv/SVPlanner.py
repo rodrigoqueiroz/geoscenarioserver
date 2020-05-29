@@ -125,22 +125,29 @@ class SVPlanner(object):
     def behavior_tick(self,frenet_state):
         #TODO: retrieve decision from BTree
         #hardcoding now
+        #Standard
         mkey=M_VELKEEP
         mconfig = MVelKeepConfig()
         
+        #Hardcoded overtake scenario
         s_pos = frenet_state[0]
         d_pos = frenet_state[3]
         if (self.vid ==1): #lane changing vehicle
             if 0 <= s_pos < 20:
                 mkey=M_VELKEEP
-                mconfig = MVelKeepConfig()
-            if 20 <= s_pos < 70:
+                mconfig = MVelKeepConfig(MP(18.0,10,6), MP(5))
+            if 20 <= s_pos < 80:
                 mkey=M_LANESWERVE
                 mconfig = MLaneSwerveConfig(target_lid=2)
-            #if 40 <= s_pos <80:
-                #print('200 300')
-            #    man_key=M_LANECHANGE
-            #    man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
+            if 80 <= s_pos <160:
+                mkey=M_VELKEEP
+                mconfig = MVelKeepConfig( MP(20.0,10,6), MP(5) )
+            if 160 <= s_pos < 220:    
+                mkey=M_LANESWERVE
+                mconfig = MLaneSwerveConfig(target_lid=1)
+            if 220 <= s_pos:
+                mkey=M_VELKEEP
+                mconfig = MVelKeepConfig(MP(13.0,10,6), MP(5))
             #if 80 <= s_pos:
             #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
             #man_key=M_LANECHANGE
