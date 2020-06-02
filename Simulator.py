@@ -8,7 +8,7 @@
 
 from TickSync import TickSync
 from SimTraffic import *
-from sv.DashBoard import *
+from dash.DashBoard import *
 from util.Constants import *
 
 if __name__ == "__main__":
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     traffic.set_map('laneletmap.osm')
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     traffic.add_vehicle( 1, 'V1', [00.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
-    traffic.add_vehicle( 2, 'V2', [20.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_vehicle( 2, 'Ego', [20.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
     #traffic.add_vehicle( 3, 'V3', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
     
     

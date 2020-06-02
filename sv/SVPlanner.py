@@ -13,8 +13,9 @@ from multiprocessing import shared_memory, Process, Lock, Array
 from TickSync import TickSync
 #from util.Constants import *
 #from util.Utils import *
-from sv.ManeuverModels import *
 from sv.VehicleState import *
+from sv.ManeuverConfig import *
+from sv.ManeuverModels import *
 
 
 #BTree #todo: pytrees

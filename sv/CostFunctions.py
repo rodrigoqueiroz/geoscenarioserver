@@ -28,7 +28,7 @@ def velocity_keeping_cost(trajectory, mconfig:MVelKeepConfig, lane_config, vehic
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
     C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    #C.append(1 * total_lat_jerk_cost(trajectory))
+    C.append(1 * total_lat_jerk_cost(trajectory))
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
@@ -41,7 +41,7 @@ def follow_cost(trajectory, mconfig:MFollowConfig, lane_config, vehicles, obstac
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
     C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    #C.append(1 * total_lat_jerk_cost(trajectory))
+    C.append(1 * total_lat_jerk_cost(trajectory))
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
@@ -53,8 +53,6 @@ def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, lane_config, vehicles
     total_cost = 0
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
-    #C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    #C.append(1 * time_cost(trajectory, goal_t))
     #C.append(1 * total_lat_jerk_cost(trajectory))
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
@@ -68,8 +66,7 @@ def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config, vehicles, obstacle
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
     C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    #C.append(1 * time_cost(trajectory, goal_t))
-    #C.append(1 * total_jerk_cost(trajectory))
+    C.append(1 * total_jerk_cost(trajectory))
     #C.append(1 * max_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))

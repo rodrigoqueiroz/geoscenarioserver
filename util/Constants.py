@@ -5,12 +5,18 @@
 # --------------------------------------------
 
 #SIM CONFIG
-TIMEOUT = 30               #timeout in [s]
+TIMEOUT = 20               #timeout in [s]
 FRAME_RATE = 30            #Global tick rate
+
+#DASH CONFIG
 SHOW_DASHBOARD = True      #plot vehicles and trajectories. Optional when running with Ureal engine.
-PLOT_VID = 1                #Vehicle to center the plot arouund. Make sure there is a vehicle with this id
-CHART_ASPECT_EQUAL = True
-#SIM CONFIG
+PLOT_VID = 1               #Vehicle to center the main plot arouund. Make sure there is a vehicle with this id
+MCHART_ASPECT_EQUAL = False  #Keep S and D with same scale
+
+VEH_STAT_CHART = False      #(!HEAVY) Vehicle Stat Chart. Limited to PLOT_VID
+VEH_TRAJ_CHART = False      #(!HEAVY) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
+
+#
 VEH_COLLISION = True        #If true, collision between vehicles with be considered during planning.
 OBJ_COLLISION = False       #If true, collision between vehicles and static objects on the road with be considered during planning.
 
