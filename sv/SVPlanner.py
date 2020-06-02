@@ -11,11 +11,10 @@ import time
 from dataclasses import dataclass
 from multiprocessing import shared_memory, Process, Lock, Array
 from TickSync import TickSync
-#from util.Constants import *
-#from util.Utils import *
 from sv.VehicleState import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
+
 
 
 #BTree #todo: pytrees
@@ -39,7 +38,7 @@ class SVPlanner(object):
         self.laneletmap = laneletmap
         self.lookahead_dist = 10
         self.PLANNER_RATE = 5
-    
+
     def start(self):
         #Create Shared arrray for Plan
         c = MotionPlan.VECTORSIZE
@@ -75,10 +74,9 @@ class SVPlanner(object):
         print('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         
         sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=True, label="PP")
-        traffic_state = None
         
         while sync_planner.tick():
-            vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
+            header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
             
             #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
@@ -101,7 +99,7 @@ class SVPlanner(object):
                                             mconfig, 
                                             vehicle_frenet_state, 
                                             lane_config, 
-                                            traffic_state)
+                                            traffic_vehicles)
                 man_key = None
                 self.write_motion_plan(mplan_sharr, traj, cand, state_time)
 
@@ -156,6 +154,8 @@ class SVPlanner(object):
         return mkey, mconfig, 
 
     def read_traffic_state(self, traffic_state_sharr):
+        from sv.SV import Vehicle
+        
         nv = self.nvehicles
         r = nv+1
         c = VehicleState.VECTORSIZE + 1
@@ -163,15 +163,20 @@ class SVPlanner(object):
         #header
         header_vector = traffic_state_sharr[0:3]
         #vehicles
-        vehicle_state = VehicleState()
+        vehicles = {}
+        my_vehicle_state = VehicleState()
         for ri in range(1,r):
             i = ri * c  #first index for row
-            print(traffic_state_sharr[i])
-            if (traffic_state_sharr[i] == self.vid):
-                sv = traffic_state_sharr[i+1:i+c]
-                vehicle_state.set_state_vector(sv)
+            vid = traffic_state_sharr[i]
+            state_vector = traffic_state_sharr[i+1:i+c]
+            if (vid == self.vid):
+                my_vehicle_state.set_state_vector(state_vector)
+            else:
+                vehicle = Vehicle(vid)
+                vehicle.vehicle_state.set_state_vector(state_vector)
+                vehicles[vid] = vehicle
         traffic_state_sharr.release() #<=========RELEASE
-        return vehicle_state, header_vector
+        return header_vector, my_vehicle_state, vehicles
 
     def write_motion_plan(self, mplan_sharr, traj, cand, state_time):
         if not traj:

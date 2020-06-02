@@ -15,17 +15,16 @@ from sv.ManeuverConfig import *
 from util.Constants import *
 from util.Utils import *
 
-def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, trafic_state):
-    vehicles = None
+def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
     #Micro maneuver layer
     if(man_key==M_VELKEEP):
-        best, trajectories  = plan_velocity_keeping(vehicle_frenet_state, mconfig, lane_config, vehicles, None) 
+        best, trajectories  = plan_velocity_keeping(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None) 
     elif(man_key==M_STOP):
-        best, trajectories  = plan_stop(vehicle_frenet_state, mconfig, lane_config, vehicles, None) 
+        best, trajectories  = plan_stop(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None) 
     elif (man_key==M_FOLLOW):
-        best, trajectories  = plan_following(vehicle_frenet_state, mconfig, lane_config, self.target_id, vehicles)
+        best, trajectories  = plan_following(vehicle_frenet_state, mconfig, lane_config, self.target_id, traffic_vehicles)
     elif (man_key==M_LANESWERVE):
-        best, trajectories = plan_laneswerve(vehicle_frenet_state,  mconfig, lane_config, vehicles, None) #returns tuple (s[], d[], t)
+        best, trajectories = plan_laneswerve(vehicle_frenet_state,  mconfig, lane_config, traffic_vehicles, None) #returns tuple (s[], d[], t)
     #elif (man_key==CUTIN):
         #candidates, best = ST_CutIn( vehicle_frenet_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
         #candidates, best  = OT_CutIn( vehicle_frenet_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
@@ -104,7 +103,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     target_state_set = []
     for t in mconfig.time.get_uniform_samples():
         #longitudinal movement: goal is to keep safe distance from leading vehicle
-        s_lv = vehicle.state_in(t)[:3]
+        s_lv = vehicle.future_state(t)[:3]
         s_target = [0,0,0]
         s_target[0] = s_lv[0] - (time_gap * s_lv[1])     
         s_target[1] = s_lv[1]                            
@@ -187,7 +186,7 @@ def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var
     multi_goals = []
 
     #main goal is relative to target vehicle predicted final position
-    goal_state_relative = np.array( vehicles[target_id].state_in(T))  +  np.array(delta)
+    goal_state_relative = np.array( vehicles[target_id].future_state(T))  +  np.array(delta)
     s_goal = goal_state_relative[:3]
     d_goal = goal_state_relative[3:]
     print ('Cut-in optmized Goal around (' + str(T) +'):')
@@ -198,7 +197,7 @@ def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var
         time_step = PLAN_TIME_STEP
         t = T - 4 * time_step
         while t <= T + 4 * time_step:
-            goal_state_relative = np.array(vehicles[target_id].state_in(t)) + np.array(delta)
+            goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta)
             s_goal = goal_state_relative[:3]
             d_goal = goal_state_relative[3:]
             goal = [(s_goal, d_goal, t)]
@@ -453,7 +452,7 @@ def plan_single_cutin(start_state, T, delta, vehicles,  target_v_id,):
     s_start = start_state[:3]
     d_start = start_state[3:]
     
-    goal_state_relative = np.array( vehicles[target_v_id].state_in(T))  +  np.array(delta)
+    goal_state_relative = np.array( vehicles[target_v_id].future_state(T))  +  np.array(delta)
 
     s_goal = goal_state_relative[:3]
     d_goal = goal_state_relative[3:]

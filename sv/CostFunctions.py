@@ -32,7 +32,7 @@ def velocity_keeping_cost(trajectory, mconfig:MVelKeepConfig, lane_config, vehic
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
-    #C.append(99 * collision_cost(trajectory, vehicles))
+    C.append(99 * collision_cost(trajectory, vehicles))
     total_cost = sum(C)
     return total_cost
 
@@ -243,7 +243,7 @@ def nearest_approach(trajectory, vehicle):
         t = float(i) / 100 * T
         cur_s = s(t)
         cur_d = d(t)
-        targ_s, _, _, targ_d, _, _ = vehicle.state_in(t)
+        targ_s, _, _, targ_d, _, _ = vehicle.future_state(t)
         dist = sqrt((cur_s-targ_s)**2 + (cur_d-targ_d)**2)
         if dist < closest:
             closest = dist
@@ -256,7 +256,7 @@ def s_diff_cost(traj, target_vehicle, delta, T, predictions):
     differ from the goal.
     """
     s, _, T = traj
-    target = predictions[target_vehicle].state_in(T)
+    target = predictions[target_vehicle].future_state(T)
     target = list(np.array(target) + np.array(delta))
     s_targ = target[:3]
     S = [f(T) for f in get_f_and_N_derivatives(s, 2)]
@@ -282,7 +282,7 @@ def d_diff_cost(traj, target_vehicle, delta, T, predictions):
 
     D = [d(T), d_dot(T), d_ddot(T)]
     
-    target = predictions[target_vehicle].state_in(T)
+    target = predictions[target_vehicle].future_state(T)
     target = list(np.array(target) + np.array(delta))
     d_targ = target[3:]
     cost = 0

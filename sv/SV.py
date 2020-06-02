@@ -17,9 +17,10 @@ from shared_mem.EgoSharedMemory import *
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
-    def __init__(self, vid, name, start_state, radius, model = None):
+    def __init__(self, vid, name = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
         #id
         self.vid = vid
+        self.name = name
         #state
         self.vehicle_state = VehicleState()
         self.vehicle_state.x = start_state[0]
