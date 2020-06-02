@@ -77,8 +77,8 @@ class SimTraffic(object):
 
         #Internal ShM
         nv = len(self.vehicles)
-        r = nv+1
-        c = VehicleState.VECTORSIZE + 1 #+1 for vid
+        r = nv+1 #+1 for header
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 #+1 for vid
         self.traffic_state_sharr = Array('f', r*c )
 
 
@@ -88,16 +88,16 @@ class SimTraffic(object):
 
         nv = len(self.vehicles)
         r = nv+1
-        c = VehicleState.VECTORSIZE + 1 #+1 for vid
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 #+1 for vid
 
         self.traffic_state_sharr.acquire() #<=========LOCK
         #header
         header_vector = [tick_count, delta_time, sim_time]
         self.traffic_state_sharr[0:3] = header_vector
         #vehicles
-        ri = 1 #row index
-        for vid in self.vehicles:
-            sv = self.vehicles[vid].vehicle_state.get_state_vector()
+        ri = 1 #row index, start at 1 for header
+        for vid, vehicle in self.vehicles.items():
+            sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
             i = ri * c  #first index for row
             self.traffic_state_sharr[i] = self.vehicles[vid].vid
             self.traffic_state_sharr[i+1:i+c] = sv

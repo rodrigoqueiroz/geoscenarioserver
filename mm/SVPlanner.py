@@ -15,7 +15,7 @@ from Utils import *
 from ManeuverModels import *
 from VehicleState import *
 from TickSync import TickSync
-from LaneletTest import LaneletTest
+from LaneletMap import LaneletMap
 
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
@@ -81,15 +81,10 @@ class SVPlanner(object):
             vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
             
-            cur_ll = self.laneletmap.get_occupying_lanelet(vehicle_state.x, vehicle_state.y)
-            #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
-            frenet_pos = LaneletTest.sim_to_frenet_frame(cur_ll, vehicle_state.x, vehicle_state.y)
-            vehicle_frenet_state = np.concatenate([
-                [frenet_pos[0], vehicle_state.x_vel, vehicle_state.x_acc],
-                [frenet_pos[1], vehicle_state.y_vel, vehicle_state.y_acc]
-            ])
+            vehicle_frenet_state = np.concatenate([vehicle_state.get_S(), vehicle_state.get_D()])
             print('Plan at time {} and FRENET STATE:'.format(state_time))
             print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
+            # TODO: transform other vehicles to frenet frame based on this vehicle
             
             #Access lane config based on vehicle_state
             lane_config = self.read_map(vehicle_state, vehicle_frenet_state)
@@ -116,13 +111,13 @@ class SVPlanner(object):
     
     def read_map(self, cart_state, frenet_state):
         # retrieve lane state from map
-        cur_ll = self.laneletmap.get_occupying_lanelet(cart_state.x, cart_state.y)
-        lower_lane_width = LaneletTest.get_lane_width(cur_ll, frenet_state[0])
+        cur_ll = self.laneletmap.get_occupying_lanelet_in_route(frenet_state[0], [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991])
+        lower_lane_width = LaneletMap.get_lane_width(cur_ll, frenet_state[0])
         # NOTE: this assumes only one lane. /2 to center it on its centerline
         # planner seems to keep a distance of 2 from right bound, maybe because width is less that 4?
         # TODO: width needs to be converted to left and right bound positions
-        lower_lane_config = LaneConfig(1, 30, lower_lane_width / 2, lower_lane_width / -2)
-        print("lane width: " + str(lower_lane_config.left_bound))
+        lower_lane_config = LaneConfig(1, 1, lower_lane_width / 2, lower_lane_width / -2)
+        # print("lane width: " + str(lower_lane_config.left_bound))
         #hardcoding now
         # LaneConfig(id, velocity, leftbound, rightbound)
         # lower_lane_config = LaneConfig(1,30,4,0)
@@ -167,7 +162,8 @@ class SVPlanner(object):
     def read_traffic_state(self, traffic_state_sharr):
         nv = self.nvehicles
         r = nv+1
-        c = VehicleState.VECTORSIZE + 1
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1
+
         traffic_state_sharr.acquire() #<=========LOCK
         #header
         header_vector = traffic_state_sharr[0:3]
@@ -175,11 +171,11 @@ class SVPlanner(object):
         vehicle_state = VehicleState()
         for ri in range(1,r):
             i = ri * c  #first index for row
-            print(traffic_state_sharr[i])
-            if (traffic_state_sharr[i] == self.vid):
+            if (traffic_state_sharr[i] == self.vid): # only reading own state
                 sv = traffic_state_sharr[i+1:i+c]
                 vehicle_state.set_state_vector(sv)
         traffic_state_sharr.release() #<=========RELEASE
+
         return vehicle_state, header_vector
 
     def write_motion_plan(self, mplan_sharr, traj, cand, state_time):

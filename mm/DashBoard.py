@@ -20,7 +20,7 @@ from Constants import *
 from Utils import *
 from Vehicle import *
 from Constants import *
-from LaneletTest import *
+from LaneletMap import *
 
 class DashBoard(object):
 
@@ -59,7 +59,10 @@ class DashBoard(object):
         for vid in traffic.vehicles:
             #vid, vehicle_state, trajectory, cand_trajectories = traffic.vehicles[i].get_stats()
             vehicle = traffic.vehicles[vid]
-            vehicle_frenet_state = vehicle.get_frenet_state()
+            vehicle_frenet_state = vehicle.vehicle_state.get_S() + vehicle.vehicle_state.get_D()
+            if vehicle_frenet_state is None:
+                print("Error: frenet state was None while plotting.")
+                continue
             plot_vehicle(vid, vehicle_frenet_state, vehicle.trajectory, vehicle.cand_trajectories)
             #Center plot around main vehicle
             x_lim_a = self.road_length / 2
@@ -121,9 +124,8 @@ def plot_vehicle_cartesian(vid, vehicle):
     x = vehicle.vehicle_state.x
     y = vehicle.vehicle_state.y
 
-    # plot lanelet
-    ll = vehicle.lanelet_map.get_occupying_lanelet(x, y)
-    LaneletTest.plot_ll(ll)
+    # plot lanelets in its path
+    vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
 
     circle1 = plt.Circle((x, y), 1.0, color='b', fill=False)
     plt.gca().add_artist(circle1)
