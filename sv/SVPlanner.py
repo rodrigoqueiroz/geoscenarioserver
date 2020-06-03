@@ -15,8 +15,8 @@ from sv.VehicleState import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 
+from Mapping.LaneletMap import LaneletMap
 
-from LaneletMap import LaneletMap
 
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
@@ -77,12 +77,7 @@ class SVPlanner(object):
         sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=True, label="PP")
         
         while sync_planner.tick():
-<<<<<<< HEAD:sv/SVPlanner.py
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
-=======
-            # header is tick_count, delta_time and sim_time
-            vehicle_state, header = self.read_traffic_state(traffic_state_sharr)
->>>>>>> a1833de... squash LL commits:mm/SVPlanner.py
             state_time = header[2]
             
             vehicle_frenet_state = np.concatenate([vehicle_state.get_S(), vehicle_state.get_D()])
@@ -120,7 +115,7 @@ class SVPlanner(object):
         # NOTE: this assumes only one lane. /2 to center it on its centerline
         # planner seems to keep a distance of 2 from right bound, maybe because width is less that 4?
         # TODO: width needs to be converted to left and right bound positions
-        lower_lane_config = LaneConfig(1, 1, lower_lane_width / 2, lower_lane_width / -2)
+        lower_lane_config = LaneConfig(1, 30, lower_lane_width / 2, lower_lane_width / -2)
         # print("lane width: " + str(lower_lane_config.left_bound))
         #hardcoding now
         # LaneConfig(id, velocity, leftbound, rightbound)
@@ -144,50 +139,30 @@ class SVPlanner(object):
         mkey=M_VELKEEP
         mconfig = MVelKeepConfig()
         
-<<<<<<< HEAD:sv/SVPlanner.py
+        # Commented out to test straight path
         #Hardcoded overtake scenario
-        s_pos = frenet_state[0]
-        d_pos = frenet_state[3]
-        if (self.vid ==1): #lane changing vehicle
-            if 0 <= s_pos < 20:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig(MP(18.0,10,6), MP(5))
-            if 20 <= s_pos < 80:
-                mkey=M_LANESWERVE
-                mconfig = MLaneSwerveConfig(target_lid=2)
-            if 80 <= s_pos <160:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig( MP(20.0,10,6), MP(5) )
-            if 160 <= s_pos < 220:    
-                mkey=M_LANESWERVE
-                mconfig = MLaneSwerveConfig(target_lid=1)
-            if 220 <= s_pos:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig(MP(13.0,10,6), MP(5))
-            #if 80 <= s_pos:
-            #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
-            #man_key=M_LANECHANGE
-            #man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
-=======
-        # TODO: commenting out to test with a straight path
         # s_pos = frenet_state[0]
         # d_pos = frenet_state[3]
         # if (self.vid ==1): #lane changing vehicle
         #     if 0 <= s_pos < 20:
         #         mkey=M_VELKEEP
-        #         mconfig = MVelKeepConfig()
-        #     if 20 <= s_pos < 70:
+        #         mconfig = MVelKeepConfig(MP(18.0,10,6), MP(5))
+        #     if 20 <= s_pos < 80:
         #         mkey=M_LANESWERVE
         #         mconfig = MLaneSwerveConfig(target_lid=2)
-        #     #if 40 <= s_pos <80:
-        #         #print('200 300')
-        #     #    man_key=M_LANECHANGE
-        #     #    man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
-        #     #if 80 <= s_pos:
-        #     #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
-        #     #man_key=M_LANECHANGE
-        #     #man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
->>>>>>> a1833de... squash LL commits:mm/SVPlanner.py
+        #     if 80 <= s_pos <160:
+        #         mkey=M_VELKEEP
+        #         mconfig = MVelKeepConfig( MP(20.0,10,6), MP(5) )
+        #     if 160 <= s_pos < 220:    
+        #         mkey=M_LANESWERVE
+        #         mconfig = MLaneSwerveConfig(target_lid=1)
+        #     if 220 <= s_pos:
+        #         mkey=M_VELKEEP
+        #         mconfig = MVelKeepConfig(MP(13.0,10,6), MP(5))
+            #if 80 <= s_pos:
+            #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
+            #man_key=M_LANECHANGE
+            #man_config = MLaneChangeConfig((MIN_VELOCITY + 20, MAX_VELOCITY+20), (VK_MIN_TIME,VK_MAX_TIME))
         return mkey, mconfig, 
 
     def read_traffic_state(self, traffic_state_sharr):
@@ -205,7 +180,6 @@ class SVPlanner(object):
         my_vehicle_state = VehicleState()
         for ri in range(1,r):
             i = ri * c  #first index for row
-<<<<<<< HEAD:sv/SVPlanner.py
             vid = traffic_state_sharr[i]
             state_vector = traffic_state_sharr[i+1:i+c]
             if (vid == self.vid):
@@ -216,14 +190,6 @@ class SVPlanner(object):
                 vehicles[vid] = vehicle
         traffic_state_sharr.release() #<=========RELEASE
         return header_vector, my_vehicle_state, vehicles
-=======
-            if (traffic_state_sharr[i] == self.vid): # only reading own state
-                sv = traffic_state_sharr[i+1:i+c]
-                vehicle_state.set_state_vector(sv)
-        traffic_state_sharr.release() #<=========RELEASE
-
-        return vehicle_state, header_vector
->>>>>>> a1833de... squash LL commits:mm/SVPlanner.py
 
     def write_motion_plan(self, mplan_sharr, traj, cand, state_time):
         if not traj:

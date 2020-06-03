@@ -11,9 +11,8 @@ from SimTraffic import *
 from dash.DashBoard import *
 from util.Constants import *
 
-from LaneletMap import *
+from Mapping.LaneletMap import *
 
-from LaneletMap import *
 
 if __name__ == "__main__":
     sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=False, label="EX")

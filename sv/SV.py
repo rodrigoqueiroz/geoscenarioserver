@@ -13,7 +13,7 @@ from util.Utils import *
 from sv.SVPlanner import *
 from sv.VehicleState import *
 from shared_mem.EgoSharedMemory import *
-from LaneletMap import LaneletMap
+from Mapping.LaneletMap import LaneletMap
 
 
 # Vehicle base class for remote control or simulation.

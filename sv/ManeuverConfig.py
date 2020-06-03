@@ -93,7 +93,7 @@ class MP:
 
 @dataclass        
 class MVelKeepConfig:
-    vel:MP = MP(14.0,10,6)          #velocity in [m/s] as MP
+    vel:MP = MP(10.0,10,6)          #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
 
 @dataclass
