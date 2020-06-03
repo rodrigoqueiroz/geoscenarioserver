@@ -13,6 +13,7 @@ from util.Utils import *
 from sv.SVPlanner import *
 from sv.VehicleState import *
 from shared_mem.EgoSharedMemory import *
+from LaneletMap import LaneletMap
 
 
 # Vehicle base class for remote control or simulation.
@@ -22,6 +23,7 @@ class Vehicle(object):
         self.vid = vid
         self.name = name
         #state
+        #start state in sim frame
         self.vehicle_state = VehicleState()
         self.vehicle_state.x = start_state[0]
         self.vehicle_state.x_vel = start_state[1]
@@ -83,6 +85,8 @@ class SV(Vehicle):
         Vehicle.__init__(self, vid, name, start_state, radius, model)
         #Map
         self.lanelet_map = None
+        # list of lanelet ids we want this vehicle to follow
+        self.lanelet_route = None
         #Planning
         self.sv_planner = None
         #Trajectory
@@ -128,6 +132,7 @@ class SV(Vehicle):
             If a planner is started, the vehicle can't have a remote.
             Use either option (start_planner or start_remote).
         """
+        self.lanelet_map = laneletmap # move this to init?
         self.is_remote = False
         self.sv_planner = SVPlanner(self.vid, nvehicles, laneletmap ,traffic_state_sharr)
         self.sv_planner.start()
@@ -161,10 +166,23 @@ class SV(Vehicle):
             if (time>self.trajectory[2]): #exceed total traj time
                 return
 
-            self.vehicle_state.x = self.s_eq(time)
+            # update frenet state
+            self.vehicle_state.s = self.s_eq(time)
+            self.vehicle_state.s_vel = self.s_vel_eq(time)
+            self.vehicle_state.s_acc = self.s_acc_eq(time)
+            self.vehicle_state.d = self.d_eq(time)
+            self.vehicle_state.d_vel = self.d_vel_eq(time)
+            self.vehicle_state.d_acc = self.d_acc_eq(time)
+
+            # Compute sim state using the global path this vehicle is following
+            global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
+            x, y = LaneletMap.frenet_to_sim_frame(global_path, self.s_eq(time), self.d_eq(time))
+            # can we just write out s_eq and d_eq to planner??
+
+            self.vehicle_state.x = x
             self.vehicle_state.x_vel = self.s_vel_eq(time)
             self.vehicle_state.x_acc = self.s_acc_eq(time)
-            self.vehicle_state.y = self.d_eq(time)
+            self.vehicle_state.y = y
             self.vehicle_state.y_vel = self.d_vel_eq(time)
             self.vehicle_state.y_acc = self.d_acc_eq(time)
             #sanity check
@@ -172,7 +190,20 @@ class SV(Vehicle):
             #    diff = self.vehicle_state.x - self.last_x
             #    print ('ERROR: X went backwards. Diff: {:.2}'.format(diff))
             #self.last_x = self.vehicle_state.x
+    
 
+    def get_frenet_state(self):
+        # ll = self.lanelet_map.get_occupying_lanelet(self.vehicle_state.x, self.vehicle_state.y)
+        # s, d = LaneletMap.sim_to_frenet_frame(ll, self.vehicle_state.x, self.vehicle_state.y)
+        if self.s_eq == None:
+            return None
+        time = self.trajectory_time
+        return [self.s_eq(time), self.s_vel_eq(time), self.s_acc_eq(time), self.d_eq(time), self.d_vel_eq(time), self.d_acc_eq(time)]
+
+    def get_global_path(self):
+        """ The ref path the SV is following
+        """
+        pass
 
     def set_new_motion_plan(self, plan, sim_time):
         """
