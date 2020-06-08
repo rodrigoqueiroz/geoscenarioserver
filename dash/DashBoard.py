@@ -205,6 +205,11 @@ class DashBoard(object):
         plt.gca().add_artist(circle1)
         plt.plot(x, y, 'bv')
 
+        # plot global path
+        if vehicle.global_path:
+            for pt in vehicle.global_path:
+                plt.plot(pt.x, pt.y, 'bo')
+
     def plot_trajectory(self, s_coef, d_coef, T,tcolor='grey'):
         s_eq = to_equation(s_coef)
         d_eq = to_equation(d_coef)

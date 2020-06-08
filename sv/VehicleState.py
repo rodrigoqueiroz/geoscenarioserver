@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #rqueiroz@gsd.uwaterloo.ca
-#d43sharm@edu.uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # --------------------------------------------
 # VehicleState and Motion Plan
 # --------------------------------------------
@@ -26,7 +26,7 @@ class VehicleState:
     yaw:float = 0.0
     steer:float = 0.0
 
-    # frenet frame
+    # frenet frame - make another FrenetState class?
     s:float = 0.0
     d:float = 0.0
     #vel

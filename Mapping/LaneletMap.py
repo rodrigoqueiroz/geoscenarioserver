@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+#rqueiroz@gsd.uwaterloo.ca
+#d43sharm@uwaterloo.ca
+# --------------------------------------------
+# LaneletMap
+# Class to parse a Lanelet 2 map and interface with lanelet2 library
+# --------------------------------------------
+
 import lanelet2
 from lanelet2.core import getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet
 from lanelet2.geometry import distance, boundingBox2d, inside, toArcCoordinates, project, length2d
@@ -21,6 +29,10 @@ def pairwise(iterable):
 def normalize(v):
     norm = np.linalg.norm(v)
     return v / norm if norm > 0 else v
+
+
+class OutsideRefPathException(Exception):
+    pass
 
 
 class LaneletMap(object):
@@ -98,9 +110,11 @@ class LaneletMap(object):
 
         return intersecting_lls[0]
 
-    def get_global_path_for_route(self, x, y, lanelet_route, meters_ahead=100):
+    def get_global_path_for_route(self, lanelet_route, x = None, y = None, meters_ahead=float("inf")):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
-            x, y only used to determine the starting lanelet, allowed to be a little outdated
+            x, y only used to determine the starting lanelet, allowed to be a little outdated.
+            NOTE: lookahead isn't implemented yet, since change in path results in change in frenet coords
+            IDEALLY we don't want to request for this very often - only when we generate a new trajectory
             @param lanelet_route:   list of consecutive lanelets to grab path from
             @return:    list of lanelet2.core.Point3d
         """
@@ -112,6 +126,10 @@ class LaneletMap(object):
                 dist = distance(p, q)
                 if path_length + dist <= meters_ahead:
                     path.append(Point3d(0, q.x, q.y, 0.0))
+                    path_length += dist
+                else:
+                    return ConstLineString3d(0, path)
+        
         path_ls = ConstLineString3d(0, path)
         return path_ls
 
@@ -134,14 +152,14 @@ class LaneletMap(object):
     
 
     @staticmethod
-    def get_lane_width(lanelet, s):
+    def get_lane_width(lanelet, x, y):
         """ Two ways to do this: project the point onto leftbound and rightbound and add their distances
             OR intersect the centerline normal at s with leftbound and rightbound.
             Either way the width would be discontinuous as you move along s.
             TODO: do we actually need average/min lane width over some lookahead time?
             @param s:   length along the lanelet centerline
         """
-        x, y = LaneletMap.sim_to_frenet_frame(lanelet.centerline, s, 0)
+        # x, y = LaneletMap.frenet_to_sim_frame(lanelet.centerline, s, 0)
         point_on_centerline = BasicPoint2d(x, y)
         # project on left and right bounds
         point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
@@ -185,8 +203,8 @@ class LaneletMap(object):
             # print((p.x, p.y, q.x, q.y))
         
         if point_on_ls is None:
-            print("s is outside the lanelet")
-            return None, None
+            print("s is outside the reference path.")
+            raise OutsideRefPathException()
         
         normal = np.array([-1 * tangent[1], tangent[0]])
         point_in_cart = point_on_ls + normal*d

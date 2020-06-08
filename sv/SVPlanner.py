@@ -27,7 +27,7 @@ BT_FOLLOW = 4 #follow a specific target
 BT_CUTIN = 5  #reach and cut in a specific target
 
 class SVPlanner(object):
-    def __init__(self, vid, nvehicles, laneletmap , traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
+    def __init__(self, vid, nvehicles, laneletmap, sim_config, traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
         #MainProcess space:
         self._process = None
         self._traffic_state_sharr = traffic_state_sharr
@@ -37,6 +37,7 @@ class SVPlanner(object):
         self.vid = vid
         self.nvehicles = nvehicles
         self.laneletmap = laneletmap
+        self.sim_config = sim_config
         self.lookahead_dist = 10
         self.PLANNER_RATE = 5
 
@@ -86,7 +87,7 @@ class SVPlanner(object):
             # TODO: transform other vehicles to frenet frame based on this vehicle
             
             #Access lane config based on vehicle_state
-            lane_config = self.read_map(vehicle_state, vehicle_frenet_state)
+            lane_config = self.read_map(vehicle_state)
 
             #BTree Tick
             mkey, mconfig = self.behavior_tick(vehicle_frenet_state)
@@ -108,10 +109,10 @@ class SVPlanner(object):
         shm_vs.close()
         shm_vp.close()
     
-    def read_map(self, cart_state, frenet_state):
+    def read_map(self, vehicle_state):
         # retrieve lane state from map
-        cur_ll = self.laneletmap.get_occupying_lanelet_in_route(frenet_state[0], [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991])
-        lower_lane_width = LaneletMap.get_lane_width(cur_ll, frenet_state[0])
+        cur_ll = self.laneletmap.get_occupying_lanelet_in_route(vehicle_state.s, self.sim_config.lanelet_routes[self.vid])
+        lower_lane_width = LaneletMap.get_lane_width(cur_ll, vehicle_state.x, vehicle_state.y)
         # NOTE: this assumes only one lane. /2 to center it on its centerline
         # planner seems to keep a distance of 2 from right bound, maybe because width is less that 4?
         # TODO: width needs to be converted to left and right bound positions
@@ -181,6 +182,7 @@ class SVPlanner(object):
         for ri in range(1,r):
             i = ri * c  #first index for row
             vid = traffic_state_sharr[i]
+            # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[i+1:i+c]
             if (vid == self.vid):
                 my_vehicle_state.set_state_vector(state_vector)

@@ -1,5 +1,5 @@
 #rqueiroz@gsd.uwaterloo.ca
-#d43sharm@edu.uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED TRAFFIC - Coordinate all vehicle Simulation, Ego interface,
 # and ShM for shared state between vehicles (perception ground truth), 
@@ -20,14 +20,15 @@ class SimTraffic(object):
     def __init__(self):
         self.vehicles = {}  #dictionary for direct access using vid
         self.static_objects = {}
-        self.laneletmap = None
+        self.lanelet_map = None
+        self.sim_config = None
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         #Internal ShM
         self.traffic_state_sharr = None
     
-    def add_vehicle(self, vid, name, start_state, btree_root, target = None, goal_x = None, goal_y = None):
-        v = SV(vid, name, start_state, 1.0)
+    def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root, target = None, goal_x = None, goal_y = None):
+        v = SV(vid, name, start_state, 1.0, self.lanelet_map, lanelet_route)
         v.set_behavior_root(btree_root, target)
         self.vehicles[vid] = v
     
@@ -37,7 +38,10 @@ class SimTraffic(object):
         self.vehicles[vid] = v
 
     def set_map(self, laneletmap):
-        self.laneletmap = laneletmap
+        self.lanelet_map = laneletmap
+
+    def set_sim_config(self, sim_config):
+        self.sim_config = sim_config
 
     def start(self):
         nv = len(self.vehicles)
@@ -51,7 +55,7 @@ class SimTraffic(object):
             if vehicle.is_remote:  
                 vehicle.start_remote()
             else: #SV
-                vehicle.start_planner(nv,self.laneletmap,self.traffic_state_sharr )
+                vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr)
             #if not, start remote 
     
     def stop_all(self):

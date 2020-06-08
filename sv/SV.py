@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #rqueiroz@gsd.uwaterloo.ca
-#d43sharm@edu.uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED VEHICLES
 # --------------------------------------------
@@ -13,12 +13,12 @@ from util.Utils import *
 from sv.SVPlanner import *
 from sv.VehicleState import *
 from shared_mem.EgoSharedMemory import *
-from Mapping.LaneletMap import LaneletMap
+from Mapping.LaneletMap import LaneletMap, OutsideRefPathException
 
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
-    def __init__(self, vid, name = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
+    def __init__(self, vid, name = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
         #id
         self.vid = vid
         self.name = name
@@ -31,6 +31,13 @@ class Vehicle(object):
         self.vehicle_state.y = start_state[3]
         self.vehicle_state.y_vel = start_state[4]
         self.vehicle_state.y_acc = start_state[5]
+        # start state in frenet
+        self.vehicle_state.s = frenet_state[0]
+        self.vehicle_state.s_vel = frenet_state[1]
+        self.vehicle_state.s_acc = frenet_state[2]
+        self.vehicle_state.d = frenet_state[3]
+        self.vehicle_state.d_vel = frenet_state[4]
+        self.vehicle_state.d_acc = frenet_state[5]
         #stats
         self.radius = radius
         self.model = model
@@ -81,12 +88,19 @@ class Vehicle(object):
 
 # A Simulated Vehicle
 class SV(Vehicle):
-    def __init__(self, vid, name, start_state, radius, model = None):
-        Vehicle.__init__(self, vid, name, start_state, radius, model)
+    def __init__(self, vid, name, start_state, radius, lanelet_map, lanelet_route, model = None):
         #Map
-        self.lanelet_map = None
+        self.lanelet_map = lanelet_map
         # list of lanelet ids we want this vehicle to follow
-        self.lanelet_route = None
+        self.lanelet_route = lanelet_route
+        self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
+
+        # Compute frenet state corresponding to start_state
+        s, d = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0], start_state[3])
+        frenet_state = [s, start_state[1], start_state[2], d, start_state[4], start_state[5]]
+        Vehicle.__init__(self, vid, name, start_state, frenet_state, radius, model)
+        print("init'd with {}, {}".format(s, d))
+
         #Planning
         self.sv_planner = None
         #Trajectory
@@ -127,14 +141,13 @@ class SV(Vehicle):
         self.btree = btree
         self.target_id = target_id
 
-    def start_planner(self, nvehicles, laneletmap, traffic_state_sharr ):
+    def start_planner(self, nvehicles, sim_config, traffic_state_sharr ):
         """For simulated vehicles controlled by SVPlanner.
             If a planner is started, the vehicle can't have a remote.
             Use either option (start_planner or start_remote).
         """
-        self.lanelet_map = laneletmap # move this to init?
         self.is_remote = False
-        self.sv_planner = SVPlanner(self.vid, nvehicles, laneletmap ,traffic_state_sharr)
+        self.sv_planner = SVPlanner(self.vid, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr)
         self.sv_planner.start()
     
     def stop(self):
@@ -166,6 +179,13 @@ class SV(Vehicle):
             if (time>self.trajectory[2]): #exceed total traj time
                 return
 
+            # sanity check
+            # if self.s_eq(time) < self.vehicle_state.s:
+            #     print ('ERROR: S went backwards from {:.2} to {:.2}'.format(self.vehicle_state.s, self.s_eq(time)))
+            #     raise Exception()
+            # else:
+            #     print ('S: {:.2}'.format(self.s_eq(time)))
+
             # update frenet state
             self.vehicle_state.s = self.s_eq(time)
             self.vehicle_state.s_vel = self.s_vel_eq(time)
@@ -175,10 +195,15 @@ class SV(Vehicle):
             self.vehicle_state.d_acc = self.d_acc_eq(time)
 
             # Compute sim state using the global path this vehicle is following
-            global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
-            x, y = LaneletMap.frenet_to_sim_frame(global_path, self.s_eq(time), self.d_eq(time))
-            # can we just write out s_eq and d_eq to planner??
-
+            # TODO: rn the global path isn't changing - its using the centerline of the entire route
+            # self.global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
+            try:
+                x, y = LaneletMap.frenet_to_sim_frame(self.global_path, self.s_eq(time), self.d_eq(time))
+            except OutsideRefPathException as e:
+                # assume we've reached the goal and exit?
+                raise e
+            
+            # update sim state
             self.vehicle_state.x = x
             self.vehicle_state.x_vel = self.s_vel_eq(time)
             self.vehicle_state.x_acc = self.s_acc_eq(time)
