@@ -43,34 +43,6 @@ class LaneletMap(object):
         self.lanelet_map, errors = lanelet2.io.loadRobust(self.example_map, projector)
         assert not errors
 
-        # nearest point test
-        # testpt = BasicPoint2d(2342.69, 863)
-        # lls = lanelet_map.laneletLayer.nearest(testpt, 1)
-
-        llid = 45166
-        # every layer is like a list with overlaoded [] like a map
-        ll = self.lanelet_map.laneletLayer[llid]
-
-        # testpt = BasicPoint2d(1125, 557)
-        testpt = BasicPoint2d(ll.centerline[0].x, ll.centerline[0].y)
-        # print(LaneletMap.get_lane_width(ll, 0))
-        # print(inside(ll, testpt))
-        # corresponding_ll = self.get_occupying_lanelet(testpt.x, testpt.y)
-        # print(corresponding_ll)
-
-        # TODO: put this stuff in unit tests
-        # print(distance(testpt, BasicPoint2d(ll.centerline[0].x, ll.centerline[0].y)))
-        # print(distance(ConstLineString2d(ll.centerline), Point2d(getId(), testpt.x, testpt.y)))
-        # print(testpt)
-        # s, d = LaneletMap.sim_to_frenet_frame(ll, testpt.x, testpt.y)
-        # print((s, d))
-        # x, y = LaneletMap.frenet_to_sim_frame(ll, s, d)
-        # print((x, y))
-
-        # plot the lanelet points for sanity testing
-        # plt.plot(testpt.x, testpt.y, 'bo')
-        # LaneletMap.plot_ll(ll)
-        # plt.show()
 
     def get_occupying_lanelet_in_route(self, s, lanelet_route):
         running_length = 0
@@ -168,44 +140,95 @@ class LaneletMap(object):
     
     
     @staticmethod
-    def sim_to_frenet_frame(ref_path, x, y):
-        """ TODO: need to transform heading?
+    def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
+        """
             @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?
         """
-        assert isinstance(ref_path, ConstLineString3d)
+        x, x_vel, x_acc = x_vector
+        y, y_vel, y_acc = y_vector
+        velocity = np.array([x_vel, y_vel])
 
         path_ls = ConstLineString2d(ref_path)
         # toArcCoordinates does not interpolate beyond or before ref_path
-        # so when it goes over, it's time to switch to a new ref path?
         arc_coords = toArcCoordinates(path_ls, BasicPoint2d(x, y))
-        return arc_coords.length, arc_coords.distance
 
-
-    @staticmethod
-    def frenet_to_sim_frame(ref_path, s, d):
-        """
-            @param ref_path:    iterable of lanelet2.core.Point3d. Change to something general?
-        """
-        point_on_ls = None
-        tangent = None
+        # velocity
+        unit_tangent = None
         arclen = 0
         for p, q in pairwise(ref_path):
             pq = np.array([q.x - p.x, q.y - p.y])
             dist = np.linalg.norm(pq)
 
-            if arclen <= s <= arclen + dist:
+            if arclen <= arc_coords.length <= arclen + dist: # if s lies between p and q
+                unit_tangent = normalize(pq)
+                break
+            arclen += dist
+
+        if unit_tangent is None:
+            print("point is outside the reference path.")
+            raise OutsideRefPathException()
+        
+        unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+        vel_frenet = np.array([
+            np.dot(velocity, unit_tangent),
+            np.dot(velocity, unit_normal)])
+         # ensure speed is right
+        return [arc_coords.length, vel_frenet[0], x_acc], [arc_coords.distance, vel_frenet[1], y_acc]
+
+
+    @staticmethod
+    def frenet_to_sim_frame(ref_path, s_vector, d_vector):
+        """
+            @param ref_path:    iterable of lanelet2.core.Point3d. Change to something general?
+        """
+        s, s_vel, s_acc = s_vector
+        d, d_vel, d_acc = d_vector
+
+        point_on_ls = None
+        # kappa = None
+        unit_tangent = None
+        arclen = 0
+        for p, q in pairwise(ref_path):
+            pq = np.array([q.x - p.x, q.y - p.y])
+            dist = np.linalg.norm(pq)
+
+            if s < 0 or arclen <= s <= arclen + dist: # if s lies between p and q
+                # r(s)
                 delta_s = s - arclen
-                tangent = normalize(pq)
-                point_on_ls = np.array([p.x, p.y]) + tangent * delta_s
+                print(delta_s)
+                unit_tangent = normalize(pq)
+                point_on_ls = np.array([p.x, p.y]) + unit_tangent * delta_s
+
+                # kappa
+                # if i+2 < len(ref_path):
+                #     # take next unit_tangent for kappa calc
+                #     r = ref_path[i+2]
+                #     tangent_qr = normalize(np.array([r.x - q.x, r.y - q.y]))
+                #     dT = tangent_qr - unit_tangent
+                #     kappa = np.linalg.norm(dT / dist)
+                # elif i-1 >= 0:
+                #     # take previous tangent for calculation
+                #     op = np.array([p.x - o.x, p.y - o.y])
+                #     o = ref_path[i-1]
+                #     tangent_op = normalize(op)
+                #     dT = unit_tangent - tangent_op
+                #     kappa = np.linalg.norm(dT / np.linalg.norm(op))
                 break
             
             arclen += dist
             # print((p.x, p.y, q.x, q.y))
         
         if point_on_ls is None:
-            print("s is outside the reference path.")
+            print("s {} d {} is outside the reference path.".format(s, d))
             raise OutsideRefPathException()
         
-        normal = np.array([-1 * tangent[1], tangent[0]])
-        point_in_cart = point_on_ls + normal*d
-        return point_in_cart[0], point_in_cart[1]
+        unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+
+        point_in_cart = point_on_ls + unit_normal*d
+        # one_minus_kappa_d_2 = (1 - kappa * d) ** 2
+        # v = np.sqrt( one_minus_kappa_d_2 * s_vel**2 + d_vel**2 )
+        # theta_r = np.arctan2(unit_tangent[1], unit_tangent[0])
+        # theta_x = np.arcsin(d_vel/v) + theta_r
+        # vel = v * np.array([np.cos(theta_x), np.sin(theta_x)])
+        vel = s_vel * unit_tangent + d_vel * unit_normal
+        return [point_in_cart[0], vel[0], s_acc], [point_in_cart[1], vel[1], d_acc]

@@ -201,14 +201,19 @@ class DashBoard(object):
         # plot lanelets in its path
         vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
 
+        # vehicle pos
         circle1 = plt.Circle((x, y), 1.0, color='b', fill=False)
         plt.gca().add_artist(circle1)
         plt.plot(x, y, 'bv')
 
+        # vehicle direction - /2 for aesthetics
+        plt.arrow(x, y, vehicle.vehicle_state.x_vel/2, vehicle.vehicle_state.y_vel/2,
+            head_width=1, head_length=1)
+
         # plot global path
-        if vehicle.global_path:
-            for pt in vehicle.global_path:
-                plt.plot(pt.x, pt.y, 'bo')
+        # if vehicle.global_path:
+        #     for pt in vehicle.global_path:
+        #         plt.plot(pt.x, pt.y, 'bo')
 
     def plot_trajectory(self, s_coef, d_coef, T,tcolor='grey'):
         s_eq = to_equation(s_coef)

@@ -22,7 +22,7 @@ def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_v
     elif(man_key==M_STOP):
         best, trajectories  = plan_stop(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None) 
     elif (man_key==M_FOLLOW):
-        best, trajectories  = plan_following(vehicle_frenet_state, mconfig, lane_config, self.target_id, traffic_vehicles)
+        best, trajectories  = plan_following(vehicle_frenet_state, mconfig, lane_config, vehicles=traffic_vehicles)
     elif (man_key==M_LANESWERVE):
         best, trajectories = plan_laneswerve(vehicle_frenet_state,  mconfig, lane_config, traffic_vehicles, None) #returns tuple (s[], d[], t)
     #elif (man_key==CUTIN):
@@ -94,7 +94,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     #Pre conditions. Can the vehicle be followed?
     vehicle = vehicles[target_vid]
     #Is target ahead?
-    if (s_start[0] >= vehicle.vehicle_state.x):
+    if (s_start[0] >= vehicle.vehicle_state.s):
         return
     #Is target on the same lane?
     #TODO

@@ -60,14 +60,15 @@ class Vehicle(object):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
             TODO: predict using history
+            NOTE: do we change this to use frenet?
         """
         state = [
-            self.vehicle_state.x + (self.vehicle_state.x_vel * t),
-            self.vehicle_state.x_vel, 
-            self.vehicle_state.x_acc, 
-            self.vehicle_state.y + (self.vehicle_state.y_vel * t), 
-            self.vehicle_state.y_vel, 
-            self.vehicle_state.y_acc
+            self.vehicle_state.s + (self.vehicle_state.s_vel * t),
+            self.vehicle_state.s_vel, 
+            self.vehicle_state.s_acc, 
+            self.vehicle_state.d + (self.vehicle_state.d_vel * t), 
+            self.vehicle_state.d_vel, 
+            self.vehicle_state.d_acc
         ]
         return state
        
@@ -96,10 +97,10 @@ class SV(Vehicle):
         self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
 
         # Compute frenet state corresponding to start_state
-        s, d = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0], start_state[3])
-        frenet_state = [s, start_state[1], start_state[2], d, start_state[4], start_state[5]]
+        s_vector, d_vector = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
+        frenet_state = s_vector + d_vector
         Vehicle.__init__(self, vid, name, start_state, frenet_state, radius, model)
-        print("init'd with {}, {}".format(s, d))
+        print("{} init'd with {}, {}".format(vid, s_vector[0], d_vector[0]))
 
         #Planning
         self.sv_planner = None
@@ -113,7 +114,7 @@ class SV(Vehicle):
         self.d_eq = None
         self.d_vel_eq = None
         self.d_acc_eq = None
-     
+
     def future_state(self, t):
         """ Predicts a new state based on time 
             and current trajectory *override
@@ -198,18 +199,18 @@ class SV(Vehicle):
             # TODO: rn the global path isn't changing - its using the centerline of the entire route
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
             try:
-                x, y = LaneletMap.frenet_to_sim_frame(self.global_path, self.s_eq(time), self.d_eq(time))
+                x_vector, y_vector = LaneletMap.frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
                 raise e
             
             # update sim state
-            self.vehicle_state.x = x
-            self.vehicle_state.x_vel = self.s_vel_eq(time)
-            self.vehicle_state.x_acc = self.s_acc_eq(time)
-            self.vehicle_state.y = y
-            self.vehicle_state.y_vel = self.d_vel_eq(time)
-            self.vehicle_state.y_acc = self.d_acc_eq(time)
+            self.vehicle_state.x = x_vector[0]
+            self.vehicle_state.x_vel = x_vector[1]
+            self.vehicle_state.x_acc = x_vector[2]
+            self.vehicle_state.y = y_vector[0]
+            self.vehicle_state.y_vel = y_vector[1]
+            self.vehicle_state.y_acc = y_vector[2]
             #sanity check
             #if ( self.vehicle_state.x < self.last_x) :
             #    diff = self.vehicle_state.x - self.last_x
@@ -218,8 +219,6 @@ class SV(Vehicle):
     
 
     def get_frenet_state(self):
-        # ll = self.lanelet_map.get_occupying_lanelet(self.vehicle_state.x, self.vehicle_state.y)
-        # s, d = LaneletMap.sim_to_frenet_frame(ll, self.vehicle_state.x, self.vehicle_state.y)
         if self.s_eq == None:
             return None
         time = self.trajectory_time

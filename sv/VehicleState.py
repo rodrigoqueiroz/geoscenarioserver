@@ -72,9 +72,15 @@ class VehicleState:
     
     def get_S(self):
         return [self.s, self.s_vel, self.s_acc]
+
+    def set_S(self, S):
+        self.s, self.s_vel, self.s_acc = S
     
     def get_D(self):
         return [self.d, self.d_vel, self.d_acc]
+    
+    def set_D(self, D):
+        self.d, self.d_vel, self.d_acc = D
     
     
 

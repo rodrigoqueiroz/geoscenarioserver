@@ -82,10 +82,16 @@ class SVPlanner(object):
             state_time = header[2]
             
             vehicle_frenet_state = np.concatenate([vehicle_state.get_S(), vehicle_state.get_D()])
-            print('Plan at time {} and FRENET STATE:'.format(state_time))
+            print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
-            # TODO: transform other vehicles to frenet frame based on this vehicle
             
+            # transform other vehicles to frenet frame based on this vehicle
+            ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid])
+            for vid, vehicle in traffic_vehicles.items():
+                s_vector, d_vector = LaneletMap.sim_to_frenet_frame(ref_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                vehicle.vehicle_state.set_S(s_vector)
+                vehicle.vehicle_state.set_D(d_vector)
+
             #Access lane config based on vehicle_state
             lane_config = self.read_map(vehicle_state)
 
@@ -140,6 +146,11 @@ class SVPlanner(object):
         mkey=M_VELKEEP
         mconfig = MVelKeepConfig()
         
+        # hardcoded follow scenario
+        if self.vid == 1:
+            mkey = M_FOLLOW
+            mconfig = MFollowConfig(2)
+
         # Commented out to test straight path
         #Hardcoded overtake scenario
         # s_pos = frenet_state[0]
