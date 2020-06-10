@@ -10,10 +10,10 @@ import math
 import sys
 from TickSync import TickSync
 from util.Utils import *
+from util.Constants import *
 from sv.SVPlanner import *
 from sv.VehicleState import *
-from shared_mem.EgoSharedMemory import *
-
+from shm.SimSharedMemory import *
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
@@ -34,18 +34,6 @@ class Vehicle(object):
         self.model = model
         #remote
         self.is_remote = False
-        self._remote_shared_memory = None
-    
-    def start_remote(self):
-        """ For vehicles controlled by external source. 
-            For example: Ego/Subject vehicle, or a vehicle controlled by a Tester
-            If a remote is started, the vehicle can't have a planner
-            Use either option (start_planner or start_remote).
-        """
-        self._remote_shared_memory = EgoSharedMemory()
-        
-    def stop(self):
-        self._remote_shared_memory = None
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
@@ -61,20 +49,21 @@ class Vehicle(object):
             self.vehicle_state.y_acc
         ]
         return state
-       
+    
+    def stop(self):
+        pass
+
     def tick(self, tick_count, delta_time, sim_time):
-        if self.is_remote:
-            if _remote_shared_memory.is_connected:
-                self._remote_shared_memory.read_memory()
-                self._remote_shared_memory
+        pass
     
     def get_sim_state(self):
-        x = round((self.vehicle_state.x * 100))
-        y = round((self.vehicle_state.y * 100))
-        z = round((self.vehicle_state.y * 100))
+        x = round((self.vehicle_state.x * CLIENT_METER_UNIT))
+        y = round((self.vehicle_state.y * CLIENT_METER_UNIT))
+        z = round((self.vehicle_state.y * CLIENT_METER_UNIT))
         position = [x, y, z]
         velocity = [self.vehicle_state.x_vel, self.vehicle_state.y_vel]
-        return self.vid, position, velocity, self.vehicle_state.yaw, self.vehicle_state.steer
+        remote = 1 if self.is_remote else 0
+        return self.vid, remote, position, velocity, self.vehicle_state.yaw, self.vehicle_state.steer
     
 
 # A Simulated Vehicle

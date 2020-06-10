@@ -16,7 +16,6 @@ from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 
 
-
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
 BT_DRIVE = 1  #follow a route with normal driving. Can switch to follow, or stop
@@ -81,8 +80,8 @@ class SVPlanner(object):
             
             #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
             vehicle_frenet_state = np.concatenate([ vehicle_state.get_X(), vehicle_state.get_Y()])
-            print('Plan at time {} and FRENET STATE:'.format(state_time))
-            print(vehicle_frenet_state)
+            #print('Plan at time {} and FRENET STATE:'.format(state_time))
+            #print(vehicle_frenet_state)
             
             #Access lane config based on vehicle_state
             lane_config = self.read_map(vehicle_frenet_state)
@@ -134,7 +133,7 @@ class SVPlanner(object):
         if (self.vid ==1): #lane changing vehicle
             if 0 <= s_pos < 20:
                 mkey=M_VELKEEP
-                mconfig = MVelKeepConfig(MP(18.0,10,6), MP(5))
+                mconfig = MVelKeepConfig(MP(2.0,10,6), MP(5))
             if 20 <= s_pos < 80:
                 mkey=M_LANESWERVE
                 mconfig = MLaneSwerveConfig(target_lid=2)
