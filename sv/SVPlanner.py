@@ -17,7 +17,6 @@ from sv.ManeuverModels import *
 
 from Mapping.LaneletMap import LaneletMap
 
-
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
 BT_DRIVE = 1  #follow a route with normal driving. Can switch to follow, or stop
@@ -158,7 +157,7 @@ class SVPlanner(object):
         # if (self.vid ==1): #lane changing vehicle
         #     if 0 <= s_pos < 20:
         #         mkey=M_VELKEEP
-        #         mconfig = MVelKeepConfig(MP(18.0,10,6), MP(5))
+        #         mconfig = MVelKeepConfig(MP(2.0,10,6), MP(5))
         #     if 20 <= s_pos < 80:
         #         mkey=M_LANESWERVE
         #         mconfig = MLaneSwerveConfig(target_lid=2)

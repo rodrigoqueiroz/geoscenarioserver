@@ -17,6 +17,7 @@ from tkinter.font import Font
 from PIL import Image, ImageTk
 from util.Constants import *
 from util.Utils import *
+from sv.SV import SV, Vehicle
 
 class DashBoard(object):
     def __init__(self):
@@ -92,15 +93,17 @@ class DashBoard(object):
         self.tframe = tk.Frame(self.window, width = 1000, height = 300)
         self.tframe.pack_propagate(False)
         self.tframe.pack()
+        self.vlabel= tk.Label(self.tframe, text='')
+        self.vlabel.pack(side = 'left')
 
         #Plot Layout
-        matplotlib.rc('font', size=8)          #default text sizes
-        matplotlib.rc('axes', titlesize=8)     #fontsize of the axes title
-        matplotlib.rc('axes', labelsize=8)    # fontsize of the x and y labels
-        matplotlib.rc('xtick', labelsize=6)    # fontsize of the tick labels
-        matplotlib.rc('ytick', labelsize=6)    # fontsize of the tick labels
-        matplotlib.rc('legend', fontsize=8)    # legend fontsize
-        matplotlib.rc('figure', titlesize=8)  # fontsize of the figure title
+        matplotlib.rc('font', size=8)
+        matplotlib.rc('axes', titlesize=8)
+        matplotlib.rc('axes', labelsize=8)
+        matplotlib.rc('xtick', labelsize=6)
+        matplotlib.rc('ytick', labelsize=6)
+        matplotlib.rc('legend', fontsize=8)
+        matplotlib.rc('figure', titlesize=8)
 
 
     def update(self,traffic,centerplot_veh_id):
@@ -109,21 +112,33 @@ class DashBoard(object):
         #Global chart
         plt_fig = plt.figure(1)
         plt_fig.patch.set_facecolor('lightgray')
-        plt.cla()               #clear axes
-        if (MCHART_ASPECT_EQUAL):
+        #clear axes
+        plt.cla()  
+        #aspect
+        if (MCHART_ASPECT_EQUAL): 
             plt.gca().set_aspect('equal', adjustable='box')
+        #basic structure
         plt.grid(True)
         self.plot_road()
+        #vehicles and trajectories
         for vid in traffic.vehicles:
             vehicle = traffic.vehicles[vid]
             vehicle_frenet_state = np.concatenate([ vehicle.vehicle_state.get_S(), vehicle.vehicle_state.get_D()])
-            self.plot_vehicle(vid, vehicle_frenet_state, vehicle.trajectory, vehicle.cand_trajectories)
             #Center plot around main vehicle
             if (vid == centerplot_veh_id):
                 x_lim_a = self.road_length / 2 
                 plt.xlim(vehicle_frenet_state[0] -  x_lim_a , vehicle_frenet_state[0] + self.road_length)
                 plt.ylim(0,10)
-        #Vehicle chart
+            #plot vehicle
+            self.plot_vehicle(vid, vehicle_frenet_state)
+            if not vehicle.is_remote:
+                if (vehicle.trajectory):
+                    self.plot_trajectory(vehicle.trajectory[0], vehicle.trajectory[1], vehicle.trajectory[2],'blue')
+                if (vehicle.cand_trajectories):
+                    for t in cand_trajectories:
+                        self.plot_trajectory(t[0], t[1], t[2], 'grey')
+        
+        #Individual Vehicle chart
         if VEH_TRAJ_CHART:
             self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)    
 
@@ -134,18 +149,20 @@ class DashBoard(object):
             self.plot_vehicle_cartesian(vid, vehicle)
 
         #-Vehicle Table
+        
+        #Individual Vehicle Table
+        strtb = '' 
         for vid in traffic.vehicles:
-            strline = str(traffic.vehicles[vid].vehicle_state)
-            lb = tk.Label(self.tframe, text=strline)
-            lb.pack(side = 'left')
-
+            strtb = strtb + '\n' + str(traffic.vehicles[vid].vehicle_state)
+        self.vlabel.config(text=strtb)
+        #    strline = str(traffic.vehicles[vid].vehicle_state)
+        #    lb = tk.Label(self.tframe, text=strline)
+        #    lb.pack(side = 'left')
+        
         self.mcanvas.draw()
         self.vcanvas.draw()
         self.ccanvas.draw()
         self.window.update() 
-        
-
-        
         #if (tofile):
         #    unique_filename = str(uuid.uuid4())[:8] 
         #    plt.savefig('plots/mtplot_'+ unique_filename + '.png')
@@ -172,13 +189,13 @@ class DashBoard(object):
         #plt.xlim(hv.start_state[0] - area,  hv.start_state[0] + area)
         #plt.title("v(m/s):" + str(c_speed * 3.6)[0:4])
 
-    def plot_vehicle(self, vid, frenet_state, traj, cand_trajectories):
-        s_pos = frenet_state[0]
-        s_vel = frenet_state[1]
-        s_acc = frenet_state[2]
-        d_pos = frenet_state[3]
-        d_vel = frenet_state[4]
-        d_acc = frenet_state[5]
+    def plot_vehicle(self, vid, vehicle_frenet_state):
+        s_pos = vehicle_frenet_state[0]
+        s_vel = vehicle_frenet_state[1]
+        s_acc = vehicle_frenet_state[2]
+        d_pos = vehicle_frenet_state[3]
+        d_vel = vehicle_frenet_state[4]
+        d_acc = vehicle_frenet_state[5]
         #main plot
         gca = plt.gca()
         plt.plot( s_pos, d_pos, "v")
@@ -186,20 +203,16 @@ class DashBoard(object):
         gca.add_artist(circle1)
         label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, float(s_pos), float(s_vel), float(s_acc))
         gca.text(s_pos, d_pos+1.5, label, style='italic')
-        #if (cand_trajectories):
-        #    for t in cand_trajectories:
-        #        self.plot_trajectory(t[0], t[1], t[2], 'grey')
-        if (traj):        
-            self.plot_trajectory(traj[0], traj[1], traj[2],'blue')
-        #vehicle stat
-        #sub plot
+        
 
     def plot_vehicle_cartesian(self, vid, vehicle):
         x = vehicle.vehicle_state.x
         y = vehicle.vehicle_state.y
 
         # plot lanelets in its path
-        vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
+        if not vehicle.is_remote:
+            vehicle.__class__ = SV
+            vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
 
         # vehicle pos
         circle1 = plt.Circle((x, y), 1.0, color='b', fill=False)

@@ -93,7 +93,7 @@ class MP:
 
 @dataclass        
 class MVelKeepConfig:
-    vel:MP = MP(7.0,10,6)          #velocity in [m/s] as MP
+    vel:MP = MP(14.0,10,6)          #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
 
 @dataclass
@@ -117,7 +117,7 @@ class MFollowConfig:
     #target
     target_vid:int                  #target vehicle id
     time:MP = MP(3.0,10,6)          #duration in [s] as MP
-    time_gap:float = 1.0            #[s]
+    time_gap:float = 2.0            #[s]
     #distance:float = 20             #distance from target [m]
     #constraints
     max_ttc:float = 10.0            #max time to collision [s]
