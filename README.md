@@ -7,6 +7,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Maneuver Models,
 - matplotlib
 - python3-tk
 - python3-sysv-ipc
+- [lanelet2](https://github.com/yuzhangbit/lanelet2_standalone)
 
 ## Simulated Vehicle Planner and Maneuver Models (/sv)
 - For Unreal Engine integration, use the module inside /unreal. This module must be added to the Unreal Project and the GeoScenario Actor classes added to the level.

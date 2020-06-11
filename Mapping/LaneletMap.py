@@ -172,7 +172,6 @@ class LaneletMap(object):
         vel_frenet = np.array([
             np.dot(velocity, unit_tangent),
             np.dot(velocity, unit_normal)])
-         # ensure speed is right
         return [arc_coords.length, vel_frenet[0], x_acc], [arc_coords.distance, vel_frenet[1], y_acc]
 
 
@@ -185,7 +184,6 @@ class LaneletMap(object):
         d, d_vel, d_acc = d_vector
 
         point_on_ls = None
-        # kappa = None
         unit_tangent = None
         arclen = 0
         for p, q in pairwise(ref_path):
@@ -198,21 +196,6 @@ class LaneletMap(object):
                 print(delta_s)
                 unit_tangent = normalize(pq)
                 point_on_ls = np.array([p.x, p.y]) + unit_tangent * delta_s
-
-                # kappa
-                # if i+2 < len(ref_path):
-                #     # take next unit_tangent for kappa calc
-                #     r = ref_path[i+2]
-                #     tangent_qr = normalize(np.array([r.x - q.x, r.y - q.y]))
-                #     dT = tangent_qr - unit_tangent
-                #     kappa = np.linalg.norm(dT / dist)
-                # elif i-1 >= 0:
-                #     # take previous tangent for calculation
-                #     op = np.array([p.x - o.x, p.y - o.y])
-                #     o = ref_path[i-1]
-                #     tangent_op = normalize(op)
-                #     dT = unit_tangent - tangent_op
-                #     kappa = np.linalg.norm(dT / np.linalg.norm(op))
                 break
             
             arclen += dist
@@ -225,10 +208,5 @@ class LaneletMap(object):
         unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
 
         point_in_cart = point_on_ls + unit_normal*d
-        # one_minus_kappa_d_2 = (1 - kappa * d) ** 2
-        # v = np.sqrt( one_minus_kappa_d_2 * s_vel**2 + d_vel**2 )
-        # theta_r = np.arctan2(unit_tangent[1], unit_tangent[0])
-        # theta_x = np.arcsin(d_vel/v) + theta_r
-        # vel = v * np.array([np.cos(theta_x), np.sin(theta_x)])
         vel = s_vel * unit_tangent + d_vel * unit_normal
         return [point_in_cart[0], vel[0], s_acc], [point_in_cart[1], vel[1], d_acc]
