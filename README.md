@@ -18,4 +18,4 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Maneuver Models,
 
 
 rqueiroz@gsd.uwaterloo.ca
-d43sharm@edu.uwaterloo.ca
+d43sharm@uwaterloo.ca

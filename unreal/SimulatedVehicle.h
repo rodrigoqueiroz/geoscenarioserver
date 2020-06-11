@@ -1,4 +1,4 @@
-//d43sharm@edu.uwaterloo.ca
+//d43sharm@uwaterloo.ca
 //rqueiroz@gsd.uwaterloo.ca
 // ---------------------------------------------
 // UNREAL SIMULATED VEHICLE CLIENT

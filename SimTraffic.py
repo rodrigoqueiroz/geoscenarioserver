@@ -1,5 +1,5 @@
 #rqueiroz@gsd.uwaterloo.ca
-#d43sharm@edu.uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED TRAFFIC - Coordinate all vehicle Simulation, Ego interface,
 # and ShM for shared state between vehicles (perception ground truth), 
@@ -20,24 +20,28 @@ class SimTraffic(object):
     def __init__(self):
         self.vehicles = {}  #dictionary for direct access using vid
         self.static_objects = {}
-        self.laneletmap = None
+        self.lanelet_map = None
+        self.sim_config = None
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         #Internal ShM
         self.traffic_state_sharr = None
     
-    def add_vehicle(self, vid, name, start_state, btree_root, target = None, goal_x = None, goal_y = None):
-        v = SV(vid, name, start_state, 1.0)
+    def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root, target = None, goal_x = None, goal_y = None):
+        v = SV(vid, name, start_state, 1.0, self.lanelet_map, lanelet_route)
         v.set_behavior_root(btree_root, target)
         self.vehicles[vid] = v
     
     def add_remote_vehicle(self, vid, name, start_state):
-        v = Vehicle(vid, name, start_state, 1.0)
+        v = Vehicle(vid, name=name, start_state=start_state, radius=1.0)
         v.is_remote = True
         self.vehicles[vid] = v
-    
+
     def set_map(self, laneletmap):
-        self.laneletmap = laneletmap
+        self.lanelet_map = laneletmap
+
+    def set_sim_config(self, sim_config):
+        self.sim_config = sim_config
 
     def start(self):
         nv = len(self.vehicles)
@@ -49,7 +53,7 @@ class SimTraffic(object):
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
             if not vehicle.is_remote:
-                vehicle.start_planner(nv,self.laneletmap,self.traffic_state_sharr )
+                vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr)
     
     def stop_all(self):
         for vid in self.vehicles:
@@ -85,8 +89,8 @@ class SimTraffic(object):
 
         #Internal ShM
         nv = len(self.vehicles)
-        r = nv+1
-        c = VehicleState.VECTORSIZE + 1 #+1 for vid
+        r = nv+1 #+1 for header
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 #+1 for vid
         self.traffic_state_sharr = Array('f', r*c )
 
 
@@ -96,16 +100,16 @@ class SimTraffic(object):
 
         nv = len(self.vehicles)
         r = nv+1
-        c = VehicleState.VECTORSIZE + 1 #+1 for vid
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 #+1 for vid
 
         self.traffic_state_sharr.acquire() #<=========LOCK
         #header
         header_vector = [tick_count, delta_time, sim_time]
         self.traffic_state_sharr[0:3] = header_vector
         #vehicles
-        ri = 1 #row index
-        for vid in self.vehicles:
-            sv = self.vehicles[vid].vehicle_state.get_state_vector()
+        ri = 1 #row index, start at 1 for header
+        for vid, vehicle in self.vehicles.items():
+            sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
             i = ri * c  #first index for row
             self.traffic_state_sharr[i] = self.vehicles[vid].vid
             self.traffic_state_sharr[i+1:i+c] = sv

@@ -32,7 +32,7 @@ def velocity_keeping_cost(trajectory, mconfig:MVelKeepConfig, lane_config, vehic
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
-    C.append(99 * collision_cost(trajectory, vehicles))
+    # C.append(99 * collision_cost(trajectory, vehicles)) #commented for now
     total_cost = sum(C)
     return total_cost
 

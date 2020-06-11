@@ -15,6 +15,7 @@ from sv.VehicleState import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 
+from Mapping.LaneletMap import LaneletMap
 
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
@@ -25,7 +26,7 @@ BT_FOLLOW = 4 #follow a specific target
 BT_CUTIN = 5  #reach and cut in a specific target
 
 class SVPlanner(object):
-    def __init__(self, vid, nvehicles, laneletmap , traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
+    def __init__(self, vid, nvehicles, laneletmap, sim_config, traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
         #MainProcess space:
         self._process = None
         self._traffic_state_sharr = traffic_state_sharr
@@ -35,6 +36,7 @@ class SVPlanner(object):
         self.vid = vid
         self.nvehicles = nvehicles
         self.laneletmap = laneletmap
+        self.sim_config = sim_config
         self.lookahead_dist = 10
         self.PLANNER_RATE = 5
 
@@ -78,13 +80,19 @@ class SVPlanner(object):
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
             
-            #TODO: convert from Sim Frame to FrenetFrame using LaneConfig
-            vehicle_frenet_state = np.concatenate([ vehicle_state.get_X(), vehicle_state.get_Y()])
-            #print('Plan at time {} and FRENET STATE:'.format(state_time))
-            #print(vehicle_frenet_state)
+            vehicle_frenet_state = np.concatenate([vehicle_state.get_S(), vehicle_state.get_D()])
+            print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
+            print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
             
+            # transform other vehicles to frenet frame based on this vehicle
+            ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid])
+            for vid, vehicle in traffic_vehicles.items():
+                s_vector, d_vector = LaneletMap.sim_to_frenet_frame(ref_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                vehicle.vehicle_state.set_S(s_vector)
+                vehicle.vehicle_state.set_D(d_vector)
+
             #Access lane config based on vehicle_state
-            lane_config = self.read_map(vehicle_frenet_state)
+            lane_config = self.read_map(vehicle_state)
 
             #BTree Tick
             mkey, mconfig = self.behavior_tick(vehicle_frenet_state)
@@ -106,18 +114,28 @@ class SVPlanner(object):
         shm_vs.close()
         shm_vp.close()
     
-    def read_map(self, frenet_state):
-        #TODO: retrieve lane state from map
+    def read_map(self, vehicle_state):
+        # retrieve lane state from map
+        cur_ll = self.laneletmap.get_occupying_lanelet_in_route(vehicle_state.s, self.sim_config.lanelet_routes[self.vid])
+        lower_lane_width = LaneletMap.get_lane_width(cur_ll, vehicle_state.x, vehicle_state.y)
+        # NOTE: this assumes only one lane. /2 to center it on its centerline
+        # planner seems to keep a distance of 2 from right bound, maybe because width is less that 4?
+        # TODO: width needs to be converted to left and right bound positions
+        lower_lane_config = LaneConfig(1, 30, lower_lane_width / 2, lower_lane_width / -2)
+        # print("lane width: " + str(lower_lane_config.left_bound))
         #hardcoding now
-        lower_lane_config = LaneConfig(1,30,4,0)
-        upper_lane_config = LaneConfig(2,30,8,4)
-        lower_lane_config.set_left_lane(upper_lane_config)
+        # LaneConfig(id, velocity, leftbound, rightbound)
+        # lower_lane_config = LaneConfig(1,30,4,0)
+        # upper_lane_config = LaneConfig(2,30,8,4)
+        # lower_lane_config.set_left_lane(upper_lane_config)
         
-        d_pos = frenet_state[3]
-        if ( 0 <= d_pos < 4):
-            return lower_lane_config
-        if ( 4 <= d_pos <= 8):
-            return upper_lane_config
+        return lower_lane_config
+        # TODO: support multiple lanes
+        # d_pos = frenet_state[3]
+        # if ( 0 <= d_pos < 4):
+        #     return lower_lane_config
+        # if ( 4 <= d_pos <= 8):
+        #     return upper_lane_config
 
     
     def behavior_tick(self,frenet_state):
@@ -127,25 +145,31 @@ class SVPlanner(object):
         mkey=M_VELKEEP
         mconfig = MVelKeepConfig()
         
+        # hardcoded follow scenario
+        if self.vid == 1:
+            mkey = M_FOLLOW
+            mconfig = MFollowConfig(2)
+
+        # Commented out to test straight path
         #Hardcoded overtake scenario
-        s_pos = frenet_state[0]
-        d_pos = frenet_state[3]
-        if (self.vid ==1): #lane changing vehicle
-            if 0 <= s_pos < 20:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig(MP(2.0,10,6), MP(5))
-            if 20 <= s_pos < 80:
-                mkey=M_LANESWERVE
-                mconfig = MLaneSwerveConfig(target_lid=2)
-            if 80 <= s_pos <160:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig( MP(20.0,10,6), MP(5) )
-            if 160 <= s_pos < 220:    
-                mkey=M_LANESWERVE
-                mconfig = MLaneSwerveConfig(target_lid=1)
-            if 220 <= s_pos:
-                mkey=M_VELKEEP
-                mconfig = MVelKeepConfig(MP(13.0,10,6), MP(5))
+        # s_pos = frenet_state[0]
+        # d_pos = frenet_state[3]
+        # if (self.vid ==1): #lane changing vehicle
+        #     if 0 <= s_pos < 20:
+        #         mkey=M_VELKEEP
+        #         mconfig = MVelKeepConfig(MP(2.0,10,6), MP(5))
+        #     if 20 <= s_pos < 80:
+        #         mkey=M_LANESWERVE
+        #         mconfig = MLaneSwerveConfig(target_lid=2)
+        #     if 80 <= s_pos <160:
+        #         mkey=M_VELKEEP
+        #         mconfig = MVelKeepConfig( MP(20.0,10,6), MP(5) )
+        #     if 160 <= s_pos < 220:    
+        #         mkey=M_LANESWERVE
+        #         mconfig = MLaneSwerveConfig(target_lid=1)
+        #     if 220 <= s_pos:
+        #         mkey=M_VELKEEP
+        #         mconfig = MVelKeepConfig(MP(13.0,10,6), MP(5))
             #if 80 <= s_pos:
             #    man_config = MVelKeepingConfig((MIN_VELOCITY, MAX_VELOCITY), (VK_MIN_TIME,VK_MAX_TIME)) 
             #man_key=M_LANECHANGE
@@ -157,7 +181,8 @@ class SVPlanner(object):
         
         nv = self.nvehicles
         r = nv+1
-        c = VehicleState.VECTORSIZE + 1
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1
+
         traffic_state_sharr.acquire() #<=========LOCK
         #header
         header_vector = traffic_state_sharr[0:3]
@@ -167,6 +192,7 @@ class SVPlanner(object):
         for ri in range(1,r):
             i = ri * c  #first index for row
             vid = traffic_state_sharr[i]
+            # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[i+1:i+c]
             if (vid == self.vid):
                 my_vehicle_state.set_state_vector(state_vector)

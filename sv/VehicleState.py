@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 #rqueiroz@gsd.uwaterloo.ca
-#d43sharm@edu.uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # --------------------------------------------
 # VehicleState and Motion Plan
 # --------------------------------------------
 from dataclasses import dataclass
 import numpy as np
 
+# question - is this all in cartesian?
 @dataclass
 class VehicleState:
     VECTORSIZE = 9
+    FRENET_VECTOR_SIZE = 6
     #sim frame
     x:float = 0.0
     y:float = 0.0
@@ -24,6 +26,16 @@ class VehicleState:
     yaw:float = 0.0
     steer:float = 0.0
 
+    # frenet frame - make another FrenetState class?
+    s:float = 0.0
+    d:float = 0.0
+    #vel
+    s_vel:float = 0.0
+    d_vel:float = 0.0
+    #acc
+    s_acc:float = 0.0
+    d_acc:float = 0.0
+
     #For easy shared memory parsing
     def get_state_vector(self):
         arr =  [self.x, self.y,  self.z, 
@@ -32,11 +44,19 @@ class VehicleState:
                 self.yaw, 
                 self.steer
                 ]
-        return arr 
+        return arr
+    
+    def get_frenet_state_vector(self):
+        return [
+            self.s, self.d,
+            self.s_vel, self.d_vel,
+            self.s_acc, self.d_acc
+        ]
 
     #For easy shared memory parsing
     def set_state_vector(self, arr):
-        self.x, self.y,  self.z, self.x_vel, self.y_vel,self.x_acc, self.y_acc, self.yaw, self.steer = arr
+        self.x, self.y,  self.z, self.x_vel, self.y_vel,self.x_acc, self.y_acc, self.yaw, self.steer,\
+            self.s, self.d, self.s_vel, self.d_vel, self.s_acc, self.d_acc = arr
 
     def get_X(self):
         return [self.x,self.x_vel,self.x_acc]
@@ -49,6 +69,18 @@ class VehicleState:
 
     def set_Y(self, Y):
         self.y, self.y_vel, self.y_acc = Y
+    
+    def get_S(self):
+        return [self.s, self.s_vel, self.s_acc]
+
+    def set_S(self, S):
+        self.s, self.s_vel, self.s_acc = S
+    
+    def get_D(self):
+        return [self.d, self.d_vel, self.d_acc]
+    
+    def set_D(self, D):
+        self.d, self.d_vel, self.d_acc = D
     
     
 

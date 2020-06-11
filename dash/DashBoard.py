@@ -11,11 +11,13 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import uuid
 import time
 import tkinter as tk
+from tkinter import RIGHT, LEFT
 from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
 from util.Constants import *
 from util.Utils import *
+from sv.SV import SV, Vehicle
 
 class DashBoard(object):
     def __init__(self):
@@ -58,7 +60,7 @@ class DashBoard(object):
         lb_wise.pack(side = "right")
         
         #-Main Canvas / Global chart
-        mframe = tk.Frame(self.window, width = 1000, height = 300, bg = "lightgray")
+        mframe = tk.Frame(self.window, width = 2000, height = 300, bg = "red")
         mframe.pack_propagate(False)
         mframe.pack()
         
@@ -67,10 +69,10 @@ class DashBoard(object):
         plt_fig.set_size_inches(10,10,forward=True)
         self.mcanvas = FigureCanvasTkAgg(plt_fig, mframe) #must be after resize
         self.mcanvas.get_tk_widget().pack_propagate(False)
-        self.mcanvas.get_tk_widget().pack()
+        self.mcanvas.get_tk_widget().pack(side="left")
         
         #-Vehicle chart
-        vframe = tk.Frame(self.window, width = 1000, height = 300)
+        vframe = tk.Frame(self.window, width = 1000, height = 300, bg="blue")
         vframe.pack_propagate(False)
         vframe.pack()
 
@@ -79,6 +81,13 @@ class DashBoard(object):
         self.vcanvas = FigureCanvasTkAgg(plt_fig2, vframe) #must be after resize
         self.vcanvas.get_tk_widget().pack_propagate(False)
         self.vcanvas.get_tk_widget().pack()
+
+        #-Cartesian plot
+        plt_cart = plt.figure(3)
+        plt_cart.set_size_inches(10,10,forward=True)
+        self.ccanvas = FigureCanvasTkAgg(plt_cart, mframe)
+        self.ccanvas.get_tk_widget().pack_propagate(False)
+        self.ccanvas.get_tk_widget().pack(side="right")
 
         #-Vehicle Table
         self.tframe = tk.Frame(self.window, width = 1000, height = 300)
@@ -114,13 +123,13 @@ class DashBoard(object):
         #vehicles and trajectories
         for vid in traffic.vehicles:
             vehicle = traffic.vehicles[vid]
+            vehicle_frenet_state = np.concatenate([ vehicle.vehicle_state.get_S(), vehicle.vehicle_state.get_D()])
             #Center plot around main vehicle
             if (vid == centerplot_veh_id):
                 x_lim_a = self.road_length / 2 
-                plt.xlim(vehicle.vehicle_state.x -  x_lim_a , vehicle.vehicle_state.x + self.road_length)
+                plt.xlim(vehicle_frenet_state[0] -  x_lim_a , vehicle_frenet_state[0] + self.road_length)
                 plt.ylim(0,10)
             #plot vehicle
-            vehicle_frenet_state = np.concatenate([ vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y()])
             self.plot_vehicle(vid, vehicle_frenet_state)
             if not vehicle.is_remote:
                 if (vehicle.trajectory):
@@ -132,6 +141,14 @@ class DashBoard(object):
         #Individual Vehicle chart
         if VEH_TRAJ_CHART:
             self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)    
+
+        #-Cartesian plot
+        plt.figure(3)
+        plt.cla()
+        for vid, vehicle in traffic.vehicles.items():
+            self.plot_vehicle_cartesian(vid, vehicle)
+
+        #-Vehicle Table
         
         #Individual Vehicle Table
         strtb = '' 
@@ -144,6 +161,7 @@ class DashBoard(object):
         
         self.mcanvas.draw()
         self.vcanvas.draw()
+        self.ccanvas.draw()
         self.window.update() 
         #if (tofile):
         #    unique_filename = str(uuid.uuid4())[:8] 
@@ -186,6 +204,29 @@ class DashBoard(object):
         label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, float(s_pos), float(s_vel), float(s_acc))
         gca.text(s_pos, d_pos+1.5, label, style='italic')
         
+
+    def plot_vehicle_cartesian(self, vid, vehicle):
+        x = vehicle.vehicle_state.x
+        y = vehicle.vehicle_state.y
+
+        # plot lanelets in its path
+        if not vehicle.is_remote:
+            vehicle.__class__ = SV
+            vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
+
+        # vehicle pos
+        circle1 = plt.Circle((x, y), 1.0, color='b', fill=False)
+        plt.gca().add_artist(circle1)
+        plt.plot(x, y, 'bv')
+
+        # vehicle direction - /2 for aesthetics
+        plt.arrow(x, y, vehicle.vehicle_state.x_vel/2, vehicle.vehicle_state.y_vel/2,
+            head_width=1, head_length=1)
+
+        # plot global path
+        # if vehicle.global_path:
+        #     for pt in vehicle.global_path:
+        #         plt.plot(pt.x, pt.y, 'bo')
 
     def plot_trajectory(self, s_coef, d_coef, T,tcolor='grey'):
         s_eq = to_equation(s_coef)
