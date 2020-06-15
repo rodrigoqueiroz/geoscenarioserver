@@ -72,15 +72,15 @@ class DashBoard(object):
         self.mcanvas.get_tk_widget().pack(side="left")
         
         #-Vehicle chart
-        vframe = tk.Frame(self.window, width = 1000, height = 300, bg="blue")
-        vframe.pack_propagate(False)
-        vframe.pack()
+        # vframe = tk.Frame(self.window, width = 1000, height = 300, bg="blue")
+        # vframe.pack_propagate(False)
+        # vframe.pack()
 
-        plt_fig2 = plt.figure(2)
-        plt_fig2.set_size_inches(10,10,forward=True)
-        self.vcanvas = FigureCanvasTkAgg(plt_fig2, vframe) #must be after resize
-        self.vcanvas.get_tk_widget().pack_propagate(False)
-        self.vcanvas.get_tk_widget().pack()
+        # plt_fig2 = plt.figure(2)
+        # plt_fig2.set_size_inches(10,10,forward=True)
+        # self.vcanvas = FigureCanvasTkAgg(plt_fig2, vframe) #must be after resize
+        # self.vcanvas.get_tk_widget().pack_propagate(False)
+        # self.vcanvas.get_tk_widget().pack()
 
         #-Cartesian plot
         plt_cart = plt.figure(3)
@@ -90,11 +90,11 @@ class DashBoard(object):
         self.ccanvas.get_tk_widget().pack(side="right")
 
         #-Vehicle Table
-        self.tframe = tk.Frame(self.window, width = 1000, height = 300)
-        self.tframe.pack_propagate(False)
-        self.tframe.pack()
-        self.vlabel= tk.Label(self.tframe, text='')
-        self.vlabel.pack(side = 'left')
+        # self.tframe = tk.Frame(self.window, width = 1000, height = 300)
+        # self.tframe.pack_propagate(False)
+        # self.tframe.pack()
+        # self.vlabel= tk.Label(self.tframe, text='')
+        # self.vlabel.pack(side = 'left')
 
         #Plot Layout
         matplotlib.rc('font', size=8)
@@ -139,8 +139,8 @@ class DashBoard(object):
                         self.plot_trajectory(t[0], t[1], t[2], 'grey')
         
         #Individual Vehicle chart
-        if VEH_TRAJ_CHART:
-            self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)    
+        # if VEH_TRAJ_CHART:
+        #     self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)    
 
         #-Cartesian plot
         plt.figure(3)
@@ -151,16 +151,16 @@ class DashBoard(object):
         #-Vehicle Table
         
         #Individual Vehicle Table
-        strtb = '' 
-        for vid in traffic.vehicles:
-            strtb = strtb + '\n' + str(traffic.vehicles[vid].vehicle_state)
-        self.vlabel.config(text=strtb)
+        # strtb = '' 
+        # for vid in traffic.vehicles:
+        #     strtb = strtb + '\n' + str(traffic.vehicles[vid].vehicle_state)
+        # self.vlabel.config(text=strtb)
         #    strline = str(traffic.vehicles[vid].vehicle_state)
         #    lb = tk.Label(self.tframe, text=strline)
         #    lb.pack(side = 'left')
         
         self.mcanvas.draw()
-        self.vcanvas.draw()
+        # self.vcanvas.draw()
         self.ccanvas.draw()
         self.window.update() 
         #if (tofile):

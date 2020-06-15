@@ -27,8 +27,8 @@ class SimTraffic(object):
         #Internal ShM
         self.traffic_state_sharr = None
     
-    def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root, target = None, goal_x = None, goal_y = None):
-        v = SV(vid, name, start_state, 1.0, self.lanelet_map, lanelet_route)
+    def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root, start_state_in_frenet=False, target = None, goal_x = None, goal_y = None):
+        v = SV(vid, name, start_state, 1.0, self.lanelet_map, lanelet_route, start_state_in_frenet=start_state_in_frenet)
         v.set_behavior_root(btree_root, target)
         self.vehicles[vid] = v
     

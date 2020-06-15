@@ -38,14 +38,14 @@ if __name__ == "__main__":
     traffic.set_sim_config(sim_config)
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     # adding vehicle at the start of a lanelet
-    traffic.add_vehicle(1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
-        sim_config.lanelet_routes[1], BT_FOLLOW, target=2)
+    traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 2.0,0.0,0.0],
+        sim_config.lanelet_routes[1], BT_VELKEEP, start_state_in_frenet=True)
     # test location
     # traffic.add_vehicle( 1, 'V1', [0,0.0,0.0, 0,0.0,0.0], BT_VELKEEP)
-    traffic.add_vehicle( 2, 'V2', [ref_path[2].x,0.0,0.0, ref_path[2].y,0.0,0.0],
-        sim_config.lanelet_routes[2], BT_VELKEEP)
+    # traffic.add_vehicle(2, 'V2', [8,0.0,0.0, 0.0,0.0,0.0],
+    #     sim_config.lanelet_routes[2], BT_VELKEEP, start_state_in_frenet=True)
 
-    traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    # traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     #traffic.add_vehicle( 2, 'Ego', [20.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
     #traffic.add_vehicle( 3, 'V3', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
     

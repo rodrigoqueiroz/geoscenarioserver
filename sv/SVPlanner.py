@@ -87,7 +87,7 @@ class SVPlanner(object):
             # transform other vehicles to frenet frame based on this vehicle
             ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid])
             for vid, vehicle in traffic_vehicles.items():
-                s_vector, d_vector = LaneletMap.sim_to_frenet_frame(ref_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(ref_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
                 vehicle.vehicle_state.set_S(s_vector)
                 vehicle.vehicle_state.set_D(d_vector)
 
@@ -146,9 +146,9 @@ class SVPlanner(object):
         mconfig = MVelKeepConfig()
         
         # hardcoded follow scenario
-        if self.vid == 1:
-            mkey = M_FOLLOW
-            mconfig = MFollowConfig(2)
+        # if self.vid == 1:
+        #     mkey = M_FOLLOW
+        #     mconfig = MFollowConfig(2)
 
         # Commented out to test straight path
         #Hardcoded overtake scenario
