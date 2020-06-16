@@ -5,12 +5,12 @@
 # --------------------------------------------
 
 #SIM CONFIG
-TIMEOUT = 20               #timeout in [s]
-FRAME_RATE = 10             #Global tick rate
+TIMEOUT = 30               #timeout in [s]
+FRAME_RATE = 30             #Global tick rate
 CLIENT_METER_UNIT = 100    #Client unit (Server uses [m], Unreal client uses [cm])
 
 #DASH CONFIG
-SHOW_DASHBOARD = True      #plot vehicles and trajectories. Optional when running with Ureal engine.
+SHOW_DASHBOARD = False      #plot vehicles and trajectories. Optional when running with Ureal engine.
 PLOT_VID = 1               #Vehicle to center the main plot arouund. Make sure there is a vehicle with this id
 MCHART_ASPECT_EQUAL = False  #Keep S and D with same scale
 

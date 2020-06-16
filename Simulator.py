@@ -46,8 +46,7 @@ if __name__ == "__main__":
         sim_config.lanelet_routes[2], BT_VELKEEP)
 
     traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-    #traffic.add_vehicle( 2, 'Ego', [20.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
-    #traffic.add_vehicle( 3, 'V3', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    #traffic.add_remote_vehicle( 11, 'V3', [0.0,0.0,0.0, 4.0,0.0,0.0])
     
     
     #GUI / Debug screen

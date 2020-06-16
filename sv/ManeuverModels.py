@@ -36,7 +36,7 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     Driving with no vehicle directly ahead
     No target point, but needs to adapt to a desired velocity
     """
-    print ('Maneuver: Velocity Keeping')
+    #print ('Maneuver: Velocity Keeping')
     s_start = start_state[:3]
     d_start = start_state[3:]
     target_t = mconfig.time.value
@@ -79,7 +79,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     Moving target point, requiring a certain temporal safety distance to the vehicle ahead (constant time gap law).
     Predict leading vehicle (assume constant acceleration)
     """
-    print ('Maneuver:  vehicle following')
+    #print ('Maneuver:  vehicle following')
 
     s_start = start_state[:3]
     d_start = start_state[3:]
@@ -135,7 +135,7 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config, vehicle
     Swerve maneuver to another lane
     No vehicles affecting the lane change, except in case of collision detection (if Collision is on).
     """
-    print ('Maneuver: Lane Change Swerve')
+    #print ('Maneuver: Lane Change Swerve')
 
     s_start = start_state[:3]
     d_start = start_state[3:]
@@ -236,7 +236,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = No
     STOP
     Stop can be a stop request by time, deceleration, or distance from current pos.
     """
-    print ('PLAN STOP')
+    #print ('PLAN STOP')
     s_start = start_state[:3]
     d_start = start_state[3:]
     target_t = mconfig.time.value
@@ -282,7 +282,7 @@ def plan_stop_at(start_state, mconfig, lane_config, target_pos , vehicles = None
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
-    print ('PLAN STOP')
+    #print ('PLAN STOP')
     if (start_state[0] >= target_pos):
         print ('Stop target position is too close: {}'.format(target_pos - start_state[0]))
         return None,None

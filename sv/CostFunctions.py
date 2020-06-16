@@ -53,7 +53,7 @@ def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, lane_config, vehicles
     total_cost = 0
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
-    #C.append(1 * total_lat_jerk_cost(trajectory))
+    C.append(1 * total_lat_jerk_cost(trajectory))
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
