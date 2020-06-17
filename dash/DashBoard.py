@@ -60,7 +60,7 @@ class DashBoard(object):
         lb_wise.pack(side = "right")
         
         #-Main Canvas / Global chart
-        mframe = tk.Frame(self.window, width = 2000, height = 300, bg = "red")
+        mframe = tk.Frame(self.window, width = 2000, height = 600, bg = "red")
         mframe.pack_propagate(False)
         mframe.pack()
         
@@ -128,7 +128,7 @@ class DashBoard(object):
             if (vid == centerplot_veh_id):
                 x_lim_a = self.road_length / 2 
                 plt.xlim(vehicle_frenet_state[0] -  x_lim_a , vehicle_frenet_state[0] + self.road_length)
-                plt.ylim(0,10)
+                plt.ylim(-10,10)
             #plot vehicle
             self.plot_vehicle(vid, vehicle_frenet_state)
             if not vehicle.is_remote:
@@ -212,7 +212,7 @@ class DashBoard(object):
         # plot lanelets in its path
         if not vehicle.is_remote:
             vehicle.__class__ = SV
-            vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
+            vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route.shortestPath())
 
         # vehicle pos
         circle1 = plt.Circle((x, y), 1.0, color='b', fill=False)
@@ -224,9 +224,9 @@ class DashBoard(object):
             head_width=1, head_length=1)
 
         # plot global path
-        # if vehicle.global_path:
-        #     for pt in vehicle.global_path:
-        #         plt.plot(pt.x, pt.y, 'bo')
+        if vehicle.global_path:
+            for pt in vehicle.global_path:
+                plt.plot(pt.x, pt.y, 'bo')
 
     def plot_trajectory(self, s_coef, d_coef, T,tcolor='grey'):
         s_eq = to_equation(s_coef)

@@ -24,8 +24,8 @@ if __name__ == "__main__":
     test_map = LaneletMap()
     # class for holding scenario settings - load from file?
     sim_config = SimConfig({
-        1 : [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
-        2 : [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
+        1 : test_map.get_route(329661501650965856, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
+        # 2 : test_map.get_shortest_path(99998, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
         })
     # for testing - grab a path to put vehicles on
     ref_path = test_map.get_global_path_for_route(sim_config.lanelet_routes[1])
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     traffic.set_sim_config(sim_config)
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     # adding vehicle at the start of a lanelet
-    traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 2.0,0.0,0.0],
+    traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 0.0,0.0,0.0],
         sim_config.lanelet_routes[1], BT_VELKEEP, start_state_in_frenet=True)
     # test location
     # traffic.add_vehicle( 1, 'V1', [0,0.0,0.0, 0,0.0,0.0], BT_VELKEEP)

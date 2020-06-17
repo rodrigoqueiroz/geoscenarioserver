@@ -9,17 +9,13 @@
 import lanelet2
 from lanelet2.core import getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet
 from lanelet2.geometry import distance, boundingBox2d, inside, toArcCoordinates, project, length2d
+from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
 
 from matplotlib import pyplot as plt
 from itertools import tee
 import numpy as np
 
-
-def get_test_ll():
-    left = LineString3d(getId(), [Point3d(getId(), 1, y, 0) for y in range(0, 5)])
-    right = LineString3d(getId(), [Point3d(getId(), 2, y, 0) for y in range(0, 5)])
-    return Lanelet(getId(), left, right)
 
 def pairwise(iterable):
     i, j = tee(iterable, 2)
@@ -53,33 +49,86 @@ class LaneletMap(object):
         # update cache for every new ref path
         self.tangents_cache = []
 
+        # generate routing table
+        traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
+        self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
+        
+        # Route has additional semantic information for the shortest path
+        # shortest_path = self.get_shortest_path(4984315, 2925017)
+        # for ll in shortest_path:
+        #     print(ll)
+        # self.plot_lanelets(shortest_path)
+        # plt.show()
+        # exit()
+
+    def get_right(self, lanelet):
+        return self.routing_graph.right(lanelet)
+    
+    def get_left(self, lanelet):
+        return self.routing_graph.left(lanelet)
+
+    def get_route(self, from_lanelet_id:int, to_lanelet_id:int):
+        from_ll = self.lanelet_map.laneletLayer[from_lanelet_id]
+        to_ll = self.lanelet_map.laneletLayer[to_lanelet_id]
+        route = self.routing_graph.getRoute(from_ll, to_ll)
+        assert(route)
+        return route
+
+    def get_shortest_path(self, from_lanelet_id:int, to_lanelet_id:int):
+        route = self.get_route(from_lanelet_id, to_lanelet_id)
+        shortest_path = route.shortestPath()
+        assert(shortest_path)
+        return shortest_path
 
     def get_occupying_lanelet_in_route(self, s, lanelet_route):
+        # NOTE: doesn't account for lane changes in route
         running_length = 0
-        for ll_id in lanelet_route:
-            ll = self.lanelet_map.laneletLayer[ll_id]
+        index = 0
+        for ll in lanelet_route:
+            # ll = self.lanelet_map.laneletLayer[ll_id]
             ll_length = length2d(ll)
             if running_length <= s <= running_length + ll_length:
-                return ll
+                return ll, index
             
+            index += 1
             running_length += ll_length
         
         # s is outside the route
-        return self.lanelet_map.laneletLayer[lanelet_route[-1]]
+        return self.lanelet_map.laneletLayer[lanelet_route[-1]], -1
+
+    def get_occupying_lanelet_by_position(self, lanelet_route, x, y):
+        index = 0
+        ret = None
+        # use ll in route instead of just shortest path?
+        for ll in lanelet_route.shortestPath():
+            if inside(ll, BasicPoint2d(x, y)):
+                ret = ll
+                break
+            index += 1
+
+        return ret, index
 
     def get_global_path_for_route(self, lanelet_route, x = None, y = None, meters_ahead=float("inf")):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
             x, y only used to determine the starting lanelet, allowed to be a little outdated.
             NOTE: lookahead isn't implemented yet, since change in path results in change in frenet coords
             IDEALLY we don't want to request for this very often - only when we generate a new trajectory
-            @param lanelet_route:   list of consecutive lanelets to grab path from
+            TODO: factor in lane changes in route - maybe return path for current lane?
+            @param lanelet_route:   Route object from lanelet2
             @return:    list of lanelet2.core.Point3d
         """
-        cur_ll = self.lanelet_map.laneletLayer[lanelet_route[0]]
+        # if a position is not given, take the first lanelet in the shortest path
+        # otherwise find the lanelet we are in in the shortest path
+        cur_ll, _ = (lanelet_route.shortestPath()[0], 0) if x is None or y is None \
+            else self.get_occupying_lanelet_by_position(lanelet_route, x, y)
+        assert cur_ll
+        
+        cur_lane = lanelet_route.fullLane(cur_ll)
+        # cur_ll = lanelet_route[0]
         path = [ Point3d(0, cur_ll.centerline[0].x, cur_ll.centerline[0].y, 0.0) ]
         path_length = 0
-        for ll_id in lanelet_route:
-            for p, q in pairwise(self.lanelet_map.laneletLayer[ll_id].centerline):
+        for ll in cur_lane:
+            for p, q in pairwise(ll.centerline):
                 dist = distance(p, q)
                 if path_length + dist <= meters_ahead:
                     path.append(Point3d(0, q.x, q.y, 0.0))
@@ -103,13 +152,14 @@ class LaneletMap(object):
                 if i == len(path_ls) - 1:   # last tangent
                     self.tangents_cache.append(normalize(qr))
                     i += 1
-            print(self.tangents_cache)
+            # print(self.tangents_cache)
             
         return path_ls
 
-    def plot_lanelets(self, lanelet_ids):
-        for ll_id in lanelet_ids:
-            LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
+    def plot_lanelets(self, lanelets):
+        for ll in lanelets:
+            # LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
+            LaneletMap.plot_ll(ll)
 
     @staticmethod
     def plot_ll(lanelet):
@@ -130,11 +180,10 @@ class LaneletMap(object):
         """ Two ways to do this: project the point onto leftbound and rightbound and add their distances
             OR intersect the centerline normal at s with leftbound and rightbound.
             Either way the width would be discontinuous as you move along s.
-            TODO: do we actually need average/min lane width over some lookahead time?
             @param s:   length along the lanelet centerline
         """
         # x, y = LaneletMap.frenet_to_sim_frame(lanelet.centerline, s, 0)
-        point_on_centerline = BasicPoint2d(x, y)
+        point_on_centerline = project(ConstLineString2d(lanelet.centerline), BasicPoint2d(x, y))
         # project on left and right bounds
         point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
         point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)

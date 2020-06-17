@@ -85,7 +85,7 @@ class SVPlanner(object):
             print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
             
             # transform other vehicles to frenet frame based on this vehicle
-            ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid])
+            ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
             for vid, vehicle in traffic_vehicles.items():
                 s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(ref_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
                 vehicle.vehicle_state.set_S(s_vector)
@@ -116,12 +116,21 @@ class SVPlanner(object):
     
     def read_map(self, vehicle_state):
         # retrieve lane state from map
-        cur_ll = self.laneletmap.get_occupying_lanelet_in_route(vehicle_state.s, self.sim_config.lanelet_routes[self.vid])
-        lower_lane_width = LaneletMap.get_lane_width(cur_ll, vehicle_state.x, vehicle_state.y)
-        # NOTE: this assumes only one lane. /2 to center it on its centerline
-        # planner seems to keep a distance of 2 from right bound, maybe because width is less that 4?
-        # TODO: width needs to be converted to left and right bound positions
-        lower_lane_config = LaneConfig(1, 30, lower_lane_width / 2, lower_lane_width / -2)
+        cur_ll, _ = self.laneletmap.get_occupying_lanelet_by_position(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+        middle_lane_width = LaneletMap.get_lane_width(cur_ll, vehicle_state.x, vehicle_state.y)
+        # LaneConfig(id, velocity, leftbound, rightbound). /2 to center it on its centerline
+        middle_lane_config = LaneConfig(1, 5, middle_lane_width / 2, middle_lane_width / -2)
+
+        if self.laneletmap.get_left(cur_ll):
+            upper_lane_width = LaneletMap.get_lane_width(self.laneletmap.get_left(cur_ll), vehicle_state.x, vehicle_state.y)
+            upper_lane_config = LaneConfig(2, 5, middle_lane_config.left_bound + upper_lane_width, middle_lane_config.left_bound)
+            middle_lane_config.set_left_lane(upper_lane_config)
+        
+        if self.laneletmap.get_right(cur_ll):
+            lower_lane_width = LaneletMap.get_lane_width(self.laneletmap.get_right(cur_ll), vehicle_state.x, vehicle_state.y)
+            lower_lane_config = LaneConfig(3, 5, middle_lane_config.right_bound - lower_lane_width, middle_lane_config.right_bound)
+            middle_lane_config.set_right_lane(lower_lane_config)
+
         # print("lane width: " + str(lower_lane_config.left_bound))
         #hardcoding now
         # LaneConfig(id, velocity, leftbound, rightbound)
@@ -129,7 +138,7 @@ class SVPlanner(object):
         # upper_lane_config = LaneConfig(2,30,8,4)
         # lower_lane_config.set_left_lane(upper_lane_config)
         
-        return lower_lane_config
+        return middle_lane_config
         # TODO: support multiple lanes
         # d_pos = frenet_state[3]
         # if ( 0 <= d_pos < 4):
@@ -144,6 +153,16 @@ class SVPlanner(object):
         #Standard
         mkey=M_VELKEEP
         mconfig = MVelKeepConfig()
+
+        # route = self.sim_config.lanelet_routes[self.vid]
+        # # Lane changing: get current ll in path
+        # cur_ll, index = self.laneletmap.get_occupying_lanelet_in_route(frenet_state[0], path)
+        # if index < len(path) - 1:
+        #     # if next in current LANE is beside return lane change config
+        #     next_ll = path[index+1]
+        #     if next_ll == self.laneletmap.get_right(cur_ll):
+        #         mkey = M_LANESWERVE
+        #         mconfig = MLaneSwerveConfig(3)
         
         # hardcoded follow scenario
         # if self.vid == 1:
