@@ -100,7 +100,7 @@ class LaneletMap(object):
         index = 0
         ret = None
         # use ll in route instead of just shortest path?
-        for ll in lanelet_route.shortestPath():
+        for ll in lanelet_route:
             if inside(ll, BasicPoint2d(x, y)):
                 ret = ll
                 break
