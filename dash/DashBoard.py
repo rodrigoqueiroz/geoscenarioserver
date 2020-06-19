@@ -212,7 +212,7 @@ class DashBoard(object):
         # plot lanelets in its path
         if not vehicle.is_remote:
             vehicle.__class__ = SV
-            vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route.shortestPath())
+            vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route.laneletMap().laneletLayer)
 
         # vehicle pos
         circle1 = plt.Circle((x, y), 1.0, color='b', fill=False)

@@ -36,6 +36,15 @@ class LaneConfig:
     right_bound:float = 0           #d
     _left_lane: LaneConfig = None
     _right_lane: LaneConfig = None
+
+    def get_current_lane(self, d):
+        if self.right_bound <= d <= self.left_bound:
+            return self
+        elif self._right_lane.right_bound <= d < self._right_lane.left_bound:
+            return self._right_lane
+        elif self._left_lane.right_bound <= d < self._left_lane.left_bound:
+            return self._left_lane
+        return None
     
     def set_left_lane(self,lane):
         self._left_lane = lane
@@ -93,8 +102,9 @@ class MP:
 
 @dataclass        
 class MVelKeepConfig:
-    vel:MP = MP(10.0,10,6)          #velocity in [m/s] as MP
+    vel:MP = MP(7.0,10,6)          #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
+    mkey:int = M_VELKEEP
 
 @dataclass
 class MStopConfig:
@@ -105,12 +115,14 @@ class MStopConfig:
     #during
     min_decel:float = 9.0           #[g]
     max_decel:float = 9.0           #[g]
+    mkey:int = M_STOP
 
 @dataclass
 class MStopAtConfig:
     #target
     stop_pos:float                  #pos in s [m]
     distance:float = 10             #[m]
+    mkey:int = M_STOP
 
 @dataclass
 class MFollowConfig:
@@ -121,6 +133,7 @@ class MFollowConfig:
     #distance:float = 20             #distance from target [m]
     #constraints
     max_ttc:float = 10.0            #max time to collision [s]
+    mkey:int = M_FOLLOW
 
 @dataclass
 class MLaneSwerveConfig:
@@ -128,7 +141,8 @@ class MLaneSwerveConfig:
     target_lid:int                  #target lane id
     time:MP = MP(5.0,10,6)          #target time in [s] as MP
     #soft constraints
-    
+    mkey:int = M_LANESWERVE
+
 
 @dataclass
 class MCutInConfig:
@@ -142,6 +156,7 @@ class MCutInConfig:
     #soft constraints
     vel_dev:float = 10              #%
     time_dev:float = 10             #%
+    mkey:int = M_CUTIN
 
 
 

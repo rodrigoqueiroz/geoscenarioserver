@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # class for holding scenario settings - load from file?
     sim_config = SimConfig({
         1 : test_map.get_route(329661501650965856, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
-        # 2 : test_map.get_shortest_path(99998, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
+        # 2 : test_map.get_route(329661501650965856, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
         })
     # for testing - grab a path to put vehicles on
     ref_path = test_map.get_global_path_for_route(sim_config.lanelet_routes[1])

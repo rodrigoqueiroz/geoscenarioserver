@@ -11,6 +11,7 @@ from lanelet2.core import getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, 
 from lanelet2.geometry import distance, boundingBox2d, inside, toArcCoordinates, project, length2d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
+from lanelet2.routing import RelationType
 
 from matplotlib import pyplot as plt
 from itertools import tee
@@ -66,10 +67,27 @@ class LaneletMap(object):
     
     def get_left(self, lanelet):
         return self.routing_graph.left(lanelet)
+    
+    @staticmethod
+    def get_left_in_route(route, lanelet):
+        leftRelation = route.leftRelation(lanelet)
+        if leftRelation.lanelet and leftRelation.relationType == RelationType.Left \
+            and route.contains(leftRelation.lanelet):
+            return leftRelation.lanelet
+        return None
+
+    @staticmethod
+    def get_right_in_route(route, lanelet):
+        rightRelation = route.rightRelation(lanelet)
+        if rightRelation and rightRelation.lanelet and rightRelation.relationType == RelationType.Right \
+            and route.contains(rightRelation.lanelet):
+            return rightRelation.lanelet
+        return None
 
     def get_route(self, from_lanelet_id:int, to_lanelet_id:int):
         from_ll = self.lanelet_map.laneletLayer[from_lanelet_id]
         to_ll = self.lanelet_map.laneletLayer[to_lanelet_id]
+        # Route object automatically constructs a sub-laneletmap
         route = self.routing_graph.getRoute(from_ll, to_ll)
         assert(route)
         return route
@@ -84,7 +102,8 @@ class LaneletMap(object):
         # NOTE: doesn't account for lane changes in route
         running_length = 0
         index = 0
-        for ll in lanelet_route:
+        llmap = lanelet_route.laneletMap()
+        for ll in llmap.laneletLayer:
             # ll = self.lanelet_map.laneletLayer[ll_id]
             ll_length = length2d(ll)
             if running_length <= s <= running_length + ll_length:
@@ -97,10 +116,10 @@ class LaneletMap(object):
         return self.lanelet_map.laneletLayer[lanelet_route[-1]], -1
 
     def get_occupying_lanelet_by_position(self, lanelet_route, x, y):
-        index = 0
+        index = 0 # NOTE index means nothing if not search in an order
         ret = None
-        # use ll in route instead of just shortest path?
-        for ll in lanelet_route:
+        # NOTE use laneletMap() requires a fix to python bindings
+        for ll in lanelet_route.laneletMap().laneletLayer:
             if inside(ll, BasicPoint2d(x, y)):
                 ret = ll
                 break
@@ -124,39 +143,44 @@ class LaneletMap(object):
         assert cur_ll
         
         cur_lane = lanelet_route.fullLane(cur_ll)
+        assert cur_lane
+        
         # cur_ll = lanelet_route[0]
-        path = [ Point3d(0, cur_ll.centerline[0].x, cur_ll.centerline[0].y, 0.0) ]
+        path = []
+        # path = [ Point3d(0, cur_ll.centerline[0].x, cur_ll.centerline[0].y, 0.0) ]
         path_length = 0
         for ll in cur_lane:
             for p, q in pairwise(ll.centerline):
+                # for first iteration, also append p
+                if path_length == 0:
+                    path.append(Point3d(0, p.x, p.y, 0.0))
+
                 dist = distance(p, q)
-                if path_length + dist <= meters_ahead:
-                    path.append(Point3d(0, q.x, q.y, 0.0))
-                    path_length += dist
-                else:
-                    return ConstLineString3d(0, path)
-        
+                path.append(Point3d(0, q.x, q.y, 0.0))
+                path_length += dist
+
         path_ls = ConstLineString3d(0, path)
 
-        if len(self.tangents_cache) == 0:
-            i = 0
-            for p, q, r in tripletwise(path_ls):
-                pq = np.array([q.x - p.x, q.y - p.y])
-                qr = np.array([r.x - q.x, r.y - q.y])
-                if i == 0:  # first tangent
-                    self.tangents_cache.append(normalize(pq))
-                    i += 1
-                # tangent of q
-                self.tangents_cache.append(normalize(pq + qr))
+        # rebuild tangent cache
+        self.tangents_cache = []
+        i = 0
+        for p, q, r in tripletwise(path_ls):
+            pq = np.array([q.x - p.x, q.y - p.y])
+            qr = np.array([r.x - q.x, r.y - q.y])
+            if i == 0:  # first tangent
+                self.tangents_cache.append(normalize(pq))
                 i += 1
-                if i == len(path_ls) - 1:   # last tangent
-                    self.tangents_cache.append(normalize(qr))
-                    i += 1
-            # print(self.tangents_cache)
+            # tangent of q
+            self.tangents_cache.append(normalize(pq + qr))
+            i += 1
+            if i == len(path_ls) - 1:   # last tangent
+                self.tangents_cache.append(normalize(qr))
+                i += 1
+        # print(self.tangents_cache)
             
         return path_ls
 
-    def plot_lanelets(self, lanelets):
+    def plot_lanelets(self, lanelets:iter):
         for ll in lanelets:
             # LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
             LaneletMap.plot_ll(ll)
@@ -165,10 +189,11 @@ class LaneletMap(object):
     def plot_ll(lanelet):
         """ Plots the bounds of the lanelet on the current pyplot
         """
-        xs = [pt.x for pt in lanelet.rightBound] + [pt.x for pt in lanelet.leftBound]
-        ys = [pt.y for pt in lanelet.rightBound] + [pt.y for pt in lanelet.leftBound]
+        for bound in (lanelet.leftBound, lanelet.rightBound):
+            xs = [pt.x for pt in bound]
+            ys = [pt.y for pt in bound]
+            plt.plot(xs, ys, 'r')
         
-        plt.plot(xs, ys, 'ro')
         plt.plot(
             [pt.x for pt in lanelet.centerline],
             [pt.y for pt in lanelet.centerline],
@@ -244,7 +269,7 @@ class LaneletMap(object):
         point_on_ls = None
         unit_tangent = None
         arclen = 0
-        for i in range(len(ref_path)):
+        for i in range(len(ref_path)-1):
             p = ref_path[i]
             q = ref_path[i+1]
             pq = np.array([q.x - p.x, q.y - p.y])
