@@ -10,7 +10,7 @@ from multiprocessing import shared_memory, Lock
 import threading
 import math
 import numpy as np
-from shared_mem.SVSharedMemory import *
+from shm.SimSharedMemory import *
 from TickSync import TickSync
 from sv.SV import *
 from sv.SVPlanner import *
@@ -48,14 +48,11 @@ class SimTraffic(object):
         self.create_traffic_state_shm()
         self.write_traffic_state(0.0,0.0,0.0)
 
-        #Start Vehicles
+         #Start SV Planners 
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
-            if vehicle.is_remote:  
-                vehicle.start_remote()
-            else: #SV
-                vehicle.start_planner(nv,self.laneletmap,self.traffic_state_sharr )
-            #if not, start remote 
+            if not vehicle.is_remote:
+                vehicle.start_planner(nv, None, self.traffic_state_sharr)
     
     def stop_all(self):
         for vid in self.vehicles:
@@ -63,9 +60,18 @@ class SimTraffic(object):
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
+        #Read Client
+        vstates = self.sim_client_shm.read_client_state( nv )
+        
         #Update Dynamic Agents
         for vid in self.vehicles:
+            if self.vehicles[vid].is_remote:
+                #update remote Agents if available
+                if vstates and (vid in vstates):
+                        self.vehicles[vid].vehicle_state = vstates[vid]
+            #tick vehicle
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
+        
         #Update static elements (obstacles)
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
@@ -74,7 +80,7 @@ class SimTraffic(object):
 
     def create_traffic_state_shm(self):
         #External Sim (Unreal) ShM
-        self.shared_memory = SVSharedMemory()
+        self.sim_client_shm = SimSharedMemory()
 
         #Internal ShM
         nv = len(self.vehicles)
@@ -108,7 +114,7 @@ class SimTraffic(object):
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
-            self.sim_client_shm.write_vehicle_stats(tick_count, delta_time, self.vehicles)
+            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles)
 
             
     def __del__(self):
