@@ -84,8 +84,8 @@ class SVPlanner(object):
             state_time = header[2]
 
             #BTree Tick - using frenet state based on old ref path
-            new_mconfig = self.behavior_tick(vehicle_state)
-            if self.mconfig is None or (new_mconfig and self.mconfig.mkey != new_mconfig.mkey):
+            new_mconfig = self.behavior_tick(vehicle_state, sync_planner.sim_time)
+            if self.mconfig is None or (new_mconfig):
                 print("Got new maneuver: {}".format(new_mconfig.mkey))
                 self.mconfig = new_mconfig
                 # new maneuver: rebuild map
@@ -139,7 +139,7 @@ class SVPlanner(object):
         return middle_lane_config
 
     
-    def behavior_tick(self,vehicle_state):
+    def behavior_tick(self,vehicle_state, sim_time):
         #TODO: retrieve decision from BTree
         #hardcoding now
         #Standard
@@ -148,17 +148,17 @@ class SVPlanner(object):
         if self.mconfig is None:
             mconfig = MVelKeepConfig()
         else:
-            # Hardcoded lane change scenario
-            if 30 < vehicle_state.s < 35:
-                mconfig = MLaneSwerveConfig(-1)
-
-            # use OLD frenet frame to check current lane position. if in target lane switch to velkeep
-            if self.mconfig.mkey == M_LANESWERVE:
-                cur_lane_config = self.lane_config.get_current_lane(vehicle_state.d)
-                if cur_lane_config.id == self.mconfig.target_lid:
-                    # TODO: Keep maneuver as LaneSwerve with target being the current lane
-                    # until maneuver has fully completed
-                    mconfig = MVelKeepConfig()
+            # Hardcoded lane change scenario - note s changes when ref path changes
+            if 6 < sim_time and self.mconfig.mkey != M_VELKEEP:
+                mconfig = MVelKeepConfig()
+            if 3 < sim_time < 6:
+                if self.mconfig.mkey != M_LANESWERVE:
+                    mconfig = MLaneSwerveConfig(-1)
+                else:
+                    # use OLD frenet frame to check current lane position. if in target lane switch to velkeep
+                    cur_lane_config = self.lane_config.get_current_lane(vehicle_state.d)
+                    if cur_lane_config.id == self.mconfig.target_lid:
+                        mconfig = MLaneSwerveConfig(0)
         
             # hardcoded follow scenario
             # if self.vid == 1:
