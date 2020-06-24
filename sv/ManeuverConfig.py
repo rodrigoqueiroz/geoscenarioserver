@@ -55,7 +55,7 @@ class LaneConfig:
         lane._left_lane = self
     
     def get_neighbour(self,l_id):
-        print((self._right_lane.id))
+        #print((self._right_lane.id))
         if (self._right_lane):
             if (self._right_lane.id == l_id):
                 return self._right_lane
