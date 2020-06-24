@@ -15,8 +15,6 @@ import time
 from multiprocessing import shared_memory, Process, Lock, Array
 from TickSync import TickSync
 import tkinter as tk
-#from tkinter import RIGHT, LEFT
-#from tkinter import ttk
 from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
@@ -87,34 +85,17 @@ class Dashboard(object):
                 truncate_vector(sv,2)
                 sv = [vid] + sv
                 self.tab.insert('', 'end', values=(sv)) 
-            
-            #strtb = '' 
-            #for vid in traffic.vehicles:
-            #    strtb = strtb + '\n' + str(traffic.vehicles[vid].vehicle_state)
-            #self.vlabel.config(text=strtb)
-            #    strline = str(traffic.vehicles[vid].vehicle_state)
-            #    lb = tk.Label(self.tframe, text=strline)
-            #    lb.pack(side = 'left')
 
             #Sub vehicle plot
             #todo: transform into log chart, instead of projected trajectory
             # if VEH_TRAJ_CHART:
             #     self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)    
             
-            
-            
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             #self.vcanvas.draw()
 
             self.window.update() 
-
-        #if (tofile):
-        #    unique_filename = str(uuid.uuid4())[:8] 
-        #    plt.savefig('plots/mtplot_'+ unique_filename + '.png')
-        #    plot_sd(best)
-        #    unique_filename = str(uuid.uuid4()) [:8]
-        #    plt.savefig('plots/sdplot_'+unique_filename+'.png')s
 
     def quit(self):
         if  self.window:
@@ -194,7 +175,6 @@ class Dashboard(object):
             y = vehicles[vid].vehicle_state.y
             axis.plot(x, y, 'bv')
         
-        
 
     def plot_cartesian_chart(self, vehicles, center_vid):
         #-Vehicle focus cartesian plot
@@ -229,6 +209,12 @@ class Dashboard(object):
             # vehicle direction - /2 for aesthetics
             plt.arrow(x, y, vehicle.vehicle_state.x_vel/2, vehicle.vehicle_state.y_vel/2,
                 head_width=1, head_length=1)
+            #debug
+            # plot global path
+            #if vehicle.global_path:
+            #    for pt in vehicle.global_path:
+            #        plt.plot(pt.x, pt.y, 'bo')
+
         #layout
         plt.xlim(x_min,x_max)
         plt.ylim(y_min,y_max)
@@ -236,35 +222,8 @@ class Dashboard(object):
         plt.gca().xaxis.set_visible(False)
         plt.gca().yaxis.set_visible(False)
         plt.margins(1,1)
-        #l<r and b<t mandatory:
         plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0) 
-        #
         #fig.tight_layout(pad=0.05)
-
-
-        
-
-        # #-Cartesian plot
-        # plt.figure(1)
-        # plt.cla()
-        # #road
-        # vehicle = traffic.vehicles[center_vid]
-        # if vehicle:
-        #     x_min = vehicle.vehicle_state.x - (CPLOT_SIZE/2)   
-        #     y_min = vehicle.vehicle_state.y - (CPLOT_SIZE/2)  
-        #     x_max = vehicle.vehicle_state.x + (CPLOT_SIZE/2)  
-        #     y_max = vehicle.vehicle_state.y + (CPLOT_SIZE/2)  
-        # else:
-        #     x_min = y_min = -1/2*CPLOT_SIZE
-        #     x_max = y_max = 1/2*CPLOT_SIZE
-
-        # plt.xlim(x_min,x_max)
-        # plt.ylim(y_min,y_max)
-        # self.laneletmap.plot_all_lanelets( x_min,y_min, x_max,y_max )
-        # #vehicles
-        # for vid in traffic.vehicles:
-        #     self.plot_vehicle_cartesian(vid, traffic.vehicles[vid])
-
 
     def plot_frenet_chart(self,vehicles,center_vid):
         #Frenet Frame plot
@@ -285,78 +244,31 @@ class Dashboard(object):
         plt.ylabel('D')
         #plt.xlim(hv.start_state[0] - area,  hv.start_state[0] + area)
         #plt.title("v(m/s):" + str(c_speed * 3.6)[0:4])
+        
         #main vehicle
         vehicle = vehicles[center_vid]
-        
-        #Center plot around main vehicle
-        x_lim_a = vehicle.vehicle_state.s - ( (1/3) * FFPLOT_LENGTH )   #1/3 before vehicle
-        x_lim_b = vehicle.vehicle_state.s + ( (2/3) * FFPLOT_LENGTH )   #2/3 ahead
-        plt.xlim(x_lim_a,x_lim_b)
-        plt.ylim(-8,8)
-        #plot vehicle
-        self.plot_vehicle_frenet(vehicle.vid, vehicle.vehicle_state)
+        vs = vehicle.vehicle_state
+
+        gca = plt.gca()
+        plt.plot( vs.s, vs.d, "v")
+        circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
+        gca.add_artist(circle1)
+        label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
+        gca.text(vs.s, vs.d+1.5, label, style='italic')
 
         #other vehicles, from main vehicle POV:
 
         #layout
         plt.grid(True)
-        if (FFPLOT_ASPECT): 
-            plt.gca().set_aspect('equal', adjustable='box')
+        #Center plot around main vehicle
+        x_lim_a = vs.s - ( (1/3) * FFPLOT_LENGTH )   #1/3 before vehicle
+        x_lim_b = vs.s + ( (2/3) * FFPLOT_LENGTH )   #2/3 ahead
+        plt.xlim(x_lim_a,x_lim_b)
+        plt.ylim(-8,8)
+        #plt.gca().set_aspect('equal', adjustable='box')
         #fig.patch.set_facecolor('lightgray')
         #fig.tight_layout(pad=0.05)
 
-        #vehicle_frenet_state = np.concatenate([ vehicle.vehicle_frenet_statevehicle_state.get_S(), vehicle.vehicle_state.get_D()])
-                #if not vehicle.is_remote:
-        #         if (vehicle.trajectory):
-        #             self.plot_trajectory(vehicle.trajectory[0], vehicle.trajectory[1], vehicle.trajectory[2],'blue')
-        #         if (vehicle.cand_trajectories):
-        #             for t in cand_trajectories:
-        #                 self.plot_trajectory(t[0], t[1], t[2], 'grey')
-
-    
-    def plot_vehicle_cartesian(self, vid, vehicle):
-        x = vehicle.vehicle_state.x
-        y = vehicle.vehicle_state.y
-
-        #plot lanelets in its path
-        #if not vehicle.is_remote:
-        #    vehicle.__class__ = SV
-        #    vehicle.lanelet_map.plot_lanelets(vehicle.lanelet_route)
-
-        # vehicle pos
-        plt.plot(x, y, 'bv')
-        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
-        plt.gca().add_artist(circle1)
-        label = "vid {}".format(vid)
-        plt.gca().text(x+1, y+1, label, style='italic')
-
-        # vehicle direction - /2 for aesthetics
-        plt.arrow(x, y, vehicle.vehicle_state.x_vel/2, vehicle.vehicle_state.y_vel/2,
-            head_width=1, head_length=1)
-
-
-        #debug
-        # plot global path
-        # if vehicle.global_path:
-        #     for pt in vehicle.global_path:
-        #         plt.plot(pt.x, pt.y, 'bo')
-
-
-    def plot_vehicle_frenet(self, vid, vehicle_state):
-        s_pos = vehicle_state.s
-        s_vel = vehicle_state.s_vel
-        s_acc = vehicle_state.s_acc
-        d_pos = vehicle_state.d
-        d_vel = vehicle_state.d_vel
-        d_acc = vehicle_state.d_acc
-        #main plot
-        gca = plt.gca()
-        plt.plot( s_pos, d_pos, "v")
-        circle1 = plt.Circle((s_pos, d_pos), VEHICLE_RADIUS, color='b', fill=False)
-        gca.add_artist(circle1)
-        label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, float(s_pos), float(s_vel), float(s_acc))
-        gca.text(s_pos, d_pos+1.5, label, style='italic')
-  
 
     @staticmethod
     def plot_trajectory(s_coef, d_coef, T,tcolor='grey'):
@@ -459,10 +371,6 @@ class Dashboard(object):
             t += 0.25
         plt.plot(X,Y,color="black")  
 
-
-
-
-
     def create_gui(self):
         #Window
         window = tk.Tk()
@@ -555,8 +463,6 @@ class Dashboard(object):
         global_frame.grid(row=3, sticky="nsew")
         #map_frame.grid(row=0, column=0, sticky="ns")
         tab_frame.grid(row=0, sticky="nsew")
-
-
         
         #title layout
         lb.pack(side = 'left')
@@ -564,8 +470,9 @@ class Dashboard(object):
         lb_wise.pack(side = "right")
         #stats layout
         #map layout
+        #fig_map.patch.set_facecolor('#000000')
+        #fig_map.patch.set_alpha(0.0)
         #tab layout
-        #tab.grid(row=0, column=0, sticky="nsew")
         tab.pack(fill='x')
         #cart layout
         #fren layout
@@ -580,55 +487,3 @@ class Dashboard(object):
         matplotlib.rc('figure', titlesize=8)
 
         return window
-
-        #title_frame.pack_propagate(False)
-        #title_frame.pack()
-
-        #-Global Frame
-        #cart_frame.pack_propagate(False)
-        #cart_frame.pack(side = 'left')
-        
-        #fig_map.patch.set_facecolor('#000000')
-        #fig_map.patch.set_alpha(0.0)
-        
-        #self.ccanvas.get_tk_widget().pack_propagate(False)
-        
-
-        #-Global Vehicle Table Frame
-        #self.tab_frame = tk.Frame(self.window, width = 500, height = 500)
-        #self.tab_frame.pack_propagate(False)
-        #self.tab_frame.pack()
-        #self.vlabel= tk.Label(self.tframe, text='')
-        #self.vlabel.pack(side = 'left')
-
-
-        #-Global Cartesian Frame
-        #cart_frame = tk.Frame(self.window, width = 500, height = 500, bg = "red")
-        #cart_frame.pack_propagate(False)
-        #cart_frame.pack(side = 'left')
-        #fig_cart = plt.figure(1)
-        #fig_cart.set_size_inches(10,10,forward=True)
-        #fig_cart.patch.set_facecolor('#000000')
-        #fig_cart.patch.set_alpha(0.0)
-        #self.ccanvas = FigureCanvasTkAgg(fig_cart, cart_frame)
-        #self.ccanvas.get_tk_widget().pack_propagate(False)
-        #self.ccanvas.get_tk_widget().pack()
-        
-        #Frenet Frame
-        #frenet_frame = tk.Frame(self.window, width = 500, height = 300, bg = "red")
-        #frenet_frame.pack_propagate(False)
-        #frenet_frame.pack(side = 'right')
-        #fig_ff = plt.figure(2)
-        #fig_ff.set_size_inches(10,10,forward=True)
-        #fig_ff.patch.set_alpha(0.0)
-        #self.ffcanvas = FigureCanvasTkAgg(fig_ff, frenet_frame) #must be after resize
-        #self.ffcanvas.get_tk_widget().pack_propagate(False)
-        #self.ffcanvas.get_tk_widget().pack()
-        
-        #plt_fig2 = plt.figure(2)
-        #plt_fig2.set_size_inches(10,10,forward=True)
-        #self.vcanvas = FigureCanvasTkAgg(plt_fig2, vframe) #must be after resize
-        #self.vcanvas.get_tk_widget().pack_propagate(False)
-        #self.vcanvas.get_tk_widget().pack()
-
-

@@ -7,8 +7,8 @@
 # --------------------------------------------
 
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict
 
 @dataclass
 class SimConfig:
-    lanelet_routes: Dict[int, List[int]] = field(default_factory=dict)
+    lanelet_routes: Dict = field(default_factory=dict)

@@ -79,18 +79,24 @@ class Vehicle(object):
 
 # A Simulated Vehicle
 class SV(Vehicle):
-    def __init__(self, vid, name, start_state, radius, lanelet_map, lanelet_route, model = None):
+    def __init__(self, vid, name, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model = None):
         #Map
         self.lanelet_map = lanelet_map
         # list of lanelet ids we want this vehicle to follow
         self.lanelet_route = lanelet_route
-        self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
 
-        # Compute frenet state corresponding to start_state
-        s_vector, d_vector = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
-        frenet_state = s_vector + d_vector
-        Vehicle.__init__(self, vid, name, start_state, frenet_state, radius, model)
-        print("{} init'd with {}, {}".format(vid, s_vector[0], d_vector[0]))
+        if start_state_in_frenet:
+            # assume frenet start_state is relative to the first lane of the route
+            self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
+            # compute sim state
+            x_vector, y_vector = self.lanelet_map.frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:])
+            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, radius=radius, model=model)
+        else:
+            self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
+            # Compute frenet state corresponding to start_state
+            s_vector, d_vector = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
+            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), radius=radius, model=model)
+        print("{} init'd with {}, {}".format(vid, self.vehicle_state.s, self.vehicle_state.d))
 
         #Planning
         self.sv_planner = None
@@ -148,14 +154,17 @@ class SV(Vehicle):
    
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
-        
-        #Compute new state
-        self.compute_vehicle_state(delta_time)
 
         #Read planner
         plan = self.sv_planner.get_plan()
         if (plan):
             self.set_new_motion_plan(plan, sim_time)
+            # the plan received might be in reference to a new global path, so we must update ours as well
+            # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
+            self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
+        
+        #Compute new state
+        self.compute_vehicle_state(delta_time)
 
  
     def compute_vehicle_state(self,delta_time):
@@ -186,10 +195,10 @@ class SV(Vehicle):
             self.vehicle_state.d_acc = self.d_acc_eq(time)
 
             # Compute sim state using the global path this vehicle is following
-            # TODO: rn the global path isn't changing - its using the centerline of the entire route
+            # TODO: rn the global path isn't changing - its using the centerline of the entire route. needs to change cause lane changes
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
             try:
-                x_vector, y_vector = LaneletMap.frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
+                x_vector, y_vector = self.lanelet_map.frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
                 raise e
@@ -224,6 +233,8 @@ class SV(Vehicle):
         Set a new trajectory to start following immediately.
         candidates: save computed trajectories for visualization and debug
         """
+        # if self.s_eq:
+        #     print('current s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
         trajectory = plan.get_trajectory()
 
         s_coef,d_coef,_ = trajectory
@@ -246,11 +257,12 @@ class SV(Vehicle):
 
         #Correct trajectory progress based 
         #on diff planning time and now
-        #print('Plan start {}, now is {}'.format(plan.t_start, sim_time))
-        #print('Advance traj in {} s'.format(diff))
         diff = sim_time - plan.t_start
+        # print('Plan start {}, now is {}'.format(plan.t_start, sim_time))
+        # print('Advance traj in {} s'.format(diff))
         if (diff>0):
             self.trajectory_time += diff
+        # print('new s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
             
    
     

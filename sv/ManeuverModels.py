@@ -143,10 +143,13 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config, vehicle
     target_t = mconfig.time.value
 
     #Find target lane
+    target_lane_config = None
     if (lane_config.id == target_lid):
+        target_lane_config = lane_config
         print('already in target lane {}'.format(target_lid))
-        return None, None
-    target_lane_config = lane_config.get_neighbour(target_lid)
+        # return None, None
+    else:
+        target_lane_config = lane_config.get_neighbour(target_lid)
     if not target_lane_config:
         print('target lane {} not found, is it a neighbour lane?'.format(target_lid))
         return None, None
