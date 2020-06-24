@@ -37,7 +37,8 @@ class OutsideRefPathException(Exception):
 
 class LaneletMap(object):
     def __init__(self):
-        self.example_map = "/home/divit/lanelet2_standalone/lanelet2_maps/res/mapping_example.osm"
+        #self.example_map = "home/rqueiroz/Desktop/mapping_example.osm"
+        self.example_map = "scenarios/ll2_round.osm"
         projector = UtmProjector(lanelet2.io.Origin(49, 8.4))
         # map is collection of primitive layers
         self.lanelet_map, errors = lanelet2.io.loadRobust(self.example_map, projector)
@@ -105,10 +106,61 @@ class LaneletMap(object):
         path_ls = ConstLineString3d(0, path)
         return path_ls
 
+
+
+    def get_points(self,  x_min=0, y_min=0, x_max=0, y_max=0):
+        data = []
+        if (x_min == x_max == y_min == y_max):
+            points = self.lanelet_map.pointLayer
+        else:
+            searchBox = BoundingBox2d(BasicPoint2d(x_min, y_min), BasicPoint2d(x_max, y_max))
+            points = self.lanelet_map.pointLayer.search(searchBox)
+
+        data = np.array([[pt.x for pt in points], [pt.y for pt in points]])
+        return data
+    
+    def get_lines(self, x_min=0, y_min=0, x_max=0, y_max=0):
+        data = []
+        
+        if (x_min == x_max == y_min == y_max):
+            lines = self.lanelet_map.lineStringLayer
+        else:
+            searchBox = BoundingBox2d(BasicPoint2d(x_min, y_min), BasicPoint2d(x_max, y_max))
+            lines = self.lanelet_map.lineStringLayer.search(searchBox)
+        
+        for line in lines:
+            xs = [pt.x for pt in line]
+            ys = [pt.y for pt in line]
+            data.append([xs,ys])
+        
+        return data
+
+    def plot_all_lanelets(self, x_min=0, y_min=0, x_max=0, y_max=0):
+        """ Plots all lanelets within given boundaries. 
+            Center line is ommited.
+            @param drawline: draw as lines (heavier). If false, draw as points.
+            @param split: split left and right lanelet into using color scheme.
+        """
+        if (x_min == x_max == y_min == y_max):
+            lanelets = self.lanelet_map.laneletLayer
+        else:
+            searchBox = BoundingBox2d(BasicPoint2d(x_min, y_min), BasicPoint2d(x_max, y_max))
+            lanelets = self.lanelet_map.laneletLayer.search(searchBox)
+            
+        for lanelet in lanelets:
+            xs = [pt.x for pt in lanelet.rightBound]
+            ys = [pt.y for pt in lanelet.rightBound]
+            plt.plot(xs, ys, 'b-')
+            xs = [pt.x for pt in lanelet.leftBound]
+            ys = [pt.y for pt in lanelet.leftBound]
+            plt.plot(xs, ys, 'g-')
+        
+
     def plot_lanelets(self, lanelet_ids):
         for ll_id in lanelet_ids:
             LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
 
+    
     @staticmethod
     def plot_ll(lanelet):
         """ Plots the bounds of the lanelet on the current pyplot

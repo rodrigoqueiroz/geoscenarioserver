@@ -8,16 +8,14 @@
 
 from TickSync import TickSync
 from SimTraffic import *
-from dash.DashBoard import *
+from dash.Dashboard import *
 from util.Constants import *
-
 from Mapping.LaneletMap import *
 from SimConfig import SimConfig
 
 
 if __name__ == "__main__":
-    sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=False, label="EX")
-    # simulation lasts TIMEOUT seconds
+    sync_global   = TickSync(rate=TRAFFIC_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
 
     # class for parsing and holding map
@@ -37,26 +35,26 @@ if __name__ == "__main__":
     traffic.set_map(test_map)
     traffic.set_sim_config(sim_config)
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
+        sim_config.lanelet_routes[1], BT_VELKEEP)
     # adding vehicle at the start of a lanelet
-    traffic.add_vehicle(1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
-        sim_config.lanelet_routes[1], BT_FOLLOW, target=2)
+    traffic.add_vehicle( 2, 'V2', [ref_path[2].x,0.0,0.0, ref_path[2].y,0.0,0.0],
+        sim_config.lanelet_routes[2], BT_FOLLOW, target=1)
     # test location
     # traffic.add_vehicle( 1, 'V1', [0,0.0,0.0, 0,0.0,0.0], BT_VELKEEP)
-    traffic.add_vehicle( 2, 'V2', [ref_path[2].x,0.0,0.0, ref_path[2].y,0.0,0.0],
-        sim_config.lanelet_routes[2], BT_VELKEEP)
+    
 
-    traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     #traffic.add_remote_vehicle( 11, 'V3', [0.0,0.0,0.0, 4.0,0.0,0.0])
     
     
     #GUI / Debug screen
-    dashboard = DashBoard()
-    if (SHOW_DASHBOARD):
-        dashboard.create()
+    dashboard = Dashboard(traffic, PLOT_VID)
     
     #SIM EXECUTION START
     print ('SIMULATION START')
     traffic.start()
+    dashboard.start()
     while sync_global.tick():
         try:
             #Update Traffic
@@ -65,12 +63,9 @@ if __name__ == "__main__":
                 sync_global.delta_time,
                 sync_global.sim_time
             )
-            #Update Dashboard (if visible)
-            dashboard.update(traffic, PLOT_VID)
         except KeyboardInterrupt:
             break
         
     traffic.stop_all()    
-    dashboard.quit()
     #SIM END
     print('SIMULATION END')

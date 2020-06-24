@@ -74,15 +74,15 @@ class SVPlanner(object):
     def run_planner_process(self, traffic_state_sharr, mplan_sharr ):
         print('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         
-        sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=True, label="PP")
+        sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
         
         while sync_planner.tick():
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
             
             vehicle_frenet_state = np.concatenate([vehicle_state.get_S(), vehicle_state.get_D()])
-            print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
-            print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
+            #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
+            #print((vehicle_frenet_state[0], vehicle_frenet_state[3]))
             
             # transform other vehicles to frenet frame based on this vehicle
             ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid])
@@ -146,9 +146,9 @@ class SVPlanner(object):
         mconfig = MVelKeepConfig()
         
         # hardcoded follow scenario
-        if self.vid == 1:
-            mkey = M_FOLLOW
-            mconfig = MFollowConfig(2)
+        #if self.vid == 1:
+        #    mkey = M_FOLLOW
+        #    mconfig = MFollowConfig(2)
 
         # Commented out to test straight path
         #Hardcoded overtake scenario
