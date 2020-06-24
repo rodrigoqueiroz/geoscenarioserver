@@ -17,6 +17,8 @@ from matplotlib import pyplot as plt
 from itertools import tee
 import numpy as np
 
+from typing import List
+
 
 def pairwise(iterable):
     i, j = tee(iterable, 2)
@@ -89,7 +91,13 @@ class LaneletMap(object):
         to_ll = self.lanelet_map.laneletLayer[to_lanelet_id]
         # Route object automatically constructs a sub-laneletmap
         route = self.routing_graph.getRoute(from_ll, to_ll)
-        assert(route)
+        assert route
+        return route
+    
+    def get_route_via(self, lanelets:List[Lanelet]):
+        assert len(lanelets) > 2
+        route = self.routing_graph.getRouteVia(lanelets[0], lanelets[1:-1], lanelets[-1])
+        assert route
         return route
 
     def get_shortest_path(self, from_lanelet_id:int, to_lanelet_id:int):
@@ -97,6 +105,24 @@ class LaneletMap(object):
         shortest_path = route.shortestPath()
         assert(shortest_path)
         return shortest_path
+
+    def get_occupying_lanelet(self, x, y):
+        point = BasicPoint2d(x, y)
+        
+        # get all intersecting lanelets using a trivial bounding box
+        searchbox = BoundingBox2d(point, point)
+        intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
+
+        if len(intersecting_lls) == 0:
+            raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+        elif len(intersecting_lls) > 1:
+            # filter results for lanelets containing the point
+            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            if len(intersecting_lls) > 1:
+                raise Exception("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                    (x,y), [ll.id for ll in intersecting_lls]))
+
+        return intersecting_lls[0]
 
     def get_occupying_lanelet_in_route(self, s, lanelet_route):
         # NOTE: doesn't account for lane changes in route

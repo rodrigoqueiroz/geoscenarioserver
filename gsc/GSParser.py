@@ -3,13 +3,34 @@ __email__ = "rqueiroz@gsd.uwaterloo.ca"
 
 import xml.etree.ElementTree
 import re
-import Utils
-import Report
+import gsc.Utils as Utils
+from gsc.Report import Report
 
-class GSChecker(object):
+# do we want the projection dependency here?
+from lanelet2.core import GPSPoint
+
+
+class Node(object):
+    def __init__(self):
+        self.id = None  # id from josm
+        self.lat = None
+        self.lon = None
+        self.x = None
+        self.y = None
+        self.tags = {}
+
+
+class Way(object):
+    def __init__(self):
+        self.id = None
+        self.nodes = []
+        self.tags = {}
+
+
+class GSParser(object):
 
     def __init__(self):
-        self.nodes = []
+        self.nodes = {}
         self.ways = []
         self.filename = ''
         
@@ -27,33 +48,40 @@ class GSChecker(object):
         self.triggers = {}
         self.paths = {}
 
-        self.report = Report.Report() 
+        self.report = Report() 
 
-    def load_geoscenario_file(self, filepath):
+    def load_geoscenario_file(self, filepath, projector=None):
         xml_root = xml.etree.ElementTree.parse(filepath).getroot()
         for osm_node in xml_root.findall('node'):
             node = Node()
-            node.id = osm_node.get('id')
-            node.lat = osm_node.get('lat')
-            node.lon = osm_node.get('lon')
+            node.id = int(osm_node.get('id'))
+            node.lat = float(osm_node.get('lat'))
+            node.lon = float(osm_node.get('lon'))
             for osm_tag in osm_node.findall('tag'):
                 node.tags[osm_tag.get('k')] =  osm_tag.get('v')
-            self.nodes.append(node)
+            if projector:
+                # NOTE: no altitude information
+                cart_pt = projector.forward(GPSPoint(node.lat, node.lon, 0.0))
+                node.x = cart_pt.x
+                node.y = cart_pt.y
+            self.nodes[node.id] = node
         for osm_node in xml_root.findall('way'):
             way = Way()
-            way.id = osm_node.get('id')
+            way.id = int(osm_node.get('id'))
             for osm_tag in osm_node.findall('tag'):
                 way.tags[osm_tag.get('k')] =  osm_tag.get('v')
+            for osm_nd in osm_node.findall('nd'):
+                way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
             self.ways.append(way)
 
-    def validate_geoscenario(self, filepath):
+    def validate_geoscenario(self, filepath, projector=None):
         #Load XML
-        self.load_geoscenario_file(filepath);
+        self.load_geoscenario_file(filepath, projector)
         self.isValid = True
         self.report.file = filepath
         self.filename = filepath
         #Process Nodes
-        for node in self.nodes:
+        for nid, node in self.nodes.items():
             if "gs" in node.tags: 
                 #physical elements
                 if node.tags["gs"] == "staticobject": self.check_static_object(node)  #also way / closedway
@@ -128,13 +156,14 @@ class GSChecker(object):
         self.tlights[n.tags["name"]] = n
          #assert duration match states
 
-    def check_path(self, n): #:Way
+    def check_path(self, n:Way): #:Way
         mandatory = {"gs","name"}
         optional = {"abstract"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
         #todo: check nd and their ids
-        self.paths[n.tags['name']] = n;
+        assert len(n.nodes) > 0
+        self.paths[n.tags['name']] = n
         return None
 
     #== Logical
@@ -222,8 +251,9 @@ class GSChecker(object):
 
         #all tags
         if not actual_set.issubset(expected_set):
-            self.report.log_warning("Element " + n.id 
-            + " has unknown tags: " + str(actual_set - expected_set))
+            self.report.log_warning("Element {} has unknown tags: {}".format(
+                n.id, actual_set - expected_set
+            ))
 
     def check_nd_ref(self,n):
        #todo: check nd attributes, and  if nodes exist
@@ -264,15 +294,4 @@ class GSChecker(object):
             for y in self.pedestrians[x].tags:
                 print (y, ':', self.pedestrians[x].tags[y])
 
-class Node(object):
-    def __init__(self):
-        self.id = None
-        self.lat = None
-        self.lon = None
-        self.tags = {}
 
-class Way(object):
-    def __init__(self):
-        self.id = None
-        self.nodes = []
-        self.tags = {}

@@ -1,7 +1,7 @@
 __author__ = "Rodrigo Queiroz"
 __email__ = "rqueiroz@gsd.uwaterloo.ca"
 
-import GSChecker
+import GSParser
 import sys
 import glob
 import errno
@@ -16,9 +16,9 @@ files = glob.glob(path)
 for name in files:
 	print(name)
 	file = name
-	gschecker = GSChecker.GSChecker()
-	gschecker.validate_geoscenario(file)
-	gschecker.report.print()
+	GSParser = GSParser.GSParser()
+	GSParser.validate_geoscenario(file)
+	GSParser.report.print()
     #try:
     #    with open(name) as f:
     #        pass # do what you want
@@ -27,6 +27,6 @@ for name in files:
     #        raise
 
 #file = sys.argv[1]
-#gschecker = GSChecker.GSChecker()
-#gschecker.validate_geoscenario(file)
-#gschecker.report.print()
+#GSParser = GSParser.GSParser()
+#GSParser.validate_geoscenario(file)
+#GSParser.report.print()
