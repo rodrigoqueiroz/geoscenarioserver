@@ -36,7 +36,7 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     Driving with no vehicle directly ahead
     No target point, but needs to adapt to a desired velocity
     """
-    print ('Maneuver: Velocity Keeping')
+    #print ('Maneuver: Velocity Keeping')
     s_start = start_state[:3]
     d_start = start_state[3:]
     target_t = mconfig.time.value
@@ -73,13 +73,13 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     return  best, list(trajectories)
 
 
-def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles = None, obstacles = None):
+def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles = None,  pedestrians = None, obstacles = None):
     """ 
     VEHICLE FOLLOWING
     Moving target point, requiring a certain temporal safety distance to the vehicle ahead (constant time gap law).
     Predict leading vehicle (assume constant acceleration)
     """
-    print ('Maneuver:  vehicle following')
+    #print ('Maneuver:  vehicle following')
 
     s_start = start_state[:3]
     d_start = start_state[3:]
@@ -129,14 +129,13 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     return  best, list(trajectories)
 
 
-def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config, vehicles = None, obstacles = None):
+def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConfig, vehicles = None,  pedestrians = None, obstacles = None):
     """
     LANE CHANGE SWERVE
     Swerve maneuver to another lane
     No vehicles affecting the lane change, except in case of collision detection (if Collision is on).
     """
-    print ('Maneuver: Lane Change Swerve')
-
+    #print ('Maneuver: Lane Change Swerve')
     s_start = start_state[:3]
     d_start = start_state[3:]
     target_lid = mconfig.target_lid
@@ -153,11 +152,12 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config, vehicle
     if not target_lane_config:
         print('target lane {} not found, is it a neighbour lane?'.format(target_lid))
         return None, None
+    
     min_d = target_lane_config.right_bound + VEHICLE_RADIUS
     max_d = target_lane_config.left_bound - VEHICLE_RADIUS
     d_samples = NUM_SAMPLING_D
     
-    #generate alternative targets:
+    #generates alternative targets:
     target_state_set = []
     for t in mconfig.time.get_uniform_samples():
         #longitudinal movement: goal is to keep velocity
@@ -239,7 +239,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = No
     STOP
     Stop can be a stop request by time, deceleration, or distance from current pos.
     """
-    print ('PLAN STOP')
+    #print ('PLAN STOP')
     s_start = start_state[:3]
     d_start = start_state[3:]
     target_t = mconfig.time.value
@@ -285,7 +285,7 @@ def plan_stop_at(start_state, mconfig, lane_config, target_pos , vehicles = None
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
-    print ('PLAN STOP')
+    #print ('PLAN STOP')
     if (start_state[0] >= target_pos):
         print ('Stop target position is too close: {}'.format(target_pos - start_state[0]))
         return None,None
@@ -402,69 +402,3 @@ def quartic_polynomial_solver(start, end, T):
     a_3_4 = np.linalg.solve(A,B)
     alphas = np.concatenate([np.array([a_0, a_1, a_2]), a_3_4])
     return alphas
-
-
-    """
-    #Threading Tests
-    #check best target
-    #_, d_coef, T = best
-    #d_eq = to_equation(d_coef)
-    #target_d = d_eq(T)
-    #print('Best target is {:2f}'.format(target_d))
-
-    #Multi Thread approach:
-    pool = ThreadPool(4)
-    trajectories = pool.starmap(find_trajectory, zip(itertools.repeat(start_state), target_state_set)
-    pool.close()
-    pool.join()
-    
-    pool = ThreadPool(4)
-    #trajectories_cost = map(velocity_keeping_cost,zip(trajectories,itertools.repeat(vehicles))) #ST
-    trajectories_cost = pool.map(velocity_keeping_cost, zip(trajectories,itertools.repeat(vehicles)))
-    trajectories_cost = list(trajectories_cost)
-    pool.close()
-    pool.join()
-    trajectories_cost = list(trajectories_cost)
-    best_cost = min(trajectories_cost, key=lambda t: t[1])
-    best = best_cost[0]
-    """
-
-    #DEBUG ONLY:
-
-def plan_single_lanechange(start_state, goal_state, T):
-    """
-    Single Trajectory (No optimization)
-    """
-    #generate a single goal
-    s_start = start_state[:3]
-    d_start = start_state[3:]
-    s_goal = goal_state[:3]
-    d_goal = goal_state[3:]
-    print ('Lane Change Single Goal (' + str(T) +'):')
-    print (goal_state)
-    
-    #Fit Jerk minimal trajectory between two points in s en d
-    s_coeffs = QuinticPolynomialTrajectory(s_start, s_goal, T)
-    d_coeffs = QuinticPolynomialTrajectory(d_start, d_goal, T)
-    trajectory = tuple([s_coeffs, d_coeffs, T])
-    return trajectory
-
-
-def plan_single_cutin(start_state, T, delta, vehicles,  target_v_id,):
-
-    s_start = start_state[:3]
-    d_start = start_state[3:]
-    
-    goal_state_relative = np.array( vehicles[target_v_id].future_state(T))  +  np.array(delta)
-
-    s_goal = goal_state_relative[:3]
-    d_goal = goal_state_relative[3:]
-
-    print ('Cut-In Single Goal (' + str(T) +'):')
-    print (goal_state_relative)
-
-    #Fit Jerk minimal trajectory between two points in s and d
-    s_coeffs = QuinticPolynomialTrajectory(s_start, s_goal, T)
-    d_coeffs = QuinticPolynomialTrajectory(d_start, d_goal, T)
-    trajectory = tuple([s_coeffs, d_coeffs, T])
-    return trajectory

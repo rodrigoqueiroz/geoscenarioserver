@@ -77,7 +77,7 @@ class SVPlanner(object):
     def run_planner_process(self, traffic_state_sharr, mplan_sharr ):
         print('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         
-        sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=True, label="PP")
+        sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
         
         while sync_planner.tick():
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
@@ -96,8 +96,8 @@ class SVPlanner(object):
             s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(ref_path, vehicle_state.get_X(), vehicle_state.get_Y())
             vehicle_state.set_S(s_vector)
             vehicle_state.set_D(d_vector)
-            print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
-            print((vehicle_state.s, vehicle_state.d))
+            #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
+            #print((vehicle_state.s, vehicle_state.d))
             
             # transform other vehicles to frenet frame based on this vehicle
             for vid, vehicle in traffic_vehicles.items():

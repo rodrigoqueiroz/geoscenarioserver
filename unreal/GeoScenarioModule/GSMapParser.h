@@ -3,3 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+/**
+ * 
+ */
+class GEOSCENARIOMODULE_API GSMapParser
+{
+public:
+	GSMapParser();
+	~GSMapParser();
+};

@@ -47,7 +47,7 @@ class SimSharedMemory(object):
             vid, remote, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
                 vid, remote, position[0], position[1], position[2],
-                yaw, velocity[0], velocity[1], steering_angle)
+                yaw, velocity[0], velocity[1], steering_angle )
         self.ss_sem.acquire(timeout=0)
         self.ss_shm.write(write_str.encode('ascii'))
         self.ss_sem.release()
@@ -89,8 +89,8 @@ class SimSharedMemory(object):
             vs.z = float(data_arr[i+3]) / CLIENT_METER_UNIT
             vstates[vid] = vs
         
-        print("VSTATES")
-        print(vstates)
+        #print("VSTATES")
+        #print(vstates)
         return vstates
 
     

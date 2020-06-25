@@ -10,7 +10,6 @@ from TickSync import TickSync
 from SimTraffic import *
 from dash.DashBoard import *
 from util.Constants import *
-
 from Mapping.LaneletMap import *
 from lanelet2.projection import UtmProjector
 from SimConfig import SimConfig
@@ -18,8 +17,7 @@ from gsc.GSParser import GSParser
 
 
 if __name__ == "__main__":
-    sync_global   = TickSync(rate=FRAME_RATE, realtime = True, block=True, verbose=False, label="EX")
-    # simulation lasts TIMEOUT seconds
+    sync_global   = TickSync(rate=TRAFFIC_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
 
     # load scenario from gsc file
@@ -50,6 +48,8 @@ if __name__ == "__main__":
             sim_config.lanelet_routes[sim_id], BT_VELKEEP)
 
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
+    #    sim_config.lanelet_routes[1], BT_VELKEEP)
     # adding vehicle at the start of a lanelet
     # traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 0.0,0.0,0.0],
     #     sim_config.lanelet_routes[1], BT_VELKEEP, start_state_in_frenet=True)
@@ -64,13 +64,12 @@ if __name__ == "__main__":
     
     
     #GUI / Debug screen
-    dashboard = DashBoard()
-    if (SHOW_DASHBOARD):
-        dashboard.create()
+    dashboard = Dashboard(traffic, PLOT_VID)
     
     #SIM EXECUTION START
     print ('SIMULATION START')
     traffic.start()
+    dashboard.start()
     while sync_global.tick():
         try:
             #Update Traffic
@@ -79,12 +78,9 @@ if __name__ == "__main__":
                 sync_global.delta_time,
                 sync_global.sim_time
             )
-            #Update Dashboard (if visible)
-            dashboard.update(traffic, PLOT_VID)
         except KeyboardInterrupt:
             break
         
     traffic.stop_all()    
-    dashboard.quit()
     #SIM END
     print('SIMULATION END')

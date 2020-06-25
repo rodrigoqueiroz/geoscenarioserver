@@ -3,12 +3,24 @@
 # ---------------------------------------------
 # UTILS
 # --------------------------------------------
-#TODO: refactor
+#TODO: refactor and bring some lost and reusable functions to this file
 
-from math import sqrt, exp
+from math import sqrt, exp , trunc
 from matplotlib import pyplot as plt
 import uuid
 import numpy as np
+
+
+#Truncates a vector of numbers
+def truncate_vector(numbers, digits):
+    for i in range(len(numbers)):
+        numbers[i] = truncate(numbers[i], digits)
+    return numbers
+
+#Truncates a numbers
+def truncate(num, digits):
+    stp = 10.0 ** digits
+    return trunc(stp * num) / stp
 
 #logistic: returns a value between 0 and 1 within the range 0 to infinity
 def logistic(x):
