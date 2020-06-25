@@ -99,7 +99,7 @@ BOOST_PYTHON_MODULE(PYTHON_API_MODULE_NAME) {  // NOLINT
            "Initialization with default routing costs")
       .def("getRoute", getRouteWrapper, "driving route from 'start' to 'end' lanelet",
            (arg("from"), arg("to"), arg("routingCostId") = 0))
-      .def("getRouteVia", getRouteWrapper,
+      .def("getRouteVia", getRouteViaWrapper,
            "driving route from 'start' to 'end' lanelet using the 'via' "
            "lanelets",
            (arg("from"), arg("via"), arg("to"), arg("routingCostId") = 0))

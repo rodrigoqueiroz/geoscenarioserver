@@ -11,7 +11,7 @@ from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
 from pymoo.model.problem import Problem
 from GSOptProblem import GSOptProblem
-import gsc/GSChecker
+import gsc/GSParser
 import msg/simulationmsg_pb2
 
 class GSServer(Problem):
@@ -20,11 +20,11 @@ class GSServer(Problem):
 		self._connection = None
 
 	def load_scenario(self, file):
-		gschecker = GSChecker.GSChecker()
-		gschecker.validate_geoscenario(file)
-		gschecker.report.print()
-		gschecker.print_stats()
-		gschecker.print_scenario()
+		GSParser = GSParser.GSParser()
+		GSParser.load_and_validate_geoscenario(file)
+		GSParser.report.print()
+		GSParser.print_stats()
+		GSParser.print_scenario()
 
 	def start_socket(self):
 		# Create a TCP/IP socket

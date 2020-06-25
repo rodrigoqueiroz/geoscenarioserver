@@ -8,38 +8,51 @@
 
 from TickSync import TickSync
 from SimTraffic import *
-from dash.Dashboard import *
+from dash.DashBoard import *
 from util.Constants import *
 from Mapping.LaneletMap import *
+from lanelet2.projection import UtmProjector
 from SimConfig import SimConfig
+from gsc.GSParser import GSParser
 
 
 if __name__ == "__main__":
     sync_global   = TickSync(rate=TRAFFIC_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
 
-    # class for parsing and holding map
-    test_map = LaneletMap("scenarios/mapping_example.osm") # "scenarios/ll2_round.osm"
-    # class for holding scenario settings - load from file?
-    sim_config = SimConfig({
-        1 : test_map.get_route(329661501650965856, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
-        2 : test_map.get_route(329661501650965856, 99991), # [99998, 99997, 99996, 99995, 99994, 99993, 99992, 99991],
-        })
-    # for testing - grab a path to put vehicles on
-    ref_path = test_map.get_global_path_for_route(sim_config.lanelet_routes[1])
+    # load scenario from gsc file
+    parser = GSParser()
+    parser.load_and_validate_geoscenario("scenarios/example_map_scenario.osm")
+    # use origin from gsc file to project nodes to sim frame
+    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
+    parser.project_nodes(projector)
+    lanelet_map = LaneletMap(projector)
 
     # PROBLEM SETUP
     # Problem setup can be defined directly, or using GeoScenario XML files (GSParser)
+    sim_config = SimConfig()
     traffic = SimTraffic()
     # set these BEFORE adding vehicles - also why not using constructor?
-    traffic.set_map(test_map)
+    traffic.set_map(lanelet_map)
     traffic.set_sim_config(sim_config)
+    
+    # setup vehicles and lanelet routes from file
+    for vid, vnode in parser.vehicles.items():
+        # Use starting point of lanelet as first point in its path
+        path_nodes = [vnode] + parser.paths[vnode.tags['path']].nodes
+        lanelets_in_path = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in path_nodes ]
+        sim_id = vnode.tags['simid']
+
+        sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
+        traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
+            sim_config.lanelet_routes[sim_id], BT_VELKEEP)
+
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
     #    sim_config.lanelet_routes[1], BT_VELKEEP)
     # adding vehicle at the start of a lanelet
-    traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 0.0,0.0,0.0],
-        sim_config.lanelet_routes[1], BT_VELKEEP, start_state_in_frenet=True)
+    # traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 0.0,0.0,0.0],
+    #     sim_config.lanelet_routes[1], BT_VELKEEP, start_state_in_frenet=True)
     # test location
     # traffic.add_vehicle( 1, 'V1', [0,0.0,0.0, 0,0.0,0.0], BT_VELKEEP)
     # traffic.add_vehicle(2, 'V2', [8,0.0,0.0, 0.0,0.0,0.0],

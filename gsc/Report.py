@@ -29,7 +29,7 @@ class Report(object):
             print (bcolors.OKBLUE + msg + bcolors.ENDC)
 
     def print(self):
-        print(bcolors.HEADER+"#### GSChecker Report #### "+bcolors.ENDC)
+        print(bcolors.HEADER+"#### GSParser Report #### "+bcolors.ENDC)
         print("GeoScenario: " + str(self.file))
         if len(self.errors) > 0: 
             print ("Contains the following errors:")
