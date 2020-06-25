@@ -21,7 +21,7 @@ class GSServer(Problem):
 
 	def load_scenario(self, file):
 		GSParser = GSParser.GSParser()
-		GSParser.validate_geoscenario(file)
+		GSParser.load_and_validate_geoscenario(file)
 		GSParser.report.print()
 		GSParser.print_stats()
 		GSParser.print_scenario()

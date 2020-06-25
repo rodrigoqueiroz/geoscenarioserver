@@ -17,7 +17,7 @@ for name in files:
 	print(name)
 	file = name
 	GSParser = GSParser.GSParser()
-	GSParser.validate_geoscenario(file)
+	GSParser.load_and_validate_geoscenario(file)
 	GSParser.report.print()
     #try:
     #    with open(name) as f:
@@ -28,5 +28,5 @@ for name in files:
 
 #file = sys.argv[1]
 #GSParser = GSParser.GSParser()
-#GSParser.validate_geoscenario(file)
+#GSParser.load_and_validate_geoscenario(file)
 #GSParser.report.print()

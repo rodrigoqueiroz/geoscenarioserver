@@ -29,10 +29,14 @@
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='0' />
+    <tag k='simid' v='0' />
     <tag k='orientation' v='0' />
     <tag k='path' v='east_path' />
     <tag k='speed' v='30' />
     <tag k='start' v='yes' />
+  </node>
+  <node id='-4409' action='modify' visible='true' lat='49' lon='8.4'>
+    <tag k='gs' v='origin' />
   </node>
   <way id='-3880' action='modify' visible='true'>
     <nd ref='-3868' />

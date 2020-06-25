@@ -50,33 +50,26 @@ class GSParser(object):
 
         self.report = Report() 
 
-    def load_geoscenario_file(self, filepath, projector=None):
+    def load_geoscenario_file(self, filepath):
         xml_root = xml.etree.ElementTree.parse(filepath).getroot()
         for osm_node in xml_root.findall('node'):
             node = Node()
             node.id = int(osm_node.get('id'))
             node.lat = float(osm_node.get('lat'))
             node.lon = float(osm_node.get('lon'))
-            for osm_tag in osm_node.findall('tag'):
-                node.tags[osm_tag.get('k')] =  osm_tag.get('v')
-            if projector:
-                # NOTE: no altitude information
-                cart_pt = projector.forward(GPSPoint(node.lat, node.lon, 0.0))
-                node.x = cart_pt.x
-                node.y = cart_pt.y
+            self.parse_tags(osm_node, node)
             self.nodes[node.id] = node
         for osm_node in xml_root.findall('way'):
             way = Way()
             way.id = int(osm_node.get('id'))
-            for osm_tag in osm_node.findall('tag'):
-                way.tags[osm_tag.get('k')] =  osm_tag.get('v')
+            self.parse_tags(osm_node, way)
             for osm_nd in osm_node.findall('nd'):
                 way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
             self.ways.append(way)
 
-    def validate_geoscenario(self, filepath, projector=None):
+    def load_and_validate_geoscenario(self, filepath):
         #Load XML
-        self.load_geoscenario_file(filepath, projector)
+        self.load_geoscenario_file(filepath)
         self.isValid = True
         self.report.file = filepath
         self.filename = filepath
@@ -103,6 +96,22 @@ class GSParser(object):
                 elif way.tags["gs"] == "location": self.check_location(way) 
                 elif way.tags["gs"] == "path": self.check_path(way) 
 
+    def parse_tags(self, osm_node, node):
+        for osm_tag in osm_node.findall('tag'):
+            v = osm_tag.get('v')
+            node.tags[osm_tag.get('k')] = float(v) if Utils.is_number(v) else v
+            # if v == 'origin':
+            #     print(osm_tag.get('k'))
+            #     print(node.tags['gs'])
+
+    def project_nodes(self, projector):
+        assert len(self.nodes) > 0
+
+        for node_id, node in self.nodes.items():
+            # NOTE: no altitude information
+            cart_pt = projector.forward(GPSPoint(node.lat, node.lon, 0.0))
+            node.x = cart_pt.x
+            node.y = cart_pt.y
         
     def check_static_object(self, n):  # node /  way / area
         mandatory = {"gs","name","area"}
@@ -125,7 +134,7 @@ class GSParser(object):
 
     def check_vehicle(self, n):
         mandatory = {"gs","name"}
-        optional = {"orientation","speed","path","cycles","usespeedprofile","start","group"}
+        optional = {"orientation","speed","path","cycles","usespeedprofile","start","group", "simid"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
@@ -174,7 +183,7 @@ class GSParser(object):
         self.check_tags(n, mandatory, optional)
         if self.origin is not None:
             self.report.log_error( "Element " + n.id + ": Duplicate origin node. Must be unique in a scenario")
-        self.origin = n;
+        self.origin = n
 
     def check_metric(self,n):
         mandatory = {"gs","name"}

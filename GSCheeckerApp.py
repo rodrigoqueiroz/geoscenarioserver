@@ -9,5 +9,5 @@ if len(sys.argv) is not 2:
     exit()
 file = sys.argv[1]
 GSParser = GSParser.GSParser()
-GSParser.validate_geoscenario(file)
+GSParser.load_and_validate_geoscenario(file)
 GSParser.report.print()
