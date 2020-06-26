@@ -13,9 +13,6 @@ class BTreeModel(object):
         self.mconfig = None
 
     def tick(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        #debug:
-        self.tree = 'lanechange_scenario_tree'
-
         mconfig = getattr(self, self.tree)(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
         
         self.mconfig = mconfig
@@ -29,12 +26,12 @@ class BTreeModel(object):
         stop if a vehicle stopped
         stop if reacthed stopping point
         '''
-        print('drive tree')
+        #print('drive tree')
         return MVelKeepConfig()
         
 
     def lanechange_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        print('lane change tree')
+        #print('lane change tree')
         target = -1
         if self.mconfig:
             if type(self.mconfig) is MLaneSwerveConfig:
@@ -49,7 +46,7 @@ class BTreeModel(object):
     #def overtake_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)      
 
     def lanechange_scenario_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        print('{} lane change scenario tree'.format(sim_time))
+        #print('{} lane change scenario tree'.format(sim_time))
         if sim_time <= 3.0:
             return self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
         elif 3.0 < sim_time <= 7.0:
