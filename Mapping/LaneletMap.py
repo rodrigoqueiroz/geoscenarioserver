@@ -43,17 +43,10 @@ class OutsideRefPathException(Exception):
 
 
 class LaneletMap(object):
-    def __init__(self, projector, map_file):
-        self.map_file = map_file
-        # map is collection of primitive layers
-        self.lanelet_map, errors = lanelet2.io.loadRobust(self.map_file, projector)
-        assert not errors
+    def __init__(self):
+        self.lanelet_map = None        
         # update cache for every new ref path
         self.tangents_cache = []
-
-        # generate routing table
-        traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
-        self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
         
         # Route has additional semantic information for the shortest path
         # shortest_path = self.get_shortest_path(4984315, 2925017)
@@ -62,6 +55,14 @@ class LaneletMap(object):
         # self.plot_lanelets(shortest_path)
         # plt.show()
         # exit()
+    
+    def load_lanelet_map(self, filename, projector):
+        self.lanelet_map, errors = lanelet2.io.loadRobust(filename, projector)
+        assert not errors
+
+        # generate routing table
+        traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
+        self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
 
     def get_right(self, lanelet):
         return self.routing_graph.right(lanelet)

@@ -121,7 +121,6 @@ class GSParser(object):
         
         self.staticobjects[n.tags["name"]] = n
 
-
     def check_pedestrian(self, n):
         mandatory = {"gs","name"}
         optional = {"orientation","speed","path","cycles","usespeedprofile","start","group"}
@@ -129,12 +128,13 @@ class GSParser(object):
         self.check_uniquename(n)
         
         self.pedestrians[n.tags["name"]] = n
-      
-        
 
     def check_vehicle(self, n):
         mandatory = {"gs","name"}
-        optional = {"orientation","speed","path","cycles","usespeedprofile","start","group", "simid"}
+        optional = {
+            "orientation","speed","path","cycles",
+            "usespeedprofile","start","group", "simid",
+            "btree"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
@@ -152,7 +152,6 @@ class GSParser(object):
                         self.report.log_error("Element "+n.id +". Invalid speed list " + str(speed_list))
                 else:
                     self.report.log_error("Invalid speed value")
-
         
         self.vehicles[n.tags["name"]] = n
 
