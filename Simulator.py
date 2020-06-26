@@ -8,7 +8,7 @@
 
 from TickSync import TickSync
 from SimTraffic import *
-from dash.DashBoard import *
+from dash.Dashboard import *
 from util.Constants import *
 from Mapping.LaneletMap import *
 from lanelet2.projection import UtmProjector
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # use origin from gsc file to project nodes to sim frame
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
     parser.project_nodes(projector)
-    lanelet_map = LaneletMap(projector)
+    lanelet_map = LaneletMap(projector, "scenarios/ll2_round.osm")
 
     # PROBLEM SETUP
     # Problem setup can be defined directly, or using GeoScenario XML files (GSParser)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
         sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
         traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
-            sim_config.lanelet_routes[sim_id], BT_VELKEEP)
+            sim_config.lanelet_routes[sim_id], "drive_tree")
 
     #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
     #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],

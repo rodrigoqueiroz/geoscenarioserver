@@ -43,10 +43,10 @@ class OutsideRefPathException(Exception):
 
 
 class LaneletMap(object):
-    def __init__(self, projector):
-        self.example_map = "/home/divit/lanelet2_standalone/lanelet2_maps/res/mapping_example.osm"
+    def __init__(self, projector, map_file):
+        self.map_file = map_file
         # map is collection of primitive layers
-        self.lanelet_map, errors = lanelet2.io.loadRobust(self.example_map, projector)
+        self.lanelet_map, errors = lanelet2.io.loadRobust(self.map_file, projector)
         assert not errors
         # update cache for every new ref path
         self.tangents_cache = []
