@@ -16,6 +16,7 @@ from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 
 from Mapping.LaneletMap import LaneletMap
+from sv.BTreeModel import *
 
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
@@ -26,7 +27,7 @@ BT_FOLLOW = 4 #follow a specific target
 BT_CUTIN = 5  #reach and cut in a specific target
 
 class SVPlanner(object):
-    def __init__(self, vid, nvehicles, laneletmap, sim_config, traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
+    def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
         #MainProcess space:
         self._process = None
         self._traffic_state_sharr = traffic_state_sharr
@@ -38,10 +39,14 @@ class SVPlanner(object):
         self.laneletmap = laneletmap
         self.sim_config = sim_config
         self.lookahead_dist = 10
-        self.PLANNER_RATE = 5
+        
 
         self.mconfig = None
         self.lane_config = None
+
+        self.btree_root = btree_root
+        #Subprocess space
+        self.btree_model = None
 
     def start(self):
         #Create Shared arrray for Plan
@@ -77,16 +82,21 @@ class SVPlanner(object):
     def run_planner_process(self, traffic_state_sharr, mplan_sharr ):
         print('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         
-        sync_planner = TickSync(rate=self.PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
+        sync_planner = TickSync(rate=PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
+
+        self.btree_model = BTreeModel(self.vid, self.btree_root)
         
         while sync_planner.tick():
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
 
             #BTree Tick - using frenet state based on old ref path
-            new_mconfig = self.behavior_tick(vehicle_state, sync_planner.sim_time)
+            #new_mconfig = self.behavior_tick(vehicle_state, sync_planner.sim_time)
+            new_mconfig = self.btree_model.tick(sync_planner.sim_time, vehicle_state, self.read_map(vehicle_state), traffic_vehicles, None, None)
+
+
             if self.mconfig is None or (new_mconfig):
-                print("Got new maneuver: {}".format(new_mconfig.mkey))
+                #print("Got new maneuver: {}".format(new_mconfig.mkey))
                 self.mconfig = new_mconfig
                 # new maneuver: rebuild map
                 self.lane_config = self.read_map(vehicle_state)

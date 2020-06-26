@@ -19,7 +19,7 @@ from shm.SimSharedMemory import *
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
-    def __init__(self, vid, name = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
+    def __init__(self, vid, name = '', btree_root = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
         #id
         self.vid = vid
         self.name = name
@@ -44,6 +44,7 @@ class Vehicle(object):
         self.model = model
         #remote
         self.is_remote = False
+        
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
@@ -79,7 +80,7 @@ class Vehicle(object):
 
 # A Simulated Vehicle
 class SV(Vehicle):
-    def __init__(self, vid, name, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model = None):
+    def __init__(self, vid, name, btree_root, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model = None):
         #Map
         self.lanelet_map = lanelet_map
         # list of lanelet ids we want this vehicle to follow
@@ -100,6 +101,8 @@ class SV(Vehicle):
 
         #Planning
         self.sv_planner = None
+        #behavior
+        self.btree_root = btree_root
         #Trajectory
         self.trajectory = None          #coefs + time[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]] 
         self.trajectory_time = 0        #consumed time
@@ -129,29 +132,20 @@ class SV(Vehicle):
         ] 
         return state
     
-    def set_behavior_root(self, btree, target_id = None, goal_pos = None):
-        """ btree: is the root behavior tree. By default, the tree is velocity keeping.
-            target: can be used in many subtrees to force a maneuver towards one specific vehicle. 
-                    Usually, Ego is the target. Only one target is allowed.
-                    Without a defined target, maneuvers will adapt to vehicles around them as target.
-        """
-        self.btree = btree
-        self.target_id = target_id
-
+        
     def start_planner(self, nvehicles, sim_config, traffic_state_sharr ):
         """For simulated vehicles controlled by SVPlanner.
             If a planner is started, the vehicle can't have a remote.
             Use either option (start_planner or start_remote).
         """
         self.is_remote = False
-        self.sv_planner = SVPlanner(self.vid, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr)
+        self.sv_planner = SVPlanner(self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr)
         self.sv_planner.start()
     
     def stop(self):
         if self.sv_planner:
             self.sv_planner.stop()
 
-   
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
 
@@ -166,7 +160,6 @@ class SV(Vehicle):
         #Compute new state
         self.compute_vehicle_state(delta_time)
 
- 
     def compute_vehicle_state(self,delta_time):
         """
         Consume trajectory based on a given time and update pose
