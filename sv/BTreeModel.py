@@ -32,17 +32,24 @@ class BTreeModel(object):
 
     def lanechange_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
         #print('lane change tree')
-        target = -1
-        if self.mconfig:
-            if type(self.mconfig) is MLaneSwerveConfig:
-                #maneuver already started
-                # use OLD frenet frame to check current lane position. if in target lane switch lane targets
-                cur_lane_config = lane_config.get_current_lane(vehicle_state.d)
-                if cur_lane_config.id == self.mconfig.target_lid:
-                    target = 0
-                    return MVelKeepConfig()
-        return MLaneSwerveConfig(target)
+        mconfig = None
 
+        if self.mconfig is None:
+            mconfig = MVelKeepConfig()
+        else:
+            # Hardcoded lane change scenario
+            if 6 < sim_time and self.mconfig.mkey != M_VELKEEP:
+                mconfig = MVelKeepConfig()
+            if 3 < sim_time < 6:
+                if self.mconfig.mkey != M_LANESWERVE:
+                    mconfig = MLaneSwerveConfig(-1)
+                else:
+                    # use OLD frenet frame to check current lane position. if in target lane switch to velkeep
+                    cur_lane_config = lane_config.get_current_lane(vehicle_state.d)
+                    if cur_lane_config.id == self.mconfig.target_lid:
+                        mconfig = MLaneSwerveConfig(0)
+
+        return mconfig
     #def overtake_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)      
 
     def lanechange_scenario_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):

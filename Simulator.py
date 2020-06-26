@@ -44,10 +44,9 @@ if __name__ == "__main__":
     sync_global   = TickSync(rate=TRAFFIC_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
 
-    lanelet_map = LaneletMap()
-
     # PROBLEM SETUP
     # Problem setup can be defined directly, or using GeoScenario XML files (GSParser)
+    lanelet_map = LaneletMap()
     sim_config = SimConfig()
     traffic = SimTraffic()
     # set these BEFORE adding vehicles - also why not using constructor?
