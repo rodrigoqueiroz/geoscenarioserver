@@ -83,6 +83,8 @@ if __name__ == "__main__":
     traffic.start()
     dashboard.start()
     while sync_global.tick():
+        if not dashboard._process.is_alive(): # might/might not be wanted
+            break
         try:
             #Update Traffic
             traffic.tick(

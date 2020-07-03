@@ -49,11 +49,12 @@ def follow_cost(trajectory, mconfig:MFollowConfig, lane_config, vehicles, obstac
     total_cost = sum(C)
     return total_cost
 
-def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, lane_config, vehicles, obstacles):
+def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, target_lane_config, vehicles, obstacles):
     total_cost = 0
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
     C.append(1 * total_lat_jerk_cost(trajectory))
+    C.append(1 * lateral_lane_offset_cost(trajectory,target_lane_config))
     #C.append(1 * max_lat_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
@@ -103,7 +104,7 @@ def lateral_lane_offset_cost(traj,lane_config):
     #Penalizes distance from lane center during the entire trajectory.
     #Not suitable for Lane Change
     _, d_coef, T = traj
-    central_d = (lane_config.left_bound - lane_config.right_bound)/2
+    central_d = (lane_config.left_bound - lane_config.right_bound)/2 + lane_config.right_bound
     
     d_eq = to_equation(d_coef)
     target_d = d_eq(T)

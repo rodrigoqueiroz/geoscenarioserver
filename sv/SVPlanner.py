@@ -41,11 +41,10 @@ class SVPlanner(object):
         self.lookahead_dist = 10
         
 
-        self.mconfig = None
-        self.lane_config = None
-
-        self.btree_root = btree_root
         #Subprocess space
+        # Reference path that the planner will use for all transformations and planning
+        self.reference_path = None
+        self.btree_root = btree_root
         self.btree_model = None
 
     def start(self):
@@ -90,50 +89,54 @@ class SVPlanner(object):
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
 
-            #BTree Tick - using frenet state based on old ref path
-            #new_mconfig = self.behavior_tick(vehicle_state, sync_planner.sim_time)
-            new_mconfig = self.btree_model.tick(sync_planner.sim_time, vehicle_state, self.read_map(vehicle_state), traffic_vehicles, None, None)
+            if self.reference_path is None:
+                self.reference_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+            
+            # update lane config based on current (possibly outdated) reference frame
+            lane_config = self.read_map(vehicle_state, self.reference_path)
 
-
-            if self.mconfig is None or (new_mconfig):
-                #print("Got new maneuver: {}".format(new_mconfig.mkey))
-                self.mconfig = new_mconfig
-                # new maneuver: rebuild map
-                self.lane_config = self.read_map(vehicle_state)
+            #BTree Tick - using frenet state and lane config based on old ref path
+            mconfig, ref_path_changed = self.btree_model.tick(sync_planner.sim_time, vehicle_state, lane_config, traffic_vehicles, None, None)
+            # when ref path changes, lane config must be updated as well
+            if ref_path_changed:
+                print("PATH CHANGED")
+                self.reference_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+                lane_config = self.read_map(vehicle_state, self.reference_path)
             
             # since global path can change in this frame, frenet state in vehicle_state may be invalid
-            ref_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
-            s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(ref_path, vehicle_state.get_X(), vehicle_state.get_Y())
-            vehicle_state.set_S(s_vector)
-            vehicle_state.set_D(d_vector)
+            new_s_vector, new_d_vector = self.laneletmap.sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
             #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
-            #print((vehicle_state.s, vehicle_state.d))
+            #print((new_s_vector[0], new_d_vector[0]))
             
             # transform other vehicles to frenet frame based on this vehicle
             for vid, vehicle in traffic_vehicles.items():
-                s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(ref_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(self.reference_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
                 vehicle.vehicle_state.set_S(s_vector)
                 vehicle.vehicle_state.set_D(d_vector)
 
             #Maneuver Tick
-            if (self.mconfig and self.lane_config):
+            if mconfig and lane_config:
                 #replan maneuver
-                traj, cand = plan_maneuver( self.mconfig.mkey, 
-                                            self.mconfig, 
-                                            np.concatenate([vehicle_state.get_S(), vehicle_state.get_D()]), 
-                                            self.lane_config, 
+                traj, cand = plan_maneuver( mconfig.mkey,
+                                            mconfig,
+                                            np.concatenate([new_s_vector, new_d_vector]),
+                                            lane_config,
                                             traffic_vehicles)
-                self.write_motion_plan(mplan_sharr, traj, cand, state_time)
+                self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed)
 
         print('PLANNER PROCESS END')
         shm_vs.close()
         shm_vp.close()
     
-    def read_map(self, vehicle_state):
-        # build lane configs centered around the current lanelet
-        cur_ll, _ = self.laneletmap.get_occupying_lanelet_by_position(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+    def read_map(self, vehicle_state, reference_path):
+        """ Builds a lane config centered around the closest lanelet to vehicle_state lying
+            on the reference_path.
+        """
+        cur_ll = self.laneletmap.get_occupying_lanelet_in_reference_path(reference_path, self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+        
         middle_lane_width = LaneletMap.get_lane_width(cur_ll, vehicle_state.x, vehicle_state.y)
-        # LaneConfig(id, velocity, leftbound, rightbound). /2 to center it on its centerline
+        # LaneConfig(id, velocity, leftbound, rightbound).
+        # /2 to center it on its centerline
         middle_lane_config = LaneConfig(0, 30, middle_lane_width / 2, middle_lane_width / -2)
 
         if self.laneletmap.get_left(cur_ll):
@@ -145,35 +148,8 @@ class SVPlanner(object):
             lower_lane_width = LaneletMap.get_lane_width(self.laneletmap.get_right(cur_ll), vehicle_state.x, vehicle_state.y)
             lower_lane_config = LaneConfig(-1, 30, middle_lane_config.right_bound, middle_lane_config.right_bound - lower_lane_width)
             middle_lane_config.set_right_lane(lower_lane_config)
-
-        return middle_lane_config
-
-    
-    def behavior_tick(self,vehicle_state, sim_time):
-        #TODO: retrieve decision from BTree
-        #hardcoding now
-        #Standard
-        mconfig = None
-
-        if self.mconfig is None:
-            mconfig = MVelKeepConfig()
-        else:
-            # Hardcoded lane change scenario - note s changes when ref path changes
-            if 6 < sim_time and self.mconfig.mkey != M_VELKEEP:
-                mconfig = MVelKeepConfig()
-            if 3 < sim_time < 6:
-                if self.mconfig.mkey != M_LANESWERVE:
-                    mconfig = MLaneSwerveConfig(-1)
-                else:
-                    # use OLD frenet frame to check current lane position. if in target lane switch to velkeep
-                    cur_lane_config = self.lane_config.get_current_lane(vehicle_state.d)
-                    if cur_lane_config.id == self.mconfig.target_lid:
-                        mconfig = MLaneSwerveConfig(0)
         
-            # hardcoded follow scenario
-            # if self.vid == 1:
-            #     mconfig = MFollowConfig(2)
-        return mconfig
+        return middle_lane_config
 
     def read_traffic_state(self, traffic_state_sharr):
         from sv.SV import Vehicle
@@ -202,12 +178,14 @@ class SVPlanner(object):
         traffic_state_sharr.release() #<=========RELEASE
         return header_vector, my_vehicle_state, vehicles
 
-    def write_motion_plan(self, mplan_sharr, traj, cand, state_time):
+    def write_motion_plan(self, mplan_sharr, traj, cand, state_time, new_frenet_frame):
         if not traj:
             return
         plan = MotionPlan()
         plan.set_trajectory(traj[0],traj[1],traj[2])
         plan.t_start = state_time
+        plan.new_frenet_frame = new_frenet_frame
+
         #write motion plan
         mplan_sharr.acquire() #<=========LOCK
         mplan_sharr[:] = plan.get_plan_vector()

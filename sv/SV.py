@@ -85,6 +85,7 @@ class SV(Vehicle):
         self.lanelet_map = lanelet_map
         # list of lanelet ids we want this vehicle to follow
         self.lanelet_route = lanelet_route
+        self.global_path = None
 
         if start_state_in_frenet:
             # assume frenet start_state is relative to the first lane of the route
@@ -97,7 +98,7 @@ class SV(Vehicle):
             # Compute frenet state corresponding to start_state
             s_vector, d_vector = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
             Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), radius=radius, model=model)
-        print("{} init'd with {}, {}".format(vid, self.vehicle_state.s, self.vehicle_state.d))
+        # print("{} init'd with {}, {}".format(vid, self.vehicle_state.s, self.vehicle_state.d))
 
         #Planning
         self.sv_planner = None
@@ -153,9 +154,9 @@ class SV(Vehicle):
         plan = self.sv_planner.get_plan()
         if (plan):
             self.set_new_motion_plan(plan, sim_time)
-            # the plan received might be in reference to a new global path, so we must update ours as well
-            # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
-            self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
+            if plan.new_frenet_frame:
+                # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
+                self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
         
         #Compute new state
         self.compute_vehicle_state(delta_time)

@@ -124,34 +124,27 @@ class LaneletMap(object):
 
         return intersecting_lls[0]
 
-    def get_occupying_lanelet_in_route(self, s, lanelet_route):
-        # NOTE: doesn't account for lane changes in route
-        running_length = 0
-        index = 0
-        llmap = lanelet_route.laneletMap()
-        for ll in llmap.laneletLayer:
-            # ll = self.lanelet_map.laneletLayer[ll_id]
-            ll_length = length2d(ll)
-            if running_length <= s <= running_length + ll_length:
-                return ll, index
-            
-            index += 1
-            running_length += ll_length
-        
-        # s is outside the route
-        return self.lanelet_map.laneletLayer[lanelet_route[-1]], -1
+    def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
+        """ Returns the lanelet closest to (x,y) that lies along ref_path.
+            Does not check if (x,y) lies inside the lanelet.
 
-    def get_occupying_lanelet_by_position(self, lanelet_route, x, y):
-        index = 0 # NOTE index means nothing if not search in an order
+            @param lanelet_route:   the lanelet2 Route object that ref_path goes through.
+        """
+        point_on_path = project(ConstLineString2d(ref_path), BasicPoint2d(x, y))
+        return self.get_occupying_lanelet_by_route(lanelet_route, point_on_path.x, point_on_path.y)
+
+    def get_occupying_lanelet_by_route(self, lanelet_route, x, y):
+        """ Returns the lanelet in lanelet_route that completely encloses the point defined by x,y.
+            If multiple lanelets enclose the point, the first is returned.
+        """
         ret = None
         # NOTE use laneletMap() requires a fix to python bindings
         for ll in lanelet_route.laneletMap().laneletLayer:
             if inside(ll, BasicPoint2d(x, y)):
                 ret = ll
                 break
-            index += 1
 
-        return ret, index
+        return ret
 
     def get_global_path_for_route(self, lanelet_route, x = None, y = None, meters_ahead=float("inf")):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
@@ -164,8 +157,8 @@ class LaneletMap(object):
         """
         # if a position is not given, take the first lanelet in the shortest path
         # otherwise find the lanelet we are in in the shortest path
-        cur_ll, _ = (lanelet_route.shortestPath()[0], 0) if x is None or y is None \
-            else self.get_occupying_lanelet_by_position(lanelet_route, x, y)
+        cur_ll = lanelet_route.shortestPath()[0] if x is None or y is None \
+            else self.get_occupying_lanelet_by_route(lanelet_route, x, y)
         assert cur_ll
         
         cur_lane = lanelet_route.fullLane(cur_ll)
