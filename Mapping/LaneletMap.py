@@ -70,6 +70,11 @@ class LaneletMap(object):
     def get_left(self, lanelet):
         return self.routing_graph.left(lanelet)
     
+    def get_next(self, lanelet):
+        # returns first following lanelet
+        following = self.routing_graph.following(lanelet)
+        return following[0] if following else None
+    
     @staticmethod
     def get_left_in_route(route, lanelet):
         leftRelation = route.leftRelation(lanelet)
@@ -146,13 +151,14 @@ class LaneletMap(object):
 
         return ret
 
-    def get_global_path_for_route(self, lanelet_route, x = None, y = None, meters_ahead=float("inf")):
+    def get_global_path_for_route(self, lanelet_route, x = None, y = None, meters_after_end=50):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
             x, y only used to determine the starting lanelet, allowed to be a little outdated.
-            NOTE: lookahead isn't implemented yet, since change in path results in change in frenet coords
-            IDEALLY we don't want to request for this very often - only when we generate a new trajectory
-            TODO: factor in lane changes in route - maybe return path for current lane?
-            @param lanelet_route:   Route object from lanelet2
+            Ideally we don't want to request for this very often - only when we generate a new trajectory.
+            
+            @param lanelet_route:       Route object from lanelet2
+            @param meters_after_end:    distance beyond the end of lanelet_route to extend the global path by
+            
             @return:    list of lanelet2.core.Point3d
         """
         # if a position is not given, take the first lanelet in the shortest path
@@ -164,19 +170,26 @@ class LaneletMap(object):
         cur_lane = lanelet_route.fullLane(cur_ll)
         assert cur_lane
         
-        # cur_ll = lanelet_route[0]
         path = []
-        # path = [ Point3d(0, cur_ll.centerline[0].x, cur_ll.centerline[0].y, 0.0) ]
-        path_length = 0
+        # append centerline of each lanelet in the lane
         for ll in cur_lane:
-            for p, q in pairwise(ll.centerline):
+            for p in ll.centerline:
+                path.append(Point3d(0, p.x, p.y, 0.0))
+        
+        # add a padding at the end of the path
+        path_length = 0
+        next_ll = self.get_next(cur_lane[-1])
+        while next_ll is not None and path_length < meters_after_end:
+            for p, q in pairwise(next_ll.centerline):
                 # for first iteration, also append p
                 if path_length == 0:
                     path.append(Point3d(0, p.x, p.y, 0.0))
 
-                dist = distance(p, q)
                 path.append(Point3d(0, q.x, q.y, 0.0))
-                path_length += dist
+                path_length += distance(p, q)
+
+                if path_length >= meters_after_end: break
+            next_ll = self.get_next(next_ll)
 
         path_ls = ConstLineString3d(0, path)
 
@@ -286,6 +299,13 @@ class LaneletMap(object):
         point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)
         return distance(point_on_leftbound, point_on_rightbound)
     
+    @staticmethod
+    def sim_to_frenet_position(ref_path:ConstLineString3d, x, y):
+        path_ls = ConstLineString2d(ref_path)
+        # toArcCoordinates does not interpolate beyond or before ref_path
+        # arc_coords.distance used as d may be discontinuous moving across points
+        arc_coords = toArcCoordinates(path_ls, BasicPoint2d(x, y))
+        return arc_coords.length, arc_coords.distance
     
     # @staticmethod
     def sim_to_frenet_frame(self, ref_path:ConstLineString3d, x_vector, y_vector):

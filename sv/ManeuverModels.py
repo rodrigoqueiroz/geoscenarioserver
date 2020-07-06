@@ -261,9 +261,9 @@ def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = No
                 #add target
                 target_state_set.append((s_target,d_target,t))
 
-    print ('Targets: {}'.format(len(target_state_set)))
-    for i in target_state_set:
-       print(i)
+    # print ('Targets: {}'.format(len(target_state_set)))
+    # for i in target_state_set:
+    #    print(i)
     
     #find trajectories
     trajectories = []

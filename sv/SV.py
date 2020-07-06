@@ -132,8 +132,7 @@ class SV(Vehicle):
             self.d_acc_eq(t),
         ] 
         return state
-    
-        
+
     def start_planner(self, nvehicles, sim_config, traffic_state_sharr ):
         """For simulated vehicles controlled by SVPlanner.
             If a planner is started, the vehicle can't have a remote.
@@ -152,7 +151,7 @@ class SV(Vehicle):
 
         #Read planner
         plan = self.sv_planner.get_plan()
-        if (plan):
+        if plan:
             self.set_new_motion_plan(plan, sim_time)
             if plan.new_frenet_frame:
                 # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)

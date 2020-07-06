@@ -110,7 +110,7 @@ class MVelKeepConfig:
 @dataclass
 class MStopConfig:
     #target
-    time:MP = MP(5.0,10,6)          #[s]
+    time:MP = MP(3.0,10,6)          #[s]
     distance:MP = MP(10.0,10,6)     #[s]
     decel:MP = MP(9.0)
     #during

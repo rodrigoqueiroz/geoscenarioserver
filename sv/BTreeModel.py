@@ -13,59 +13,60 @@ class BTreeModel(object):
         self.tree_name = root
         self.mconfig = None
         self.tree = None
+        self.reached_goal = False   # for drive tree
 
-    def tick(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        mconfig, ref_path_changed = getattr(self, self.tree_name)(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+
+    def tick(self, planner_state):
+        mconfig, ref_path_changed = getattr(self, self.tree_name)(planner_state)
         
         self.mconfig = mconfig
         return self.mconfig, ref_path_changed
         
     
-    def drive_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        ''' Driving on route and alternating between 
-        velocity keeping if road ahead is free
-        vehicle following if there is a vehicle on the way
-        stop if a vehicle stopped
-        stop if reacthed stopping point
-        '''
+    def drive_tree(self, planner_state):
+        """ Driving on route and alternating between 
+            velocity keeping if road ahead is free
+            vehicle following if there is a vehicle on the way
+            stop if a vehicle stopped
+            stop if reacthed stopping point
+        """
         #print('drive tree')
-        return MVelKeepConfig()
+        mconfig = MVelKeepConfig()
+
+        if not self.reached_goal:
+            self.reached_goal = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point_frenet)
+        
+        if self.reached_goal:
+            mconfig = MStopConfig()
+        
+        return mconfig
         
 
-    def lanechange_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+    def lanechange_tree(self, planner_state):
         target = -1        
         return MLaneSwerveConfig(target)
 
-    #def overtake_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)      
+    #def overtake_tree(planner_state)      
 
-    def lanechange_scenario_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+    def lanechange_scenario_tree(self, planner_state):
         """ Controls switching of behaviour trees (not maneuvers)
         """
         # print('{} lane change scenario tree'.format(sim_time))
         ref_path_changed = False
-        
-        if sim_time < 3:
+
+        if planner_state.sim_time < 3:
             self.tree = self.drive_tree
-        elif type(self.mconfig) == MLaneSwerveConfig and lane_swerve_completed(vehicle_state, lane_config, self.mconfig):
+        elif type(self.mconfig) == MLaneSwerveConfig and lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig):
             # print("done lane swerve")
             self.tree = self.drive_tree
             ref_path_changed = True
-        elif sim_time < 4:
+        elif planner_state.sim_time < 4:
             self.tree = self.lanechange_tree
         
-        return self.tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles), ref_path_changed
+        return self.tree(planner_state), ref_path_changed
         # else:
-        #     return self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+        #     return self.drive_tree(planner_state)
     
-    def drive_scenario_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        tree = self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+    def drive_scenario_tree(self, planner_state):
+        tree = self.drive_tree(planner_state)
         return tree, False
-
-
-    
-
-    
-
-
-
-      

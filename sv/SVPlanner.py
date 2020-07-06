@@ -18,6 +18,8 @@ from sv.ManeuverModels import *
 from Mapping.LaneletMap import LaneletMap
 from sv.BTreeModel import *
 
+from typing import Tuple, Dict, List
+
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
 BT_DRIVE = 1  #follow a route with normal driving. Can switch to follow, or stop
@@ -25,6 +27,18 @@ BT_STOP = 2
 BT_VELKEEP = 3
 BT_FOLLOW = 4 #follow a specific target
 BT_CUTIN = 5  #reach and cut in a specific target
+
+@dataclass
+class PlannerState:
+    sim_time:float
+    vehicle_state:VehicleState
+    lane_config:LaneConfig
+    vehicles:Dict
+    pedestrians:List
+    obstacles:List
+    goal_point:Tuple = None
+    goal_point_frenet:Tuple = None
+
 
 class SVPlanner(object):
     def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
@@ -39,7 +53,6 @@ class SVPlanner(object):
         self.laneletmap = laneletmap
         self.sim_config = sim_config
         self.lookahead_dist = 10
-        
 
         #Subprocess space
         # Reference path that the planner will use for all transformations and planning
@@ -61,7 +74,6 @@ class SVPlanner(object):
         #if (self._process):
             #self._process.join()
 
-    
     def get_plan(self):
         plan = MotionPlan()
         self._mplan_sharr.acquire() #<=========LOCK
@@ -94,9 +106,22 @@ class SVPlanner(object):
             
             # update lane config based on current (possibly outdated) reference frame
             lane_config = self.read_map(vehicle_state, self.reference_path)
+            if not lane_config:
+                # No map data for current position
+                print("no lane config")
+                continue
 
             #BTree Tick - using frenet state and lane config based on old ref path
-            mconfig, ref_path_changed = self.btree_model.tick(sync_planner.sim_time, vehicle_state, lane_config, traffic_vehicles, None, None)
+            planner_state = PlannerState(
+                sim_time=sync_planner.sim_time,
+                vehicle_state=vehicle_state,
+                lane_config=lane_config,
+                goal_point_frenet=LaneletMap.sim_to_frenet_position(self.reference_path, *self.sim_config.goal_points[self.vid]),
+                vehicles=traffic_vehicles,
+                pedestrians=None,
+                obstacles=None
+            )
+            mconfig, ref_path_changed = self.btree_model.tick(planner_state)
             # when ref path changes, lane config must be updated as well
             if ref_path_changed:
                 print("PATH CHANGED")
@@ -125,14 +150,19 @@ class SVPlanner(object):
                 self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed)
 
         print('PLANNER PROCESS END')
-        shm_vs.close()
-        shm_vp.close()
+        # shm_vs.close()
+        # shm_vp.close()
     
     def read_map(self, vehicle_state, reference_path):
         """ Builds a lane config centered around the closest lanelet to vehicle_state lying
             on the reference_path.
         """
         cur_ll = self.laneletmap.get_occupying_lanelet_in_reference_path(reference_path, self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+        if not cur_ll:
+            # as last resort, search the whole map
+            cur_ll = self.laneletmap.get_occupying_lanelet(vehicle_state.x, vehicle_state.y)
+            if not cur_ll:
+                return None
         
         middle_lane_width = LaneletMap.get_lane_width(cur_ll, vehicle_state.x, vehicle_state.y)
         # LaneConfig(id, velocity, leftbound, rightbound).

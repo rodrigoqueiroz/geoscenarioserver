@@ -11,4 +11,5 @@ from typing import Dict
 
 @dataclass
 class SimConfig:
-    lanelet_routes: Dict = field(default_factory=dict)
+    lanelet_routes:Dict = field(default_factory=dict)
+    goal_points:Dict = field(default_factory=dict)

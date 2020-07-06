@@ -2,9 +2,8 @@
 
 from sv.ManeuverConfig import *
 from util.Constants import *
+import numpy as np
 
-# this messes up frenet state because itll report we have not lane changed
-# even tho new reference path is calculated
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
     current_lane = None
     if mconfig.target_lid == 1: # left
@@ -19,4 +18,13 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
     return current_lane.id == mconfig.target_lid
 
 def can_perform_lane_change():
-    pass
+    return True
+
+# no way of knowing if passed goal
+def has_reached_goal(vehicle_state, goal_point, threshold=2):
+    to_goal = np.array(goal_point) - np.array([vehicle_state.x, vehicle_state.y])
+    sqr_distance = np.dot(to_goal, to_goal)
+    return sqr_distance < threshold*threshold
+
+def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
+    return goal_point[0] - vehicle_state.s < threshold

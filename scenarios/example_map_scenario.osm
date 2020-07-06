@@ -1,31 +1,31 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='true' generator='JOSM'>
-  <node id='-20466' action='modify' visible='true' lat='49.00277852206' lon='8.42411016864'>
+  <node id='-1891' action='modify' visible='true' lat='49.00277852206' lon='8.42411016864'>
     <tag k='gs' v='egogoal' />
     <tag k='name' v='goal_1' />
     <tag k='scenario' v='egogoal' />
   </node>
-  <node id='-20468' action='modify' visible='true' lat='49.00383720662' lon='8.42391586435'>
+  <node id='-1893' action='modify' visible='true' lat='49.00383720662' lon='8.42391586435'>
     <tag k='gs' v='egostart' />
     <tag k='orientation' v='45' />
     <tag k='rotation' v='45' />
   </node>
-  <node id='-20470' action='modify' visible='true' lat='49.00295975322' lon='8.42471711431'>
+  <node id='-1895' action='modify' visible='true' lat='49.00295975322' lon='8.42471711431'>
     <tag k='agentspeed' v='1' />
   </node>
-  <node id='-20472' action='modify' visible='true' lat='49.00346265241' lon='8.42370245871'>
+  <node id='-1897' action='modify' visible='true' lat='49.00348008692' lon='8.42395435637'>
     <tag k='agentspeed' v='0' />
   </node>
-  <node id='-20474' action='modify' visible='true' lat='49.00311479546' lon='8.42469641193'>
+  <node id='-1899' action='modify' visible='true' lat='49.00311479546' lon='8.42469641193'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-20476' action='modify' visible='true' lat='49.00351510949' lon='8.42428861442'>
+  <node id='-1901' action='modify' visible='true' lat='49.00354735919' lon='8.42432082282'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-20478' action='modify' visible='true' lat='49.00346076242' lon='8.42457842185'>
+  <node id='-1903' action='modify' visible='true' lat='49.00332286676' lon='8.42471234099'>
     <tag k='agentspeed' v='7' />
   </node>
-  <node id='-20480' action='modify' visible='true' lat='49.00295256035' lon='8.42471302561'>
+  <node id='-1905' action='modify' visible='true' lat='49.00295256035' lon='8.42471302561'>
     <tag k='btree' v='lanechange_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
@@ -36,15 +36,15 @@
     <tag k='speed' v='30' />
     <tag k='start' v='yes' />
   </node>
-  <node id='-20482' action='modify' visible='true' lat='49.00287543851' lon='8.42476260494'>
+  <node id='-1907' action='modify' visible='true' lat='49.00287543851' lon='8.42476260494'>
     <tag k='gs' v='origin' />
   </node>
-  <way id='-20484' action='modify' visible='true'>
-    <nd ref='-20470' />
-    <nd ref='-20474' />
-    <nd ref='-20478' />
-    <nd ref='-20476' />
-    <nd ref='-20472' />
+  <way id='-1909' action='modify' visible='true'>
+    <nd ref='-1895' />
+    <nd ref='-1899' />
+    <nd ref='-1903' />
+    <nd ref='-1901' />
+    <nd ref='-1897' />
     <tag k='gs' v='path' />
     <tag k='name' v='east_path' />
     <tag k='virtual' v='no' />
