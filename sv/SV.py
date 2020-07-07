@@ -9,11 +9,12 @@ from matplotlib import pyplot as plt
 import math
 import sys
 from TickSync import TickSync
-from util.Utils import *
 from util.Constants import *
+from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
+from util.Utils import *
 from sv.SVPlanner import *
 from sv.VehicleState import *
-from Mapping.LaneletMap import LaneletMap, OutsideRefPathException
+from Mapping.LaneletMap import LaneletMap
 
 from shm.SimSharedMemory import *
 
@@ -91,12 +92,12 @@ class SV(Vehicle):
             # assume frenet start_state is relative to the first lane of the route
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
             # compute sim state
-            x_vector, y_vector = self.lanelet_map.frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:])
+            x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:])
             Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, radius=radius, model=model)
         else:
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, x=start_state[0], y=start_state[3])
             # Compute frenet state corresponding to start_state
-            s_vector, d_vector = self.lanelet_map.sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
+            s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
             Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), radius=radius, model=model)
         # print("{} init'd with {}, {}".format(vid, self.vehicle_state.s, self.vehicle_state.d))
 
@@ -191,7 +192,7 @@ class SV(Vehicle):
             # TODO: rn the global path isn't changing - its using the centerline of the entire route. needs to change cause lane changes
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
             try:
-                x_vector, y_vector = self.lanelet_map.frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
+                x_vector, y_vector = frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
                 raise e

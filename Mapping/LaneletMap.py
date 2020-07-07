@@ -25,28 +25,10 @@ def pairwise(iterable):
     next(j, None)
     return zip(i, j)
 
-# this might not be worth using over indexes
-def tripletwise(iterable):
-    i, j, k = tee(iterable, 3)
-    next(j, None)
-    next(k, None)
-    next(k, None)
-    return zip(i, j, k)
-
-def normalize(v):
-    norm = np.linalg.norm(v)
-    return v / norm if norm > 0 else v
-
-
-class OutsideRefPathException(Exception):
-    pass
-
 
 class LaneletMap(object):
     def __init__(self):
         self.lanelet_map = None        
-        # update cache for every new ref path
-        self.tangents_cache = []
         
         # Route has additional semantic information for the shortest path
         # shortest_path = self.get_shortest_path(4984315, 2925017)
@@ -191,25 +173,7 @@ class LaneletMap(object):
                 if path_length >= meters_after_end: break
             next_ll = self.get_next(next_ll)
 
-        path_ls = ConstLineString3d(0, path)
-
-        # rebuild tangent cache
-        self.tangents_cache = []
-        i = 0
-        for p, q, r in tripletwise(path_ls):
-            pq = np.array([q.x - p.x, q.y - p.y])
-            qr = np.array([r.x - q.x, r.y - q.y])
-            if i == 0:  # first tangent
-                self.tangents_cache.append(normalize(pq))
-                i += 1
-            # tangent of q
-            self.tangents_cache.append(normalize(pq + qr))
-            i += 1
-            if i == len(path_ls) - 1:   # last tangent
-                self.tangents_cache.append(normalize(qr))
-                i += 1
-        # print(self.tangents_cache)
-            
+        path_ls = ConstLineString3d(0, path)            
         return path_ls
 
     def get_points(self,  x_min=0, y_min=0, x_max=0, y_max=0):
@@ -260,7 +224,7 @@ class LaneletMap(object):
             plt.plot(xs, ys, 'g-')
         
 
-    def plot_lanelets(self, lanelet_ids):
+    def plot_lanelet_ids(self, lanelet_ids):
         for ll_id in lanelet_ids:
             LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
 
@@ -292,101 +256,10 @@ class LaneletMap(object):
             Either way the width would be discontinuous as you move along s.
             @param s:   length along the lanelet centerline
         """
-        # x, y = LaneletMap.frenet_to_sim_frame(lanelet.centerline, s, 0)
         point_on_centerline = project(ConstLineString2d(lanelet.centerline), BasicPoint2d(x, y))
         # project on left and right bounds
         point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
         point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)
         return distance(point_on_leftbound, point_on_rightbound)
     
-    @staticmethod
-    def sim_to_frenet_position(ref_path:ConstLineString3d, x, y):
-        path_ls = ConstLineString2d(ref_path)
-        # toArcCoordinates does not interpolate beyond or before ref_path
-        # arc_coords.distance used as d may be discontinuous moving across points
-        arc_coords = toArcCoordinates(path_ls, BasicPoint2d(x, y))
-        return arc_coords.length, arc_coords.distance
     
-    # @staticmethod
-    def sim_to_frenet_frame(self, ref_path:ConstLineString3d, x_vector, y_vector):
-        """
-            @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?
-        """
-        x, x_vel, x_acc = x_vector
-        y, y_vel, y_acc = y_vector
-        velocity = np.array([x_vel, y_vel])
-
-        path_ls = ConstLineString2d(ref_path)
-        # toArcCoordinates does not interpolate beyond or before ref_path
-        # arc_coords.distance used as d may be discontinuous moving across points
-        arc_coords = toArcCoordinates(path_ls, BasicPoint2d(x, y))
-        s = arc_coords.length
-        d = arc_coords.distance
-
-        # velocity
-        unit_tangent = None
-        arclen = 0
-        for i in range(len(ref_path)-1):
-            p = ref_path[i]
-            q = ref_path[i+1]
-            
-            pq = np.array([q.x - p.x, q.y - p.y])
-            dist = np.linalg.norm(pq)
-
-            if arclen <= s <= arclen + dist: # if s lies between p and q
-                percent_delta_s = (s - arclen) / dist
-                unit_tangent = normalize( self.tangents_cache[i] + percent_delta_s * (self.tangents_cache[i+1] - self.tangents_cache[i]) )
-                break
-            arclen += dist
-
-        if unit_tangent is None:
-            print("point is outside the reference path.")
-            raise OutsideRefPathException()
-        
-        unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
-        vel_frenet = np.array([
-            np.dot(velocity, unit_tangent),
-            np.dot(velocity, unit_normal)])
-        return [s, vel_frenet[0], x_acc], [d, vel_frenet[1], y_acc]
-
-
-    # @staticmethod
-    def frenet_to_sim_frame(self, ref_path, s_vector, d_vector):
-        """
-            @param ref_path:    iterable of lanelet2.core.Point3d. Change to something general?
-        """
-        s, s_vel, s_acc = s_vector
-        d, d_vel, d_acc = d_vector
-
-        point_on_ls = None
-        unit_tangent = None
-        arclen = 0
-        for i in range(len(ref_path)-1):
-            p = ref_path[i]
-            q = ref_path[i+1]
-            pq = np.array([q.x - p.x, q.y - p.y])
-            dist = np.linalg.norm(pq)
-
-            if s < 0 or arclen <= s <= arclen + dist: # if s lies between p and q
-                # r(s)
-                delta_s = s - arclen
-                unit_pq = normalize(pq)
-                # we are still travelling along pq, but facing in the direction of an interpolated tangent
-                point_on_ls = np.array([p.x, p.y]) + unit_pq * delta_s
-                
-                percent_delta_s = delta_s / dist
-                unit_tangent = normalize(self.tangents_cache[i] + percent_delta_s * (self.tangents_cache[i+1] - self.tangents_cache[i]))
-                unit_normal = np.array([-1 * unit_pq[1], unit_pq[0]])
-                break
-            
-            arclen += dist
-            # print((p.x, p.y, q.x, q.y))
-        
-        if point_on_ls is None:
-            print("s {} d {} is outside the reference path.".format(s, d))
-            raise OutsideRefPathException()
-        
-
-        point_in_cart = point_on_ls + unit_normal*d
-        vel = s_vel * unit_tangent + d_vel * unit_normal
-        return [point_in_cart[0], vel[0], s_acc], [point_in_cart[1], vel[1], d_acc]

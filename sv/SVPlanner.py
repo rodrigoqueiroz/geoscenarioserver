@@ -14,6 +14,7 @@ from TickSync import TickSync
 from sv.VehicleState import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
+from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
 
 from Mapping.LaneletMap import LaneletMap
 from sv.BTreeModel import *
@@ -116,7 +117,7 @@ class SVPlanner(object):
                 sim_time=sync_planner.sim_time,
                 vehicle_state=vehicle_state,
                 lane_config=lane_config,
-                goal_point_frenet=LaneletMap.sim_to_frenet_position(self.reference_path, *self.sim_config.goal_points[self.vid]),
+                goal_point_frenet=sim_to_frenet_position(self.reference_path, *self.sim_config.goal_points[self.vid]),
                 vehicles=traffic_vehicles,
                 pedestrians=None,
                 obstacles=None
@@ -129,13 +130,13 @@ class SVPlanner(object):
                 lane_config = self.read_map(vehicle_state, self.reference_path)
             
             # since global path can change in this frame, frenet state in vehicle_state may be invalid
-            new_s_vector, new_d_vector = self.laneletmap.sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
+            new_s_vector, new_d_vector = sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
             #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #print((new_s_vector[0], new_d_vector[0]))
             
             # transform other vehicles to frenet frame based on this vehicle
             for vid, vehicle in traffic_vehicles.items():
-                s_vector, d_vector = self.laneletmap.sim_to_frenet_frame(self.reference_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
                 vehicle.vehicle_state.set_S(s_vector)
                 vehicle.vehicle_state.set_D(d_vector)
 
