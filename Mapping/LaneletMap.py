@@ -261,5 +261,3 @@ class LaneletMap(object):
         point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
         point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)
         return distance(point_on_leftbound, point_on_rightbound)
-    
-    
