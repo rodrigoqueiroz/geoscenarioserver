@@ -198,7 +198,7 @@ class Dashboard(object):
             plt.plot(line[0], line[1], 'g-')
 
         #vehicles
-        for vid in vehicles:
+        for vid, vehicle in vehicles.items():
             x = vehicles[vid].vehicle_state.x
             y = vehicles[vid].vehicle_state.y
             plt.plot(x, y, 'bv')

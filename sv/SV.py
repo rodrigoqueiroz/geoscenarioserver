@@ -257,7 +257,4 @@ class SV(Vehicle):
         if (diff>0):
             self.trajectory_time += diff
         # print('new s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
-            
-   
-    
  

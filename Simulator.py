@@ -38,8 +38,9 @@ def setup_problem_from_file(filename, sim_traffic, sim_config, lanelet_map):
         sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
         sim_config.goal_points[sim_id] = (path_nodes[-1].x, path_nodes[-1].y)
         
-        traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
+        sim_traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
             sim_config.lanelet_routes[sim_id], btree_root)
+
 
 
 if __name__ == "__main__":

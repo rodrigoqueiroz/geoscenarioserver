@@ -21,10 +21,10 @@ def can_perform_lane_change():
     return True
 
 # no way of knowing if passed goal
-def has_reached_goal(vehicle_state, goal_point, threshold=2):
-    to_goal = np.array(goal_point) - np.array([vehicle_state.x, vehicle_state.y])
-    sqr_distance = np.dot(to_goal, to_goal)
-    return sqr_distance < threshold*threshold
+# def has_reached_goal(vehicle_state, goal_point, threshold=2):
+#     to_goal = np.array(goal_point) - np.array([vehicle_state.x, vehicle_state.y])
+#     sqr_distance = np.dot(to_goal, to_goal)
+#     return sqr_distance < threshold*threshold
 
 def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
     return goal_point[0] - vehicle_state.s < threshold
