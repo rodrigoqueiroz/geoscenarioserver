@@ -2,3 +2,4 @@ sv/plots/*
 logs/*
 *__pycache__/
 **/build/
+.vscode/
