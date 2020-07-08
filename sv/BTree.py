@@ -1,7 +1,7 @@
 from py_trees import *
 
 from sv.VehicleState import *
-from sv.ManeuverConfig import *
+import sv.ManeuverConfig as MConf
 from Mapping.LaneletMap import LaneletMap
 from BTreeLeaves import *
 
@@ -26,9 +26,13 @@ class BTree(object):
         self.bb_maneu.register_key(key="config", access=common.Access.READ)
 
     def tick(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+
+        # Update blackboard
+        
+
+
         self.tree.tick_once()
         # TODO: rethink this!
-        mkey = eval(self.bb_maneu.key)
         self.mconfig = eval(self.bb_maneu.config)
         return self.mconfig
 
@@ -39,39 +43,40 @@ class BTree(object):
         stop if a vehicle stopped
         stop if reacthed stopping point
         '''
-        ## Maneuvers List
-        # TODO: Update these with the correct maneuver model configs
-        free_lane = Maneuver("M_VELKEEP", "MVelKeepConfig(MP(18.0,10,6), MP(5))")
-        follow_obstc = Maneuver("FollowVehicle", "MFollowVehicle()")
-        stop_ego = Maneuver("M_STOP", "MStop()")
+        # Maneuvers List
+        kp_vel = Maneuver("Keep Velocity", MConf.MVelKeepConfig)
+        follow_obstc = Maneuver("Follow Vehicle", MConf.MFollowConfig)
+        stop_self = Maneuver("Stop", MConf.MStopConfig)
         
-        ## Conditions List
+        # Conditions List
         end_point = Condition("EndPoint")
-        occupied = Condition("Occupied")
+        free = Condition("Free")
         stp_vehicle = Condition("Stopped")
 
-        ## Coordinate Maneuvers and Conditions
+        # Coordinate Maneuvers and Conditions
         stp_obstc = composites.Sequence(["Stopped Obstacle"])
-        stp_obstc.add_children([stp_vehicle, stop_ego])
+        stp_obstc.add_children([stp_vehicle, stop_self])
 
-        dyn_obstc = composites.Selector("Obstacle Dynamics")
-        dyn_obstc.add_children([stp_obstc, follow_obstc])
+        occ_lane = composites.Selector("Occupied Lane")
+        occ_lane.add_children([stp_obstc, follow_obstc])
 
-        occ_lane = composites.Sequence("Occupied Lane")
-        occ_lane.add_children([occupied, dyn_obstc])
+        free_lane = composites.Sequence("Free Lane")
+        free_lane.add_children([free, kp_vel])
 
         traj_follow = composites.Selector("Follow Trajectory")
-        traj_follow.add_children([occ_lane, free_lane])
+        traj_follow.add_children([free_lane, occ_lane])
 
         reached_end_point = composites.Sequence("Reached End Point")
-        reached_end_point.add_children([end_point, stop_ego])
+        reached_end_point.add_children([end_point, stop_self])
 
         root = composites.Selector("Simple Drive")
         root.add_children([reached_end_point, traj_follow])
-
+        
+        # Set Behavior Tree
         drive_tree = trees.BehaviourTree(root=root)
         drive_tree.setup(timeout=15)
 
+        # Print Tree
         print('++++ Drive Tree ++++')
         print(display.unicode_tree(root=root))
 
