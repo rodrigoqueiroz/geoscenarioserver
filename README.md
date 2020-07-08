@@ -8,6 +8,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Maneuver Models,
 - python3-tk
 - python3-sysv-ipc
 - [lanelet2](https://github.com/yuzhangbit/lanelet2_standalone)
+- [py_trees](https://github.com/splintered-reality/py_trees)
 
 ## Simulated Vehicle Planner and Maneuver Models (/sv)
 - Check util/Constants for configuration options. Use SHOW_DASHBOARD = True for independent view (no Unreal, but affect performance).
