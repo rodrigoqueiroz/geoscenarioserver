@@ -19,16 +19,31 @@ class BTree(object):
 
     def setup(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
         self.tree = self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
-        self.bb_cond.register_key(key="EndPoint", access=common.Access.WRITE)
-        self.bb_cond.register_key(key="Occupied", access=common.Access.WRITE)
-        self.bb_cond.register_key(key="Stopped", access=common.Access.WRITE)
+        self.bb_cond.register_key(key="endpoint", access=common.Access.WRITE)
+        self.bb_cond.register_key(key="free", access=common.Access.WRITE)
+        self.bb_cond.register_key(key="stopped", access=common.Access.WRITE)
         self.bb_maneu.register_key(key="key", access=common.Access.READ)
         self.bb_maneu.register_key(key="config", access=common.Access.READ)
 
     def tick(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
 
         # Update blackboard
-        
+        ## Is in endpoint?
+        self.bb_cond.endpoint = True if (self.vehicle_state.x == goal.x and self.vehicle_state.y == goal.y and self.vehicle_state.z == goal.z) else False
+
+        ## Is the lane free?
+        self.bb_cond.free = False
+        vehicle_in_the_lane = None
+        for vehicle in vehicles:
+            # how to get the current lane of the other vehicles?
+            if(lane_config.get_current_lane == vehicle.get_current_lane):
+                self.bb_cond.free = True
+                vehicle_in_the_lane = vehicle
+                break
+
+        ## Is the obstacle stopped?
+        if(self.bb_cond.free == True): #There is a vehicle in the lane
+            self.bb_cond.stopped = True if vehicle_in_the_lane.velocity == 0 else False
 
 
         self.tree.tick_once()
