@@ -58,6 +58,7 @@ class RandCondition(behaviour.Behaviour):
 class Condition(behaviour.Behaviour):
     def __init__(self, name):
         super(Condition, self).__init__(name)
+        self.name = name
         self.conditions = self.attach_blackboard_client("Condition")
         self.conditions.register_key(key=name, access=common.Access.READ)
 
@@ -74,7 +75,7 @@ class Condition(behaviour.Behaviour):
             decision = self.conditions.get(self.name)
             print(self.name+" = " + str(decision))
         except KeyError as e:
-            raise RuntimeError("Missing condition '"+name+"'.")
+            raise RuntimeError("Missing condition '"+self.name+"'.")
 
         if decision:
             self.feedback_message = "True"

@@ -3,7 +3,7 @@ from py_trees import *
 from sv.VehicleState import *
 import sv.ManeuverConfig as MConf
 from Mapping.LaneletMap import LaneletMap
-from BTreeLeaves import *
+from sv.BTreeLeaves import *
 
 class BTree(object):
     
@@ -16,42 +16,53 @@ class BTree(object):
         self.mconfig = None
         self.bb_cond = blackboard.Client(name="Condition")
         self.bb_maneu = blackboard.Client(name="Maneuver")
+        self.endpoint = goal
+        self.setup()
 
-    def setup(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
-        self.tree = self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+
+    def setup(self):
+        self.tree = self.drive_tree()
         self.bb_cond.register_key(key="endpoint", access=common.Access.WRITE)
         self.bb_cond.register_key(key="free", access=common.Access.WRITE)
         self.bb_cond.register_key(key="stopped", access=common.Access.WRITE)
         self.bb_maneu.register_key(key="key", access=common.Access.READ)
         self.bb_maneu.register_key(key="config", access=common.Access.READ)
 
+    #Mock for evaluating if the car reached the endpoint
+    def isEndPoint(self,time): return time > 10
+        
     def tick(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
 
         # Update blackboard
         ## Is in endpoint?
-        self.bb_cond.endpoint = True if (self.vehicle_state.x == goal.x and self.vehicle_state.y == goal.y and self.vehicle_state.z == goal.z) else False
+        self.bb_cond.endpoint = self.isEndPoint(sim_time)
 
         ## Is the lane free?
-        self.bb_cond.free = False
-        vehicle_in_the_lane = None
-        for vehicle in vehicles:
+        self.bb_cond.free = True
+        adversary_in_the_lane = None
+        for adversary in vehicles:
+            # avoid comparison with itself
+            if (adversary.vehicle_state.get_state_vector() == vehicle_state.get_state_vector()) : continue
             # how to get the current lane of the other vehicles?
-            if(lane_config.get_current_lane == vehicle.get_current_lane):
-                self.bb_cond.free = True
-                vehicle_in_the_lane = vehicle
+            if( vehicle_state.get_Y() == adversary.vehicle_state.get_Y()
+                or vehicle_state.get_X() == adversary.vehicle_state.get_X()):
+                self.bb_cond.free = False
+                adversary_in_the_lane = adversary
                 break
 
         ## Is the obstacle stopped?
-        if(self.bb_cond.free == True): #There is a vehicle in the lane
-            self.bb_cond.stopped = True if vehicle_in_the_lane.velocity == 0 else False
+        if(self.bb_cond.free == False): #There is a vehicle in the lane
+            self.bb_cond.stopped = True if adversary_in_the_lane.velocity == 0 else False
+        else : self.bb_cond.stopped = False
 
-
-        self.tree.tick_once()
+        print("Tick BTree!!!!")
+        self.tree.root.tick_once()
         # TODO: rethink this!
-        self.mconfig = eval(self.bb_maneu.config)
+        self.mconfig = self.bb_maneu.config
+        print("Retrieved " + str(self.mconfig) + " :D")
         return self.mconfig
 
-    def drive_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+    def drive_tree(self):
         ''' Driving on route and alternating between 
         velocity keeping if road ahead is free
         vehicle following if there is a vehicle on the way
@@ -61,16 +72,17 @@ class BTree(object):
         # Maneuvers List
         kp_vel = Maneuver("Keep Velocity", MConf.MVelKeepConfig)
         follow_obstc = Maneuver("Follow Vehicle", MConf.MFollowConfig)
-        stop_self = Maneuver("Stop", MConf.MStopConfig)
+        stop_self1 = Maneuver("Stop", MConf.MStopConfig)
+        stop_self2 = Maneuver("Stop", MConf.MStopConfig)
         
         # Conditions List
-        end_point = Condition("EndPoint")
-        free = Condition("Free")
-        stp_vehicle = Condition("Stopped")
+        end_point = Condition("endpoint")
+        free = Condition("free")
+        stp_vehicle = Condition("stopped")
 
         # Coordinate Maneuvers and Conditions
-        stp_obstc = composites.Sequence(["Stopped Obstacle"])
-        stp_obstc.add_children([stp_vehicle, stop_self])
+        stp_obstc = composites.Sequence("Stopped Obstacle")
+        stp_obstc.add_children([stp_vehicle, stop_self1])
 
         occ_lane = composites.Selector("Occupied Lane")
         occ_lane.add_children([stp_obstc, follow_obstc])
@@ -82,7 +94,7 @@ class BTree(object):
         traj_follow.add_children([free_lane, occ_lane])
 
         reached_end_point = composites.Sequence("Reached End Point")
-        reached_end_point.add_children([end_point, stop_self])
+        reached_end_point.add_children([end_point, stop_self2])
 
         root = composites.Selector("Simple Drive")
         root.add_children([reached_end_point, traj_follow])

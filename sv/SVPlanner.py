@@ -16,7 +16,8 @@ from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 
 from Mapping.LaneletMap import LaneletMap
-from sv.BTreeModel import *
+from sv.BTreeModel import * # Deprecated
+from sv.BTree import *
 
 #BTree #todo: pytrees
 BT_PARKED = 0 #default, car is stopped
@@ -84,7 +85,7 @@ class SVPlanner(object):
         
         sync_planner = TickSync(rate=PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
 
-        self.btree_model = BTreeModel(self.vid, self.btree_root)
+        self.btree_model = BTree(self.vid, self.btree_root)
         
         while sync_planner.tick():
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
