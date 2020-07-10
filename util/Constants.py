@@ -5,7 +5,7 @@
 # --------------------------------------------
 
 #SIM CONFIG
-TIMEOUT = 20               #timeout in [s]
+TIMEOUT = 30               #timeout in [s]
 TRAFFIC_RATE = 30             #Global tick rate
 
 #Planner Process (BTree and MM)

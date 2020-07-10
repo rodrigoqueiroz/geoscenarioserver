@@ -40,7 +40,7 @@ class LaneletMap(object):
     
     def load_lanelet_map(self, filename, projector):
         self.lanelet_map, errors = lanelet2.io.loadRobust(filename, projector)
-        assert not errors
+        assert not errors, print(errors)
 
         # generate routing table
         traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)

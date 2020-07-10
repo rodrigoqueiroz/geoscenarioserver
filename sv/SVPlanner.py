@@ -35,7 +35,7 @@ class PlannerState:
     sim_time:float
     vehicle_state:VehicleState
     lane_config:LaneConfig
-    vehicles:Dict
+    traffic_vehicles:Dict
     pedestrians:List
     obstacles:List
     goal_point:Tuple = None
@@ -113,33 +113,40 @@ class SVPlanner(object):
                 print("no lane config")
                 continue
 
+            # transform other vehicles to frenet frame based on this vehicle
+            for vid, vehicle in traffic_vehicles.items():
+                s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                vehicle.vehicle_state.set_S(s_vector)
+                vehicle.vehicle_state.set_D(d_vector)
+
             #BTree Tick - using frenet state and lane config based on old ref path
             planner_state = PlannerState(
                 sim_time=sync_planner.sim_time,
                 vehicle_state=vehicle_state,
                 lane_config=lane_config,
                 goal_point_frenet=sim_to_frenet_position(self.reference_path, *self.sim_config.goal_points[self.vid]),
-                vehicles=traffic_vehicles,
+                traffic_vehicles=traffic_vehicles,
                 pedestrians=None,
                 obstacles=None
             )
             mconfig, ref_path_changed = self.btree_model.tick(planner_state)
-            # when ref path changes, lane config must be updated as well
+            # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
             if ref_path_changed:
                 print("PATH CHANGED")
                 self.reference_path = self.laneletmap.get_global_path_for_route(self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
                 lane_config = self.read_map(vehicle_state, self.reference_path)
+                # transform other vehicles to frenet frame based on this vehicle
+                for vid, vehicle in traffic_vehicles.items():
+                    s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
+                    vehicle.vehicle_state.set_S(s_vector)
+                    vehicle.vehicle_state.set_D(d_vector)
             
             # since global path can change in this frame, frenet state in vehicle_state may be invalid
             new_s_vector, new_d_vector = sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
             #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #print((new_s_vector[0], new_d_vector[0]))
             
-            # transform other vehicles to frenet frame based on this vehicle
-            for vid, vehicle in traffic_vehicles.items():
-                s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle.vehicle_state.get_X(), vehicle.vehicle_state.get_Y())
-                vehicle.vehicle_state.set_S(s_vector)
-                vehicle.vehicle_state.set_D(d_vector)
+
 
             #Maneuver Tick
             if mconfig and lane_config:

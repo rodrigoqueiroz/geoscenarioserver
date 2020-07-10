@@ -16,16 +16,16 @@ from SimConfig import SimConfig
 from gsc.GSParser import GSParser
 
 
-def setup_problem_from_file(filename, sim_traffic, sim_config, lanelet_map):
+def setup_problem_from_file(scenario_filename, map_filename, sim_traffic, sim_config, lanelet_map):
     # load scenario from gsc file
     parser = GSParser()
-    parser.load_and_validate_geoscenario("scenarios/example_map_scenario.osm")
+    parser.load_and_validate_geoscenario(scenario_filename)
 
     # use origin from gsc file to project nodes to sim frame
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
     parser.project_nodes(projector)
 
-    lanelet_map.load_lanelet_map("scenarios/ll2_round.osm", projector)
+    lanelet_map.load_lanelet_map(map_filename, projector)
 
     # populate traffic and lanelet routes from file
     for vid, vnode in parser.vehicles.items():
@@ -42,7 +42,6 @@ def setup_problem_from_file(filename, sim_traffic, sim_config, lanelet_map):
             sim_config.lanelet_routes[sim_id], btree_root)
 
 
-
 if __name__ == "__main__":
     sync_global   = TickSync(rate=TRAFFIC_RATE, realtime = True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(TIMEOUT)
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     traffic.set_sim_config(sim_config)
 
     # Load scenario from file
-    setup_problem_from_file("scenarios/example_map_scenario.osm", traffic, sim_config, lanelet_map)
+    setup_problem_from_file("scenarios/straight_road_scenario.osm", "scenarios/mapping_example.osm", traffic, sim_config, lanelet_map)
 
     # Setup scenario directly
     # projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4))

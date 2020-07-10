@@ -103,7 +103,6 @@ class Dashboard(object):
             self.window.quit()
 
 
-
     def read_traffic_state(self, traffic_state_sharr, nv):
         r = nv+1
         c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1
@@ -156,7 +155,6 @@ class Dashboard(object):
         #todo: include key scenario elements
 
         fig.tight_layout()
-        
 
 
     def plot_map_chart(self, vehicles):

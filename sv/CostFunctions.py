@@ -62,12 +62,12 @@ def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, target_lane_config, v
     total_cost = sum(C)
     return total_cost
 
-def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config, vehicles, obstacles):
+def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles, obstacles):
     total_cost = 0
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
-    C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    C.append(1 * total_jerk_cost(trajectory))
+    C.append(1 * total_lat_jerk_cost(trajectory))
+    C.append(1 * lateral_lane_offset_cost(trajectory, lane_config))
     #C.append(1 * max_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))

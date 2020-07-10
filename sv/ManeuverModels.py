@@ -17,17 +17,20 @@ from util.Utils import *
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
     #Micro maneuver layer
-    if(man_key==M_VELKEEP):
-        best, trajectories  = plan_velocity_keeping(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None) 
-    elif(man_key==M_STOP):
-        best, trajectories  = plan_stop(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None) 
+    if (man_key==M_VELKEEP):
+        planner = plan_velocity_keeping
+    elif (man_key==M_STOP):
+        planner = plan_stop
     elif (man_key==M_FOLLOW):
-        best, trajectories  = plan_following(vehicle_frenet_state, mconfig, lane_config, vehicles=traffic_vehicles)
+        planner = plan_following
     elif (man_key==M_LANESWERVE):
-        best, trajectories = plan_laneswerve(vehicle_frenet_state,  mconfig, lane_config, traffic_vehicles, None) #returns tuple (s[], d[], t)
-    #elif (man_key==CUTIN):
+        planner = plan_laneswerve
+    elif (man_key==M_CUTIN):
+        planner = plan_cutin
         #candidates, best = ST_CutIn( vehicle_frenet_state, delta, T,vehicles,target_id) #, True, True) #returns tuple (s[], d[], t)
         #candidates, best  = OT_CutIn( vehicle_frenet_state, delta, T, vehicles,target_id,True,True) #returns tuple (s[], d[], t)
+    
+    best, trajectories = planner(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None)
     return best, trajectories
 
 def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneConfig, vehicles = None, obstacles = None):
@@ -171,67 +174,58 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
     #find trajectories
     trajectories = []
     trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))  #zip two arrays for the pool.map
-    
+
     #cost
     best = min(trajectories, key=lambda x: laneswerve_cost(x, mconfig,target_lane_config,vehicles,obstacles))
     
     #return best trajectory, and candidates for debug
-    return  best, list(trajectories)
+    return best, list(trajectories)
 
 
-def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var_pos = False, obstacles = None):
+# def plan_cutin(start_state, delta, T, vehicles, target_id, var_time = False, var_pos = False, obstacles = None):
+def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles = None, pedestrians = None, obstacles = None):
     """
     Cut-in Lane Change
     """ 
     s_start = start_state[:3]
     d_start = start_state[3:]
-    
-    multi_goals = []
+    target_id = mconfig.target_vid
+    delta = mconfig.delta_s + mconfig.delta_d
 
-    #main goal is relative to target vehicle predicted final position
-    goal_state_relative = np.array( vehicles[target_id].future_state(T))  +  np.array(delta)
-    s_goal = goal_state_relative[:3]
-    d_goal = goal_state_relative[3:]
-    print ('Cut-in optmized Goal around (' + str(T) +'):')
-    print (goal_state_relative)
+    target_lane_config = lane_config.get_current_lane(vehicles[target_id].vehicle_state.d)
+    if not target_lane_config:
+        print("Target vehicle {} is not in an adjacent lane".format(target_id))
+        return None, None
+    elif target_lane_config.id == lane_config.id:
+        print("Already in target lane")
+        return None, None
 
-    #generate alternative goals in Time and Space
-    if (var_time):
-        time_step = PLAN_TIME_STEP
-        t = T - 4 * time_step
-        while t <= T + 4 * time_step:
-            goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta)
-            s_goal = goal_state_relative[:3]
-            d_goal = goal_state_relative[3:]
-            goal = [(s_goal, d_goal, t)]
-            if(var_pos):  #generate alternative goals in Position
-                for _ in range(N_SAMPLES):
-                    goal = perturb_goal(s_goal, d_goal)
-                    multi_goals.append((goal[0],goal[1],t))
-            else:
-                multi_goals += goal
-            t +=time_step
-    else:
-        multi_goals += goal_state_relative
-    
+    min_d = target_lane_config.right_bound + VEHICLE_RADIUS
+    max_d = target_lane_config.left_bound - VEHICLE_RADIUS
+    d_samples = NUM_SAMPLING_D
+    # print(target_lane_config.id)
+
+    # List[(target s, target d, t)]
+    target_state_set = []
+    for t in mconfig.time.get_uniform_samples():
+        #main goal is relative to target vehicle predicted final position
+        goal_state_relative = np.array(vehicles[target_id].future_state(mconfig.time.value)) + np.array(delta) # t or mconfig.time.value?
+        s_target = goal_state_relative[:3]
+        for di in np.linspace(min_d, max_d, d_samples):
+            # no lateral movement expected at the end
+            d_target = [di, 0, 0]
+            target_state_set.append((s_target, d_target, t))
+
+    #print ('Targets: {}'.format(len(target_state_set)))
 
     #Fit Jerk minimal trajectory between two points in s en d per goal
-    trajectories = []
-    for goal in multi_goals:
-        s_goal, d_goal, t = goal
-        s_coef = QuinticPolynomialTrajectory(s_start, s_goal, t)
-        d_coef = QuinticPolynomialTrajectory(d_start, d_goal, t)
-        trajectories.append(tuple([s_coef, d_coef, t]))
+    trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))
 
     #evaluate and select "best" trajectory    
-    
-    #best = min(trajectories, key=lambda tr: calculate_cost(tr, target_id, delta, T, vehicles, FREE_LANNECHANGE_COST))
-    best = min(trajectories, key=lambda tr: cutin_cost(tr, T, vehicles))
-    #calculate again just to show in the terminal
-    #calculate_cost(best, target_id, delta, T, vehicles, FREE_LANNECHANGE_COST, verbose=True)
-   
+    best = min(trajectories, key=lambda tr: cutin_cost(tr, mconfig, target_lane_config, vehicles, obstacles))
+
     #return best
-    return trajectories, best
+    return best, trajectories
 
 
 def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = None):

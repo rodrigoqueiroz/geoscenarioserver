@@ -51,7 +51,6 @@ class Vehicle(object):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
             TODO: predict using history
-            NOTE: do we change this to use frenet?
         """
         state = [
             self.vehicle_state.s + (self.vehicle_state.s_vel * t),

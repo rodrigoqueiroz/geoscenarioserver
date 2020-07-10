@@ -40,9 +40,9 @@ class LaneConfig:
     def get_current_lane(self, d):
         if self.right_bound <= d <= self.left_bound:
             return self
-        elif self._right_lane.right_bound <= d < self._right_lane.left_bound:
+        elif self._right_lane and self._right_lane.right_bound <= d < self._right_lane.left_bound:
             return self._right_lane
-        elif self._left_lane.right_bound <= d < self._left_lane.left_bound:
+        elif self._left_lane and self._left_lane.right_bound <= d < self._left_lane.left_bound:
             return self._left_lane
         return None
     
@@ -101,7 +101,7 @@ class MP:
             samples.append(random.gauss(self.value, self.sigma))
         return samples
 
-@dataclass        
+@dataclass
 class MVelKeepConfig:
     vel:MP = MP(14.0,10,6)          #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
@@ -129,8 +129,8 @@ class MStopAtConfig:
 class MFollowConfig:
     #target
     target_vid:int                  #target vehicle id
-    time:MP = MP(3.0,10,6)          #duration in [s] as MP
-    time_gap:float = 2.0            #[s]
+    time:MP = MP(2.0,10,6)          #duration in [s] as MP
+    time_gap:float = 3.0            #[s]
     #distance:float = 20             #distance from target [m]
     #constraints
     max_ttc:float = 10.0            #max time to collision [s]
@@ -144,13 +144,12 @@ class MLaneSwerveConfig:
     #soft constraints
     mkey:int = M_LANESWERVE
 
-
 @dataclass
 class MCutInConfig:
     #target
     target_vid:int                  #target vehicle id
     vel:float = 30
-    time:float = 5
+    time:MP = MP(5,10,6)
     delta_s:tuple = (10,5,0)        #(s, vel, acc)
     delta_d:tuple = (0,5,0)         #(s, vel, acc)
     delta_cross:tuple = (10,5,0)    #(s, vel, acc)
