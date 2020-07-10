@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' generator='JOSM'>
+<osm version='0.6' upload='true' generator='JOSM'>
   <node id='38992' visible='true' version='1' lat='49.00345654351' lon='8.42427590707' />
   <node id='38994' visible='true' version='1' lat='49.00343904846' lon='8.42418467193' />
   <node id='38996' visible='true' version='1' lat='49.00338841975' lon='8.4240886406' />
@@ -3714,12 +3714,12 @@
     <nd ref='39038' />
     <tag k='type' v='road_border' />
   </way>
-  <way id='153150002894734344' visible='true' version='1'>
+  <way id='153150002894734344' action='modify' visible='true' version='1'>
     <nd ref='39386' />
     <nd ref='6826713373117478855' />
     <nd ref='39388' />
     <nd ref='4692836657899886925' />
-    <tag k='subtype' v='solid' />
+    <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
   <way id='162339000355939130' visible='true' version='1'>

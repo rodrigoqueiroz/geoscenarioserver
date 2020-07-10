@@ -103,14 +103,14 @@ class MP:
 
 @dataclass        
 class MVelKeepConfig:
-    vel:MP = MP(7.0,10,6)          #velocity in [m/s] as MP
+    vel:MP = MP(14.0,10,6)          #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
     mkey:int = M_VELKEEP
 
 @dataclass
 class MStopConfig:
     #target
-    time:MP = MP(5.0,10,6)          #[s]
+    time:MP = MP(3.0,10,6)          #[s]
     distance:MP = MP(10.0,10,6)     #[s]
     decel:MP = MP(9.0)
     #during
@@ -140,7 +140,7 @@ class MFollowConfig:
 class MLaneSwerveConfig:
     #target
     target_lid:int                  #target lane id
-    time:MP = MP(5.0,10,6)          #target time in [s] as MP
+    time:MP = MP(3.0,10,6)          #target time in [s] as MP
     #soft constraints
     mkey:int = M_LANESWERVE
 

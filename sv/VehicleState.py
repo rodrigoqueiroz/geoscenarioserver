@@ -86,11 +86,12 @@ class VehicleState:
 
 @dataclass
 class MotionPlan:
-    VECTORSIZE = 13
+    VECTORSIZE = 14
     s_coef:tuple = tuple([0.0,0.0,0.0,0.0,0.0])     #5 coef
     d_coef:tuple = tuple([0.0,0.0,0.0,0.0,0.0,0.0]) #6 coef
     t:float = 0                                     #duration
     t_start:float = 0                               #start time [s]
+    new_frenet_frame = False
     #Boundaries in Frenet Frame
     #s_start:tuple = [0.0,0.0,0.0]     #start state in s
     #d_start:tuple = [0.0,0.0,0.0]     #start state in d
@@ -112,11 +113,13 @@ class MotionPlan:
         self.d_coef = P[5:11]
         self.t = P[11]
         self.t_start = P[12]
+        self.new_frenet_frame = P[13]
     
     def get_plan_vector(self):
         return np.concatenate([
             self.s_coef, 
             self.d_coef,
             np.asarray([self.t]),
-            np.asarray([self.t_start])
+            np.asarray([self.t_start]),
+            np.asarray([self.new_frenet_frame])
             ])

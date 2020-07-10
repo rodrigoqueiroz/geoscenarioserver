@@ -167,13 +167,13 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
         for di in np.linspace(min_d, max_d, d_samples):
             d_target = [di,0,0] #no lateral movement expected at the end
             target_state_set.append((s_target,d_target,t))
-
+    
     #find trajectories
     trajectories = []
     trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))  #zip two arrays for the pool.map
     
     #cost
-    best = min(trajectories, key=lambda x: laneswerve_cost(x, mconfig,lane_config,vehicles,obstacles))
+    best = min(trajectories, key=lambda x: laneswerve_cost(x, mconfig,target_lane_config,vehicles,obstacles))
     
     #return best trajectory, and candidates for debug
     return  best, list(trajectories)
@@ -261,9 +261,9 @@ def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = No
                 #add target
                 target_state_set.append((s_target,d_target,t))
 
-    print ('Targets: {}'.format(len(target_state_set)))
-    for i in target_state_set:
-       print(i)
+    # print ('Targets: {}'.format(len(target_state_set)))
+    # for i in target_state_set:
+    #    print(i)
     
     #find trajectories
     trajectories = []
