@@ -31,21 +31,22 @@ class BTree(object):
     #Mock for evaluating if the car reached the endpoint
     def isEndPoint(self,time): return time > 10
         
-    def tick(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+    def tick(self, planner_state):
 
         # Update blackboard
         ## Is in endpoint?
-        self.bb_cond.endpoint = self.isEndPoint(sim_time)
+        self.bb_cond.endpoint = self.isEndPoint(planner_state.sim_time)
 
         ## Is the lane free?
         self.bb_cond.free = True
         adversary_in_the_lane = None
-        for adversary in vehicles:
+        print("planner_state.vehicles: " + str(planner_state.vehicles))
+        for key,adversary in planner_state.vehicles.items():
             # avoid comparison with itself
-            if (adversary.vehicle_state.get_state_vector() == vehicle_state.get_state_vector()) : continue
+            if (adversary.vehicle_state.get_state_vector() == planner_state.vehicle_state.get_state_vector()) : continue
             # how to get the current lane of the other vehicles?
-            if( vehicle_state.get_Y() == adversary.vehicle_state.get_Y()
-                or vehicle_state.get_X() == adversary.vehicle_state.get_X()):
+            if( planner_state.vehicle_state.get_Y() == adversary.vehicle_state.get_Y()
+                or planner_state.vehicle_state.get_X() == adversary.vehicle_state.get_X()):
                 self.bb_cond.free = False
                 adversary_in_the_lane = adversary
                 break
@@ -60,7 +61,7 @@ class BTree(object):
         # TODO: rethink this!
         self.mconfig = self.bb_maneu.config
         print("Retrieved " + str(self.mconfig) + " :D")
-        return self.mconfig
+        return self.mconfig, 0.0
 
     def drive_tree(self):
         ''' Driving on route and alternating between 
@@ -109,7 +110,7 @@ class BTree(object):
 
         return drive_tree
 
-    def lanechange_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+    def lanechange_tree(self, planner_state):
         #print('lane change tree')
         target = -1
         if self.mconfig:
@@ -122,13 +123,13 @@ class BTree(object):
                     return MVelKeepConfig()
         return MLaneSwerveConfig(target)
 
-    #def overtake_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)      
+    #def overtake_tree(planner_state)      
 
-    def lanechange_scenario_tree(self, sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles):
+    def lanechange_scenario_tree(self, planner_state):
         #print('{} lane change scenario tree'.format(sim_time))
         if sim_time <= 3.0:
-            return self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+            return self.drive_tree(planner_state)
         elif 3.0 < sim_time <= 7.0:
-            return self.lanechange_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+            return self.lanechange_tree(planner_state)
         else:
-            return self.drive_tree(sim_time, vehicle_state, lane_config, vehicles, pedestrians, obstacles)
+            return self.drive_tree(planner_state)
