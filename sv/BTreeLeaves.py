@@ -73,7 +73,7 @@ class Condition(behaviour.Behaviour):
 
         try:
             decision = self.conditions.get(self.name)
-            print(self.name+" = " + str(decision))
+            #print(self.name+" = " + str(decision))
         except KeyError as e:
             raise RuntimeError("Missing condition '"+self.name+"'.")
 

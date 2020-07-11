@@ -2,6 +2,7 @@ from py_trees import *
 
 from sv.VehicleState import *
 import sv.ManeuverConfig as MConf
+from sv.ManeuverUtils import *
 from Mapping.LaneletMap import LaneletMap
 from sv.BTreeLeaves import *
 
@@ -35,32 +36,24 @@ class BTree(object):
 
         # Update blackboard
         ## Is in endpoint?
-        self.bb_cond.endpoint = self.isEndPoint(planner_state.sim_time)
+        self.bb_cond.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
 
         ## Is the lane free?
-        self.bb_cond.free = True
-        adversary_in_the_lane = None
-        print("planner_state.vehicles: " + str(planner_state.vehicles))
-        for key,adversary in planner_state.vehicles.items():
-            # avoid comparison with itself
-            if (adversary.vehicle_state.get_state_vector() == planner_state.vehicle_state.get_state_vector()) : continue
-            # how to get the current lane of the other vehicles?
-            if( planner_state.vehicle_state.get_Y() == adversary.vehicle_state.get_Y()
-                or planner_state.vehicle_state.get_X() == adversary.vehicle_state.get_X()):
-                self.bb_cond.free = False
-                adversary_in_the_lane = adversary
-                break
+        vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.vehicles)
 
+        # lane is free if there are no vehicles ahead
+        self.bb_cond.free = True if vehicle_ahead is None else False
+        
         ## Is the obstacle stopped?
         if(self.bb_cond.free == False): #There is a vehicle in the lane
-            self.bb_cond.stopped = True if adversary_in_the_lane.velocity == 0 else False
-        else : self.bb_cond.stopped = False
+            self.bb_cond.stopped = is_stopped(vehicle_ahead)
 
-        print("Tick BTree!!!!")
         self.tree.root.tick_once()
         # TODO: rethink this!
         self.mconfig = self.bb_maneu.config
-        print("Retrieved " + str(self.mconfig) + " :D")
+        
+        print("Vehicle " + str(self.vid) + " is performing a " + str(self.mconfig))
+
         return self.mconfig, 0.0
 
     def drive_tree(self):

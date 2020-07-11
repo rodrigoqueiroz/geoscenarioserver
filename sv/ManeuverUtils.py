@@ -27,4 +27,29 @@ def can_perform_lane_change():
 #     return sqr_distance < threshold*threshold
 
 def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
-    return goal_point[0] - vehicle_state.s < threshold
+    return False if not goal_point else goal_point[0] - vehicle_state.s < threshold
+
+def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=10):
+    ''' Analyzes (frenet coordinates) whether is there an adversary vehicle
+    (adversary_vehicle) ahead of subject vehicle (subject_vehicle) 
+    sharing the same lane, within a threshold (frenet s-plane). In case
+    of multiple vehicles, it returns the closest one.'''
+
+    subject_vehicle_state = vehicle_state
+    s_current_lane = lane_config.get_current_lane(subject_vehicle_state.d)
+    matching_vehicles = list()
+    for vid, adversary_vehicle in vehicles.items():
+        a_current_lane = lane_config.get_current_lane(adversary_vehicle.vehicle_state.d)
+        
+        #if they are both in the same lane
+        if s_current_lane == a_current_lane: 
+            # and the adv is ahead of the subj (within the thresh)
+            if subject_vehicle_state.s < adversary_vehicle.vehicle_state.s and adversary_vehicle.vehicle_state.s < subject_vehicle_state.s + threshold: 
+                # add the vehicle to the list
+                matching_vehicles.append(adversary_vehicle)
+    
+    return None if not matching_vehicles else matching_vehicles[0]
+
+def is_stopped(vehicle):
+    return vehicle.vehicle_state.s_vel == 0
+
