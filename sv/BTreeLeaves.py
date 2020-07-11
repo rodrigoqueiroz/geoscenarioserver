@@ -3,6 +3,7 @@
 
 from py_trees import *
 import random
+from sv.ManeuverStatus import *
 
 class RandAction(behaviour.Behaviour):
     def __init__(self, name):
@@ -88,31 +89,29 @@ class Condition(behaviour.Behaviour):
         self.logger.debug("  %s [Condition::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
 
 class Maneuver(behaviour.Behaviour):
-    def __init__(self, name, params):
+    def __init__(self, name, config):
         super(Maneuver, self).__init__(name)
-        self.params=params
+        self.config=config
         self.maneuver = self.attach_blackboard_client("Maneuver")
-        self.maneuver.register_key(key="key", access=common.Access.WRITE)
         self.maneuver.register_key(key="config", access=common.Access.WRITE)
-        #self.state = self.attach_blackboard_client("State", "state")
-        #self.state = self.attach_blackboard_client("State", "state")
-        #self.state.register_key(key=name, access=common.Access.WRITE)
+        #self.maneuver.register_key(key="status", access=common.Access.READ)
 
     def setup(self):
         self.logger.debug("  %s [Maneuver::setup()]" % self.name)
 
     def initialise(self):
         self.logger.debug("  %s [Maneuver::initialise()]" % self.name)
-        #self.state.set(variable_name=self.name, value=common.Status.RUNNING) 
 
     def update(self):
         self.logger.debug("  %s [Maneuver::update()]" % self.name)
-        #self.status = self.state.get(self.name)
-        # calculate parameters
-        # update parameters
-        self.maneuver.key = self.name
-        self.maneuver.config = self.params
-        return common.Status.SUCCESS#, self.params
+
+        #if (self.maneuver.status == ManeuverStatus.INIT):
+        self.maneuver.config = self.config
+        #    return common.Status.RUNNING
+        #elif (self.maneuver.status == ManeuverStatus.SUCCESS):
+        return common.Status.SUCCESS
+        #elif (self.maneuver.status == ManeuverStatus.FAILURE):
+        #    return common.Status.FAILURE
 
     def terminate(self, new_status):
         self.logger.debug("  %s [Maneuver::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))

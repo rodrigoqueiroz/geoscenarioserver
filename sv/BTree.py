@@ -20,37 +20,47 @@ class BTree(object):
         self.endpoint = goal
         self.setup()
 
-
     def setup(self):
         self.tree = self.drive_tree()
         self.bb_cond.register_key(key="endpoint", access=common.Access.WRITE)
         self.bb_cond.register_key(key="free", access=common.Access.WRITE)
         self.bb_cond.register_key(key="stopped", access=common.Access.WRITE)
-        self.bb_maneu.register_key(key="key", access=common.Access.READ)
         self.bb_maneu.register_key(key="config", access=common.Access.READ)
 
-    #Mock for evaluating if the car reached the endpoint
-    def isEndPoint(self,time): return time > 10
-        
-    def tick(self, planner_state):
-
-        # Update blackboard
+    def update_world_model(self, planner_state):
         ## Is in endpoint?
         self.bb_cond.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
 
         ## Is the lane free?
         vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.vehicles)
-
+        
         # lane is free if there are no vehicles ahead
-        self.bb_cond.free = True if vehicle_ahead is None else False
+        self.bb_cond.free = True if not vehicle_ahead else False
         
         ## Is the obstacle stopped?
         if(self.bb_cond.free == False): #There is a vehicle in the lane
-            self.bb_cond.stopped = is_stopped(vehicle_ahead)
+            self.bb_cond.stopped = is_stopped(vehicle_ahead[1])
+
+    def configMVelKeepConfig(self, planner_state):
+        conf = MConf.MVelKeepConfig
+        return conf
+
+    def configMStopConfig(self, planner_state):
+        conf = MConf.MStopConfig
+        return conf
+
+    def configMFollowConfig(self, planner_state):
+        conf = MConf.MFollowConfig
+        conf.target_vid = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.vehicles)[0]
+        return conf
+
+    def tick(self, planner_state):
+
+        self.update_world_model(planner_state)
 
         self.tree.root.tick_once()
-        # TODO: rethink this!
-        self.mconfig = self.bb_maneu.config
+        #self.mconfig = self.bb_maneu.config
+        exec("self.mconfig = self.config"+ str(self.bb_maneu.config.__name__) + "(planner_state)")
         
         print("Vehicle " + str(self.vid) + " is performing a " + str(self.mconfig))
 

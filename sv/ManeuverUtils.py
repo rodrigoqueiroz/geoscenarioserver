@@ -34,12 +34,12 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=10):
     (adversary_vehicle) ahead of subject vehicle (subject_vehicle) 
     sharing the same lane, within a threshold (frenet s-plane). In case
     of multiple vehicles, it returns the closest one.
-    @return {vid, sv.SV.Vehicle}'''
+    @return (vid, sv.SV.Vehicle)'''
 
     subject_vehicle_state = vehicle_state
     s_current_lane = lane_config.get_current_lane(subject_vehicle_state.d)
     dist = float('inf')
-    nearest = None
+    nearest = list()
     for vid, adversary_vehicle in vehicles.items():
         a_current_lane = lane_config.get_current_lane(adversary_vehicle.vehicle_state.d)
         
@@ -50,9 +50,9 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=10):
                 diff = adversary_vehicle.vehicle_state.s - subject_vehicle_state.s
                 if diff < dist:
                     dist = diff
-                    nearest = {vid,adversary_vehicle}
+                    nearest = [vid,adversary_vehicle]
 
-    return None if not nearest else nearest
+    return nearest
 
 def is_stopped(vehicle):
     return vehicle.vehicle_state.s_vel == 0
