@@ -62,7 +62,7 @@ class BTree(object):
         #self.mconfig = self.bb_maneu.config
         exec("self.mconfig = self.config"+ str(self.bb_maneu.config.__name__) + "(planner_state)")
         
-        print("Vehicle " + str(self.vid) + " is performing a " + str(self.mconfig))
+        print("Vehicle " + str(self.vid) + " is performing a " + str(self.mconfig.__name__))
 
         return self.mconfig, 0.0
 
