@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
 # SIMULATOR
@@ -14,67 +14,25 @@ from Mapping.LaneletMap import *
 from lanelet2.projection import UtmProjector
 from SimConfig import SimConfig
 from gsc.GSParser import GSParser
+from argparse import ArgumentParser
 
-
-def setup_problem_from_file(scenario_filename, map_filename, sim_traffic, sim_config, lanelet_map):
-    # load scenario from gsc file
-    parser = GSParser()
-    parser.load_and_validate_geoscenario(scenario_filename)
-
-    # use origin from gsc file to project nodes to sim frame
-    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
-    parser.project_nodes(projector)
-
-    lanelet_map.load_lanelet_map(map_filename, projector)
-
-    # populate traffic and lanelet routes from file
-    for vid, vnode in parser.vehicles.items():
-        # Use starting point of lanelet as first point in its path
-        path_nodes = [vnode] + parser.paths[vnode.tags['path']].nodes
-        lanelets_in_path = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in path_nodes ]
-        sim_id = vnode.tags['simid']
-        btree_root = vnode.tags['btree']
-
-        sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
-        sim_config.goal_points[sim_id] = (path_nodes[-1].x, path_nodes[-1].y)
-        
-        sim_traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
-            sim_config.lanelet_routes[sim_id], btree_root)
-
-
-if __name__ == "__main__":
-    sync_global   = TickSync(rate=TRAFFIC_RATE, realtime = True, block=True, verbose=False, label="EX")
-    sync_global.set_timeout(TIMEOUT)
-
-    # PROBLEM SETUP
-    # Problem setup can be defined directly, or using GeoScenario XML files (GSParser)
+def start_server(args):
+    print ('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
-    traffic = SimTraffic()
-    # set these BEFORE adding vehicles - also why not using constructor?
-    traffic.set_map(lanelet_map)
-    traffic.set_sim_config(sim_config)
+    traffic = SimTraffic(lanelet_map, sim_config)
 
-    # Load scenario from file
-    setup_problem_from_file("scenarios/straight_road_scenario.osm", "scenarios/mapping_example.osm", traffic, sim_config, lanelet_map)
-
-    # Setup scenario directly
-    # projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4))
-    # lanelet_map.load_lanelet_map("scenarios/ll2_round.osm", projector)
-    #traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-    #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
-    #    sim_config.lanelet_routes[1], BT_VELKEEP)
-    # adding vehicle at the start of a lanelet
-    # traffic.add_vehicle(1, 'V1', [4.0,0.0,0.0, 0.0,0.0,0.0],
-    #     sim_config.lanelet_routes[1], BT_VELKEEP, start_state_in_frenet=True)
-    # test location
-    # traffic.add_vehicle( 1, 'V1', [0,0.0,0.0, 0,0.0,0.0], BT_VELKEEP)
-    # traffic.add_vehicle(2, 'V2', [8,0.0,0.0, 0.0,0.0,0.0],
-    #     sim_config.lanelet_routes[2], BT_VELKEEP, start_state_in_frenet=True)
-
-    # traffic.add_remote_vehicle( 99, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-    #traffic.add_vehicle( 2, 'Ego', [20.0,0.0,0.0, 0.0,0.0,0.0], BT_VELKEEP)
-    #traffic.add_vehicle( 3, 'V3', [0.0,0.0,0.0, 2.0,0.0,0.0], BT_VELKEEP)
+    # Scenario SETUP
+    if not args.gsfile:
+        #Direct setup
+        setup_problem(traffic, sim_config, lanelet_map)
+    else:
+        #Using GeoScenario XML files (GSParser)
+        if not setup_problem_from_file(args.gsfile, traffic, sim_config, lanelet_map):
+            return
+            
+    sync_global   = TickSync(rate=sim_config.traffic_rate, realtime = True, block=True, verbose=False, label="EX")
+    sync_global.set_timeout(sim_config.timeout)
     
     
     #GUI / Debug screen
@@ -100,3 +58,64 @@ if __name__ == "__main__":
     traffic.stop_all()    
     #SIM END
     print('SIMULATION END')
+    print('GeoScenario server shutdown')
+
+def setup_problem(sim_traffic, sim_config, lanelet_map):
+    """ Setup scenario directly
+    """
+    sim_config.scenario_name = "MyScenario"
+    sim_config.timeout = 10
+    map_file = "scenarios/maps/ll2_round.osm"
+    projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4))
+    #map
+    lanelet_map.load_lanelet_map(map_file, projector)
+    #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
+    #    sim_config.lanelet_routes[1], BT_VELKEEP)
+    #traffic.add_remote_vehicle(1, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    #adding vehicle at the start of a lanelet
+    #traffic.add_vehicle(2, 'V2', [4.0,0.0,0.0, 0.0,0.0,0.0],
+    #    sim_config.lanelet_routes[1], 'drive_tree')
+    #traffic.add_vehicle(3, 'V3', [8,0.0,0.0, 0.0,0.0,0.0],
+    #        sim_config.lanelet_routes[2], 'drive_tree')
+    
+
+def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
+    """ Setup problem from GeoScenario file
+    """
+    parser = GSParser()
+    if not parser.load_and_validate_geoscenario(gsfile):
+        print("Error loading GeoScenario file")
+        return False
+    if parser.globalconfig.tags['version'] < 2.0:
+        print("GSServer requires GeoScenario 2.0 or newer")
+        return False
+    
+    sim_config.scenario_name = parser.globalconfig.tags['name']
+    sim_config.timeout = parser.globalconfig.tags['timeout']
+    #map
+    map_file = 'scenarios/' + parser.globalconfig.tags['lanelet']
+    # use origin from gsc file to project nodes to sim frame
+    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
+    parser.project_nodes(projector)
+    lanelet_map.load_lanelet_map(map_file, projector)
+
+    # populate traffic and lanelet routes from file
+    for vid, vnode in parser.vehicles.items():
+        # Use starting point of lanelet as first point in its path
+        path_nodes = [vnode] + parser.paths[vnode.tags['path']].nodes
+        lanelets_in_path = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in path_nodes ]
+        sim_id = vnode.tags['simid']
+        btree_root = vnode.tags['btree']
+        sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
+        sim_config.goal_points[sim_id] = (path_nodes[-1].x, path_nodes[-1].y)
+        
+        sim_traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
+            sim_config.lanelet_routes[sim_id], btree_root)
+    return True
+    
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
+    args = parser.parse_args()
+    start_server(args)

@@ -1,5 +1,7 @@
-__author__ = "Rodrigo Queiroz"
-__email__ = "rqueiroz@gsd.uwaterloo.ca"
+#!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
+# ---------------------------------------------
 
 import xml.etree.ElementTree
 import re
@@ -95,6 +97,9 @@ class GSParser(object):
                 if way.tags["gs"] == "staticobject": self.check_static_object(way)  
                 elif way.tags["gs"] == "location": self.check_location(way) 
                 elif way.tags["gs"] == "path": self.check_path(way) 
+        
+        #Return result
+        return self.isValid
 
     def parse_tags(self, osm_node, node):
         for osm_tag in osm_node.findall('tag'):
@@ -219,11 +224,12 @@ class GSParser(object):
         self.locations[n.tags["name"]] = n
     
     def check_global_config(self, n):
-        mandatory = {"gs","version","name","lanelet","collision","timeout"}
-        optional = {"notes","metric","mutate","optimize","optmetric"}
+        mandatory = {"gs","version","name","lanelet","timeout",}
+        optional = {"collision","notes","metric","mutate","optimize","optmetric",}
         self.check_tags(n, mandatory, optional)
         if self.globalconfig is not None:
             self.report.log_error( "Element " + n.id + ": Duplicate Global Config node. Must be unique")
+        self.globalconfig = n
 
     def check_trigger(self, n):
         mandatory = {"gs","name","activate"}

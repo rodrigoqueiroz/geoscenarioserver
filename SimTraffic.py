@@ -17,11 +17,12 @@ from sv.SVPlanner import *
 
 class SimTraffic(object):
 
-    def __init__(self):
+    def __init__(self, laneletmap, sim_config):
+        self.lanelet_map = laneletmap
+        self.sim_config = sim_config
+
         self.vehicles = {}  #dictionary for direct access using vid
         self.static_objects = {}
-        self.lanelet_map = None
-        self.sim_config = None
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         #Internal ShM
@@ -35,12 +36,6 @@ class SimTraffic(object):
         v = Vehicle(vid, name=name, start_state=start_state, radius=1.0)
         v.is_remote = True
         self.vehicles[vid] = v
-
-    def set_map(self, laneletmap):
-        self.lanelet_map = laneletmap
-
-    def set_sim_config(self, sim_config):
-        self.sim_config = sim_config
 
     def start(self):
         nv = len(self.vehicles)
