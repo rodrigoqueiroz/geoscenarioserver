@@ -1,201 +1,122 @@
-__author__ = "Rodrigo Queiroz"
-__email__ = "rqueiroz@gsd.uwaterloo.ca"
+#!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
+# ---------------------------------------------
+# GeoScenario Server
+# Controls the problem setup and traffic simulation loop
+# --------------------------------------------
 
-import sys
-import socket
-import struct
-import autograd.numpy as anp
-from pymoo.algorithms.nsga2 import NSGA2
-from pymoo.factory import get_problem
-from pymoo.optimize import minimize
-from pymoo.visualization.scatter import Scatter
-from pymoo.model.problem import Problem
-from GSOptProblem import GSOptProblem
-import gsc/GSParser
-import msg/simulationmsg_pb2
+from TickSync import TickSync
+from SimTraffic import *
+from dash.Dashboard import *
+from mapping.LaneletMap import *
+from lanelet2.projection import UtmProjector
+from SimConfig import SimConfig
+from gsc.GSParser import GSParser
+from argparse import ArgumentParser
 
-class GSServer(Problem):
+def start_server(args):
+    print ('GeoScenario server START')
+    lanelet_map = LaneletMap()
+    sim_config = SimConfig()
+    traffic = SimTraffic(lanelet_map, sim_config)
 
-	def __init__(self):
-		self._connection = None
-
-	def load_scenario(self, file):
-		GSParser = GSParser.GSParser()
-		GSParser.load_and_validate_geoscenario(file)
-		GSParser.report.print()
-		GSParser.print_stats()
-		GSParser.print_scenario()
-
-	def start_socket(self):
-		# Create a TCP/IP socket
-		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-		# Bind the socket to the port
-		server_address = ('localhost', 10001)
-		print('starting socket on {} port {}'.format(*server_address))
-		sock.bind(server_address)
-
-		# Listen for incoming connections and wait
-		sock.listen(1)
-		print('waiting for simulation client')
-		self._connection, client_address = sock.accept() #block
-		print('connection accepted from', client_address)
-
-	def close_connection(self):
-		print('closing server socket')
-		self._connection.close()
-
-	def send_message(self, msg, type = 0):
-		print('sending new data to sim client')
-		sock = self._connection
-
-		serialmsg = msg.SerializeToString()
-		msglen = len(serialmsg) 
-		pack1 = struct.pack('>I',msglen)
-		sock.sendall(pack1+serialmsg)
-		#self._connection.sendall(b'Hello Stranger')
-
-	def read_message(self):
-		print('reading data from client')
-		sock = self._connection
-		serialmsg = ''
-		try:
-			totallen = sock.recv(4) 
-			if (len(totallen)==0):
-				raise RuntimeError('client closed connection')
-			msglen = struct.unpack('>I',totallen)[0]
-			serialmsg = sock.recv(msglen)
-			if (len(serialmsg)==0):
-				raise RuntimeError('client closed connection')
-			print('received {!r}'.format(serialmsg))
-			#data = sock.recv(256) #block
-	    	#if data:
-		except Exception as error:
-			print('Error: ' + repr(error))
-		return serialmsg, 1
-
-	def start_optimization(self):
-		print('Start Opt Problem')
-
-		#mask = ["int", "real"]
-		problem = GSOptProblem(n_var=3,n_obj=1, n_constr=0, 
-								xl=anp.array([0,0,0]),xu=anp.array([2,2,2]),
-								simulation_function = self.run_simulation)
-
-		#NSGA2 PARAMETERS:
-		#pop_size: population size per gen
-		#n_offsprings: number of offssprings per gen.
-		#sampling: 
-		#crossover: 
-			#sbx simulated binary crossover
-			#prob:mutation probability and 
-		#muation:
-		algorithm = NSGA2(pop_size=10, 
-							n_offsprings=10, 
-							sampling=get_sampling("bin_random")
-							crossover=get_crossover("real_sbx", prob=0.9, eta=15), 
-							mutation=get_mutation("real_pm", eta=20),
-							eliminate_duplicates=True
-							callback=self.callback)
-		
-		
-		#seed: Random seed to be used. If None, a random seed is chosen. 
-		#the seed is stored in the result object for reproducibility
-		#ngen: number of generations
-		res = minimize(problem,algorithm,('n_gen', 10),seed=1,verbose=True)
-	
-	def callback(algorithm, numeval, pop):
-		print (x)
-
-
-	def run_simulation(self,pop):
-		f = []
-		for indiv in pop:
-			print(indiv)
-			pedestrian = simulationmsg_pb2.Pedestrian()
-			pedestrian.name = "p1" #todo, keep original geoscenario ob and only mix variables
-			pedestrian.velocity = indiv[0] #todo: make a map with types and their array positions
-			pedestrian.orientation = indiv[1]
-			#pedestrian.returnpoint = x[2] #todo
-			#pedestrian.startdistancetoego = x[2] #todo
-
-			print('request simulation')
-			self.send_message(pedestrian,2);
-			#read results
-			serialmsg, msgtype = self.read_message()
-			if (msgtype==1): #results
-				results = simulationmsg_pb2.ScenarioResult()
-				results.ParseFromString(serialmsg)
-				f.append(results.mindistance)
-		#f1 = pop[:,0]**2 + pop[:,1]**2 #tests
-		#f1 = f
-		print('function f1')
-		print(f)
-		return f;
-
-
-
-#START
-
-if len(sys.argv) is not 2:
-    print("Error: expected a single argument with a GeoScenario file.")
-    exit()
-
-#SCenario Parsing and Checking
-file = sys.argv[1]
-gsserver = GSServer()
-gsserver.load_scenario(file)
-
-#Simulation 
-#Will block til a connection
-gsserver.start_socket()
-
-#Sampling
-#TODO
-
-#Optimization
-gsserver.start_optimization()
-
-#test msg
-#for  i in range(10):
-#	scenario = simulationmsg_pb2.Scenario()
-#	scenario.name = "sample name"
-#	serialmsg = scenario.SerializeToString()
-#	print('request simulation')
-#	gsserver.send_message(serialmsg);
-
-#Server
-print('end')
-gsserver.close_connection()
-
-
-#while True:
-#	 try:
-
-
-#while True:
-    # Wait for a connection //block
-    #connection, client_address = sock.accept()
+    # Scenario SETUP
+    if not args.gsfile:
+        #Direct setup
+        setup_problem(traffic, sim_config, lanelet_map)
+    else:
+        #Using GeoScenario XML files (GSParser)
+        if not setup_problem_from_file(args.gsfile, traffic, sim_config, lanelet_map):
+            return
+            
+    sync_global   = TickSync(rate=sim_config.traffic_rate, realtime = True, block=True, verbose=False, label="EX")
+    sync_global.set_timeout(sim_config.timeout)
     
- #   try:
-        #Receive the data in small chunks and retransmit it
-		#connection.sendall(b'Hello Stranger')
-        #print('sending new data the client')
-    #        data = connection.recv(16)
-    #        print('received {!r}'.format(data))
-    #        if data:
-    #            print('sending new data the client')
-                #connection.sendall(data)
-    #            connection.sendall(b'Hello Stranger')
-    #        else:
-    #            print('no data from', client_address)
-    #            break
-    #finally:
-        # Clean up the connection
-        #connection.close()
+    
+    #GUI / Debug screen
+    dashboard = Dashboard(traffic, PLOT_VID)
+    
+    #SIM EXECUTION START
+    print ('SIMULATION START')
+    traffic.start()
+    dashboard.start()
+    while sync_global.tick():
+        if not dashboard._process.is_alive(): # might/might not be wanted
+            break
+        try:
+            #Update Traffic
+            traffic.tick(
+                sync_global.tick_count, 
+                sync_global.delta_time,
+                sync_global.sim_time
+            )
+        except KeyboardInterrupt:
+            break
+        
+    traffic.stop_all()    
+    dashboard.quit()
+    #SIM END
+    print('SIMULATION END')
+    print('GeoScenario server shutdown')
 
+def setup_problem(sim_traffic, sim_config, lanelet_map):
+    """ Setup scenario directly
+    """
+    sim_config.scenario_name = "MyScenario"
+    sim_config.timeout = 10
+    map_file = "scenarios/maps/ll2_round.osm"
+    projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4))
+    #map
+    lanelet_map.load_lanelet_map(map_file, projector)
+    #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
+    #    sim_config.lanelet_routes[1], BT_VELKEEP)
+    #traffic.add_remote_vehicle(1, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    #adding vehicle at the start of a lanelet
+    #traffic.add_vehicle(2, 'V2', [4.0,0.0,0.0, 0.0,0.0,0.0],
+    #    sim_config.lanelet_routes[1], 'drive_tree')
+    #traffic.add_vehicle(3, 'V3', [8,0.0,0.0, 0.0,0.0,0.0],
+    #        sim_config.lanelet_routes[2], 'drive_tree')
+    
 
+def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
+    """ Setup scenario from GeoScenario file
+    """
+    parser = GSParser()
+    if not parser.load_and_validate_geoscenario(gsfile):
+        print("Error loading GeoScenario file")
+        return False
+    if parser.globalconfig.tags['version'] < 2.0:
+        print("GSServer requires GeoScenario 2.0 or newer")
+        return False
+    
+    sim_config.scenario_name = parser.globalconfig.tags['name']
+    sim_config.timeout = parser.globalconfig.tags['timeout']
+    
+    #map
+    map_file = 'scenarios/' + parser.globalconfig.tags['lanelet']
+    # use origin from gsc file to project nodes to sim frame
+    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
+    parser.project_nodes(projector)
+    lanelet_map.load_lanelet_map(map_file, projector)
 
-
-	
-
+    # populate traffic and lanelet routes from file
+    for vid, vnode in parser.vehicles.items():
+        # Use starting point of lanelet as first point in its path
+        path_nodes = [vnode] + parser.paths[vnode.tags['path']].nodes
+        lanelets_in_path = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in path_nodes ]
+        sim_id = vnode.tags['simid']
+        btree_root = vnode.tags['btree']
+        sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
+        sim_config.goal_points[sim_id] = (path_nodes[-1].x, path_nodes[-1].y)
+        
+        sim_traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
+            sim_config.lanelet_routes[sim_id], btree_root)
+    return True
+    
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
+    args = parser.parse_args()
+    start_server(args)

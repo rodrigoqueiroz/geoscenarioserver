@@ -5,9 +5,10 @@
     <tag k='version' v='2.0' />
     <tag k='name' v='Straight Road Scenario' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='timeout' v='10' />
     <tag k='collision' v='yes' />
-    <tag k='timeout' v='20' />
   </node>
+  
   <node id='-8' action='modify' visible='true' lat='49.00731806199' lon='8.45754913699'>
     <tag k='gs' v='egogoal' />
     <tag k='name' v='goal_1' />

@@ -1,18 +1,13 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TRAJECTORY EVALUATION
 # --------------------------------------------
-#TODO: configurable weights (as constants?)
-#TODO: add alternative total cost functions for agressive maneuvers leading to crash
-#TODO: add driver error to cost
-#TODO: Add cost to change trajectory (to make keeping the same trajectory easier)
-#TODO: Add traj feasibility check
 
 import numpy as np
 from sv.ManeuverConfig import *
 from util.Utils import *
-from util.Constants import *
+from SimConfig import *
 
 #=============================== FEASIBILITY
 

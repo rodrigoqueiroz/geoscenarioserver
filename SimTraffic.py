@@ -1,4 +1,5 @@
-#rqueiroz@gsd.uwaterloo.ca
+#!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED TRAFFIC - Coordinate all vehicle Simulation, Ego interface,
@@ -114,8 +115,3 @@ class SimTraffic(object):
         #Write out simulator state
         if (self.sim_client_shm):
             self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles)
-
-            
-    def __del__(self):
-        pass
-       

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # --------------------------------------------
 # GEOSCENARIO SIMULATION VEHICLE PLANNER
 # --------------------------------------------
@@ -16,19 +17,10 @@ from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
 
-from Mapping.LaneletMap import LaneletMap
+from mapping.LaneletMap import LaneletMap
 from sv.BTreeModel import *
 
 from typing import Tuple, Dict, List
-
-#BTree #todo: pytrees
-BT_PARKED = 0 #default, car is stopped
-BT_DRIVE = 1  #follow a route with normal driving. Can switch to follow, or stop
-BT_STOP = 2
-BT_VELKEEP = 3
-BT_FOLLOW = 4 #follow a specific target
-BT_CUTIN = 5  #reach and cut in a specific target
-
 
 @dataclass
 class PlannerState:
@@ -71,10 +63,10 @@ class SVPlanner(object):
         self._process.start()
     
     def stop(self):
-       pass 
-       #print("Planner Process Join")
-        #if (self._process):
-            #self._process.join()
+        if self._process:
+            print("Terminate Planner Process - vehicle {}".format(self.vid))
+            self._process.terminate()
+        
 
     def get_plan(self):
         plan = MotionPlan()

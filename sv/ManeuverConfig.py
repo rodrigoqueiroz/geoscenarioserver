@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # CONFIG Data Classes and Constants for Maneuvers
 # --------------------------------------------

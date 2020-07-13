@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 # --------------------------------------------
 # GEOSCENARIO Micro Maneuver Models for Motion Planning
 # --------------------------------------------
@@ -12,7 +12,7 @@ from dataclasses import dataclass
 #from multiprocessing import Pool as ThreadPool
 from sv.CostFunctions import *
 from sv.ManeuverConfig import *
-from util.Constants import *
+from SimConfig import *
 from util.Utils import *
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):

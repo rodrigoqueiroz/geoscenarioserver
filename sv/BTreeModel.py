@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
+
 from sv.VehicleState import *
 from sv.ManeuverConfig import *
-from Mapping.LaneletMap import LaneletMap
+from mapping.LaneletMap import LaneletMap
 from sv.ManeuverUtils import *
 
 class BTreeModel(object):

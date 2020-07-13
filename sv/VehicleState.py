@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
 # VehicleState and Motion Plan
@@ -7,7 +7,7 @@
 from dataclasses import dataclass
 import numpy as np
 
-# question - is this all in cartesian?
+
 @dataclass
 class VehicleState:
     VECTORSIZE = 9
@@ -26,7 +26,6 @@ class VehicleState:
     yaw:float = 0.0
     steer:float = 0.0
 
-    # frenet frame - make another FrenetState class?
     s:float = 0.0
     d:float = 0.0
     #vel

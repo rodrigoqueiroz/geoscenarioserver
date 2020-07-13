@@ -1,11 +1,8 @@
 import sysv_ipc
 from sv.VehicleState import *
-from util.Constants import *
+from SimConfig import *
 
-SHM_KEY = 123456
-SEM_KEY = 346565
-CS_SHM_KEY = 333943
-CS_SEM_KEY = 933433
+
 
 # Class defining shared memory structure used to sync with
 # an external simulator (client)

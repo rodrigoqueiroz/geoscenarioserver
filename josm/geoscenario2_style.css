@@ -1,0 +1,199 @@
+canvas{
+    fill-color: lightgrey;
+}
+
+node[gs] {
+    font-size: 13;
+    text-color: black;
+    font-weight: bold;
+    
+    text-halo-color: white;
+
+    icon-width: 32;
+}
+
+node[gs=globalconfig] {
+    icon-image: "config.png" ;
+    text: eval("GEOSCENARIO CONFIG");
+    
+}
+
+node[gs=metric] {
+    icon-image: "metrics.png" ;
+    text: eval(concat( "Metric: " , tag("name")));
+    
+}
+
+node[gs=origin] {
+    icon-image: "origin.png" ;
+    text:eval("(0,0)");
+   
+}
+
+
+
+node[gs=egostart] {
+    icon-image:"vehicle_ego.png" ;
+    icon-width: 64;
+    icon-rotation: degree_to_radians(tag("orientation"));
+    text: eval("EGO");
+    text-offset-x: -50;
+    text-offset-y: 35;
+}
+
+node[gs=egogoal] {
+    icon-image: "egogoal_target.png" ;
+    text: eval(concat( "GOAL " , tag("name")));
+    text-offset-x: -30;
+    text-offset-y: 38;
+}
+
+node[gs=pedestrian] {
+    icon-image: "pedestrian_black.png" ;
+    icon-width: 20;
+    text: eval(concat( "P: ", tag("name"), " (", tag("orientation"),"°, ", tag("speed"), " km/h)"));
+    text-offset-x: -30;
+    text-offset-y: 35;
+}
+
+
+node[gs=vehicle] {
+    icon-image: "vehicle_black.png";   
+    icon-rotation: degree_to_radians(tag("orientation"));
+    icon-width: 64;
+    text: eval(concat( "V: ", tag("name"), println()," (", tag("orientation"),"°, ", tag("speed"), " km/h)"));
+    text-offset-x: -50;
+    text-offset-y: 35;
+}
+
+
+node[gs=trigger] {
+    icon-image: "trigger_red.png";
+	text: eval(concat( "T: ", tag("owner")," -> ", tag("target")));
+    text-offset-x: -30;
+    text-offset-y: 35;
+}
+
+
+
+node[gs=trafficlight] {
+    icon-image:"trafficlight.png" ;
+    text: eval(concat( "TL: ", tag("name")));
+}
+
+
+way[gs=path] {
+    width: 3;
+    color: blue;
+    text: "name";
+    text-position: line;
+    text-offset: 5;
+    font-size: 12;
+    text-color: blue;
+    text-halo-color: white;
+    text-halo-radius: 2;
+    direction: true;
+}
+
+way[gs=path][abstract=yes]{
+    width: 3;
+    color: blue;
+	dashes: 15,15;
+    dashes-background-color: alpha;
+    text: "name";
+    text-position: line;
+    text-offset: 5;
+    font-size: 12;
+    text-color: blue;
+    text-halo-color: white;
+    text-halo-radius: 2;
+}
+
+node[nodespeed]{
+    text: eval(concat( "sp:", tag("nodespeed"),",", tag("nodeacceleration")));
+    font-size: 16;
+    text-color: black;
+    symbol-shape: circle;
+    symbol-size: (tag("nodespeed")/3)+5; 
+}
+
+node[gs=staticobject] {
+    icon-image: "staticobject_black.png" ;
+    text: eval(concat( "SO: ", tag("name")));
+}
+
+way[gs=staticobject] {
+    icon-image: "staticobject_black.png" ;
+    icon-width: 32;
+    text: eval(concat( "SO: " , tag("name")));
+    text-color: black;
+    font-weight: bold;
+    text-position: center;
+    icon-position: center;
+    text-offset: 15;
+    font-size: 13;
+
+    width: 3;
+    color: black;
+}
+
+area[gs=staticobject] {
+    icon-image: "staticobject_black.png";
+    icon-width: 32;
+    text: eval(concat( "SO: " , tag("name")));
+    text-color: white;
+    font-weight: bold;
+    text-position: center;
+    icon-position: center;
+    text-offset: 15;
+    font-size: 13;
+    width: 3;
+    color: black;
+    fill-color: black;
+    fill-opacity: 0.5;
+}
+
+
+
+node[gs=location] {
+    icon-image: "location.png" ;
+    icon-width: 32;
+    text: eval(concat( "L: " , tag("name")));
+    font-weight: bold;
+}
+
+
+way[gs=location] {
+    icon-image: "location.png"; 
+    icon-position: line;
+    icon-width: 32;
+    icon-offset: 40;
+    text: eval(concat( "L: " , tag("name")));
+    text-color: black;
+    font-weight: bold;
+    text-position: line;
+    
+    text-offset: 15;
+    font-size: 13;
+
+    width: 3;
+    color: #66CCFF;
+}
+
+area[gs=location] {
+    icon-image: "location.png";
+    icon-width: 32;
+    icon-position: center;
+
+    text: eval(concat( "L: " , tag("name")));
+    text-color: black;
+    font-weight: bold;
+    text-position: center;
+    text-offset: 15;
+    font-size: 13; 
+
+    width: 3;
+    color: #66CCFF;
+    fill-color: #66CCFF;
+    fill-opacity: 0.5;
+}

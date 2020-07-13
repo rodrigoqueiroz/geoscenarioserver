@@ -1,7 +1,10 @@
 #!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
+
 
 from sv.ManeuverConfig import *
-from util.Constants import *
+from SimConfig import *
 import numpy as np
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
@@ -63,3 +66,6 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
                     leading_vid = vid
     
     return is_following, leading_vid
+
+#def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
+#def range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):

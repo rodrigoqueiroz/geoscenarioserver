@@ -1,5 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-1' action='modify' visible='true' lat='49.00277852206' lon='8.42411016864'>
+    <tag k='gs' v='globalconfig' />
+    <tag k='version' v='2.0' />
+    <tag k='name' v='Roundabout Scenario' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='timeout' v='10' />
+    <tag k='collision' v='yes' />
+  </node>    
   <node id='-1910' action='modify' visible='true' lat='49.00277852206' lon='8.42411016864'>
     <tag k='gs' v='egogoal' />
     <tag k='name' v='goal_1' />

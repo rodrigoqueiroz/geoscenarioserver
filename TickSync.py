@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TickSync
 # Syncronize simulation loop based on a given frequency (frame-rate).

@@ -1,4 +1,5 @@
-sv/plots/*
-logs/*
+scenarios//plots/*
+scenarios/logs/*
 *__pycache__/
 **/build/
+*.DS_Store

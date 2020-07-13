@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #d43sharm@uwaterloo.ca
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # Transformations between Cartesian and Frenet frames.
 # --------------------------------------------

@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<presets xmlns="http://josm.openstreetmap.de/tagging-preset-1.0"
+	author="rqueiroz@gsd.uwaterloo.ca"
+	version="1.1"
+	shortdescription="GeoScenario Presets">
+
+<group  name="GeoScenario Tools" icon="gs.png">
+
+	<!-- GLOBAL CONFIG OPTIONS -->
+
+	<item name="GS Global Config" icon="config.png" type="node" preset_name_label="true">
+		<key key="gs" value="globalconfig" />
+		<key key="version" value="1.1" />
+		<space/>
+		<label text="Global Scenario Configuration" />
+		<item_separator />
+
+		<text key="name" text="*Scenario Name" />
+		<text key="author" text="Author" />
+		<text key="notes" text="Notes" />
+		<item_separator />
+
+		<label text="Road Network" />
+		<text key="lanelet" text="*Lanelet Layer" />
+		<item_separator />
+
+		<label text="Global Failure Conditions" />
+		<check key="collision" text="*Collision" default="on"/>
+		<text key="timeout" text="*Timeout (s)" default="60"/>
+		<text key="metric" text="Metric []" />
+		<label text="(a metric node must be defined)" />
+		<item_separator />
+
+		<label text="Scenario Mutation:" />
+		<check key="mutate" text="Mutate on Start" default="off"/>
+		<item_separator />
+
+		<link href="https://git.uwaterloo.ca/wise-lab/geoscenario" text="https://git.uwaterloo.ca/wise-lab/geoscenario"/>
+		<item_separator />
+
+	</item>
+
+	<item name="Origin" icon="origin.png" type="node" preset_name_label="true">
+		<key key="gs" value="origin" />
+	</item>
+
+
+	
+  <item name="Metric" type="node"  icon="metrics.png" preset_name_label="true" >
+		<key key="gs" value="metric" />
+		<space/>
+		<label text="Metric" />
+		<item_separator />
+
+		<text key="name" text="*Name (e.g., ttc_v1_v2)" />
+		<text key="reference" text="Reference" />
+		<text key="agents" text="Agents []" />
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+  </item>
+
+
+	<!-- EGO -->
+  		
+  	<item name="Ego Start" icon="ego.png" type="node" preset_name_label="true">
+		<key key="gs" value="egostart" />
+		<text key="orientation" text="* Orientation(deg)" />
+		<space/>
+		<label text="Ego's starting position" />
+  	</item>
+
+  	<item name="Ego Goal" icon="egogoal_target.png" type="node" preset_name_label="true">
+		<key key="gs" value="egogoal" />
+		<space/>
+		<label text="Goal position for Ego" />
+		<item_separator />
+
+		<text key="name" text="*Name " />
+		<text key="order" text="Order " />
+		<item_separator />
+
+  	</item>
+
+	<!-- STATIC OBJECTS -->
+
+	<item name="Static Object" type="node,way"  icon="staticobject_black.png"  preset_name_label="true">
+		<key key="gs" value="staticobject" />
+		<key key="area" value="no" />
+		<space/>
+		<label text="GeoScenario Static Object" />
+		<item_separator />
+
+		<text key="name" text="* Name " />
+		<text key="model" text="Model" />
+		<text key="height" text="Height(in cm)" />
+		<item_separator />
+
+		<text key="group" text="Group [] " />
+		<item_separator />
+
+	</item>
+
+	<item name="Static Object (Polygon)" type="closedway"  icon="staticobject.png"  preset_name_label="true">
+		<key key="gs" value="staticobject" />
+		<key key="area" value="yes" />
+		<space/>
+		<label text="GeoScenario Static Object" />
+		<item_separator />
+
+		<text key="name" text="* Name " />
+		<text key="model" text="Model" />
+		<text key="height" text="Height(in cm)" />
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+
+	</item>
+
+	<!-- DYNAMIC AGENTS -->
+
+  	<item name="Pedestrian" type="node"  icon="pedestrian_black.png"  preset_name_label="true">
+		<key key="gs" value="pedestrian" />
+		<space/>
+		<label text="GeoScenario Pedestrian" />
+		<item_separator />
+
+		<text key="name" text="* Name " />
+		<item_separator />
+
+		<label text="Initial Attributes" />
+		<text key="orientation" text="Orientation[](deg)" />
+		<text key="speed" text="Speed[](km/h)" />
+		<text key="path" text="Path ID" />
+		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
+		<text key="usespeedprofile" text="Use Speed Profile (y/n)" />
+		<check key="start" text="Start In Motion" />
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+
+	</item>
+
+	
+
+  <item name="Vehicle" type="node"  icon="vehicle_black.png" preset_name_label="true">
+		<key key="gs" value="vehicle" />
+		<space/>
+		<label text="GeoScenario Vehicle" />
+		<item_separator />
+
+		<text key="name" text="* Name " />
+		<item_separator />
+
+		<label text="Initial Attributes" />
+		<text key="orientation" text="Orientation[](deg)" />
+		<text key="speed" text="Speed[](km/h)" />
+		<text key="path" text="Path ID" />
+		<text key="cycles" text="Cycles(-1 for infinite)" default="1" />
+		<check key="usespeedprofile" text="Use Speed Profile" />
+		<check key="start" text="Start In Motion" />
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+
+	</item>
+
+
+
+	<!-- PATHS AND LOCATIONS -->
+
+
+   <item name="Path" type="way"  icon="path.png" preset_name_label="true">
+		<key key="gs" value="path" />
+		<space/>
+		<label text="GeoScenario Path for Dynamic Agents" />
+		<item_separator />
+		
+		<text key="name" text="Name " />
+		<check key="abstract" text="Abstract" default="off"/>
+		<item_separator />
+
+		<text key="group" text="Group (list) " />
+		<item_separator />
+
+  	</item>
+
+  	<item name="Node speed profile" type="node"  preset_name_label="true">
+		<label text="Node speed profile for a path" />
+		<item_separator />
+		<text key="agentspeed" text="Node speed " />
+		<text key="agentacceleration" text="Node acceleration" />
+		<text key="timetoacceleration" text="Time to acceleration" />
+  	</item>
+
+
+  	<item name="Location" type="node,way"  icon="location.png" preset_name_label="true">
+		<key key="gs" value="location" />
+		<key key="area" value="no" />
+		<space/>
+		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers" />
+		<item_separator />
+
+		<text key="name" text="*Name " />
+		<item_separator />
+
+		<check key="continuous" text="Continuous" default="off" />
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+
+  	</item>
+
+  	<item name="Location (Area)" type="closedway"  icon="location.png" preset_name_label="true">
+		<key key="gs" value="location" />
+		<key key="area" value="yes" />
+		<space/>
+		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers" />
+		<item_separator />
+
+		<text key="name" text="*Name " />
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+
+  	</item>
+
+
+
+	<!-- TRIGGERS -->
+
+	<item name="Trigger" type="node"  icon="trigger_red.png" preset_name_label="true" >
+		<key key="gs" value="trigger" />
+		
+		<space/>
+		<label text="GeoScenario Trigger" />
+		<item_separator />
+		<text key="name" text="*Name " />
+		<item_separator />
+
+		<multiselect key="activate" delimiter="," text="Activated by" values="location,time,condition" />
+		<text key="radius" text="Radius (cm)"/>
+		<text key="time" text="Time (s)" />
+		<text key="metric" text="Metric []" />
+		<text key="value" text="Value []" />
+		<item_separator />
+
+		<label text="Agents:" />
+		<text key="owner" text="*Owners []" />
+		<text key="target" text="Targets []" />
+		<item_separator />
+		
+		<label text="Actions" />
+		<text key="aspeed" text="Change speed (km/h)"/>
+		<text key="aspeedprofile" text="Use speed profile (y/n)"/>
+		<text key="alocation" text="Change location"/>
+		<text key="apath" text="Change path"/>
+		<text key="astate" text="Change state"/>
+		<check key="astart" text="Start"/>
+		<space/>
+		<label text="Global Actions" />
+		<check key="afail" text="Fail Scenario"/>
+		<check key="asuccess" text="Success Scenario"/>
+		<item_separator />
+
+		<text key="delay" text="Action delay (s)"/>
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+		
+  </item>
+	
+
+
+
+
+<item name="Traffic Light" type="node"  icon="trafficlight.png" preset_name_label="true" >
+		<key key="gs" value="trafficlight" />
+		<space/>
+		<label text="Traffic Light Signal" />
+		<item_separator />
+
+		<text key="name" text="*Name" />
+		<item_separator />
+		<text key="states" text="*States (in order)[]"  default="green,yellow,red"/>
+		<text key="duration" text="Duration[]"  default="15,3,15"/>
+		<item_separator />
+
+		<text key="group" text="Group []" />
+		<item_separator />
+  </item>
+  
+</group>
+</presets>
