@@ -5,7 +5,7 @@
     <tag k='version' v='2.0' />
     <tag k='name' v='Straight Road Scenario' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
-    <tag k='timeout' v='10' />
+    <tag k='timeout' v='30' />
     <tag k='collision' v='yes' />
   </node>
   
