@@ -3,6 +3,7 @@ from py_trees import *
 from sv.VehicleState import *
 import sv.ManeuverConfig as MConf
 from sv.ManeuverUtils import *
+from sv.ManeuverStatus import * 
 from Mapping.LaneletMap import LaneletMap
 from sv.BTreeLeaves import *
 
@@ -15,39 +16,63 @@ class BTree(object):
         #runtime
         self.tree = root 
         self.mconfig = None
-        self.bb_cond = blackboard.Client(name="Condition")
-        self.bb_maneu = blackboard.Client(name="Maneuver")
+        self.bb_condition = blackboard.Client(name="Condition")
+        self.bb_maneuver = blackboard.Client(name="Maneuver")
         self.endpoint = goal
         self.setup()
 
     def setup(self):
         self.tree = self.drive_tree()
-        self.bb_cond.register_key(key="endpoint", access=common.Access.WRITE)
-        self.bb_cond.register_key(key="free", access=common.Access.WRITE)
-        self.bb_cond.register_key(key="stopped", access=common.Access.WRITE)
-        self.bb_maneu.register_key(key="config", access=common.Access.READ)
+        self.bb_condition.register_key(key="endpoint", access=common.Access.WRITE)
+        self.bb_condition.register_key(key="free", access=common.Access.WRITE)
+        self.bb_condition.register_key(key="stopped", access=common.Access.WRITE)
+        self.bb_maneuver.register_key(key="config", access=common.Access.READ)
+        self.bb_maneuver.register_key(key="status", access=common.Access.WRITE)
+        
+
+    def update_maneuver_status(self, planner_state):
+        if self.mconfig is None: return 
+
+        if self.mconfig.__name__ == MConf.MVelKeepConfig.__name__: 
+            self.bb_maneuver.status = self.get_MVelKeep_status(planner_state)
+        elif self.mconfig.__name__ == MConf.MStopConfig.__name__:
+            self.bb_maneuver.status = self.get_MStop_status(planner_state)
+        elif self.mconfig.__name__ == MConf.MFollowConfig.__name__:
+            self.bb_maneuver.status = self.get_MFollow_status(planner_state)
+        else:
+            print("Could not update maneuver status. Maneuver not found.")
+            
 
     def update_world_model(self, planner_state):
         ## Is in endpoint?
-        self.bb_cond.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
+        self.bb_condition.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
 
         ## Is the lane free?
         vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.vehicles)
         
         # lane is free if there are no vehicles ahead
-        self.bb_cond.free = True if not vehicle_ahead else False
+        self.bb_condition.free = True if not vehicle_ahead else False
         
         ## Is the obstacle stopped?
-        if(self.bb_cond.free == False): #There is a vehicle in the lane
-            self.bb_cond.stopped = is_stopped(vehicle_ahead[1])
+        if(self.bb_condition.free == False): #There is a vehicle in the lane
+            self.bb_condition.stopped = is_stopped(vehicle_ahead[1])
+    
+    def get_MVelKeep_status(self, planner_state):
+        return ManeuverStatus.SUCCESS
 
     def configMVelKeepConfig(self, planner_state):
         conf = MConf.MVelKeepConfig
         return conf
 
+    def get_MStop_status(self, planner_state):
+        return ManeuverStatus.SUCCESS if planner_state.vehicle_state.s_vel == 0 else ManeuverStatus.RUNNING
+
     def configMStopConfig(self, planner_state):
         conf = MConf.MStopConfig
         return conf
+
+    def get_MFollow_status(self, planner_state):
+        return ManeuverStatus.SUCCESS
 
     def configMFollowConfig(self, planner_state):
         conf = MConf.MFollowConfig
@@ -57,14 +82,14 @@ class BTree(object):
     def tick(self, planner_state):
 
         self.update_world_model(planner_state)
+        self.update_maneuver_status(planner_state)
 
         self.tree.root.tick_once()
-        #self.mconfig = self.bb_maneu.config
-        exec("self.mconfig = self.config"+ str(self.bb_maneu.config.__name__) + "(planner_state)")
+        exec("self.mconfig = self.config"+ str(self.bb_maneuver.config.__name__) + "(planner_state)")
         
         print("Vehicle " + str(self.vid) + " is performing a " + str(self.mconfig.__name__))
 
-        return self.mconfig, 0.0
+        return self.mconfig, False
 
     def drive_tree(self):
         ''' Driving on route and alternating between 

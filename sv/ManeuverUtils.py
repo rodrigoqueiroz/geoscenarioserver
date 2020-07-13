@@ -56,4 +56,3 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=10):
 
 def is_stopped(vehicle):
     return vehicle.vehicle_state.s_vel == 0
-

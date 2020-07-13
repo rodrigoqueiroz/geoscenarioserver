@@ -94,24 +94,33 @@ class Maneuver(behaviour.Behaviour):
         self.config=config
         self.maneuver = self.attach_blackboard_client("Maneuver")
         self.maneuver.register_key(key="config", access=common.Access.WRITE)
-        #self.maneuver.register_key(key="status", access=common.Access.READ)
+        self.maneuver.register_key(key="status", access=common.Access.WRITE)
 
     def setup(self):
         self.logger.debug("  %s [Maneuver::setup()]" % self.name)
 
     def initialise(self):
         self.logger.debug("  %s [Maneuver::initialise()]" % self.name)
+        self.maneuver.status = ManeuverStatus.INIT
 
     def update(self):
         self.logger.debug("  %s [Maneuver::update()]" % self.name)
 
-        #if (self.maneuver.status == ManeuverStatus.INIT):
-        self.maneuver.config = self.config
-        #    return common.Status.RUNNING
-        #elif (self.maneuver.status == ManeuverStatus.SUCCESS):
-        return common.Status.SUCCESS
-        #elif (self.maneuver.status == ManeuverStatus.FAILURE):
-        #    return common.Status.FAILURE
+        status = None
+        if (self.maneuver.status == ManeuverStatus.INIT):
+            self.maneuver.config = self.config
+            status = common.Status.RUNNING
+            self.maneuver.status = ManeuverStatus.RUNNING
+        elif (self.maneuver.status == ManeuverStatus.SUCCESS):
+            status =  common.Status.SUCCESS
+            self.maneuver.status = ManeuverStatus.INIT # reset
+        elif (self.maneuver.status == ManeuverStatus.FAILURE):
+            status = common.Status.FAILURE
+            self.maneuver.status = ManeuverStatus.INIT # reset
+        else:
+            status = common.Status.RUNNING
+        
+        return status
 
     def terminate(self, new_status):
         self.logger.debug("  %s [Maneuver::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
