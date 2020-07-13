@@ -19,7 +19,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 
 ## Running
-- run `python GSSserver.py -s scenarios/<geoscenario_file>` to start the Server.
+- run `python GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 ```
 optional arguments:
   -h, --help            show this help message and exit
