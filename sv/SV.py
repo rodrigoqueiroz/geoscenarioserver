@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED VEHICLES
@@ -9,13 +9,12 @@ from matplotlib import pyplot as plt
 import math
 import sys
 from TickSync import TickSync
-from util.Constants import *
+from SimConfig import *
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
 from util.Utils import *
 from sv.SVPlanner import *
 from sv.VehicleState import *
-from Mapping.LaneletMap import LaneletMap
-
+from mapping.LaneletMap import LaneletMap
 from shm.SimSharedMemory import *
 
 # Vehicle base class for remote control or simulation.
@@ -51,7 +50,6 @@ class Vehicle(object):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
             TODO: predict using history
-            NOTE: do we change this to use frenet?
         """
         state = [
             self.vehicle_state.s + (self.vehicle_state.s_vel * t),

@@ -1,0 +1,1140 @@
+<osm_xy>
+  <node id="1000" x="1004.23907" y="987.68980" />
+  <node id="1001" x="1014.20874" y="1012.21132" />
+  <node id="1002" x="983.27261" y="1000.37438" />
+  <node id="1003" x="984.14535" y="1006.31055" />
+  <node id="1004" x="986.70772" y="1002.26297" />
+  <node id="1005" x="988.31588" y="997.27105" />
+  <node id="1006" x="989.37883" y="992.81882" />
+  <node id="1007" x="989.76018" y="987.36826" />
+  <node id="1008" x="981.52804" y="1003.55846" />
+  <node id="1009" x="985.20797" y="996.46175" />
+  <node id="1010" x="986.05267" y="989.41917" />
+  <node id="1011" x="1016.93481" y="1002.03222" />
+  <node id="1012" x="966.38805" y="1000.85270" />
+  <node id="1013" x="1014.62192" y="989.00993" />
+  <node id="1014" x="999.38791" y="1015.82195" />
+  <node id="1015" x="996.31925" y="987.75341" />
+  <node id="1016" x="982.56152" y="971.41065" />
+  <node id="1017" x="1009.02754" y="1020.26920" />
+  <node id="1018" x="989.18747" y="983.96845" />
+  <node id="1019" x="978.72620" y="972.97016" />
+  <node id="1020" x="984.13250" y="982.75686" />
+  <node id="1021" x="1020.88632" y="996.66828" />
+  <node id="1022" x="1035.99600" y="990.20186" />
+  <node id="1023" x="1019.58516" y="993.68689" />
+  <node id="1024" x="1034.49928" y="987.15653" />
+  <node id="1025" x="1018.52793" y="990.48463" />
+  <node id="1026" x="1033.16375" y="984.07923" />
+  <node id="1027" x="952.67506" y="1011.14962" />
+  <node id="1028" x="967.79049" y="1010.36399" />
+  <node id="1029" x="974.21397" y="1007.82383" />
+  <node id="1030" x="1029.26219" y="976.62690" />
+  <node id="1031" x="975.59623" y="1007.27163" />
+  <node id="1032" x="976.00277" y="1006.94033" />
+  <node id="1033" x="976.24667" y="1006.27777" />
+  <node id="1034" x="951.37390" y="1008.38411" />
+  <node id="1035" x="1012.63518" y="984.16853" />
+  <node id="1036" x="975.92139" y="1005.83609" />
+  <node id="1037" x="975.27090" y="1005.83613" />
+  <node id="1039" x="1009.74365" y="985.34318" />
+  <node id="1040" x="953.95212" y="1014.06605" />
+  <node id="1041" x="1030.67059" y="979.88074" />
+  <node id="1042" x="1011.69760" y="988.16609" />
+  <node id="1043" x="1010.46308" y="988.62304" />
+  <node id="1044" x="1009.25835" y="990.16164" />
+  <node id="1045" x="1009.56110" y="990.60405" />
+  <node id="1046" x="1009.92091" y="990.80787" />
+  <node id="1047" x="1010.53591" y="990.80109" />
+  <node id="1048" x="1011.53510" y="990.37459" />
+  <node id="1049" x="1032.26917" y="981.20824" />
+  <node id="1050" x="975.14396" y="974.96374" />
+  <node id="1051" x="975.94496" y="976.48764" />
+  <node id="1052" x="976.89545" y="978.25687" />
+  <node id="1053" x="977.30221" y="981.54260" />
+  <node id="1054" x="977.30239" y="984.52406" />
+  <node id="1055" x="976.73340" y="987.72641" />
+  <node id="1056" x="976.16436" y="990.04536" />
+  <node id="1057" x="975.10745" y="992.47476" />
+  <node id="1058" x="1024.82165" y="1035.39568" />
+  <node id="1059" x="1013.65035" y="1010.80302" />
+  <node id="1060" x="1018.83554" y="1017.70413" />
+  <node id="1061" x="973.94371" y="1017.31493" />
+  <node id="1062" x="982.68906" y="1012.78642" />
+  <node id="1063" x="985.51655" y="1011.90887" />
+  <node id="1064" x="988.11850" y="1011.46701" />
+  <node id="1065" x="1001.29136" y="1017.76045" />
+  <node id="1066" x="1021.84345" y="999.16243" />
+  <node id="1067" x="987.69550" y="980.91916" />
+  <node id="1068" x="1007.45043" y="1010.99495" />
+  <node id="1069" x="1021.75112" y="1038.02343" />
+  <node id="1070" x="997.25187" y="1013.97428" />
+  <node id="1071" x="995.38401" y="1012.87264" />
+  <node id="1072" x="992.75328" y="1011.68759" />
+  <node id="1073" x="990.23260" y="1011.46689" />
+  <node id="1074" x="1014.95098" y="1004.50875" />
+  <node id="1075" x="1017.55279" y="1001.41672" />
+  <node id="1076" x="978.47540" y="1014.65555" />
+  <node id="1077" x="975.56448" y="1003.05286" />
+  <node id="1078" x="1021.21171" y="999.31845" />
+  <node id="1079" x="1030.21300" y="1030.22272" />
+  <node id="1080" x="985.78064" y="999.72667" />
+  <node id="1081" x="1037.03235" y="992.97899" />
+  <node id="1082" x="1027.73376" y="973.54065" />
+  <node id="1083" x="1014.54742" y="1012.47078" />
+  <node id="1084" x="992.86872" y="999.29453" />
+  <node id="1085" x="1003.62115" y="983.93492" />
+  <node id="1086" x="1013.73150" y="1008.04240" />
+  <node id="1087" x="999.08450" y="1000.42745" />
+  <node id="1088" x="986.27163" y="1003.82800" />
+  <node id="1089" x="1000.42985" y="984.39278" />
+  <node id="1090" x="997.77758" y="983.91179" />
+  <node id="1091" x="1016.33318" y="1002.63145" />
+  <node id="1092" x="1005.62755" y="1003.66502" />
+  <node id="1093" x="992.59637" y="1003.47686" />
+  <node id="1094" x="993.75548" y="981.90238" />
+  <node id="1095" x="990.92207" y="978.96155" />
+  <node id="1096" x="1019.50420" y="1000.09152" />
+  <node id="1097" x="1012.55246" y="1010.11350" />
+  <node id="1098" x="998.21238" y="1004.47490" />
+  <node id="1099" x="988.60040" y="974.68857" />
+  <node id="1100" x="1022.10613" y="999.09756" />
+  <node id="1101" x="1014.18369" y="1012.19103" />
+  <node id="1102" x="1002.92885" y="1007.25386" />
+  <node id="1103" x="950.21804" y="1004.92144" />
+  <node id="1104" x="969.66974" y="1014.29836" />
+  <node id="1105" x="970.39162" y="996.67119" />
+  <node id="1106" x="972.18044" y="996.00853" />
+  <node id="1107" x="1011.91383" y="980.34691" />
+  <node id="1108" x="975.74864" y="1005.43409" />
+  <node id="1109" x="973.80658" y="994.35206" />
+  <node id="1110" x="985.13038" y="968.32858" />
+  <node id="1111" x="978.16657" y="1010.39574" />
+  <node id="1112" x="969.28082" y="1008.11999" />
+  <node id="1113" x="968.21566" y="1005.44408" />
+  <node id="1114" x="1006.39072" y="1000.75083" />
+  <node id="1115" x="965.50670" y="998.63856" />
+  <node id="1116" x="966.88181" y="1002.09948" />
+  <node id="1117" x="1015.62970" y="1021.56168" />
+  <node id="1118" x="1005.14238" y="987.00196" />
+  <node id="1119" x="1027.26187" y="1033.17536" />
+  <node id="1120" x="1013.91692" y="1007.50513" />
+  <node id="1121" x="1007.09909" y="993.06068" />
+  <node id="1122" x="992.71033" y="981.56161" />
+  <node id="1123" x="1007.86233" y="990.84802" />
+  <node id="1124" x="975.43265" y="991.70177" />
+  <node id="1125" x="1011.89233" y="990.21666" />
+  <node id="1126" x="1009.62295" y="988.84847" />
+  <node id="1127" x="1006.73150" y="1018.13615" />
+  <node id="1128" x="1017.19971" y="987.87031" />
+  <node id="1129" x="1004.23907" y="987.68980" />
+  <node id="1130" x="972.10556" y="996.03627" />
+  <node id="1132" x="976.48953" y="988.72025" />
+  <node id="1133" x="1002.02841" y="993.33077" />
+  <node id="1134" x="1010.99673" y="988.40408" />
+  <node id="1135" x="1015.05996" y="999.40118" />
+  <node id="1136" x="1008.41295" y="981.86967" />
+  <node id="1137" x="995.10966" y="983.19792" />
+  <node id="1138" x="1001.81068" y="999.61778" />
+  <node id="1139" x="1013.87077" y="987.19916" />
+  <node id="1140" x="1010.67094" y="1001.99177" />
+  <node id="1141" x="1011.22086" y="980.67550" />
+  <node id="1142" x="991.12275" y="979.27041" />
+  <node id="1143" x="1002.11102" y="1007.71261" />
+  <node id="1144" x="991.88286" y="986.33638" />
+  <node id="1145" x="1010.64690" y="1015.72099" />
+  <node id="1146" x="1001.15202" y="987.86198" />
+  <node id="1147" x="981.84210" y="1013.07665" />
+  <node id="1148" x="986.16206" y="995.16652" />
+  <node id="1149" x="981.51137" y="986.52423" />
+  <node id="1150" x="974.16699" y="998.21630" />
+  <node id="1151" x="978.33786" y="994.87017" />
+  <node id="1152" x="1012.54470" y="992.72979" />
+  <node id="1153" x="982.65636" y="987.52403" />
+  <node id="1154" x="1003.20076" y="994.86872" />
+  <node id="1155" x="981.43306" y="990.91497" />
+  <node id="1156" x="979.67655" y="1014.00502" />
+  <node id="1157" x="1010.81498" y="988.46476" />
+  <node id="1158" x="1004.04656" y="1020.54358" />
+  <node id="1159" x="1004.62302" y="1014.52254" />
+  <node id="1160" x="996.33081" y="995.81351" />
+  <node id="1161" x="990.44224" y="996.13765" />
+  <node id="1162" x="981.96354" y="992.22563" />
+  <node id="1163" x="1009.57307" y="991.32685" />
+  <node id="1164" x="1003.63677" y="991.68472" />
+  <node id="1165" x="997.55732" y="991.17239" />
+  <node id="1166" x="992.35021" y="989.74260" />
+  <node id="1167" x="984.30202" y="983.21140" />
+  <node id="1168" x="1008.51745" y="1005.58061" />
+  <node id="1169" x="1007.67257" y="1009.87092" />
+  <node id="1170" x="1008.51782" y="1012.21838" />
+  <node id="1171" x="1014.96531" y="1013.13543" />
+  <node id="1172" x="1004.40143" y="1014.86292" />
+  <node id="1173" x="999.41227" y="1010.68087" />
+  <node id="1174" x="993.93249" y="1008.33368" />
+  <node id="1175" x="987.68947" y="1007.65948" />
+  <node id="1176" x="982.37349" y="1009.06290" />
+  <node id="30032" x="978.74745" y="1005.73074" />
+  <node id="30033" x="1007.09436" y="1018.49751" />
+  <node id="30034" x="985.53441" y="984.75116" />
+  <node id="30035" x="983.93946" y="982.45770" />
+  <node id="30036" x="977.56028" y="985.23736" />
+  <node id="30037" x="977.26038" y="984.25246" />
+  <node id="30039" x="1011.98724" y="1017.92502" />
+  <node id="30040" x="976.79487" y="1006.58756" />
+  <node id="30041" x="984.47111" y="983.69892" />
+  <node id="30042" x="979.74645" y="1013.97727" />
+  <node id="30043" x="981.31028" y="1009.11693" />
+  <node id="30044" x="988.83302" y="983.21295" />
+  <node id="30045" x="1017.07826" y="1015.75263" />
+  <node id="30046" x="1013.38216" y="1019.31773" />
+  <node id="30047" x="1006.91915" y="1023.44764" />
+  <node id="30055" x="977.21842" y="980.54567" />
+  <node id="30056" x="976.38823" y="987.96266" />
+  <node id="30057" x="977.13756" y="981.64861" />
+  <node id="30058" x="976.81729" y="982.74818" />
+  <node id="30059" x="974.67749" y="987.28145" />
+  <node id="30060" x="976.17669" y="983.62853" />
+  <node id="30061" x="975.51903" y="984.18847" />
+  <node id="30062" x="961.36706" y="990.81702" />
+  <node id="30063" x="974.15440" y="993.85011" />
+  <node id="30064" x="961.46264" y="993.49507" />
+  <node id="30065" x="1009.64451" y="989.29638" />
+  <node id="30066" x="975.84977" y="987.50398" />
+  <node id="30067" x="985.12498" y="976.07617" />
+  <node id="30068" x="977.46518" y="984.99801" />
+  <node id="30069" x="1009.13710" y="1013.42717" />
+  <node id="30070" x="984.37539" y="983.66636" />
+  <node id="30071" x="977.38300" y="984.71537" />
+  <node id="30072" x="1007.60569" y="986.27031" />
+  <node id="30073" x="992.52306" y="980.84807" />
+  <node id="30074" x="981.36292" y="977.70886" />
+  <node id="30075" x="977.15103" y="979.31459" />
+  <way id="10000">
+    <nd ref="1067" />
+    <nd ref="1145" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10001">
+    <nd ref="1112" />
+    <nd ref="1108" />
+    <nd ref="1088" />
+    <nd ref="1093" />
+    <nd ref="1098" />
+    <nd ref="1102" />
+    <nd ref="30069" />
+    <nd ref="1145" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10002">
+    <nd ref="1113" />
+    <nd ref="1077" />
+    <nd ref="1080" />
+    <nd ref="1084" />
+    <nd ref="1087" />
+    <nd ref="1092" />
+    <nd ref="1097" />
+    <nd ref="1101" />
+    <nd ref="1171" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10003">
+    <nd ref="1158" />
+    <nd ref="30036" />
+    <nd ref="1054" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10004">
+    <nd ref="1069" />
+    <nd ref="30047" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10005">
+    <nd ref="1079" />
+    <nd ref="1060" />
+    <nd ref="30045" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10006">
+    <nd ref="1020" />
+    <nd ref="30041" />
+    <nd ref="1127" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10007">
+    <nd ref="1128" />
+    <nd ref="1163" />
+    <nd ref="1164" />
+    <nd ref="1165" />
+    <nd ref="1166" />
+    <nd ref="1167" />
+    <nd ref="1020" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10008">
+    <nd ref="1142" />
+    <nd ref="1001" />
+    <nd ref="1171" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10009">
+    <nd ref="1127" />
+    <nd ref="30033" />
+    <nd ref="1017" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10010">
+    <nd ref="1025" />
+    <nd ref="1152" />
+    <nd ref="1154" />
+    <nd ref="1160" />
+    <nd ref="1161" />
+    <nd ref="1148" />
+    <nd ref="1162" />
+    <nd ref="30068" />
+    <nd ref="1054" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10011">
+    <nd ref="1115" />
+    <nd ref="1136" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10012">
+    <nd ref="1020" />
+    <nd ref="30034" />
+    <nd ref="1010" />
+    <nd ref="1009" />
+    <nd ref="1002" />
+    <nd ref="1008" />
+    <nd ref="30032" />
+    <nd ref="1032" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10013">
+    <nd ref="1040" />
+    <nd ref="1112" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10014">
+    <nd ref="1027" />
+    <nd ref="1113" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10016">
+    <nd ref="1034" />
+    <nd ref="1116" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10017">
+    <nd ref="1032" />
+    <nd ref="1031" />
+    <nd ref="1029" />
+    <nd ref="1028" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10018">
+    <nd ref="1066" />
+    <nd ref="1128" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="10019">
+    <nd ref="1082" />
+    <nd ref="1107" />
+    <nd ref="1141" />
+    <nd ref="1136" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10020">
+    <nd ref="1125" />
+    <nd ref="1011" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10021">
+    <nd ref="1096" />
+    <nd ref="1013" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10022">
+    <nd ref="1066" />
+    <nd ref="1100" />
+    <nd ref="1081" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10023">
+    <nd ref="1145" />
+    <nd ref="1068" />
+    <nd ref="1114" />
+    <nd ref="1121" />
+    <nd ref="1123" />
+    <nd ref="1126" />
+    <nd ref="1134" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10024">
+    <nd ref="1059" />
+    <nd ref="1065" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10025">
+    <nd ref="1120" />
+    <nd ref="1014" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10026">
+    <nd ref="1111" />
+    <nd ref="1104" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10027">
+    <nd ref="1054" />
+    <nd ref="30037" />
+    <nd ref="1053" />
+    <nd ref="30075" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10028">
+    <nd ref="1039" />
+    <nd ref="30072" />
+    <nd ref="1118" />
+    <nd ref="1146" />
+    <nd ref="1015" />
+    <nd ref="1144" />
+    <nd ref="1018" />
+    <nd ref="1067" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10029">
+    <nd ref="1020" />
+    <nd ref="30035" />
+    <nd ref="30074" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10030">
+    <nd ref="1021" />
+    <nd ref="1147" />
+    <nd ref="30042" />
+    <nd ref="1156" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10031">
+    <nd ref="1022" />
+    <nd ref="1021" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10032">
+    <nd ref="1024" />
+    <nd ref="1023" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10033">
+    <nd ref="1156" />
+    <nd ref="1076" />
+    <nd ref="1061" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10034">
+    <nd ref="1026" />
+    <nd ref="1025" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10035">
+    <nd ref="30039" />
+    <nd ref="30046" />
+    <nd ref="1117" />
+    <nd ref="1119" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10036">
+    <nd ref="1171" />
+    <nd ref="1083" />
+    <nd ref="1059" />
+    <nd ref="1086" />
+    <nd ref="1120" />
+    <nd ref="1074" />
+    <nd ref="1091" />
+    <nd ref="1011" />
+    <nd ref="1075" />
+    <nd ref="1096" />
+    <nd ref="1078" />
+    <nd ref="1066" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10037">
+    <nd ref="1017" />
+    <nd ref="30039" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="10038">
+    <nd ref="1158" />
+    <nd ref="1065" />
+    <nd ref="1014" />
+    <nd ref="1070" />
+    <nd ref="1071" />
+    <nd ref="1072" />
+    <nd ref="1073" />
+    <nd ref="1064" />
+    <nd ref="1063" />
+    <nd ref="1062" />
+    <nd ref="1156" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10039">
+    <nd ref="1127" />
+    <nd ref="1172" />
+    <nd ref="1173" />
+    <nd ref="1174" />
+    <nd ref="1175" />
+    <nd ref="1176" />
+    <nd ref="1111" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10040">
+    <nd ref="1136" />
+    <nd ref="1085" />
+    <nd ref="1089" />
+    <nd ref="1090" />
+    <nd ref="1094" />
+    <nd ref="30073" />
+    <nd ref="1142" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10041">
+    <nd ref="1023" />
+    <nd ref="1111" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10042">
+    <nd ref="1115" />
+    <nd ref="1105" />
+    <nd ref="1130" />
+    <nd ref="1106" />
+    <nd ref="1109" />
+    <nd ref="30063" />
+    <nd ref="1057" />
+    <nd ref="1056" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10043">
+    <nd ref="1067" />
+    <nd ref="30044" />
+    <nd ref="1007" />
+    <nd ref="1006" />
+    <nd ref="1005" />
+    <nd ref="1004" />
+    <nd ref="1003" />
+    <nd ref="30043" />
+    <nd ref="1111" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10044">
+    <nd ref="1103" />
+    <nd ref="1115" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10045">
+    <nd ref="1125" />
+    <nd ref="1048" />
+    <nd ref="1047" />
+    <nd ref="1046" />
+    <nd ref="1045" />
+    <nd ref="1044" />
+    <nd ref="30065" />
+    <nd ref="1043" />
+    <nd ref="1134" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10046">
+    <nd ref="1116" />
+    <nd ref="1129" />
+    <nd ref="1039" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10047">
+    <nd ref="1142" />
+    <nd ref="1095" />
+    <nd ref="1099" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10048">
+    <nd ref="1112" />
+    <nd ref="1037" />
+    <nd ref="1036" />
+    <nd ref="1033" />
+    <nd ref="1032" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10049">
+    <nd ref="1113" />
+    <nd ref="1157" />
+    <nd ref="1134" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10050">
+    <nd ref="1025" />
+    <nd ref="30040" />
+    <nd ref="1032" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10051">
+    <nd ref="1112" />
+    <nd ref="1113" />
+    <nd ref="1116" />
+    <nd ref="1012" />
+    <nd ref="1115" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10052">
+    <nd ref="1021" />
+    <nd ref="1135" />
+    <nd ref="1140" />
+    <nd ref="1168" />
+    <nd ref="1169" />
+    <nd ref="1170" />
+    <nd ref="1145" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10053">
+    <nd ref="1132" />
+    <nd ref="1149" />
+    <nd ref="1122" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10054">
+    <nd ref="1137" />
+    <nd ref="1124" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10055">
+    <nd ref="1142" />
+    <nd ref="1067" />
+    <nd ref="1020" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="10056">
+    <nd ref="1134" />
+    <nd ref="1042" />
+    <nd ref="1139" />
+    <nd ref="1041" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10057">
+    <nd ref="1158" />
+    <nd ref="1127" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="10058">
+    <nd ref="1130" />
+    <nd ref="1111" />
+    <nd ref="1156" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10059">
+    <nd ref="1039" />
+    <nd ref="1000" />
+    <nd ref="1133" />
+    <nd ref="1138" />
+    <nd ref="1143" />
+    <nd ref="1159" />
+    <nd ref="1127" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10060">
+    <nd ref="1039" />
+    <nd ref="1035" />
+    <nd ref="1030" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10062">
+    <nd ref="1134" />
+    <nd ref="1039" />
+    <nd ref="1136" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10063">
+    <nd ref="1139" />
+    <nd ref="1035" />
+    <nd ref="1141" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="10064">
+    <nd ref="1067" />
+    <nd ref="30067" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="10065">
+    <nd ref="1116" />
+    <nd ref="1150" />
+    <nd ref="1151" />
+    <nd ref="1155" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="10066">
+    <nd ref="1049" />
+    <nd ref="1128" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="10067">
+    <nd ref="1128" />
+    <nd ref="1013" />
+    <nd ref="1125" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30048">
+    <nd ref="1017" />
+    <nd ref="1058" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="30049">
+    <nd ref="30047" />
+    <nd ref="1158" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30050">
+    <nd ref="1145" />
+    <nd ref="30039" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="30051">
+    <nd ref="30045" />
+    <nd ref="1171" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30076">
+    <nd ref="30075" />
+    <nd ref="1052" />
+    <nd ref="1051" />
+    <nd ref="1050" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30077">
+    <nd ref="30074" />
+    <nd ref="1019" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="30078">
+    <nd ref="30067" />
+    <nd ref="1016" />
+    <tag k="subtype" v="solid" />
+    <tag k="type" v="line_thick" />
+  </way>
+  <way id="30079">
+    <nd ref="1099" />
+    <nd ref="1110" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30080">
+    <nd ref="1056" />
+    <nd ref="1055" />
+    <nd ref="30071" />
+    <nd ref="1054" />
+    <tag k="type" v="virtual" />
+  </way>
+  <way id="30081">
+    <nd ref="30063" />
+    <nd ref="1062" />
+    <tag k="type" v="pedestrian_marking" />
+  </way>
+  <way id="30082">
+    <nd ref="1056" />
+    <nd ref="30056" />
+    <nd ref="30066" />
+    <nd ref="30059" />
+    <nd ref="30064" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30083">
+    <nd ref="30075" />
+    <nd ref="30055" />
+    <nd ref="30057" />
+    <nd ref="30058" />
+    <nd ref="30060" />
+    <nd ref="30061" />
+    <nd ref="30062" />
+    <tag k="subtype" v="low" />
+    <tag k="type" v="curbstone" />
+  </way>
+  <way id="30084">
+    <nd ref="1155" />
+    <nd ref="1153" />
+    <nd ref="30070" />
+    <nd ref="1020" />
+    <tag k="type" v="virtual" />
+  </way>
+  <relation id="30000">
+    <member ref="10000" role="left" type="way" />
+    <member ref="10008" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30001">
+    <member ref="10023" role="left" type="way" />
+    <member ref="10059" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30002">
+    <member ref="10006" role="left" type="way" />
+    <member ref="10003" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30003">
+    <member ref="10039" role="left" type="way" />
+    <member ref="10038" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30004">
+    <member ref="30048" role="left" type="way" />
+    <member ref="10004" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30005">
+    <member ref="10007" role="left" type="way" />
+    <member ref="10010" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30006">
+    <member ref="10049" role="left" type="way" />
+    <member ref="10046" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30007">
+    <member ref="10001" role="left" type="way" />
+    <member ref="10002" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30008">
+    <member ref="10065" role="left" type="way" />
+    <member ref="10042" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30009">
+    <member ref="10034" role="left" type="way" />
+    <member ref="10032" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30011">
+    <member ref="10056" role="left" type="way" />
+    <member ref="10060" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30012">
+    <member ref="10028" role="left" type="way" />
+    <member ref="10040" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30013">
+    <member ref="10060" role="left" type="way" />
+    <member ref="10019" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30014">
+    <member ref="10014" role="left" type="way" />
+    <member ref="10016" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30015">
+    <member ref="10013" role="left" type="way" />
+    <member ref="10014" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30016">
+    <member ref="10064" role="left" type="way" />
+    <member ref="10047" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30017">
+    <member ref="10066" role="left" type="way" />
+    <member ref="10034" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30018">
+    <member ref="10032" role="left" type="way" />
+    <member ref="10031" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30019">
+    <member ref="10029" role="left" type="way" />
+    <member ref="10064" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30020">
+    <member ref="10052" role="left" type="way" />
+    <member ref="10036" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30021">
+    <member ref="10016" role="left" type="way" />
+    <member ref="10044" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30022">
+    <member ref="10046" role="left" type="way" />
+    <member ref="10011" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30023">
+    <member ref="10029" role="left" type="way" />
+    <member ref="10027" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30024">
+    <member ref="10031" role="left" type="way" />
+    <member ref="10022" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30025">
+    <member ref="10017" role="left" type="way" />
+    <member ref="10026" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30026">
+    <member ref="10026" role="left" type="way" />
+    <member ref="10033" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30027">
+    <member ref="10035" role="left" type="way" />
+    <member ref="10005" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30028">
+    <member ref="10050" role="left" type="way" />
+    <member ref="10041" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30029">
+    <member ref="10012" role="left" type="way" />
+    <member ref="10043" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30030">
+    <member ref="10035" role="left" type="way" />
+    <member ref="30048" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30031">
+    <member ref="10041" role="left" type="way" />
+    <member ref="10030" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30052">
+    <member ref="10009" role="left" type="way" />
+    <member ref="30049" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30053">
+    <member ref="30050" role="left" type="way" />
+    <member ref="30051" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30054">
+    <member ref="30050" role="left" type="way" />
+    <member ref="10009" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30085">
+    <member ref="30078" role="left" type="way" />
+    <member ref="30079" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30086">
+    <member ref="30077" role="left" type="way" />
+    <member ref="30078" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30087">
+    <member ref="30077" role="left" type="way" />
+    <member ref="30076" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="30088">
+    <member ref="30084" role="left" type="way" />
+    <member ref="30080" role="right" type="way" />
+    <tag k="location" v="urban" />
+    <tag k="one_way" v="yes" />
+    <tag k="region" v="bg" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+</osm_xy>

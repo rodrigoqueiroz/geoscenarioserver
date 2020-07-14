@@ -4,7 +4,7 @@ from sv.VehicleState import *
 import sv.ManeuverConfig as MConf
 from sv.ManeuverUtils import *
 from sv.ManeuverStatus import * 
-from Mapping.LaneletMap import LaneletMap
+from mapping.LaneletMap import LaneletMap
 from sv.BTreeLeaves import *
 
 class BTree(object):
@@ -57,7 +57,7 @@ class BTree(object):
             self.bb_condition.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
 
             ## Is the lane free?
-            vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.vehicles)
+            vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)
             
             # lane is free if there are no vehicles ahead
             self.bb_condition.free = True if not vehicle_ahead else False
@@ -66,7 +66,7 @@ class BTree(object):
             if(self.bb_condition.free == False): #There is a vehicle in the lane
                 self.bb_condition.stopped = is_stopped(vehicle_ahead[1])
         elif (self.tree_name == "lanechange"):
-            self.bb_condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.vehicles)
+            self.bb_condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.traffic_vehicles)
     
     def get_keepvelocity_status(self, planner_state):
         return ManeuverStatus.SUCCESS
@@ -90,7 +90,7 @@ class BTree(object):
     def config_followvehicle(self, planner_state):
         man = "followvehicle"
         conf = MConf.MFollowConfig
-        conf.target_vid = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.vehicles)[0]
+        conf.target_vid = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)[0]
         return man, conf
 
     def get_accelerate_status(self, planner_state):
@@ -103,7 +103,7 @@ class BTree(object):
         return man, conf
 
     def get_swerve_status(self, planner_state):
-        return ManeuverStatus.SUCCESS if lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, mconfig) else ManeuverStatus.FAILURE
+        return ManeuverStatus.SUCCESS if lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig) else ManeuverStatus.FAILURE
         
     def config_swerve(self, planner_state):
         man = "swerve"

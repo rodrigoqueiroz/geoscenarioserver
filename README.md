@@ -1,61 +1,51 @@
 #   GeoScenario Server
-Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Maneuver Models, and Scenario Optimization modules.
+Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees and Maneuver Models.
 
-### Dependencies (python3)
+## Dependencies:
 - python 3.8
 - numpy
 - matplotlib
 - python3-tk
 - python3-sysv-ipc
-- [lanelet2](https://github.com/yuzhangbit/lanelet2_standalone)
 - [py_trees](https://github.com/splintered-reality/py_trees)
 
-## Simulated Vehicle Planner and Maneuver Models (/sv)
-- Check util/Constants for configuration options. Use SHOW_DASHBOARD = True for independent view (no Unreal, but affect performance).
-- Simulations run in Real Time. Adjust FRAME_RATE based on hardware performance to avoid drift (Recommended 30Hz).
+#### Lanelet Dependencies:
+- [lanelet2](https://github.com/yuzhangbit/lanelet2_standalone)
+- Boost 1.58 (does not compile with Boost 1.6.5 or newer)
+- eigen3
+- pugixml
+- boost-python3
+- geographiclib
+
 
 ## Running
-- run `python3 Simulator.py` to start he Server
-- Unreal simulator is optional, and can be started in any order.
-
-
-## Unreal Integration
-Copy (or symlink) unreal/GeoScenarioModule into your unreal project source folder.
-Copy (or symlink) unreal/GeoScenarioContent into your unreal project content folder.
-
-Add GeoScenario Module to your *myprojectname.uproject* file:
-
+- run `python GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 ```
-"Modules": [
-    {
-    "Name": "GeoScenarioModule",
-    "Type": "Runtime",
-    "LoadingPhase": "Default",
-    "AdditionalDependencies": [
-        "Engine"
-        ]
-	}
+optional arguments:
+  -h, --help            show this help message and exit
+  -s FILE, --scenario FILE
+                        GeoScenario file
+  -q VERBOSE, --quiet VERBOSE
+                        don't print messages to stdout
 ```
 
-Add GeoScenarioModule to the TargetRules in files *Source/myprojectname.Target.cs* and *Source/myprojectnameEditor.Target.cs*:
+- GeoScenario files (2.0 required) must be placed inside *scenarios/* 
+- If a file is not given, you must provide a manual problem startup from code.
+- LaneletMap files must be placed inside *scenarios/maps* (a map file is mandatory).
+- Co-Simulator (Unreal or other) is optional.
 
-```
-ExtraModuleNames.AddRange( new string[] {"GeoScenarioModule" } );
-```
-Rebuild your Unreal Project
+## Configuration:
 
-### How to run
+- Check *SimConfig.py* for configuration options. 
+- Adjust FRAME_RATE based on hardware performance to avoid drift (Recommended 30Hz).
+- Adjust PLANNER_RATE based on hardware performance and what scenario requirements.
+- Use SHOW_DASHBOARD = True for GUI. Adjust dashboard refresh rate according to performance.
+- Simulations can only run in Real Time (so far). 
 
-Add GSClient (actor) to your level. 
-When the level starts, the client will attempt to connect to GeoScenario Server.
-When the connection is estabilished and the Server starts publishing Vehicles states, the client will spawn Simulated Vehicles and sync with Server.
-In order to sync vehicles spawned and controlled by the client (e.g., Ego), add the following tags to the respective Actor instance (or Pawn) and GSClient will find them. 
+## Co-Simulation:
 
-```
-gsvehicle
-vid:x
-```
-the vehicle id must matche a remote id in the Server.
+- Use the shared memory keys inside SimConfig to read/write the server shared memory blocks. 
+- We provide a GeoScenario Client for Unreal in */unreal*.
 
 
 rqueiroz@gsd.uwaterloo.ca

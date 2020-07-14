@@ -1,18 +1,13 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TRAJECTORY EVALUATION
 # --------------------------------------------
-#TODO: configurable weights (as constants?)
-#TODO: add alternative total cost functions for agressive maneuvers leading to crash
-#TODO: add driver error to cost
-#TODO: Add cost to change trajectory (to make keeping the same trajectory easier)
-#TODO: Add traj feasibility check
 
 import numpy as np
 from sv.ManeuverConfig import *
 from util.Utils import *
-from util.Constants import *
+from SimConfig import *
 
 #=============================== FEASIBILITY
 
@@ -62,12 +57,12 @@ def laneswerve_cost(trajectory, mconfig:MLaneSwerveConfig, target_lane_config, v
     total_cost = sum(C)
     return total_cost
 
-def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config, vehicles, obstacles):
+def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles, obstacles):
     total_cost = 0
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
-    C.append(1 * lateral_lane_offset_cost(trajectory,lane_config))
-    C.append(1 * total_jerk_cost(trajectory))
+    C.append(1 * total_lat_jerk_cost(trajectory))
+    C.append(1 * lateral_lane_offset_cost(trajectory, lane_config))
     #C.append(1 * max_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))

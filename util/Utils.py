@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
 # ---------------------------------------------
 # UTILS
 # --------------------------------------------

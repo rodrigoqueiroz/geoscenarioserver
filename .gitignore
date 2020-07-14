@@ -1,5 +1,6 @@
-sv/plots/*
-logs/*
+scenarios//plots/*
+scenarios/logs/*
 *__pycache__/
 **/build/
 .vscode/
+*.DS_Store

@@ -1,7 +1,10 @@
 #!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
+
 
 from sv.ManeuverConfig import *
-from util.Constants import *
+from SimConfig import *
 import numpy as np
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
@@ -16,6 +19,14 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
         current_lane = lane_config
     
     return current_lane.id == mconfig.target_lid
+
+def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig, traffic_vehicles):
+    target_lane_config = lane_config.get_current_lane(traffic_vehicles[mconfig.target_vid].vehicle_state.d)
+    if not target_lane_config:
+        print("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
+        return None, None
+    
+    return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lane_config.id))
 
 def can_perform_lane_change():
     return True
@@ -72,9 +83,39 @@ def reached_acceptance_gap(vehicle_state, lane_config, vehicles, threshold=1):
         adversary_vehicle_state = adversary_vehicle.vehicle_state
 
         a_current_lane = lane_config.get_current_lane(adversary_vehicle_state.d)
-        if (a_current_lane.id - 1 != s_current_lane): continue #makes sure not to compare with irrelevant vehicles (-1 is hardcoded)
+        if (a_current_lane is None or a_current_lane.id - 1 != s_current_lane): continue #makes sure not to compare with irrelevant vehicles (-1 is hardcoded)
 
         if subject_vehicle_state.s - VEHICLE_RADIUS < adversary_vehicle_state.s + VEHICLE_RADIUS + threshold: 
             reached = False
 
     return reached
+
+def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5):
+    is_following = False
+    leading_vid = None
+
+    closest_dist = float('inf')
+    cur_lane = lane_config.get_current_lane(vehicle_state.d)
+
+    for vid, traffic_vehicle in other_vehicles.items():
+        other_vehicle_lane = lane_config.get_current_lane(traffic_vehicle.vehicle_state.d)
+        # TODO: need a function to get all vehicles in current lane
+        if other_vehicle_lane and other_vehicle_lane.id == cur_lane.id:
+            dist = traffic_vehicle.vehicle_state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
+            ttc = dist / abs(vehicle_state.s_vel) if vehicle_state.s_vel != 0 else float('inf')
+            
+            # if self_id == 2:
+            #     is_following = True
+            #     leading_vid = vid
+            # if not moving, determine if too close (one car width's apart)
+            if (0 < dist < VEHICLE_RADIUS * 10) or (0 <= ttc < time_gap):
+                if dist < closest_dist:
+                    # TODO follow not working? time gap doesn't seem to be correct
+                    # print("{} is leading by {}".format(vid, ttc))
+                    is_following = True
+                    leading_vid = vid
+    
+    return is_following, leading_vid
+
+#def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
+#def range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):

@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
-from util.Constants import *
+from SimConfig import *
 from util.Utils import *
 from sv.SV import SV, Vehicle
 from sv.VehicleState import *
@@ -31,7 +31,7 @@ class Dashboard(object):
     def __init__(self, traffic, center_vid):
         self.traffic = traffic
         self.center_vid = center_vid
-        
+        self.window = None
 
     def start(self):
         """ Start dashboard in subprocess.
@@ -64,9 +64,12 @@ class Dashboard(object):
         #self.map_canvas.draw()
         
         while sync_dash.tick():
+            if not self.window:
+                return
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
             #trajectories = self.read_trajectories(self.traffic)
             #update stats
+
 
             #map chart dynamic content
             #self.plot_map_chart(vehicles)
@@ -98,10 +101,7 @@ class Dashboard(object):
             self.window.update() 
 
     def quit(self):
-        if  self.window:
-            #self.window.mainloop() #blocks UI
-            self.window.quit()
-
+        self._process.terminate()
 
 
     def read_traffic_state(self, traffic_state_sharr, nv):
@@ -156,7 +156,6 @@ class Dashboard(object):
         #todo: include key scenario elements
 
         fig.tight_layout()
-        
 
 
     def plot_map_chart(self, vehicles):
@@ -236,9 +235,9 @@ class Dashboard(object):
         plt.axhline(0, color="black")
         plt.axvline(0, color="black")
         #Lane lines
-        plt.axhline(0, color="gray")
-        plt.axhline(4, color="gray")
-        plt.axhline(8, color="gray")
+        #plt.axhline(0, color="gray")
+        #plt.axhline(4, color="gray")
+        #plt.axhline(8, color="gray")
         #lables
         plt.xlabel('S')
         plt.ylabel('D')
@@ -255,6 +254,10 @@ class Dashboard(object):
         gca.add_artist(circle1)
         label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
         gca.text(vs.s, vs.d+1.5, label, style='italic')
+
+        
+        # update lane config based on current (possibly outdated) reference frame
+        #lane_config = self.read_map(vehicle_state, self.reference_path)
 
         #other vehicles, from main vehicle POV:
 
@@ -426,8 +429,8 @@ class Dashboard(object):
                             'x_vel','y_vel', 
                             'x_acc','y_acc', 
                             'yaw','steer', 
-                            's','s vel','s acc',
-                            'd','d vel','d acc')
+                            's','d','s vel',
+                            'd vel','s acc','d acc')
         tab.heading("#0", text='actor', anchor='w')
         tab.column("#0", anchor="w" , width=100)
         for col in tab['columns']:
