@@ -89,11 +89,10 @@ class Condition(behaviour.Behaviour):
         self.logger.debug("  %s [Condition::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
 
 class Maneuver(behaviour.Behaviour):
-    def __init__(self, name, config):
+    def __init__(self, name):
         super(Maneuver, self).__init__(name)
-        self.config=config
         self.maneuver = self.attach_blackboard_client("Maneuver")
-        self.maneuver.register_key(key="config", access=common.Access.WRITE)
+        self.maneuver.register_key(key="identifier", access=common.Access.WRITE)
         self.maneuver.register_key(key="status", access=common.Access.WRITE)
 
     def setup(self):
@@ -108,7 +107,7 @@ class Maneuver(behaviour.Behaviour):
 
         status = None
         if (self.maneuver.status == ManeuverStatus.INIT):
-            self.maneuver.config = self.config
+            self.maneuver.identifier = self.name
             status = common.Status.RUNNING
             self.maneuver.status = ManeuverStatus.RUNNING
         elif (self.maneuver.status == ManeuverStatus.SUCCESS):
