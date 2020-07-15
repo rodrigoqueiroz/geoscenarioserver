@@ -19,8 +19,7 @@ from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
 
 from mapping.LaneletMap import LaneletMap
 from sv.btree.BTreeModel import * # Deprecated
-from sv.btree.DriveTree import *
-from sv.btree.LaneChangeTree import *
+from sv.btree.BTreeFactory import * 
 
 from typing import Tuple, Dict, List
 
@@ -91,7 +90,7 @@ class SVPlanner(object):
         
         sync_planner = TickSync(rate=PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
 
-        self.btree_model = LaneChangeTree(self.vid, self.btree_root)
+        self.btree_model = BTreeFactory(self.vid, self.btree_root).build_tree()
         
         while sync_planner.tick():
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)

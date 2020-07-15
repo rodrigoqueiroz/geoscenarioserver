@@ -7,11 +7,8 @@ from sv.Maneuver import *
 
 class BTree(object):
     
-    def __init__(self, vid, root, goal = None): 
+    def __init__(self, vid, goal = None): 
         self.vid = vid
-        self.root_tree = root
-        #todo: load tree xml
-        #runtime
         self.know_repo = blackboard.Client(name="KnowledgeRepository")
         self.know_repo.register_key(key="maneuver", access=common.Access.WRITE)
         self.know_repo.maneuver = Maneuver()

@@ -20,8 +20,8 @@ from mapping.LaneletMap import LaneletMap
 '''
 class DriveTree(BTree):
     
-    def __init__(self, vid, root, goal = None):
-        super().__init__(vid, root, goal)
+    def __init__(self, vid, goal = None):
+        super().__init__(vid, goal)
 
         # Configure Blackboard
         self.know_repo.register_key(key="/condition/endpoint", access=common.Access.WRITE)

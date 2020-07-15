@@ -17,8 +17,8 @@ from mapping.LaneletMap import LaneletMap
 '''
 class LaneChangeTree(BTree):
 
-    def __init__(self, vid, root, goal = None): 
-        super().__init__(vid, root, goal)
+    def __init__(self, vid, goal = None): 
+        super().__init__(vid, goal)
 
         # Configure Blackboard
         self.know_repo.register_key(key="/condition/free", access=common.Access.WRITE)
@@ -34,7 +34,7 @@ class LaneChangeTree(BTree):
 
         # Subtrees List
         self.subtrees = list()
-        self.drive = DriveTree(vid, root)
+        self.drive = DriveTree(vid)
         self.subtrees.append(self.drive)
 
         # Conditions List
