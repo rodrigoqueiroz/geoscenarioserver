@@ -61,7 +61,7 @@ class LaneChangeTree(BTree):
         return ManeuverStatus.SUCCESS
 
     def get_swerve_status(self, planner_state):
-        return ManeuverStatus.SUCCESS if lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig) else ManeuverStatus.FAILURE
+        return ManeuverStatus.SUCCESS if lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.know_repo.maneuver.get_config()) else ManeuverStatus.FAILURE
 
     def update_maneuver_status(self, planner_state):
         if self.know_repo.maneuver is None: return 
@@ -79,6 +79,12 @@ class LaneChangeTree(BTree):
     def update_world_model(self, planner_state):
         for subtree in self.subtrees: subtree.update_world_model(planner_state)
         
+        ## Is the lane free?
+        vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)
+        
+        # lane is free if there are no vehicles ahead
+        self.know_repo.condition.free = True if not vehicle_ahead else False
+
         ## Is the obstacle stopped?
         if(self.know_repo.condition.free == False): #There is a vehicle in the lane
             self.know_repo.condition.slow_vehicle = is_slow_vehicle(planner_state.vehicle_state, vehicle_ahead[1])

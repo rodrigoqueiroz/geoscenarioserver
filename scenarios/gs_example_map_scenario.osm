@@ -34,7 +34,7 @@
     <tag k='agentspeed' v='7' />
   </node>
   <node id='-1924' action='modify' visible='true' lat='49.00295256035' lon='8.42471302561'>
-    <tag k='btree' v='drive' />
+    <tag k='btree' v='lanechange' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
@@ -48,7 +48,7 @@
     <tag k='gs' v='origin' />
   </node>
   <node id='-1930' action='modify' visible='true' lat='49.00312957656' lon='8.42468209404'>
-    <tag k='btree' v='lanechange' />
+    <tag k='btree' v='a' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
