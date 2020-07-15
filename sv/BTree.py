@@ -28,6 +28,9 @@ class BTree(object):
             self.tree = self.drive_tree()
         elif (self.tree_name == "lanechange"):
             self.tree = self.lanechange_tree()
+        elif (self.tree_name == "lanechange_scenario_tree"):
+            print("lanechange_scenario_tree")
+            self.tree = self.lanechange_scenario_tree()
 
         print("[Vehicle " + str(self.vid) + "] configured with a " + self.tree_name + " tree")
 
@@ -67,6 +70,23 @@ class BTree(object):
                 self.bb_condition.stopped = is_stopped(vehicle_ahead[1])
         elif (self.tree_name == "lanechange"):
             self.bb_condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.traffic_vehicles)
+        elif (self.tree_name == "lanechange_scenario_tree"):
+            ## Is in endpoint?
+            self.bb_condition.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
+
+            ## Is the lane free?
+            vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)
+            
+            # lane is free if there are no vehicles ahead
+            self.bb_condition.free = True if not vehicle_ahead else False
+            
+            ## Is the obstacle stopped?
+            if(self.bb_condition.free == False): #There is a vehicle in the lane
+                self.bb_condition.stopped = is_stopped(vehicle_ahead[1])
+                self.bb_condition.slow_vehicle = is_slow_vehicle(planner_state.vehicle_state, vehicle_ahead[1])
+            
+            self.bb_condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.traffic_vehicles)
+            
     
     def get_keepvelocity_status(self, planner_state):
         return ManeuverStatus.SUCCESS
@@ -112,6 +132,7 @@ class BTree(object):
         return man, conf
 
     def tick(self, planner_state):
+        if self.tree is None: return None, False
 
         self.update_world_model(planner_state)
         self.update_maneuver_status(planner_state)
@@ -123,7 +144,7 @@ class BTree(object):
 
         return self.mconfig, False
 
-    def drive_tree(self):
+    def drive_subtree(self):
         ''' Driving on route and alternating between 
         velocity keeping if road ahead is free
         vehicle following if there is a vehicle on the way
@@ -166,16 +187,16 @@ class BTree(object):
         root.add_children([reached_end_point, traj_follow])
         
         # Set Behavior Tree
-        tree = trees.BehaviourTree(root=root)
-        tree.setup(timeout=15)
+        #tree = trees.BehaviourTree(root=root)
+        #tree.setup(timeout=15)
+        #
+        ## Print Tree
+        #print('++++ Drive Tree ++++')
+        #print(display.unicode_tree(root=root))
 
-        # Print Tree
-        print('++++ Drive Tree ++++')
-        print(display.unicode_tree(root=root))
+        return root
 
-        return tree
-
-    def lanechange_tree(self):
+    def changelane_subtree(self):
         ''' Change the lane when find acceptance gap,
         accelerate the vehicle otherwise.
         '''
@@ -197,23 +218,51 @@ class BTree(object):
         root = composites.Selector("Change Lane")
         root.add_children([reach_accpt_gap, swerve])
         
+        ## Set Behavior Tree
+        #tree = trees.BehaviourTree(root=root)
+        #tree.setup(timeout=15)
+        #
+        ## Print Tree
+        #print('++++ Lane Change Tree ++++')
+        #print(display.unicode_tree(root=root))
+
+        return root
+
+    #def overtake_tree(planner_state)      
+
+    def lanechange_scenario_tree(self):
+        ''' Drive normally until it finds a slower vehicle in front
+            in this case, change the lane.
+        '''
+        
+        # Configure Blackboard
+        self.bb_condition.register_key(key="slow_vehicle", access=common.Access.WRITE)
+        self.bb_condition.slow_vehicle = False
+
+        # Subtrees List
+        drive = self.drive_subtree()
+        change_lane = self.changelane_subtree()
+        
+        # Conditions List
+        slow_vehicle = Condition("slow_vehicle")
+
+        # Coordinate Maneuvers and Conditions
+        avoid_slow_vehicle = composites.Sequence("Avoid Slow Vehicle")
+        avoid_slow_vehicle.add_children([slow_vehicle])
+
+        root = composites.Selector("Change Lane")
+        root.add_children([avoid_slow_vehicle])
+        
         # Set Behavior Tree
         tree = trees.BehaviourTree(root=root)
         tree.setup(timeout=15)
 
+        # Insert Subtrees
+        tree.insert_subtree(change_lane, avoid_slow_vehicle.id, 1)
+        tree.insert_subtree(drive, root.id, 1)
+
         # Print Tree
-        print('++++ Lane Change Tree ++++')
+        print('++++ Lane Change Scenario Tree ++++')
         print(display.unicode_tree(root=root))
-
+        print(self.bb_condition)
         return tree
-
-    #def overtake_tree(planner_state)      
-
-    def lanechange_scenario_tree(self, planner_state):
-        #print('{} lane change scenario tree'.format(sim_time))
-        if sim_time <= 3.0:
-            return self.drive_tree(planner_state)
-        elif 3.0 < sim_time <= 7.0:
-            return self.lanechange_tree(planner_state)
-        else:
-            return self.drive_tree(planner_state)

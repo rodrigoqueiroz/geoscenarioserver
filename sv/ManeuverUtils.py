@@ -65,9 +65,11 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=4):
 
     return nearest
 
-def is_stopped(vehicle):
-    return vehicle.vehicle_state.s_vel == 0
+def is_stopped(traffic_vehicle):
+    return traffic_vehicle.vehicle_state.s_vel == 0
 
+def is_slow_vehicle(subject_vehicle, traffic_vehicle):
+    return subject_vehicle.s_vel > traffic_vehicle.vehicle_state.s_vel
 
 def reached_acceptance_gap(vehicle_state, lane_config, vehicles, threshold=1):
     ''' Analyzes (frenet coordinates) whether is there an adversary vehicle
