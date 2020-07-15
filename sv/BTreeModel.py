@@ -40,7 +40,7 @@ class BTreeModel(object):
 
         is_following, leading_vid = is_in_following_range(self.vid, planner_state.vehicle_state, planner_state.traffic_vehicles, planner_state.lane_config)
         if is_following:
-            print("{} following {}".format(self.vid, leading_vid))
+            # print("{} following {}".format(self.vid, leading_vid))
             mconfig = MFollowConfig(leading_vid)
 
         # reaching goal overrides other maneuvers

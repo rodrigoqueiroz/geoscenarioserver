@@ -129,8 +129,9 @@ class MStopAtConfig:
 class MFollowConfig:
     #target
     target_vid:int                  #target vehicle id
-    time:MP = MP(2.0,10,6)          #duration in [s] as MP
-    time_gap:float = 3.0            #[s]
+    time:MP = MP(3.0,10,6)          #duration in [s] as MP
+    time_gap:float = 2.0            #[s]
+    decel:MP = MP(5.0,10,6)         #[m/s2]
     #distance:float = 20             #distance from target [m]
     #constraints
     max_ttc:float = 10.0            #max time to collision [s]

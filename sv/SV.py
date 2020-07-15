@@ -50,13 +50,14 @@ class Vehicle(object):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
             TODO: predict using history
+            TODO: predict velocity and accel
         """
         state = [
             self.vehicle_state.s + (self.vehicle_state.s_vel * t),
-            self.vehicle_state.s_vel, 
-            self.vehicle_state.s_acc, 
+            self.vehicle_state.s_vel,
+            self.vehicle_state.s_acc,
             self.vehicle_state.d + (self.vehicle_state.d_vel * t), 
-            self.vehicle_state.d_vel, 
+            self.vehicle_state.d_vel,
             self.vehicle_state.d_acc
         ]
         return state
@@ -114,23 +115,23 @@ class SV(Vehicle):
         self.d_vel_eq = None
         self.d_acc_eq = None
 
-    def future_state(self, t):
-        """ Predicts a new state based on time 
-            and current trajectory *override
-        """
-        if (not self.trajectory): #If no trajectory, returns prediction
-            return Vehicle.future_state(self,t)
+    # def future_state(self, t):
+    #     """ Predicts a new state based on time 
+    #         and current trajectory *override
+    #     """
+    #     if (not self.trajectory): #If no trajectory, returns prediction
+    #         return Vehicle.future_state(self,t)
 
-        t = self.trajectory_time + t
-        state = [
-            self.s_eq(t),
-            self.s_vel_eq(t),
-            self.s_acc_eq(t),
-            self.d_eq(t),
-            self.d_vel_eq(t),
-            self.d_acc_eq(t),
-        ] 
-        return state
+    #     t = self.trajectory_time + t 
+    #     state = [
+    #         self.s_eq(t),
+    #         self.s_vel_eq(t),
+    #         self.s_acc_eq(t),
+    #         self.d_eq(t),
+    #         self.d_vel_eq(t),
+    #         self.d_acc_eq(t),
+    #     ] 
+    #     return state
 
     def start_planner(self, nvehicles, sim_config, traffic_state_sharr ):
         """For simulated vehicles controlled by SVPlanner.
