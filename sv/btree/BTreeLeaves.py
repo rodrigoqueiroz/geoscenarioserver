@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+#dinizr@chalmers.se
 
 from py_trees import *
 import random
@@ -59,8 +60,8 @@ class Condition(behaviour.Behaviour):
     def __init__(self, name):
         super(Condition, self).__init__(name)
         self.name = name
-        self.conditions = self.attach_blackboard_client("Condition")
-        self.conditions.register_key(key=name, access=common.Access.READ)
+        self.know_repo = self.attach_blackboard_client("KnowledgeRepository")
+        self.know_repo.register_key(key="/condition/"+name, access=common.Access.READ)
 
     def setup(self):
         self.logger.debug("  %s [Condition::setup()]" % self.name)
@@ -72,8 +73,7 @@ class Condition(behaviour.Behaviour):
         self.logger.debug("  %s [Condition::update()]" % self.name)
 
         try:
-            decision = self.conditions.get(self.name)
-            #print(self.name+" = " + str(decision))
+            decision = self.know_repo.get("/condition/"+self.name)
         except KeyError as e:
             raise RuntimeError("Missing condition '"+self.name+"'.")
 
@@ -87,56 +87,40 @@ class Condition(behaviour.Behaviour):
     def terminate(self, new_status):
         self.logger.debug("  %s [Condition::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
 
-class Maneuver(behaviour.Behaviour):
-    def __init__(self, name):
-        super(Maneuver, self).__init__(name)
-        self.maneuver = self.attach_blackboard_client("Maneuver")
-        self.maneuver.register_key(key="identifier", access=common.Access.WRITE)
-        self.maneuver.register_key(key="status", access=common.Access.WRITE)
+class Action(behaviour.Behaviour):
+    def __init__(self, name, maneuver):
+        super(Action, self).__init__(name)
+        self.maneuver = maneuver
+        self.know_repo = self.attach_blackboard_client("KnowledgeRepository")
+        self.know_repo.register_key(key="maneuver", access=common.Access.WRITE)
 
     def setup(self):
-        self.logger.debug("  %s [Maneuver::setup()]" % self.name)
+        self.logger.debug("  %s [Action::setup()]" % self.name)
 
     def initialise(self):
-        self.logger.debug("  %s [Maneuver::initialise()]" % self.name)
-        self.maneuver.status = ManeuverStatus.INIT
+        self.logger.debug("  %s [Action::initialise()]" % self.name)
+        self.know_repo.maneuver.update_status(ManeuverStatus.INIT)
+        self.know_repo.maneuver = self.maneuver
 
     def update(self):
-        self.logger.debug("  %s [Maneuver::update()]" % self.name)
+        self.logger.debug("  %s [Action::update()]" % self.name)
 
         status = None
-        if (self.maneuver.status == ManeuverStatus.INIT):
-            self.maneuver.identifier = self.name
-            status = common.Status.RUNNING
-            self.maneuver.status = ManeuverStatus.RUNNING
-        elif (self.maneuver.status == ManeuverStatus.SUCCESS):
+        #if (self.know_repo.maneuver.get_status() == ManeuverStatus.INIT):
+        #    status = common.Status.RUNNING
+        #    self.know_repo.maneuver.update_status(ManeuverStatus.RUNNING)
+        if (self.know_repo.maneuver.get_status() == ManeuverStatus.SUCCESS):
             status =  common.Status.SUCCESS
-            self.maneuver.status = ManeuverStatus.INIT # reset
-        elif (self.maneuver.status == ManeuverStatus.FAILURE):
+            self.know_repo.maneuver.update_status(ManeuverStatus.INIT) # reset
+        elif (self.know_repo.maneuver.get_status() == ManeuverStatus.FAILURE):
             status = common.Status.FAILURE
-            self.maneuver.status = ManeuverStatus.INIT # reset
+            self.know_repo.maneuver.update_status(ManeuverStatus.INIT) # reset
         else:
             status = common.Status.RUNNING
+            self.know_repo.maneuver.update_status(ManeuverStatus.RUNNING)
+        
         
         return status
 
     def terminate(self, new_status):
-        self.logger.debug("  %s [Maneuver::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
-
-# TODO
-class Helper(behaviour.Behaviour):
-    def __init__(self, name):
-        super(Helper, self).__init__(name)
-
-    def setup(self):
-        self.logger.debug("  %s [Helper::setup()]" % self.name)
-
-    def initialise(self):
-        self.logger.debug("  %s [Helper::initialise()]" % self.name)
-
-    def update(self):
-        self.logger.debug("  %s [Helper::update()]" % self.name)
-        return None
-
-    def terminate(self, new_status):
-        self.logger.debug("  %s [Helper::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status)) 
+        self.logger.debug("  %s [Action::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))

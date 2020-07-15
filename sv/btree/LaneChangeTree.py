@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+#dinizr@chalmers.se
 
 from py_trees import *
 from sv.btree.BTree import * 
@@ -20,15 +21,16 @@ class LaneChangeTree(BTree):
         super().__init__(vid, root, goal)
 
         # Configure Blackboard
-        self.bb_condition.register_key(key="free", access=common.Access.READ)
-        self.bb_condition.register_key(key="slow_vehicle", access=common.Access.WRITE)
-        self.bb_condition.slow_vehicle = False
-        self.bb_condition.register_key(key="accpt_gap", access=common.Access.WRITE)
-        self.bb_condition.accpt_gap = False
+        self.know_repo.register_key(key="/condition/free", access=common.Access.WRITE)
+        self.know_repo.condition.free = False
+        self.know_repo.register_key(key="/condition/slow_vehicle", access=common.Access.WRITE)
+        self.know_repo.condition.slow_vehicle = False
+        self.know_repo.register_key(key="/condition/accpt_gap", access=common.Access.WRITE)
+        self.know_repo.condition.accpt_gap = False
 
        # Maneuvers List
-        self.accel = Maneuver("accelerate")
-        self.swerve = Maneuver("swerve")
+        self.accel = self.create_maneuver("Accelerate", MConf.MVelKeepConfig, "config.vel.value += 2")
+        self.swerve = self.create_maneuver("Lane Swerve", MConf.MLaneSwerveConfig, "config.target_lid = -1")
 
         # Subtrees List
         self.subtrees = list()
@@ -41,7 +43,6 @@ class LaneChangeTree(BTree):
 
         #Build Tree
         self.root, self.tree = self.build()
-        #print("[Vehicle " + str(self.vid) + "] configured with a " + self.__name__ + " tree")
         
     def get_subtree(self): return self.root
 
@@ -50,63 +51,39 @@ class LaneChangeTree(BTree):
     def get_keepvelocity_status(self, planner_state):
         return ManeuverStatus.SUCCESS
 
-    def config_keepvelocity(self, planner_state):
-        man = "keepvelocity"
-        conf = MConf.MVelKeepConfig
-        return man, conf
-
     def get_stop_status(self, planner_state):
         return ManeuverStatus.SUCCESS if planner_state.vehicle_state.s_vel == 0 else ManeuverStatus.RUNNING
-
-    def config_stop(self, planner_state):
-        man = "stop"
-        conf = MConf.MStopConfig
-        return man, conf
 
     def get_follow_status(self, planner_state):
         return ManeuverStatus.SUCCESS
 
-    def config_followvehicle(self, planner_state):
-        man = "followvehicle"
-        conf = MConf.MFollowConfig
-        conf.target_vid = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)[0]
-        return man, conf
-
     def get_accelerate_status(self, planner_state):
         return ManeuverStatus.SUCCESS
 
-    def config_accelerate(self, planner_state):
-        man = "accelerate"
-        conf = MConf.MVelKeepConfig
-        conf.vel.value = conf.vel.value + 2
-        return man, conf
-
     def get_swerve_status(self, planner_state):
         return ManeuverStatus.SUCCESS if lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig) else ManeuverStatus.FAILURE
-        
-    def config_swerve(self, planner_state):
-        man = "swerve"
-        conf = MConf.MLaneSwerveConfig
-        conf.target_lid = -1 #hardcoded for testing purposes
-        return man, conf
 
     def update_maneuver_status(self, planner_state):
-        if self.maneuver is None: return 
+        if self.know_repo.maneuver is None: return 
         for subtree in self.subtrees: subtree.update_maneuver_status(planner_state)
 
-        if self.maneuver == "accelerate":
-            self.bb_maneuver.status = self.get_accelerate_status(planner_state)
-        elif self.maneuver == "swerve":
-            self.bb_maneuver.status = self.get_swerve_status(planner_state)
-            
+        maneuver = self.know_repo.maneuver 
+
+        if maneuver.get_name() == "Accelerate":
+            maneuver.update_status(self.get_accelerate_status(planner_state))
+        elif maneuver.get_name() == "Lane Swerve":
+            maneuver.update_status(self.get_swerve_status(planner_state))
+
+        self.know_repo.maneuver = maneuver
+        
     def update_world_model(self, planner_state):
         for subtree in self.subtrees: subtree.update_world_model(planner_state)
         
         ## Is the obstacle stopped?
-        if(self.bb_condition.free == False): #There is a vehicle in the lane
-            self.bb_condition.slow_vehicle = is_slow_vehicle(planner_state.vehicle_state, vehicle_ahead[1])
+        if(self.know_repo.condition.free == False): #There is a vehicle in the lane
+            self.know_repo.condition.slow_vehicle = is_slow_vehicle(planner_state.vehicle_state, vehicle_ahead[1])
         
-        self.bb_condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.traffic_vehicles)
+        self.know_repo.condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.traffic_vehicles)
             
     def build(self):
         # Coordinate Maneuvers and Conditions

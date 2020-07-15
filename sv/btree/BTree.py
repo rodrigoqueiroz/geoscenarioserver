@@ -1,6 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+#dinizr@chalmers.se
 
 from py_trees import *
+from sv.btree.BTreeLeaves import * 
+from sv.Maneuver import *
 
 class BTree(object):
     
@@ -9,15 +12,17 @@ class BTree(object):
         self.root_tree = root
         #todo: load tree xml
         #runtime
-        self.tree_name = root
-        self.tree = None
-        self.maneuver = None 
-        self.mconfig = None
-        self.bb_condition = blackboard.Client(name="Condition")
-        self.bb_maneuver = blackboard.Client(name="Maneuver")
-        self.bb_maneuver.register_key(key="identifier", access=common.Access.READ)
-        self.bb_maneuver.register_key(key="status", access=common.Access.WRITE)
+        self.know_repo = blackboard.Client(name="KnowledgeRepository")
+        self.know_repo.register_key(key="maneuver", access=common.Access.WRITE)
+        self.know_repo.maneuver = Maneuver()
         self.endpoint = goal
+        self.maneuvers = list()
+
+    def create_maneuver(self, m_id, config, policy=""):
+        maneuver = Maneuver(m_id, config, policy)
+        self.maneuvers.append(maneuver)
+
+        return Action(m_id, maneuver)
 
     def update_maneuver_status(self, planner_state): pass
             
@@ -30,7 +35,7 @@ class BTree(object):
         self.update_maneuver_status(planner_state)
 
         self.tree.root.tick_once()
-        exec("self.maneuver, self.mconfig = self.config_"+ str(self.bb_maneuver.identifier) + "(planner_state)")
-        print("[Vehicle " + str(self.vid) + "] is executing " + str(self.maneuver) + "...")
+        curr_man = self.know_repo.maneuver
+        curr_man.reconfigure(planner_state)
 
-        return self.mconfig, False
+        return curr_man.get_config(), False

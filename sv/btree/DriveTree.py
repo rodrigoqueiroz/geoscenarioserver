@@ -1,5 +1,6 @@
 
-#!/usr/bin/env python3
+#!/usr/bin/env python
+#dinizr@chalmers.se
 
 from py_trees import *
 from sv.btree.BTree import * 
@@ -23,15 +24,18 @@ class DriveTree(BTree):
         super().__init__(vid, root, goal)
 
         # Configure Blackboard
-        self.bb_condition.register_key(key="endpoint", access=common.Access.WRITE)
-        self.bb_condition.register_key(key="free", access=common.Access.WRITE)
-        self.bb_condition.register_key(key="stopped", access=common.Access.WRITE)
+        self.know_repo.register_key(key="/condition/endpoint", access=common.Access.WRITE)
+        self.know_repo.condition.endpoint = True
+        self.know_repo.register_key(key="/condition/free", access=common.Access.WRITE)
+        self.know_repo.condition.free = False
+        self.know_repo.register_key(key="/condition/stopped", access=common.Access.WRITE)
+        self.know_repo.condition.stopped = False
 
-        # Maneuvers List
-        self.kp_vel = Maneuver("keepvelocity")
-        self.follow_obstc = Maneuver("followvehicle")
-        self.stop_self1 = Maneuver("stop")
-        self.stop_self2 = Maneuver("stop")
+        # Actions List
+        self.kp_vel = self.create_maneuver("Keep Velocity", MConf.MVelKeepConfig)
+        self.follow_obstc = self.create_maneuver("Follow Vehicle", MConf.MFollowConfig, "config.target_vid = get_vehicle_ahead(info.vehicle_state, info.lane_config,info.traffic_vehicles)[0]")
+        self.stop_self1 = self.create_maneuver("Stop1", MConf.MStopConfig)
+        self.stop_self2 = self.create_maneuver("Stop2", MConf.MStopConfig)
         
         # Conditions List
         self.end_point = Condition("endpoint")
@@ -39,7 +43,6 @@ class DriveTree(BTree):
         self.stp_vehicle = Condition("stopped")
 
         self.root, self.tree = self.build()
-        #print("[Vehicle " + str(self.vid) + "] configured with a " + self.__name__ + " tree")
 
     def get_subtree(self): return self.root
 
@@ -48,52 +51,40 @@ class DriveTree(BTree):
     def get_keepvelocity_status(self, planner_state):
         return ManeuverStatus.SUCCESS
 
-    def config_keepvelocity(self, planner_state):
-        man = "keepvelocity"
-        conf = MConf.MVelKeepConfig
-        return man, conf
-
     def get_stop_status(self, planner_state):
-        return ManeuverStatus.SUCCESS if planner_state.vehicle_state.s_vel == 0 else ManeuverStatus.RUNNING
-
-    def config_stop(self, planner_state):
-        man = "stop"
-        conf = MConf.MStopConfig
-        return man, conf
+        return ManeuverStatus.SUCCESS
 
     def get_follow_status(self, planner_state):
         return ManeuverStatus.SUCCESS
 
-    def config_followvehicle(self, planner_state):
-        man = "followvehicle"
-        conf = MConf.MFollowConfig
-        conf.target_vid = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)[0]
-        return man, conf
-
     def update_maneuver_status(self, planner_state):
-        if self.maneuver is None: return 
+        if self.know_repo.maneuver is None: return 
 
-        if self.maneuver == "keepvelocity": 
-            self.bb_maneuver.status = self.get_keepvelocity_status(planner_state)
-        elif self.maneuver == "stop":
-            self.bb_maneuver.status = self.get_stop_status(planner_state)
-        elif self.maneuver == "followvehicle":
-            self.bb_maneuver.status = self.get_follow_status(planner_state)
-        
+        maneuver = self.know_repo.maneuver 
+
+        if maneuver.get_name() == "Keep Velocity": 
+            maneuver.update_status(self.get_keepvelocity_status(planner_state))
+        elif maneuver.get_name() == "Follow Vehicle":
+            maneuver.update_status(self.get_follow_status(planner_state))
+        elif maneuver.get_name() == "Stop1" or maneuver.get_name() == "Stop2":
+            maneuver.update_status(self.get_stop_status(planner_state))
+
+        self.know_repo.maneuver = maneuver
+
     def update_world_model(self, planner_state):
         
         ## Is in endpoint?
-        self.bb_condition.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
+        self.know_repo.condition.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
 
         ## Is the lane free?
         vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)
         
         # lane is free if there are no vehicles ahead
-        self.bb_condition.free = True if not vehicle_ahead else False
+        self.know_repo.condition.free = True if not vehicle_ahead else False
         
         ## Is the obstacle stopped?
-        if(self.bb_condition.free == False): #There is a vehicle in the lane
-            self.bb_condition.stopped = is_stopped(vehicle_ahead[1])
+        if(self.know_repo.condition.free == False): #There is a vehicle in the lane
+            self.know_repo.condition.stopped = is_stopped(vehicle_ahead[1])
             
     def build(self):
         # Coordinate Maneuvers and Conditions
