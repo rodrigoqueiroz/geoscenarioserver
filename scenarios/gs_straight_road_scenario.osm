@@ -33,14 +33,8 @@
   <node id='-101759' action='modify' visible='true' lat='49.00778602145' lon='8.45784874473'>
     <tag k='agentspeed' v='7' />
   </node>
-<<<<<<< HEAD
-  <node id='-24' action='modify' visible='true' lat='49.00724799424' lon='8.45715702989'>
-    <tag k='btree' v='reverse_scenario_tree' />
-    <tag k='cycles' v='1' />
-=======
   <node id='-101760' action='modify' visible='true' lat='49.00728001001' lon='8.45719531171'>
     <tag k='btree' v='lanechange_scenario_tree' />
->>>>>>> abd18c2b50704610cac56a0ff23e3fb95cb950aa
     <tag k='gs' v='vehicle' />
     <tag k='name' v='lane_change_vehicle' />
     <tag k='orientation' v='325' />
@@ -53,18 +47,6 @@
   </node>
   <node id='-101762' action='modify' visible='true' lat='49.00723471616' lon='8.45706195698'>
     <tag k='btree' v='drive_scenario_tree' />
-<<<<<<< HEAD
-    <tag k='cycles' v='1' />
-    <tag k='gs' v='vehicle_disabled' />
-    <tag k='name' v='v2' />
-    <tag k='orientation' v='0' />
-    <tag k='path' v='path2' />
-    <tag k='simid' v='2' />
-    <tag k='speed' v='30' />
-    <tag k='start' v='yes' />
-  </node>
-  <node id='-30' action='modify' visible='true' lat='49.00732302363' lon='8.45719005607'>
-=======
     <tag k='gs' v='vehicle' />
     <tag k='name' v='ego_placeholder' />
     <tag k='orientation' v='325' />
@@ -72,7 +54,6 @@
     <tag k='vid' v='1' />
   </node>
   <node id='-101763' action='modify' visible='true' lat='49.00732302363' lon='8.45719005607'>
->>>>>>> abd18c2b50704610cac56a0ff23e3fb95cb950aa
     <tag k='agentspeed' v='1' />
   </node>
   <node id='-101764' action='modify' visible='true' lat='49.00747917892' lon='8.45739314388'>
