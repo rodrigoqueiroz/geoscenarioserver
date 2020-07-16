@@ -89,28 +89,54 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     target_vid = mconfig.target_vid
     target_t = mconfig.time.value
     time_gap = mconfig.time_gap
+    acc = -mconfig.decel.value
     #distance = mconfig.distance
     min_d = lane_config.right_bound + VEHICLE_RADIUS
     max_d = lane_config.left_bound - VEHICLE_RADIUS
     d_samples = NUM_SAMPLING_D
     
     #Pre conditions. Can the vehicle be followed?
-    vehicle = vehicles[target_vid]
+    leading_vehicle = vehicles[target_vid]
     #Is target ahead?
-    if (s_start[0] >= vehicle.vehicle_state.s):
+    if (s_start[0] >= leading_vehicle.vehicle_state.s):
         return
     #Is target on the same lane?
     #TODO
+    
+    # check if need to deccel to increase gap
+    dist_between_vehicles = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - s_start[0] - VEHICLE_RADIUS
+    ttc = dist_between_vehicles / abs(s_start[1]) if s_start[1] != 0 else float('inf')
+    following_too_close = ttc < mconfig.time_gap
 
     #generate alternative targets:
     target_state_set = []
+        
     for t in mconfig.time.get_uniform_samples():
-        #longitudinal movement: goal is to keep safe distance from leading vehicle
-        s_lv = vehicle.future_state(t)[:3]
+        #longitudinal movement: goal is to keep safe distance from leading_vehicle
+        s_lv = leading_vehicle.future_state(t)[:3]
         s_target = [0,0,0]
-        s_target[0] = s_lv[0] - (time_gap * s_lv[1])     
-        s_target[1] = s_lv[1]                            
-        s_target[2] = s_lv[2]                            
+        if following_too_close:
+            # decelerate for t seconds to increase time gap
+            # s_target[2] = acc
+            # s_target[1] = s_start[1] + acc * t
+            # s_target[0] = s_lv[0] - (time_gap * s_target[1])
+            
+            # calculate exactly how long to decelerate for to achieve desired time gap
+            roots = np.roots([acc, s_start[1] - s_lv[1] + time_gap*acc, s_start[1] * time_gap])
+            time_to_gap = max(roots)
+            s_target[2] = acc
+            s_target[1] = s_start[1] + acc * time_to_gap
+            s_target[0] = s_lv[0] - (time_gap * s_target[1])
+
+            # calculate target v to make time gap 2s, keeping DISTANCE constant
+            # s_target[1] = dist_between_vehicles / time_gap
+            # s_target[0] = s_lv[0] - (time_gap * s_target[1])
+            # s_target[2] = (s_target[1] - s_start[1]) / t
+        else:
+            # match leading vehicle speed
+            s_target[0] = s_lv[0] - (time_gap * s_lv[1])
+            s_target[1] = s_lv[1]
+            s_target[2] = s_lv[2]
         #lateral movement
         for di in np.linspace(min_d, max_d, d_samples):
             d_target = [di,0,0] 
@@ -127,6 +153,9 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
 
      #cost
     best = min(trajectories, key=lambda x: follow_cost(x, mconfig, lane_config, vehicles, obstacles))
+
+    # eq = to_equation(differentiate(best[0]))
+    # print([ eq(t) for t in np.linspace(0, mconfig.time.value, 5) ])
    
     #return best trajectory, and candidates for debug
     return  best, list(trajectories)

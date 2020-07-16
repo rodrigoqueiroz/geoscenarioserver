@@ -70,6 +70,7 @@ class Dashboard(object):
             #trajectories = self.read_trajectories(self.traffic)
             #update stats
 
+
             #map chart dynamic content
             #self.plot_map_chart(vehicles)
 
@@ -428,8 +429,8 @@ class Dashboard(object):
                             'x_vel','y_vel', 
                             'x_acc','y_acc', 
                             'yaw','steer', 
-                            's','s vel','s acc',
-                            'd','d vel','d acc')
+                            's','d','s vel',
+                            'd vel','s acc','d acc')
         tab.heading("#0", text='actor', anchor='w')
         tab.column("#0", anchor="w" , width=100)
         for col in tab['columns']:

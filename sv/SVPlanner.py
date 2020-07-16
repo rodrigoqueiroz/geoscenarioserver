@@ -138,8 +138,6 @@ class SVPlanner(object):
             #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #print((new_s_vector[0], new_d_vector[0]))
             
-
-
             #Maneuver Tick
             if mconfig and lane_config:
                 #replan maneuver
