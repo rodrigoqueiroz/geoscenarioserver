@@ -7,7 +7,7 @@
 # dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
 # --------------------------------------------
 
-from multiprocessing import shared_memory, Lock
+from multiprocessing import shared_memory, Lock, Manager
 import threading
 import math
 import numpy as np
@@ -28,6 +28,7 @@ class SimTraffic(object):
         self.sim_client_shm = None
         #Internal ShM
         self.traffic_state_sharr = None
+        self.debug_shdata = None
     
     def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root = "drive_tree", start_state_in_frenet=False):
         v = SV(vid, name, btree_root, start_state, 1.0, self.lanelet_map, lanelet_route, start_state_in_frenet=start_state_in_frenet)
@@ -48,7 +49,7 @@ class SimTraffic(object):
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
             if not vehicle.is_remote:
-                vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr)
+                vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr, self.debug_shdata)
     
     def stop_all(self):
         for vid in self.vehicles:
@@ -74,6 +75,8 @@ class SimTraffic(object):
         
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
+
+        #print(self.debug_shdata)
     
     
     #Shared Memory:
@@ -87,6 +90,9 @@ class SimTraffic(object):
         r = nv+1 #+1 for header
         c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 #+1 for vid
         self.traffic_state_sharr = Array('f', r*c )
+
+        #Internal Debug Shared Data
+        self.debug_shdata = Manager().dict()
 
 
     def write_traffic_state(self, tick_count, delta_time, sim_time):
