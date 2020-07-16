@@ -57,7 +57,7 @@ class BTreeModel(object):
     def lanechange_tree(self, planner_state, target=0):
         mconfig = MLaneSwerveConfig(target)
 
-        mconfig = MCutInConfig(2)
+        mconfig = MCutInConfig(1)
 
         return mconfig
 

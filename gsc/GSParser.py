@@ -49,6 +49,7 @@ class GSParser(object):
         self.locations = {}
         self.triggers = {}
         self.paths = {}
+        self.routes = {}
 
         self.report = Report() 
 
@@ -97,6 +98,7 @@ class GSParser(object):
                 if way.tags["gs"] == "staticobject": self.check_static_object(way)  
                 elif way.tags["gs"] == "location": self.check_location(way) 
                 elif way.tags["gs"] == "path": self.check_path(way) 
+                elif way.tags["gs"] == "route": self.check_route(way) 
         
         #Return result
         return self.isValid
@@ -135,30 +137,30 @@ class GSParser(object):
         self.pedestrians[n.tags["name"]] = n
 
     def check_vehicle(self, n):
-        mandatory = {"gs","name"}
+        mandatory = {"gs","vid","name"}
         optional = {
             "orientation","speed","path","cycles",
             "usespeedprofile","start","group", "simid",
-            "btree"}
+            "btree", "route"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
-        speed = n.tags['speed']
-
-        if not Utils.is_positive_number(speed):
-            speed_range = Utils.get_number_range(speed)
-            if speed_range is not None:
-                if not Utils.is_valid_number_range(speed_range[0],speed_range[1],0,100):
-                    self.report.log_error("Invalid speed range")
-            else:
-                speed_list = Utils.get_numberlist(speed)
-                if speed_list is not None:
-                    if not Utils.is_valid_numberlist(speed_list,0,100):
-                        self.report.log_error("Element "+n.id +". Invalid speed list " + str(speed_list))
+        if ("speed" in n.tags):
+            speed = n.tags['speed']
+            if not Utils.is_positive_number(speed):
+                speed_range = Utils.get_number_range(speed)
+                if speed_range is not None:
+                    if not Utils.is_valid_number_range(speed_range[0],speed_range[1],0,100):
+                        self.report.log_error("Invalid speed range")
                 else:
-                    self.report.log_error("Invalid speed value")
+                    speed_list = Utils.get_numberlist(speed)
+                    if speed_list is not None:
+                        if not Utils.is_valid_numberlist(speed_list,0,100):
+                            self.report.log_error("Element "+n.id +". Invalid speed list " + str(speed_list))
+                    else:
+                        self.report.log_error("Invalid speed value")
         
-        self.vehicles[n.tags["name"]] = n
+        self.vehicles[n.tags["vid"]] = n
 
     def check_traffic_light(self, n):
         mandatory = {"gs","name","states"}
@@ -177,6 +179,16 @@ class GSParser(object):
         #todo: check nd and their ids
         assert len(n.nodes) > 0
         self.paths[n.tags['name']] = n
+        return None
+    
+    def check_route(self, n:Way): #:Way
+        mandatory = {"gs","name"}
+        optional = {}
+        self.check_tags(n, mandatory, optional)
+        self.check_uniquename(n)
+        #todo: check nd and their ids
+        assert len(n.nodes) > 0
+        self.routes[n.tags['name']] = n
         return None
 
     #== Logical
