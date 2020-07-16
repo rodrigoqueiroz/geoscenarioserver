@@ -133,13 +133,13 @@ class SV(Vehicle):
     #     ] 
     #     return state
 
-    def start_planner(self, nvehicles, sim_config, traffic_state_sharr ):
+    def start_planner(self, nvehicles, sim_config, traffic_state_sharr, debug_shdata ):
         """For simulated vehicles controlled by SVPlanner.
             If a planner is started, the vehicle can't have a remote.
             Use either option (start_planner or start_remote).
         """
         self.is_remote = False
-        self.sv_planner = SVPlanner(self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr)
+        self.sv_planner = SVPlanner(self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr,debug_shdata)
         self.sv_planner.start()
     
     def stop(self):

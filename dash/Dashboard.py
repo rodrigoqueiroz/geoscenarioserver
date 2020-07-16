@@ -42,17 +42,22 @@ class Dashboard(object):
             print ("Dashboard will not start")
             return
 
-        self._traffic_state_sharr = self.traffic.traffic_state_sharr
-        if not (self._traffic_state_sharr):
-            print ("Dashboard cannot start before traffic")
+        if not self.traffic:
+            print ("Dashboard requires a traffic to start")
+            return
+
+        if not (self.traffic.traffic_state_sharr):
+            print ("Dashboard can not start before traffic")
             return
 
         self.nvehicles = len(self.traffic.vehicles)
         self.lanelet_map = self.traffic.lanelet_map
-        self._process = Process(target=self.run_dash_process, args=(self._traffic_state_sharr,), daemon = True)  
+        self._process = Process(target=self.run_dash_process, 
+                                args=(self.traffic.traffic_state_sharr, self.traffic.debug_shdata), 
+                                daemon = True)  
         self._process.start()
 
-    def run_dash_process(self, traffic_state_sharr):
+    def run_dash_process(self, traffic_state_sharr, debug_shdata):
         
         self.window = self.create_gui()
         sync_dash = TickSync(DASH_RATE,realtime = True, block=True, verbose=False, label="DP")
@@ -78,7 +83,10 @@ class Dashboard(object):
             self.plot_cartesian_chart(vehicles,self.center_vid)
             
             #Frenet frame plot
-            self.plot_frenet_chart(vehicles,self.center_vid)
+            if FFPLOT_LITE:
+                self.plot_frenet_chart_lite(vehicles,self.center_vid)
+            else:
+                self.plot_frenet_chart(debug_shdata,self.center_vid)
             
             #Vehicles Table
             self.tab.delete(*self.tab.get_children())
@@ -224,7 +232,70 @@ class Dashboard(object):
         plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0) 
         #fig.tight_layout(pad=0.05)
 
-    def plot_frenet_chart(self,vehicles,center_vid):
+    def plot_frenet_chart(self,debug_shdata,center_vid):
+        #Frenet Frame plot
+        fig = plt.figure(Dashboard.FRE_FIG_ID)
+        plt.cla()
+        gca = plt.gca()
+
+        #data
+        vehicle_state, traj, cand, traffic_vehicles, lane_config  = debug_shdata[center_vid]
+        
+        #road
+        
+        #0 lines
+        #plt.axhline(0, color="black")
+        #plt.axvline(0, color="black")
+        #Lane lines
+        plt.axhline(lane_config.left_bound, color="black", linestyle='--')
+        plt.axhline(lane_config.right_bound, color="black", linestyle='--')
+        #lables
+        plt.title("Frenet Frame. Vehicle {}:".format(center_vid))
+        plt.xlabel('S')
+        plt.ylabel('D')
+        
+        #other vehicles, from main vehicle POV:
+        for vid in traffic_vehicles:
+            vs = traffic_vehicles[vid].vehicle_state
+            plt.plot( vs.s, vs.d, "v")
+            circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
+            gca.add_artist(circle1)
+            #label = "vid {}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
+            label = "vid {}".format(int(vid))
+            gca.text(vs.s, vs.d+1.5, label)
+
+        #main vehicle
+        if cand:
+            for t in cand:
+                Dashboard.plot_trajectory(t[0], t[1], t[2])
+        if traj:
+            Dashboard.plot_trajectory(traj[0], traj[1], traj[2], 'blue')
+        
+        vs = vehicle_state
+        vid = center_vid
+        plt.plot( vs.s, vs.d, "v")
+        circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
+        gca.add_artist(circle1)
+        #label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
+        label = "vid {} | [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
+        gca.text(vs.s, vs.d+1.5, label)
+        
+        # update lane config based on current (possibly outdated) reference frame
+        #lane_config = self.read_map(vehicle_state, self.reference_path)
+
+        #layout
+        plt.grid(True)
+        #Center plot around main vehicle
+        x_lim_a = vs.s - ( (1/3) * FFPLOT_LENGTH )   #1/3 before vehicle
+        x_lim_b = vs.s + ( (2/3) * FFPLOT_LENGTH )   #2/3 ahead
+        plt.xlim(x_lim_a,x_lim_b)
+        plt.ylim(vs.d-8,vs.d+8)
+        #plt.gca().set_aspect('equal', adjustable='box')
+        #fig.patch.set_facecolor('lightgray')
+        #fig.tight_layout(pad=0.05)
+
+
+    def plot_frenet_chart_lite(self,vehicles,center_vid):
         #Frenet Frame plot
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()

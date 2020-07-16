@@ -37,6 +37,7 @@ def start_server(args):
     #GUI / Debug screen
     dashboard = Dashboard(traffic, PLOT_VID)
     
+    
     #SIM EXECUTION START
     print ('SIMULATION START')
     traffic.start()
