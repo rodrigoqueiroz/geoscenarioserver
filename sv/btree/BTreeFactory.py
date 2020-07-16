@@ -3,6 +3,7 @@
 
 from py_trees import *
 from sv.btree.BTree import *
+from sv.btree.DriveAimlesslyTree import *
 from sv.btree.LaneChangeTree import *
 from sv.btree.DriveSubtree import *
 
@@ -20,11 +21,11 @@ class BTreeFactory(object):
             tree = LaneChangeTree(self.vid, self.goal)
         elif self.name == "drive":
             tree = DriveSubtree(self.vid, self.goal)
+        elif self.name == "alice" or self.name == "aimless_driver":
+            tree = DriveAimlesslyTree(self.vid, self.goal)
         elif self.name == "default":
             tree = DriveSubtree(self.vid, self.goal)
-        elif self.name == "idler" or self.name == "idle":
-            tree = BTree(self.vid, self.goal)
         else:
-            raise RuntimeError("Could not setup Vehicle's " + self.vid + " behavior.")
+            raise RuntimeError("Could not set Vehicle " + self.vid + " up behavior.")
             
         return tree
