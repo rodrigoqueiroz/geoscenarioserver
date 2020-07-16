@@ -15,14 +15,9 @@ TRAFFIC_RATE = 30          #global tick rate
 
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
-<<<<<<< HEAD
-DASH_RATE = 20              #dash tick rate. Max is traffic rate.
-PLOT_VID = 2               	#vehicle to center the main plot arouund. Make sure there existis a vehicle with this id
-=======
 DASH_RATE = 30              #dash tick rate. Max is traffic rate.
 PLOT_VID = 2               	#vehicle to center the main plot arouund. Make sure there existis a vehicle with this id
 #Frenet
->>>>>>> a762d4a89374565e738f4e82a0dac499b365a997
 FFPLOT_ASPECT = False  		#frenet frame plot: keep S and D aspect ratio (same scale)
 FFPLOT_LENGTH = 100			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
