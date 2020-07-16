@@ -106,19 +106,13 @@ class Action(behaviour.Behaviour):
         self.logger.debug("  %s [Action::update()]" % self.name)
 
         status = None
-        #if (self.know_repo.maneuver.get_status() == ManeuverStatus.INIT):
-        #    status = common.Status.RUNNING
-        #    self.know_repo.maneuver.update_status(ManeuverStatus.RUNNING)
         if (self.know_repo.maneuver.get_status() == ManeuverStatus.SUCCESS):
             status =  common.Status.SUCCESS
-            self.know_repo.maneuver.update_status(ManeuverStatus.INIT) # reset
         elif (self.know_repo.maneuver.get_status() == ManeuverStatus.FAILURE):
             status = common.Status.FAILURE
-            self.know_repo.maneuver.update_status(ManeuverStatus.INIT) # reset
         else:
             status = common.Status.RUNNING
             self.know_repo.maneuver.update_status(ManeuverStatus.RUNNING)
-        
         
         return status
 

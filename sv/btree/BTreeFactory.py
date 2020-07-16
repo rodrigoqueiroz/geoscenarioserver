@@ -21,5 +21,7 @@ class BTreeFactory(object):
             tree = DriveTree(self.vid, self.goal)
         elif self.name == "default":
             tree = DriveTree(self.vid, self.goal)
+        else:
+            raise RuntimeError("Could not setup Vehicle's " + vid + " behavior.")
             
         return tree
