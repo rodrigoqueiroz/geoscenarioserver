@@ -34,6 +34,7 @@ class BTree(object):
 
         self.tree.root.tick_once()
         curr_man = self.know_repo.maneuver
+        print("[Vehicle "+str(self.vid)+"] "+str(curr_man))
         curr_man.reconfigure(planner_state)
 
         return curr_man.get_config(), False

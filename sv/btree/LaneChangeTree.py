@@ -21,8 +21,8 @@ class LaneChangeTree(BTree):
         super().__init__(vid, goal)
 
         # Configure Blackboard
-        self.know_repo.register_key(key="/condition/free", access=common.Access.WRITE)
-        self.know_repo.condition.free = False
+        self.know_repo.register_key(key="/condition/occupied", access=common.Access.WRITE)
+        self.know_repo.condition.occupied = False
         self.know_repo.register_key(key="/condition/slow_vehicle", access=common.Access.WRITE)
         self.know_repo.condition.slow_vehicle = False
         self.know_repo.register_key(key="/condition/accpt_gap", access=common.Access.WRITE)
@@ -83,10 +83,10 @@ class LaneChangeTree(BTree):
         vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)
         
         # lane is free if there are no vehicles ahead
-        self.know_repo.condition.free = True if not vehicle_ahead else False
+        self.know_repo.condition.occupied = True if vehicle_ahead else False
 
         ## Is the obstacle stopped?
-        if(self.know_repo.condition.free == False): #There is a vehicle in the lane
+        if(self.know_repo.condition.occupied == True): #There is a vehicle in the lane
             self.know_repo.condition.slow_vehicle = is_slow_vehicle(planner_state.vehicle_state, vehicle_ahead[1])
         
         self.know_repo.condition.accpt_gap = not reached_acceptance_gap(planner_state.vehicle_state, planner_state.lane_config, planner_state.traffic_vehicles)

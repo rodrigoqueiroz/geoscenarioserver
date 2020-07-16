@@ -41,8 +41,8 @@ class Maneuver(object):
         try:
             exec(self.policy)
             if self.policy == "": self.config = self.default_config
-        except RuntimeError as e:
-            print("[Error] " + e)
+        except Exception as e:
+            print("[Error] " + str(e))
             print("Failed to reconfigure " + self.m_id + " setting the default configuration...")
             self.config = self.default_config
     

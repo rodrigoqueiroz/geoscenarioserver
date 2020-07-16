@@ -26,8 +26,8 @@ class DriveTree(BTree):
         # Configure Blackboard
         self.know_repo.register_key(key="/condition/endpoint", access=common.Access.WRITE)
         self.know_repo.condition.endpoint = True
-        self.know_repo.register_key(key="/condition/free", access=common.Access.WRITE)
-        self.know_repo.condition.free = False
+        self.know_repo.register_key(key="/condition/occupied", access=common.Access.WRITE)
+        self.know_repo.condition.occupied = False
         self.know_repo.register_key(key="/condition/stopped", access=common.Access.WRITE)
         self.know_repo.condition.stopped = False
 
@@ -39,7 +39,7 @@ class DriveTree(BTree):
         
         # Conditions List
         self.end_point = Condition("endpoint")
-        self.free = Condition("free")
+        self.occupied = Condition("occupied")
         self.stp_vehicle = Condition("stopped")
 
         self.root, self.tree = self.build()
@@ -52,7 +52,7 @@ class DriveTree(BTree):
         return ManeuverStatus.SUCCESS
 
     def get_stop_status(self, planner_state):
-        return ManeuverStatus.SUCCESS
+        return ManeuverStatus.SUCCESS if planner_state.vehicle_state.s_vel < 0.1 else ManeuverStatus.RUNNING
 
     def get_follow_status(self, planner_state):
         return ManeuverStatus.SUCCESS
@@ -80,10 +80,10 @@ class DriveTree(BTree):
         vehicle_ahead = get_vehicle_ahead(planner_state.vehicle_state, planner_state.lane_config,planner_state.traffic_vehicles)
         
         # lane is free if there are no vehicles ahead
-        self.know_repo.condition.free = True if not vehicle_ahead else False
+        self.know_repo.condition.occupied = True if vehicle_ahead else False
         
         ## Is the obstacle stopped?
-        if(self.know_repo.condition.free == False): #There is a vehicle in the lane
+        if(self.know_repo.condition.occupied == True): #There is a vehicle in the lane
             self.know_repo.condition.stopped = is_stopped(vehicle_ahead[1])
             
     def build(self):
@@ -94,11 +94,11 @@ class DriveTree(BTree):
         occ_lane = composites.Selector("Occupied Lane")
         occ_lane.add_children([stp_obstc, self.follow_obstc])
 
-        free_lane = composites.Sequence("Free Lane")
-        free_lane.add_children([self.free, self.kp_vel])
+        free_lane = composites.Sequence("Not Free Lane")
+        free_lane.add_children([self.occupied, occ_lane])
 
         traj_follow = composites.Selector("Follow Trajectory")
-        traj_follow.add_children([free_lane, occ_lane])
+        traj_follow.add_children([free_lane, self.kp_vel])
 
         reached_end_point = composites.Sequence("Reached End Point")
         reached_end_point.add_children([self.end_point, self.stop_self2])
