@@ -2,6 +2,7 @@
 #dinizr@chalmers.se
 
 from py_trees import *
+from sv.btree.BTree import *
 from sv.btree.LaneChangeTree import *
 from sv.btree.DriveTree import *
 
@@ -21,7 +22,9 @@ class BTreeFactory(object):
             tree = DriveTree(self.vid, self.goal)
         elif self.name == "default":
             tree = DriveTree(self.vid, self.goal)
+        elif self.name == "idler" or self.name == "idle":
+            tree = BTree(self.vid, self.goal)
         else:
-            raise RuntimeError("Could not setup Vehicle's " + vid + " behavior.")
+            raise RuntimeError("Could not setup Vehicle's " + self.vid + " behavior.")
             
         return tree
