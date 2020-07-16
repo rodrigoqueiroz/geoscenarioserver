@@ -35,7 +35,7 @@ def start_server(args):
     
     
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, PLOT_VID)
+    dashboard = Dashboard(traffic, sim_config.plot_vid)
     
     
     #SIM EXECUTION START
@@ -97,6 +97,8 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     
     sim_config.scenario_name = parser.globalconfig.tags['name']
     sim_config.timeout = parser.globalconfig.tags['timeout']
+    if 'plotvid' in parser.globalconfig.tags:
+        sim_config.plot_vid = parser.globalconfig.tags['plotvid']
     
     #map
     map_file = 'scenarios/' + parser.globalconfig.tags['lanelet']

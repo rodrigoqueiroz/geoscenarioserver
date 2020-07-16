@@ -56,7 +56,7 @@ class BTreeModel(object):
 
 
     def lanechange_tree(self, planner_state, target=0):
-        mconfig = MLaneSwerveConfig(target)
+        # mconfig = MLaneSwerveConfig(target)
 
         mconfig = MCutInConfig(1)
 
@@ -68,9 +68,10 @@ class BTreeModel(object):
         """ Controls switching of behaviour trees (not maneuvers)
         """
         # print('{} lane change scenario tree'.format(sim_time))
+        cutin_trigger_time = 5
         ref_path_changed = False
 
-        if planner_state.sim_time < 3:
+        if planner_state.sim_time < cutin_trigger_time:
             self.tree_args = {}
             self.tree = self.drive_tree
         elif (type(self.mconfig) == MLaneSwerveConfig and lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig)) or (
@@ -78,8 +79,8 @@ class BTreeModel(object):
             self.tree_args = {}
             self.tree = self.drive_tree
             ref_path_changed = True
-        elif planner_state.sim_time < 4:
-            self.tree_args = { "target": 1 }
+        elif planner_state.sim_time < cutin_trigger_time + 1:
+            self.tree_args = { "target": -1 }
             self.tree = self.lanechange_tree
         
         return self.tree(planner_state, **self.tree_args), ref_path_changed

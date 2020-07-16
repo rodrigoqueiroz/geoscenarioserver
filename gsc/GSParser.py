@@ -237,7 +237,7 @@ class GSParser(object):
     
     def check_global_config(self, n):
         mandatory = {"gs","version","name","lanelet","timeout",}
-        optional = {"collision","notes","metric","mutate","optimize","optmetric",}
+        optional = {"collision","notes","metric","mutate","optimize","optmetric","plotvid",}
         self.check_tags(n, mandatory, optional)
         if self.globalconfig is not None:
             self.report.log_error( "Element " + n.id + ": Duplicate Global Config node. Must be unique")
@@ -267,13 +267,15 @@ class GSParser(object):
         
         #duplicates
         if ( len(tags_list) != len(actual_set)):
-            self.report.log_error( "Element " + n.id 
-                + " contains duplicate tags: " + str(tags_list))
+            self.report.log_error("Element {} contains duplicate tags: {}".format(
+                n.id, tags_list
+            ))
 
         #mandatory tags
         if not mandatory_set.issubset(actual_set):
-            self.report.log_error( "Element " + n.id 
-                + " missing mandatory tags: " + str(mandatory_set - actual_set))
+            self.report.log_error("Element {} missing mandatory tags: {}".format(
+                n.id, mandatory_set - actual_set
+            ))
 
         #all tags
         if not actual_set.issubset(expected_set):

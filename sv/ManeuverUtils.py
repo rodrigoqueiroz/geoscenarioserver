@@ -58,9 +58,8 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
             #     is_following = True
             #     leading_vid = vid
             # if not moving, determine if too close (one car width's apart)
-            if (0 < dist < VEHICLE_RADIUS * 10) or (0 <= ttc < time_gap):
+            if (0 < dist < VEHICLE_RADIUS * 5) or (0 <= ttc < time_gap):
                 if dist < closest_dist:
-                    # TODO follow not working? time gap doesn't seem to be correct
                     # print("{} is leading by {}".format(vid, ttc))
                     is_following = True
                     leading_vid = vid
