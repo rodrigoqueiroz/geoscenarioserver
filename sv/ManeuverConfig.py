@@ -14,6 +14,7 @@ M_FOLLOW = 2
 M_LANESWERVE = 3
 M_CUTIN = 4
 M_STOP = 5
+M_REVERSE = 6
 
 #Feasibility Constants
 
@@ -106,6 +107,12 @@ class MVelKeepConfig:
     vel:MP = MP(14.0,10,6)          #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
     mkey:int = M_VELKEEP
+
+@dataclass
+class MReverseConfig:
+    vel:MP = MP(7.0,10,6)           #velocity in [m/s] as MP
+    time:MP = MP(4.0,10,3)          #duration in [s] as MP
+    mkey:int = M_REVERSE
 
 @dataclass
 class MStopConfig:

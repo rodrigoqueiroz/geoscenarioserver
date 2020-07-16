@@ -20,14 +20,12 @@ class BTreeModel(object):
         self.tree_args = {}
         self.reached_goal = False   # for drive tree
 
-
     def tick(self, planner_state):
         mconfig, ref_path_changed = getattr(self, self.tree_name)(planner_state)
         
         self.mconfig = mconfig
         return self.mconfig, ref_path_changed
         
-    
     def drive_tree(self, planner_state, **kwargs):
         """ Driving on route and alternating between 
             velocity keeping if road ahead is free
@@ -50,7 +48,11 @@ class BTreeModel(object):
             mconfig = MStopConfig()
         
         return mconfig
-        
+
+    def reverse_tree(self, planner_state, **kwargs):
+        mconfig = MReverseConfig()
+        return mconfig
+
 
     def lanechange_tree(self, planner_state, target=0):
         mconfig = MLaneSwerveConfig(target)
@@ -84,3 +86,7 @@ class BTreeModel(object):
     def drive_scenario_tree(self, planner_state):
         tree = self.drive_tree(planner_state)
         return tree, False
+    
+    def reverse_scenario_tree(self, planner_state):
+        self.tree = self.reverse_tree
+        return self.tree(planner_state), False

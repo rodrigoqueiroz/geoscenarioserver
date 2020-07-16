@@ -19,6 +19,9 @@ def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_v
     #Micro maneuver layer
     if (man_key==M_VELKEEP):
         planner = plan_velocity_keeping
+    elif (man_key==M_REVERSE):
+        mconfig.vel.value = -mconfig.vel.value
+        planner = plan_velocity_keeping
     elif (man_key==M_STOP):
         planner = plan_stop
     elif (man_key==M_FOLLOW):
