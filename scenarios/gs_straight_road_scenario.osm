@@ -1,98 +1,89 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' upload='true' generator='JOSM'>
-  <node id='-1' action='modify' visible='true' lat='49.00731806199' lon='8.45754913699'>
-    <tag k='gs' v='globalconfig' />
-    <tag k='version' v='2.0' />
-    <tag k='name' v='Straight Road Scenario' />
-    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
-    <tag k='timeout' v='10' />
+<osm version='0.6' generator='JOSM'>
+  <node id='-101752' action='modify' visible='true' lat='49.00786131385' lon='8.45736107875'>
     <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='name' v='Straight Road Scenario' />
+    <tag k='timeout' v='10' />
+    <tag k='version' v='2.0' />
   </node>
-  
-  <node id='-8' action='modify' visible='true' lat='49.00731806199' lon='8.45754913699'>
+  <node id='-101753' action='modify' visible='true' lat='49.00822161311' lon='8.45831270129'>
     <tag k='gs' v='egogoal' />
     <tag k='name' v='goal_1' />
     <tag k='scenario' v='egogoal' />
   </node>
-  <node id='-10' action='modify' visible='true' lat='49.00841978917' lon='8.45727445199'>
+  <node id='-101754' action='modify' visible='true' lat='49.00841978917' lon='8.45727445199'>
     <tag k='gs' v='egostart' />
     <tag k='orientation' v='45' />
     <tag k='rotation' v='45' />
   </node>
-  <node id='-12' action='modify' visible='true' lat='49.00730754336' lon='8.45723535821'>
+  <node id='-101755' action='modify' visible='true' lat='49.00730754336' lon='8.45723535821'>
     <tag k='agentspeed' v='1' />
   </node>
-  <node id='-14' action='modify' visible='true' lat='49.00817624551' lon='8.45835927518'>
+  <node id='-101756' action='modify' visible='true' lat='49.00817624551' lon='8.45835927518'>
     <tag k='agentspeed' v='0' />
   </node>
-  <node id='-16' action='modify' visible='true' lat='49.00750211699' lon='8.4574959883'>
+  <node id='-101757' action='modify' visible='true' lat='49.00750211699' lon='8.4574959883'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-18' action='modify' visible='true' lat='49.00797575285' lon='8.45810827706'>
+  <node id='-101758' action='modify' visible='true' lat='49.00797575285' lon='8.45810827706'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-20' action='modify' visible='true' lat='49.00778602145' lon='8.45784874473'>
+  <node id='-101759' action='modify' visible='true' lat='49.00778602145' lon='8.45784874473'>
     <tag k='agentspeed' v='7' />
   </node>
-  <node id='-22' action='modify' visible='true' lat='49.00724799424' lon='8.45715702989'>
+  <node id='-101760' action='modify' visible='true' lat='49.00728001001' lon='8.45719531171'>
     <tag k='btree' v='lanechange_scenario_tree' />
-    <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
-    <tag k='name' v='v1' />
-    <tag k='orientation' v='0' />
-    <tag k='path' v='path1' />
-    <tag k='simid' v='1' />
-    <tag k='speed' v='30' />
-    <tag k='start' v='yes' />
+    <tag k='name' v='lane_change_vehicle' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='right_route' />
+    <tag k='vid' v='2' />
   </node>
-  <node id='-24' action='modify' visible='true' lat='49.00719807093' lon='8.45708720441'>
+  <node id='-101761' action='modify' visible='true' lat='49.00790482164' lon='8.45736112446'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-26' action='modify' visible='true' lat='49.00723588337' lon='8.45706521059'>
+  <node id='-101762' action='modify' visible='true' lat='49.00723471616' lon='8.45706195698'>
     <tag k='btree' v='drive_scenario_tree' />
-    <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
-    <tag k='name' v='v2' />
-    <tag k='orientation' v='0' />
-    <tag k='path' v='path2' />
-    <tag k='simid' v='2' />
-    <tag k='speed' v='30' />
-    <tag k='start' v='yes' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='left_route' />
+    <tag k='vid' v='1' />
   </node>
-  <node id='-28' action='modify' visible='true' lat='49.00732302363' lon='8.45719005607'>
+  <node id='-101763' action='modify' visible='true' lat='49.00732302363' lon='8.45719005607'>
     <tag k='agentspeed' v='1' />
   </node>
-  <node id='-30' action='modify' visible='true' lat='49.00747917892' lon='8.45739314388'>
+  <node id='-101764' action='modify' visible='true' lat='49.00747917892' lon='8.45739314388'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-32' action='modify' visible='true' lat='49.00762103721' lon='8.45758083134'>
+  <node id='-101765' action='modify' visible='true' lat='49.00762103721' lon='8.45758083134'>
     <tag k='agentspeed' v='7' />
   </node>
-  <node id='-34' action='modify' visible='true' lat='49.00787146676' lon='8.45789593045'>
+  <node id='-101766' action='modify' visible='true' lat='49.00787146676' lon='8.45789593045'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-36' action='modify' visible='true' lat='49.00807590857' lon='8.45815373212'>
+  <node id='-101767' action='modify' visible='true' lat='49.00807590857' lon='8.45815373212'>
     <tag k='agentspeed' v='0' />
   </node>
-  <way id='-38' action='modify' visible='true'>
-    <nd ref='-12' />
-    <nd ref='-16' />
-    <nd ref='-20' />
-    <nd ref='-18' />
-    <nd ref='-14' />
-    <tag k='gs' v='path' />
-    <tag k='name' v='path1' />
-    <tag k='virtual' v='no' />
+  <way id='-101782' action='modify' visible='true'>
+    <nd ref='-101755' />
+    <nd ref='-101757' />
+    <nd ref='-101759' />
+    <nd ref='-101758' />
+    <nd ref='-101756' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='right_route' />
   </way>
-  <way id='-40' action='modify' visible='true'>
-    <nd ref='-28' />
-    <nd ref='-30' />
-    <nd ref='-32' />
-    <nd ref='-34' />
-    <nd ref='-36' />
-    <tag k='gs' v='path' />
-    <tag k='name' v='path2' />
-    <tag k='virtual' v='no' />
+  <way id='-101783' action='modify' visible='true'>
+    <nd ref='-101763' />
+    <nd ref='-101764' />
+    <nd ref='-101765' />
+    <nd ref='-101766' />
+    <nd ref='-101767' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route' />
   </way>
 </osm>

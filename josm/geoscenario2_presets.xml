@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <presets xmlns="http://josm.openstreetmap.de/tagging-preset-1.0"
-	author="rqueiroz@gsd.uwaterloo.ca"
-	version="1.1"
-	shortdescription="GeoScenario Presets">
+	author="rqueiroz@uwaterloo.ca"
+	version="2.0"
+	shortdescription="GeoScenario 2.0 Presets">
 
-<group  name="GeoScenario Tools" icon="gs.png">
+<group  name="GeoScenario 2 Tools" icon="gs.png">
 
 	<!-- GLOBAL CONFIG OPTIONS -->
 
 	<item name="GS Global Config" icon="config.png" type="node" preset_name_label="true">
 		<key key="gs" value="globalconfig" />
-		<key key="version" value="1.1" />
+		<key key="version" value="2.0" />
 		<space/>
 		<label text="Global Scenario Configuration" />
 		<item_separator />
@@ -152,11 +152,18 @@
 		<label text="GeoScenario Vehicle" />
 		<item_separator />
 
+		<text key="vid" text="* VID " />
 		<text key="name" text="* Name " />
+		<text key="orientation" text="Orientation[](deg)" />
 		<item_separator />
 
-		<label text="Initial Attributes" />
-		<text key="orientation" text="Orientation[](deg)" />
+		<label text="Dynamic Behavior (SimVehicle)"/>
+		<text key="route" text="Route ID" />
+		<text key="btree" text="BehaviorTree (root)" />
+		<check key="remote" text="Remote Vehicle?" />
+		<item_separator />
+
+		<label text="Fixed Behavior"/>
 		<text key="speed" text="Speed[](km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 for infinite)" default="1" />
@@ -173,6 +180,19 @@
 
 	<!-- PATHS AND LOCATIONS -->
 
+	<item name="Route" type="way"  icon="path.png" preset_name_label="true">
+		<key key="gs" value="route" />
+		<space/>
+		<label text="GeoScenario Route for Dynamic Agents" />
+		<item_separator />
+		
+		<text key="name" text="Name " />
+		<item_separator />
+
+		<text key="group" text="Group (list) " />
+		<item_separator />
+
+  	</item>
 
    <item name="Path" type="way"  icon="path.png" preset_name_label="true">
 		<key key="gs" value="path" />
@@ -188,6 +208,8 @@
 		<item_separator />
 
   	</item>
+
+
 
   	<item name="Node speed profile" type="node"  preset_name_label="true">
 		<label text="Node speed profile for a path" />
