@@ -3,7 +3,7 @@
 
 from py_trees import *
 from sv.btree.BTree import * 
-from sv.btree.DriveTree import * 
+from sv.btree.DriveSubtree import * 
 from sv.btree.BTreeLeaves import * 
 from sv.VehicleState import *
 import sv.ManeuverConfig as MConf
@@ -34,7 +34,7 @@ class LaneChangeTree(BTree):
 
         # Subtrees List
         self.subtrees = list()
-        self.drive = DriveTree(vid)
+        self.drive = DriveSubtree(vid)
         self.subtrees.append(self.drive)
 
         # Conditions List

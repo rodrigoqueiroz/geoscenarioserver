@@ -4,7 +4,7 @@
 from py_trees import *
 from sv.btree.BTree import *
 from sv.btree.LaneChangeTree import *
-from sv.btree.DriveTree import *
+from sv.btree.DriveSubtree import *
 
 class BTreeFactory(object):
     
@@ -19,9 +19,9 @@ class BTreeFactory(object):
         if self.name == "lanechange":
             tree = LaneChangeTree(self.vid, self.goal)
         elif self.name == "drive":
-            tree = DriveTree(self.vid, self.goal)
+            tree = DriveSubtree(self.vid, self.goal)
         elif self.name == "default":
-            tree = DriveTree(self.vid, self.goal)
+            tree = DriveSubtree(self.vid, self.goal)
         elif self.name == "idler" or self.name == "idle":
             tree = BTree(self.vid, self.goal)
         else:
