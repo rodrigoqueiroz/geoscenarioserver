@@ -221,6 +221,10 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     target_id = mconfig.target_vid
     delta = mconfig.delta_s + mconfig.delta_d
 
+    if (target_id not in vehicles):
+        print("Target vehicle {} is not in traffic".format(target_id))
+        return None
+    
     target_lane_config = lane_config.get_current_lane(vehicles[target_id].vehicle_state.d)
     if not target_lane_config:
         print("Target vehicle {} is not in an adjacent lane".format(target_id))
