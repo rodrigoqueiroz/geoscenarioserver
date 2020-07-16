@@ -51,6 +51,7 @@ class BTreeModel(object):
 
     def reverse_tree(self, planner_state, **kwargs):
         mconfig = MReverseConfig()
+        print(mconfig.vel)
         return mconfig
 
 

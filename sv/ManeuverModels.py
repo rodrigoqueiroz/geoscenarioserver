@@ -16,12 +16,13 @@ from SimConfig import *
 from util.Utils import *
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
+    # print((mconfig.mkey, mconfig.vel.value))
+
     #Micro maneuver layer
     if (man_key==M_VELKEEP):
         planner = plan_velocity_keeping
     elif (man_key==M_REVERSE):
-        mconfig.vel.value = -mconfig.vel.value
-        planner = plan_velocity_keeping
+        planner = plan_reversing
     elif (man_key==M_STOP):
         planner = plan_stop
     elif (man_key==M_FOLLOW):
@@ -78,6 +79,47 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     #return best trajectory, and candidates for debug
     return  best, list(trajectories)
 
+def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles = None, obstacles = None):
+    """
+    REVERSING
+    Driving in reverse
+    No target point, but needs to adapt to a desired velocity
+    """
+    #print ('Maneuver: Velocity Keeping')
+    min_d = lane_config.right_bound + VEHICLE_RADIUS
+    max_d = lane_config.left_bound - VEHICLE_RADIUS
+    d_samples = NUM_SAMPLING_D
+
+    #generate alternative targets:
+    target_state_set = []
+    for t in mconfig.time.get_uniform_samples():
+        #longitudinal movement: goal is to reach velocity
+        for vel in mconfig.vel.get_uniform_samples():
+            s_target = [0,-vel,0] #pos not relevant
+            #lateral movement
+            for di in np.linspace(min_d, max_d, d_samples):
+                d_target = [di,0,0] 
+                #add target
+                target_state_set.append((s_target,d_target,t))
+
+    #print ('Targets: {}'.format(len(target_state_set)))
+    # for ts in target_state_set:
+    #     print(ts)
+
+    #find trajectories
+    trajectories = []
+    trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))  
+    
+    #evaluate feasibility
+    #TODO: pre evaluate trajectories and eliminate unfeasible trajectories
+
+    #cost
+    best = min(trajectories, key=lambda x: velocity_keeping_cost(x, mconfig, lane_config, vehicles, obstacles))
+
+    # eq = to_equation(differentiate(best[0]))
+    # print([ eq(t) for t in np.linspace(0, mconfig.time.value, 5) ])
+
+    return  best, list(trajectories)
 
 def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles = None,  pedestrians = None, obstacles = None):
     """ 
@@ -172,9 +214,7 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
     """
     #print ('Maneuver: Lane Change Swerve')
     s_start = start_state[:3]
-    d_start = start_state[3:]
     target_lid = mconfig.target_lid
-    target_t = mconfig.time.value
 
     #Find target lane
     target_lane_config = None
@@ -219,8 +259,6 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     """
     Cut-in Lane Change
     """ 
-    s_start = start_state[:3]
-    d_start = start_state[3:]
     target_id = mconfig.target_vid
     delta = mconfig.delta_s + mconfig.delta_d
 
