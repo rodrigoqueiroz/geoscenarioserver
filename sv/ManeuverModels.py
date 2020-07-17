@@ -283,7 +283,7 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     target_state_set = []
     for t in mconfig.time.get_uniform_samples():
         #main goal is relative to target vehicle predicted final position
-        goal_state_relative = np.array(vehicles[target_id].future_state(mconfig.time.value)) + np.array(delta) # t or mconfig.time.value?
+        goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta) # t or mconfig.time.value?
         s_target = goal_state_relative[:3]
         for di in np.linspace(min_d, max_d, d_samples):
             # no lateral movement expected at the end
