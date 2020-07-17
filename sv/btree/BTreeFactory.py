@@ -21,7 +21,7 @@ class BTreeFactory(object):
             tree = LaneChangeTree(self.vid, self.goal)
         elif self.name == "drive":
             tree = DriveSubtree(self.vid, self.goal)
-        elif self.name == "drive" or self.name == "patient_driver" or self.name="simple_drive":
+        elif self.name == "drive" or self.name == "patient_driver" or self.name=="simple_drive":
             tree = DriveAimlesslyTree(self.vid, self.goal)
         elif self.name == "alice" or self.name == "aimless_driver":
             tree = DriveAimlesslyTree(self.vid, self.goal)
