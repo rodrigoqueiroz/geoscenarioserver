@@ -19,7 +19,7 @@ class BTreeFactory(object):
         self.goal = goal
     
     def build_tree(self):
-        if self.name == "impatient_drive" or self.name == "drive_timed_lane_change":
+        if self.name == "impatient_drive" or self.name == "drive_timed_lane_change" or self.name == "lanechange":
             tree = DriveImpatientlyTree(self.vid, self.goal)
         elif self.name == "drive" or self.name == "patient_driver" or self.name=="simple_drive":
             tree = DrivePatientlyTree(self.vid, self.goal)
@@ -28,6 +28,6 @@ class BTreeFactory(object):
         elif self.name == "default":
             tree = DrivePatientlyTree(self.vid, self.goal)
         else:
-            raise RuntimeError("Could not set Vehicle " + self.vid + " up behavior.")
+            raise RuntimeError("Could not set Vehicle " + str(self.vid) + " up behavior.")
             
         return tree

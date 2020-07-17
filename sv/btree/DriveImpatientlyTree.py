@@ -38,7 +38,7 @@ class DriveImpatientlyTree(BTree):
         self.subtrees.append(self.drive)
 
         # Conditions List
-        self.end_point = Condition("endpoint")
+        self.endpoint = Condition("endpoint")
         self.time_passed = Condition("time_passed")
 
         #Build Tree
@@ -69,19 +69,19 @@ class DriveImpatientlyTree(BTree):
     def update_world_model(self, planner_state):
         for subtree in self.subtrees: subtree.update_world_model(planner_state)
         # check time passed
-        self.time_passed = has_passed_enough_time(self.time, planner_state.sim_time, 10)
+        self.know_repo.condition.time_passed = has_passed_enough_time(self.time, planner_state.sim_time, 10)
         # update time reference
-        self.time = planner_stater.sim_time if self.time_passed == True else self.time
+        self.time = planner_state.sim_time if self.time_passed == True else self.time
         
         self.know_repo.condition.endpoint = has_reached_goal_frenet(planner_state.vehicle_state, planner_state.goal_point)
             
     def build(self):
         # Coordinate Maneuvers and Conditions
         reach_endline = composites.Sequence("The End")
-        reach_endline.add_children([self.endline, self.stop])
+        reach_endline.add_children([self.endpoint, self.stop])
 
         lane_change_due_to_time = composites.Sequence("Time to Change Lane!!")
-        lane_change_due_to_time = ([self.time_passed])
+        lane_change_due_to_time.add_children([self.time_passed])
 
         root = composites.Selector("Drive Impatiently")
         root.add_children([reach_endline, lane_change_due_to_time])

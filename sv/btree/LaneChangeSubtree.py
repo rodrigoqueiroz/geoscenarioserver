@@ -33,7 +33,7 @@ class LaneChangeSubtree(BTree):
 
         # Actions List
         self.accel = self.create_maneuver("Accelerate", MConf.MVelKeepConfig, "config.vel.value += 2")
-        self.swerve = self.create_maneuver("Lane Swerve", MConf.MLaneSwerveConfig, "config.target_lid = -1"
+        self.swerve = self.create_maneuver("Lane Swerve", MConf.MLaneSwerveConfig, "config.target_lid = -1")
 
         # Conditions List
         self.free_lane = Condition("free_lane")
@@ -66,14 +66,14 @@ class LaneChangeSubtree(BTree):
 
     def update_world_model(self, planner_state):
 
-    self.know_repo.condition.free_lane = False
-    self.know_repo.condition.gap_reachable = is_gap_reachable(planner_state.vehicle_state, planner_state.traffic_vehicles, gap_size)
-    self.know_repo.condition.not_reached_gap = was_the_gap_reached(planner_state.vehicle_state, planner_state.traffic_vehicles, gap)
+        self.know_repo.condition.free_lane = False
+        self.know_repo.condition.gap_reachable = is_gap_reachable(planner_state.vehicle_state, planner_state.traffic_vehicles, gap_size)
+        self.know_repo.condition.not_reached_gap = was_the_gap_reached(planner_state.vehicle_state, planner_state.traffic_vehicles, gap)
             
     def build(self):
         # Coordinate Maneuvers and Conditions
         reach_the_gap = composites.Sequence("Reach Gap")
-        stp_obstc.add_children([self.gap_reachable, self.not_reached_gap, self.accel])
+        reach_the_gap.add_children([self.gap_reachable, self.not_reached_gap, self.accel])
 
         tg_lane_free = composites.Selector("Target Lane Free")
         tg_lane_free.add_children([self.free_lane, reach_the_gap])
