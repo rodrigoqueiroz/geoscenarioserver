@@ -61,8 +61,6 @@ class DriveImpatientlyTree(BTree):
 
         if maneuver.get_name() == "Stop":
             maneuver.update_status(self.get_stop_status(planner_state))
-        if maneuver.get_name() == "Stop":
-            maneuver.update_status(self.get_stop_status(planner_state))
 
         self.know_repo.maneuver = maneuver
         
