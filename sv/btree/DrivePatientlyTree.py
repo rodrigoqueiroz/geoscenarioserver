@@ -38,9 +38,10 @@ class DrivePatientlyTree(BTree):
         #Build Tree
         self.tree = self.build()
         
-    def get_subtree(self): return self.root
-
     def get_tree(self): return self.tree
+
+    def get_stop_status(self, planner_state):
+        return ManeuverStatus.SUCCESS if planner_state.vehicle_state.s_vel < 0.1 else ManeuverStatus.RUNNING
 
     def update_maneuver_status(self, planner_state):
         for subtree in self.subtrees: subtree.update_maneuver_status(planner_state)
