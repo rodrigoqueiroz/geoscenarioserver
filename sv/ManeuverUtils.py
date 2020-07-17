@@ -124,3 +124,11 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
 
 def has_passed_enough_time(ref_time, curr_time, threshold):
     return ref_time - curr_time > threshold
+
+# TODO
+def is_gap_reachable(vehicle, traffic_vehicles, gap_size):
+    return False
+    
+# TODO
+def was_the_gap_reached(vehicle, traffic_vehicles, gap_size):
+    return False

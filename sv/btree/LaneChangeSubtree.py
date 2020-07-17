@@ -42,6 +42,8 @@ class LaneChangeSubtree(BTree):
 
         self.root = self.build()
 
+        self.gap_size = 3
+
     def get_subtree(self): return self.root
 
     def get_accelerate_status(self, planner_state):
@@ -65,8 +67,8 @@ class LaneChangeSubtree(BTree):
     def update_world_model(self, planner_state):
 
     self.know_repo.condition.free_lane = False
-    self.know_repo.condition.gap_reachable = False
-    self.know_repo.condition.not_reached_gap = False
+    self.know_repo.condition.gap_reachable = is_gap_reachable(planner_state.vehicle_state, planner_state.traffic_vehicles, gap_size)
+    self.know_repo.condition.not_reached_gap = was_the_gap_reached(planner_state.vehicle_state, planner_state.traffic_vehicles, gap)
             
     def build(self):
         # Coordinate Maneuvers and Conditions
