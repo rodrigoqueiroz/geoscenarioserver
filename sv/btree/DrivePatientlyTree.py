@@ -33,7 +33,7 @@ class DrivePatientlyTree(BTree):
         self.subtrees.append(self.drive)
 
         # Conditions List
-        self.end_point = Condition("endpoint")
+        self.endpoint = Condition("endpoint")
 
         #Build Tree
         self.tree = self.build()
@@ -60,11 +60,11 @@ class DrivePatientlyTree(BTree):
             
     def build(self):
         # Coordinate Maneuvers and Conditions
-        reach_endline = composites.Sequence("The End")
-        reach_endline.add_children([self.endline, self.stop])
+        reach_endpoint = composites.Sequence("The End")
+        reach_endpoint.add_children([self.endpoint, self.stop])
 
         root = composites.Selector("Drive Patiently")
-        root.add_children([reach_endline])
+        root.add_children([reach_endpoint])
 
         # Set Behavior Tree
         tree = trees.BehaviourTree(root=root)
