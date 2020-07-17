@@ -121,3 +121,6 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
 
 #def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
 #def range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
+
+def has_passed_enough_time(ref_time, curr_time, threshold):
+    return ref_time - curr_time > threshold
