@@ -116,9 +116,6 @@ def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, 
     #cost
     best = min(trajectories, key=lambda x: velocity_keeping_cost(x, mconfig, lane_config, vehicles, obstacles))
 
-    # eq = to_equation(differentiate(best[0]))
-    # print([ eq(t) for t in np.linspace(0, mconfig.time.value, 5) ])
-
     return  best, list(trajectories)
 
 def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles = None,  pedestrians = None, obstacles = None):

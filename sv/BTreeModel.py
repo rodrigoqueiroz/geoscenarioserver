@@ -51,7 +51,13 @@ class BTreeModel(object):
 
     def reverse_tree(self, planner_state, **kwargs):
         mconfig = MReverseConfig()
-        print(mconfig.vel)
+
+        # reaching goal overrides other maneuvers
+        if not self.reached_goal:
+            self.reached_goal = has_reached_goal_frenet(planner_state.vehicle_state, (0,0), threshold=15, reverse=True)
+        if self.reached_goal:
+            mconfig = MStopConfig()
+
         return mconfig
 
 
@@ -68,14 +74,13 @@ class BTreeModel(object):
         """ Controls switching of behaviour trees (not maneuvers)
         """
         # print('{} lane change scenario tree'.format(sim_time))
-        cutin_trigger_time = 5
+        cutin_trigger_time = 3
         ref_path_changed = False
 
         if planner_state.sim_time < cutin_trigger_time:
             self.tree_args = {}
             self.tree = self.drive_tree
-        elif (type(self.mconfig) == MLaneSwerveConfig and lane_swerve_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig)) or (
-                type(self.mconfig) == MCutInConfig and cutin_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig, planner_state.traffic_vehicles)):
+        elif lane_swerve_or_cutin_completed(planner_state.vehicle_state, planner_state.lane_config, self.mconfig, planner_state.traffic_vehicles):
             self.tree_args = {}
             self.tree = self.drive_tree
             ref_path_changed = True

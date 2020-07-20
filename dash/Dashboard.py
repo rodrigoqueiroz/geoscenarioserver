@@ -213,9 +213,14 @@ class Dashboard(object):
             plt.gca().add_artist(circle1)
             label = "vid {}".format(vid)
             plt.gca().text(x+1, y+1, label, style='italic')
+            
             # vehicle direction - /2 for aesthetics
-            plt.arrow(x, y, vehicle.vehicle_state.x_vel/2, vehicle.vehicle_state.y_vel/2,
-                head_width=1, head_length=1)
+            vx = vehicle.vehicle_state.x_vel
+            vy = vehicle.vehicle_state.y_vel
+            if vehicle.vehicle_state.s_vel < 0:
+                vx = -vx
+                vy = -vy
+            plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1)
             #debug
             # plot global path
             #if vehicle.global_path:

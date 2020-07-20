@@ -112,9 +112,11 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
         simvid = int(vid)
         btree_root = vnode.tags['btree']
         myroute = vnode.tags['route']
-        # Use starting point of lanelet as first point in its path
+        # Use starting point of vehicle as first point in its path
+        # NOTE we may not want to do this, in case the user starts the vehicle in the middle of the path
         route_nodes = [vnode] + parser.routes[myroute].nodes
         lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
+        
         sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
         sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
         sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
