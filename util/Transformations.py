@@ -6,6 +6,7 @@
 # --------------------------------------------
 
 import numpy as np
+from math import copysign
 from lanelet2.core import BasicPoint2d, ConstLineString2d, ConstLineString3d
 from lanelet2.geometry import toArcCoordinates
 
@@ -52,6 +53,7 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
     x, x_vel, x_acc = x_vector
     y, y_vel, y_acc = y_vector
     velocity = np.array([x_vel, y_vel])
+    acc = np.array([x_acc, y_acc])
 
     path_ls = ConstLineString2d(ref_path)
     # toArcCoordinates does not interpolate beyond or before ref_path
@@ -76,7 +78,11 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
             tangent_p = tangent_of_path_at(ref_path, i)
             tangent_q = tangent_of_path_at(ref_path, i+1)
             unit_tangent = normalize(vector_interp(tangent_p, tangent_q, percent_delta_s)) # tangent_p + percent_delta_s * (tangent_q - tangent_p) )
-            kappa = (tangent_q - tangent_p) / dist
+            unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+            # should be in direction of unit normal, pointing inwards
+            # curvature is negative if pointing away from unit normal
+            kappa_vector = (tangent_q - tangent_p) / dist
+            kappa = copysign(np.linalg.norm(kappa_vector), np.dot(kappa_vector, unit_normal))
             break
 
         arclen += dist
@@ -85,16 +91,13 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
         print("point is outside the reference path.")
         raise OutsideRefPathException()
     
-    unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
-    # should we be using d(t) or d(s)?
-    # ddt_unit 
-    # ddt_unit_normal = -kappa * unit_tangent
+    s_vel = np.dot(velocity, unit_tangent)
+    d_vel = np.dot(velocity, unit_normal)
+    # using d/dt(tangent(s(t))) = kappa*normal*s_vel and ddt(normal(s(t))) = -kappa*tangent*s_vel
+    s_acc = np.dot(acc, unit_tangent) + np.dot(velocity, kappa*s_vel*unit_normal)
+    d_acc = np.dot(acc, unit_normal) - np.dot(velocity, kappa*s_vel*unit_tangent)
     
-    vel_frenet = np.array([
-        np.dot(velocity, unit_tangent),
-        np.dot(velocity, unit_normal)])
-    
-    return [s, vel_frenet[0], x_acc], [d, vel_frenet[1], y_acc]
+    return [s, s_vel, s_acc], [d, d_vel, d_acc]
 
 
 def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector):
@@ -126,7 +129,13 @@ def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector):
             tangent_q = tangent_of_path_at(ref_path, i+1)
             percent_delta_s = delta_s / dist
             unit_tangent = normalize(vector_interp(tangent_p, tangent_q, percent_delta_s))
-            kappa = (tangent_q - tangent_p) / dist
+            # unit normal turns tangent counter-clockwise according to frenet conventions
+            unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+            
+            # should be in direction of unit normal, pointing inwards
+            # curvature is negative if pointing away from unit normal
+            kappa_vector = (tangent_q - tangent_p) / dist
+            kappa = copysign(np.linalg.norm(kappa_vector), np.dot(kappa_vector, unit_normal))
             break
         
         arclen += dist
@@ -135,8 +144,8 @@ def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector):
         print("s {} d {} is outside the reference path.".format(s, d))
         raise OutsideRefPathException()
     
-    # kappa always points inwards - unit normal turns tangent counter-clockwise
-    unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
-    point_in_cart = point_on_ls + unit_normal*d
+    position = point_on_ls + unit_normal*d
     vel = s_vel * unit_tangent + d_vel * unit_normal
-    return [point_in_cart[0], vel[0], s_acc], [point_in_cart[1], vel[1], d_acc]
+    # using d/dt(tangent(s(t))) = kappa*normal*s_vel and ddt(normal(s(t))) = -kappa*tangent*s_vel
+    acc = s_acc*unit_tangent + s_vel*s_vel*kappa*unit_normal + d_acc*unit_normal - d_vel*s_vel*kappa*unit_tangent
+    return [position[0], vel[0], acc[0]], [position[1], vel[1], acc[1]]

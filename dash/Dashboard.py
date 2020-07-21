@@ -222,6 +222,8 @@ class Dashboard(object):
                 vy = -vy
             plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1)
             #debug
+            # plot acc
+            plt.arrow(x, y, vehicle.vehicle_state.x_acc, vehicle.vehicle_state.y_acc, head_width=1, head_length=1)
             # plot global path
             #if vehicle.global_path:
             #    for pt in vehicle.global_path:
