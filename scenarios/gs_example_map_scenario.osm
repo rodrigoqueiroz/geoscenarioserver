@@ -49,7 +49,7 @@
     <tag k='gs' v='origin' />
   </node>
   <node id='-28' action='modify' visible='true' lat='49.00300005564' lon='8.42468594643'>
-    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='btree' v='lanechange_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
