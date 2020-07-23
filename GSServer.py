@@ -35,7 +35,8 @@ def start_server(args):
     
     
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, PLOT_VID)
+    dashboard = Dashboard(traffic, sim_config.plot_vid)
+    
     
     #SIM EXECUTION START
     print ('SIMULATION START')
@@ -72,6 +73,10 @@ def setup_problem(sim_traffic, sim_config, lanelet_map):
     #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
     #    sim_config.lanelet_routes[1], BT_VELKEEP)
     #traffic.add_remote_vehicle(1, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+    #traffic.add_remote_vehicle(2, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+
+    #traffic.add_remote_vehicle(x, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
+
     #adding vehicle at the start of a lanelet
     #traffic.add_vehicle(2, 'V2', [4.0,0.0,0.0, 0.0,0.0,0.0],
     #    sim_config.lanelet_routes[1], 'drive_tree')
@@ -92,6 +97,8 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     
     sim_config.scenario_name = parser.globalconfig.tags['name']
     sim_config.timeout = parser.globalconfig.tags['timeout']
+    if 'plotvid' in parser.globalconfig.tags:
+        sim_config.plot_vid = parser.globalconfig.tags['plotvid']
     
     #map
     map_file = 'scenarios/' + parser.globalconfig.tags['lanelet']
@@ -102,16 +109,18 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
 
     # populate traffic and lanelet routes from file
     for vid, vnode in parser.vehicles.items():
-        # Use starting point of lanelet as first point in its path
-        path_nodes = [vnode] + parser.paths[vnode.tags['path']].nodes
-        lanelets_in_path = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in path_nodes ]
-        sim_id = vnode.tags['simid']
+        simvid = int(vid)
         btree_root = vnode.tags['btree']
-        sim_config.lanelet_routes[sim_id] = lanelet_map.get_route_via(lanelets_in_path)
-        sim_config.goal_points[sim_id] = (path_nodes[-1].x, path_nodes[-1].y)
+        myroute = vnode.tags['route']
+        # Use starting point of vehicle as first point in its path
+        # NOTE we may not want to do this, in case the user starts the vehicle in the middle of the path
+        route_nodes = [vnode] + parser.routes[myroute].nodes
+        lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
         
-        sim_traffic.add_vehicle(sim_id, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
-            sim_config.lanelet_routes[sim_id], btree_root)
+        sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
+        sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
+        sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
+            sim_config.lanelet_routes[simvid], btree_root)
     return True
     
 if __name__ == "__main__":

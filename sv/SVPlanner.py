@@ -10,13 +10,12 @@ import random
 import datetime
 import time
 from dataclasses import dataclass
-from multiprocessing import shared_memory, Process, Lock, Array
+from multiprocessing import shared_memory, Process, Lock, Array, Manager
 from TickSync import TickSync
 from sv.VehicleState import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
 from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
-
 from mapping.LaneletMap import LaneletMap
 from sv.btree.BTreeModel import * # Deprecated
 from sv.btree.BTreeFactory import * 
@@ -36,10 +35,11 @@ class PlannerState:
 
 
 class SVPlanner(object):
-    def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr): #lock_vs, shm_vs, lock_vp, shm_vp):
+    def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr, debug_shdata):
         #MainProcess space:
         self._process = None
         self._traffic_state_sharr = traffic_state_sharr
+        self._debug_shdata = debug_shdata
         self._mplan_sharr = None
         self.motion_plan = None
         #Shared space
@@ -60,7 +60,7 @@ class SVPlanner(object):
         c = MotionPlan.VECTORSIZE
         self._mplan_sharr = Array('f', c )
         #Process based
-        self._process = Process(target=self.run_planner_process, args=(self._traffic_state_sharr, self._mplan_sharr ), daemon = True)  
+        self._process = Process(target=self.run_planner_process, args=(self._traffic_state_sharr, self._mplan_sharr, self._debug_shdata ), daemon = True)  
         self._process.start()
     
     def stop(self):
@@ -85,7 +85,7 @@ class SVPlanner(object):
     
     #==SUB PROCESS=============================================
 
-    def run_planner_process(self, traffic_state_sharr, mplan_sharr ):
+    def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata ):
         print('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         
         sync_planner = TickSync(rate=PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
@@ -139,8 +139,6 @@ class SVPlanner(object):
             #print('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #print((new_s_vector[0], new_d_vector[0]))
             
-
-
             #Maneuver Tick
             if mconfig and lane_config:
                 #replan maneuver
@@ -150,6 +148,10 @@ class SVPlanner(object):
                                             lane_config,
                                             traffic_vehicles)
                 self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed)
+            
+            #Write down debug info (for Dahsboard and Log)
+            debug_shdata[self.vid] = (vehicle_state, traj, cand, traffic_vehicles, lane_config) 
+
 
         print('PLANNER PROCESS END')
         # shm_vs.close()

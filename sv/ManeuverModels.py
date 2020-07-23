@@ -16,9 +16,13 @@ from SimConfig import *
 from util.Utils import *
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
+    # print((mconfig.mkey, mconfig.vel.value))
+
     #Micro maneuver layer
     if (man_key==M_VELKEEP):
         planner = plan_velocity_keeping
+    elif (man_key==M_REVERSE):
+        planner = plan_reversing
     elif (man_key==M_STOP):
         planner = plan_stop
     elif (man_key==M_FOLLOW):
@@ -75,6 +79,44 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     #return best trajectory, and candidates for debug
     return  best, list(trajectories)
 
+def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles = None, obstacles = None):
+    """
+    REVERSING
+    Driving in reverse
+    No target point, but needs to adapt to a desired velocity
+    """
+    #print ('Maneuver: Velocity Keeping')
+    min_d = lane_config.right_bound + VEHICLE_RADIUS
+    max_d = lane_config.left_bound - VEHICLE_RADIUS
+    d_samples = NUM_SAMPLING_D
+
+    #generate alternative targets:
+    target_state_set = []
+    for t in mconfig.time.get_uniform_samples():
+        #longitudinal movement: goal is to reach velocity
+        for vel in mconfig.vel.get_uniform_samples():
+            s_target = [0,-vel,0] #pos not relevant
+            #lateral movement
+            for di in np.linspace(min_d, max_d, d_samples):
+                d_target = [di,0,0] 
+                #add target
+                target_state_set.append((s_target,d_target,t))
+
+    #print ('Targets: {}'.format(len(target_state_set)))
+    # for ts in target_state_set:
+    #     print(ts)
+
+    #find trajectories
+    trajectories = []
+    trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))  
+    
+    #evaluate feasibility
+    #TODO: pre evaluate trajectories and eliminate unfeasible trajectories
+
+    #cost
+    best = min(trajectories, key=lambda x: velocity_keeping_cost(x, mconfig, lane_config, vehicles, obstacles))
+
+    return  best, list(trajectories)
 
 def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles = None,  pedestrians = None, obstacles = None):
     """ 
@@ -89,28 +131,54 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     target_vid = mconfig.target_vid
     target_t = mconfig.time.value
     time_gap = mconfig.time_gap
+    acc = -mconfig.decel.value
     #distance = mconfig.distance
     min_d = lane_config.right_bound + VEHICLE_RADIUS
     max_d = lane_config.left_bound - VEHICLE_RADIUS
     d_samples = NUM_SAMPLING_D
     
     #Pre conditions. Can the vehicle be followed?
-    vehicle = vehicles[target_vid]
+    leading_vehicle = vehicles[target_vid]
     #Is target ahead?
-    if (s_start[0] >= vehicle.vehicle_state.s):
+    if (s_start[0] >= leading_vehicle.vehicle_state.s):
         return
     #Is target on the same lane?
     #TODO
+    
+    # check if need to deccel to increase gap
+    dist_between_vehicles = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - s_start[0] - VEHICLE_RADIUS
+    ttc = dist_between_vehicles / abs(s_start[1]) if s_start[1] != 0 else float('inf')
+    following_too_close = ttc < mconfig.time_gap
 
     #generate alternative targets:
     target_state_set = []
+        
     for t in mconfig.time.get_uniform_samples():
-        #longitudinal movement: goal is to keep safe distance from leading vehicle
-        s_lv = vehicle.future_state(t)[:3]
+        #longitudinal movement: goal is to keep safe distance from leading_vehicle
+        s_lv = leading_vehicle.future_state(t)[:3]
         s_target = [0,0,0]
-        s_target[0] = s_lv[0] - (time_gap * s_lv[1])     
-        s_target[1] = s_lv[1]                            
-        s_target[2] = s_lv[2]                            
+        if following_too_close:
+            # decelerate for t seconds to increase time gap
+            # s_target[2] = acc
+            # s_target[1] = s_start[1] + acc * t
+            # s_target[0] = s_lv[0] - (time_gap * s_target[1])
+            
+            # calculate exactly how long to decelerate for to achieve desired time gap
+            roots = np.roots([acc, s_start[1] - s_lv[1] + time_gap*acc, s_start[1] * time_gap])
+            time_to_gap = max(roots)
+            s_target[2] = acc
+            s_target[1] = s_start[1] + acc * time_to_gap
+            s_target[0] = s_lv[0] - (time_gap * s_target[1])
+
+            # calculate target v to make time gap 2s, keeping DISTANCE constant
+            # s_target[1] = dist_between_vehicles / time_gap
+            # s_target[0] = s_lv[0] - (time_gap * s_target[1])
+            # s_target[2] = (s_target[1] - s_start[1]) / t
+        else:
+            # match leading vehicle speed
+            s_target[0] = s_lv[0] - (time_gap * s_lv[1])
+            s_target[1] = s_lv[1]
+            s_target[2] = s_lv[2]
         #lateral movement
         for di in np.linspace(min_d, max_d, d_samples):
             d_target = [di,0,0] 
@@ -127,6 +195,9 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
 
      #cost
     best = min(trajectories, key=lambda x: follow_cost(x, mconfig, lane_config, vehicles, obstacles))
+
+    # eq = to_equation(differentiate(best[0]))
+    # print([ eq(t) for t in np.linspace(0, mconfig.time.value, 5) ])
    
     #return best trajectory, and candidates for debug
     return  best, list(trajectories)
@@ -140,9 +211,7 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
     """
     #print ('Maneuver: Lane Change Swerve')
     s_start = start_state[:3]
-    d_start = start_state[3:]
     target_lid = mconfig.target_lid
-    target_t = mconfig.time.value
 
     #Find target lane
     target_lane_config = None
@@ -187,11 +256,13 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     """
     Cut-in Lane Change
     """ 
-    s_start = start_state[:3]
-    d_start = start_state[3:]
     target_id = mconfig.target_vid
     delta = mconfig.delta_s + mconfig.delta_d
 
+    if (target_id not in vehicles):
+        print("Target vehicle {} is not in traffic".format(target_id))
+        return None
+    
     target_lane_config = lane_config.get_current_lane(vehicles[target_id].vehicle_state.d)
     if not target_lane_config:
         print("Target vehicle {} is not in an adjacent lane".format(target_id))
@@ -209,7 +280,7 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     target_state_set = []
     for t in mconfig.time.get_uniform_samples():
         #main goal is relative to target vehicle predicted final position
-        goal_state_relative = np.array(vehicles[target_id].future_state(mconfig.time.value)) + np.array(delta) # t or mconfig.time.value?
+        goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta) # t or mconfig.time.value?
         s_target = goal_state_relative[:3]
         for di in np.linspace(min_d, max_d, d_samples):
             # no lateral movement expected at the end

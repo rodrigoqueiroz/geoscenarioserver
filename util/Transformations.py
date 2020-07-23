@@ -19,6 +19,10 @@ def normalize(v):
     return v / norm if norm > 0 else v
 
 
+def vector_interp(a, b, t):
+    return a + t * (b - a)
+
+
 def sim_to_frenet_position(ref_path:ConstLineString3d, x, y):
     path_ls = ConstLineString2d(ref_path)
     # toArcCoordinates does not interpolate beyond or before ref_path
@@ -28,6 +32,10 @@ def sim_to_frenet_position(ref_path:ConstLineString3d, x, y):
 
 
 def tangent_of_path_at(path, i):
+    """ Returns the average of the vectors path[i] - path[i-1] and path[i+1] - path[i].
+        If i points to the first or last point in path, the vector to the next or
+        previous point respectively is returned.
+    """
     p = path[i]
     
     op = np.array([0,0]) if i == 0 else np.array([p.x - path[i-1].x, p.y - path[i-1].y])
@@ -38,6 +46,7 @@ def tangent_of_path_at(path, i):
 
 def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
     """ Transforms position and speed from cartesian to frenet frame based of ref_path
+        
         @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?
     """
     x, x_vel, x_acc = x_vector
@@ -66,7 +75,8 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
             percent_delta_s = (s - arclen) / dist
             tangent_p = tangent_of_path_at(ref_path, i)
             tangent_q = tangent_of_path_at(ref_path, i+1)
-            unit_tangent = normalize( tangent_p + percent_delta_s * (tangent_q - tangent_p) )
+            unit_tangent = normalize(vector_interp(tangent_p, tangent_q, percent_delta_s)) # tangent_p + percent_delta_s * (tangent_q - tangent_p) )
+            kappa = (tangent_q - tangent_p) / dist
             break
 
         arclen += dist
@@ -76,6 +86,10 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector, y_vector):
         raise OutsideRefPathException()
     
     unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+    # should we be using d(t) or d(s)?
+    # ddt_unit 
+    # ddt_unit_normal = -kappa * unit_tangent
+    
     vel_frenet = np.array([
         np.dot(velocity, unit_tangent),
         np.dot(velocity, unit_normal)])
@@ -111,18 +125,18 @@ def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector):
             tangent_p = tangent_of_path_at(ref_path, i)
             tangent_q = tangent_of_path_at(ref_path, i+1)
             percent_delta_s = delta_s / dist
-            unit_tangent = normalize(tangent_p + percent_delta_s * (tangent_q - tangent_p))
-            # use unit_tangent here or unit_pq?
-            unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+            unit_tangent = normalize(vector_interp(tangent_p, tangent_q, percent_delta_s))
+            kappa = (tangent_q - tangent_p) / dist
             break
         
         arclen += dist
-        # print((p.x, p.y, q.x, q.y))
     
     if point_on_ls is None:
         print("s {} d {} is outside the reference path.".format(s, d))
         raise OutsideRefPathException()
     
+    # kappa always points inwards - unit normal turns tangent counter-clockwise
+    unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
     point_in_cart = point_on_ls + unit_normal*d
     vel = s_vel * unit_tangent + d_vel * unit_normal
     return [point_in_cart[0], vel[0], s_acc], [point_in_cart[1], vel[1], d_acc]

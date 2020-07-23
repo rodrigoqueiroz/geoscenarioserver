@@ -14,6 +14,7 @@ M_FOLLOW = 2
 M_LANESWERVE = 3
 M_CUTIN = 4
 M_STOP = 5
+M_REVERSE = 6
 
 #Feasibility Constants
 
@@ -108,6 +109,12 @@ class MVelKeepConfig:
     mkey:int = M_VELKEEP
 
 @dataclass
+class MReverseConfig:
+    vel:MP = MP(7.0,10,6)           #velocity in [m/s] as MP
+    time:MP = MP(4.0,10,3)          #duration in [s] as MP
+    mkey:int = M_REVERSE
+
+@dataclass
 class MStopConfig:
     #target
     time:MP = MP(3.0,10,6)          #[s]
@@ -129,8 +136,9 @@ class MStopAtConfig:
 class MFollowConfig:
     #target
     target_vid:int                  #target vehicle id
-    time:MP = MP(2.0,10,6)          #duration in [s] as MP
-    time_gap:float = 3.0            #[s]
+    time:MP = MP(3.0,10,6)          #duration in [s] as MP
+    time_gap:float = 2.0            #[s]
+    decel:MP = MP(5.0,10,6)         #[m/s2]
     #distance:float = 20             #distance from target [m]
     #constraints
     max_ttc:float = 10.0            #max time to collision [s]

@@ -28,6 +28,13 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
     
     return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lane_config.id))
 
+def lane_swerve_or_cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig, traffic_vehicles):
+    if type(mconfig) == MLaneSwerveConfig:
+        return lane_swerve_completed(vehicle_state, lane_config, mconfig)
+    elif type(mconfig) == MCutInConfig:
+        return cutin_completed(vehicle_state, lane_config, mconfig, traffic_vehicles)
+    return False
+
 def can_perform_lane_change():
     return True
 
@@ -37,8 +44,48 @@ def can_perform_lane_change():
 #     sqr_distance = np.dot(to_goal, to_goal)
 #     return sqr_distance < threshold*threshold
 
-def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
-    return False if not goal_point else goal_point[0] - vehicle_state.s < threshold
+#def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
+#    return False if not goal_point else goal_point[0] - vehicle_state.s < threshold
+
+def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2, reverse = False):
+    """ Checks if the vehicle has reached or passed the goal point in the frenet frame.
+        @param goal_point:  Arraylike (s,d) goal position in the vehicle's frenet frame
+    """
+    direction = -1 if reverse else 1
+    # A distance to goal with the same sign as direction means we've reached and passed it
+    return direction * (goal_point[0] - vehicle_state.s) < threshold
+
+
+def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5):
+    is_following = False
+    leading_vid = None
+
+    closest_dist = float('inf')
+    cur_lane = lane_config.get_current_lane(vehicle_state.d)
+
+    for vid, traffic_vehicle in other_vehicles.items():
+        other_vehicle_lane = lane_config.get_current_lane(traffic_vehicle.vehicle_state.d)
+        # TODO: need a function to get all vehicles in current lane
+        if other_vehicle_lane and other_vehicle_lane.id == cur_lane.id:
+            dist = traffic_vehicle.vehicle_state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
+            ttc = dist / abs(vehicle_state.s_vel) if vehicle_state.s_vel != 0 else float('inf')
+            
+            # if self_id == 2:
+            #     is_following = True
+            #     leading_vid = vid
+            # if not moving, determine if too close (one car width's apart)
+            if (0 < dist < VEHICLE_RADIUS * 5) or (0 <= ttc < time_gap):
+                if dist < closest_dist:
+                    # print("{} is leading by {}".format(vid, ttc))
+                    is_following = True
+                    leading_vid = vid
+    
+    return is_following, leading_vid
+
+#def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
+#def range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
+
+#Ricardo's implementation:
 
 def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=4):
     ''' Analyzes (frenet coordinates) whether is there an adversary vehicle
@@ -91,36 +138,6 @@ def reached_acceptance_gap(vehicle_state, lane_config, vehicles, threshold=1):
             reached = False
 
     return reached
-
-def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5):
-    is_following = False
-    leading_vid = None
-
-    closest_dist = float('inf')
-    cur_lane = lane_config.get_current_lane(vehicle_state.d)
-
-    for vid, traffic_vehicle in other_vehicles.items():
-        other_vehicle_lane = lane_config.get_current_lane(traffic_vehicle.vehicle_state.d)
-        # TODO: need a function to get all vehicles in current lane
-        if other_vehicle_lane and other_vehicle_lane.id == cur_lane.id:
-            dist = traffic_vehicle.vehicle_state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
-            ttc = dist / abs(vehicle_state.s_vel) if vehicle_state.s_vel != 0 else float('inf')
-            
-            # if self_id == 2:
-            #     is_following = True
-            #     leading_vid = vid
-            # if not moving, determine if too close (one car width's apart)
-            if (0 < dist < VEHICLE_RADIUS * 10) or (0 <= ttc < time_gap):
-                if dist < closest_dist:
-                    # TODO follow not working? time gap doesn't seem to be correct
-                    # print("{} is leading by {}".format(vid, ttc))
-                    is_following = True
-                    leading_vid = vid
-    
-    return is_following, leading_vid
-
-#def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
-#def range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
 
 def has_passed_enough_time(ref_time, curr_time, threshold):
     return ref_time - curr_time > threshold

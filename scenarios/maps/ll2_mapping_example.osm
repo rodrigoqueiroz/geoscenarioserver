@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' generator='JOSM'>
+<osm version='0.6' upload='true' generator='JOSM'>
   <node id='38992' visible='true' version='1' lat='49.00345654351' lon='8.42427590707' />
   <node id='38994' visible='true' version='1' lat='49.00343904846' lon='8.42418467193' />
   <node id='38996' visible='true' version='1' lat='49.00338841975' lon='8.4240886406' />
@@ -9106,12 +9106,12 @@
     <nd ref='39038' />
     <tag k='type' v='road_border' />
   </way>
-  <way id='153150002894734344' visible='true' version='1'>
+  <way id='153150002894734344' action='modify' visible='true' version='1'>
     <nd ref='39386' />
     <nd ref='6826713373117478855' />
     <nd ref='39388' />
     <nd ref='4692836657899886925' />
-    <tag k='subtype' v='solid' />
+    <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
   <way id='162339000355939130' visible='true' version='1'>
@@ -13263,6 +13263,96 @@
     <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
+  <relation id='99990' visible='true' version='1'>
+    <member type='way' ref='9181279454905460716' role='left' />
+    <member type='way' ref='6112086798485489644' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99991' visible='true' version='1'>
+    <member type='way' ref='4406727741069666934' role='left' />
+    <member type='way' ref='43190' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99992' visible='true' version='1'>
+    <member type='way' ref='8889715064795329898' role='left' />
+    <member type='way' ref='6524926095869225522' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99993' visible='true' version='1'>
+    <member type='way' ref='3927820499591601096' role='left' />
+    <member type='way' ref='7679164744260043442' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99994' visible='true' version='1'>
+    <member type='way' ref='3551195395812260352' role='left' />
+    <member type='way' ref='8482773866294866532' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99995' visible='true' version='1'>
+    <member type='way' ref='43278' role='left' />
+    <member type='way' ref='6196346418755874574' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99996' visible='true' version='1'>
+    <member type='way' ref='8217292096843912176' role='left' />
+    <member type='way' ref='3991654723617669502' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99997' visible='true' version='1'>
+    <member type='way' ref='3406453887639049662' role='left' />
+    <member type='way' ref='43284' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99998' visible='true' version='1'>
+    <member type='way' ref='7672743366039716330' role='left' />
+    <member type='way' ref='6960048458279195872' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='99999' visible='true' version='1'>
+    <member type='way' ref='6960048458279195872' role='left' />
+    <member type='way' ref='43178' role='right' />
+    <tag k='location' v='urban' />
+    <tag k='one_way' v='yes' />
+    <tag k='region' v='de' />
+    <tag k='subtype' v='road' />
+    <tag k='type' v='lanelet' />
+  </relation>
   <relation id='185265' visible='true' version='1'>
     <member type='way' ref='43232' role='left' />
     <member type='way' ref='2053119275757392434' role='right' />
@@ -13407,15 +13497,6 @@
     <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='99994' visible='true' version='1'>
-    <member type='way' ref='3551195395812260352' role='left' />
-    <member type='way' ref='8482773866294866532' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
   <relation id='805058864315633006' visible='true' version='1'>
     <member type='way' ref='2053119275757392434' role='left' />
     <member type='way' ref='8568203256492266514' role='right' />
@@ -13434,15 +13515,6 @@
     <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='99993' visible='true' version='1'>
-    <member type='way' ref='3927820499591601096' role='left' />
-    <member type='way' ref='7679164744260043442' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
   <relation id='1090413704220797690' visible='true' version='1'>
     <member type='way' ref='8230290393821926464' role='left' />
     <member type='way' ref='3736747992581037134' role='right' />
@@ -13455,15 +13527,6 @@
   <relation id='1181845994370657488' visible='true' version='1'>
     <member type='way' ref='5185815806838018402' role='left' />
     <member type='way' ref='333112375971347570' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
-  <relation id='99995' visible='true' version='1'>
-    <member type='way' ref='43278' role='left' />
-    <member type='way' ref='6196346418755874574' role='right' />
     <tag k='location' v='urban' />
     <tag k='one_way' v='yes' />
     <tag k='region' v='de' />
@@ -13695,27 +13758,9 @@
     <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='99998' visible='true' version='1'>
-    <member type='way' ref='7672743366039716330' role='left' />
-    <member type='way' ref='6960048458279195872' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
   <relation id='3055700409747041357' visible='true' version='1'>
     <member type='way' ref='6971153781307361378' role='left' />
     <member type='way' ref='2465262824334318956' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
-  <relation id='99990' visible='true' version='1'>
-    <member type='way' ref='9181279454905460716' role='left' />
-    <member type='way' ref='6112086798485489644' role='right' />
     <tag k='location' v='urban' />
     <tag k='one_way' v='yes' />
     <tag k='region' v='de' />
@@ -13758,15 +13803,6 @@
     <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='99992' visible='true' version='1'>
-    <member type='way' ref='8889715064795329898' role='left' />
-    <member type='way' ref='6524926095869225522' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
   <relation id='3372255899520750209' visible='true' version='1'>
     <member type='way' ref='43224' role='left' />
     <member type='way' ref='43180' role='right' />
@@ -13779,15 +13815,6 @@
   <relation id='3535038449830291886' visible='true' version='1'>
     <member type='way' ref='2203198908421162458' role='left' />
     <member type='way' ref='4598712960786644818' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
-  <relation id='99996' visible='true' version='1'>
-    <member type='way' ref='8217292096843912176' role='left' />
-    <member type='way' ref='3991654723617669502' role='right' />
     <tag k='location' v='urban' />
     <tag k='one_way' v='yes' />
     <tag k='region' v='de' />
@@ -14262,15 +14289,6 @@
     <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='99999' visible='true' version='1'>
-    <member type='way' ref='6960048458279195872' role='left' />
-    <member type='way' ref='43178' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
   <relation id='7326074532659563937' visible='true' version='1'>
     <member type='way' ref='5214965862031460312' role='left' />
     <member type='way' ref='43270' role='right' />
@@ -14292,15 +14310,6 @@
   <relation id='7402914969115001621' visible='true' version='1'>
     <member type='way' ref='650139529148356484' role='left' />
     <member type='way' ref='8537768764427223288' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
-  <relation id='99991' visible='true' version='1'>
-    <member type='way' ref='4406727741069666934' role='left' />
-    <member type='way' ref='43190' role='right' />
     <tag k='location' v='urban' />
     <tag k='one_way' v='yes' />
     <tag k='region' v='de' />
@@ -14526,15 +14535,6 @@
   <relation id='9187600893603114095' visible='true' version='1'>
     <member type='way' ref='7546618800081767594' role='left' />
     <member type='way' ref='452984144889804318' role='right' />
-    <tag k='location' v='urban' />
-    <tag k='one_way' v='yes' />
-    <tag k='region' v='de' />
-    <tag k='subtype' v='road' />
-    <tag k='type' v='lanelet' />
-  </relation>
-  <relation id='99997' visible='true' version='1'>
-    <member type='way' ref='3406453887639049662' role='left' />
-    <member type='way' ref='43284' role='right' />
     <tag k='location' v='urban' />
     <tag k='one_way' v='yes' />
     <tag k='region' v='de' />

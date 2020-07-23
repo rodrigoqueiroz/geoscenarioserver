@@ -14,7 +14,7 @@ node[gs] {
 
 node[gs=globalconfig] {
     icon-image: "config.png" ;
-    text: eval("GEOSCENARIO CONFIG");
+    text: eval("GeoScenario2 CONFIG");
     
 }
 
@@ -61,9 +61,9 @@ node[gs=vehicle] {
     icon-image: "vehicle_black.png";   
     icon-rotation: degree_to_radians(tag("orientation"));
     icon-width: 64;
-    text: eval(concat( "V: ", tag("name"), println()," (", tag("orientation"),"°, ", tag("speed"), " km/h)"));
+    text: eval(concat( "V: ", tag("vid"), " ", tag("name"), " bt:", tag("btree"), " (", tag("speed"), " km/h)" ," )" ));
     text-offset-x: -50;
-    text-offset-y: 35;
+    text-offset-y: 40;
 }
 
 
@@ -79,6 +79,20 @@ node[gs=trigger] {
 node[gs=trafficlight] {
     icon-image:"trafficlight.png" ;
     text: eval(concat( "TL: ", tag("name")));
+}
+
+way[gs=route] {
+    text: "name";
+    width: 3;
+    color: blue;
+    dashes: 15,15;
+    dashes-background-color: alpha;
+    text-position: line;
+    text-offset: 5;
+    font-size: 12;
+    text-color: blue;
+    text-halo-color: white;
+    text-halo-radius: 2;
 }
 
 

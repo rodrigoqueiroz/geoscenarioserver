@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-47' action='modify' visible='true' lat='49.00786131385' lon='8.45736107875'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='name' v='Straight Road Scenario' />
+    <tag k='timeout' v='10' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-49' action='modify' visible='true' lat='49.00822161311' lon='8.45831270129'>
+    <tag k='gs' v='egogoal' />
+    <tag k='name' v='goal_1' />
+    <tag k='scenario' v='egogoal' />
+  </node>
+  <node id='-51' action='modify' visible='true' lat='49.00841978917' lon='8.45727445199'>
+    <tag k='gs' v='egostart' />
+    <tag k='orientation' v='45' />
+    <tag k='rotation' v='45' />
+  </node>
+  <node id='-53' action='modify' visible='true' lat='49.00730754336' lon='8.45723535821'>
+    <tag k='agentspeed' v='1' />
+  </node>
+  <node id='-55' action='modify' visible='true' lat='49.00817624551' lon='8.45835927518'>
+    <tag k='agentspeed' v='0' />
+  </node>
+  <node id='-57' action='modify' visible='true' lat='49.00750211699' lon='8.4574959883'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-59' action='modify' visible='true' lat='49.00797575285' lon='8.45810827706'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-61' action='modify' visible='true' lat='49.00778602145' lon='8.45784874473'>
+    <tag k='agentspeed' v='7' />
+  </node>
+  <node id='-63' action='modify' visible='true' lat='49.00736715306' lon='8.45733285594'>
+    <tag k='btree' v='reverse_scenario_tree' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='reversing_vehicle' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='right_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-65' action='modify' visible='true' lat='49.00790482164' lon='8.45736112446'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-67' action='modify' visible='true' lat='49.00723471616' lon='8.45706195698'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='gs' v='vehicle_disabled' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='left_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-69' action='modify' visible='true' lat='49.00732302363' lon='8.45719005607'>
+    <tag k='agentspeed' v='1' />
+  </node>
+  <node id='-71' action='modify' visible='true' lat='49.00747917892' lon='8.45739314388'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-73' action='modify' visible='true' lat='49.00762103721' lon='8.45758083134'>
+    <tag k='agentspeed' v='7' />
+  </node>
+  <node id='-75' action='modify' visible='true' lat='49.00787146676' lon='8.45789593045'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-77' action='modify' visible='true' lat='49.00807590857' lon='8.45815373212'>
+    <tag k='agentspeed' v='0' />
+  </node>
+  <way id='-79' action='modify' visible='true'>
+    <nd ref='-53' />
+    <nd ref='-57' />
+    <nd ref='-61' />
+    <nd ref='-59' />
+    <nd ref='-55' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='right_route' />
+  </way>
+  <way id='-81' action='modify' visible='true'>
+    <nd ref='-69' />
+    <nd ref='-71' />
+    <nd ref='-73' />
+    <nd ref='-75' />
+    <nd ref='-77' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route' />
+  </way>
+</osm>
