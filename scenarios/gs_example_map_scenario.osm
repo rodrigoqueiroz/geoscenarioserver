@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='true' generator='JOSM'>
-  <node id='-111' action='modify' visible='true' lat='49.00285414313' lon='8.42414407222'>
+  <node id='-8' action='modify' visible='true' lat='49.00285414313' lon='8.42414407222'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
@@ -9,32 +9,32 @@
     <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-113' action='modify' visible='true' lat='49.00277852206' lon='8.42411016864'>
+  <node id='-10' action='modify' visible='true' lat='49.00277852206' lon='8.42411016864'>
     <tag k='gs' v='egogoal' />
     <tag k='name' v='goal_1' />
     <tag k='scenario' v='egogoal' />
   </node>
-  <node id='-115' action='modify' visible='true' lat='49.00383720662' lon='8.42391586435'>
+  <node id='-12' action='modify' visible='true' lat='49.00383720662' lon='8.42391586435'>
     <tag k='gs' v='egostart' />
     <tag k='orientation' v='45' />
     <tag k='rotation' v='45' />
   </node>
-  <node id='-117' action='modify' visible='true' lat='49.00295975322' lon='8.42471711431'>
+  <node id='-14' action='modify' visible='true' lat='49.00295975322' lon='8.42471711431'>
     <tag k='agentspeed' v='1' />
   </node>
-  <node id='-119' action='modify' visible='true' lat='49.00348008692' lon='8.42395435637'>
+  <node id='-16' action='modify' visible='true' lat='49.00348008692' lon='8.42395435637'>
     <tag k='agentspeed' v='0' />
   </node>
-  <node id='-121' action='modify' visible='true' lat='49.00311479546' lon='8.42469641193'>
+  <node id='-18' action='modify' visible='true' lat='49.00311479546' lon='8.42469641193'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-123' action='modify' visible='true' lat='49.00354735919' lon='8.42432082282'>
+  <node id='-20' action='modify' visible='true' lat='49.00354735919' lon='8.42432082282'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-125' action='modify' visible='true' lat='49.00332286676' lon='8.42471234099'>
+  <node id='-22' action='modify' visible='true' lat='49.00332286676' lon='8.42471234099'>
     <tag k='agentspeed' v='7' />
   </node>
-  <node id='-127' action='modify' visible='true' lat='49.00295256035' lon='8.42471302561'>
+  <node id='-24' action='modify' visible='true' lat='49.00295256035' lon='8.42471302561'>
     <tag k='btree' v='drive_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
@@ -45,10 +45,10 @@
     <tag k='start' v='yes' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-129' action='modify' visible='true' lat='49.00287543851' lon='8.42476260494'>
+  <node id='-26' action='modify' visible='true' lat='49.00287543851' lon='8.42476260494'>
     <tag k='gs' v='origin' />
   </node>
-  <node id='-131' action='modify' visible='true' lat='49.00300005564' lon='8.42468594643'>
+  <node id='-28' action='modify' visible='true' lat='49.00300005564' lon='8.42468594643'>
     <tag k='btree' v='lanechange_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
@@ -59,37 +59,37 @@
     <tag k='start' v='yes' />
     <tag k='vid' v='2' />
   </node>
-  <node id='-133' action='modify' visible='true' lat='49.00323170023' lon='8.42472844403'>
+  <node id='-30' action='modify' visible='true' lat='49.00323170023' lon='8.42472844403'>
     <tag k='agentspeed' v='1' />
   </node>
-  <node id='-135' action='modify' visible='true' lat='49.00336629661' lon='8.42468856289'>
+  <node id='-32' action='modify' visible='true' lat='49.00336629661' lon='8.42468856289'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-137' action='modify' visible='true' lat='49.00349258707' lon='8.42447434682'>
+  <node id='-34' action='modify' visible='true' lat='49.00349258707' lon='8.42447434682'>
     <tag k='agentspeed' v='7' />
   </node>
-  <node id='-139' action='modify' visible='true' lat='49.00344343123' lon='8.42387785565'>
+  <node id='-36' action='modify' visible='true' lat='49.00344343123' lon='8.42387785565'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-141' action='modify' visible='true' lat='49.00344535727' lon='8.42384701751'>
+  <node id='-38' action='modify' visible='true' lat='49.00344535727' lon='8.42384701751'>
     <tag k='agentspeed' v='0' />
   </node>
-  <way id='-143' action='modify' visible='true'>
-    <nd ref='-117' />
-    <nd ref='-121' />
-    <nd ref='-125' />
-    <nd ref='-123' />
-    <nd ref='-119' />
+  <way id='-40' action='modify' visible='true'>
+    <nd ref='-14' />
+    <nd ref='-18' />
+    <nd ref='-22' />
+    <nd ref='-20' />
+    <nd ref='-16' />
     <tag k='gs' v='route' />
     <tag k='name' v='route left' />
     <tag k='virtual' v='no' />
   </way>
-  <way id='-145' action='modify' visible='true'>
-    <nd ref='-133' />
-    <nd ref='-135' />
-    <nd ref='-137' />
-    <nd ref='-139' />
-    <nd ref='-141' />
+  <way id='-42' action='modify' visible='true'>
+    <nd ref='-30' />
+    <nd ref='-32' />
+    <nd ref='-34' />
+    <nd ref='-36' />
+    <nd ref='-38' />
     <tag k='gs' v='route' />
     <tag k='name' v='route right' />
     <tag k='virtual' v='no' />
