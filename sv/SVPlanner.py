@@ -18,7 +18,8 @@ from sv.ManeuverModels import *
 from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
 from mapping.LaneletMap import LaneletMap
 from sv.btree.BTreeModel import * # Deprecated
-from sv.btree.BTreeFactory import * 
+#from sv.btree.BTreeFactory import * 
+from sv.btree.BehaviorModels import *  
 
 from typing import Tuple, Dict, List
 
@@ -90,7 +91,9 @@ class SVPlanner(object):
         
         sync_planner = TickSync(rate=PLANNER_RATE, realtime = True, block=True, verbose=False, label="PP")
 
-        self.btree_model = BTreeFactory(self.vid, self.btree_root).build_tree()
+        #self.btree_model = BTreeModel(self.vid, self.btree_root)
+        #self.btree_model = BTreeFactory(self.vid, self.btree_root).build_tree()
+        self.btree_model = BehaviorModels(self.vid, self.btree_root)
         
         while sync_planner.tick():
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
@@ -122,7 +125,7 @@ class SVPlanner(object):
                 pedestrians=None,
                 obstacles=None
             )
-            mconfig, ref_path_changed = self.btree_model.tick(planner_state)
+            mconfig, ref_path_changed, snapshot_tree = self.btree_model.tick(planner_state)
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
             if ref_path_changed:
                 print("PATH CHANGED")
@@ -148,9 +151,10 @@ class SVPlanner(object):
                                             lane_config,
                                             traffic_vehicles)
                 self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed)
-            
+            else:
+                traj, cand = None, None
             #Write down debug info (for Dahsboard and Log)
-            debug_shdata[self.vid] = (vehicle_state, traj, cand, traffic_vehicles, lane_config) 
+            debug_shdata[self.vid] = (vehicle_state, snapshot_tree,traj, cand, traffic_vehicles, lane_config) 
 
 
         print('PLANNER PROCESS END')

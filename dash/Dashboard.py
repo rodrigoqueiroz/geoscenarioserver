@@ -88,6 +88,11 @@ class Dashboard(object):
             else:
                 self.plot_frenet_chart(debug_shdata,self.center_vid)
             
+            #BTree
+            tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(self.center_vid)
+            tree_str += debug_shdata[self.center_vid][1]
+            self.tree_msg.configure(text=tree_str) 
+
             #Vehicles Table
             self.tab.delete(*self.tab.get_children())
             for vid in vehicles:
@@ -244,7 +249,7 @@ class Dashboard(object):
         gca = plt.gca()
 
         #data
-        vehicle_state, traj, cand, traffic_vehicles, lane_config  = debug_shdata[center_vid]
+        vehicle_state, _, traj, cand, traffic_vehicles, lane_config  = debug_shdata[center_vid]
         
         #road
         
@@ -457,20 +462,23 @@ class Dashboard(object):
         window.grid_columnconfigure(0, weight=1)
 
         #Containers:
-        title_frame = tk.Frame(window, width = 1000, height = 40, bg = "orange")
-        stats_frame = tk.Frame(window, width = 1000, height = 40, bg = "white")
-        vehicle_frame = tk.Frame(window, width = 1000, height = 500, bg = "gray")
-        global_frame = tk.Frame(window, width = 1000, height = 500, bg = "white")
+        title_frame = tk.Frame(window, width = 1300, height = 40, bg = "orange")
+        stats_frame = tk.Frame(window, width = 1300, height = 40, bg = "white")
+        vehicle_frame = tk.Frame(window, width = 1300, height = 500, bg = "white")
+        global_frame = tk.Frame(window, width = 1300, height = 500, bg = "white")
+        #vehicle sub containers
+        vehicle_frame.grid_rowconfigure(1, weight=1)
+        vehicle_frame.grid_columnconfigure(2, weight=1)
+        cart_frame = tk.Frame(vehicle_frame, width = 400, height = 500, bg = "white")
+        fren_frame = tk.Frame(vehicle_frame, width = 600, height = 500, bg = "white")
+        bt_frame = tk.Frame(vehicle_frame, width = 300, height = 500, bg = "white")
+        #white_space = tk.Frame(vehicle_frame, width = 10, height = 500, bg = "white")
         #global sub containers
         global_frame.grid_rowconfigure(0, weight=1)
         global_frame.grid_columnconfigure(0, weight=1)
         #map_frame = tk.Frame(global_frame, width = 500, height = 300, bg = "green")
         tab_frame = tk.Frame(global_frame, width = 1000, height = 300, bg = "blue")
-        #vehicle sub containers
-        #vehicle_frame.grid_rowconfigure(0, weight=1)
-        #vehicle_frame.grid_columnconfigure(2, weight=1)
-        cart_frame = tk.Frame(vehicle_frame, width = 400, height = 400, bg = "blue")
-        fren_frame = tk.Frame(vehicle_frame, width = 600, height = 400, bg = "green")
+        
 
         #Content:
         window.title = 'GeoScenario Server'
@@ -490,6 +498,15 @@ class Dashboard(object):
         lb_uw.photo = img_uw    #holding a ref to avoid photo garbage collected
         lb_wise = tk.Label(title_frame, image=img_wise)
         lb_wise.photo = img_wise #holding a ref to avoid photo garbage collected
+
+        
+        tree_msg= tk.Message(bt_frame,text='', anchor='s', 
+                                    width=300, 
+                                    bg='white',foreground='black')
+
+        #tree_msg.grid(row=0,column=0, sticky='nsew')
+        tree_msg.pack()
+        self.tree_msg = tree_msg
 
         # stats
 
@@ -531,14 +548,16 @@ class Dashboard(object):
         #--------------------------
         # title frame
         # stats frame
-        # vehicle frame [  cart | frenet ]
+        # vehicle frame [  cart | frenet | Btree ]
         # global frame  [  map  | table  ]*under construction
         #---------------
         title_frame.grid(row=0, sticky="nsew")
-        stats_frame.grid(row=1, sticky="ew")
-        vehicle_frame.grid(row=2, sticky="ew")
-        cart_frame.grid(row=0, column=0, sticky="ew")
-        fren_frame.grid(row=0, column=1, sticky="ew")
+        stats_frame.grid(row=1, sticky="nsew")
+        vehicle_frame.grid(row=2, sticky="nsew")
+        cart_frame.grid(row=0, column=0, sticky="nsew")
+        fren_frame.grid(row=0, column=1, sticky="nsew")
+        bt_frame.grid(row=0, column=2, sticky="nsew")
+        #white_space.grid(row=0, column=3, sticky="ew")
         global_frame.grid(row=3, sticky="nsew")
         #map_frame.grid(row=0, column=0, sticky="ns")
         tab_frame.grid(row=0, sticky="nsew")
