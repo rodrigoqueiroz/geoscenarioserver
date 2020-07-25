@@ -44,7 +44,7 @@ class SVPlanner(object):
         self._mplan_sharr = None
         self.motion_plan = None
         #Shared space
-        self.vid = vid
+        self.vid = int(vid)
         self.nvehicles = nvehicles
         self.laneletmap = laneletmap
         self.sim_config = sim_config
@@ -154,7 +154,7 @@ class SVPlanner(object):
             else:
                 traj, cand = None, None
             #Write down debug info (for Dahsboard and Log)
-            debug_shdata[self.vid] = (vehicle_state, snapshot_tree,traj, cand, traffic_vehicles, lane_config) 
+            debug_shdata[int(self.vid)] = (vehicle_state, snapshot_tree,traj, cand, traffic_vehicles, lane_config) 
 
 
         print('PLANNER PROCESS END')

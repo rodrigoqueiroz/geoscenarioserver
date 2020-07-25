@@ -71,22 +71,28 @@ class Dashboard(object):
         while sync_dash.tick():
             if not self.window:
                 return
+
+            #get data
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
-            #trajectories = self.read_trajectories(self.traffic)
+            #planning data
+            if self.center_vid not in debug_shdata:
+                self.center_vid = next(iter(debug_shdata))
+                print( "Dash: center vid not in array, auto switch to {}".format(self.center_vid) )
+            vehicle_state, _, traj, cand, traffic_vehicles, lane_config  = debug_shdata[self.center_vid]
+
             #update stats
-
-
+            tickcount, delta_time, sim_tim = header
             #map chart dynamic content
             #self.plot_map_chart(vehicles)
 
             #Cartesian plot with lanelet
-            self.plot_cartesian_chart(vehicles,self.center_vid)
+            self.plot_cartesian_chart(self.center_vid, vehicles)
             
             #Frenet frame plot
             if FFPLOT_LITE:
-                self.plot_frenet_chart_lite(vehicles,self.center_vid)
+                self.plot_frenet_chart_lite(vehicle_state, vehicles,self.center_vid)
             else:
-                self.plot_frenet_chart(debug_shdata,self.center_vid)
+                self.plot_frenet_chart(self.center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config)
             
             #BTree
             tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(self.center_vid)
@@ -100,7 +106,9 @@ class Dashboard(object):
                 sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
                 truncate_vector(sv,2)
                 sv = [vid] + sv
-                self.tab.insert('', 'end', values=(sv)) 
+                self.tab.insert('', 'end', int(vid), values=(sv)) 
+            self.tab.selection_set(self.center_vid)
+            
 
             #Sub vehicle plot
             #todo: transform into log chart, instead of projected trajectory
@@ -116,6 +124,11 @@ class Dashboard(object):
     def quit(self):
         self._process.terminate()
 
+
+    def change_tab_focus(self, event):
+        focus = self.tab.focus()
+        if (focus):
+            self.center_vid = int(focus)
 
     def read_traffic_state(self, traffic_state_sharr, nv):
         r = nv+1
@@ -144,6 +157,7 @@ class Dashboard(object):
             plan = traffic.vehicles[vid].sv_planner.get_plan()
             trajectories[vid] = plan.get_trajectory()
         return trajectories
+
 
     def pre_plot_map_chart(self):
         #Map pre plot: static primitives only
@@ -188,49 +202,69 @@ class Dashboard(object):
             axis.plot(x, y, 'bv')
         
 
-    def plot_cartesian_chart(self, vehicles, center_vid):
+    def plot_cartesian_chart(self, center_vid, vehicles):
+        
+        vehicle_state = vehicles[self.center_vid].vehicle_state 
+
         #-Vehicle focus cartesian plot
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
-        #boundaries
-        vehicle = vehicles[center_vid]
-        if vehicle:
-            x_min = vehicle.vehicle_state.x - (CPLOT_SIZE/2)   
-            y_min = vehicle.vehicle_state.y - (CPLOT_SIZE/2)  
-            x_max = vehicle.vehicle_state.x + (CPLOT_SIZE/2)  
-            y_max = vehicle.vehicle_state.y + (CPLOT_SIZE/2)  
-        else:
-            x_min = y_min = -1/2*CPLOT_SIZE
-            x_max = y_max = 1/2*CPLOT_SIZE
         
+        #boundaries
+        x_min = vehicle_state.x - (CPLOT_SIZE/2)   
+        y_min = vehicle_state.y - (CPLOT_SIZE/2)  
+        x_max = vehicle_state.x + (CPLOT_SIZE/2)  
+        y_max = vehicle_state.y + (CPLOT_SIZE/2)
+
         #road
         #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
         data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
         for line in data:
             plt.plot(line[0], line[1], 'g-')
 
-        #vehicles
+        #other vehicles
         for vid, vehicle in vehicles.items():
-            x = vehicles[vid].vehicle_state.x
-            y = vehicles[vid].vehicle_state.y
+            if (vid == center_vid): #skip main
+                continue
+            vs = vehicles[vid].vehicle_state
+            x = vs.x
+            y = vs.y
             plt.plot(x, y, 'bv')
             circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
             plt.gca().add_artist(circle1)
             label = "vid {}".format(vid)
             plt.gca().text(x+1, y+1, label, style='italic')
-            
             # vehicle direction - /2 for aesthetics
-            vx = vehicle.vehicle_state.x_vel
-            vy = vehicle.vehicle_state.y_vel
-            if vehicle.vehicle_state.s_vel < 0:
+            vx = vs.x_vel
+            vy = vs.y_vel
+            if vs.s_vel < 0:
                 vx = -vx
                 vy = -vy
             plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1)
-            #debug
+            
+        #main vehicle
+        vs = vehicle_state
+        vid = center_vid
+        x = vs.x
+        y = vs.y
+        plt.plot(x, y, 'bv')
+        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
+        plt.gca().add_artist(circle1)
+        label = "vid {}".format(vid)
+        plt.gca().text(x+1, y+1, label, style='italic')
+        # vehicle direction - /2 for aesthetics
+        vx = vs.x_vel
+        vy = vs.y_vel
+        if vs.s_vel < 0:
+            vx = -vx
+            vy = -vy
+        plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1)
+        #plt.arrow(x, y, vehicle.vehicle_state.x_acc, vehicle.vehicle_state.y_acc, head_width=1, head_length=1)
             # plot global path
             #if vehicle.global_path:
             #    for pt in vehicle.global_path:
             #        plt.plot(pt.x, pt.y, 'bo')
+
 
         #layout
         plt.xlim(x_min,x_max)
@@ -242,24 +276,15 @@ class Dashboard(object):
         plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0) 
         #fig.tight_layout(pad=0.05)
 
-    def plot_frenet_chart(self,debug_shdata,center_vid):
+    def plot_frenet_chart(self, center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config):
         #Frenet Frame plot
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
         gca = plt.gca()
 
-        #data
-        vehicle_state, _, traj, cand, traffic_vehicles, lane_config  = debug_shdata[center_vid]
-        
         #road
-        
-        #0 lines
-        #plt.axhline(0, color="black")
-        #plt.axvline(0, color="black")
-        #Lane lines
         plt.axhline(lane_config.left_bound, color="black", linestyle='--')
         plt.axhline(lane_config.right_bound, color="black", linestyle='--')
-        #lables
         plt.title("Frenet Frame. Vehicle {}:".format(center_vid))
         plt.xlabel('S')
         plt.ylabel('D')
@@ -283,11 +308,12 @@ class Dashboard(object):
         
         vs = vehicle_state
         vid = center_vid
+
         plt.plot( vs.s, vs.d, "v")
         circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
         gca.add_artist(circle1)
         #label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
-        label = "vid {} | [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
+        label = "vid {}".format(int(vid))
         gca.text(vs.s, vs.d+1.5, label)
         
         # update lane config based on current (possibly outdated) reference frame
@@ -295,7 +321,7 @@ class Dashboard(object):
 
         #layout
         plt.grid(True)
-        #Center plot around main vehicle
+        #center plot around main vehicle
         x_lim_a = vs.s - ( (1/3) * FFPLOT_LENGTH )   #1/3 before vehicle
         x_lim_b = vs.s + ( (2/3) * FFPLOT_LENGTH )   #2/3 ahead
         plt.xlim(x_lim_a,x_lim_b)
@@ -529,8 +555,10 @@ class Dashboard(object):
         for col in tab['columns']:
             tab.heading(col, text=col, anchor='e')
             tab.column(col, anchor="e", width=50, minwidth=50)
+        
+        tab.bind('<<TreeviewSelect>>',self.change_tab_focus)
         self.tab = tab
-
+        
         # vehicle cart
         fig_cart = plt.figure(2)
         fig_cart.set_size_inches(4,4,forward=True)
