@@ -53,11 +53,11 @@ class Vehicle(object):
             TODO: predict velocity and accel
         """
         state = [
-            self.vehicle_state.s + (self.vehicle_state.s_vel * t),
-            self.vehicle_state.s_vel,
+            self.vehicle_state.s + (self.vehicle_state.s_vel * t) + (self.vehicle_state.s_acc * t * t),
+            self.vehicle_state.s_vel + (self.vehicle_state.s_acc * t),
             self.vehicle_state.s_acc,
-            self.vehicle_state.d + (self.vehicle_state.d_vel * t), 
-            self.vehicle_state.d_vel,
+            self.vehicle_state.d + (self.vehicle_state.d_vel * t) + (self.vehicle_state.d_acc * t * t),
+            self.vehicle_state.d_vel + (self.vehicle_state.d_acc * t),
             self.vehicle_state.d_acc
         ]
         return state

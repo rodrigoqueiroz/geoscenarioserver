@@ -162,13 +162,19 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
             # s_target[2] = acc
             # s_target[1] = s_start[1] + acc * t
             # s_target[0] = s_lv[0] - (time_gap * s_target[1])
-            
+
+            # calculate decceleration needed for t seconds to achieve time gap
+            acc_target = (s_lv[0] - s_start[1]*(t + time_gap) - s_start[0]) / (t*(time_gap + t))
+            s_target[2] = acc_target
+            s_target[1] = s_start[1] + acc_target * t
+            s_target[0] = s_start[0] + s_start[1]*t + acc_target*t*t
+
             # calculate exactly how long to decelerate for to achieve desired time gap
-            roots = np.roots([acc, s_start[1] - s_lv[1] + time_gap*acc, s_start[1] * time_gap])
-            time_to_gap = max(roots)
-            s_target[2] = acc
-            s_target[1] = s_start[1] + acc * time_to_gap
-            s_target[0] = s_lv[0] - (time_gap * s_target[1])
+            # roots = np.roots([acc, s_start[1] - s_lv[1] + time_gap*acc, s_start[1] * time_gap])
+            # time_to_gap = max(roots)
+            # s_target[2] = acc
+            # s_target[1] = s_start[1] + acc * time_to_gap
+            # s_target[0] = s_lv[0] - (time_gap * s_target[1])
 
             # calculate target v to make time gap 2s, keeping DISTANCE constant
             # s_target[1] = dist_between_vehicles / time_gap
