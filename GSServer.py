@@ -7,15 +7,16 @@
 # --------------------------------------------
 
 from TickSync import TickSync
-from SimTraffic import *
+from SimTraffic import SimTraffic
 from dash.Dashboard import *
 from mapping.LaneletMap import *
 from lanelet2.projection import UtmProjector
 from SimConfig import SimConfig
 from gsc.GSParser import GSParser
 from argparse import ArgumentParser
+from sv.ManeuverConfig import *
 
-def start_server(args):
+def start_server(args, m = MVelKeepConfig()):
     print ('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()

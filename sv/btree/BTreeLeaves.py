@@ -7,38 +7,48 @@ import random
 from sv.ManeuverStatus import *
 from sv.btree.BehaviorModels import *
 from sv.ManeuverConfig import *
+import sv.ManeuverUtils
 
 #alternative:
 class BCondition(behaviour.Behaviour):
-    def __init__(self, bmodel, name, condition, **kwargs):
+    def __init__(self, bmodel, name, condition, repeat=True, **kwargs):
         super(BCondition, self).__init__(name)
         self.name = name
         self.condition = condition
         self.bmodel = bmodel
         self.kwargs = kwargs
+        self.repeat = repeat
+        self.triggered = False
 
     def update(self):
         self.logger.debug("  %s [BCondition::update()]" % self.name)
+        status = common.Status.FAILURE
+
         #print("BCondition {} {}".format(self.name,self.kwargs))
         try:
-            
-            if(self.bmodel.test_condition(self.condition, self.kwargs)):
-                #print("SUCCESS")
-                return common.Status.SUCCESS
-            else:
-                #print("FAILURE")
-                return common.Status.FAILURE
-                
+            if self.repeat or not self.triggered:
+                if self.bmodel.test_condition(self.condition, self.kwargs):
+                    #print("SUCCESS")
+                    status = common.Status.SUCCESS
+                    self.triggered = True
+
         except KeyError as e:
-            raise RuntimeError("Missing condition '"+self.name+"'.")
+            raise RuntimeError("Missing condition '" + self.name + "'.")
+
+        return status
+
 
 class ManeuverAction(behaviour.Behaviour):
     def __init__(self, bmodel, name, mconfig, **kwargs):
         super(ManeuverAction, self).__init__(name)
         self.name = name
-        self.bmodel = bmodel
+        self.bmodel:BehaviorModels = bmodel
         self.mconfig = mconfig
         self.kwargs = kwargs
+        # self.status = common.Status.SUCCESS
+        # Some maneuvers can "finish" (eg. lane change) while some are indefinite
+        # eg. vel keep and follow
+        self.maneuver_completed = False
 
     def update(self):
         self.logger.debug("  %s [ManeuverAction::update()]" % self.name)
@@ -48,35 +58,49 @@ class ManeuverAction(behaviour.Behaviour):
         #By standard, they return SUCCESS.
         #Except if a maneuver cannot be performed (FAILURE).
         #Or if a maneuver has ending (RUNNING or SUCCESS).
-        status =  common.Status.SUCCESS
-        
+        status = common.Status.SUCCESS
+
         #Maneuver specific logic for runtime configuration:
         if self.mconfig.mkey == M_VELKEEP:
+            pass
+            # status = common.Status.SUCCESS
+
+        elif self.mconfig.mkey == M_FOLLOW:
+            leading_vehicle = sv.ManeuverUtils.get_leading_vehicle(
+                self.bmodel.planner_state.vehicle_state,
+                self.bmodel.planner_state.lane_config,
+                self.bmodel.planner_state.traffic_vehicles)
+            if leading_vehicle is not None:
+                self.mconfig.target_vid = leading_vehicle.vid
+            else:
+                status = common.Status.FAILURE
+
+        elif self.mconfig.mkey == M_LANESWERVE:
+            # if self.status == common.Status.RUNNING:
+            if not self.maneuver_completed:
+                if sv.ManeuverUtils.lane_swerve_or_cutin_completed(
+                        self.bmodel.planner_state.vehicle_state,
+                        self.bmodel.planner_state.lane_config,
+                        self.mconfig,
+                        self.bmodel.planner_state.traffic_vehicles):
+                    status = common.Status.SUCCESS
+                    self.bmodel.set_ref_path_changed(True)
+                    self.maneuver_completed = True
+                else:
+                    status = common.Status.RUNNING
+            # self.bmodel.set_maneuver(self.mconfig)
+
+        # if self.mconfig.mkey == M_CUTIN:
+        #     self.bmodel.set_maneuver(self.mconfig)
+        #     #status = common.Status.RUNNING
+
+        # self.status = status
+        if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)
 
-        if self.mconfig.mkey == M_FOLLOW:
-            if self.bmodel.leading_vid > 0:
-                self.mconfig.target_vid = self.bmodel.leading_vid
-            else:
-                status =  common.Status.FAILURE
-            
-        if self.mconfig.mkey == M_LANESWERVE:
-            self.bmodel.set_maneuver(self.mconfig)
-            #status = common.Status.RUNNING
-            
-        if self.mconfig.mkey == M_CUTIN:
-            self.bmodel.set_maneuver(self.mconfig)
-            #status = common.Status.RUNNING
-            
-        if self.mconfig.mkey == M_STOP:
-            self.bmodel.set_maneuver(self.mconfig)
-            
-        if self.mconfig.mkey == M_REVERSE:
-            self.bmodel.set_maneuver(self.mconfig)
-        
         return status
 
-#original:
+# original:
 class Condition(behaviour.Behaviour):
     def __init__(self, name):
         super(Condition, self).__init__(name)
@@ -134,10 +158,9 @@ class Action(behaviour.Behaviour):
         else:
             status = common.Status.RUNNING
             self.know_repo.maneuver.update_status(ManeuverStatus.RUNNING)
-        
+
         return status
 
     def terminate(self, new_status):
         self.logger.debug("  %s [Action::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
 
-    

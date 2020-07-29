@@ -11,28 +11,30 @@ import datetime
 import time
 from dataclasses import dataclass
 from multiprocessing import shared_memory, Process, Lock, Array, Manager
+from typing import Tuple, Dict, List
+
 from TickSync import TickSync
+from mapping.LaneletMap import LaneletMap
 from sv.VehicleState import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import *
-from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
-from mapping.LaneletMap import LaneletMap
 from sv.btree.BTreeModel import * # Deprecated
 #from sv.btree.BTreeFactory import * 
-from sv.btree.BehaviorModels import *  
+from sv.btree.BehaviorModels import *
+# import sv.SV
+from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
 
-from typing import Tuple, Dict, List
 
 @dataclass
 class PlannerState:
-    sim_time:float
-    vehicle_state:VehicleState
-    lane_config:LaneConfig
-    traffic_vehicles:Dict
-    pedestrians:List
-    obstacles:List
-    goal_point:Tuple = None
-    goal_point_frenet:Tuple = None
+    sim_time: float
+    vehicle_state: VehicleState
+    lane_config: LaneConfig
+    traffic_vehicles: Dict#[int, sv.SV.Vehicle]
+    pedestrians: List
+    obstacles: List
+    goal_point: Tuple[float,float] = None
+    goal_point_frenet: Tuple[float,float] = None
 
 
 class SVPlanner(object):

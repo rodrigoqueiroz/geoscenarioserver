@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # CONFIG Data Classes and Constants for Maneuvers
