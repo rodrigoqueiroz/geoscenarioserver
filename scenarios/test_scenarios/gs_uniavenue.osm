@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-1942722' action='modify' visible='true' lat='43.47206346861' lon='-80.53745830974'>
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-1942723' action='modify' visible='true' lat='43.47215700421' lon='-80.53745063781'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_roads_around_campus.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Test roads around campus' />
+    <tag k='timeout' v='120' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-1942724' action='modify' visible='true' lat='43.47157129084' lon='-80.53716217306'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='route' v='outer_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-1942725' action='modify' visible='true' lat='43.47180401793' lon='-80.53671720084' />
+  <node id='-1942726' action='modify' visible='true' lat='43.47296652756' lon='-80.53691513829' />
+  <way id='-1944951' action='modify' visible='true'>
+    <nd ref='-1942725' />
+    <nd ref='-1942726' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='outer_route' />
+  </way>
+</osm>
