@@ -4,12 +4,11 @@
 # ---------------------------------------------
 # UTILS
 # --------------------------------------------
-#TODO: refactor and bring some lost and reusable functions to this file
-
 from math import sqrt, exp , trunc
 from matplotlib import pyplot as plt
 import uuid
 import numpy as np
+from scipy.stats import truncnorm
 
 
 #Truncates a vector of numbers
@@ -44,10 +43,8 @@ def differentiate(coefficients):
     return der_coef
 
 
-def get_f_and_N_derivatives(coeffs, N=3):
-    functions = [to_equation(coeffs)]
-    for i in range(N):
-        coeffs = differentiate(coeffs)
-        functions.append(to_equation(coeffs))
-    return functions
+def get_truncated_normal(mean, sd, lo, up):
+    return truncnorm.rvs(
+        (lo - mean) / sd, (up - mean) / sd, loc=mean, scale=sd)
+
 

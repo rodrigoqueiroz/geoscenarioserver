@@ -61,11 +61,11 @@ class ManeuverAction(behaviour.Behaviour):
         status = common.Status.SUCCESS
 
         #Maneuver specific logic for runtime configuration:
-        if self.mconfig.mkey == M_VELKEEP:
+        if self.mconfig.mkey == Maneuver.M_VELKEEP:
             pass
             # status = common.Status.SUCCESS
 
-        elif self.mconfig.mkey == M_FOLLOW:
+        elif self.mconfig.mkey == Maneuver.M_FOLLOW:
             leading_vehicle = sv.ManeuverUtils.get_leading_vehicle(
                 self.bmodel.planner_state.vehicle_state,
                 self.bmodel.planner_state.lane_config,
@@ -75,7 +75,7 @@ class ManeuverAction(behaviour.Behaviour):
             else:
                 status = common.Status.FAILURE
 
-        elif self.mconfig.mkey == M_LANESWERVE:
+        elif self.mconfig.mkey == Maneuver.M_LANESWERVE:
             # if self.status == common.Status.RUNNING:
             if not self.maneuver_completed:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(

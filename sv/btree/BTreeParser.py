@@ -33,7 +33,7 @@ class BTreeParser(object):
         #Drive SubTree
         #maneuvers
         m_vk = ManeuverAction(bmodel,"m vel keep", mvk_config)
-        m_follow = ManeuverAction(bmodel,"m follow", MFollowConfig(-1))
+        m_follow = ManeuverAction(bmodel,"m follow", MFollowConfig())
         m_stop = ManeuverAction(bmodel,"m stop", mstop_config)
         #conditions
         c_lane_occupied = BCondition(bmodel,"c lane_occupied?", "lane_occupied")
@@ -78,7 +78,7 @@ class BTreeParser(object):
 
     def lane_change_tree(self, bmodel, target=1):
         # determine whether to do cutin
-        m_lane_swerve = ManeuverAction(bmodel, "m lane swerve", MLaneSwerveConfig(target))
+        m_lane_swerve = ManeuverAction(bmodel, "m lane swerve", MLaneSwerveConfig(target_lid = target))
 
         return m_lane_swerve
 
@@ -113,7 +113,7 @@ class BTreeParser(object):
 
     def fast_driver_scenario_tree(self,bmodel):
         #faster driver (e.g., 16/m/s)
-        mvk_config = MVelKeepConfig(MP(16.0))
+        mvk_config = MVelKeepConfig(vel = MP(16.0))
         root = drive_tree(bmodel,mvk_config=mvk_config)
 
         return root

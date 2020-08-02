@@ -5,9 +5,11 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - python 3.8
 - numpy
 - matplotlib
+- scipy
 - python3-tk
 - python3-sysv-ipc
 - [py_trees](https://github.com/splintered-reality/py_trees)
+
 
 #### Lanelet Dependencies:
 - [lanelet2](https://github.com/yuzhangbit/lanelet2_standalone)
