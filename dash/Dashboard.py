@@ -76,8 +76,12 @@ class Dashboard(object):
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
             #planning data
             if self.center_vid not in debug_shdata:
-                self.center_vid = next(iter(debug_shdata))
-                print( "Dash: center vid not in array, auto switch to {}".format(self.center_vid) )
+                if 1 in debug_shdata:
+                    self.center_vid = 1
+                    print( "Dash: center vid not in array, auto switch to {}".format(self.center_vid) )
+                else:
+                    self.center_vid = next(iter(debug_shdata))
+                    print( "Dash: center vid not in array, auto switch to {}".format(self.center_vid) )
             vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[self.center_vid]
 
             #update stats

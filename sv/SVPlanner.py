@@ -82,8 +82,8 @@ class SVPlanner(object):
         self._mplan_sharr.acquire() #<=========LOCK
         plan.set_plan_vector(self._mplan_sharr[:])
         self._mplan_sharr.release() #<=========RELEASE
-        if (plan.t == 0): #if not valid
-            return None
+        #if (plan.t == 0): #if not valid
+        #    return None
         if (self.motion_plan): #if same as current
             if (np.array_equal(self.motion_plan.get_plan_vector(),plan.get_plan_vector())):
                 return None

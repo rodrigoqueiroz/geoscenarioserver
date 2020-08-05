@@ -152,10 +152,13 @@ class SV(Vehicle):
         #Read planner
         plan = self.sv_planner.get_plan()
         if plan:
-            self.set_new_motion_plan(plan, sim_time)
-            if plan.new_frenet_frame:
-                # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
-                self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
+            if plan.t is not 0:
+                self.set_new_motion_plan(plan, sim_time)
+                if plan.new_frenet_frame:
+                    # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
+                    self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
+            else:
+                self.set_new_motion_plan(plan, sim_time)
         
         #Compute new state
         self.compute_vehicle_state(delta_time)
@@ -226,6 +229,11 @@ class SV(Vehicle):
         Set a new trajectory to start following immediately.
         candidates: save computed trajectories for visualization and debug
         """
+        if (plan.t == 0):
+            self.trajectory = None
+            return
+
+
         # if self.s_eq:
         #     print('current s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
         trajectory = plan.get_trajectory()

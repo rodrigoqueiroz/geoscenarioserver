@@ -1,0 +1,4639 @@
+<osm generator="JOSM" version="0.6">
+    <node id="-2" lat="43.47784362777" lon="-80.52013650007">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-5" lat="43.47781854055" lon="-80.5201139133">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-8" lat="43.47791095769" lon="-80.51953304321">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-9" lat="43.47791806994" lon="-80.51953545638">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-11" lat="43.47793336096" lon="-80.51953798984">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-12" lat="43.47794886043" lon="-80.51953800959">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-14" lat="43.47796415786" lon="-80.51953551511">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-16" lat="43.47799254217" lon="-80.5195233125">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-18" lat="43.47800487734" lon="-80.51951392755">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-19" lat="43.47801552696" lon="-80.51950266614">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-20" lat="43.47802420899" lon="-80.51948982651">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-21" lat="43.47803069349" lon="-80.51947574869">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-24" lat="43.4776333235" lon="-80.51934844752">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-27" lat="43.47761659903" lon="-80.51938160996">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-30" lat="43.47759982234" lon="-80.51941764972">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-33" lat="43.47758533888" lon="-80.51945161113">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-36" lat="43.47785166452" lon="-80.51990425772">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-37" lat="43.47784971018" lon="-80.51985749799">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-39" lat="43.47784269651" lon="-80.51981916473">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-45" lat="43.47813013553" lon="-80.51942667842">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-46" lat="43.47836738722" lon="-80.51876666931">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-48" lat="43.47839594075" lon="-80.51877975634">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-51" lat="43.47842330455" lon="-80.51879641257">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-54" lat="43.47845175126" lon="-80.51881577227">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-55" lat="43.4783745256" lon="-80.51903197921">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-56" lat="43.47825198336" lon="-80.51938413944">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-59" lat="43.47821391198" lon="-80.51949359464">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-60" lat="43.47820103887" lon="-80.51956002049">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-61" lat="43.47819354874" lon="-80.51962726638">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-62" lat="43.4781914901" lon="-80.51969489679">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-65" lat="43.4781948763" lon="-80.51976247374">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-66" lat="43.47820493222" lon="-80.51980503888">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-67" lat="43.47822173276" lon="-80.51984542025">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-68" lat="43.47824483651" lon="-80.51988255688">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-69" lat="43.47827363646" lon="-80.51991547308">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-72" lat="43.47818269143" lon="-80.51946774194">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-73" lat="43.47817912318" lon="-80.51949337136">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-74" lat="43.47817050004" lon="-80.51955067342">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-75" lat="43.47815963868" lon="-80.51963178767">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-77" lat="43.47815474762" lon="-80.51971347957">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-79" lat="43.47815585314" lon="-80.5197953103">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-80" lat="43.47817491144" lon="-80.51983903164">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-81" lat="43.47819850273" lon="-80.51988048312">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-82" lat="43.47822636049" lon="-80.51991919643">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-85" lat="43.47810468156" lon="-80.51940845685">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-86" lat="43.47818440667" lon="-80.51918616828">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-87" lat="43.47834101737" lon="-80.5187492086">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-89" lat="43.47788452608" lon="-80.51992645404">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-92" lat="43.4778938949" lon="-80.51957451071">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-98" lat="43.47790673928" lon="-80.51958260287">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-99" lat="43.47792079213" lon="-80.5195884112">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-100" lat="43.47793562623" lon="-80.51959175317">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-101" lat="43.47795081217" lon="-80.51959253203">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-102" lat="43.47796591034" lon="-80.51959072523">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-103" lat="43.47798048369" lon="-80.51958638509">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-104" lat="43.47799411034" lon="-80.51957963724">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-105" lat="43.47800639585" lon="-80.51957067701">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-108" lat="43.47821387101" lon="-80.52007871674">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-109" lat="43.47812125899" lon="-80.52003240135">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-110" lat="43.47809297271" lon="-80.52003330255">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-113" lat="43.47802732325" lon="-80.52006349372">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-114" lat="43.47801427521" lon="-80.52006894832">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-116" lat="43.47803043286244" lon="-80.5200172817139">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-118" lat="43.47796260349" lon="-80.52021305708">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-120" lat="43.47815701843" lon="-80.5194465167">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-123" lat="43.47816563434" lon="-80.51992588229">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-124" lat="43.47813866555" lon="-80.51985773375">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-125" lat="43.47811651826" lon="-80.51978767908">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-126" lat="43.47809902496" lon="-80.51971631982">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-127" lat="43.47808626137" lon="-80.51964396479">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-130" lat="43.47814880248" lon="-80.51995858285">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-131" lat="43.47811495542" lon="-80.51991780337">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-132" lat="43.47808647869" lon="-80.51987240601">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-133" lat="43.4780640184" lon="-80.51982375028">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-134" lat="43.47804794066" lon="-80.51977262934">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-135" lat="43.47803850756" lon="-80.51971987651">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-136" lat="43.47803587288" lon="-80.51966635172">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-137" lat="43.47804007956" lon="-80.51961292749">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-140" lat="43.47783332374" lon="-80.51972332841">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-141" lat="43.47763713064" lon="-80.51954546689">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-142" lat="43.47756714005" lon="-80.51948460548">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-144" lat="43.47807830172" lon="-80.51957093237">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-145" lat="43.47806110929" lon="-80.51960049714">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-146" lat="43.47803930166" lon="-80.51962683608">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-147" lat="43.47801345506" lon="-80.51964922503">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-148" lat="43.47798427494" lon="-80.5196670529">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-149" lat="43.47795255777" lon="-80.51967983309">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-150" lat="43.47791916925" lon="-80.51968721677">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-151" lat="43.4778850207" lon="-80.5196890024">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-154" lat="43.47810472847" lon="-80.51958966512">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-156" lat="43.47808147843" lon="-80.51964781556">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-157" lat="43.47806274976" lon="-80.51967317362">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-158" lat="43.47804020564" lon="-80.51969520898">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-159" lat="43.47801442678" lon="-80.51971335406">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-160" lat="43.47798607716" lon="-80.5197271415">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-161" lat="43.47795588701" lon="-80.51973621614">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-162" lat="43.47792463397" lon="-80.51974034426">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-163" lat="43.47789312303" lon="-80.51973941953">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-164" lat="43.47786216586" lon="-80.51973346575">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-167" lat="43.47796311679" lon="-80.51997733907">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-168" lat="43.47797630302" lon="-80.51995820366">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-169" lat="43.47799236823" lon="-80.51994141232">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-170" lat="43.47801090241" lon="-80.51992739361">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-171" lat="43.47803143252" lon="-80.51991650532">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-172" lat="43.47805343457" lon="-80.51990902534">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-173" lat="43.47807634701" lon="-80.51990514459">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-174" lat="43.47809958506" lon="-80.51990496212">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-175" lat="43.47812255562" lon="-80.51990848257">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-176" lat="43.47814467242" lon="-80.51991561611">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-179" lat="43.47793757738" lon="-80.51996365469">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-180" lat="43.4779451662" lon="-80.51993903828">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-181" lat="43.47795691172" lon="-80.5199161123">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-182" lat="43.47797245752" lon="-80.51989557244">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-183" lat="43.47799133186" lon="-80.51987804197">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-184" lat="43.478012962" lon="-80.51986405287">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-185" lat="43.47803669157" lon="-80.51985402964">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-186" lat="43.4780618005" lon="-80.51984827642">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-187" lat="43.47808752686" lon="-80.51984696779">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-188" lat="43.47811308997" lon="-80.51985014348">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-189" lat="43.47813771414" lon="-80.51985770711">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-190" lat="43.47816065212" lon="-80.51986942917">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-194" lat="43.47789072292" lon="-80.5198969769">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-195" lat="43.47789261545" lon="-80.51986533497">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-196" lat="43.47788967304" lon="-80.51983377336">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-197" lat="43.47788196417" lon="-80.51980302655">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-198" lat="43.47786966823" lon="-80.51977381007">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-199" lat="43.47785307137" lon="-80.51974680382">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-202" lat="43.47785104418" lon="-80.51968514126">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-203" lat="43.47788295711" lon="-80.51971867464">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-204" lat="43.47791019886" lon="-80.51975610204">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-205" lat="43.47793229926" lon="-80.51979677752">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-206" lat="43.47794887692" lon="-80.51983999909">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-207" lat="43.47795964572" lon="-80.51988502082">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-208" lat="43.47796441981" lon="-80.51993106569">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-211" lat="43.47786413122" lon="-80.51964706988">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-212" lat="43.47789998653" lon="-80.51966655805">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-213" lat="43.47793234434" lon="-80.51969142497">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-214" lat="43.47796040487" lon="-80.51972105602">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-215" lat="43.47798347453" lon="-80.51975471881">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-216" lat="43.47800098311" lon="-80.51979158128">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-217" lat="43.47801249786" lon="-80.5198307323">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-218" lat="43.47801773416" lon="-80.51987120418">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-219" lat="43.47801656258" lon="-80.51991199658">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-220" lat="43.47800901209" lon="-80.51995210122">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-223" lat="43.47806464116" lon="-80.5257618434">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-226" lat="43.47812638448" lon="-80.5256000331">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-227" lat="43.4781011345" lon="-80.5257724046">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-229" lat="43.4782030721" lon="-80.52549429255">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-231" lat="43.47816039916" lon="-80.52551997051">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-233" lat="43.47814973777" lon="-80.52554046459">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-235" lat="43.47814279771" lon="-80.525552212">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-236" lat="43.47813624205" lon="-80.52556670196">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-237" lat="43.47813111304" lon="-80.52558067158">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-238" lat="43.47812796634" lon="-80.52559219904">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-241" lat="43.47820282918" lon="-80.52475333281">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-244" lat="43.47816147012" lon="-80.52474394508">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-247" lat="43.47777463992" lon="-80.52519321509">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-248" lat="43.47790650307" lon="-80.52522003718">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-251" lat="43.47777804598" lon="-80.52527770467">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-254" lat="43.47776928753" lon="-80.52523613043">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-257" lat="43.47796927177" lon="-80.52523411877">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-258" lat="43.47797178009" lon="-80.52523408525">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-259" lat="43.47797865301" lon="-80.52523360915">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-260" lat="43.47798891253" lon="-80.52523212723">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-262" lat="43.47801567922" lon="-80.52522389285">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-264" lat="43.47803023034" lon="-80.52521601386">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-265" lat="43.47804425596" lon="-80.52520487599">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-267" lat="43.47805677805" lon="-80.52518991597">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-268" lat="43.47806681859" lon="-80.52517057054">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-270" lat="43.47807522423" lon="-80.52514778517">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-273" lat="43.47802366932" lon="-80.52557603605">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-274" lat="43.47802451103" lon="-80.525547055">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-277" lat="43.47800941646" lon="-80.52549242623">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-278" lat="43.47800114414" lon="-80.52547781892">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-280" lat="43.47799019466" lon="-80.52546680041">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-281" lat="43.47797243429" lon="-80.52544936571">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-282" lat="43.47795894504" lon="-80.52544180759">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-285" lat="43.47864561261" lon="-80.52546009488">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-286" lat="43.47845292923" lon="-80.52544333108">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-287" lat="43.47827523598" lon="-80.52542040657">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-290" lat="43.47864463995" lon="-80.5255030109">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-291" lat="43.47852202332" lon="-80.52548825875">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-292" lat="43.47830452368" lon="-80.52546612985">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-295" lat="43.47863977373" lon="-80.52554123171">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-296" lat="43.47859549553" lon="-80.52553653784">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-297" lat="43.47844076485" lon="-80.52552111514">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-298" lat="43.47839648651" lon="-80.52551709183">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-299" lat="43.47830763492" lon="-80.52550819711">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-302" lat="43.47808410428" lon="-80.52559152313">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-303" lat="43.47808891556" lon="-80.52557371326">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-304" lat="43.47809508731" lon="-80.52555395544">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-305" lat="43.47810390994" lon="-80.52552918859">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-306" lat="43.47811548855" lon="-80.52550108239">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-307" lat="43.47812992822" lon="-80.52547130652">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-308" lat="43.47814733407" lon="-80.52544153064">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-309" lat="43.4781678112" lon="-80.52541342445">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-310" lat="43.47819146469" lon="-80.5253886576">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-313" lat="43.47805746413" lon="-80.52558548815">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-314" lat="43.47805784755" lon="-80.52557811677">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-315" lat="43.47805986491" lon="-80.52555642374">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-316" lat="43.47806414777" lon="-80.52552472875">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-317" lat="43.47807144936" lon="-80.52548668094">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-318" lat="43.4780825229" lon="-80.52544592947">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-319" lat="43.47809812161" lon="-80.52540612347">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-320" lat="43.47811899872" lon="-80.5253709121">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-321" lat="43.47814590743" lon="-80.5253439445">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-322" lat="43.47817960096" lon="-80.52532886982">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-325" lat="43.47820888111" lon="-80.52544978292">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-326" lat="43.47820222193" lon="-80.52544919439">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-327" lat="43.47819266848" lon="-80.52544931307">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-328" lat="43.47818037657" lon="-80.52545180149">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-329" lat="43.47816597096" lon="-80.52545799941">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-330" lat="43.47815007643" lon="-80.52546924658">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-331" lat="43.47813331772" lon="-80.52548688278">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-332" lat="43.47811631962" lon="-80.52551224776">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-333" lat="43.47809970688" lon="-80.52554668128">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-336" lat="43.47796470943" lon="-80.52527414825">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-337" lat="43.47796850792" lon="-80.5252751115">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-338" lat="43.47797890154" lon="-80.52527700185">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-339" lat="43.47799438747" lon="-80.52527832016">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-340" lat="43.4780134629" lon="-80.52527756734">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-341" lat="43.47803462503" lon="-80.52527324425">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-342" lat="43.47805637104" lon="-80.52526385179">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-343" lat="43.47807719813" lon="-80.52524789084">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-344" lat="43.4780956035" lon="-80.52522386228">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-345" lat="43.47811008435" lon="-80.525190267">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-348" lat="43.47795467441" lon="-80.52536219426">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-349" lat="43.47796869567" lon="-80.52536493011">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-350" lat="43.47798373484" lon="-80.52537016042">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-351" lat="43.47800191537" lon="-80.52537957497">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-352" lat="43.47802157898" lon="-80.52539438076">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-353" lat="43.47804106742" lon="-80.52541578479">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-354" lat="43.47805872242" lon="-80.52544499405">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-355" lat="43.47807288574" lon="-80.52548321553">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-356" lat="43.47808189911" lon="-80.52553165622">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-359" lat="43.47796011978" lon="-80.52531441726">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-360" lat="43.47796425223" lon="-80.52531554326">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-361" lat="43.47797952496" lon="-80.52531927355">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-362" lat="43.47800171101" lon="-80.52532705933">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-363" lat="43.47802813611" lon="-80.52534018405">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-364" lat="43.47805612604" lon="-80.52535993114">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-365" lat="43.47808300656" lon="-80.52538758405">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-366" lat="43.47810610344" lon="-80.5254244262">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-367" lat="43.47812274245" lon="-80.52547174104">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-368" lat="43.47813024937" lon="-80.525530812">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-371" lat="43.47811913788" lon="-80.52514560588">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-372" lat="43.4781179915" lon="-80.52515042447">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-373" lat="43.47811551385" lon="-80.52516355522">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-374" lat="43.47811314713" lon="-80.52518301062">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-375" lat="43.47811233358" lon="-80.52520680316">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-376" lat="43.47811451539" lon="-80.52523294531">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-377" lat="43.47812113479" lon="-80.52525944956">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-378" lat="43.478133634" lon="-80.52528432839">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-379" lat="43.47815345522" lon="-80.52530559428">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-380" lat="43.47818204066" lon="-80.52532125972">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-384" lat="43.47811811947" lon="-80.52515172467">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-385" lat="43.47811478593" lon="-80.52516832419">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-386" lat="43.47810871976" lon="-80.52519276917">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-387" lat="43.47809950349" lon="-80.52522242434">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-388" lat="43.47808671963" lon="-80.52525465444">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-389" lat="43.4780699507" lon="-80.52528682418">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-390" lat="43.4780487792" lon="-80.52531629831">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-391" lat="43.47802278764" lon="-80.52534044154">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-392" lat="43.47799155854" lon="-80.52535661861">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-395" lat="43.47816061861433" lon="-80.52515231140225">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-396" lat="43.47816007609" lon="-80.52515984038">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-398" lat="43.4781584242" lon="-80.52518112778">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-399" lat="43.47815550479" lon="-80.52521279938">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-400" lat="43.47814811861" lon="-80.52525047512">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-401" lat="43.47813568176" lon="-80.52529061314">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-402" lat="43.47811688047" lon="-80.52532950393">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-403" lat="43.47809040098" lon="-80.52536343798">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-404" lat="43.47805492949" lon="-80.52538870581">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-405" lat="43.47800915224" lon="-80.5254015979">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-418" lat="43.47800683051" lon="-80.52574724482">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-419" lat="43.47801111754" lon="-80.52569076486">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-428" lat="43.47795175542" lon="-80.52539840475">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-429" lat="43.47790406993" lon="-80.52539002184">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-430" lat="43.47779094011" lon="-80.52536789361">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-431" lat="43.47776004226" lon="-80.52536152337">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-433" lat="43.47822083252" lon="-80.52532933719">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-434" lat="43.47834977574" lon="-80.52535683051">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-435" lat="43.47842860096" lon="-80.52537292377">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-436" lat="43.4786495052" lon="-80.5254205323">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-443" lat="43.4779580194" lon="-80.52544098381">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-449" lat="43.47821839964" lon="-80.52536889978">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-450" lat="43.47821510795" lon="-80.52536896616">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-451" lat="43.47820625468" lon="-80.52536814339">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-452" lat="43.47819337255" lon="-80.52536489859">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-453" lat="43.47817799428" lon="-80.52535769887">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-454" lat="43.47816165259" lon="-80.52534501135">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-455" lat="43.47814588018" lon="-80.52532530315">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-456" lat="43.47813220979" lon="-80.52529704139">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-457" lat="43.47812217412" lon="-80.52525869317">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-458" lat="43.47811730591" lon="-80.52520872563">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-461" lat="43.47821322976" lon="-80.52541089311">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-462" lat="43.47819553831" lon="-80.5254099483">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-463" lat="43.47817564606" lon="-80.52540565878">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-464" lat="43.47815220958" lon="-80.52539642461">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-465" lat="43.47812777463" lon="-80.52538038298">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-466" lat="43.47810488699" lon="-80.52535567112">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-467" lat="43.47808609244" lon="-80.52532042623">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-468" lat="43.47807393674" lon="-80.5252727855">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-469" lat="43.4780709657" lon="-80.52521088615">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-474" lat="43.47806242628" lon="-80.525534028">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-475" lat="43.47806249253" lon="-80.52552528343">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-476" lat="43.47806152531" lon="-80.52551216957">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-477" lat="43.47805864293" lon="-80.52549588135">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-478" lat="43.47805296371" lon="-80.52547761365">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-479" lat="43.47804360593" lon="-80.52545856138">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-480" lat="43.47802968792" lon="-80.52543991946">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-481" lat="43.47801032796" lon="-80.52542288277">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-482" lat="43.47798464436" lon="-80.52540864624">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-486" lat="43.47816006732" lon="-80.52515486889">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-487" lat="43.4781591618" lon="-80.52516370542">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-489" lat="43.47815835554" lon="-80.52517687909">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-490" lat="43.47815822368" lon="-80.52519311853">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-492" lat="43.47815885477" lon="-80.52521215819">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-493" lat="43.47816228368" lon="-80.52522970922">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-494" lat="43.47816762581" lon="-80.52524751775">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-495" lat="43.47817594287" lon="-80.52526330657">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-497" lat="43.47818781" lon="-80.52527580433">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-501" lat="43.47811894986" lon="-80.52003446517">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-507" lat="43.47826692834" lon="-80.51996278082">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-508" lat="43.47852942851" lon="-80.52020457759">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-509" lat="43.47866848156" lon="-80.5203337229">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-511" lat="43.47824864483" lon="-80.52000264577">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-512" lat="43.47851159137" lon="-80.52024474821">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-513" lat="43.47865047834" lon="-80.52037462659">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-515" lat="43.47863636771" lon="-80.52040882476">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-516" lat="43.47851607149" lon="-80.520297593">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-517" lat="43.47839112902" lon="-80.52017819879">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-520" lat="43.47861933764" lon="-80.52044637568">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-521" lat="43.47853180797" lon="-80.52036281175">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-522" lat="43.47842646258" lon="-80.5202657517">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-525" lat="43.47819836462107" lon="-80.52011333958521">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-526" lat="43.47818202721" lon="-80.52010701969">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-527" lat="43.47815109421" lon="-80.52009869158">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-528" lat="43.47810588445" lon="-80.52009631212">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-531" lat="43.47805353631" lon="-80.52011653754">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-532" lat="43.47801749425" lon="-80.52014029962">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-533" lat="43.47799475294" lon="-80.52016379148">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-536" lat="43.4778907616" lon="-80.52017770736">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-539" lat="43.47813429615" lon="-80.51999645105">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-540" lat="43.47810816508" lon="-80.51997233917">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-543" lat="43.47782086496" lon="-80.5197646255">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-544" lat="43.47779641431" lon="-80.51973662994">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-545" lat="43.47772493275" lon="-80.51967086449">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-546" lat="43.47758573428" lon="-80.51954951198">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-547" lat="43.4775525277" lon="-80.51951980081">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-549" lat="43.47788078744" lon="-80.5196125677">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-552" lat="43.4780774164" lon="-80.51939244629">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-553" lat="43.47818783719" lon="-80.51908236182">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-554" lat="43.47821368496" lon="-80.51900485671">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-555" lat="43.47831863488" lon="-80.5187197043">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-557" lat="43.47791183645" lon="-80.51994614401">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-563" lat="43.47795207403118" lon="-80.52543691663612">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-564" lat="43.47789944742" lon="-80.52542623166">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-565" lat="43.47785078946" lon="-80.52542053197">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-566" lat="43.47775444658" lon="-80.52540209178">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-568" lat="43.47808064489" lon="-80.52513321228">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-569" lat="43.47809188952" lon="-80.52504435249">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-570" lat="43.47811086606" lon="-80.52488878436">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-571" lat="43.47813032916" lon="-80.52473321624">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-580" lat="43.47827522837" lon="-80.52542044586">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-583" lat="43.47803933909" lon="-80.52575580843">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-590" lat="43.47822800953" lon="-80.52529094808">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-591" lat="43.47832641961" lon="-80.52530989118">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-592" lat="43.47846947278" lon="-80.52534073658">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-593" lat="43.47865193806" lon="-80.52538432248">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-599" lat="43.47860279413" lon="-80.52048191495">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-600" lat="43.47849492633" lon="-80.52037589879">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-601" lat="43.47822232689" lon="-80.52012796292">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-602" lat="43.47821434692" lon="-80.52012334775">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-605" lat="43.47799511948" lon="-80.51999094497">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-606" lat="43.47791978527" lon="-80.52020104447">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-611" lat="43.47779031448" lon="-80.52009645273">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-612" lat="43.47784747499" lon="-80.51993498466">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-615" lat="43.47813329715" lon="-80.51960629158">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-616" lat="43.47811096755" lon="-80.51966892548">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-619" lat="43.47816292886405" lon="-80.51962611455387">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-627" lat="43.47786629398" lon="-80.52016413935">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-630" lat="43.47828377857" lon="-80.5199253295">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-631" lat="43.47835810732" lon="-80.51999756449">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-632" lat="43.47854274096" lon="-80.52017470549">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-633" lat="43.47868161903" lon="-80.52030019529">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-635" lat="43.47764421354" lon="-80.51931769843">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-636" lat="43.47773471066" lon="-80.51939032476">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-637" lat="43.47783844373" lon="-80.51947645177">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-638" lat="43.47790339232" lon="-80.51953047629">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-641" lat="43.47777609966" lon="-80.52532598443">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-644" lat="43.4782315043" lon="-80.52003370892">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-653" lat="43.47804936623" lon="-80.51956268621">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-656" lat="43.47801835753" lon="-80.51955869251">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-684" lat="43.47819462348" lon="-80.51984510721">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-687" lat="43.47818208821" lon="-80.5198858343">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-717" lat="43.478134742100956" lon="-80.51970043210777">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-718" lat="43.47808994867161" lon="-80.5196321093752">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-720" lat="43.4781259488089" lon="-80.51993759549758">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-721" lat="43.4780935807183" lon="-80.52000875870678">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-723" lat="43.478063918364306" lon="-80.52553945394689">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-724" lat="43.47802939874471" lon="-80.52553150601071">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-726" lat="43.478061985400785" lon="-80.5255386001533">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-727" lat="43.47802167727" lon="-80.52553028024">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-730" lat="43.47799647152445" lon="-80.52523075260066">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-732" lat="43.47797580038131" lon="-80.52544485187563">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-733" lat="43.47802401895881" lon="-80.52521937713469">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-735" lat="43.478070022947286" lon="-80.52516188441217">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-736" lat="43.4781586767738" lon="-80.52517163037595">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-738" lat="43.478053711486055" lon="-80.5251935795646">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-739" lat="43.478158607134155" lon="-80.52520468714427">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-741" lat="43.478147467264876" lon="-80.52554430786448">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-742" lat="43.47817906772652" lon="-80.52526659748396">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-744" lat="43.47817860542" lon="-80.52550405093">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-745" lat="43.47820399153" lon="-80.52528356435">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-747" lat="43.47801707375" lon="-80.5255096715">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-748" lat="43.47815165111756" lon="-80.52553678661785">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-750" lat="43.47799236053117" lon="-80.52546897993555">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-753" lat="43.47782862977" lon="-80.51978252451">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-754" lat="43.47792482511459" lon="-80.5195365755966">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-756" lat="43.47784120460038" lon="-80.51981527869083">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-757" lat="43.47795269413852" lon="-80.51953738444521">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-759" lat="43.47799782727558" lon="-80.5195192914408">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-760" lat="43.47812936698304" lon="-80.51971675957226">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-762" lat="43.47797300917427" lon="-80.51953459575353">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-763" lat="43.478118303207275" lon="-80.51975036690595">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-765" lat="43.478192139904394" lon="-80.51970786465922">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-766" lat="43.478154895104566" lon="-80.51971101624018">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-768" lat="43.47819382926124" lon="-80.51974157843361">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-769" lat="43.478155159645" lon="-80.51974397771218">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-771" lat="43.47814104609457" lon="-80.51979689801544">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-772" lat="43.47808003351803" lon="-80.51999663132345">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-774" lat="43.47812002882755" lon="-80.519777986587">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-775" lat="43.4780587022257" lon="-80.51997753566685">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-777" lat="43.47803178044174" lon="-80.52001318831226">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-778" lat="43.477848224671455" lon="-80.51984937893282">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-780" lat="43.47804212891157" lon="-80.51998175383761">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-781" lat="43.477834337374816" lon="-80.51979739134353">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-783" lat="43.47808900169519" lon="-80.52003424172169">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-784" lat="43.4781033773917" lon="-80.52009728075667">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-786" lat="43.47806360487" lon="-80.52004024824">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-787" lat="43.478078761976896" lon="-80.5201067912607">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-789" lat="43.47801277617223" lon="-80.5200041133383">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-790" lat="43.47800469735644" lon="-80.52002994665833">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-791" lat="43.47794119438294" lon="-80.52020705077368">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-794" lat="43.47797911813961" lon="-80.51998414202012">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-795" lat="43.47790527343589" lon="-80.52018937591242">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-798" lat="43.47787852778485" lon="-80.52017092335062">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-802" lat="43.47785496087482" lon="-80.52015031970616">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-806" lat="43.47783108416018" lon="-80.52012520668231">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-810" lat="43.47780442750786" lon="-80.52010518300828">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-811" lat="43.47786600053344" lon="-80.5199307193517">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-815" lat="43.47790242629977" lon="-80.51955377695587">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-816" lat="43.47791240461529" lon="-80.51955902961532">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-817" lat="43.47792280862648" lon="-80.5195624933831">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-818" lat="43.4779270765509" lon="-80.5195632005101">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-819" lat="43.477949836302635" lon="-80.51956527079231">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-820" lat="43.47795175315818" lon="-80.51956495822058">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-821" lat="43.47796503410277" lon="-80.51956312015211">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-822" lat="43.47797674643289" lon="-80.51956049040506">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-823" lat="43.47800544984978" lon="-80.51954100249904">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-824" lat="43.47800809240197" lon="-80.51953899196721">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-825" lat="43.47801161743419" lon="-80.51953631001753">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-826" lat="43.47801694224754" lon="-80.51953067930671">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-827" lat="43.47802128326698" lon="-80.51952425949041">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-828" lat="43.47802452552111" lon="-80.51951722058014">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-829" lat="43.478047887006866" lon="-80.51947556940783">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-832" lat="43.47782709434911" lon="-80.51974397696632">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-833" lat="43.477814869021486" lon="-80.51972997917842">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-834" lat="43.47777912824824" lon="-80.51969709642654">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-835" lat="43.47757643717389" lon="-80.51951705873998">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-836" lat="43.47755983387391" lon="-80.51950220315304">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-839" lat="43.47784218395902" lon="-80.51970423484337">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-840" lat="43.47761123477549" lon="-80.51949853900048">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-841" lat="43.47757623946416" lon="-80.51946810831119">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-844" lat="43.47759258061362" lon="-80.51943463042149">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-848" lat="43.477608210688864" lon="-80.51939962983725">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-852" lat="43.477624961268376" lon="-80.519365028738">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-856" lat="43.47763876852318" lon="-80.51933307297034">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-857" lat="43.47768401708219" lon="-80.5193693861225">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-858" lat="43.47786616931963" lon="-80.51952548120705">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-859" lat="43.477898643614616" lon="-80.51955249349012">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-863" lat="43.47786809530044" lon="-80.5199153558769">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-864" lat="43.47787116281381" lon="-80.51986141647836">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-865" lat="43.47786894885149" lon="-80.51984157615084">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-866" lat="43.47786233033528" lon="-80.51981109564473">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-867" lat="43.477855436415034" lon="-80.51979454438829">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-868" lat="43.477852002802926" lon="-80.51978560071029">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-869" lat="43.47784085056964" lon="-80.5197646641712">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-873" lat="43.47843752790553" lon="-80.5188060924178">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-874" lat="43.47839891512269" lon="-80.51891419600034">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-875" lat="43.47821733740579" lon="-80.5194259407102">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-879" lat="43.478409622657374" lon="-80.51878808445746">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-883" lat="43.47838166398968" lon="-80.51877321282555">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-887" lat="43.47811740853676" lon="-80.51941756762687">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-888" lat="43.47815727117734" lon="-80.51930642334152">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-889" lat="43.478354202287505" lon="-80.51875793894787">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-892" lat="43.47809104897368" lon="-80.51940045156428">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-893" lat="43.47818612194287" lon="-80.51913426501861">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-894" lat="43.478199045859306" lon="-80.51909551246507">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-895" lat="43.47832982612471" lon="-80.51873445644561">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-898" lat="43.47819651758018" lon="-80.51949348299998">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-899" lat="43.47818576945741" lon="-80.51955534695456">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-900" lat="43.47817659371067" lon="-80.51962952702553">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-901" lat="43.47817319260793" lon="-80.51970295651513">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-902" lat="43.478173517504906" lon="-80.51970944045014">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-903" lat="43.47817449445344" lon="-80.51974277807325">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-904" lat="43.47817501802581" lon="-80.51975322574773">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-905" lat="43.478189921832374" lon="-80.51982203526298">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-906" lat="43.47821011774817" lon="-80.51986295168562">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-907" lat="43.47823559850387" lon="-80.51990087665304">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-908" lat="43.47827028240441" lon="-80.51993912693746">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-912" lat="43.477924706907345" lon="-80.51995489934265">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-916" lat="43.47789818126529" lon="-80.51993629902269">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-920" lat="43.47787245933361" lon="-80.51962981878759">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-924" lat="43.47788734117423" lon="-80.51959353919936">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-925" lat="43.47815105852513" lon="-80.51983191040469">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-926" lat="43.478161567154935" lon="-80.51984136612957">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-930" lat="43.47820611781447" lon="-80.52009602817013">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-931" lat="43.47819794911043" lon="-80.52009286821914">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-932" lat="43.47813617660936" lon="-80.52006554646695">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-933" lat="43.4780994285878" lon="-80.52006480734856">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-934" lat="43.47809817505829" lon="-80.52006529166886">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-935" lat="43.47807118343219" lon="-80.52007351976336">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-936" lat="43.478040429786596" lon="-80.52009001563137">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-937" lat="43.47801588473658" lon="-80.52010462399156">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-938" lat="43.47800451407962" lon="-80.52011636993304">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-939" lat="43.47798843936271" lon="-80.52014100275878">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-942" lat="43.47819830170609" lon="-80.51948066828695">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-946" lat="43.478169854930776" lon="-80.51945712931798">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-950" lat="43.478143576980614" lon="-80.51943659755793">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-954" lat="43.47806383397318" lon="-80.51956680928845">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-958" lat="43.4780338618795" lon="-80.51956068935941">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-962" lat="43.47815721841329" lon="-80.51994223256816">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-963" lat="43.47812681049316" lon="-80.51988776855522">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-964" lat="43.47809026833169" lon="-80.51980571468766">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-965" lat="43.478068766260535" lon="-80.51971809816584">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-966" lat="43.478063170466264" lon="-80.5196284461342">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-967" lat="43.47806383397701" lon="-80.51956680928959">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-970" lat="43.478091515095535" lon="-80.51958029874305">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-971" lat="43.478075528982856" lon="-80.51961630325488">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-972" lat="43.47807129386574" lon="-80.51962415635364">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-973" lat="43.47805102571538" lon="-80.51965000485151">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-974" lat="43.47802683035504" lon="-80.51967221700461">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-975" lat="43.47799935086481" lon="-80.51969020347799">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-976" lat="43.47798517605451" lon="-80.5196970972186">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-977" lat="43.477954222394516" lon="-80.5197080246319">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-978" lat="43.47792190161474" lon="-80.51971378052998">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-979" lat="43.477889071870095" lon="-80.51971421097774">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-980" lat="43.47785660502541" lon="-80.5197093035152">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-984" lat="43.47795034707994" lon="-80.51997049687569">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-985" lat="43.477954141494024" lon="-80.51995818866664">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-986" lat="43.47796660736909" lon="-80.51993715797042">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-987" lat="43.47798241287414" lon="-80.51991849236893">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-988" lat="43.47800111713423" lon="-80.51990271777731">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-989" lat="43.478022197259364" lon="-80.51989027908063">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-990" lat="43.47804506306961" lon="-80.51988152747403">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-991" lat="43.47806907375498" lon="-80.51987671048767">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-992" lat="43.47808193694176" lon="-80.51987605617676">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-993" lat="43.47810633752166" lon="-80.51987755278937">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-994" lat="43.478130134886214" lon="-80.5198830948318">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-995" lat="43.47815266227555" lon="-80.51989252263375">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-999" lat="43.477857587704236" lon="-80.51966610556435">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1000" lat="43.47789147182656" lon="-80.51969261633771">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1001" lat="43.47792127160906" lon="-80.51972376349781">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1002" lat="43.477935301866616" lon="-80.5197385790371">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1003" lat="43.47795788689753" lon="-80.51977574817344">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1004" lat="43.477974930018554" lon="-80.51981579019454">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1005" lat="43.477980687391515" lon="-80.51983536569722">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1006" lat="43.477988689943054" lon="-80.51987811250262">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1007" lat="43.47799049119551" lon="-80.5199215311391">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1008" lat="43.47798671596261" lon="-80.51994158345684">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1012" lat="43.478105244381624" lon="-80.52559577811385">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1013" lat="43.47808288783264" lon="-80.52576712399916">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1016" lat="43.47805199012384" lon="-80.52575882591407">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1020" lat="43.47802308479824" lon="-80.52575152662334">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1021" lat="43.478025228315154" lon="-80.52572328662706">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1025" lat="43.4782026470175" lon="-80.52547174348418">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1026" lat="43.478172288195296" lon="-80.52548102517846">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1027" lat="43.47814685844245" lon="-80.52550342664281">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1028" lat="43.47813398536962" lon="-80.52552451718546">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1029" lat="43.4781330286963" lon="-80.52552635617145">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1030" lat="43.4781318934444" lon="-80.52552827780897">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1031" lat="43.478129558668826" lon="-80.52553222987878">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1032" lat="43.4781179744655" lon="-80.525556691617">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1033" lat="43.478115409962264" lon="-80.52556367642667">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1034" lat="43.47811383661482" lon="-80.52556944015879">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1038" lat="43.47818214965196" lon="-80.52474863894383">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1042" lat="43.47809989138202" lon="-80.52513940907697">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1043" lat="43.47810551370473" lon="-80.52509497914946">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1044" lat="43.47813616810293" lon="-80.52481636477908">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1045" lat="43.478145899637234" lon="-80.5247385806576">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1048" lat="43.47795191472731" lon="-80.52541766070526">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1049" lat="43.47790175867506" lon="-80.52540812676146">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1050" lat="43.47787742969602" lon="-80.52540527691174">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1051" lat="43.47775724442016" lon="-80.52538180758786">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1054" lat="43.47795321491553" lon="-80.52538029951666">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1055" lat="43.47792937217087" lon="-80.52537610805582">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1056" lat="43.47778351988985" lon="-80.5253469390257">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1057" lat="43.477768070958966" lon="-80.52534375390773">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1060" lat="43.477777072823166" lon="-80.52530184453514">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1064" lat="43.47777366675458" lon="-80.52525691753746">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1068" lat="43.47777196372861" lon="-80.52521467274815">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1069" lat="43.47793560625223" lon="-80.52524709270105">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1073" lat="43.47796699060313" lon="-80.52525413349869">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1074" lat="43.47796824476373" lon="-80.52525411673996">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1075" lat="43.47797877727698" lon="-80.52525530548617">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1076" lat="43.47799165000069" lon="-80.52525522368009">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1077" lat="43.47799542950035" lon="-80.52525453636574">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1078" lat="43.47801457106385" lon="-80.52525073007854">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1079" lat="43.4780293219947" lon="-80.52524631067537">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1080" lat="43.47803242768722" lon="-80.52524462903621">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1081" lat="43.47805031350056" lon="-80.52523436387125">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1082" lat="43.47806545480751" lon="-80.52522073518834">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1083" lat="43.47807619077575" lon="-80.5252068891191">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1084" lat="43.478088451470455" lon="-80.52518041876648">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1085" lat="43.47809005364936" lon="-80.52517607570125">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1086" lat="43.478097181054764" lon="-80.52514669552542">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1090" lat="43.47804056672297" lon="-80.52558076209806">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1091" lat="43.47804324821387" lon="-80.52554282757833">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1092" lat="43.478041831334" lon="-80.52553444019495">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1093" lat="43.47803785833663" lon="-80.52550277642861">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1094" lat="43.478026511195495" lon="-80.52547549381055">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1095" lat="43.47801541602995" lon="-80.52545886919664">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1096" lat="43.47800134424469" lon="-80.52544593136449">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1097" lat="43.47800026130912" lon="-80.52544484160019">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1098" lat="43.47797853932409" lon="-80.52542900598615">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1099" lat="43.477955350234105" lon="-80.52542010618104">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1103" lat="43.478645126281705" lon="-80.5254815529038">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1104" lat="43.47848747627751" lon="-80.52546579490233">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1105" lat="43.47828987983477" lon="-80.52544326820832">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1109" lat="43.47864220684015" lon="-80.52552212131712">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1110" lat="43.4786200677411" lon="-80.52551977437692">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1111" lat="43.478481394086295" lon="-80.52550468695604">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1112" lat="43.478350505098106" lon="-80.52549161082072">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1113" lat="43.478306079302904" lon="-80.52548716349254">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1117" lat="43.47807078420389" lon="-80.52558850563906">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1118" lat="43.47807097591023" lon="-80.52558481994598">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1119" lat="43.478074390228144" lon="-80.52556506849359">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1120" lat="43.47807961754037" lon="-80.52553934209071">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1121" lat="43.478087679650216" lon="-80.52550793475696">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1122" lat="43.47810622556072" lon="-80.52545861799003">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1123" lat="43.47812272784117" lon="-80.52542382704763">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1124" lat="43.47814340496136" lon="-80.52539216826587">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1125" lat="43.478156859315554" lon="-80.52537868445371">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1126" lat="43.478185532825705" lon="-80.52535876369087">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1130" lat="43.47795739709913" lon="-80.52533830574667">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1131" lat="43.47795946332494" lon="-80.52533886874934">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1132" lat="43.47797411032003" lon="-80.52534210182046">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1133" lat="43.47799272293005" lon="-80.525348609871">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1134" lat="43.47801502574374" lon="-80.52535987951121">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1135" lat="43.478038852512135" lon="-80.5253771559541">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1136" lat="43.47806203699105" lon="-80.52540168442478">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1137" lat="43.47808241293054" lon="-80.525434710129">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1138" lat="43.47809781409745" lon="-80.52547747828682">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1139" lat="43.47810607424028" lon="-80.52553123411016">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1143" lat="43.47813987824828" lon="-80.52514895864016">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1144" lat="43.47813960260193" lon="-80.52515023738387">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1145" lat="43.47813914984652" lon="-80.52515465564984">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1146" lat="43.47813833413745" lon="-80.52516102741944">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1147" lat="43.47813693469856" lon="-80.52517021715371">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1148" lat="43.47813568540711" lon="-80.52518806457358">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1149" lat="43.47813547035741" lon="-80.52520574515252">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1150" lat="43.47813559417577" lon="-80.52520948067408">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1151" lat="43.47814170923623" lon="-80.52524457939488">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1152" lat="43.478150629907574" lon="-80.52526592307402">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1153" lat="43.47816469904965" lon="-80.52528445042388">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1154" lat="43.47816626147697" lon="-80.525286095883">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1155" lat="43.47818492533398" lon="-80.52529853201257">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1156" lat="43.47819301609879" lon="-80.52530241203458">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1161" lat="43.47813960698914" lon="-80.52515272312898">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1162" lat="43.47813839812238" lon="-80.52516167751966">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1163" lat="43.478136605068265" lon="-80.52517472598363">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1164" lat="43.47813211227551" lon="-80.52520278427114">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1165" lat="43.47812381105097" lon="-80.52523644972442">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1166" lat="43.47811120069676" lon="-80.52527263378296">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1167" lat="43.47809341558781" lon="-80.52530816404744">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1168" lat="43.47806959009397" lon="-80.52533986813862">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1169" lat="43.478038858570045" lon="-80.52536457367233">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1170" lat="43.478000355395366" lon="-80.52537910825981">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1174" lat="43.47796241460816" lon="-80.52529428274363">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1183" lat="43.4781389073278" lon="-80.52515861812383">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1187" lat="43.47820597660544" lon="-80.52547203774927">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1188" lat="43.47796377790601" lon="-80.525421628314">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1189" lat="43.477954887413794" lon="-80.52541969429129">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1193" lat="43.47821105543535" lon="-80.52543033802746">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1198" lat="43.4782468140089" lon="-80.52539467280877">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1199" lat="43.478215814700384" lon="-80.52538989645845">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1202" lat="43.47821961608247" lon="-80.52534911847302">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1203" lat="43.47828408769198" lon="-80.5253628651514">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1204" lat="43.47832350030198" lon="-80.52537091177155">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1205" lat="43.47864755890791" lon="-80.52544031357856">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1208" lat="43.47822442102859" lon="-80.52531014262554">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1209" lat="43.478338097674325" lon="-80.52533336083427">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1210" lat="43.47844903687152" lon="-80.52535683018016">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1211" lat="43.47865072163219" lon="-80.52540242737906">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1214" lat="43.47821416885633" lon="-80.52538992964855">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1215" lat="43.4782008964943" lon="-80.52538904585707">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1216" lat="43.47818450930401" lon="-80.52538527869446">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1217" lat="43.478165101929676" lon="-80.52537706174711">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1218" lat="43.478144713610455" lon="-80.52536269717093">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1219" lat="43.4781253835858" lon="-80.52534048714033">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1220" lat="43.47810915111563" lon="-80.52530873381446">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1221" lat="43.478098055426926" lon="-80.52526573933882">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1222" lat="43.47809413580477" lon="-80.52520980589044">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1226" lat="43.47812662300393" lon="-80.52001545811899">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1227" lat="43.478100872898054" lon="-80.51999054894694">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1228" lat="43.47809409929931" lon="-80.51998448524986">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1229" lat="43.47808343365229" lon="-80.51997493741956">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1233" lat="43.478141549313925" lon="-80.51997751695919">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1234" lat="43.478117056943525" lon="-80.51995496734075">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1238" lat="43.478611065883975" lon="-80.5204641453226">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1239" lat="43.47851336714658" lon="-80.52036935527332">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1240" lat="43.478218098955026" lon="-80.52010333984217">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1241" lat="43.478214108967336" lon="-80.5201010322591">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1245" lat="43.47862785267398" lon="-80.5204276002283">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1246" lat="43.478523939738615" lon="-80.52033020238719">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1247" lat="43.478408795814524" lon="-80.52022197524742">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1251" lat="43.478643423023904" lon="-80.52039172568279">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1252" lat="43.478513831434434" lon="-80.52027117062035">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1253" lat="43.47845136020006" lon="-80.5202114734669">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1257" lat="43.47825778658947" lon="-80.5199827132921">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1258" lat="43.47852050994453" lon="-80.52022466289672">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1259" lat="43.47865947995464" lon="-80.52035417474163">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1262" lat="43.478275353459104" lon="-80.51994405515688">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1263" lat="43.478312517831576" lon="-80.51998017264195">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1264" lat="43.47853608473803" lon="-80.52018964153703">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1265" lat="43.47867505029857" lon="-80.52031695909082">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1269" lat="43.47804665855305" lon="-80.52553547997728">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1273" lat="43.47814811300757" lon="-80.51961620306459">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1274" lat="43.47812285482793" lon="-80.5196846787926">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1275" lat="43.47812016727238" lon="-80.51969284253121">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1276" lat="43.47811463538814" lon="-80.51970964621557">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1277" lat="43.478018624197524" lon="-80.51998634940524">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1278" lat="43.478013449961495" lon="-80.52000206663782">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1282" lat="43.478119012817146" lon="-80.51959797835205">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1283" lat="43.47810784801881" lon="-80.51962929532253">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1291" lat="43.478222687654075" lon="-80.52005621284131">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1295" lat="43.47824007456414" lon="-80.52001817735068">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1296" lat="43.47815721840906" lon="-80.51994223257637">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1299" lat="43.47817386127955" lon="-80.51990585829091">
+        <tag k="elevation" v="None" />
+    </node>
+    <node id="-1303" lat="43.47818835584957" lon="-80.51986547074816">
+        <tag k="elevation" v="None" />
+    </node>
+    <way id="-1">
+        <nd ref="-2" />
+        <nd ref="-557" />
+        </way>
+    <way id="-4">
+        <nd ref="-5" />
+        <nd ref="-89" />
+        </way>
+    <way id="-7">
+        <nd ref="-8" />
+        <nd ref="-9" />
+        <nd ref="-754" />
+        <nd ref="-11" />
+        <nd ref="-12" />
+        <nd ref="-757" />
+        <nd ref="-14" />
+        <nd ref="-762" />
+        <nd ref="-16" />
+        <nd ref="-759" />
+        <nd ref="-18" />
+        <nd ref="-19" />
+        <nd ref="-20" />
+        <nd ref="-21" />
+        <nd ref="-552" />
+        </way>
+    <way id="-23">
+        <nd ref="-24" />
+        <nd ref="-92" />
+        </way>
+    <way id="-26">
+        <nd ref="-27" />
+        <nd ref="-549" />
+        </way>
+    <way id="-29">
+        <nd ref="-30" />
+        <nd ref="-211" />
+        </way>
+    <way id="-32">
+        <nd ref="-33" />
+        <nd ref="-202" />
+        </way>
+    <way id="-35">
+        <nd ref="-36" />
+        <nd ref="-37" />
+        <nd ref="-778" />
+        <nd ref="-39" />
+        <nd ref="-756" />
+        <nd ref="-781" />
+        <nd ref="-753" />
+        <nd ref="-543" />
+        </way>
+    <way id="-44">
+        <nd ref="-45" />
+        <nd ref="-46" />
+        </way>
+    <way id="-47">
+        <nd ref="-48" />
+        <nd ref="-120" />
+        </way>
+    <way id="-50">
+        <nd ref="-51" />
+        <nd ref="-72" />
+        </way>
+    <way id="-53">
+        <nd ref="-54" />
+        <nd ref="-55" />
+        <nd ref="-56" />
+        <nd ref="-59" />
+        </way>
+    <way id="-58">
+        <nd ref="-59" />
+        <nd ref="-60" />
+        <nd ref="-61" />
+        <nd ref="-62" />
+        <nd ref="-765" />
+        <nd ref="-768" />
+        <nd ref="-65" />
+        <nd ref="-66" />
+        <nd ref="-67" />
+        <nd ref="-68" />
+        <nd ref="-69" />
+        <nd ref="-630" />
+        </way>
+    <way id="-71">
+        <nd ref="-72" />
+        <nd ref="-73" />
+        <nd ref="-74" />
+        <nd ref="-75" />
+        <nd ref="-766" />
+        <nd ref="-77" />
+        <nd ref="-769" />
+        <nd ref="-79" />
+        <nd ref="-80" />
+        <nd ref="-81" />
+        <nd ref="-82" />
+        <nd ref="-507" />
+        </way>
+    <way id="-84">
+        <nd ref="-85" />
+        <nd ref="-86" />
+        <nd ref="-87" />
+        </way>
+    <way id="-88">
+        <nd ref="-89" />
+        <nd ref="-656" />
+        </way>
+    <way id="-91">
+        <nd ref="-92" />
+        <nd ref="-774" />
+        <nd ref="-771" />
+        <nd ref="-684" />
+        </way>
+    <way id="-96">
+        <nd ref="-92" />
+        <nd ref="-98" />
+        <nd ref="-99" />
+        <nd ref="-100" />
+        <nd ref="-101" />
+        <nd ref="-102" />
+        <nd ref="-103" />
+        <nd ref="-104" />
+        <nd ref="-105" />
+        <nd ref="-656" />
+        </way>
+    <way id="-107">
+        <nd ref="-108" />
+        <nd ref="-109" />
+        <nd ref="-110" />
+        <nd ref="-783" />
+        <nd ref="-786" />
+        <nd ref="-113" />
+        <nd ref="-114" />
+        </way>
+    <way id="-115">
+        <nd ref="-116" />
+        <nd ref="-114" />
+        <nd ref="-118" />
+        </way>
+    <way id="-119">
+        <nd ref="-120" />
+        <nd ref="-154" />
+        </way>
+    <way id="-122">
+        <nd ref="-123" />
+        <nd ref="-124" />
+        <nd ref="-125" />
+        <nd ref="-126" />
+        <nd ref="-127" />
+        <nd ref="-144" />
+        </way>
+    <way id="-129">
+        <nd ref="-130" />
+        <nd ref="-131" />
+        <nd ref="-132" />
+        <nd ref="-133" />
+        <nd ref="-134" />
+        <nd ref="-135" />
+        <nd ref="-136" />
+        <nd ref="-137" />
+        <nd ref="-653" />
+        </way>
+    <way id="-139">
+        <nd ref="-140" />
+        <nd ref="-141" />
+        <nd ref="-142" />
+        </way>
+    <way id="-143">
+        <nd ref="-144" />
+        <nd ref="-145" />
+        <nd ref="-146" />
+        <nd ref="-147" />
+        <nd ref="-148" />
+        <nd ref="-149" />
+        <nd ref="-150" />
+        <nd ref="-151" />
+        <nd ref="-202" />
+        </way>
+    <way id="-153">
+        <nd ref="-154" />
+        <nd ref="-718" />
+        <nd ref="-156" />
+        <nd ref="-157" />
+        <nd ref="-158" />
+        <nd ref="-159" />
+        <nd ref="-160" />
+        <nd ref="-161" />
+        <nd ref="-162" />
+        <nd ref="-163" />
+        <nd ref="-164" />
+        <nd ref="-140" />
+        </way>
+    <way id="-166">
+        <nd ref="-167" />
+        <nd ref="-168" />
+        <nd ref="-169" />
+        <nd ref="-170" />
+        <nd ref="-171" />
+        <nd ref="-172" />
+        <nd ref="-173" />
+        <nd ref="-174" />
+        <nd ref="-175" />
+        <nd ref="-176" />
+        <nd ref="-123" />
+        </way>
+    <way id="-178">
+        <nd ref="-179" />
+        <nd ref="-180" />
+        <nd ref="-181" />
+        <nd ref="-182" />
+        <nd ref="-183" />
+        <nd ref="-184" />
+        <nd ref="-185" />
+        <nd ref="-186" />
+        <nd ref="-187" />
+        <nd ref="-188" />
+        <nd ref="-189" />
+        <nd ref="-190" />
+        <nd ref="-687" />
+        </way>
+    <way id="-192">
+        <nd ref="-89" />
+        <nd ref="-194" />
+        <nd ref="-195" />
+        <nd ref="-196" />
+        <nd ref="-197" />
+        <nd ref="-198" />
+        <nd ref="-199" />
+        <nd ref="-140" />
+        </way>
+    <way id="-201">
+        <nd ref="-202" />
+        <nd ref="-203" />
+        <nd ref="-204" />
+        <nd ref="-205" />
+        <nd ref="-206" />
+        <nd ref="-207" />
+        <nd ref="-208" />
+        <nd ref="-167" />
+        </way>
+    <way id="-210">
+        <nd ref="-211" />
+        <nd ref="-212" />
+        <nd ref="-213" />
+        <nd ref="-214" />
+        <nd ref="-215" />
+        <nd ref="-216" />
+        <nd ref="-217" />
+        <nd ref="-218" />
+        <nd ref="-219" />
+        <nd ref="-220" />
+        <nd ref="-605" />
+        </way>
+    <way id="-222">
+        <nd ref="-223" />
+        <nd ref="-302" />
+        </way>
+    <way id="-225">
+        <nd ref="-226" />
+        <nd ref="-227" />
+        </way>
+    <way id="-228">
+        <nd ref="-229" />
+        <nd ref="-744" />
+        <nd ref="-231" />
+        <nd ref="-748" />
+        <nd ref="-233" />
+        <nd ref="-741" />
+        <nd ref="-235" />
+        <nd ref="-236" />
+        <nd ref="-237" />
+        <nd ref="-238" />
+        <nd ref="-226" />
+        </way>
+    <way id="-240">
+        <nd ref="-241" />
+        <nd ref="-395" />
+        </way>
+    <way id="-243">
+        <nd ref="-244" />
+        <nd ref="-371" />
+        </way>
+    <way id="-246">
+        <nd ref="-247" />
+        <nd ref="-248" />
+        <nd ref="-257" />
+        </way>
+    <way id="-250">
+        <nd ref="-251" />
+        <nd ref="-359" />
+        </way>
+    <way id="-253">
+        <nd ref="-254" />
+        <nd ref="-336" />
+        </way>
+    <way id="-256">
+        <nd ref="-257" />
+        <nd ref="-258" />
+        <nd ref="-259" />
+        <nd ref="-260" />
+        <nd ref="-730" />
+        <nd ref="-262" />
+        <nd ref="-733" />
+        <nd ref="-264" />
+        <nd ref="-265" />
+        <nd ref="-738" />
+        <nd ref="-267" />
+        <nd ref="-268" />
+        <nd ref="-735" />
+        <nd ref="-270" />
+        <nd ref="-568" />
+        </way>
+    <way id="-272">
+        <nd ref="-273" />
+        <nd ref="-274" />
+        <nd ref="-727" />
+        <nd ref="-747" />
+        <nd ref="-277" />
+        <nd ref="-278" />
+        <nd ref="-750" />
+        <nd ref="-280" />
+        <nd ref="-281" />
+        <nd ref="-282" />
+        <nd ref="-563" />
+        </way>
+    <way id="-284">
+        <nd ref="-285" />
+        <nd ref="-286" />
+        <nd ref="-287" />
+        <nd ref="-461" />
+        </way>
+    <way id="-289">
+        <nd ref="-290" />
+        <nd ref="-291" />
+        <nd ref="-292" />
+        <nd ref="-325" />
+        </way>
+    <way id="-294">
+        <nd ref="-295" />
+        <nd ref="-296" />
+        <nd ref="-297" />
+        <nd ref="-298" />
+        <nd ref="-299" />
+        <nd ref="-229" />
+        </way>
+    <way id="-301">
+        <nd ref="-302" />
+        <nd ref="-303" />
+        <nd ref="-304" />
+        <nd ref="-305" />
+        <nd ref="-306" />
+        <nd ref="-307" />
+        <nd ref="-308" />
+        <nd ref="-309" />
+        <nd ref="-310" />
+        <nd ref="-449" />
+        </way>
+    <way id="-312">
+        <nd ref="-313" />
+        <nd ref="-314" />
+        <nd ref="-315" />
+        <nd ref="-316" />
+        <nd ref="-317" />
+        <nd ref="-318" />
+        <nd ref="-319" />
+        <nd ref="-320" />
+        <nd ref="-321" />
+        <nd ref="-322" />
+        <nd ref="-433" />
+        </way>
+    <way id="-324">
+        <nd ref="-325" />
+        <nd ref="-326" />
+        <nd ref="-327" />
+        <nd ref="-328" />
+        <nd ref="-329" />
+        <nd ref="-330" />
+        <nd ref="-331" />
+        <nd ref="-332" />
+        <nd ref="-333" />
+        <nd ref="-302" />
+        </way>
+    <way id="-335">
+        <nd ref="-336" />
+        <nd ref="-337" />
+        <nd ref="-338" />
+        <nd ref="-339" />
+        <nd ref="-340" />
+        <nd ref="-341" />
+        <nd ref="-342" />
+        <nd ref="-343" />
+        <nd ref="-344" />
+        <nd ref="-345" />
+        <nd ref="-371" />
+        </way>
+    <way id="-347">
+        <nd ref="-348" />
+        <nd ref="-349" />
+        <nd ref="-350" />
+        <nd ref="-351" />
+        <nd ref="-352" />
+        <nd ref="-353" />
+        <nd ref="-354" />
+        <nd ref="-355" />
+        <nd ref="-356" />
+        <nd ref="-302" />
+        </way>
+    <way id="-358">
+        <nd ref="-359" />
+        <nd ref="-360" />
+        <nd ref="-361" />
+        <nd ref="-362" />
+        <nd ref="-363" />
+        <nd ref="-364" />
+        <nd ref="-365" />
+        <nd ref="-366" />
+        <nd ref="-367" />
+        <nd ref="-368" />
+        <nd ref="-226" />
+        </way>
+    <way id="-370">
+        <nd ref="-371" />
+        <nd ref="-372" />
+        <nd ref="-373" />
+        <nd ref="-374" />
+        <nd ref="-375" />
+        <nd ref="-376" />
+        <nd ref="-377" />
+        <nd ref="-378" />
+        <nd ref="-379" />
+        <nd ref="-380" />
+        <nd ref="-433" />
+        </way>
+    <way id="-382">
+        <nd ref="-371" />
+        <nd ref="-384" />
+        <nd ref="-385" />
+        <nd ref="-386" />
+        <nd ref="-387" />
+        <nd ref="-388" />
+        <nd ref="-389" />
+        <nd ref="-390" />
+        <nd ref="-391" />
+        <nd ref="-392" />
+        <nd ref="-348" />
+        </way>
+    <way id="-394">
+        <nd ref="-395" />
+        <nd ref="-396" />
+        <nd ref="-736" />
+        <nd ref="-398" />
+        <nd ref="-399" />
+        <nd ref="-400" />
+        <nd ref="-401" />
+        <nd ref="-402" />
+        <nd ref="-403" />
+        <nd ref="-404" />
+        <nd ref="-405" />
+        <nd ref="-428" />
+        </way>
+    <way id="-407">
+        <nd ref="-359" />
+        <nd ref="-449" />
+        </way>
+    <way id="-410">
+        <nd ref="-395" />
+        <nd ref="-736" />
+        <nd ref="-226" />
+        </way>
+    <way id="-414">
+        <nd ref="-371" />
+        <nd ref="-302" />
+        </way>
+    <way id="-417">
+        <nd ref="-418" />
+        <nd ref="-419" />
+        <nd ref="-273" />
+        </way>
+    <way id="-421">
+        <nd ref="-336" />
+        <nd ref="-433" />
+        </way>
+    <way id="-424">
+        <nd ref="-325" />
+        <nd ref="-428" />
+        </way>
+    <way id="-427">
+        <nd ref="-428" />
+        <nd ref="-429" />
+        <nd ref="-430" />
+        <nd ref="-431" />
+        </way>
+    <way id="-432">
+        <nd ref="-433" />
+        <nd ref="-434" />
+        <nd ref="-435" />
+        <nd ref="-436" />
+        </way>
+    <way id="-437">
+        <nd ref="-257" />
+        <nd ref="-590" />
+        </way>
+    <way id="-440">
+        <nd ref="-229" />
+        <nd ref="-732" />
+        <nd ref="-443" />
+        <nd ref="-563" />
+        </way>
+    <way id="-445">
+        <nd ref="-336" />
+        <nd ref="-433" />
+        </way>
+    <way id="-448">
+        <nd ref="-449" />
+        <nd ref="-450" />
+        <nd ref="-451" />
+        <nd ref="-452" />
+        <nd ref="-453" />
+        <nd ref="-454" />
+        <nd ref="-455" />
+        <nd ref="-456" />
+        <nd ref="-457" />
+        <nd ref="-458" />
+        <nd ref="-371" />
+        </way>
+    <way id="-460">
+        <nd ref="-461" />
+        <nd ref="-462" />
+        <nd ref="-463" />
+        <nd ref="-464" />
+        <nd ref="-465" />
+        <nd ref="-466" />
+        <nd ref="-467" />
+        <nd ref="-468" />
+        <nd ref="-469" />
+        <nd ref="-568" />
+        </way>
+    <way id="-471">
+        <nd ref="-313" />
+        <nd ref="-726" />
+        <nd ref="-474" />
+        <nd ref="-475" />
+        <nd ref="-476" />
+        <nd ref="-477" />
+        <nd ref="-478" />
+        <nd ref="-479" />
+        <nd ref="-480" />
+        <nd ref="-481" />
+        <nd ref="-482" />
+        <nd ref="-428" />
+        </way>
+    <way id="-484">
+        <nd ref="-395" />
+        <nd ref="-486" />
+        <nd ref="-487" />
+        <nd ref="-736" />
+        <nd ref="-489" />
+        <nd ref="-490" />
+        <nd ref="-739" />
+        <nd ref="-492" />
+        <nd ref="-493" />
+        <nd ref="-494" />
+        <nd ref="-495" />
+        <nd ref="-742" />
+        <nd ref="-497" />
+        <nd ref="-745" />
+        <nd ref="-590" />
+        </way>
+    <way id="-500">
+        <nd ref="-501" />
+        <nd ref="-721" />
+        <nd ref="-772" />
+        <nd ref="-775" />
+        <nd ref="-543" />
+        </way>
+    <way id="-506">
+        <nd ref="-507" />
+        <nd ref="-508" />
+        <nd ref="-509" />
+        </way>
+    <way id="-510">
+        <nd ref="-511" />
+        <nd ref="-512" />
+        <nd ref="-513" />
+        </way>
+    <way id="-514">
+        <nd ref="-515" />
+        <nd ref="-516" />
+        <nd ref="-517" />
+        <nd ref="-644" />
+        </way>
+    <way id="-519">
+        <nd ref="-520" />
+        <nd ref="-521" />
+        <nd ref="-522" />
+        <nd ref="-108" />
+        </way>
+    <way id="-524">
+        <nd ref="-525" />
+        <nd ref="-526" />
+        <nd ref="-527" />
+        <nd ref="-528" />
+        <nd ref="-784" />
+        <nd ref="-787" />
+        <nd ref="-531" />
+        <nd ref="-532" />
+        <nd ref="-533" />
+        <nd ref="-118" />
+        </way>
+    <way id="-535">
+        <nd ref="-536" />
+        <nd ref="-167" />
+        </way>
+    <way id="-538">
+        <nd ref="-539" />
+        <nd ref="-540" />
+        <nd ref="-140" />
+        </way>
+    <way id="-542">
+        <nd ref="-543" />
+        <nd ref="-544" />
+        <nd ref="-545" />
+        <nd ref="-546" />
+        <nd ref="-547" />
+        </way>
+    <way id="-548">
+        <nd ref="-549" />
+        <nd ref="-687" />
+        </way>
+    <way id="-551">
+        <nd ref="-552" />
+        <nd ref="-553" />
+        <nd ref="-554" />
+        <nd ref="-555" />
+        </way>
+    <way id="-556">
+        <nd ref="-557" />
+        <nd ref="-653" />
+        </way>
+    <way id="-559">
+        <nd ref="-45" />
+        <nd ref="-144" />
+        </way>
+    <way id="-562">
+        <nd ref="-563" />
+        <nd ref="-564" />
+        <nd ref="-565" />
+        <nd ref="-566" />
+        </way>
+    <way id="-567">
+        <nd ref="-568" />
+        <nd ref="-569" />
+        <nd ref="-570" />
+        <nd ref="-571" />
+        </way>
+    <way id="-572">
+        <nd ref="-449" />
+        <nd ref="-285" />
+        </way>
+    <way id="-575">
+        <nd ref="-461" />
+        <nd ref="-348" />
+        </way>
+    <way id="-578">
+        <nd ref="-290" />
+        <nd ref="-580" />
+        <nd ref="-461" />
+        </way>
+    <way id="-582">
+        <nd ref="-583" />
+        <nd ref="-313" />
+        </way>
+    <way id="-585">
+        <nd ref="-273" />
+        <nd ref="-724" />
+        <nd ref="-568" />
+        </way>
+    <way id="-589">
+        <nd ref="-590" />
+        <nd ref="-591" />
+        <nd ref="-592" />
+        <nd ref="-593" />
+        </way>
+    <way id="-594">
+        <nd ref="-313" />
+        <nd ref="-723" />
+        <nd ref="-371" />
+        </way>
+    <way id="-598">
+        <nd ref="-599" />
+        <nd ref="-600" />
+        <nd ref="-601" />
+        <nd ref="-602" />
+        <nd ref="-525" />
+        </way>
+    <way id="-604">
+        <nd ref="-605" />
+        <nd ref="-606" />
+        </way>
+    <way id="-607">
+        <nd ref="-167" />
+        <nd ref="-536" />
+        </way>
+    <way id="-610">
+        <nd ref="-611" />
+        <nd ref="-612" />
+        <nd ref="-36" />
+        </way>
+    <way id="-614">
+        <nd ref="-615" />
+        <nd ref="-616" />
+        <nd ref="-605" />
+        </way>
+    <way id="-618">
+        <nd ref="-619" />
+        <nd ref="-717" />
+        <nd ref="-760" />
+        <nd ref="-763" />
+        <nd ref="-780" />
+        <nd ref="-777" />
+        <nd ref="-116" />
+        </way>
+    <way id="-626">
+        <nd ref="-627" />
+        <nd ref="-179" />
+        </way>
+    <way id="-629">
+        <nd ref="-630" />
+        <nd ref="-631" />
+        <nd ref="-632" />
+        <nd ref="-633" />
+        </way>
+    <way id="-634">
+        <nd ref="-635" />
+        <nd ref="-636" />
+        <nd ref="-637" />
+        <nd ref="-638" />
+        <nd ref="-8" />
+        </way>
+    <way id="-640">
+        <nd ref="-641" />
+        <nd ref="-348" />
+        </way>
+    <way id="-643">
+        <nd ref="-644" />
+        <nd ref="-130" />
+        </way>
+    <way id="-646">
+        <nd ref="-120" />
+        <nd ref="-154" />
+        </way>
+    <way id="-649">
+        <nd ref="-179" />
+        <nd ref="-144" />
+        </way>
+    <way id="-652">
+        <nd ref="-653" />
+        <nd ref="-85" />
+        </way>
+    <way id="-655">
+        <nd ref="-656" />
+        <nd ref="-552" />
+        </way>
+    <way id="-658">
+        <nd ref="-211" />
+        <nd ref="-123" />
+        </way>
+    <way id="-661">
+        <nd ref="-154" />
+        <nd ref="-167" />
+        </way>
+    <way id="-664">
+        <nd ref="-59" />
+        <nd ref="-619" />
+        </way>
+    <way id="-667">
+        <nd ref="-72" />
+        <nd ref="-615" />
+        </way>
+    <way id="-670">
+        <nd ref="-525" />
+        <nd ref="-501" />
+        </way>
+    <way id="-673">
+        <nd ref="-108" />
+        <nd ref="-539" />
+        </way>
+    <way id="-676">
+        <nd ref="-130" />
+        <nd ref="-720" />
+        <nd ref="-202" />
+        </way>
+    <way id="-680">
+        <nd ref="-123" />
+        <nd ref="-511" />
+        </way>
+    <way id="-683">
+        <nd ref="-684" />
+        <nd ref="-630" />
+        </way>
+    <way id="-686">
+        <nd ref="-687" />
+        <nd ref="-507" />
+        </way>
+    <way id="-689">
+        <nd ref="-348" />
+        <nd ref="-257" />
+        </way>
+    <way id="-692">
+        <nd ref="-371" />
+        <nd ref="-395" />
+        </way>
+    <way id="-695">
+        <nd ref="-229" />
+        <nd ref="-461" />
+        </way>
+    <way id="-698">
+        <nd ref="-461" />
+        <nd ref="-449" />
+        </way>
+    <way id="-701">
+        <nd ref="-302" />
+        <nd ref="-313" />
+        </way>
+    <way id="-704">
+        <nd ref="-202" />
+        <nd ref="-8" />
+        </way>
+    <way id="-707">
+        <nd ref="-154" />
+        <nd ref="-144" />
+        </way>
+    <way id="-710">
+        <nd ref="-167" />
+        <nd ref="-36" />
+        </way>
+    <way id="-713">
+        <nd ref="-123" />
+        <nd ref="-130" />
+        </way>
+    <way id="-716">
+        <nd ref="-717" />
+        <nd ref="-718" />
+        </way>
+    <way id="-719">
+        <nd ref="-720" />
+        <nd ref="-721" />
+        </way>
+    <way id="-722">
+        <nd ref="-723" />
+        <nd ref="-724" />
+        </way>
+    <way id="-725">
+        <nd ref="-726" />
+        <nd ref="-727" />
+        </way>
+    <way id="-728">
+        <nd ref="-563" />
+        <nd ref="-730" />
+        </way>
+    <way id="-731">
+        <nd ref="-732" />
+        <nd ref="-733" />
+        </way>
+    <way id="-734">
+        <nd ref="-735" />
+        <nd ref="-736" />
+        </way>
+    <way id="-737">
+        <nd ref="-738" />
+        <nd ref="-739" />
+        </way>
+    <way id="-740">
+        <nd ref="-741" />
+        <nd ref="-742" />
+        </way>
+    <way id="-743">
+        <nd ref="-744" />
+        <nd ref="-745" />
+        </way>
+    <way id="-746">
+        <nd ref="-747" />
+        <nd ref="-748" />
+        </way>
+    <way id="-749">
+        <nd ref="-750" />
+        <nd ref="-744" />
+        </way>
+    <way id="-752">
+        <nd ref="-753" />
+        <nd ref="-754" />
+        </way>
+    <way id="-755">
+        <nd ref="-756" />
+        <nd ref="-757" />
+        </way>
+    <way id="-758">
+        <nd ref="-759" />
+        <nd ref="-760" />
+        </way>
+    <way id="-761">
+        <nd ref="-762" />
+        <nd ref="-763" />
+        </way>
+    <way id="-764">
+        <nd ref="-765" />
+        <nd ref="-766" />
+        </way>
+    <way id="-767">
+        <nd ref="-768" />
+        <nd ref="-769" />
+        </way>
+    <way id="-770">
+        <nd ref="-771" />
+        <nd ref="-772" />
+        </way>
+    <way id="-773">
+        <nd ref="-774" />
+        <nd ref="-775" />
+        </way>
+    <way id="-776">
+        <nd ref="-777" />
+        <nd ref="-778" />
+        </way>
+    <way id="-779">
+        <nd ref="-780" />
+        <nd ref="-781" />
+        </way>
+    <way id="-782">
+        <nd ref="-783" />
+        <nd ref="-784" />
+        </way>
+    <way id="-785">
+        <nd ref="-786" />
+        <nd ref="-787" />
+        </way>
+    <way id="-788">
+        <nd ref="-789" />
+        <nd ref="-790" />
+        <nd ref="-791" />
+        </way>
+    <way id="-793">
+        <nd ref="-794" />
+        <nd ref="-795" />
+        </way>
+    <way id="-797">
+        <nd ref="-798" />
+        <nd ref="-984" />
+        </way>
+    <way id="-801">
+        <nd ref="-802" />
+        <nd ref="-912" />
+        </way>
+    <way id="-805">
+        <nd ref="-806" />
+        <nd ref="-916" />
+        </way>
+    <way id="-809">
+        <nd ref="-810" />
+        <nd ref="-811" />
+        <nd ref="-863" />
+        </way>
+    <way id="-814">
+        <nd ref="-815" />
+        <nd ref="-816" />
+        <nd ref="-817" />
+        <nd ref="-818" />
+        <nd ref="-819" />
+        <nd ref="-820" />
+        <nd ref="-821" />
+        <nd ref="-822" />
+        <nd ref="-823" />
+        <nd ref="-824" />
+        <nd ref="-825" />
+        <nd ref="-826" />
+        <nd ref="-827" />
+        <nd ref="-828" />
+        <nd ref="-829" />
+        </way>
+    <way id="-831">
+        <nd ref="-832" />
+        <nd ref="-833" />
+        <nd ref="-834" />
+        <nd ref="-835" />
+        <nd ref="-836" />
+        </way>
+    <way id="-838">
+        <nd ref="-839" />
+        <nd ref="-840" />
+        <nd ref="-841" />
+        </way>
+    <way id="-843">
+        <nd ref="-844" />
+        <nd ref="-999" />
+        </way>
+    <way id="-847">
+        <nd ref="-848" />
+        <nd ref="-920" />
+        </way>
+    <way id="-851">
+        <nd ref="-852" />
+        <nd ref="-924" />
+        </way>
+    <way id="-855">
+        <nd ref="-856" />
+        <nd ref="-857" />
+        <nd ref="-858" />
+        <nd ref="-859" />
+        <nd ref="-815" />
+        </way>
+    <way id="-862">
+        <nd ref="-863" />
+        <nd ref="-864" />
+        <nd ref="-865" />
+        <nd ref="-866" />
+        <nd ref="-867" />
+        <nd ref="-868" />
+        <nd ref="-869" />
+        <nd ref="-832" />
+        </way>
+    <way id="-872">
+        <nd ref="-873" />
+        <nd ref="-874" />
+        <nd ref="-875" />
+        <nd ref="-942" />
+        </way>
+    <way id="-878">
+        <nd ref="-879" />
+        <nd ref="-946" />
+        </way>
+    <way id="-882">
+        <nd ref="-883" />
+        <nd ref="-950" />
+        </way>
+    <way id="-886">
+        <nd ref="-887" />
+        <nd ref="-888" />
+        <nd ref="-889" />
+        </way>
+    <way id="-891">
+        <nd ref="-892" />
+        <nd ref="-893" />
+        <nd ref="-894" />
+        <nd ref="-895" />
+        </way>
+    <way id="-897">
+        <nd ref="-898" />
+        <nd ref="-899" />
+        <nd ref="-900" />
+        <nd ref="-901" />
+        <nd ref="-902" />
+        <nd ref="-903" />
+        <nd ref="-904" />
+        <nd ref="-905" />
+        <nd ref="-906" />
+        <nd ref="-907" />
+        <nd ref="-908" />
+        <nd ref="-1262" />
+        </way>
+    <way id="-911">
+        <nd ref="-912" />
+        <nd ref="-954" />
+        </way>
+    <way id="-915">
+        <nd ref="-916" />
+        <nd ref="-958" />
+        </way>
+    <way id="-919">
+        <nd ref="-920" />
+        <nd ref="-1299" />
+        </way>
+    <way id="-923">
+        <nd ref="-924" />
+        <nd ref="-925" />
+        <nd ref="-926" />
+        <nd ref="-1303" />
+        </way>
+    <way id="-929">
+        <nd ref="-930" />
+        <nd ref="-931" />
+        <nd ref="-932" />
+        <nd ref="-933" />
+        <nd ref="-934" />
+        <nd ref="-935" />
+        <nd ref="-936" />
+        <nd ref="-937" />
+        <nd ref="-938" />
+        <nd ref="-939" />
+        </way>
+    <way id="-941">
+        <nd ref="-942" />
+        <nd ref="-1273" />
+        </way>
+    <way id="-945">
+        <nd ref="-946" />
+        <nd ref="-1282" />
+        </way>
+    <way id="-949">
+        <nd ref="-950" />
+        <nd ref="-970" />
+        </way>
+    <way id="-953">
+        <nd ref="-954" />
+        <nd ref="-887" />
+        </way>
+    <way id="-957">
+        <nd ref="-958" />
+        <nd ref="-892" />
+        </way>
+    <way id="-961">
+        <nd ref="-962" />
+        <nd ref="-963" />
+        <nd ref="-964" />
+        <nd ref="-965" />
+        <nd ref="-966" />
+        <nd ref="-967" />
+        </way>
+    <way id="-969">
+        <nd ref="-970" />
+        <nd ref="-971" />
+        <nd ref="-972" />
+        <nd ref="-973" />
+        <nd ref="-974" />
+        <nd ref="-975" />
+        <nd ref="-976" />
+        <nd ref="-977" />
+        <nd ref="-978" />
+        <nd ref="-979" />
+        <nd ref="-980" />
+        <nd ref="-839" />
+        </way>
+    <way id="-983">
+        <nd ref="-984" />
+        <nd ref="-985" />
+        <nd ref="-986" />
+        <nd ref="-987" />
+        <nd ref="-988" />
+        <nd ref="-989" />
+        <nd ref="-990" />
+        <nd ref="-991" />
+        <nd ref="-992" />
+        <nd ref="-993" />
+        <nd ref="-994" />
+        <nd ref="-995" />
+        <nd ref="-1299" />
+        </way>
+    <way id="-998">
+        <nd ref="-999" />
+        <nd ref="-1000" />
+        <nd ref="-1001" />
+        <nd ref="-1002" />
+        <nd ref="-1003" />
+        <nd ref="-1004" />
+        <nd ref="-1005" />
+        <nd ref="-1006" />
+        <nd ref="-1007" />
+        <nd ref="-1008" />
+        <nd ref="-794" />
+        </way>
+    <way id="-1011">
+        <nd ref="-1012" />
+        <nd ref="-1013" />
+        </way>
+    <way id="-1015">
+        <nd ref="-1016" />
+        <nd ref="-1117" />
+        </way>
+    <way id="-1019">
+        <nd ref="-1020" />
+        <nd ref="-1021" />
+        <nd ref="-1090" />
+        </way>
+    <way id="-1024">
+        <nd ref="-1025" />
+        <nd ref="-1026" />
+        <nd ref="-1027" />
+        <nd ref="-1028" />
+        <nd ref="-1029" />
+        <nd ref="-1030" />
+        <nd ref="-1031" />
+        <nd ref="-1032" />
+        <nd ref="-1033" />
+        <nd ref="-1034" />
+        <nd ref="-1012" />
+        </way>
+    <way id="-1037">
+        <nd ref="-1038" />
+        <nd ref="-1143" />
+        </way>
+    <way id="-1041">
+        <nd ref="-1042" />
+        <nd ref="-1043" />
+        <nd ref="-1044" />
+        <nd ref="-1045" />
+        </way>
+    <way id="-1047">
+        <nd ref="-1048" />
+        <nd ref="-1049" />
+        <nd ref="-1050" />
+        <nd ref="-1051" />
+        </way>
+    <way id="-1053">
+        <nd ref="-1054" />
+        <nd ref="-1055" />
+        <nd ref="-1056" />
+        <nd ref="-1057" />
+        </way>
+    <way id="-1059">
+        <nd ref="-1060" />
+        <nd ref="-1130" />
+        </way>
+    <way id="-1063">
+        <nd ref="-1064" />
+        <nd ref="-1174" />
+        </way>
+    <way id="-1067">
+        <nd ref="-1068" />
+        <nd ref="-1069" />
+        <nd ref="-1073" />
+        </way>
+    <way id="-1072">
+        <nd ref="-1073" />
+        <nd ref="-1074" />
+        <nd ref="-1075" />
+        <nd ref="-1076" />
+        <nd ref="-1077" />
+        <nd ref="-1078" />
+        <nd ref="-1079" />
+        <nd ref="-1080" />
+        <nd ref="-1081" />
+        <nd ref="-1082" />
+        <nd ref="-1083" />
+        <nd ref="-1084" />
+        <nd ref="-1085" />
+        <nd ref="-1086" />
+        <nd ref="-1042" />
+        </way>
+    <way id="-1089">
+        <nd ref="-1090" />
+        <nd ref="-1091" />
+        <nd ref="-1092" />
+        <nd ref="-1093" />
+        <nd ref="-1094" />
+        <nd ref="-1095" />
+        <nd ref="-1096" />
+        <nd ref="-1097" />
+        <nd ref="-1098" />
+        <nd ref="-1099" />
+        <nd ref="-1048" />
+        </way>
+    <way id="-1102">
+        <nd ref="-1103" />
+        <nd ref="-1104" />
+        <nd ref="-1105" />
+        <nd ref="-1193" />
+        </way>
+    <way id="-1108">
+        <nd ref="-1109" />
+        <nd ref="-1110" />
+        <nd ref="-1111" />
+        <nd ref="-1112" />
+        <nd ref="-1113" />
+        <nd ref="-1187" />
+        </way>
+    <way id="-1116">
+        <nd ref="-1117" />
+        <nd ref="-1118" />
+        <nd ref="-1119" />
+        <nd ref="-1120" />
+        <nd ref="-1121" />
+        <nd ref="-1122" />
+        <nd ref="-1123" />
+        <nd ref="-1124" />
+        <nd ref="-1125" />
+        <nd ref="-1126" />
+        <nd ref="-1202" />
+        </way>
+    <way id="-1129">
+        <nd ref="-1130" />
+        <nd ref="-1131" />
+        <nd ref="-1132" />
+        <nd ref="-1133" />
+        <nd ref="-1134" />
+        <nd ref="-1135" />
+        <nd ref="-1136" />
+        <nd ref="-1137" />
+        <nd ref="-1138" />
+        <nd ref="-1139" />
+        <nd ref="-1012" />
+        </way>
+    <way id="-1142">
+        <nd ref="-1143" />
+        <nd ref="-1144" />
+        <nd ref="-1145" />
+        <nd ref="-1146" />
+        <nd ref="-1147" />
+        <nd ref="-1148" />
+        <nd ref="-1149" />
+        <nd ref="-1150" />
+        <nd ref="-1151" />
+        <nd ref="-1152" />
+        <nd ref="-1153" />
+        <nd ref="-1154" />
+        <nd ref="-1155" />
+        <nd ref="-1156" />
+        <nd ref="-1208" />
+        </way>
+    <way id="-1159">
+        <nd ref="-1143" />
+        <nd ref="-1161" />
+        <nd ref="-1162" />
+        <nd ref="-1163" />
+        <nd ref="-1164" />
+        <nd ref="-1165" />
+        <nd ref="-1166" />
+        <nd ref="-1167" />
+        <nd ref="-1168" />
+        <nd ref="-1169" />
+        <nd ref="-1170" />
+        <nd ref="-1054" />
+        </way>
+    <way id="-1173">
+        <nd ref="-1174" />
+        <nd ref="-1202" />
+        </way>
+    <way id="-1177">
+        <nd ref="-1073" />
+        <nd ref="-1208" />
+        </way>
+    <way id="-1181">
+        <nd ref="-1143" />
+        <nd ref="-1183" />
+        <nd ref="-1012" />
+        </way>
+    <way id="-1186">
+        <nd ref="-1187" />
+        <nd ref="-1188" />
+        <nd ref="-1189" />
+        <nd ref="-1048" />
+        </way>
+    <way id="-1192">
+        <nd ref="-1193" />
+        <nd ref="-1054" />
+        </way>
+    <way id="-1196">
+        <nd ref="-1103" />
+        <nd ref="-1198" />
+        <nd ref="-1199" />
+        </way>
+    <way id="-1201">
+        <nd ref="-1202" />
+        <nd ref="-1203" />
+        <nd ref="-1204" />
+        <nd ref="-1205" />
+        </way>
+    <way id="-1207">
+        <nd ref="-1208" />
+        <nd ref="-1209" />
+        <nd ref="-1210" />
+        <nd ref="-1211" />
+        </way>
+    <way id="-1213">
+        <nd ref="-1214" />
+        <nd ref="-1215" />
+        <nd ref="-1216" />
+        <nd ref="-1217" />
+        <nd ref="-1218" />
+        <nd ref="-1219" />
+        <nd ref="-1220" />
+        <nd ref="-1221" />
+        <nd ref="-1222" />
+        <nd ref="-1042" />
+        </way>
+    <way id="-1225">
+        <nd ref="-1226" />
+        <nd ref="-1227" />
+        <nd ref="-1228" />
+        <nd ref="-1229" />
+        <nd ref="-832" />
+        </way>
+    <way id="-1232">
+        <nd ref="-1233" />
+        <nd ref="-1234" />
+        <nd ref="-839" />
+        </way>
+    <way id="-1237">
+        <nd ref="-1238" />
+        <nd ref="-1239" />
+        <nd ref="-1240" />
+        <nd ref="-1241" />
+        <nd ref="-930" />
+        </way>
+    <way id="-1244">
+        <nd ref="-1245" />
+        <nd ref="-1246" />
+        <nd ref="-1247" />
+        <nd ref="-1291" />
+        </way>
+    <way id="-1250">
+        <nd ref="-1251" />
+        <nd ref="-1252" />
+        <nd ref="-1253" />
+        <nd ref="-1295" />
+        </way>
+    <way id="-1256">
+        <nd ref="-1257" />
+        <nd ref="-1258" />
+        <nd ref="-1259" />
+        </way>
+    <way id="-1261">
+        <nd ref="-1262" />
+        <nd ref="-1263" />
+        <nd ref="-1264" />
+        <nd ref="-1265" />
+        </way>
+    <way id="-1267">
+        <nd ref="-1090" />
+        <nd ref="-1269" />
+        <nd ref="-1042" />
+        </way>
+    <way id="-1272">
+        <nd ref="-1273" />
+        <nd ref="-1274" />
+        <nd ref="-1275" />
+        <nd ref="-1276" />
+        <nd ref="-1277" />
+        <nd ref="-1278" />
+        <nd ref="-789" />
+        </way>
+    <way id="-1281">
+        <nd ref="-1282" />
+        <nd ref="-1283" />
+        <nd ref="-794" />
+        </way>
+    <way id="-1286">
+        <nd ref="-930" />
+        <nd ref="-1226" />
+        </way>
+    <way id="-1290">
+        <nd ref="-1291" />
+        <nd ref="-1233" />
+        </way>
+    <way id="-1294">
+        <nd ref="-1295" />
+        <nd ref="-1296" />
+        </way>
+    <way id="-1298">
+        <nd ref="-1299" />
+        <nd ref="-1257" />
+        </way>
+    <way id="-1302">
+        <nd ref="-1303" />
+        <nd ref="-1262" />
+        </way>
+    <relation id="-1306">
+        <member ref="-728" role="left" type="way" />
+        <member ref="-731" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1307">
+        <member ref="-734" role="left" type="way" />
+        <member ref="-737" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1308">
+        <member ref="-743" role="left" type="way" />
+        <member ref="-740" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1309">
+        <member ref="-746" role="left" type="way" />
+        <member ref="-749" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1310">
+        <member ref="-752" role="left" type="way" />
+        <member ref="-755" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1311">
+        <member ref="-758" role="left" type="way" />
+        <member ref="-761" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1312">
+        <member ref="-764" role="left" type="way" />
+        <member ref="-767" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1313">
+        <member ref="-770" role="left" type="way" />
+        <member ref="-773" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1314">
+        <member ref="-776" role="left" type="way" />
+        <member ref="-779" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1315">
+        <member ref="-782" role="left" type="way" />
+        <member ref="-785" role="right" type="way" />
+        <tag k="subtype" v="crosswalk" />
+        <tag k="type" v="lanelet" />
+    </relation>
+    <relation id="-1316">
+        <member ref="-604" role="left" type="way" />
+        <member ref="-115" role="right" type="way" />
+        <tag k="name" v="-1316" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1317">
+        <member ref="-607" role="left" type="way" />
+        <member ref="-604" role="right" type="way" />
+        <tag k="name" v="-1317" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1318">
+        <member ref="-607" role="left" type="way" />
+        <member ref="-626" role="right" type="way" />
+        <member ref="-710" role="stop_line" type="way" />
+        <tag k="name" v="-1318" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1319">
+        <member ref="-626" role="left" type="way" />
+        <member ref="-1" role="right" type="way" />
+        <member ref="-710" role="stop_line" type="way" />
+        <tag k="name" v="-1319" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1320">
+        <member ref="-1" role="left" type="way" />
+        <member ref="-4" role="right" type="way" />
+        <member ref="-710" role="stop_line" type="way" />
+        <tag k="name" v="-1320" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1321">
+        <member ref="-4" role="left" type="way" />
+        <member ref="-610" role="right" type="way" />
+        <member ref="-710" role="stop_line" type="way" />
+        <tag k="name" v="-1321" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1322">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-96" role="left" type="way" />
+        <member ref="-7" role="right" type="way" />
+        <tag k="name" v="-1322" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1323">
+        <member ref="-139" role="left" type="way" />
+        <member ref="-542" role="right" type="way" />
+        <tag k="name" v="-1323" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1324">
+        <member ref="-32" role="left" type="way" />
+        <member ref="-139" role="right" type="way" />
+        <tag k="name" v="-1324" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1325">
+        <member ref="-32" role="left" type="way" />
+        <member ref="-29" role="right" type="way" />
+        <member ref="-704" role="stop_line" type="way" />
+        <tag k="name" v="-1325" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1326">
+        <member ref="-29" role="left" type="way" />
+        <member ref="-26" role="right" type="way" />
+        <member ref="-704" role="stop_line" type="way" />
+        <tag k="name" v="-1326" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1327">
+        <member ref="-26" role="left" type="way" />
+        <member ref="-23" role="right" type="way" />
+        <member ref="-704" role="stop_line" type="way" />
+        <tag k="name" v="-1327" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1328">
+        <member ref="-23" role="left" type="way" />
+        <member ref="-634" role="right" type="way" />
+        <member ref="-704" role="stop_line" type="way" />
+        <tag k="name" v="-1328" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1329">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-192" role="left" type="way" />
+        <member ref="-35" role="right" type="way" />
+        <tag k="name" v="-1329" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1330">
+        <member ref="-50" role="left" type="way" />
+        <member ref="-53" role="right" type="way" />
+        <tag k="name" v="-1330" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1331">
+        <member ref="-47" role="left" type="way" />
+        <member ref="-50" role="right" type="way" />
+        <tag k="name" v="-1331" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1332">
+        <member ref="-44" role="left" type="way" />
+        <member ref="-47" role="right" type="way" />
+        <tag k="name" v="-1332" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1333">
+        <member ref="-44" role="left" type="way" />
+        <member ref="-84" role="right" type="way" />
+        <tag k="name" v="-1333" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1334">
+        <member ref="-84" role="left" type="way" />
+        <member ref="-551" role="right" type="way" />
+        <tag k="name" v="-1334" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1335">
+        <member ref="-1312" role="" type="relation" />
+        <member ref="-71" role="left" type="way" />
+        <member ref="-58" role="right" type="way" />
+        <tag k="name" v="-1335" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1336">
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-649" role="left" type="way" />
+        <member ref="-556" role="right" type="way" />
+        <tag k="name" v="-1336" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1337">
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-556" role="left" type="way" />
+        <member ref="-88" role="right" type="way" />
+        <tag k="name" v="-1337" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1338">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1313" role="" type="relation" />
+        <member ref="-658" role="left" type="way" />
+        <member ref="-548" role="right" type="way" />
+        <tag k="name" v="-1338" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1339">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1313" role="" type="relation" />
+        <member ref="-548" role="left" type="way" />
+        <member ref="-91" role="right" type="way" />
+        <tag k="name" v="-1339" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1340">
+        <member ref="-1315" role="" type="relation" />
+        <member ref="-107" role="left" type="way" />
+        <member ref="-524" role="right" type="way" />
+        <tag k="name" v="-1340" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1341">
+        <member ref="-667" role="left" type="way" />
+        <member ref="-664" role="right" type="way" />
+        <tag k="name" v="-1341" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1342">
+        <member ref="-646" role="left" type="way" />
+        <member ref="-667" role="right" type="way" />
+        <tag k="name" v="-1342" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1343">
+        <member ref="-559" role="left" type="way" />
+        <member ref="-646" role="right" type="way" />
+        <member ref="-707" role="stop_line" type="way" />
+        <tag k="name" v="-1343" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1344">
+        <member ref="-559" role="left" type="way" />
+        <member ref="-652" role="right" type="way" />
+        <tag k="name" v="-1344" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1345">
+        <member ref="-652" role="left" type="way" />
+        <member ref="-655" role="right" type="way" />
+        <tag k="name" v="-1345" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1346">
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-1313" role="" type="relation" />
+        <member ref="-129" role="left" type="way" />
+        <member ref="-122" role="right" type="way" />
+        <tag k="name" v="-1346" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1347">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-143" role="left" type="way" />
+        <member ref="-153" role="right" type="way" />
+        <tag k="name" v="-1347" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1348">
+        <member ref="-1313" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-166" role="left" type="way" />
+        <member ref="-178" role="right" type="way" />
+        <tag k="name" v="-1348" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1349">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-201" role="left" type="way" />
+        <member ref="-210" role="right" type="way" />
+        <tag k="name" v="-1349" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1350">
+        <member ref="-222" role="left" type="way" />
+        <member ref="-225" role="right" type="way" />
+        <tag k="name" v="-1350" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1351">
+        <member ref="-222" role="left" type="way" />
+        <member ref="-582" role="right" type="way" />
+        <member ref="-701" role="stop_line" type="way" />
+        <tag k="name" v="-1351" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1352">
+        <member ref="-582" role="left" type="way" />
+        <member ref="-417" role="right" type="way" />
+        <tag k="name" v="-1352" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1353">
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-1309" role="" type="relation" />
+        <member ref="-324" role="left" type="way" />
+        <member ref="-228" role="right" type="way" />
+        <tag k="name" v="-1353" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1354">
+        <member ref="-243" role="left" type="way" />
+        <member ref="-240" role="right" type="way" />
+        <member ref="-692" role="stop_line" type="way" />
+        <tag k="name" v="-1354" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1355">
+        <member ref="-243" role="left" type="way" />
+        <member ref="-567" role="right" type="way" />
+        <tag k="name" v="-1355" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1356">
+        <member ref="-427" role="left" type="way" />
+        <member ref="-562" role="right" type="way" />
+        <tag k="name" v="-1356" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1357">
+        <member ref="-640" role="left" type="way" />
+        <member ref="-427" role="right" type="way" />
+        <tag k="name" v="-1357" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1358">
+        <member ref="-640" role="left" type="way" />
+        <member ref="-250" role="right" type="way" />
+        <member ref="-689" role="stop_line" type="way" />
+        <tag k="name" v="-1358" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1359">
+        <member ref="-250" role="left" type="way" />
+        <member ref="-253" role="right" type="way" />
+        <member ref="-689" role="stop_line" type="way" />
+        <tag k="name" v="-1359" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1360">
+        <member ref="-253" role="left" type="way" />
+        <member ref="-246" role="right" type="way" />
+        <member ref="-689" role="stop_line" type="way" />
+        <tag k="name" v="-1360" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1361">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1307" role="" type="relation" />
+        <member ref="-335" role="left" type="way" />
+        <member ref="-256" role="right" type="way" />
+        <tag k="name" v="-1361" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1362">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1309" role="" type="relation" />
+        <member ref="-471" role="left" type="way" />
+        <member ref="-272" role="right" type="way" />
+        <member ref="-725" role="stop_line" type="way" />
+        <tag k="name" v="-1362" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1363">
+        <member ref="-284" role="left" type="way" />
+        <member ref="-289" role="right" type="way" />
+        <member ref="-695" role="stop_line" type="way" />
+        <tag k="name" v="-1363" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1364">
+        <member ref="-289" role="left" type="way" />
+        <member ref="-294" role="right" type="way" />
+        <member ref="-695" role="stop_line" type="way" />
+        <tag k="name" v="-1364" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1365">
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-1309" role="" type="relation" />
+        <member ref="-301" role="left" type="way" />
+        <member ref="-312" role="right" type="way" />
+        <tag k="name" v="-1365" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1366">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1309" role="" type="relation" />
+        <member ref="-347" role="left" type="way" />
+        <member ref="-358" role="right" type="way" />
+        <tag k="name" v="-1366" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1367">
+        <member ref="-1307" role="" type="relation" />
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-370" role="left" type="way" />
+        <member ref="-484" role="right" type="way" />
+        <tag k="name" v="-1367" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1368">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1307" role="" type="relation" />
+        <member ref="-382" role="left" type="way" />
+        <member ref="-394" role="right" type="way" />
+        <tag k="name" v="-1368" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1369">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-407" role="left" type="way" />
+        <member ref="-445" role="right" type="way" />
+        <tag k="name" v="-1369" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1370">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-445" role="left" type="way" />
+        <member ref="-437" role="right" type="way" />
+        <tag k="name" v="-1370" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1371">
+        <member ref="-1307" role="" type="relation" />
+        <member ref="-1309" role="" type="relation" />
+        <member ref="-414" role="left" type="way" />
+        <member ref="-410" role="right" type="way" />
+        <tag k="name" v="-1371" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1372">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-424" role="left" type="way" />
+        <member ref="-440" role="right" type="way" />
+        <tag k="name" v="-1372" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1373">
+        <member ref="-1306" role="" type="relation" />
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-575" role="left" type="way" />
+        <member ref="-424" role="right" type="way" />
+        <tag k="name" v="-1373" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1374">
+        <member ref="-572" role="left" type="way" />
+        <member ref="-578" role="right" type="way" />
+        <member ref="-698" role="stop_line" type="way" />
+        <tag k="name" v="-1374" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1375">
+        <member ref="-572" role="left" type="way" />
+        <member ref="-432" role="right" type="way" />
+        <tag k="name" v="-1375" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1376">
+        <member ref="-432" role="left" type="way" />
+        <member ref="-589" role="right" type="way" />
+        <tag k="name" v="-1376" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1377">
+        <member ref="-1307" role="" type="relation" />
+        <member ref="-1308" role="" type="relation" />
+        <member ref="-448" role="left" type="way" />
+        <member ref="-460" role="right" type="way" />
+        <tag k="name" v="-1377" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1378">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1313" role="" type="relation" />
+        <member ref="-538" role="left" type="way" />
+        <member ref="-500" role="right" type="way" />
+        <member ref="-719" role="stop_line" type="way" />
+        <tag k="name" v="-1378" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1379">
+        <member ref="-1310" role="" type="relation" />
+        <member ref="-1313" role="" type="relation" />
+        <member ref="-676" role="left" type="way" />
+        <member ref="-538" role="right" type="way" />
+        <member ref="-719" role="stop_line" type="way" />
+        <tag k="name" v="-1379" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1380">
+        <member ref="-519" role="left" type="way" />
+        <member ref="-598" role="right" type="way" />
+        <tag k="name" v="-1380" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1381">
+        <member ref="-514" role="left" type="way" />
+        <member ref="-519" role="right" type="way" />
+        <tag k="name" v="-1381" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1382">
+        <member ref="-510" role="left" type="way" />
+        <member ref="-514" role="right" type="way" />
+        <tag k="name" v="-1382" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1383">
+        <member ref="-510" role="left" type="way" />
+        <member ref="-506" role="right" type="way" />
+        <tag k="name" v="-1383" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1384">
+        <member ref="-506" role="left" type="way" />
+        <member ref="-629" role="right" type="way" />
+        <tag k="name" v="-1384" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1385">
+        <member ref="-1307" role="" type="relation" />
+        <member ref="-1309" role="" type="relation" />
+        <member ref="-594" role="left" type="way" />
+        <member ref="-585" role="right" type="way" />
+        <member ref="-722" role="stop_line" type="way" />
+        <tag k="name" v="-1385" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1386">
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-614" role="left" type="way" />
+        <member ref="-618" role="right" type="way" />
+        <member ref="-716" role="stop_line" type="way" />
+        <tag k="name" v="-1386" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1387">
+        <member ref="-1311" role="" type="relation" />
+        <member ref="-1314" role="" type="relation" />
+        <member ref="-661" role="left" type="way" />
+        <member ref="-614" role="right" type="way" />
+        <member ref="-716" role="stop_line" type="way" />
+        <tag k="name" v="-1387" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1388">
+        <member ref="-673" role="left" type="way" />
+        <member ref="-670" role="right" type="way" />
+        <tag k="name" v="-1388" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1389">
+        <member ref="-643" role="left" type="way" />
+        <member ref="-673" role="right" type="way" />
+        <tag k="name" v="-1389" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1390">
+        <member ref="-680" role="left" type="way" />
+        <member ref="-643" role="right" type="way" />
+        <member ref="-713" role="stop_line" type="way" />
+        <tag k="name" v="-1390" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1391">
+        <member ref="-680" role="left" type="way" />
+        <member ref="-686" role="right" type="way" />
+        <tag k="name" v="-1391" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1392">
+        <member ref="-686" role="left" type="way" />
+        <member ref="-683" role="right" type="way" />
+        <tag k="name" v="-1392" />
+        <tag k="lane_type" v="driving" />
+        <tag k="speed_limit" v="50" />
+        <tag k="left_marking" v="none" />
+        <tag k="right_marking" v="none" />
+        <tag k="type" v="lanelet" />
+        </relation>
+    <relation id="-1393">
+        <member ref="-1322" role="connection" type="relation" />
+        <member ref="-1329" role="connection" type="relation" />
+        <member ref="-1335" role="connection" type="relation" />
+        <member ref="-1336" role="connection" type="relation" />
+        <member ref="-1337" role="connection" type="relation" />
+        <member ref="-1338" role="connection" type="relation" />
+        <member ref="-1339" role="connection" type="relation" />
+        <member ref="-1340" role="connection" type="relation" />
+        <member ref="-1346" role="connection" type="relation" />
+        <member ref="-1347" role="connection" type="relation" />
+        <member ref="-1348" role="connection" type="relation" />
+        <member ref="-1349" role="connection" type="relation" />
+        <member ref="-1378" role="connection" type="relation" />
+        <member ref="-1379" role="connection" type="relation" />
+        <member ref="-1386" role="connection" type="relation" />
+        <member ref="-1387" role="connection" type="relation" />
+        <member ref="-1310" role="crosswalk" type="relation" />
+        <member ref="-1311" role="crosswalk" type="relation" />
+        <member ref="-1312" role="crosswalk" type="relation" />
+        <member ref="-1313" role="crosswalk" type="relation" />
+        <member ref="-1314" role="crosswalk" type="relation" />
+        <member ref="-1315" role="crosswalk" type="relation" />
+        <tag k="type" v="intersection" />
+        </relation>
+    <relation id="-1394">
+        <member ref="-1353" role="connection" type="relation" />
+        <member ref="-1361" role="connection" type="relation" />
+        <member ref="-1362" role="connection" type="relation" />
+        <member ref="-1365" role="connection" type="relation" />
+        <member ref="-1366" role="connection" type="relation" />
+        <member ref="-1367" role="connection" type="relation" />
+        <member ref="-1368" role="connection" type="relation" />
+        <member ref="-1369" role="connection" type="relation" />
+        <member ref="-1370" role="connection" type="relation" />
+        <member ref="-1371" role="connection" type="relation" />
+        <member ref="-1372" role="connection" type="relation" />
+        <member ref="-1373" role="connection" type="relation" />
+        <member ref="-1377" role="connection" type="relation" />
+        <member ref="-1385" role="connection" type="relation" />
+        <member ref="-1306" role="crosswalk" type="relation" />
+        <member ref="-1307" role="crosswalk" type="relation" />
+        <member ref="-1308" role="crosswalk" type="relation" />
+        <member ref="-1309" role="crosswalk" type="relation" />
+        <tag k="type" v="intersection" />
+        </relation>
+    </osm>

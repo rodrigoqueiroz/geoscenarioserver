@@ -62,11 +62,11 @@ class ManeuverAction(behaviour.Behaviour):
         status = common.Status.SUCCESS
 
         #Maneuver specific logic for runtime configuration:
-        if self.mconfig.mkey == M_VELKEEP:
+        if self.mconfig.mkey == Maneuver.M_VELKEEP:
             pass
             # status = common.Status.SUCCESS
 
-        elif self.mconfig.mkey == M_FOLLOW:
+        elif self.mconfig.mkey == Maneuver.M_FOLLOW:
             leading_vehicle = sv.ManeuverUtils.get_leading_vehicle(
                 self.bmodel.planner_state.vehicle_state,
                 self.bmodel.planner_state.lane_config,
@@ -76,8 +76,9 @@ class ManeuverAction(behaviour.Behaviour):
             else:
                 status = common.Status.FAILURE
 
-        elif self.mconfig.mkey == M_CUTIN:
-            if self.mconfig.target_vid == -1:
+        elif self.mconfig.mkey == Maneuver.M_CUTIN:
+            if self.mconfig.target_vid is None:
+                # find target vehicle in adjacent lane
                 target_vehicle = sv.ManeuverUtils.get_closest_vehicle_in_lane(
                     self.bmodel.planner_state.vehicle_state,
                     self.bmodel.planner_state.lane_config.get_neighbour(self.mconfig.target_lid),
@@ -85,7 +86,7 @@ class ManeuverAction(behaviour.Behaviour):
                 )
                 self.mconfig.target_vid = target_vehicle.vid
 
-        if self.mconfig.mkey == M_LANESWERVE or self.mconfig.mkey == M_CUTIN:
+        if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(
                         self.bmodel.planner_state.vehicle_state,
