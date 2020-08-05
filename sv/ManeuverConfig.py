@@ -28,7 +28,7 @@ MAX_JERK = 10                    # maximum jerk [m/s/s/s]
 
 
 @dataclass
-class LaneConfig:                   
+class LaneConfig:
     #Lane Config in Frenet Frame
     #Left and Right lanes exist only if traversal is possible
     id:int = 0
@@ -46,15 +46,15 @@ class LaneConfig:
         elif self._left_lane and self._left_lane.right_bound <= d < self._left_lane.left_bound:
             return self._left_lane
         return None
-    
+
     def set_left_lane(self,lane):
         self._left_lane = lane
         lane._right_lane = self
-    
+
     def set_right_lane(self,lane):
         self._right_lane = lane
         lane._left_lane = self
-    
+
     def get_neighbour(self,l_id):
         #print((self._right_lane.id))
         if (self._right_lane):
@@ -64,23 +64,22 @@ class LaneConfig:
             if (self._left_lane.id == l_id):
                 return self._left_lane
         return None
-    
-    
-        
-@dataclass        
+
+
+@dataclass
 class MP:
     #Maneuver Parameter that supports sampling
     value:float = 0.0               #target value
     bound_p:float = 0.0             #boundary in percentage (relative to value)
     nsamples:int = 1                #number of samples
     sigma:float = 1                 #std dev for sampling from normal
-    
+
     def bounds(self):
         if (self.bound_p > 0.0):
             lo = self.value - (self.value * self.bound_p / 100)
             up = self.value + (self.value * self.bound_p / 100)
             return lo,up
-        else: 
+        else:
             return self.value,self.value
 
     def get_linear_samples(self):
@@ -156,6 +155,7 @@ class MLaneSwerveConfig:
 class MCutInConfig:
     #target
     target_vid:int                  #target vehicle id
+    target_lid:int = None           #lane id of target vehicle
     vel:float = 30
     time:MP = MP(5,10,6)
     delta_s:tuple = (10,5,0)        #(s, vel, acc)
@@ -168,7 +168,7 @@ class MCutInConfig:
 
 
 
-#TARGET_VELOCITY = 30.0 / 3.6 #=8.3m/s      #HV target speed [m/s] 
+#TARGET_VELOCITY = 30.0 / 3.6 #=8.3m/s      #HV target speed [m/s]
 #TS_SAMP = 5.0 / 3.6  # ~1.38 m/s        #HV target speed sampling [m/s]
 #VELOCITY_STEP = 6
 #MAX_VELOCITY = 30 / 3.6                 #11 m/s
@@ -177,7 +177,7 @@ class MCutInConfig:
 
 #PLANNING TIMES
 #PLAN_TIME_STEP = 0.5    #general planning time step
-#VK_TIME = 4             #velocity keeping planning time 
+#VK_TIME = 4             #velocity keeping planning time
 #VK_MIN_TIME = 2         #velocity keeping time variation (+ and -)
 #VK_MAX_TIME = 6
 
@@ -189,7 +189,7 @@ class MCutInConfig:
 #STOP_DISTANCE_STEP = 10
 #LC_TIME_VAR = 4
 #CI_TIME = 8
-#CI_TIME_VAR = 2 
+#CI_TIME_VAR = 2
 
 #space sampling
 #N_SAMPLES = 10

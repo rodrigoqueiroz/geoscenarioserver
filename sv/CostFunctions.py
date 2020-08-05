@@ -12,7 +12,7 @@ from SimConfig import *
 #=============================== FEASIBILITY
 
 def check_trajectory(trajectory, vehicles, allow_near_collision):
-    #TODO: adjust to support near collision under certain conditions 
+    #TODO: adjust to support near collision under certain conditions
     if (collision_cost(trajectory, vehicles)):
         return False
     return True
@@ -62,7 +62,7 @@ def cutin_cost(trajectory, mconfig:MCutInConfig, lane_config:LaneConfig, vehicle
     C = []
     C.append(1 * time_cost(trajectory, mconfig.time.value))
     C.append(1 * total_lat_jerk_cost(trajectory))
-    # C.append(1 * lateral_lane_offset_cost(trajectory, lane_config))
+    C.append(1 * lateral_lane_offset_cost(trajectory, lane_config))
     #C.append(1 * max_jerk_cost(trajectory))
     #C.append(1 * max_acc_cost(trajectory))
     #C.append(1 * total_acc_cost(trajectory))
@@ -100,7 +100,7 @@ def lateral_lane_offset_cost(traj,lane_config):
     #Not suitable for Lane Change
     _, d_coef, T = traj
     central_d = (lane_config.left_bound - lane_config.right_bound)/2 + lane_config.right_bound
-    
+
     d_eq = to_equation(d_coef)
     target_d = d_eq(T)
     total_offset = 0
@@ -111,12 +111,12 @@ def lateral_lane_offset_cost(traj,lane_config):
         offset = d_eq(t) - central_d
         total_offset += abs(offset)
         #print("dt {:.2f} central_d {:.2f} offset {:.2f} ".format(d_eq(t),central_d,offset))
-    
+
     #print("total offset is {:.2f} ".format(total_offset))
     offset_per_second = total_offset / T
     #print("offset_per_second {:.2f}".format(offset_per_second) )
     cost = logistic(offset_per_second/EXPECTED_OFFSET_PER_SEC)
-    
+
     #print("total lateral offset cost is {:.2f} for target {:.2f}".format(cost,target_d) )
     return cost
 
@@ -198,9 +198,9 @@ def total_acc_cost(trajectory):
         acc = a(t)
         total_acc += abs(acc*dt)
     acc_per_second = total_acc / T
-    
+
     return logistic(acc_per_second / EXPECTED_ACC_PER_SEC )
-    
+
 def max_acc_cost(trajectory):
     s, d, T = trajectory
     s_dot = differentiate(s)
@@ -248,7 +248,7 @@ def nearest_approach(trajectory, vehicle):
 #CHECK:
 def s_diff_cost(traj, target_vehicle, delta, T, predictions):
     """
-    Penalizes trajectories whose s coordinate (and derivatives) 
+    Penalizes trajectories whose s coordinate (and derivatives)
     differ from the goal.
     """
     s, _, T = traj
@@ -264,11 +264,11 @@ def s_diff_cost(traj, target_vehicle, delta, T, predictions):
 
 def d_diff_cost(traj, target_vehicle, delta, T, predictions):
     """
-    Penalizes trajectories whose d coordinate (and derivatives) 
+    Penalizes trajectories whose d coordinate (and derivatives)
     differ from the goal.
     """
     _, d_coeffs, T = traj
-    
+
     d_dot_coeffs = differentiate(d_coeffs)
     d_ddot_coeffs = differentiate(d_dot_coeffs)
 
@@ -277,7 +277,7 @@ def d_diff_cost(traj, target_vehicle, delta, T, predictions):
     d_ddot = to_equation(d_ddot_coeffs)
 
     D = [d(T), d_dot(T), d_ddot(T)]
-    
+
     target = predictions[target_vehicle].future_state(T)
     target = list(np.array(target) + np.array(delta))
     d_targ = target[3:]

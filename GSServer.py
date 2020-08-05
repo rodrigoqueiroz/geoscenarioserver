@@ -6,6 +6,9 @@
 # Controls the problem setup and traffic simulation loop
 # --------------------------------------------
 
+from argparse import ArgumentParser
+import glog as log
+
 from TickSync import TickSync
 from SimTraffic import SimTraffic
 from dash.Dashboard import *
@@ -13,11 +16,12 @@ from mapping.LaneletMap import *
 from lanelet2.projection import UtmProjector
 from SimConfig import SimConfig
 from gsc.GSParser import GSParser
-from argparse import ArgumentParser
 from sv.ManeuverConfig import *
 
-def start_server(args, m = MVelKeepConfig()):
-    print ('GeoScenario server START')
+def start_server(args, m=MVelKeepConfig()):
+    # log.setLevel("INFO")
+
+    log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
     traffic = SimTraffic(lanelet_map, sim_config)
@@ -30,17 +34,15 @@ def start_server(args, m = MVelKeepConfig()):
         #Using GeoScenario XML files (GSParser)
         if not setup_problem_from_file(args.gsfile, traffic, sim_config, lanelet_map):
             return
-            
-    sync_global   = TickSync(rate=sim_config.traffic_rate, realtime = True, block=True, verbose=False, label="EX")
+
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(sim_config.timeout)
-    
-    
+
     #GUI / Debug screen
     dashboard = Dashboard(traffic, sim_config.plot_vid)
-    
-    
+
     #SIM EXECUTION START
-    print ('SIMULATION START')
+    log.info('SIMULATION START')
     traffic.start()
     dashboard.start()
     while sync_global.tick():
@@ -49,18 +51,18 @@ def start_server(args, m = MVelKeepConfig()):
         try:
             #Update Traffic
             traffic.tick(
-                sync_global.tick_count, 
+                sync_global.tick_count,
                 sync_global.delta_time,
                 sync_global.sim_time
             )
         except KeyboardInterrupt:
             break
-        
-    traffic.stop_all()    
+
+    traffic.stop_all()
     dashboard.quit()
     #SIM END
-    print('SIMULATION END')
-    print('GeoScenario server shutdown')
+    log.info('SIMULATION END')
+    log.info('GeoScenario server shutdown')
 
 def setup_problem(sim_traffic, sim_config, lanelet_map):
     """ Setup scenario directly
@@ -83,24 +85,24 @@ def setup_problem(sim_traffic, sim_config, lanelet_map):
     #    sim_config.lanelet_routes[1], 'drive_tree')
     #traffic.add_vehicle(3, 'V3', [8,0.0,0.0, 0.0,0.0,0.0],
     #        sim_config.lanelet_routes[2], 'drive_tree')
-    
+
 
 def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     """ Setup scenario from GeoScenario file
     """
     parser = GSParser()
     if not parser.load_and_validate_geoscenario(gsfile):
-        print("Error loading GeoScenario file")
+        log.error("Error loading GeoScenario file")
         return False
     if parser.globalconfig.tags['version'] < 2.0:
-        print("GSServer requires GeoScenario 2.0 or newer")
+        log.error("GSServer requires GeoScenario 2.0 or newer")
         return False
-    
+
     sim_config.scenario_name = parser.globalconfig.tags['name']
     sim_config.timeout = parser.globalconfig.tags['timeout']
     if 'plotvid' in parser.globalconfig.tags:
         sim_config.plot_vid = parser.globalconfig.tags['plotvid']
-    
+
     #map
     map_file = 'scenarios/' + parser.globalconfig.tags['lanelet']
     # use origin from gsc file to project nodes to sim frame
@@ -117,13 +119,13 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
         # NOTE we may not want to do this, in case the user starts the vehicle in the middle of the path
         route_nodes = [vnode] + parser.routes[myroute].nodes
         lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
-        
+
         sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
         sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
         sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
-            sim_config.lanelet_routes[simvid], btree_root)
+                                sim_config.lanelet_routes[simvid], btree_root)
     return True
-    
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
