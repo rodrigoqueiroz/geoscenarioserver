@@ -192,11 +192,20 @@ void RoutingGraphBuilder::addFollowingEdges(const ConstLanelet& ll) {
   } else if (merging.size() == 1 && following.size() > 1) {
     relation = RelationType::Diverging;
   } else {
-    throw RoutingGraphError("Could not determine relationship between lanelets following lanelet " +
+    std::string errString = "Could not determine relationship between lanelets following lanelet " +
                             std::to_string(ll.id()) +
                             ". Lanelets that are diverging and merging at the same time are not permitted. " +
                             "The Lanelet has " + std::to_string(merging.size()) + " merging Lanelets and " +
-                            std::to_string(following.size()) + " following Lanelets.");
+                            std::to_string(following.size()) + " following Lanelets.";
+    errString += " Merging lanelets:";
+    for (const auto& merging_ll : merging) {
+      errString += " " + std::to_string(merging_ll.id());
+    }
+    errString += ". Following lanelets:";
+    for (const auto& following_ll : following) {
+      errString += " " + std::to_string(following_ll.id());
+    }
+    throw RoutingGraphError(errString);
   }
 
   for (auto& followingIt : following) {
