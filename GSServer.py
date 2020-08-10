@@ -26,6 +26,10 @@ def start_server(args, m=MVelKeepConfig()):
     sim_config = SimConfig()
     traffic = SimTraffic(lanelet_map, sim_config)
 
+    if args.verify_map != "":
+        verify_map_file(args.verify_map, lanelet_map)
+        return
+
     # Scenario SETUP
     if not args.gsfile:
         #Direct setup
@@ -63,6 +67,11 @@ def start_server(args, m=MVelKeepConfig()):
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario server shutdown')
+
+def verify_map_file(map_file, lanelet_map:LaneletMap):
+    # TODO: origin needs to be close to the map
+    projector = UtmProjector(lanelet2.io.Origin(43.0, -80))
+    lanelet_map.load_lanelet_map(map_file, projector)
 
 def setup_problem(sim_traffic, sim_config, lanelet_map):
     """ Setup scenario directly
@@ -126,9 +135,11 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
                                 sim_config.lanelet_routes[simvid], btree_root)
     return True
 
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     args = parser.parse_args()
     start_server(args)
