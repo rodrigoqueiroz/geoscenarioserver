@@ -41,11 +41,11 @@ INDENT
 DEDENT
 
 rule names:
-behavior_tree
-root_node
+behaviorTree
+rootNode
 node
-node_composition
-leaf_node
+nodeComposition
+leafNode
 condition
 maneuver
 subtree

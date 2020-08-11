@@ -27,22 +27,22 @@ def nextToken(self):
 /*
 * Parser Rules
 */
-behaviorTree        : ('BehaviorTree' id ':' INDENT rootNode NL? DEDENT?)+ EOF;
+behaviorTree        : ('BehaviorTree' name ':' INDENT rootNode NL? DEDENT?)+ EOF;
 
 rootNode            : node;
 node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'Condition' id ('(' params ')')?;
-maneuver            : 'Maneuver' id ('(' key (',' params)* ')')?;
-subtree             : 'Subtree' id ('(' params ')')?;
+condition           : 'Condition' name ('(' params ')')?;
+maneuver            : 'Maneuver' name ('(' key (',' params)* ')')?;
+subtree             : 'Subtree' name ('(' params ')')?;
 
-key                 : 'key' ATT id ;
+key                 : 'key' ATT name ;
 params              : bexpr (',' bexpr)* ;
-bexpr               : id (BOP|ATT) value ;
-value               : FLOAT | id;
-id                  : WS* WORD WS*;
+bexpr               : name (BOP|ATT) value ;
+value               : FLOAT | name;
+name                : WS* WORD WS*;
 
 /*
 * Lexer Rules
@@ -54,6 +54,6 @@ FLOAT               : [+-]?([0-9]*[.])?[0-9]+;
 WORD                : ([a-z] | [A-Z] | '_')+ ;
 WS                  : (' ' | '\t') ;
 /*
- * From antlr-denter to help with IDENT and DEDENT tokens
+ * From antlr-denter to help with INDENT and DEDENT tokens
  */
 NL: ('\r'? '\n' ' '*); //For tabs just switch out ' '* with '\t'*

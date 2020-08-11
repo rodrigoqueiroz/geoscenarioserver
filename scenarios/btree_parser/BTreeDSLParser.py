@@ -71,11 +71,11 @@ class BTreeDSLParser ( Parser ):
                       "<INVALID>", "<INVALID>", "OPERATOR", "BOP", "ATT", 
                       "FLOAT", "WORD", "WS", "NL", "INDENT", "DEDENT" ]
 
-    RULE_behavior_tree = 0
-    RULE_root_node = 1
+    RULE_behaviorTree = 0
+    RULE_rootNode = 1
     RULE_node = 2
-    RULE_node_composition = 3
-    RULE_leaf_node = 4
+    RULE_nodeComposition = 3
+    RULE_leafNode = 4
     RULE_condition = 5
     RULE_maneuver = 6
     RULE_subtree = 7
@@ -85,8 +85,8 @@ class BTreeDSLParser ( Parser ):
     RULE_value = 11
     RULE_name = 12
 
-    ruleNames =  [ "behavior_tree", "root_node", "node", "node_composition", 
-                   "leaf_node", "condition", "maneuver", "subtree", "key", 
+    ruleNames =  [ "behaviorTree", "rootNode", "node", "nodeComposition", 
+                   "leafNode", "condition", "maneuver", "subtree", "key", 
                    "params", "bexpr", "value", "name" ]
 
     EOF = Token.EOF
@@ -117,7 +117,7 @@ class BTreeDSLParser ( Parser ):
 
 
 
-    class Behavior_treeContext(ParserRuleContext):
+    class BehaviorTreeContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -139,11 +139,11 @@ class BTreeDSLParser ( Parser ):
             else:
                 return self.getToken(BTreeDSLParser.INDENT, i)
 
-        def root_node(self, i:int=None):
+        def rootNode(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(BTreeDSLParser.Root_nodeContext)
+                return self.getTypedRuleContexts(BTreeDSLParser.RootNodeContext)
             else:
-                return self.getTypedRuleContext(BTreeDSLParser.Root_nodeContext,i)
+                return self.getTypedRuleContext(BTreeDSLParser.RootNodeContext,i)
 
 
         def NL(self, i:int=None):
@@ -159,23 +159,23 @@ class BTreeDSLParser ( Parser ):
                 return self.getToken(BTreeDSLParser.DEDENT, i)
 
         def getRuleIndex(self):
-            return BTreeDSLParser.RULE_behavior_tree
+            return BTreeDSLParser.RULE_behaviorTree
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBehavior_tree" ):
-                listener.enterBehavior_tree(self)
+            if hasattr( listener, "enterBehaviorTree" ):
+                listener.enterBehaviorTree(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBehavior_tree" ):
-                listener.exitBehavior_tree(self)
+            if hasattr( listener, "exitBehaviorTree" ):
+                listener.exitBehaviorTree(self)
 
 
 
 
-    def behavior_tree(self):
+    def behaviorTree(self):
 
-        localctx = BTreeDSLParser.Behavior_treeContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 0, self.RULE_behavior_tree)
+        localctx = BTreeDSLParser.BehaviorTreeContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 0, self.RULE_behaviorTree)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -192,7 +192,7 @@ class BTreeDSLParser ( Parser ):
                 self.state = 29
                 self.match(BTreeDSLParser.INDENT)
                 self.state = 30
-                self.root_node()
+                self.rootNode()
                 self.state = 32
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -225,7 +225,7 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class Root_nodeContext(ParserRuleContext):
+    class RootNodeContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -236,23 +236,23 @@ class BTreeDSLParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return BTreeDSLParser.RULE_root_node
+            return BTreeDSLParser.RULE_rootNode
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterRoot_node" ):
-                listener.enterRoot_node(self)
+            if hasattr( listener, "enterRootNode" ):
+                listener.enterRootNode(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitRoot_node" ):
-                listener.exitRoot_node(self)
+            if hasattr( listener, "exitRootNode" ):
+                listener.exitRootNode(self)
 
 
 
 
-    def root_node(self):
+    def rootNode(self):
 
-        localctx = BTreeDSLParser.Root_nodeContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 2, self.RULE_root_node)
+        localctx = BTreeDSLParser.RootNodeContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 2, self.RULE_rootNode)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 43
@@ -271,12 +271,12 @@ class BTreeDSLParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def leaf_node(self):
-            return self.getTypedRuleContext(BTreeDSLParser.Leaf_nodeContext,0)
+        def leafNode(self):
+            return self.getTypedRuleContext(BTreeDSLParser.LeafNodeContext,0)
 
 
-        def node_composition(self):
-            return self.getTypedRuleContext(BTreeDSLParser.Node_compositionContext,0)
+        def nodeComposition(self):
+            return self.getTypedRuleContext(BTreeDSLParser.NodeCompositionContext,0)
 
 
         def getRuleIndex(self):
@@ -304,12 +304,12 @@ class BTreeDSLParser ( Parser ):
             if token in [BTreeDSLParser.T__2, BTreeDSLParser.T__5, BTreeDSLParser.T__7]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 45
-                self.leaf_node()
+                self.leafNode()
                 pass
             elif token in [BTreeDSLParser.OPERATOR]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 46
-                self.node_composition()
+                self.nodeComposition()
                 pass
             else:
                 raise NoViableAltException(self)
@@ -322,7 +322,7 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class Node_compositionContext(ParserRuleContext):
+    class NodeCompositionContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -345,23 +345,23 @@ class BTreeDSLParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return BTreeDSLParser.RULE_node_composition
+            return BTreeDSLParser.RULE_nodeComposition
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNode_composition" ):
-                listener.enterNode_composition(self)
+            if hasattr( listener, "enterNodeComposition" ):
+                listener.enterNodeComposition(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNode_composition" ):
-                listener.exitNode_composition(self)
+            if hasattr( listener, "exitNodeComposition" ):
+                listener.exitNodeComposition(self)
 
 
 
 
-    def node_composition(self):
+    def nodeComposition(self):
 
-        localctx = BTreeDSLParser.Node_compositionContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 6, self.RULE_node_composition)
+        localctx = BTreeDSLParser.NodeCompositionContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 6, self.RULE_nodeComposition)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -391,7 +391,7 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class Leaf_nodeContext(ParserRuleContext):
+    class LeafNodeContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -413,23 +413,23 @@ class BTreeDSLParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return BTreeDSLParser.RULE_leaf_node
+            return BTreeDSLParser.RULE_leafNode
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLeaf_node" ):
-                listener.enterLeaf_node(self)
+            if hasattr( listener, "enterLeafNode" ):
+                listener.enterLeafNode(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLeaf_node" ):
-                listener.exitLeaf_node(self)
+            if hasattr( listener, "exitLeafNode" ):
+                listener.exitLeafNode(self)
 
 
 
 
-    def leaf_node(self):
+    def leafNode(self):
 
-        localctx = BTreeDSLParser.Leaf_nodeContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 8, self.RULE_leaf_node)
+        localctx = BTreeDSLParser.LeafNodeContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 8, self.RULE_leafNode)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 61

@@ -8,21 +8,21 @@ else:
 # This class defines a complete listener for a parse tree produced by BTreeDSLParser.
 class BTreeDSLListener(ParseTreeListener):
 
-    # Enter a parse tree produced by BTreeDSLParser#behavior_tree.
-    def enterBehavior_tree(self, ctx:BTreeDSLParser.Behavior_treeContext):
+    # Enter a parse tree produced by BTreeDSLParser#behaviorTree.
+    def enterBehaviorTree(self, ctx:BTreeDSLParser.BehaviorTreeContext):
         pass
 
-    # Exit a parse tree produced by BTreeDSLParser#behavior_tree.
-    def exitBehavior_tree(self, ctx:BTreeDSLParser.Behavior_treeContext):
+    # Exit a parse tree produced by BTreeDSLParser#behaviorTree.
+    def exitBehaviorTree(self, ctx:BTreeDSLParser.BehaviorTreeContext):
         pass
 
 
-    # Enter a parse tree produced by BTreeDSLParser#root_node.
-    def enterRoot_node(self, ctx:BTreeDSLParser.Root_nodeContext):
+    # Enter a parse tree produced by BTreeDSLParser#rootNode.
+    def enterRootNode(self, ctx:BTreeDSLParser.RootNodeContext):
         pass
 
-    # Exit a parse tree produced by BTreeDSLParser#root_node.
-    def exitRoot_node(self, ctx:BTreeDSLParser.Root_nodeContext):
+    # Exit a parse tree produced by BTreeDSLParser#rootNode.
+    def exitRootNode(self, ctx:BTreeDSLParser.RootNodeContext):
         pass
 
 
@@ -35,21 +35,21 @@ class BTreeDSLListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by BTreeDSLParser#node_composition.
-    def enterNode_composition(self, ctx:BTreeDSLParser.Node_compositionContext):
+    # Enter a parse tree produced by BTreeDSLParser#nodeComposition.
+    def enterNodeComposition(self, ctx:BTreeDSLParser.NodeCompositionContext):
         pass
 
-    # Exit a parse tree produced by BTreeDSLParser#node_composition.
-    def exitNode_composition(self, ctx:BTreeDSLParser.Node_compositionContext):
+    # Exit a parse tree produced by BTreeDSLParser#nodeComposition.
+    def exitNodeComposition(self, ctx:BTreeDSLParser.NodeCompositionContext):
         pass
 
 
-    # Enter a parse tree produced by BTreeDSLParser#leaf_node.
-    def enterLeaf_node(self, ctx:BTreeDSLParser.Leaf_nodeContext):
+    # Enter a parse tree produced by BTreeDSLParser#leafNode.
+    def enterLeafNode(self, ctx:BTreeDSLParser.LeafNodeContext):
         pass
 
-    # Exit a parse tree produced by BTreeDSLParser#leaf_node.
-    def exitLeaf_node(self, ctx:BTreeDSLParser.Leaf_nodeContext):
+    # Exit a parse tree produced by BTreeDSLParser#leafNode.
+    def exitLeafNode(self, ctx:BTreeDSLParser.LeafNodeContext):
         pass
 
 

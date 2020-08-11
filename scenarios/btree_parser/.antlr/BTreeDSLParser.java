@@ -22,11 +22,11 @@ public class BTreeDSLParser extends Parser {
 	public static final int
 		RULE_behaviorTree = 0, RULE_rootNode = 1, RULE_node = 2, RULE_nodeComposition = 3, 
 		RULE_leafNode = 4, RULE_condition = 5, RULE_maneuver = 6, RULE_subtree = 7, 
-		RULE_key = 8, RULE_params = 9, RULE_bexpr = 10, RULE_value = 11, RULE_id = 12;
+		RULE_key = 8, RULE_params = 9, RULE_bexpr = 10, RULE_value = 11, RULE_name = 12;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"behaviorTree", "rootNode", "node", "nodeComposition", "leafNode", "condition", 
-			"maneuver", "subtree", "key", "params", "bexpr", "value", "id"
+			"maneuver", "subtree", "key", "params", "bexpr", "value", "name"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -97,11 +97,11 @@ public class BTreeDSLParser extends Parser {
 
 	public static class BehaviorTreeContext extends ParserRuleContext {
 		public TerminalNode EOF() { return getToken(BTreeDSLParser.EOF, 0); }
-		public List<IdContext> id() {
-			return getRuleContexts(IdContext.class);
+		public List<NameContext> name() {
+			return getRuleContexts(NameContext.class);
 		}
-		public IdContext id(int i) {
-			return getRuleContext(IdContext.class,i);
+		public NameContext name(int i) {
+			return getRuleContext(NameContext.class,i);
 		}
 		public List<TerminalNode> INDENT() { return getTokens(BTreeDSLParser.INDENT); }
 		public TerminalNode INDENT(int i) {
@@ -143,7 +143,7 @@ public class BTreeDSLParser extends Parser {
 				setState(26);
 				match(T__0);
 				setState(27);
-				id();
+				name();
 				setState(28);
 				match(T__1);
 				setState(29);
@@ -392,8 +392,8 @@ public class BTreeDSLParser extends Parser {
 	}
 
 	public static class ConditionContext extends ParserRuleContext {
-		public IdContext id() {
-			return getRuleContext(IdContext.class,0);
+		public NameContext name() {
+			return getRuleContext(NameContext.class,0);
 		}
 		public ParamsContext params() {
 			return getRuleContext(ParamsContext.class,0);
@@ -414,7 +414,7 @@ public class BTreeDSLParser extends Parser {
 			setState(65);
 			match(T__2);
 			setState(66);
-			id();
+			name();
 			setState(71);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -443,8 +443,8 @@ public class BTreeDSLParser extends Parser {
 	}
 
 	public static class ManeuverContext extends ParserRuleContext {
-		public IdContext id() {
-			return getRuleContext(IdContext.class,0);
+		public NameContext name() {
+			return getRuleContext(NameContext.class,0);
 		}
 		public KeyContext key() {
 			return getRuleContext(KeyContext.class,0);
@@ -471,7 +471,7 @@ public class BTreeDSLParser extends Parser {
 			setState(73);
 			match(T__5);
 			setState(74);
-			id();
+			name();
 			setState(86);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -516,8 +516,8 @@ public class BTreeDSLParser extends Parser {
 	}
 
 	public static class SubtreeContext extends ParserRuleContext {
-		public IdContext id() {
-			return getRuleContext(IdContext.class,0);
+		public NameContext name() {
+			return getRuleContext(NameContext.class,0);
 		}
 		public ParamsContext params() {
 			return getRuleContext(ParamsContext.class,0);
@@ -538,7 +538,7 @@ public class BTreeDSLParser extends Parser {
 			setState(88);
 			match(T__7);
 			setState(89);
-			id();
+			name();
 			setState(94);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -568,8 +568,8 @@ public class BTreeDSLParser extends Parser {
 
 	public static class KeyContext extends ParserRuleContext {
 		public TerminalNode ATT() { return getToken(BTreeDSLParser.ATT, 0); }
-		public IdContext id() {
-			return getRuleContext(IdContext.class,0);
+		public NameContext name() {
+			return getRuleContext(NameContext.class,0);
 		}
 		public KeyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -588,7 +588,7 @@ public class BTreeDSLParser extends Parser {
 			setState(97);
 			match(ATT);
 			setState(98);
-			id();
+			name();
 			}
 		}
 		catch (RecognitionException re) {
@@ -656,8 +656,8 @@ public class BTreeDSLParser extends Parser {
 	}
 
 	public static class BexprContext extends ParserRuleContext {
-		public IdContext id() {
-			return getRuleContext(IdContext.class,0);
+		public NameContext name() {
+			return getRuleContext(NameContext.class,0);
 		}
 		public ValueContext value() {
 			return getRuleContext(ValueContext.class,0);
@@ -678,7 +678,7 @@ public class BTreeDSLParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(108);
-			id();
+			name();
 			setState(109);
 			_la = _input.LA(1);
 			if ( !(_la==BOP || _la==ATT) ) {
@@ -706,8 +706,8 @@ public class BTreeDSLParser extends Parser {
 
 	public static class ValueContext extends ParserRuleContext {
 		public TerminalNode FLOAT() { return getToken(BTreeDSLParser.FLOAT, 0); }
-		public IdContext id() {
-			return getRuleContext(IdContext.class,0);
+		public NameContext name() {
+			return getRuleContext(NameContext.class,0);
 		}
 		public ValueContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -734,7 +734,7 @@ public class BTreeDSLParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(113);
-				id();
+				name();
 				}
 				break;
 			default:
@@ -752,21 +752,21 @@ public class BTreeDSLParser extends Parser {
 		return _localctx;
 	}
 
-	public static class IdContext extends ParserRuleContext {
+	public static class NameContext extends ParserRuleContext {
 		public TerminalNode WORD() { return getToken(BTreeDSLParser.WORD, 0); }
 		public List<TerminalNode> WS() { return getTokens(BTreeDSLParser.WS); }
 		public TerminalNode WS(int i) {
 			return getToken(BTreeDSLParser.WS, i);
 		}
-		public IdContext(ParserRuleContext parent, int invokingState) {
+		public NameContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_id; }
+		@Override public int getRuleIndex() { return RULE_name; }
 	}
 
-	public final IdContext id() throws RecognitionException {
-		IdContext _localctx = new IdContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_id);
+	public final NameContext name() throws RecognitionException {
+		NameContext _localctx = new NameContext(_ctx, getState());
+		enterRule(_localctx, 24, RULE_name);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
