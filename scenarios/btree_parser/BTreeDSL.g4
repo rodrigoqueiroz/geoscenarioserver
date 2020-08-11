@@ -28,14 +28,12 @@ def nextToken(self):
 * Parser Rules
 */
 behavior_tree       : ('BehaviorTree' name ':' INDENT
-                       stmt 
-                       condition*
-                       maneuver*
-                       subtree* NL? DEDENT?)+ EOF;
+                       root_node NL? DEDENT?)+ EOF;
 
-stmt                : simple_stmt | block_stmt;
-block_stmt          : OPERATOR INDENT stmt+ DEDENT;
-simple_stmt         : (maneuver | condition | subtree) NL;
+root_node           : node;
+node                : leaf_node | node_composition;
+node_composition    : OPERATOR INDENT node+ DEDENT;
+leaf_node           : (maneuver | condition | subtree) NL;
 
 condition           : 'Condition' name ('(' params ')')?;
 maneuver            : 'Maneuver' name ('(' key (',' params)* ')')?;

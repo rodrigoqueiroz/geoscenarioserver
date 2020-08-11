@@ -17,30 +17,39 @@ class BTreeDSLListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by BTreeDSLParser#stmt.
-    def enterStmt(self, ctx:BTreeDSLParser.StmtContext):
+    # Enter a parse tree produced by BTreeDSLParser#root_node.
+    def enterRoot_node(self, ctx:BTreeDSLParser.Root_nodeContext):
         pass
 
-    # Exit a parse tree produced by BTreeDSLParser#stmt.
-    def exitStmt(self, ctx:BTreeDSLParser.StmtContext):
-        pass
-
-
-    # Enter a parse tree produced by BTreeDSLParser#block_stmt.
-    def enterBlock_stmt(self, ctx:BTreeDSLParser.Block_stmtContext):
-        pass
-
-    # Exit a parse tree produced by BTreeDSLParser#block_stmt.
-    def exitBlock_stmt(self, ctx:BTreeDSLParser.Block_stmtContext):
+    # Exit a parse tree produced by BTreeDSLParser#root_node.
+    def exitRoot_node(self, ctx:BTreeDSLParser.Root_nodeContext):
         pass
 
 
-    # Enter a parse tree produced by BTreeDSLParser#simple_stmt.
-    def enterSimple_stmt(self, ctx:BTreeDSLParser.Simple_stmtContext):
+    # Enter a parse tree produced by BTreeDSLParser#node.
+    def enterNode(self, ctx:BTreeDSLParser.NodeContext):
         pass
 
-    # Exit a parse tree produced by BTreeDSLParser#simple_stmt.
-    def exitSimple_stmt(self, ctx:BTreeDSLParser.Simple_stmtContext):
+    # Exit a parse tree produced by BTreeDSLParser#node.
+    def exitNode(self, ctx:BTreeDSLParser.NodeContext):
+        pass
+
+
+    # Enter a parse tree produced by BTreeDSLParser#node_composition.
+    def enterNode_composition(self, ctx:BTreeDSLParser.Node_compositionContext):
+        pass
+
+    # Exit a parse tree produced by BTreeDSLParser#node_composition.
+    def exitNode_composition(self, ctx:BTreeDSLParser.Node_compositionContext):
+        pass
+
+
+    # Enter a parse tree produced by BTreeDSLParser#leaf_node.
+    def enterLeaf_node(self, ctx:BTreeDSLParser.Leaf_nodeContext):
+        pass
+
+    # Exit a parse tree produced by BTreeDSLParser#leaf_node.
+    def exitLeaf_node(self, ctx:BTreeDSLParser.Leaf_nodeContext):
         pass
 
 
