@@ -75,7 +75,7 @@ class BehaviorModels(object):
            TODO: add logic combinations with multiple conditions
         '''
         if condition == "reached_goal":
-            return has_reached_goal_frenet(self.planner_state.vehicle_state, self.planner_state.goal_point_frenet)
+            return has_reached_goal_frenet(self.planner_state.vehicle_state, self.planner_state.goal_point_frenet, **kwargs)
 
         elif condition == "lane_occupied":
             lane_occupied, lv_id = is_in_following_range(

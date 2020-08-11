@@ -91,14 +91,29 @@ class BTreeParser(object):
     def lane_cutin_tree(self):
         pass
 
-    def reverse_tree(self):
-        pass
+    def reverse_tree(self, bmodel):
+        m_reverse = ManeuverAction(bmodel, "m reverse", MReverseConfig())
+        m_stop = ManeuverAction(bmodel,"m stop", MStopConfig())
+        c_reached_goal = BCondition(bmodel, "c reached_goal", "reached_goal", reverse=True)
+
+        # if reached goal, do stop maneuver
+        seq_reached_goal = composites.Sequence("seq reached goal")
+        seq_reached_goal.add_children([c_reached_goal, m_stop])
+
+        st_sel_reverse = composites.Selector("ST Reverse")
+        st_sel_reverse.add_children([seq_reached_goal, m_reverse])
+
+        return st_sel_reverse
 
     # SCENARIO SPECIFIC TREES
 
     def drive_scenario_tree(self, bmodel):
         #standard driving is 14m/s
         root = self.drive_tree(bmodel)
+        return root
+
+    def reverse_scenario_tree(self, bmodel):
+        root = self.reverse_tree(bmodel)
         return root
 
     def lane_change_scenario_tree(self, bmodel):

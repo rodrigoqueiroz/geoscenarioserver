@@ -221,7 +221,6 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
         log.warn("Already in target lane")
         return None, None
 
-
     # List[(target s, target d, t)]
     target_state_set = []
     for t in mconfig.time.get_samples():
@@ -232,7 +231,6 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
             # no lateral movement expected at the end
             d_target = [di, 0, 0]
             target_state_set.append((s_target, d_target, t))
-
 
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
     return best,list(trajectories)
@@ -250,7 +248,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     target_decel = mconfig.decel.value
     target_distance = mconfig.distance.value
 
-    if (s_start[1] <= 0.01 ):
+    if (abs(s_start[1]) <= 0.01):
         return tuple([ np.array([0, 0, 0, 0, 0]), np.array([0, 0, 0, 0, 0, 0]), 0 ]), None
 
     #generate alternative targets:
@@ -273,7 +271,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return best,list(trajectories)
 
-def plan_stop_at(start_state, mconfig, lane_config, target_pos, vehicles = None, obstacles = None):
+def plan_stop_at(start_state, mconfig, lane_config, target_pos, vehicles=None, obstacles=None):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.

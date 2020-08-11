@@ -51,13 +51,14 @@ def can_perform_lane_change():
 #def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
 #    return False if not goal_point else goal_point[0] - vehicle_state.s < threshold
 
-def has_reached_goal_frenet(vehicle_state, goal_point, threshold=10, reverse=False):
+def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=10, reverse=False):
     """ Checks if the vehicle has reached or passed the goal point in the frenet frame.
-        @param goal_point:  Arraylike (s,d) goal position in the vehicle's frenet frame
+        @param frenet_goal_point:  Arraylike (s,d) goal position in the vehicle's frenet frame
     """
+    goal_s = 0 if reverse else frenet_goal_point[0]
     direction = -1 if reverse else 1
     # A distance to goal with the same sign as direction means we've reached and passed it
-    return direction * (goal_point[0] - vehicle_state.s) < threshold
+    return direction * (goal_s - vehicle_state.s) < threshold
 
 def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5):
     log.check_notnone(lane_config)
