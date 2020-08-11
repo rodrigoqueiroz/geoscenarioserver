@@ -27,23 +27,22 @@ def nextToken(self):
 /*
 * Parser Rules
 */
-behavior_tree       : ('BehaviorTree' name ':' INDENT
-                       root_node NL? DEDENT?)+ EOF;
+behaviorTree        : ('BehaviorTree' id ':' INDENT rootNode NL? DEDENT?)+ EOF;
 
-root_node           : node;
-node                : leaf_node | node_composition;
-node_composition    : OPERATOR INDENT node+ DEDENT;
-leaf_node           : (maneuver | condition | subtree) NL;
+rootNode            : node;
+node                : leafNode | nodeComposition;
+nodeComposition     : OPERATOR INDENT node+ DEDENT;
+leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'Condition' name ('(' params ')')?;
-maneuver            : 'Maneuver' name ('(' key (',' params)* ')')?;
-subtree             : 'Subtree' name ('(' params ')')?;
+condition           : 'Condition' id ('(' params ')')?;
+maneuver            : 'Maneuver' id ('(' key (',' params)* ')')?;
+subtree             : 'Subtree' id ('(' params ')')?;
 
-key                 : 'key' ATT name ;
+key                 : 'key' ATT id ;
 params              : bexpr (',' bexpr)* ;
-bexpr               : name (BOP|ATT) value ;
-value               : FLOAT | name;
-name                : WS* WORD WS*;
+bexpr               : id (BOP|ATT) value ;
+value               : FLOAT | id;
+id                  : WS* WORD WS*;
 
 /*
 * Lexer Rules

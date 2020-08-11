@@ -14,7 +14,7 @@ def main():
 
     tree = parser.behavior_tree()
     #print(tree.getText())
-    print ("Tree " + tree.toStringTree(recog=parser))
+    #print ("Tree " + tree.toStringTree(recog=parser))
 
     return
 
