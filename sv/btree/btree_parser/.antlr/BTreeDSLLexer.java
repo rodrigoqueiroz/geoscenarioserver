@@ -1,4 +1,4 @@
-// Generated from /home/rcaldas/phd/research/explore_research_topic/behavior_trees/impl/geoscenarioserver/scenarios/btree_parser/BTreeDSL.g4 by ANTLR 4.8
+// Generated from /home/rcaldas/phd/research/explore_research_topic/behavior_trees/impl/geoscenarioserver/sv/btree/btree_parser/BTreeDSL.g4 by ANTLR 4.8
 
 from antlr_denter.DenterHelper import DenterHelper
 from BTreeDSLParser import BTreeDSLParser
