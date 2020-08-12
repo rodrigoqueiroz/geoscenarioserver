@@ -20,7 +20,7 @@ def genstr(i):
 class BuildTree(BTreeDSLListener):
 
     def __init__(self):
-        self.stack=[]
+        self.exec_stack=[]
     
     def map(self, symbol):
         if symbol == "->" : return "Sequence" 
@@ -28,6 +28,61 @@ class BuildTree(BTreeDSLListener):
         if symbol == "||" : return "Parallel"
         
         raise RuntimeError("No symbol matched (" + symbol + ")")
+    
+    def postProcessExecStack(self):
+        self.sortExecStack()
+        self.completeInsertSubtree()
+
+    def sortExecStack(self):
+        aux = []
+        for item in self.exec_stack:
+            if re.search("tree.insert_subtree",item):
+                aux.append(item)
+        
+        for aux_item in aux:
+            self.exec_stack.remove(aux_item)
+            self.exec_stack.append(aux_item)
+    
+    def completeInsertSubtree(self):
+        aux = []
+        del_list = []
+        for item in self.exec_stack:
+            if re.search("~", item): 
+                aux2 = item[1:].split(",")
+                self.exec_stack.remove(item)
+                for itemm in self.exec_stack:
+                    if re.search(aux2[0], itemm):
+                        del_list.append(itemm)
+                        itemm=itemm.replace("[parent]", aux2[1])
+                        itemm = itemm.replace("[pos]", aux2[2])
+                        aux.append(itemm)
+        
+        for del_item in del_list:
+            self.exec_stack.remove(del_item)
+        
+        for aux_item in aux:
+            self.exec_stack.append(aux_item)
+
+    def exitBehaviorTree(self, ctx):
+        s = "tree = trees.BehaviourTree(root=root)"
+        self.exec_stack.append(s)
+        #print(s)
+        s = "tree.setup(timeout=15)"
+        self.exec_stack.append(s)
+        #print(s)
+
+        self.postProcessExecStack()
+        for item in self.exec_stack:
+            print(item)
+
+    def exitRootNode(self,ctx):
+        node = ctx.node()
+        if node.leafNode() != None:
+            raise RuntimeError("Root nodes must be operators (e.g. '?', '->', '||').")
+        elif node.nodeComposition() != None:
+            var = self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + genstr(node.nodeComposition().getText())
+        s = "root = " + var
+        #print(s)
 
     def exitNodeComposition(self, ctx): 
         nm = genstr(ctx.getText())
@@ -35,30 +90,30 @@ class BuildTree(BTreeDSLListener):
         var = op.lower()[:3] + "_" + nm
         
         s =  var + " = composites." + op + "(\"" + nm + "\")"
-        self.stack.append(s)
-        print(s)
+        self.exec_stack.append(s)
+        #print(s)
         
-        x = []
-
+        aux = []
         if hasattr(ctx.node(), '__iter__'):
+            pos=0
             for node in ctx.node():
-                if node.leafNode() == None:
-                    x.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + genstr(node.nodeComposition().getText()))
 
-                elif node.nodeComposition() == None:
+                if node.leafNode() != None:
                     if node.leafNode().maneuver() != None:
-                        x.append(node.leafNode().maneuver().name().getText())
+                        aux.append(node.leafNode().maneuver().name().getText())
                     elif node.leafNode().condition() != None:
-                        x.append(node.leafNode().condition().name().getText())
-                    elif node.leafNode().subtree() != None:
-                        x.append(node.leafNode().subtree().name().getText())
-
+                        aux.append(node.leafNode().condition().name().getText())
+                    elif node.leafNode().subtree() != None:     self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+var+","+str(pos))
+                    
+                elif node.nodeComposition() != None:
+                    aux.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + genstr(node.nodeComposition().getText()))
+                pos += 1
         else:    
             x = "["+genstr(ctx.node().getText()) + "]"
 
-        s = var + ".add_children(" + str(x) + ")"
-        self.stack.append(s)
-        print(s)
+        s = var + ".add_children(" + str(aux).replace("\'","") + ")"
+        self.exec_stack.append(s)
+        #print(s)
 
     def exitManeuver(self, ctx): 
         params = ""
@@ -67,8 +122,8 @@ class BuildTree(BTreeDSLListener):
         else:    
             params = ctx.params().getText()
         s = ctx.name().getText() + " = " + "ManeuverAction(" + ctx.key().getText() +", params={" + params + "})"
-        self.stack.append(s)
-        print(s)
+        self.exec_stack.append(s)
+        #print(s)
 
     def exitCondition(self, ctx): 
         params = ""
@@ -78,8 +133,8 @@ class BuildTree(BTreeDSLListener):
             params = ctx.params().getText()
         
         s = ctx.name().getText() + " = " + "BCondition(params={" + params + "})"
-        self.stack.append(s)
-        print(s)
+        self.exec_stack.append(s)
+        #print(s)
 
     #needs to be fixed, how do we reconfigure the subtree?
     # root.id is hardcoded and incorrect
@@ -91,9 +146,9 @@ class BuildTree(BTreeDSLListener):
             for param in ctx.params(): params += param.getText()
         else:    
             params = ctx.params().getText()
-        s = "tree.insert_subtree(self."+ctx.name().getText()+".get_subtree(), root.id, 1)"
-        self.stack.append(s)
-        print(s)
+        s = "tree.insert_subtree(self."+ctx.name().getText()+".get_subtree(), [parent].id, [pos])"
+        self.exec_stack.append(s)
+        #print(s)
 
         
 
