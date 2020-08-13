@@ -107,10 +107,16 @@ class BTreeParser(object):
         return root
 
     def lane_change_tree(self, bmodel, target=1):
-        # determine whether to do cutin
-        m_lane_swerve = ManeuverAction(bmodel, "m lane swerve", MLaneSwerveConfig(target_lid = target))
+        m_lane_swerve = ManeuverAction(bmodel, "m lane swerve", MLaneSwerveConfig(target_lid=target))
+        m_cutin = ManeuverAction(bmodel, "m cutin", MCutInConfig(target_lid=target))
+        c_should_cutin = BCondition(bmodel, "c should do cutin?", "should_cutin", target_lane_id=target)
 
-        return m_lane_swerve
+        # determine whether to do cutin
+        seq_cutin = composites.Sequence("seq cutin", children=[c_should_cutin, m_cutin])
+
+        sel_cutin_or_lane_swerve = composites.Selector("sel cutin or lane swerve", children=[seq_cutin, m_lane_swerve])
+
+        return sel_cutin_or_lane_swerve
 
     def lane_cutin_tree(self):
         pass

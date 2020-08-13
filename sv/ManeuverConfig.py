@@ -27,7 +27,7 @@ class SamplingMethod(Enum):
 
 
 @dataclass
-class LaneConfig:                   
+class LaneConfig:
     ''' Lane Config in Frenet Frame
         Left and Right lanes exist only if traversal is possible
     '''
@@ -49,15 +49,15 @@ class LaneConfig:
         elif self._left_lane and self._left_lane.right_bound <= d < self._left_lane.left_bound:
             return self._left_lane
         return None
-    
+
     def set_left_lane(self,lane):
         self._left_lane = lane
         lane._right_lane = self
-    
+
     def set_right_lane(self,lane):
         self._right_lane = lane
         lane._left_lane = self
-    
+
     def get_neighbour(self,l_id):
         if (self._right_lane):
             if (self._right_lane.id == l_id):
@@ -66,18 +66,18 @@ class LaneConfig:
             if (self._left_lane.id == l_id):
                 return self._left_lane
         return None
-    
+
     def get_samples(self):
         if (self.nsamples==1):
             return tuple([0])
-        
+
         if (self.sampling==SamplingMethod.LINEAR):
             return self.get_linear_samples()
         elif (self.sampling==SamplingMethod.UNIFORM):
             return self.get_uniform_samples()
         elif (self.sampling==SamplingMethod.NORMAL):
             return self.get_normal_samples()
-        
+
         return tuple([0])
 
     def get_linear_samples(self):
@@ -94,7 +94,7 @@ class LaneConfig:
         for x in range(self.nsamples):
             samples.append(random.uniform(lo, up))
         return samples
-    
+
     def get_normal_samples(self):
         lo = self.right_bound + VEHICLE_RADIUS
         up = self.left_bound - VEHICLE_RADIUS
@@ -102,12 +102,12 @@ class LaneConfig:
         samples = []
         for x in range(self.nsamples):
             #same as random.gauss(), but with bounds:
-            s = get_truncated_normal(0,sd,lo,up) 
+            s = get_truncated_normal(0,sd,lo,up)
             samples.append(s)
         return samples
-  
-        
-@dataclass        
+
+
+@dataclass
 class MP:
     '''
     Maneuver Parameter that supports sampling
@@ -117,8 +117,7 @@ class MP:
     nsamples:int = 1                #number of samples
     sampling:int = SamplingMethod.UNIFORM
     sigma:float = 1                 #std dev for sampling from normal
-    
-    
+
     def get_samples(self):
         if (self.nsamples==1):
             return tuple([value])
@@ -130,7 +129,7 @@ class MP:
             return self.get_uniform_samples()
         elif (self.sampling==SamplingMethod.NORMAL):
             return self.get_normal_samples()
-        
+
         return tuple([self.value])
 
     def bounds(self):
@@ -138,7 +137,7 @@ class MP:
             lo = self.value - (self.value * self.bound_p / 100)
             up = self.value + (self.value * self.bound_p / 100)
             return lo,up
-        else: 
+        else:
             return self.value,self.value
 
     def get_linear_samples(self):
@@ -160,7 +159,7 @@ class MP:
         samples = []
         for x in range(self.nsamples):
             #same as random.gauss(), but with bounds:
-            s = get_truncated_normal(0,sd,lo,up) 
+            s = get_truncated_normal(0,sd,lo,up)
             samples.append(s)
         return samples
 
@@ -170,8 +169,8 @@ class MConfig:
     Maneuver Configuration SuperClass.
     Individual cost must be changed in the __post_init__ method
     '''
-    #feasibility_weight defines what functions will be used 
-    #to remove trajectories from candidate set [binary 0-1] 
+    #feasibility_weight defines what functions will be used
+    #to remove trajectories from candidate set [binary 0-1]
     feasibility_constraints = {
         'max_lat_jerk':        0,
         'max_long_jerk':       0,
@@ -179,7 +178,7 @@ class MConfig:
         'collision':           0,
         'off_lane':            1,
     }
-    #cost_weight defines what cost functions will be used 
+    #cost_weight defines what cost functions will be used
     #to select trajectories from candidate set [cost > 0]
     cost_weight = {
         'time_cost':                1,
@@ -196,7 +195,7 @@ class MConfig:
     expected_lat_acc_per_sec = 1    # [m/s/s]
     expected_long_jerk_per_sec = 2  # [m/s/s/s]
     expected_lat_jerk_per_sec = 2   # [m/s/s/s]
-    
+
     #Feasibility constraints
     max_long_jerk = 10              # maximum longitudinal jerk [m/s/s/s]
     max_lat_jerk = 10               # maximum lateral jerk [m/s/s/s]
@@ -256,11 +255,11 @@ class MLaneSwerveConfig(MConfig):
         self.cost_weight['lane_offset_cost'] = 0.5
         self.feasibility_constraints['off_lane'] = 0
 
-
 @dataclass
 class MCutInConfig(MConfig):
     #target
     target_vid:int = None               #target vehicle id
+    target_lid:int = None
     time:MP = MP(4.0,10,6)
     delta_s:tuple = (10,5,0)        #(s, vel, acc)
     delta_d:tuple = (0,5,0)         #(s, vel, acc)

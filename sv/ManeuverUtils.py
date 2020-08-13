@@ -9,6 +9,7 @@
 from sv.ManeuverConfig import *
 from SimConfig import *
 import numpy as np
+import glog as log
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
     current_lane = None
@@ -18,7 +19,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
     elif mconfig.target_lid == -1: # right
         current_lane = lane_config.get_current_lane(vehicle_state.d + VEHICLE_RADIUS)
     else: # target_lid is None or 0
-        print("WARNING: Lane swerve target_lid {}".format(mconfig.target_lid))
+        log.warn("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
         current_lane = lane_config
 
     return current_lane.id == mconfig.target_lid
@@ -26,7 +27,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
 def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig, traffic_vehicles):
     target_lane_config = lane_config.get_current_lane(traffic_vehicles[mconfig.target_vid].vehicle_state.d)
     if not target_lane_config:
-        print("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
+        log.warn("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
         return None, None
 
     return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lane_config.id))
@@ -59,6 +60,8 @@ def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2, reverse=Fals
     return direction * (goal_point[0] - vehicle_state.s) < threshold
 
 def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5):
+    log.check_notnone(lane_config)
+
     is_following = False
     leading_vid = None
 
@@ -76,14 +79,25 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
 
     return is_following, leading_vid
 
-def get_vehicles_ahead(vehicle_state, lane_config, traffic_vehicles):
-    """ Gets vehicles in lane lane_config that are ahead of vehicle_state.s.
-    """
+def is_lane_occupied(vehicle_state, lane_config, traffic_vehicles, threshold=50):
+    log.check_notnone(lane_config)
+
+    smin = vehicle_state.s - threshold
+    smax = vehicle_state.s + threshold
+    vehicles_in_lane = list(filter(
+        lambda v: smin < v.vehicle_state.s < smax,
+        get_vehicles_in_lane(lane_config, traffic_vehicles)
+    ))
+
+    return len(vehicles_in_lane) != 0
+
+def get_vehicles_in_lane(lane_config, traffic_vehicles):
+    log.check_notnone(lane_config)
+
     vehicles = []
     for vid, traffic_vehicle in traffic_vehicles.items():
         other_vehicle_lane = lane_config.get_current_lane(traffic_vehicle.vehicle_state.d)
-        if (other_vehicle_lane and other_vehicle_lane.id == lane_config.id) and (
-                traffic_vehicle.vehicle_state.s > vehicle_state.s):
+        if other_vehicle_lane and other_vehicle_lane.id == lane_config.id:
             vehicles.append(traffic_vehicle)
     return vehicles
 
@@ -91,12 +105,26 @@ def get_vehicles_ahead(vehicle_state, lane_config, traffic_vehicles):
 def get_leading_vehicle(vehicle_state, lane_config, traffic_vehicles):
     """ Gets closest vehicle in the same lane as vehicle_state.
     """
+    log.check_notnone(lane_config)
+
     cur_lane = lane_config.get_current_lane(vehicle_state.d)
-    vehicles_in_lane = get_vehicles_ahead(vehicle_state, cur_lane, traffic_vehicles)
-    if len(vehicles_in_lane) == 0:
+    log.check_notnone(cur_lane)
+
+    vehicles_ahead = list(filter(
+        lambda v: v.vehicle_state.s > vehicle_state.s,
+        get_vehicles_in_lane(cur_lane, traffic_vehicles)
+    ))
+
+    if len(vehicles_ahead) == 0:
         return None
 
-    return min(vehicles_in_lane, key=lambda v: v.vehicle_state.s)
+    return min(vehicles_ahead, key=lambda v: v.vehicle_state.s)
+
+def get_closest_vehicle_in_lane(vehicle_state, lane_config, traffic_vehicles):
+    vehicles_in_lane = get_vehicles_in_lane(lane_config, traffic_vehicles)
+    if len(vehicles_in_lane) == 0:
+        return None
+    return min(vehicles_in_lane, key=lambda v: abs(v.vehicle_state.s - vehicle_state.s))
 
 
 #def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):

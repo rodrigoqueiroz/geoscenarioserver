@@ -10,7 +10,7 @@
   </node>
   <node id='-10' action='modify' visible='true' lat='49.00745181635' lon='8.45742981836' />
   <node id='-12' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088' />
-  <node id='-14' action='modify' visible='true' lat='49.00725748342' lon='8.45716968766'>
+  <node id='-14' action='modify' visible='true' lat='49.00726959741' lon='8.45718389342'>
     <tag k='btree' v='lane_change_scenario_tree' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
@@ -22,7 +22,7 @@
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-18' action='modify' visible='true' lat='49.00740092367' lon='8.45736019324'>
+  <node id='-18' action='modify' visible='true' lat='49.0072393224' lon='8.45708382017'>
     <tag k='btree' v='drive_scenario_tree' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
@@ -31,7 +31,7 @@
     <tag k='vid' v='2' />
   </node>
   <node id='-20' action='modify' visible='true' lat='49.00727991761' lon='8.45713372968' />
-  <node id='-22' action='modify' visible='true' lat='49.0080328032' lon='8.45809740573' />
+  <node id='-22' action='modify' visible='true' lat='49.00814459256' lon='8.45824376898' />
   <way id='-24' action='modify' visible='true'>
     <nd ref='-10' />
     <nd ref='-12' />

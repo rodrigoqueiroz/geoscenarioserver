@@ -87,7 +87,7 @@ class BehaviorModels(object):
         if condition == "reached_goal":
             return has_reached_goal_frenet(self.planner_state.vehicle_state, self.planner_state.goal_point_frenet)
 
-        if condition == "lane_occupied":
+        elif condition == "lane_occupied":
             lane_occupied, lv_id = is_in_following_range(
                 self.vid,
                 self.planner_state.vehicle_state,
@@ -95,15 +95,22 @@ class BehaviorModels(object):
                 self.planner_state.lane_config)
             return lane_occupied
 
-        if condition == "lv_stopped":
+        elif condition == "should_cutin":
+            return is_lane_occupied(
+                self.planner_state.vehicle_state,
+                self.planner_state.lane_config.get_neighbour(kwargs['target_lane_id']),
+                self.planner_state.traffic_vehicles
+            )
+
+        elif condition == "lv_stopped":
             if self.leading_vid > 0:
                 return is_stopped(self.planner_state.traffic_vehicles[self.leading_vid])
             return False
 
-        if condition == "reached_gap":
+        elif condition == "reached_gap":
             pass
 
-        if condition == "sim_time":
+        elif condition == "sim_time":
             if 'tmin' in kwargs and 'tmax' in kwargs:
                 return kwargs['tmin'] < self.planner_state.sim_time < kwargs['tmax']
             return False

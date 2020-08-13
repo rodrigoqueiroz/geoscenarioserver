@@ -12,7 +12,7 @@ from SimConfig import *
 #=============================== FEASIBILITY
 
 def maneuver_feasibility(start_state, trajectory,  mconfig, lane_config:LaneConfig, vehicles, obstacles):
-    
+
     for c in mconfig.feasibility_constraints:
         if mconfig.feasibility_constraints[c] > 0:
             #collision
@@ -101,9 +101,9 @@ def time_cost(trajectory, target_t):
 def lane_offset_cost(trajectory,lane_config, expected_offset_per_sec):
     '''Penalizes distance from lane center during the entire trajectory'''
     _, d_coef, T = trajectory
-    
+
     central_d = (lane_config.left_bound - lane_config.right_bound)/2 + lane_config.right_bound
-    
+
     d_eq = to_equation(d_coef)
     target_d = d_eq(T)
     total_offset = 0
@@ -114,19 +114,19 @@ def lane_offset_cost(trajectory,lane_config, expected_offset_per_sec):
         offset = d_eq(t) - central_d
         total_offset += abs(offset)
         #print("dt {:.2f} central_d {:.2f} offset {:.2f} ".format(d_eq(t),central_d,offset))
-    
+
     #print("total offset is {:.2f} ".format(total_offset))
     offset_per_second = total_offset / T
     #print("offset_per_second {:.2f}".format(offset_per_second) )
     cost = logistic(offset_per_second/expected_offset_per_sec)
-    
+
     #print("total lateral offset cost is {:.2f} for target {:.2f}".format(cost,target_d) )
     return cost
 
 def off_lane_cost(trajectory,lane_config):
     '''
     Penalizes trajectories going beyond lane boundaries
-    Current implementation relies on a fixed lane width. 
+    Current implementation relies on a fixed lane width.
     #TODO: Adapt to project lane over the entire trajectory
     '''
     _, d_coef, T = trajectory
@@ -149,9 +149,9 @@ def max_long_jerk_cost(trajectory, expected_max_jerk):
     jerk = to_equation(differentiate(differentiate(differentiate(s_coef))))
     all_jerks = [jerk(float(T)/100 * i) for i in range(100)]
     max_jerk = max(all_jerks, key=abs)
-    if abs(max_jerk) > expected_max_jerk: 
+    if abs(max_jerk) > expected_max_jerk:
         return 1
-    else: 
+    else:
         return 0
 
 def max_lat_jerk_cost(trajectory, expected_max_jerk):
@@ -160,11 +160,11 @@ def max_lat_jerk_cost(trajectory, expected_max_jerk):
     jerk = to_equation(differentiate(differentiate(differentiate(d_coef))))
     all_jerks = [jerk(float(T)/100 * i) for i in range(100)]
     max_jerk = max(all_jerks, key=abs)
-    if abs(max_jerk) > expected_max_jerk: 
+    if abs(max_jerk) > expected_max_jerk:
         return 1
-    else: 
+    else:
         return 0
-        
+
 def total_long_jerk_cost(trajectory, expected_jerk_per_sec):
     '''Penalizes high longitudinal jerk '''
     s_coef, _, T = trajectory
@@ -210,9 +210,9 @@ def max_acc_cost(x_coef, T, expected_acc_per_sec):
         t = dt * i
         all_accs.append(acc(t))
     max_acc = max(all_accs, key=abs)
-    if abs(max_acc) > expected_max_acc: 
+    if abs(max_acc) > expected_max_acc:
         return 1
-    else: 
+    else:
         return 0
 
 def total_long_acc_cost(trajectory, expected_long_acc_per_sec):
@@ -243,11 +243,11 @@ def collision_cost(start_state, trajectory, lane_config, vehicles):
     '''Penalizes collision (binary function)'''
     if (vehicles == None):
         return 0
-    #check nearest        
+    #check nearest
     nearest = nearest_to_vehicles_ahead(start_state, trajectory, lane_config, vehicles)
-    if nearest < 2*VEHICLE_RADIUS: 
+    if nearest < 2*VEHICLE_RADIUS:
         return 1
-    else: 
+    else:
         return 0
 
 def proximity_cost(start_state, trajectory, lane_config, vehicles):
@@ -293,5 +293,3 @@ def nearest_approach(trajectory, vehicle):
         if dist < closest:
             closest = dist
     return closest
-
-

@@ -8,6 +8,7 @@ import random
 import itertools
 import datetime
 import time
+import glog as log
 from dataclasses import dataclass
 #from multiprocessing import Pool as ThreadPool
 from sv.CostFunctions import *
@@ -17,23 +18,23 @@ from util.Utils import *
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
     #Micro maneuver layer
-    if (man_key==Maneuver.M_VELKEEP):
+    if (man_key == Maneuver.M_VELKEEP):
         planner = plan_velocity_keeping
-    elif (man_key==Maneuver.M_REVERSE):
+    elif (man_key == Maneuver.M_REVERSE):
         planner = plan_reversing
-    elif (man_key==Maneuver.M_STOP):
+    elif (man_key == Maneuver.M_STOP):
         planner = plan_stop
-    elif (man_key==Maneuver.M_FOLLOW):
+    elif (man_key == Maneuver.M_FOLLOW):
         planner = plan_following
-    elif (man_key==Maneuver.M_LANESWERVE):
+    elif (man_key == Maneuver.M_LANESWERVE):
         planner = plan_laneswerve
-    elif (man_key==Maneuver.M_CUTIN):
+    elif (man_key == Maneuver.M_CUTIN):
         planner = plan_cutin
 
     best, trajectories = planner(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None)
     return best, trajectories
 
-def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneConfig, vehicles = None, obstacles = None):
+def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneConfig, vehicles=None, obstacles=None):
     """
     VELOCITY KEEPING
     Driving with no vehicle directly ahead
@@ -47,7 +48,7 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     else:
         target_t = mconfig.time_lowvel.value
     target_vel = mconfig.vel.value
-    
+
     #generate alternative targets:
     target_state_set = []
     for t in mconfig.time.get_samples():
@@ -65,7 +66,7 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return  best, list(trajectories)
 
-def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles = None, obstacles = None):
+def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles=None, obstacles=None):
     """
     REVERSING
     Driving in reverse
@@ -102,7 +103,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     target_t = mconfig.time.value
     time_gap = mconfig.time_gap
     acc = -mconfig.decel.value
-    
+
     #Pre conditions. Can the vehicle be followed?
     if target_vid == None:
         return
@@ -163,7 +164,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     return  best, list(trajectories)
 
 
-def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConfig, vehicles = None,  pedestrians = None, obstacles = None):
+def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, obstacles=None):
     """
     LANE CHANGE SWERVE
     Swerve maneuver to another lane
@@ -177,12 +178,12 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
     target_lane_config = None
     if (lane_config.id == target_lid):
         target_lane_config = lane_config
-        print('already in target lane {}'.format(target_lid))
-        # return None, None
+        log.warn('already in target lane {}'.format(target_lid))
+        return None, None
     else:
         target_lane_config = lane_config.get_neighbour(target_lid)
     if not target_lane_config:
-        print('target lane {} not found, is it a neighbour lane?'.format(target_lid))
+        log.warn('target lane {} not found, is it a neighbour lane?'.format(target_lid))
         return None, None
 
     #generates alternative targets:
@@ -196,12 +197,12 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
             d_target = [di,0,0] #no lateral movement expected at the end
             target_state_set.append((s_target,d_target,t))
 
-    
+
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
     return best, list(trajectories)
 
 
-def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles = None, pedestrians = None, obstacles = None):
+def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, obstacles=None):
     """
     CUT-IN LANE SWERVE
     """
@@ -209,15 +210,15 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     delta = mconfig.delta_s + mconfig.delta_d
 
     if (target_id not in vehicles):
-        print("Target vehicle {} is not in traffic".format(target_id))
+        log.warn("Target vehicle {} is not in traffic".format(target_id))
         return None
 
     target_lane_config = lane_config.get_current_lane(vehicles[target_id].vehicle_state.d)
     if not target_lane_config:
-        print("Target vehicle {} is not in an adjacent lane".format(target_id))
+        log.warn("Target vehicle {} is not in an adjacent lane".format(target_id))
         return None, None
     elif target_lane_config.id == lane_config.id:
-        print("Already in target lane")
+        log.warn("Already in target lane")
         return None, None
 
 
@@ -225,19 +226,19 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     target_state_set = []
     for t in mconfig.time.get_samples():
         #main goal is relative to target vehicle predicted final position
-        goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta) # t or mconfig.time.value?
+        goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta)
         s_target = goal_state_relative[:3]
         for di in target_lane_config.get_samples():
             # no lateral movement expected at the end
             d_target = [di, 0, 0]
             target_state_set.append((s_target, d_target, t))
 
-    
+
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
     return best,list(trajectories)
 
 
-def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = None):
+def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     """
     STOP
     Stop can be a stop request by time, deceleration, or distance from current pos.
@@ -251,7 +252,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = No
 
     if (s_start[1] <= 0.01 ):
         return tuple([ np.array([0, 0, 0, 0, 0]), np.array([0, 0, 0, 0, 0, 0]), 0 ]), None
-    
+
     #generate alternative targets:
     target_state_set = []
     for t in mconfig.time.get_samples():
@@ -272,7 +273,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles = None, obstacles = No
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return best,list(trajectories)
 
-def plan_stop_at(start_state, mconfig, lane_config, target_pos , vehicles = None, obstacles = None ):
+def plan_stop_at(start_state, mconfig, lane_config, target_pos, vehicles = None, obstacles = None):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.
@@ -280,7 +281,7 @@ def plan_stop_at(start_state, mconfig, lane_config, target_pos , vehicles = None
     """
     #print ('PLAN STOP')
     if (start_state[0] >= target_pos):
-        print ('Stop target position is too close: {}'.format(target_pos - start_state[0]))
+        print('Stop target position is too close: {}'.format(target_pos - start_state[0]))
         return None,None
     #start
     s_start = start_state[:3]
@@ -290,7 +291,7 @@ def plan_stop_at(start_state, mconfig, lane_config, target_pos , vehicles = None
     max_t = man_config.time_range[1]
     t_step = PLAN_TIME_STEP
     #distance
-    
+
     #targets
     target_set = []
     #generates alternative targets
