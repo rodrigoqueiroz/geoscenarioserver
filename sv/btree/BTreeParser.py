@@ -16,6 +16,7 @@ import random
 import string
 
 import re
+import os
 
 '''For readability:
     st_ = subtree
@@ -46,7 +47,7 @@ class BTreeParser(object):
         ff = open(path+".tmp"+str(self.vid)+".btree", 'r')
         exec(ff.read())
         ff.close()
-        #delete(path+".tmp"+str(self.vid)+".btree)
+        os.remove(path+".tmp"+str(self.vid)+".btree")
         #return getattr(self,root_btree_name)(bmodel)
         return tree
 
@@ -260,13 +261,6 @@ class BTreeParser(object):
         # e.g. stop = ManeuverAction(bmodel, "stop", MStopConfig(time=2, dist=10, decel=3))
         def exitManeuver(self, ctx):
             name=ctx.name().getText() 
-            #params = ""
-            #if hasattr(ctx.params(), #'__iter__'):
-            #    for param in ctx.params(): #params += param.getText()
-            #else:    
-            #    params = ctx.params().#getText()
-            #key = ctx.key().name().getText()
-            #mconfig = key+"("+params+")"
             mconfig = ctx.mconfig().getText()
             s = name + " = " + "ManeuverAction(bmodel," + "\""+ name + "\""+"," + mconfig + ")"
             self.exec_stack.append(s)
