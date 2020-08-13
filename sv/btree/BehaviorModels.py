@@ -35,8 +35,11 @@ class BehaviorModels(object):
         self.ref_path_changed = False
 
     def build(self):
+        
+        if True:
+        #if self.loaded_btree != "":
 
-        if self.loaded_btree != "":
+            self.loaded_btree = open("impatientdriver.btree",'r').read()
             parser = BTreeParser.BTreeParser(self.vid)
             tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
         else:

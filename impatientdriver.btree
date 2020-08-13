@@ -5,5 +5,5 @@ BehaviorTree ImpatientDriver:
             Maneuver stopself: MStopConfig(time=2, distance=10, decel=3)
         ->
             Condition time: key=reached_gap, tmin=100, tmax=120
-            Subtree lanechange
-        Subtree drive: MVelKeepConfig(), MStopConfig()
+            Subtree lane_change_tree
+        Subtree drive_tree: MVelKeepConfig(), MStopConfig()

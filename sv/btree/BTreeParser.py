@@ -41,13 +41,20 @@ class BTreeParser(object):
 
         ast = parser.behaviorTree()
         walker = ParseTreeWalker()
-        walker.walk(self.BTreeListener(), ast)
+        walker.walk(self.BTreeListener(self.vid), ast)
         
+        # instantiate the parsed tree
         path="./sv/btree/"
-        ff = open(path+".tmp"+str(self.vid)+".btree", 'r')
-        exec(ff.read())
+        ff = open(path+"tmp"+str(self.vid)+".btree", 'r')
+        behavior_tree = ff.read()
+
+        try:
+            exec(behavior_tree, globals()) #defines get_tree
+            tree = get_tree(self, bmodel)
+        except:
+            raise RuntimeError("Could not set behavior tree up.")
         ff.close()
-        os.remove(path+".tmp"+str(self.vid)+".btree")
+        os.remove(path+"tmp"+str(self.vid)+".btree")
         #return getattr(self,root_btree_name)(bmodel)
         return tree
 
@@ -95,7 +102,7 @@ class BTreeParser(object):
         #root.add_children([s_reach_goal, vk])
 
         # Insert Subtrees
-        #tree.insert_subtree(self.drive.get_subtree(), root.id, 1)
+        #btree.insert_subtree(self.drive.get_subtree(), root.id, 1)
 
         return root
 
@@ -149,11 +156,11 @@ class BTreeParser(object):
         
         def genstr(self, i):
             # gen 10 word random string
-            j = ''.join(random.choice(string.ascii_letters) for x in range(10))
+            #j = ''.join(random.choice(string.ascii_letters) for x in range(10))
             # interleave input with randword
-            res = "".join(m + n for m, n in zip(i, j))
+            #res = "".join(m + n for m, n in zip(i, j))
             # to_lower
-            s = res.lower()
+            s = i.lower()
             # remove non-alphabetical chars
             s=re.sub(r'\W+', '', s)
             #reduce the string size, 3-fold
@@ -206,10 +213,11 @@ class BTreeParser(object):
 
         def build_tree(self):
             path="./sv/btree/"
-            of = open(path+'.tmp'+str(self.vid)+".btree",'w')
+            of = open(path+'tmp'+str(self.vid)+".btree",'w')
+            of.write("def get_tree(parser,bmodel):\n")
             for item in self.exec_stack:
-                of.write(item)
-                of.write('\n')
+                of.write("    "+item+"\n")
+            of.write("    return tree")
             of.close()
 
         def exitBehaviorTree(self, ctx):
@@ -217,8 +225,6 @@ class BTreeParser(object):
             self.exec_stack.append(s)
 
             self.postProcessExecStack()
-            for item in self.exec_stack:
-                print(item)
             self.build_tree()
 
         def exitRootNode(self,ctx):
@@ -228,13 +234,14 @@ class BTreeParser(object):
             elif node.nodeComposition() != None:
                 var = self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
             s = "root = " + var
+            self.exec_stack.append(s)
 
         def exitNodeComposition(self, ctx): 
             nm = self.genstr(ctx.getText())
             op = self.map(ctx.OPERATOR().getText())
             var = op.lower()[:3] + "_" + nm
             
-            s =  var + " = composites." + op + "(\"" + nm + "\")"
+            s =  var + " = composites." + op + "(\"" + var + "\")"
             self.exec_stack.append(s)
             
             aux = []
@@ -285,7 +292,7 @@ class BTreeParser(object):
                 for conf in ctx.mconfig(): mconfigs += "," + conf.getText()
             else:    
                 mconfigs = ctx.mconfig().getText()
-            s = "tree.insert_subtree(self."+ctx.name().getText()+"(self"
+            s = "tree.insert_subtree(parser."+ctx.name().getText()+"(bmodel"
             if mconfigs != "": s += mconfigs 
             s += "), [parent].id, [pos])"
             self.exec_stack.append(s)
