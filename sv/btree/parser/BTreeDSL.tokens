@@ -20,9 +20,9 @@ DEDENT=18
 ':'=2
 'Condition'=3
 '('=4
-')'=5
-'Maneuver'=6
-','=7
+','=5
+')'=6
+'Maneuver'=7
 'Subtree'=8
 'key'=9
 '='=12

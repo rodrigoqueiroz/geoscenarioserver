@@ -1,3 +1,5 @@
+//dinizr@chalmers.se
+//to generate python parser: antlr4 -Dlanguage=Python3 BTreeDSL.g4
 grammar BTreeDSL;
 
 tokens { INDENT, DEDENT }
@@ -34,9 +36,9 @@ node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'Condition' name ('(' params ')')?;
-maneuver            : 'Maneuver' name ('(' key (',' params)* ')')?;
-subtree             : 'Subtree' name ('(' params ')')?;
+condition           : 'Condition' name ('('  key (',' params)* ')');
+maneuver            : 'Maneuver' name ('(' key (',' params)* ')');
+subtree             : 'Subtree' name ('(' params* ')')?;
 
 key                 : 'key' ATT name ;
 params              : bexpr (',' bexpr)* ;
@@ -52,7 +54,7 @@ BOP                 : '<'|'>'|'=='|'>='|'<='|'!=';
 ATT                 : '=';
 FLOAT               : [+-]?([0-9]*[.])?[0-9]+;
 WORD                : ([a-z] | [A-Z] | '_')+ ;
-WS                  : (' ' | '\t') ;
+WS                  : (' ' | '\t') -> skip;
 /*
  * From antlr-denter to help with INDENT and DEDENT tokens
  */

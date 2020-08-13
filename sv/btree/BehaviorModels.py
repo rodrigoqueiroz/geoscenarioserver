@@ -8,6 +8,7 @@ from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
 import sv.btree.BTreeParser as BTreeParser
 from sv.btree.BTreeLeaves import *
+from sv.btree.DrivePatientlyTree import *
 
 class BehaviorModels(object):
     ''''
@@ -18,9 +19,10 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name):
+    def __init__(self, vid, root_btree_name, loaded_btree=""):
         self.vid = vid
         self.root_btree_name = root_btree_name
+        self.loaded_btree = loaded_btree
         #Build Tree
         self.tree = self.build()
         #print(self)
@@ -33,10 +35,15 @@ class BehaviorModels(object):
         self.ref_path_changed = False
 
     def build(self):
-        parser = BTreeParser.BTreeParser()
-        root = parser.parse_tree(self, self.root_btree_name)
 
-        tree = trees.BehaviourTree(root=root)
+        if self.loaded_btree != "":
+            parser = BTreeParser.BTreeParser(self.vid)
+            tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
+        else:
+            #TODO: use default btree
+            tree = DrivePatientlyTree(self.vid, self.goal).get_tree()
+
+        #tree = trees.BehaviourTree(root=root)
         #tree.setup(timeout=15) #?
 
         self.snapshot_visitor = visitors.SnapshotVisitor()

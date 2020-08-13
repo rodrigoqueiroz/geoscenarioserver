@@ -1,0 +1,9 @@
+BehaviorTree ImpatientDriver:
+    ?
+        ->
+            Condition endpoint(key=reached_goal)
+            Maneuver stopself(key=MStopConfig, time=2, dist=10, decel=3)
+        ->
+            Condition time(key=reached_gap, tmin=100, tmax=120)
+            Subtree lanechange()
+        Subtree drive()

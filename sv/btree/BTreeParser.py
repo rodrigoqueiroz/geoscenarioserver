@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
+#dinizr@chalmers.se
 
 from py_trees import *
 from sv.ManeuverConfig import MVelKeepConfig
 from sv.ManeuverUtils import *
 from sv.btree.BTreeLeaves import *
+
+from antlr4 import *
+from sv.btree.parser.BTreeDSLLexer import BTreeDSLLexer
+from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
+from sv.btree.parser.BTreeDSLListener import BTreeDSLListener
+
+import random
+import string
+
+import re
 
 '''For readability:
     st_ = subtree
@@ -19,14 +30,25 @@ from sv.btree.BTreeLeaves import *
     must be handled with a specialized tree (create and modify)
 '''
 
-
 class BTreeParser(object):
-    def __init__(self):
-        pass
+    def __init__(self, vid):
+        self.vid = vid
 
-    def parse_tree(self, bmodel, root_btree_name):
-        #TODO: All trees must be parsed from JSON/XML/YAML file
-        return getattr(self,root_btree_name)(bmodel)
+    def parse_tree(self, bmodel, btree_name, textual_model):
+        lexer = BTreeDSLLexer(InputStream(textual_model))
+        parser = BTreeDSLParser(CommonTokenStream(lexer))
+
+        ast = parser.behaviorTree()
+        walker = ParseTreeWalker()
+        walker.walk(self.BTreeListener(), ast)
+        
+        path="./sv/btree/"
+        ff = open(path+".tmp"+str(self.vid)+".btree", 'r')
+        exec(ff.read())
+        ff.close()
+        #delete(path+".tmp"+str(self.vid)+".btree)
+        #return getattr(self,root_btree_name)(bmodel)
+        return tree
 
     #REUSABLE TREES
     def drive_tree(self, bmodel, mvk_config=MVelKeepConfig(), mstop_config=MStopConfig()):
@@ -117,3 +139,156 @@ class BTreeParser(object):
         root = drive_tree(bmodel,mvk_config=mvk_config)
 
         return root
+
+    class BTreeListener(BTreeDSLListener):
+
+        def __init__(self, vid):
+            self.exec_stack=[]
+            self.vid = vid
+        
+        def genstr(self, i):
+            # gen 10 word random string
+            j = ''.join(random.choice(string.ascii_letters) for x in range(10))
+            # interleave input with randword
+            res = "".join(m + n for m, n in zip(i, j))
+            # to_lower
+            s = res.lower()
+            # remove non-alphabetical chars
+            s=re.sub(r'\W+', '', s)
+            #reduce the string size, 3-fold
+            aux = ""
+            for i in range(0,len(s),int(len(s)/3)):
+                aux += s[i]
+            s = aux[::-1]
+            return s
+
+        def map(self, symbol):
+            if symbol == "->" : return "Sequence" 
+            if symbol == "?"  : return "Selector"
+            if symbol == "||" : return "Parallel"
+            
+            raise RuntimeError("No symbol matched (" + symbol + ")")
+        
+        def postProcessExecStack(self):
+            self.sortExecStack()
+            self.completeInsertSubtree()
+
+        def sortExecStack(self):
+            aux = []
+            for item in self.exec_stack:
+                if re.search("tree.insert_subtree",item):
+                    aux.append(item)
+            
+            for aux_item in aux:
+                self.exec_stack.remove(aux_item)
+                self.exec_stack.append(aux_item)
+        
+        def completeInsertSubtree(self):
+            aux = []
+            del_list = []
+            for item in self.exec_stack:
+                if re.search("~", item): 
+                    aux2 = item[1:].split(",")
+                    self.exec_stack.remove(item)
+                    for itemm in self.exec_stack:
+                        if re.search(aux2[0], itemm):
+                            del_list.append(itemm)
+                            itemm=itemm.replace("[parent]", aux2[1])
+                            itemm = itemm.replace("[pos]", aux2[2])
+                            aux.append(itemm)
+            
+            for del_item in del_list:
+                self.exec_stack.remove(del_item)
+            
+            for aux_item in aux:
+                self.exec_stack.append(aux_item)
+
+        def build_tree(self):
+            path="./sv/btree/"
+            of = open(path+'.tmp'+str(self.vid)+".btree",'w')
+            for item in self.exec_stack:
+                of.write(item)
+                of.write('\n')
+            of.close()
+
+        def exitBehaviorTree(self, ctx):
+            s = "tree = trees.BehaviourTree(root=root)"
+            self.exec_stack.append(s)
+
+            self.postProcessExecStack()
+            for item in self.exec_stack:
+                print(item)
+            self.build_tree()
+
+        def exitRootNode(self,ctx):
+            node = ctx.node()
+            if node.leafNode() != None:
+                raise RuntimeError("Root nodes must be operators (e.g. '?', '->', '||').")
+            elif node.nodeComposition() != None:
+                var = self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+            s = "root = " + var
+
+        def exitNodeComposition(self, ctx): 
+            nm = self.genstr(ctx.getText())
+            op = self.map(ctx.OPERATOR().getText())
+            var = op.lower()[:3] + "_" + nm
+            
+            s =  var + " = composites." + op + "(\"" + nm + "\")"
+            self.exec_stack.append(s)
+            
+            aux = []
+            if hasattr(ctx.node(), '__iter__'):
+                pos=0
+                for node in ctx.node():
+
+                    if node.leafNode() != None:
+                        if node.leafNode().maneuver() != None:
+                            aux.append(node.leafNode().maneuver().name().getText())
+                        elif node.leafNode().condition() != None:
+                            aux.append(node.leafNode().condition().name().getText())
+                        elif node.leafNode().subtree() != None:     self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+var+","+str(pos))
+                        
+                    elif node.nodeComposition() != None:
+                        aux.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText()))
+                    pos += 1
+            else:    
+                aux = "["+self.genstr(ctx.node().getText()) + "]"
+
+            s = var + ".add_children(" + str(aux).replace("\'","") + ")"
+            self.exec_stack.append(s)
+        
+        # e.g. stop = ManeuverAction(bmodel, "stop", MStopConfig(time=2, dist=10, decel=3))
+        def exitManeuver(self, ctx):
+            name=ctx.name().getText() 
+            params = ""
+            if hasattr(ctx.params(), '__iter__'):
+                for param in ctx.params(): params += param.getText()
+            else:    
+                params = ctx.params().getText()
+            key = ctx.key().name().getText()
+            mconfig = key+"("+params+")"
+            s = name + " = " + "ManeuverAction(bmodel," + "\""+ name + "\""+"," + mconfig + ")"
+            self.exec_stack.append(s)
+
+        # e.g. endpoint = BCondition(bmodel,"endpoint", "lane_occupied", args)
+        def exitCondition(self, ctx): 
+            name=ctx.name().getText() 
+            params = ""
+            if hasattr(ctx.params(), '__iter__'):
+                for param in ctx.params(): params += param.getText()
+            else:    
+                params = ctx.params().getText()
+            key = ctx.key().name().getText()
+            s = ctx.name().getText() + " = " + "BCondition(bmodel," + "\"" + name + "\"" + "," + "\"" + key + "\""
+            if params != "": s = s + "," + params
+            s += ")"
+            self.exec_stack.append(s)
+
+        def exitSubtree(self, ctx): 
+            params = ""
+            if hasattr(ctx.params(), '__iter__'):
+                for param in ctx.params(): params += param.getText()
+            else:    
+                params = ctx.params().getText()
+            s = "tree.insert_subtree(self."+ctx.name().getText()+".get_subtree(), [parent].id, [pos])"
+            self.exec_stack.append(s)
