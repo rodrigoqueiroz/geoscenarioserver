@@ -8,51 +8,52 @@ import sys
 def serializedATN():
     with StringIO() as buf:
         buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\24")
-        buf.write("\u008b\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
+        buf.write("\u008e\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
-        buf.write("\t\16\3\2\3\2\3\2\3\2\3\2\3\2\5\2#\n\2\3\2\5\2&\n\2\6")
-        buf.write("\2(\n\2\r\2\16\2)\3\2\3\2\3\3\3\3\3\4\3\4\5\4\62\n\4\3")
-        buf.write("\5\3\5\3\5\6\5\67\n\5\r\5\16\58\3\5\3\5\3\6\3\6\3\6\5")
-        buf.write("\6@\n\6\3\6\3\6\3\7\3\7\3\7\3\7\3\7\3\7\7\7J\n\7\f\7\16")
-        buf.write("\7M\13\7\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\b\7\bW\n\b\f\b")
-        buf.write("\16\bZ\13\b\3\b\3\b\3\t\3\t\3\t\3\t\7\tb\n\t\f\t\16\t")
-        buf.write("e\13\t\3\t\5\th\n\t\3\n\3\n\3\n\3\n\3\13\3\13\3\13\7\13")
-        buf.write("q\n\13\f\13\16\13t\13\13\3\f\3\f\3\f\3\f\3\r\3\r\5\r|")
-        buf.write("\n\r\3\16\7\16\177\n\16\f\16\16\16\u0082\13\16\3\16\3")
-        buf.write("\16\7\16\u0086\n\16\f\16\16\16\u0089\13\16\3\16\2\2\17")
-        buf.write("\2\4\6\b\n\f\16\20\22\24\26\30\32\2\3\3\2\r\16\2\u008c")
-        buf.write("\2\'\3\2\2\2\4-\3\2\2\2\6\61\3\2\2\2\b\63\3\2\2\2\n?\3")
-        buf.write("\2\2\2\fC\3\2\2\2\16P\3\2\2\2\20]\3\2\2\2\22i\3\2\2\2")
-        buf.write("\24m\3\2\2\2\26u\3\2\2\2\30{\3\2\2\2\32\u0080\3\2\2\2")
-        buf.write("\34\35\7\3\2\2\35\36\5\32\16\2\36\37\7\4\2\2\37 \7\23")
-        buf.write("\2\2 \"\5\4\3\2!#\7\22\2\2\"!\3\2\2\2\"#\3\2\2\2#%\3\2")
-        buf.write("\2\2$&\7\24\2\2%$\3\2\2\2%&\3\2\2\2&(\3\2\2\2\'\34\3\2")
-        buf.write("\2\2()\3\2\2\2)\'\3\2\2\2)*\3\2\2\2*+\3\2\2\2+,\7\2\2")
-        buf.write("\3,\3\3\2\2\2-.\5\6\4\2.\5\3\2\2\2/\62\5\n\6\2\60\62\5")
-        buf.write("\b\5\2\61/\3\2\2\2\61\60\3\2\2\2\62\7\3\2\2\2\63\64\7")
-        buf.write("\f\2\2\64\66\7\23\2\2\65\67\5\6\4\2\66\65\3\2\2\2\678")
-        buf.write("\3\2\2\28\66\3\2\2\289\3\2\2\29:\3\2\2\2:;\7\24\2\2;\t")
-        buf.write("\3\2\2\2<@\5\16\b\2=@\5\f\7\2>@\5\20\t\2?<\3\2\2\2?=\3")
-        buf.write("\2\2\2?>\3\2\2\2@A\3\2\2\2AB\7\22\2\2B\13\3\2\2\2CD\7")
-        buf.write("\5\2\2DE\5\32\16\2EF\7\6\2\2FK\5\22\n\2GH\7\7\2\2HJ\5")
-        buf.write("\24\13\2IG\3\2\2\2JM\3\2\2\2KI\3\2\2\2KL\3\2\2\2LN\3\2")
-        buf.write("\2\2MK\3\2\2\2NO\7\b\2\2O\r\3\2\2\2PQ\7\t\2\2QR\5\32\16")
-        buf.write("\2RS\7\6\2\2SX\5\22\n\2TU\7\7\2\2UW\5\24\13\2VT\3\2\2")
-        buf.write("\2WZ\3\2\2\2XV\3\2\2\2XY\3\2\2\2Y[\3\2\2\2ZX\3\2\2\2[")
-        buf.write("\\\7\b\2\2\\\17\3\2\2\2]^\7\n\2\2^g\5\32\16\2_c\7\6\2")
-        buf.write("\2`b\5\24\13\2a`\3\2\2\2be\3\2\2\2ca\3\2\2\2cd\3\2\2\2")
-        buf.write("df\3\2\2\2ec\3\2\2\2fh\7\b\2\2g_\3\2\2\2gh\3\2\2\2h\21")
-        buf.write("\3\2\2\2ij\7\13\2\2jk\7\16\2\2kl\5\32\16\2l\23\3\2\2\2")
-        buf.write("mr\5\26\f\2no\7\7\2\2oq\5\26\f\2pn\3\2\2\2qt\3\2\2\2r")
-        buf.write("p\3\2\2\2rs\3\2\2\2s\25\3\2\2\2tr\3\2\2\2uv\5\32\16\2")
-        buf.write("vw\t\2\2\2wx\5\30\r\2x\27\3\2\2\2y|\7\17\2\2z|\5\32\16")
-        buf.write("\2{y\3\2\2\2{z\3\2\2\2|\31\3\2\2\2}\177\7\21\2\2~}\3\2")
-        buf.write("\2\2\177\u0082\3\2\2\2\u0080~\3\2\2\2\u0080\u0081\3\2")
-        buf.write("\2\2\u0081\u0083\3\2\2\2\u0082\u0080\3\2\2\2\u0083\u0087")
-        buf.write("\7\20\2\2\u0084\u0086\7\21\2\2\u0085\u0084\3\2\2\2\u0086")
-        buf.write("\u0089\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0088\3\2\2\2")
-        buf.write("\u0088\33\3\2\2\2\u0089\u0087\3\2\2\2\20\"%)\618?KXcg")
-        buf.write("r{\u0080\u0087")
+        buf.write("\t\16\4\17\t\17\3\2\3\2\3\2\3\2\3\2\3\2\5\2%\n\2\3\2\5")
+        buf.write("\2(\n\2\6\2*\n\2\r\2\16\2+\3\2\3\2\3\3\3\3\3\4\3\4\5\4")
+        buf.write("\64\n\4\3\5\3\5\3\5\6\59\n\5\r\5\16\5:\3\5\3\5\3\6\3\6")
+        buf.write("\3\6\5\6B\n\6\3\6\3\6\3\7\3\7\3\7\3\7\3\7\3\7\7\7L\n\7")
+        buf.write("\f\7\16\7O\13\7\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\3\t\3")
+        buf.write("\t\3\t\7\t\\\n\t\f\t\16\t_\13\t\5\ta\n\t\3\n\3\n\3\n\7")
+        buf.write("\nf\n\n\f\n\16\ni\13\n\3\n\3\n\3\13\3\13\3\13\3\13\3\f")
+        buf.write("\3\f\3\f\7\ft\n\f\f\f\16\fw\13\f\3\r\3\r\3\r\3\r\3\16")
+        buf.write("\3\16\5\16\177\n\16\3\17\7\17\u0082\n\17\f\17\16\17\u0085")
+        buf.write("\13\17\3\17\3\17\7\17\u0089\n\17\f\17\16\17\u008c\13\17")
+        buf.write("\3\17\2\2\20\2\4\6\b\n\f\16\20\22\24\26\30\32\34\2\3\3")
+        buf.write("\2\r\16\2\u008e\2)\3\2\2\2\4/\3\2\2\2\6\63\3\2\2\2\b\65")
+        buf.write("\3\2\2\2\nA\3\2\2\2\fE\3\2\2\2\16P\3\2\2\2\20U\3\2\2\2")
+        buf.write("\22b\3\2\2\2\24l\3\2\2\2\26p\3\2\2\2\30x\3\2\2\2\32~\3")
+        buf.write("\2\2\2\34\u0083\3\2\2\2\36\37\7\3\2\2\37 \5\34\17\2 !")
+        buf.write("\7\4\2\2!\"\7\23\2\2\"$\5\4\3\2#%\7\22\2\2$#\3\2\2\2$")
+        buf.write("%\3\2\2\2%\'\3\2\2\2&(\7\24\2\2\'&\3\2\2\2\'(\3\2\2\2")
+        buf.write("(*\3\2\2\2)\36\3\2\2\2*+\3\2\2\2+)\3\2\2\2+,\3\2\2\2,")
+        buf.write("-\3\2\2\2-.\7\2\2\3.\3\3\2\2\2/\60\5\6\4\2\60\5\3\2\2")
+        buf.write("\2\61\64\5\n\6\2\62\64\5\b\5\2\63\61\3\2\2\2\63\62\3\2")
+        buf.write("\2\2\64\7\3\2\2\2\65\66\7\f\2\2\668\7\23\2\2\679\5\6\4")
+        buf.write("\28\67\3\2\2\29:\3\2\2\2:8\3\2\2\2:;\3\2\2\2;<\3\2\2\2")
+        buf.write("<=\7\24\2\2=\t\3\2\2\2>B\5\16\b\2?B\5\f\7\2@B\5\20\t\2")
+        buf.write("A>\3\2\2\2A?\3\2\2\2A@\3\2\2\2BC\3\2\2\2CD\7\22\2\2D\13")
+        buf.write("\3\2\2\2EF\7\5\2\2FG\5\34\17\2GH\7\4\2\2HM\5\24\13\2I")
+        buf.write("J\7\6\2\2JL\5\26\f\2KI\3\2\2\2LO\3\2\2\2MK\3\2\2\2MN\3")
+        buf.write("\2\2\2N\r\3\2\2\2OM\3\2\2\2PQ\7\7\2\2QR\5\34\17\2RS\7")
+        buf.write("\4\2\2ST\5\22\n\2T\17\3\2\2\2UV\7\b\2\2V`\5\34\17\2WX")
+        buf.write("\7\4\2\2X]\5\22\n\2YZ\7\6\2\2Z\\\5\22\n\2[Y\3\2\2\2\\")
+        buf.write("_\3\2\2\2][\3\2\2\2]^\3\2\2\2^a\3\2\2\2_]\3\2\2\2`W\3")
+        buf.write("\2\2\2`a\3\2\2\2a\21\3\2\2\2bc\5\34\17\2cg\7\t\2\2df\5")
+        buf.write("\26\f\2ed\3\2\2\2fi\3\2\2\2ge\3\2\2\2gh\3\2\2\2hj\3\2")
+        buf.write("\2\2ig\3\2\2\2jk\7\n\2\2k\23\3\2\2\2lm\7\13\2\2mn\7\16")
+        buf.write("\2\2no\5\34\17\2o\25\3\2\2\2pu\5\30\r\2qr\7\6\2\2rt\5")
+        buf.write("\30\r\2sq\3\2\2\2tw\3\2\2\2us\3\2\2\2uv\3\2\2\2v\27\3")
+        buf.write("\2\2\2wu\3\2\2\2xy\5\34\17\2yz\t\2\2\2z{\5\32\16\2{\31")
+        buf.write("\3\2\2\2|\177\7\17\2\2}\177\5\34\17\2~|\3\2\2\2~}\3\2")
+        buf.write("\2\2\177\33\3\2\2\2\u0080\u0082\7\21\2\2\u0081\u0080\3")
+        buf.write("\2\2\2\u0082\u0085\3\2\2\2\u0083\u0081\3\2\2\2\u0083\u0084")
+        buf.write("\3\2\2\2\u0084\u0086\3\2\2\2\u0085\u0083\3\2\2\2\u0086")
+        buf.write("\u008a\7\20\2\2\u0087\u0089\7\21\2\2\u0088\u0087\3\2\2")
+        buf.write("\2\u0089\u008c\3\2\2\2\u008a\u0088\3\2\2\2\u008a\u008b")
+        buf.write("\3\2\2\2\u008b\35\3\2\2\2\u008c\u008a\3\2\2\2\20$\'+\63")
+        buf.write(":AM]`gu~\u0083\u008a")
         return buf.getvalue()
 
 
@@ -67,7 +68,7 @@ class BTreeDSLParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "'BehaviorTree'", "':'", "'Condition'", 
-                     "'('", "','", "')'", "'Maneuver'", "'Subtree'", "'key'", 
+                     "','", "'Maneuver'", "'Subtree'", "'('", "')'", "'key'", 
                      "<INVALID>", "<INVALID>", "'='" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
@@ -83,15 +84,16 @@ class BTreeDSLParser ( Parser ):
     RULE_condition = 5
     RULE_maneuver = 6
     RULE_subtree = 7
-    RULE_key = 8
-    RULE_params = 9
-    RULE_bexpr = 10
-    RULE_value = 11
-    RULE_name = 12
+    RULE_mconfig = 8
+    RULE_key = 9
+    RULE_params = 10
+    RULE_bexpr = 11
+    RULE_value = 12
+    RULE_name = 13
 
     ruleNames =  [ "behaviorTree", "rootNode", "node", "nodeComposition", 
-                   "leafNode", "condition", "maneuver", "subtree", "key", 
-                   "params", "bexpr", "value", "name" ]
+                   "leafNode", "condition", "maneuver", "subtree", "mconfig", 
+                   "key", "params", "bexpr", "value", "name" ]
 
     EOF = Token.EOF
     T__0=1
@@ -183,43 +185,43 @@ class BTreeDSLParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 37 
+            self.state = 39 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 26
-                self.match(BTreeDSLParser.T__0)
-                self.state = 27
-                self.name()
                 self.state = 28
-                self.match(BTreeDSLParser.T__1)
+                self.match(BTreeDSLParser.T__0)
                 self.state = 29
-                self.match(BTreeDSLParser.INDENT)
+                self.name()
                 self.state = 30
-                self.rootNode()
+                self.match(BTreeDSLParser.T__1)
+                self.state = 31
+                self.match(BTreeDSLParser.INDENT)
                 self.state = 32
+                self.rootNode()
+                self.state = 34
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==BTreeDSLParser.NL:
-                    self.state = 31
+                    self.state = 33
                     self.match(BTreeDSLParser.NL)
 
 
-                self.state = 35
+                self.state = 37
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==BTreeDSLParser.DEDENT:
-                    self.state = 34
+                    self.state = 36
                     self.match(BTreeDSLParser.DEDENT)
 
 
-                self.state = 39 
+                self.state = 41 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==BTreeDSLParser.T__0):
                     break
 
-            self.state = 41
+            self.state = 43
             self.match(BTreeDSLParser.EOF)
         except RecognitionException as re:
             localctx.exception = re
@@ -259,7 +261,7 @@ class BTreeDSLParser ( Parser ):
         self.enterRule(localctx, 2, self.RULE_rootNode)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 43
+            self.state = 45
             self.node()
         except RecognitionException as re:
             localctx.exception = re
@@ -302,17 +304,17 @@ class BTreeDSLParser ( Parser ):
         localctx = BTreeDSLParser.NodeContext(self, self._ctx, self.state)
         self.enterRule(localctx, 4, self.RULE_node)
         try:
-            self.state = 47
+            self.state = 49
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [BTreeDSLParser.T__2, BTreeDSLParser.T__6, BTreeDSLParser.T__7]:
+            if token in [BTreeDSLParser.T__2, BTreeDSLParser.T__4, BTreeDSLParser.T__5]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 45
+                self.state = 47
                 self.leafNode()
                 pass
             elif token in [BTreeDSLParser.OPERATOR]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 46
+                self.state = 48
                 self.nodeComposition()
                 pass
             else:
@@ -369,23 +371,23 @@ class BTreeDSLParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 49
+            self.state = 51
             self.match(BTreeDSLParser.OPERATOR)
-            self.state = 50
+            self.state = 52
             self.match(BTreeDSLParser.INDENT)
-            self.state = 52 
+            self.state = 54 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 51
+                self.state = 53
                 self.node()
-                self.state = 54 
+                self.state = 56 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << BTreeDSLParser.T__2) | (1 << BTreeDSLParser.T__6) | (1 << BTreeDSLParser.T__7) | (1 << BTreeDSLParser.OPERATOR))) != 0)):
+                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << BTreeDSLParser.T__2) | (1 << BTreeDSLParser.T__4) | (1 << BTreeDSLParser.T__5) | (1 << BTreeDSLParser.OPERATOR))) != 0)):
                     break
 
-            self.state = 56
+            self.state = 58
             self.match(BTreeDSLParser.DEDENT)
         except RecognitionException as re:
             localctx.exception = re
@@ -436,25 +438,25 @@ class BTreeDSLParser ( Parser ):
         self.enterRule(localctx, 8, self.RULE_leafNode)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 61
+            self.state = 63
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [BTreeDSLParser.T__6]:
-                self.state = 58
+            if token in [BTreeDSLParser.T__4]:
+                self.state = 60
                 self.maneuver()
                 pass
             elif token in [BTreeDSLParser.T__2]:
-                self.state = 59
+                self.state = 61
                 self.condition()
                 pass
-            elif token in [BTreeDSLParser.T__7]:
-                self.state = 60
+            elif token in [BTreeDSLParser.T__5]:
+                self.state = 62
                 self.subtree()
                 pass
             else:
                 raise NoViableAltException(self)
 
-            self.state = 63
+            self.state = 65
             self.match(BTreeDSLParser.NL)
         except RecognitionException as re:
             localctx.exception = re
@@ -506,29 +508,27 @@ class BTreeDSLParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 65
+            self.state = 67
             self.match(BTreeDSLParser.T__2)
-            self.state = 66
+            self.state = 68
             self.name()
 
-            self.state = 67
-            self.match(BTreeDSLParser.T__3)
-            self.state = 68
+            self.state = 69
+            self.match(BTreeDSLParser.T__1)
+            self.state = 70
             self.key()
-            self.state = 73
+            self.state = 75
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.T__4:
-                self.state = 69
-                self.match(BTreeDSLParser.T__4)
-                self.state = 70
+            while _la==BTreeDSLParser.T__3:
+                self.state = 71
+                self.match(BTreeDSLParser.T__3)
+                self.state = 72
                 self.params()
-                self.state = 75
+                self.state = 77
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 76
-            self.match(BTreeDSLParser.T__5)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -547,15 +547,8 @@ class BTreeDSLParser ( Parser ):
             return self.getTypedRuleContext(BTreeDSLParser.NameContext,0)
 
 
-        def key(self):
-            return self.getTypedRuleContext(BTreeDSLParser.KeyContext,0)
-
-
-        def params(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(BTreeDSLParser.ParamsContext)
-            else:
-                return self.getTypedRuleContext(BTreeDSLParser.ParamsContext,i)
+        def mconfig(self):
+            return self.getTypedRuleContext(BTreeDSLParser.MconfigContext,0)
 
 
         def getRuleIndex(self):
@@ -576,32 +569,16 @@ class BTreeDSLParser ( Parser ):
 
         localctx = BTreeDSLParser.ManeuverContext(self, self._ctx, self.state)
         self.enterRule(localctx, 12, self.RULE_maneuver)
-        self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 78
-            self.match(BTreeDSLParser.T__6)
+            self.match(BTreeDSLParser.T__4)
             self.state = 79
             self.name()
-
             self.state = 80
-            self.match(BTreeDSLParser.T__3)
+            self.match(BTreeDSLParser.T__1)
             self.state = 81
-            self.key()
-            self.state = 86
-            self._errHandler.sync(self)
-            _la = self._input.LA(1)
-            while _la==BTreeDSLParser.T__4:
-                self.state = 82
-                self.match(BTreeDSLParser.T__4)
-                self.state = 83
-                self.params()
-                self.state = 88
-                self._errHandler.sync(self)
-                _la = self._input.LA(1)
-
-            self.state = 89
-            self.match(BTreeDSLParser.T__5)
+            self.mconfig()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -620,11 +597,11 @@ class BTreeDSLParser ( Parser ):
             return self.getTypedRuleContext(BTreeDSLParser.NameContext,0)
 
 
-        def params(self, i:int=None):
+        def mconfig(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(BTreeDSLParser.ParamsContext)
+                return self.getTypedRuleContexts(BTreeDSLParser.MconfigContext)
             else:
-                return self.getTypedRuleContext(BTreeDSLParser.ParamsContext,i)
+                return self.getTypedRuleContext(BTreeDSLParser.MconfigContext,i)
 
 
         def getRuleIndex(self):
@@ -648,30 +625,94 @@ class BTreeDSLParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 91
-            self.match(BTreeDSLParser.T__7)
-            self.state = 92
+            self.state = 83
+            self.match(BTreeDSLParser.T__5)
+            self.state = 84
             self.name()
-            self.state = 101
+            self.state = 94
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==BTreeDSLParser.T__3:
-                self.state = 93
-                self.match(BTreeDSLParser.T__3)
-                self.state = 97
+            if _la==BTreeDSLParser.T__1:
+                self.state = 85
+                self.match(BTreeDSLParser.T__1)
+                self.state = 86
+                self.mconfig()
+                self.state = 91
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==BTreeDSLParser.WORD or _la==BTreeDSLParser.WS:
-                    self.state = 94
-                    self.params()
-                    self.state = 99
+                while _la==BTreeDSLParser.T__3:
+                    self.state = 87
+                    self.match(BTreeDSLParser.T__3)
+                    self.state = 88
+                    self.mconfig()
+                    self.state = 93
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
-                self.state = 100
-                self.match(BTreeDSLParser.T__5)
 
 
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+    class MconfigContext(ParserRuleContext):
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def name(self):
+            return self.getTypedRuleContext(BTreeDSLParser.NameContext,0)
+
+
+        def params(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(BTreeDSLParser.ParamsContext)
+            else:
+                return self.getTypedRuleContext(BTreeDSLParser.ParamsContext,i)
+
+
+        def getRuleIndex(self):
+            return BTreeDSLParser.RULE_mconfig
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterMconfig" ):
+                listener.enterMconfig(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitMconfig" ):
+                listener.exitMconfig(self)
+
+
+
+
+    def mconfig(self):
+
+        localctx = BTreeDSLParser.MconfigContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 16, self.RULE_mconfig)
+        self._la = 0 # Token type
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 96
+            self.name()
+            self.state = 97
+            self.match(BTreeDSLParser.T__6)
+            self.state = 101
+            self._errHandler.sync(self)
+            _la = self._input.LA(1)
+            while _la==BTreeDSLParser.WORD or _la==BTreeDSLParser.WS:
+                self.state = 98
+                self.params()
+                self.state = 103
+                self._errHandler.sync(self)
+                _la = self._input.LA(1)
+
+            self.state = 104
+            self.match(BTreeDSLParser.T__7)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -710,14 +751,14 @@ class BTreeDSLParser ( Parser ):
     def key(self):
 
         localctx = BTreeDSLParser.KeyContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 16, self.RULE_key)
+        self.enterRule(localctx, 18, self.RULE_key)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 103
+            self.state = 106
             self.match(BTreeDSLParser.T__8)
-            self.state = 104
+            self.state = 107
             self.match(BTreeDSLParser.ATT)
-            self.state = 105
+            self.state = 108
             self.name()
         except RecognitionException as re:
             localctx.exception = re
@@ -757,21 +798,21 @@ class BTreeDSLParser ( Parser ):
     def params(self):
 
         localctx = BTreeDSLParser.ParamsContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 18, self.RULE_params)
+        self.enterRule(localctx, 20, self.RULE_params)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 107
+            self.state = 110
             self.bexpr()
-            self.state = 112
+            self.state = 115
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,10,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
-                    self.state = 108
-                    self.match(BTreeDSLParser.T__4)
-                    self.state = 109
+                    self.state = 111
+                    self.match(BTreeDSLParser.T__3)
+                    self.state = 112
                     self.bexpr() 
-                self.state = 114
+                self.state = 117
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,10,self._ctx)
 
@@ -820,20 +861,20 @@ class BTreeDSLParser ( Parser ):
     def bexpr(self):
 
         localctx = BTreeDSLParser.BexprContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 20, self.RULE_bexpr)
+        self.enterRule(localctx, 22, self.RULE_bexpr)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 115
+            self.state = 118
             self.name()
-            self.state = 116
+            self.state = 119
             _la = self._input.LA(1)
             if not(_la==BTreeDSLParser.BOP or _la==BTreeDSLParser.ATT):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
                 self.consume()
-            self.state = 117
+            self.state = 120
             self.value()
         except RecognitionException as re:
             localctx.exception = re
@@ -873,19 +914,19 @@ class BTreeDSLParser ( Parser ):
     def value(self):
 
         localctx = BTreeDSLParser.ValueContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 22, self.RULE_value)
+        self.enterRule(localctx, 24, self.RULE_value)
         try:
-            self.state = 121
+            self.state = 124
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [BTreeDSLParser.FLOAT]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 119
+                self.state = 122
                 self.match(BTreeDSLParser.FLOAT)
                 pass
             elif token in [BTreeDSLParser.WORD, BTreeDSLParser.WS]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 120
+                self.state = 123
                 self.name()
                 pass
             else:
@@ -931,30 +972,30 @@ class BTreeDSLParser ( Parser ):
     def name(self):
 
         localctx = BTreeDSLParser.NameContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 24, self.RULE_name)
+        self.enterRule(localctx, 26, self.RULE_name)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 126
+            self.state = 129
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==BTreeDSLParser.WS:
-                self.state = 123
+                self.state = 126
                 self.match(BTreeDSLParser.WS)
-                self.state = 128
+                self.state = 131
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
-            self.state = 129
+            self.state = 132
             self.match(BTreeDSLParser.WORD)
-            self.state = 133
+            self.state = 136
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,13,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
-                    self.state = 130
+                    self.state = 133
                     self.match(BTreeDSLParser.WS) 
-                self.state = 135
+                self.state = 138
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,13,self._ctx)
 

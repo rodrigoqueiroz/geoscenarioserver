@@ -260,13 +260,14 @@ class BTreeParser(object):
         # e.g. stop = ManeuverAction(bmodel, "stop", MStopConfig(time=2, dist=10, decel=3))
         def exitManeuver(self, ctx):
             name=ctx.name().getText() 
-            params = ""
-            if hasattr(ctx.params(), '__iter__'):
-                for param in ctx.params(): params += param.getText()
-            else:    
-                params = ctx.params().getText()
-            key = ctx.key().name().getText()
-            mconfig = key+"("+params+")"
+            #params = ""
+            #if hasattr(ctx.params(), #'__iter__'):
+            #    for param in ctx.params(): #params += param.getText()
+            #else:    
+            #    params = ctx.params().#getText()
+            #key = ctx.key().name().getText()
+            #mconfig = key+"("+params+")"
+            mconfig = ctx.mconfig().getText()
             s = name + " = " + "ManeuverAction(bmodel," + "\""+ name + "\""+"," + mconfig + ")"
             self.exec_stack.append(s)
 
@@ -285,10 +286,12 @@ class BTreeParser(object):
             self.exec_stack.append(s)
 
         def exitSubtree(self, ctx): 
-            params = ""
-            if hasattr(ctx.params(), '__iter__'):
-                for param in ctx.params(): params += param.getText()
+            mconfigs = ""
+            if hasattr(ctx.mconfig(), '__iter__'):
+                for conf in ctx.mconfig(): mconfigs += "," + conf.getText()
             else:    
-                params = ctx.params().getText()
-            s = "tree.insert_subtree(self."+ctx.name().getText()+".get_subtree(), [parent].id, [pos])"
+                mconfigs = ctx.mconfig().getText()
+            s = "tree.insert_subtree(self."+ctx.name().getText()+"(self"
+            if mconfigs != "": s += mconfigs 
+            s += "), [parent].id, [pos])"
             self.exec_stack.append(s)

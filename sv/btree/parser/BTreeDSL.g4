@@ -36,9 +36,11 @@ node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'Condition' name ('('  key (',' params)* ')');
-maneuver            : 'Maneuver' name ('(' key (',' params)* ')');
-subtree             : 'Subtree' name ('(' params* ')')?;
+condition           : 'Condition' name (':' key (',' params)*);
+maneuver            : 'Maneuver' name ':' mconfig;
+subtree             : 'Subtree' name (':' mconfig (',' mconfig)*)?;
+
+mconfig             : name '(' params* ')';
 
 key                 : 'key' ATT name ;
 params              : bexpr (',' bexpr)* ;

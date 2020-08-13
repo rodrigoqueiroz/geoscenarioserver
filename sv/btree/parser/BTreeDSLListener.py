@@ -80,6 +80,15 @@ class BTreeDSLListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BTreeDSLParser#mconfig.
+    def enterMconfig(self, ctx:BTreeDSLParser.MconfigContext):
+        pass
+
+    # Exit a parse tree produced by BTreeDSLParser#mconfig.
+    def exitMconfig(self, ctx:BTreeDSLParser.MconfigContext):
+        pass
+
+
     # Enter a parse tree produced by BTreeDSLParser#key.
     def enterKey(self, ctx:BTreeDSLParser.KeyContext):
         pass
