@@ -34,7 +34,7 @@
     <tag k='agentspeed' v='7' />
   </node>
   <node id='-101759' action='modify' visible='true' lat='49.00724799424' lon='8.45715702989'>
-    <tag k='btree' v='drive' />
+    <tag k='btree' v='drive_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
@@ -49,7 +49,7 @@
     <tag k='name' v='origin' />
   </node>
   <node id='-101761' action='modify' visible='true' lat='49.00723588337' lon='8.45706521059'>
-    <tag k='btree' v='drive' />
+    <tag k='btree' v='drive_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
@@ -75,7 +75,7 @@
     <tag k='agentspeed' v='0' />
   </node>
   <node id='-101805' action='modify' visible='true' lat='49.00779820451' lon='8.4578658565'>
-    <tag k='btree' v='idler' />
+    <tag k='btree' v='idle_scenario_tree' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v3' />
