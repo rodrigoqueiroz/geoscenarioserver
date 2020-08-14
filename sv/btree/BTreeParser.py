@@ -126,33 +126,33 @@ class BTreeParser(object):
 
     # SCENARIO SPECIFIC TREES
 
-    def drive_scenario_tree(self, bmodel):
-        #standard driving is 14m/s
-        root = self.drive_tree(bmodel)
-        return root
+    #def drive_scenario_tree(self, bmodel):
+    #    #standard driving is 14m/s
+    #    root = self.drive_tree(bmodel)
+    #    return root
 
-    def lane_change_scenario_tree(self, bmodel):
-        # subtrees
-        st_lane_change_tree = self.lane_change_tree(bmodel)
-        st_drive_tree = self.drive_tree(bmodel)
-        # conditions
-        # parameters to condition predicate should be passed some other way
-        c_sim_time = BCondition(bmodel, "c sim time > 3?", "sim_time", repeat=False, tmin=3, tmax=float('inf'))
+    #def lane_change_scenario_tree(self, bmodel):
+    #    # subtrees
+    #    st_lane_change_tree = self.lane_change_tree(bmodel)
+    #    st_drive_tree = self.drive_tree(bmodel)
+    #    # conditions
+    #    # parameters to condition predicate should be passed some other way
+    #    c_sim_time = BCondition(bmodel, "c sim time > 3?", "sim_time", repeat=False, tmin=3, tmax=float('inf'))
 
-        seq_lane_change = composites.Sequence("seq do lane change")
-        seq_lane_change.add_children([c_sim_time, st_lane_change_tree])
+    #    seq_lane_change = composites.Sequence("seq do lane change")
+    #    seq_lane_change.add_children([c_sim_time, st_lane_change_tree])
 
-        sel_lane_change_or_drive = composites.Selector("sel do lane change or drive")
-        sel_lane_change_or_drive.add_children([seq_lane_change, st_drive_tree])
+    #    sel_lane_change_or_drive = composites.Selector("sel do lane change or drive")
+    #    sel_lane_change_or_drive.add_children([seq_lane_change, st_drive_tree])
 
-        return sel_lane_change_or_drive
+    #    return sel_lane_change_or_drive
 
-    def fast_driver_scenario_tree(self,bmodel):
-        #faster driver (e.g., 16/m/s)
-        mvk_config = MVelKeepConfig(vel = MP(16.0))
-        root = drive_tree(bmodel,mvk_config=mvk_config)
+    #def fast_driver_scenario_tree(self,bmodel):
+    #    #faster driver (e.g., 16/m/s)
+    #    mvk_config = MVelKeepConfig(vel = MP(16.0))
+    #    root = drive_tree(bmodel,mvk_config=mvk_config)
 
-        return root
+    #    return root
 
     class BTreeListener(BTreeDSLListener):
 
@@ -236,7 +236,7 @@ class BTreeParser(object):
         def exitRootNode(self,ctx):
             node = ctx.node()
             if node.leafNode() != None:
-                raise RuntimeError("Root nodes must be operators (e.g. '?', '->', '||').")
+                raise RuntimeError("The root node must be an operator (e.g. '?', '->', '||').")
             elif node.nodeComposition() != None:
                 var = self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
             s = "root = " + var
