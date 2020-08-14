@@ -125,6 +125,15 @@ class BTreeDSLListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BTreeDSLParser#func.
+    def enterFunc(self, ctx:BTreeDSLParser.FuncContext):
+        pass
+
+    # Exit a parse tree produced by BTreeDSLParser#func.
+    def exitFunc(self, ctx:BTreeDSLParser.FuncContext):
+        pass
+
+
     # Enter a parse tree produced by BTreeDSLParser#name.
     def enterName(self, ctx:BTreeDSLParser.NameContext):
         pass

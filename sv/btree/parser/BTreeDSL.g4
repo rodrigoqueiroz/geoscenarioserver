@@ -45,7 +45,8 @@ mconfig             : name '(' params* ')';
 key                 : 'key' ATT name ;
 params              : bexpr (',' bexpr)* ;
 bexpr               : name (BOP|ATT) value ;
-value               : FLOAT | name;
+value               : FLOAT | name | func;
+func                : name '('FLOAT (',' FLOAT)*')';
 name                : WS* WORD WS*;
 
 /*

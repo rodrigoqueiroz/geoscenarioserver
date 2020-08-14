@@ -13,7 +13,7 @@
   <node id='-101873' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088'>
   </node>
   <node id='-101877' action='modify' visible='true' lat='49.00725748342' lon='8.45716968766'>
-    <tag k='btree' v='impatient_drive_scenario_tree' />
+    <tag k='btree' v='fast_drive_scenario_tree' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
     <tag k='orientation' v='325' />
@@ -25,7 +25,7 @@
     <tag k='name' v='origin' />
   </node>
   <node id='-101879' action='modify' visible='true' lat='49.00723465764' lon='8.45706515025'>
-    <tag k='btree' v='lane_change_scenario_tree' />
+    <tag k='btree' v='impatient_drive_scenario_tree' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
     <tag k='orientation' v='325' />

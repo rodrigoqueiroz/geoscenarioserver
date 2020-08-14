@@ -47,7 +47,7 @@ class BTreeParser(object):
         path="./sv/btree/"
         ff = open(path+"tmp"+str(self.vid)+".btree", 'r')
         behavior_tree = ff.read()
-
+        print(behavior_tree)
         try:
             exec(behavior_tree, globals()) #defines get_tree
             tree = get_tree(self, bmodel)
