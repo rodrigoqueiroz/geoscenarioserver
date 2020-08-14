@@ -19,10 +19,9 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name, loaded_btree=""):
+    def __init__(self, vid, root_btree_name):
         self.vid = vid
         self.root_btree_name = root_btree_name
-        self.loaded_btree = loaded_btree
         #Build Tree
         self.tree = self.build()
         #print(self)
@@ -36,18 +35,9 @@ class BehaviorModels(object):
 
     def build(self):
         
-        if True:
-        #if self.loaded_btree != "":
-
-            self.loaded_btree = open("impatientdriver.btree",'r').read()
-            parser = BTreeParser.BTreeParser(self.vid)
-            tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
-        else:
-            #TODO: use default btree
-            tree = DrivePatientlyTree(self.vid, self.goal).get_tree()
-
-        #tree = trees.BehaviourTree(root=root)
-        #tree.setup(timeout=15) #?
+        self.loaded_btree = open("scenarios/trees/"+self.root_btree_name+".btree",'r').read()
+        parser = BTreeParser.BTreeParser(self.vid)
+        tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)
