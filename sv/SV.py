@@ -8,6 +8,7 @@
 from matplotlib import pyplot as plt
 import math
 import sys
+import glog as log
 from TickSync import TickSync
 from SimConfig import *
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
@@ -44,7 +45,7 @@ class Vehicle(object):
         self.model = model
         #remote
         self.is_remote = False
-        
+
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
@@ -61,13 +62,13 @@ class Vehicle(object):
             self.vehicle_state.d_acc
         ]
         return state
-    
+
     def stop(self):
         pass
 
     def tick(self, tick_count, delta_time, sim_time):
         pass
-    
+
     def get_sim_state(self):
         x = round((self.vehicle_state.x * CLIENT_METER_UNIT))
         y = round((self.vehicle_state.y * CLIENT_METER_UNIT))
@@ -76,7 +77,7 @@ class Vehicle(object):
         velocity = [self.vehicle_state.x_vel, self.vehicle_state.y_vel]
         remote = 1 if self.is_remote else 0
         return self.vid, remote, position, velocity, self.vehicle_state.yaw, self.vehicle_state.steer
-    
+
 
 # A Simulated Vehicle
 class SV(Vehicle):
@@ -105,7 +106,7 @@ class SV(Vehicle):
         #behavior
         self.btree_root = btree_root
         #Trajectory
-        self.trajectory = None          #coefs + time[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]] 
+        self.trajectory = None          #coefs + time[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]]
         self.trajectory_time = 0        #consumed time
         self.cand_trajectories = None   #plotting only
         self.s_eq = None
@@ -116,13 +117,13 @@ class SV(Vehicle):
         self.d_acc_eq = None
 
     # def future_state(self, t):
-    #     """ Predicts a new state based on time 
+    #     """ Predicts a new state based on time
     #         and current trajectory *override
     #     """
     #     if (not self.trajectory): #If no trajectory, returns prediction
     #         return Vehicle.future_state(self,t)
 
-    #     t = self.trajectory_time + t 
+    #     t = self.trajectory_time + t
     #     state = [
     #         self.s_eq(t),
     #         self.s_vel_eq(t),
@@ -130,18 +131,18 @@ class SV(Vehicle):
     #         self.d_eq(t),
     #         self.d_vel_eq(t),
     #         self.d_acc_eq(t),
-    #     ] 
+    #     ]
     #     return state
 
-    def start_planner(self, nvehicles, sim_config, traffic_state_sharr, debug_shdata ):
+    def start_planner(self, nvehicles, sim_config, traffic_state_sharr, debug_shdata):
         """For simulated vehicles controlled by SVPlanner.
             If a planner is started, the vehicle can't have a remote.
             Use either option (start_planner or start_remote).
         """
         self.is_remote = False
-        self.sv_planner = SVPlanner(self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr,debug_shdata)
+        self.sv_planner = SVPlanner(self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config, traffic_state_sharr, debug_shdata)
         self.sv_planner.start()
-    
+
     def stop(self):
         if self.sv_planner:
             self.sv_planner.stop()
@@ -152,14 +153,14 @@ class SV(Vehicle):
         #Read planner
         plan = self.sv_planner.get_plan()
         if plan:
-            if plan.t is not 0:
+            if plan.t != 0:
                 self.set_new_motion_plan(plan, sim_time)
                 if plan.new_frenet_frame:
                     # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
                     self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.vehicle_state.x, self.vehicle_state.y)
             else:
                 self.set_new_motion_plan(plan, sim_time)
-        
+
         #Compute new state
         self.compute_vehicle_state(delta_time)
 
@@ -172,7 +173,7 @@ class SV(Vehicle):
             self.trajectory_time += delta_time
             time = self.trajectory_time
 
-            if (time>self.trajectory[2]): #exceed total traj time
+            if (time > self.trajectory[2]): #exceed total traj time
                 return
 
             # sanity check
@@ -198,7 +199,7 @@ class SV(Vehicle):
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
                 raise e
-            
+
             # update sim state
             self.vehicle_state.x = x_vector[0]
             self.vehicle_state.x_vel = x_vector[1]
@@ -211,7 +212,7 @@ class SV(Vehicle):
             #    diff = self.vehicle_state.x - self.last_x
             #    print ('ERROR: X went backwards. Diff: {:.2}'.format(diff))
             #self.last_x = self.vehicle_state.x
-    
+
 
     def get_frenet_state(self):
         if self.s_eq == None:
@@ -233,30 +234,29 @@ class SV(Vehicle):
             self.trajectory = None
             return
 
-
         # if self.s_eq:
         #     print('current s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
         trajectory = plan.get_trajectory()
 
         s_coef,d_coef,_ = trajectory
         self.trajectory = trajectory
-        self.trajectory_time = 0 
+        self.trajectory_time = 0
         #self.cand_trajectories = candidates
         #Pre-compute derivatives and equations for execution
         #S
-        self.s_eq = to_equation(s_coef) 
+        self.s_eq = to_equation(s_coef)
         s_vel_coef = differentiate(s_coef)
         self.s_vel_eq = to_equation(s_vel_coef)
         s_acc_coef = differentiate(s_vel_coef)
         self.s_acc_eq = to_equation(s_acc_coef)
         #D
-        self.d_eq = to_equation(d_coef) 
+        self.d_eq = to_equation(d_coef)
         d_vel_coef = differentiate(d_coef)
         self.d_vel_eq = to_equation(d_vel_coef)
         d_acc_coef = differentiate(d_vel_coef)
         self.d_acc_eq = to_equation(d_acc_coef)
 
-        #Correct trajectory progress based 
+        #Correct trajectory progress based
         #on diff planning time and now
         diff = sim_time - plan.t_start
         # print('Plan start {}, now is {}'.format(plan.t_start, sim_time))
@@ -264,4 +264,3 @@ class SV(Vehicle):
         if (diff>0):
             self.trajectory_time += diff
         # print('new s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
- 

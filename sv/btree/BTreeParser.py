@@ -41,17 +41,20 @@ class BTreeParser(object):
         c_reached_goal = BCondition(bmodel, "c reached_goal", "reached_goal")
 
         #Coordinate Maneuvers and Conditions
-        seq_lv_stop = composites.Sequence("seq lv stop")
-        seq_lv_stop.add_children([c_lv_stop, ManeuverAction(bmodel, "stop when lv stopped", mstop_config)])
+        # stopping when leading vehicle is stopped shouldn't have to be a separate behaviour,
+        # follow maneuver should just do that. Also this will never be triggered because the
+        # condition is broken (not keeping leading_vehicle in behaviour models anymore)
+        # seq_lv_stop = composites.Sequence("seq lv stop")
+        # seq_lv_stop.add_children([c_lv_stop, ManeuverAction(bmodel, "stop when lv stopped", mstop_config)])
         # if reached goal, do stop maneuver
         seq_reached_goal = composites.Sequence("seq reached goal")
         seq_reached_goal.add_children([c_reached_goal, m_stop])
 
-        sel_lv = composites.Selector("sel lv")
-        sel_lv.add_children([seq_lv_stop, m_follow])
+        # sel_lv = composites.Selector("sel lv")
+        # sel_lv.add_children([seq_lv_stop, m_follow])
 
         seq_busy_lane = composites.Sequence("seq busy Lane")
-        seq_busy_lane.add_children([c_lane_occupied, sel_lv])
+        seq_busy_lane.add_children([c_lane_occupied, m_follow])
 
         st_sel_drive = composites.Selector("ST Drive")
         st_sel_drive.add_children([seq_reached_goal, seq_busy_lane, m_vk])
@@ -116,13 +119,13 @@ class BTreeParser(object):
         root = self.reverse_tree(bmodel)
         return root
 
-    def lane_change_scenario_tree(self, bmodel):
+    def lane_change_scenario_tree(self, bmodel, seconds_before_lane_change=3):
         # subtrees
         st_lane_change_tree = self.lane_change_tree(bmodel)
         st_drive_tree = self.drive_tree(bmodel)
         # conditions
         # parameters to condition predicate should be passed some other way
-        c_sim_time = BCondition(bmodel, "c sim time > 3?", "sim_time", repeat=False, tmin=3, tmax=float('inf'))
+        c_sim_time = BCondition(bmodel, "c sim time > 3?", "sim_time", repeat=False, tmin=seconds_before_lane_change, tmax=float('inf'))
 
         seq_lane_change = composites.Sequence("seq do lane change")
         seq_lane_change.add_children([c_sim_time, st_lane_change_tree])
@@ -131,6 +134,15 @@ class BTreeParser(object):
         sel_lane_change_or_drive.add_children([seq_lane_change, st_drive_tree])
 
         return sel_lane_change_or_drive
+
+    def leave_parking_scenario_tree(self, bmodel):
+        # st_lane_change_tree = self.lane_change_tree(bmodel)
+        # st_drive_tree = self.drive_tree(bmodel)
+
+        # seq_lane_change = composites.Sequence("seq do lane change")
+        # seq_lane_change.add_children([st_lane_change_tree, st_drive_tree])
+
+        return self.lane_change_scenario_tree(bmodel, seconds_before_lane_change=1)
 
     def fast_driver_scenario_tree(self,bmodel):
         #faster driver (e.g., 16/m/s)

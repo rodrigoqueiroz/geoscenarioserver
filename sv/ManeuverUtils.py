@@ -60,7 +60,7 @@ def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=10, reve
     # A distance to goal with the same sign as direction means we've reached and passed it
     return direction * (goal_s - vehicle_state.s) < threshold
 
-def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5):
+def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5, distance_gap=5):
     log.check_notnone(lane_config)
 
     is_following = False
@@ -70,10 +70,12 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
 
     if leading_vehicle is not None:
         dist = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
+        if dist < 0:
+            log.error("distance to leading vehicle zero!")
         ttc = dist / abs(vehicle_state.s_vel) if vehicle_state.s_vel != 0 else float('inf')
 
-        # if not moving, determine if too close. TODO the distance threshold is hardcoded
-        if (0 < dist < VEHICLE_RADIUS * 5) or (0 <= ttc < time_gap):
+        # if not moving, determine if too close.
+        if (0 < dist < distance_gap) or (0 <= ttc < time_gap):
             # print("{} is leading by {}".format(leading_vehicle.vid, ttc))
             is_following = True
             leading_vid = leading_vehicle.vid
@@ -159,7 +161,7 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=4):
     return nearest
 
 def is_stopped(traffic_vehicle):
-    return traffic_vehicle.vehicle_state.s_vel == 0
+    return abs(traffic_vehicle.vehicle_state.s_vel) < 0.05
 
 def is_slow_vehicle(subject_vehicle, traffic_vehicle):
     return subject_vehicle.s_vel > traffic_vehicle.vehicle_state.s_vel
