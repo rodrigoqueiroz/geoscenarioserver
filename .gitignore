@@ -4,3 +4,4 @@ scenarios/logs/*
 **/build/
 .vscode/
 *.DS_Store
+test_btree_parser
