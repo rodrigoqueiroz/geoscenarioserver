@@ -1,7 +1,6 @@
 BehaviorTree LaneChange:
     ?
         ->
-            Condition should_cutin: key=should_cutin, target_lane_id=1
-            Maneuver cutin: MCutInConfig(target_lid=1)
-        ->
-            Maneuver lane_swerve: MLaneSwerveConfig(target_lid=1)
+            Condition sim_time: key=sim_time, repeat=False, tmin=3, tmax=5
+            Subtree lane_change_tree
+        Subtree drive_tree: MVelKeepConfig(), MStopConfig()
