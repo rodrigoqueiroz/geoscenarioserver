@@ -116,7 +116,8 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
         log.warn("Leading vehicle {} is on a different lane.".format(target_vid))
         return
 
-    # check if need to deccel to increase gap
+    # check if we need to deccel to increase gap, for the case when both vehicles
+    # have positive velocity.
     dist_between_vehicles = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - s_start[0] - VEHICLE_RADIUS
     ttc = dist_between_vehicles / abs(s_start[1]) if s_start[1] != 0 else float('inf')
     following_too_close = ttc < mconfig.time_gap
@@ -139,6 +140,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
             s_target[2] = acc_target
             s_target[1] = s_start[1] + acc_target * t
             s_target[0] = s_start[0] + s_start[1]*t + acc_target*t*t
+            # log.info("Following too closely. Chose target speed of {}".format(s_target[1]))
 
             # calculate exactly how long to decelerate for to achieve desired time gap
             # roots = np.roots([acc, s_start[1] - s_lv[1] + time_gap*acc, s_start[1] * time_gap])
@@ -153,6 +155,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
             # s_target[2] = (s_target[1] - s_start[1]) / t
         else:
             # match leading vehicle speed
+            # log.info("matching leading speed {}".format(s_lv[1]))
             s_target[0] = s_lv[0] - (time_gap * s_lv[1])
             s_target[1] = s_lv[1]
             s_target[2] = s_lv[2]

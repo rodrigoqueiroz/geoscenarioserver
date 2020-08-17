@@ -213,7 +213,7 @@ class MVelKeepConfig(MConfig):
 
 @dataclass
 class MReverseConfig(MConfig):
-    vel:MP = MP(7.0,10,6)           #velocity in [m/s] as MP
+    vel:MP = MP(5.0,10,6)           #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
     mkey:int = Maneuver.M_REVERSE
 

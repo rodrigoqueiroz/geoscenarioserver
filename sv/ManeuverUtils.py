@@ -60,7 +60,14 @@ def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=10, reve
     # A distance to goal with the same sign as direction means we've reached and passed it
     return direction * (goal_s - vehicle_state.s) < threshold
 
-def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5, distance_gap=5):
+def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=2, distance_gap=10, m_vk=MVelKeepConfig()):
+    """ Determines whether there is a vehicle in front of a given vehicle in the same lane and within a specified
+        time or distance gap.
+        @param time_gap:        The time gap below which a vehicle is considered to be following a leading vehicle.
+        @param distance_gap:    The distance at which a vehicle is considered to be following a leading vehicle,
+                                regardless of the time gap to the leading vehicle. This should be around the stopping
+                                distance of SVs.
+    """
     log.check_notnone(lane_config)
 
     is_following = False
@@ -72,11 +79,26 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
         dist = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
         if dist < 0:
             log.error("distance to leading vehicle zero!")
-        ttc = dist / abs(vehicle_state.s_vel) if vehicle_state.s_vel != 0 else float('inf')
+
+        # NEW: test for time gap assuming we are at velocity keeping speed
+        current_gap = dist / m_vk.vel.value
+
+        # Possible situations: us and leader going forward, leader reversing and us moving forward,
+        # us reversing and leader moving forward, or us and leader reversing. In the first case time to
+        # collision would be too long, so we use time to collision considering the leading vehicle to be
+        # stopped.
+        # delta_v = vehicle_state.s_vel - leading_vehicle.vehicle_state.s_vel
+        # time_to_collision = dist / delta_v if delta_v != 0 else float('inf')
+        # time_to_collision_without_leader = dist / vehicle_state.s_vel if vehicle_state.s_vel != 0 else float('inf')
+
+        # current_gap = float('inf')
+        # # Choose smaller positive time of the two.
+        # if time_to_collision > 0 or time_to_collision_without_leader > 0:
+        #     current_gap = min(filter(lambda t: t >= 0, [time_to_collision, time_to_collision_without_leader]))
 
         # if not moving, determine if too close.
-        if (0 < dist < distance_gap) or (0 <= ttc < time_gap):
-            # print("{} is leading by {}".format(leading_vehicle.vid, ttc))
+        if 0 <= current_gap < time_gap:
+            # print("{} is leading by {}".format(leading_vehicle.vid, current_gap))
             is_following = True
             leading_vid = leading_vehicle.vid
 
