@@ -42,19 +42,19 @@ class BTreeParser(object):
         ast = parser.behaviorTree()
         walker = ParseTreeWalker()
         walker.walk(self.BTreeListener(self.vid), ast)
-        
+
         # instantiate the parsed tree
-        path="./sv/btree/"
-        ff = open(path+"tmp"+str(self.vid)+".btree", 'r')
+        path = "./sv/btree/"
+        ff = open(path + "tmp" + str(self.vid) + ".btree", 'r')
         behavior_tree = ff.read()
-        print(behavior_tree)
+        # print(behavior_tree)
         try:
             exec(behavior_tree, globals()) #defines get_tree
             tree = get_tree(self, bmodel)
-        except:
+        except Exception:
             raise RuntimeError("Could not set behavior tree up.")
         ff.close()
-        os.remove(path+"tmp"+str(self.vid)+".btree")
+        os.remove(path + "tmp" + str(self.vid) + ".btree")
         #return getattr(self,root_btree_name)(bmodel)
         return tree
 
@@ -103,7 +103,6 @@ class BTreeParser(object):
 
         return sel_cutin_or_lane_swerve
 
-
     def reverse_tree(self, bmodel):
         m_reverse = ManeuverAction(bmodel, "m reverse", MReverseConfig())
         m_stop = ManeuverAction(bmodel,"m stop", MStopConfig())
@@ -121,9 +120,9 @@ class BTreeParser(object):
     class BTreeListener(BTreeDSLListener):
 
         def __init__(self, vid):
-            self.exec_stack=[]
+            self.exec_stack = []
             self.vid = vid
-        
+
         def genstr(self, i):
             # gen 10 word random string
             #j = ''.join(random.choice(string.ascii_letters) for x in range(10))
@@ -141,12 +140,12 @@ class BTreeParser(object):
             return s
 
         def map(self, symbol):
-            if symbol == "->" : return "Sequence" 
+            if symbol == "->" : return "Sequence"
             if symbol == "?"  : return "Selector"
             if symbol == "||" : return "Parallel"
-            
+
             raise RuntimeError("No symbol matched (" + symbol + ")")
-        
+
         def postProcessExecStack(self):
             self.sortExecStack()
             self.completeInsertSubtree()
@@ -156,28 +155,28 @@ class BTreeParser(object):
             for item in self.exec_stack:
                 if re.search("tree.insert_subtree",item):
                     aux.append(item)
-            
+
             for aux_item in aux:
                 self.exec_stack.remove(aux_item)
                 self.exec_stack.append(aux_item)
-        
+
         def completeInsertSubtree(self):
             aux = []
             del_list = []
             for item in self.exec_stack:
-                if re.search("~", item): 
+                if re.search("~", item):
                     aux2 = item[1:].split(",")
                     self.exec_stack.remove(item)
                     for itemm in self.exec_stack:
                         if re.search(aux2[0], itemm):
                             del_list.append(itemm)
-                            itemm=itemm.replace("[parent]", aux2[1])
+                            itemm = itemm.replace("[parent]", aux2[1])
                             itemm = itemm.replace("[pos]", aux2[2])
                             aux.append(itemm)
-            
+
             for del_item in del_list:
                 self.exec_stack.remove(del_item)
-            
+
             for aux_item in aux:
                 self.exec_stack.append(aux_item)
 
@@ -206,14 +205,14 @@ class BTreeParser(object):
             s = "root = " + var
             self.exec_stack.append(s)
 
-        def exitNodeComposition(self, ctx): 
+        def exitNodeComposition(self, ctx):
             nm = self.genstr(ctx.getText())
             op = self.map(ctx.OPERATOR().getText())
             var = op.lower()[:3] + "_" + nm
-            
+
             s =  var + " = composites." + op + "(\"" + var + "\")"
             self.exec_stack.append(s)
-            
+
             aux = []
             if hasattr(ctx.node(), '__iter__'):
                 pos=0
@@ -225,30 +224,30 @@ class BTreeParser(object):
                         elif node.leafNode().condition() != None:
                             aux.append(node.leafNode().condition().name().getText())
                         elif node.leafNode().subtree() != None:     self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+var+","+str(pos))
-                        
+
                     elif node.nodeComposition() != None:
                         aux.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText()))
                     pos += 1
-            else:    
+            else:
                 aux = "["+self.genstr(ctx.node().getText()) + "]"
 
             s = var + ".add_children(" + str(aux).replace("\'","") + ")"
             self.exec_stack.append(s)
-        
+
         # e.g. stop = ManeuverAction(bmodel, "stop", MStopConfig(time=2, dist=10, decel=3))
         def exitManeuver(self, ctx):
-            name=ctx.name().getText() 
+            name=ctx.name().getText()
             mconfig = ctx.mconfig().getText()
             s = name + " = " + "ManeuverAction(bmodel," + "\""+ name + "\""+"," + mconfig + ")"
             self.exec_stack.append(s)
 
         # e.g. endpoint = BCondition(bmodel,"endpoint", "lane_occupied", args)
-        def exitCondition(self, ctx): 
-            name=ctx.name().getText() 
+        def exitCondition(self, ctx):
+            name=ctx.name().getText()
             params = ""
             if hasattr(ctx.params(), '__iter__'):
                 for param in ctx.params(): params += param.getText()
-            else:    
+            else:
                 params = ctx.params().getText()
             key = ctx.key().name().getText()
             s = ctx.name().getText() + " = " + "BCondition(bmodel," + "\"" + name + "\"" + "," + "\"" + key + "\""
@@ -256,13 +255,13 @@ class BTreeParser(object):
             s += ")"
             self.exec_stack.append(s)
 
-        def exitSubtree(self, ctx): 
+        def exitSubtree(self, ctx):
             mconfigs = ""
             if hasattr(ctx.mconfig(), '__iter__'):
                 for conf in ctx.mconfig(): mconfigs += "," + conf.getText()
-            else:    
+            else:
                 mconfigs = ctx.mconfig().getText()
             s = "tree.insert_subtree(parser."+ctx.name().getText()+"(bmodel"
-            if mconfigs != "": s += mconfigs 
+            if mconfigs != "": s += mconfigs
             s += "), [parent].id, [pos])"
             self.exec_stack.append(s)
