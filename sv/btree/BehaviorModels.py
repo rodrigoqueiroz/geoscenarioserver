@@ -8,6 +8,7 @@ from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
 import sv.btree.BTreeParser as BTreeParser
 from sv.btree.BTreeLeaves import *
+from sv.btree.DrivePatientlyTree import *
 
 class BehaviorModels(object):
     ''''
@@ -33,11 +34,10 @@ class BehaviorModels(object):
         self.ref_path_changed = False
 
     def build(self):
-        parser = BTreeParser.BTreeParser()
-        root = parser.parse_tree(self, self.root_btree_name)
-
-        tree = trees.BehaviourTree(root=root)
-        #tree.setup(timeout=15) #?
+        
+        self.loaded_btree = open("scenarios/trees/"+self.root_btree_name+".btree",'r').read()
+        parser = BTreeParser.BTreeParser(self.vid)
+        tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)

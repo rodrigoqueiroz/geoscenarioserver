@@ -1,0 +1,27 @@
+# do not forget to insert this into the grammar
+NL: ('\r'? '\n' ' '*);
+
+#add after generating lexer and parser
+tokens { INDENT, DEDENT }
+
+@lexer::header{
+from antlr_denter.DenterHelper import DenterHelper
+from BTreeDSLParser import BTreeDSLParser
+}
+@lexer::members {
+class BTreeDSLDenter(DenterHelper):
+    def __init__(self, lexer, nl_token, indent_token, dedent_token, ignore_eof):
+        super().__init__(nl_token, indent_token, dedent_token, ignore_eof)
+        self.lexer: BTreeDSLLexer = lexer
+
+    def pull_token(self):
+        return super(BTreeDSLLexer, self.lexer).nextToken()
+
+denter = None
+
+def nextToken(self):
+    if not self.denter:
+        self.denter = self.BTreeDSLDenter(self, self.NL, BTreeDSLParser.INDENT, BTreeDSLParser.DEDENT, ignore_eof=True)
+    return self.denter.next_token()
+
+}
