@@ -36,9 +36,9 @@ node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'condition' name (':' key (',' params)*);
-maneuver            : 'maneuver' name ':' mconfig;
-subtree             : 'subtree' name (':' mconfig (',' mconfig)*)?;
+condition           : 'condition' name ('(' key (',' params)*) ')';
+maneuver            : 'maneuver' name '(' mconfig ')';
+subtree             : 'subtree' name '(' (mconfig (',' mconfig)*)? ')';
 
 mconfig             : name '(' params* ')';
 
