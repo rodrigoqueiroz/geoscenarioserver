@@ -1,9 +1,9 @@
 behaviortree ImpatientDriver:
     ?
         ->
-            condition endpoint(key=reached_goal)
+            condition endpoint(reached_goal())
             maneuver stopself(MStopConfig(time=2, distance=10, decel=3))
         ->
-            condition time(key=reached_gap, tmin=100, tmax=120)
+            condition time(reached_gap(tmin=100, tmax=120))
             subtree lane_change_tree()
         subtree drive_tree(MVelKeepConfig(), MStopConfig())

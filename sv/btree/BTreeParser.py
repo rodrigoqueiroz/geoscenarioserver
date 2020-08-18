@@ -280,15 +280,15 @@ class BTreeParser(object):
 
         # e.g. endpoint = BCondition(bmodel,"endpoint", "lane_occupied", args)
         def exitCondition(self, ctx): 
-            name=ctx.name().getText() 
-            params = ""
-            if hasattr(ctx.params(), '__iter__'):
-                for param in ctx.params(): params += param.getText()
+            name = ctx.name().getText() 
+            cconfig_name = ctx.cconfig().name().getText()
+            s = name + " = " + "BCondition(bmodel," + "\"" + cconfig_name + "\"" + "," + "\"" + name + "\""
+            cconfig_params = ""
+            if hasattr(ctx.cconfig().params(), '__iter__'):
+                for param in ctx.cconfig().params(): cconfig_params += "," + param.getText()
             else:    
-                params = ctx.params().getText()
-            key = ctx.key().name().getText()
-            s = ctx.name().getText() + " = " + "BCondition(bmodel," + "\"" + name + "\"" + "," + "\"" + key + "\""
-            if params != "": s = s + "," + params
+                cconfig_params = ctx.cconfig().params().getText()
+            if cconfig_params != "": s += cconfig_params
             s += ")"
             self.exec_stack.append(s)
 

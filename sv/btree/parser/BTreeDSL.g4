@@ -36,13 +36,13 @@ node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'condition' name ('(' key (',' params)*) ')';
+condition           : 'condition' name '(' cconfig ')';
 maneuver            : 'maneuver' name '(' mconfig ')';
 subtree             : 'subtree' name '(' (mconfig (',' mconfig)*)? ')';
 
 mconfig             : name '(' params* ')';
+cconfig             : name '(' params* ')';
 
-key                 : 'key' ATT name ;
 params              : bexpr (',' bexpr)* ;
 bexpr               : name (BOP|ATT) value ;
 value               : FLOAT | name | func;
