@@ -3,6 +3,7 @@
 
 from py_trees import *
 import functools
+import glog as log
 from sv.ManeuverConfig import *
 from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
@@ -34,7 +35,7 @@ class BehaviorModels(object):
         self.ref_path_changed = False
 
     def build(self):
-        
+
         self.loaded_btree = open("scenarios/trees/"+self.root_btree_name+".btree",'r').read()
         parser = BTreeParser.BTreeParser(self.vid)
         tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
@@ -86,9 +87,16 @@ class BehaviorModels(object):
             return lane_occupied
 
         elif condition == "should_cutin":
+            target_lane_id = kwargs['target_lane_id']
+            target_lane_config = self.planner_state.lane_config.get_neighbour(target_lane_id)
+            if not target_lane_config:
+                log.warn("No reachable {} lane for lane changing vehicle {}".format(
+                    "LEFT" if target_lane_id == 1 else "RIGHT",
+                    self.vid))
+
             return is_lane_occupied(
                 self.planner_state.vehicle_state,
-                self.planner_state.lane_config.get_neighbour(kwargs['target_lane_id']),
+                target_lane_config,
                 self.planner_state.traffic_vehicles
             )
 

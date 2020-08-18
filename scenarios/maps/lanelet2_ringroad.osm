@@ -12792,6 +12792,9 @@
     <nd ref='-6064' />
     <nd ref='-3050' />
     <tag k='elevation' v='298.0' />
+    <tag k='lane_change' v='yes' />
+    <tag k='subtype' v='solid' />
+    <tag k='type' v='line_thin' />
   </way>
   <way id='-6722' action='modify' visible='true'>
     <nd ref='-3050' />
@@ -12807,6 +12810,9 @@
     <nd ref='-4112' />
     <nd ref='-3062' />
     <tag k='elevation' v='298.0' />
+    <tag k='lane_change' v='yes' />
+    <tag k='subtype' v='solid' />
+    <tag k='type' v='line_thin' />
   </way>
   <way id='-6724' action='modify' visible='true'>
     <nd ref='-3064' />
@@ -15251,7 +15257,7 @@
     <tag k='name' v='parking_pre_exit_opposite' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-7286' action='modify' visible='true'>
+  <relation id='-7228' action='modify' visible='true'>
     <member type='way' ref='-6956' role='left' />
     <member type='way' ref='-6926' role='right' />
     <tag k='name' v='parking_end' />

@@ -49,6 +49,10 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('SIMULATION START')
     traffic.start()
     dashboard.start()
+
+    if WAIT_FOR_INPUT:
+        input("waiting for [ENTER]...")
+
     while sync_global.tick():
         if not dashboard._process.is_alive(): # might/might not be wanted
             break

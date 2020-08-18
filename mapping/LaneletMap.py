@@ -130,7 +130,7 @@ class LaneletMap(object):
 
         return ret
 
-    def get_global_path_for_route(self, lanelet_route, x = None, y = None, meters_after_end=50):
+    def get_global_path_for_route(self, lanelet_route, x=None, y=None, meters_after_end=50):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
             x, y only used to determine the starting lanelet, allowed to be a little outdated.
             Ideally we don't want to request for this very often - only when we generate a new trajectory.
@@ -144,7 +144,7 @@ class LaneletMap(object):
         # otherwise find the lanelet we are in in the shortest path
         cur_ll = lanelet_route.shortestPath()[0] if x is None or y is None \
             else self.get_occupying_lanelet_by_route(lanelet_route, x, y)
-        assert cur_ll
+        assert cur_ll, "Cannot get current lane from x={}, y={}".format(x, y)
 
         cur_lane = lanelet_route.fullLane(cur_ll)
         assert cur_lane

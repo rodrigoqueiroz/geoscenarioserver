@@ -132,7 +132,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
 
         # If leading vehicle is slower than some threshold velocity, our
         # target is to stop.
-        if s_lv[1] > 1.5:
+        if abs(s_lv[1]) > 1.5:
             if following_too_close:
                 # decelerate for t seconds to increase time gap
                 # s_target[2] = acc

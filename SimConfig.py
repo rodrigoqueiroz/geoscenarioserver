@@ -10,8 +10,9 @@ from dataclasses import dataclass, field
 from typing import Dict
 
 #Sim Config
-TIMEOUT = 30               #default timeout in [s] if not defined by scenario
-TRAFFIC_RATE = 30          #global tick rate
+TIMEOUT = 30                #default timeout in [s] if not defined by scenario
+TRAFFIC_RATE = 30           #global tick rate
+WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.

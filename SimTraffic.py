@@ -3,7 +3,7 @@
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED TRAFFIC - Coordinate all vehicle Simulation, Ego interface,
-# and ShM for shared state between vehicles (perception ground truth), 
+# and ShM for shared state between vehicles (perception ground truth),
 # dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
 # --------------------------------------------
 
@@ -11,6 +11,7 @@ from multiprocessing import shared_memory, Lock, Manager
 import threading
 import math
 import numpy as np
+import glog as log
 from shm.SimSharedMemory import *
 from TickSync import TickSync
 from sv.SV import *
@@ -29,11 +30,15 @@ class SimTraffic(object):
         #Internal ShM
         self.traffic_state_sharr = None
         self.debug_shdata = None
-    
+
     def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root = "drive_tree", start_state_in_frenet=False):
-        v = SV(vid, name, btree_root, start_state, 1.0, self.lanelet_map, lanelet_route, start_state_in_frenet=start_state_in_frenet)
+        try:
+            v = SV(vid, name, btree_root, start_state, 1.0, self.lanelet_map, lanelet_route, start_state_in_frenet=start_state_in_frenet)
+        except Exception as e:
+            log.error("Failed to initialize vehicle {}".format(vid))
+            raise e
         self.vehicles[vid] = v
-    
+
     def add_remote_vehicle(self, vid, name, start_state):
         v = Vehicle(vid, name=name, start_state=start_state, radius=1.0)
         v.is_remote = True
@@ -41,26 +46,26 @@ class SimTraffic(object):
 
     def start(self):
         nv = len(self.vehicles)
-        #Creates Shared Memory Blocks to publish all vehicles'state. 
+        #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
         self.write_traffic_state(0.0,0.0,0.0)
 
-        #Start SV Planners 
+        #Start SV Planners
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
             if not vehicle.is_remote:
                 vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr, self.debug_shdata)
-    
+
     def stop_all(self):
         for vid in self.vehicles:
             self.vehicles[vid].stop()
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
-        
+
         #Read Client
         vstates = self.sim_client_shm.read_client_state( nv )
-        
+
         #Update Dynamic Agents
         for vid in self.vehicles:
             if self.vehicles[vid].is_remote:
@@ -69,16 +74,16 @@ class SimTraffic(object):
                         self.vehicles[vid].vehicle_state = vstates[vid]
             #tick vehicle
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
-        
+
         #Update static elements (obstacles)
         #TODO
-        
+
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
 
         #print(self.debug_shdata)
-    
-    
+
+
     #Shared Memory:
 
     def create_traffic_state_shm(self):

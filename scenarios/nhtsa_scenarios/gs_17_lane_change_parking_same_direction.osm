@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='true' generator='JOSM'>
-  <node id='-7261' action='modify' visible='true' lat='43.46975723241' lon='-80.54309280195'>
+  <node id='-7387' action='modify' visible='true' lat='43.46975723241' lon='-80.54309280195'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
@@ -9,14 +9,14 @@
     <tag k='timeout' v='180' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-7263' action='modify' visible='true' lat='43.46971291534' lon='-80.54298906259'>
+  <node id='-7389' action='modify' visible='true' lat='43.46971291534' lon='-80.54298906259'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-7265' action='modify' visible='true' lat='43.46956124856' lon='-80.5440771879' />
-  <node id='-7267' action='modify' visible='true' lat='43.46989612307' lon='-80.5441742915' />
-  <node id='-7269' action='modify' visible='true' lat='43.468561827' lon='-80.54382349995' />
-  <node id='-7271' action='modify' visible='true' lat='43.46972983358' lon='-80.54409631883'>
+  <node id='-7391' action='modify' visible='true' lat='43.46956124856' lon='-80.5440771879' />
+  <node id='-7393' action='modify' visible='true' lat='43.46989612307' lon='-80.5441742915' />
+  <node id='-7395' action='modify' visible='true' lat='43.468561827' lon='-80.54382349995' />
+  <node id='-7397' action='modify' visible='true' lat='43.46970307516' lon='-80.54408812536'>
     <tag k='btree' v='drive_scenario_tree' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -24,7 +24,7 @@
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
   </node>
-  <node id='-7273' action='modify' visible='true' lat='43.46968673611' lon='-80.54412705991'>
+  <node id='-7399' action='modify' visible='true' lat='43.46965169708' lon='-80.54411257576'>
     <tag k='btree' v='leave_parking_scenario_tree' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -32,18 +32,18 @@
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-7275' action='modify' visible='true' lat='43.46964240607' lon='-80.54406364087' />
-  <node id='-7277' action='modify' visible='true' lat='43.46904011152' lon='-80.54391348252' />
-  <way id='-7279' action='modify' visible='true'>
-    <nd ref='-7265' />
-    <nd ref='-7277' />
+  <node id='-7401' action='modify' visible='true' lat='43.46964240607' lon='-80.54406364087' />
+  <node id='-7403' action='modify' visible='true' lat='43.46881165422' lon='-80.54387872055' />
+  <way id='-7405' action='modify' visible='true'>
+    <nd ref='-7391' />
+    <nd ref='-7403' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
   </way>
-  <way id='-7281' action='modify' visible='true'>
-    <nd ref='-7267' />
-    <nd ref='-7275' />
-    <nd ref='-7269' />
+  <way id='-7407' action='modify' visible='true'>
+    <nd ref='-7393' />
+    <nd ref='-7401' />
+    <nd ref='-7395' />
     <tag k='gs' v='route' />
     <tag k='name' v='ego_route' />
   </way>

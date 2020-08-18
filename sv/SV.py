@@ -81,7 +81,7 @@ class Vehicle(object):
 
 # A Simulated Vehicle
 class SV(Vehicle):
-    def __init__(self, vid, name, btree_root, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model = None):
+    def __init__(self, vid, name, btree_root, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model=None):
         #Map
         self.lanelet_map = lanelet_map
         # list of lanelet ids we want this vehicle to follow

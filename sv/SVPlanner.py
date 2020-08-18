@@ -112,9 +112,8 @@ class SVPlanner(object):
 
             # Get traffic and lane config in current frenet frame
             planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles)
-            if not planner_state.lane_config:
-                # No map data for current position
-                log.warn("no lane config")
+            if not planner_state:
+                log.warn("Invalid planner state, skipping planning step...")
                 continue
 
             #BTree Tick - using frenet state and lane config based on old ref path
@@ -129,8 +128,8 @@ class SVPlanner(object):
 
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
                 planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles)
-                if not planner_state.lane_config:
-                    log.warn("no lane config")
+                if not planner_state:
+                    log.warn("Invalid planner state, skipping planning step...")
                     continue
                 mconfig, _, snapshot_tree = self.btree_model.tick(planner_state)
 
@@ -176,6 +175,10 @@ class SVPlanner(object):
 
         # update lane config based on current (possibly outdated) reference frame
         lane_config = self.read_map(vehicle_state, self.reference_path)
+        if not lane_config:
+            # No map data for current position
+            log.warn("no lane config")
+            return None
 
         # transform other vehicles to frenet frame based on this vehicle
         for vid, vehicle in traffic_vehicles.items():

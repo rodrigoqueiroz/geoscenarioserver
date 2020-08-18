@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='true' generator='JOSM'>
   <node id='-8' action='modify' visible='true' lat='43.47539462673' lon='-80.53855767589' />
-  <node id='-12' action='modify' visible='true' lat='43.47490547327' lon='-80.53953552541'>
+  <node id='-10' action='modify' visible='true' lat='43.47490547327' lon='-80.53953552541'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_roads_around_campus.osm' />
@@ -10,14 +10,14 @@
     <tag k='timeout' v='180' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-14' action='modify' visible='true' lat='43.47484523897' lon='-80.53945035028'>
+  <node id='-12' action='modify' visible='true' lat='43.47484523897' lon='-80.53945035028'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-16' action='modify' visible='true' lat='43.47527286371' lon='-80.53863142266' />
-  <node id='-18' action='modify' visible='true' lat='43.47485844265' lon='-80.5383196966' />
-  <node id='-22' action='modify' visible='true' lat='43.4758167801' lon='-80.53903160151' />
-  <node id='-26' action='modify' visible='true' lat='43.47483212012' lon='-80.538292806'>
+  <node id='-14' action='modify' visible='true' lat='43.47527286371' lon='-80.53863142266' />
+  <node id='-16' action='modify' visible='true' lat='43.47485844265' lon='-80.5383196966' />
+  <node id='-18' action='modify' visible='true' lat='43.4758167801' lon='-80.53903160151' />
+  <node id='-20' action='modify' visible='true' lat='43.47483212012' lon='-80.538292806'>
     <tag k='btree' v='drive_scenario_tree' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -25,7 +25,7 @@
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
   </node>
-  <node id='-28' action='modify' visible='true' lat='43.47539252847' lon='-80.53856356266'>
+  <node id='-22' action='modify' visible='true' lat='43.47539252847' lon='-80.53856356266'>
     <tag k='btree' v='reverse_scenario_tree' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -33,15 +33,15 @@
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
   </node>
-  <way id='-30' action='modify' visible='true'>
-    <nd ref='-16' />
+  <way id='-26' action='modify' visible='true'>
+    <nd ref='-14' />
     <nd ref='-8' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
   </way>
-  <way id='-32' action='modify' visible='true'>
+  <way id='-28' action='modify' visible='true'>
+    <nd ref='-16' />
     <nd ref='-18' />
-    <nd ref='-22' />
     <tag k='gs' v='route' />
     <tag k='name' v='ego_route' />
   </way>
