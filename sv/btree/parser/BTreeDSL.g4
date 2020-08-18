@@ -29,16 +29,16 @@ def nextToken(self):
 /*
 * Parser Rules
 */
-behaviorTree        : ('BehaviorTree' name ':' INDENT rootNode NL? DEDENT?)+ EOF;
+behaviorTree        : ('behaviortree' name ':' INDENT rootNode NL? DEDENT?)+ EOF;
 
 rootNode            : node;
 node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'Condition' name (':' key (',' params)*);
-maneuver            : 'Maneuver' name ':' mconfig;
-subtree             : 'Subtree' name (':' mconfig (',' mconfig)*)?;
+condition           : 'condition' name (':' key (',' params)*);
+maneuver            : 'maneuver' name ':' mconfig;
+subtree             : 'subtree' name (':' mconfig (',' mconfig)*)?;
 
 mconfig             : name '(' params* ')';
 

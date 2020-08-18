@@ -34,14 +34,14 @@ def serializedATN():
         buf.write("#\3\2\2\2\5\60\3\2\2\2\7\62\3\2\2\2\t<\3\2\2\2\13>\3\2")
         buf.write("\2\2\rG\3\2\2\2\17O\3\2\2\2\21Q\3\2\2\2\23S\3\2\2\2\25")
         buf.write("\\\3\2\2\2\27g\3\2\2\2\31i\3\2\2\2\33l\3\2\2\2\35}\3\2")
-        buf.write("\2\2\37\u0081\3\2\2\2!\u0086\3\2\2\2#$\7D\2\2$%\7g\2\2")
+        buf.write("\2\2\37\u0081\3\2\2\2!\u0086\3\2\2\2#$\7d\2\2$%\7g\2\2")
         buf.write("%&\7j\2\2&\'\7c\2\2\'(\7x\2\2()\7k\2\2)*\7q\2\2*+\7t\2")
-        buf.write("\2+,\7V\2\2,-\7t\2\2-.\7g\2\2./\7g\2\2/\4\3\2\2\2\60\61")
-        buf.write("\7<\2\2\61\6\3\2\2\2\62\63\7E\2\2\63\64\7q\2\2\64\65\7")
+        buf.write("\2+,\7v\2\2,-\7t\2\2-.\7g\2\2./\7g\2\2/\4\3\2\2\2\60\61")
+        buf.write("\7<\2\2\61\6\3\2\2\2\62\63\7e\2\2\63\64\7q\2\2\64\65\7")
         buf.write("p\2\2\65\66\7f\2\2\66\67\7k\2\2\678\7v\2\289\7k\2\29:")
-        buf.write("\7q\2\2:;\7p\2\2;\b\3\2\2\2<=\7.\2\2=\n\3\2\2\2>?\7O\2")
+        buf.write("\7q\2\2:;\7p\2\2;\b\3\2\2\2<=\7.\2\2=\n\3\2\2\2>?\7o\2")
         buf.write("\2?@\7c\2\2@A\7p\2\2AB\7g\2\2BC\7w\2\2CD\7x\2\2DE\7g\2")
-        buf.write("\2EF\7t\2\2F\f\3\2\2\2GH\7U\2\2HI\7w\2\2IJ\7d\2\2JK\7")
+        buf.write("\2EF\7t\2\2F\f\3\2\2\2GH\7u\2\2HI\7w\2\2IJ\7d\2\2JK\7")
         buf.write("v\2\2KL\7t\2\2LM\7g\2\2MN\7g\2\2N\16\3\2\2\2OP\7*\2\2")
         buf.write("P\20\3\2\2\2QR\7+\2\2R\22\3\2\2\2ST\7m\2\2TU\7g\2\2UV")
         buf.write("\7{\2\2V\24\3\2\2\2W]\7A\2\2XY\7/\2\2Y]\7@\2\2Z[\7~\2")
@@ -92,8 +92,8 @@ class BTreeDSLLexer(Lexer):
     modeNames = [ "DEFAULT_MODE" ]
 
     literalNames = [ "<INVALID>",
-            "'BehaviorTree'", "':'", "'Condition'", "','", "'Maneuver'", 
-            "'Subtree'", "'('", "')'", "'key'", "'='" ]
+            "'behaviortree'", "':'", "'condition'", "','", "'maneuver'", 
+            "'subtree'", "'('", "')'", "'key'", "'='" ]
 
     symbolicNames = [ "<INVALID>",
             "OPERATOR", "BOP", "ATT", "FLOAT", "WORD", "WS", "NL" ]
@@ -106,7 +106,7 @@ class BTreeDSLLexer(Lexer):
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        #self.checkVersion("4.7.2")
+        self.checkVersion("4.7.2")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None

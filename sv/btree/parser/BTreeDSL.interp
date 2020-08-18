@@ -1,11 +1,11 @@
 token literal names:
 null
-'BehaviorTree'
+'behaviortree'
 ':'
-'Condition'
+'condition'
 ','
-'Maneuver'
-'Subtree'
+'maneuver'
+'subtree'
 '('
 ')'
 'key'

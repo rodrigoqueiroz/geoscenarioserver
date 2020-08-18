@@ -1,7 +1,7 @@
-BehaviorTree LaneChange:
+behaviortree LaneChange:
     ?
         ->
-            Condition should_cutin: key=should_cutin, target_lane_id=1
-            Maneuver cutin: MCutInConfig(target_lid=1)
+            condition should_cutin: key=should_cutin, target_lane_id=1
+            maneuver cutin: MCutInConfig(target_lid=1)
         ->
-            Maneuver lane_swerve: MLaneSwerveConfig(target_lid=1)
+            maneuver lane_swerve: MLaneSwerveConfig(target_lid=1)
