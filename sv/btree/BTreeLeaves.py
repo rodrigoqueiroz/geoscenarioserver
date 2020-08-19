@@ -51,6 +51,7 @@ class ManeuverAction(behaviour.Behaviour):
         self.maneuver_completed = False
 
     def reconfigure(self, new_mconfig):
+        print("new config: "+ str(new_mconfig))
         self.mconfig = new_mconfig
         
     def update(self):

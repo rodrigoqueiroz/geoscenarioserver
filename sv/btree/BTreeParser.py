@@ -73,17 +73,17 @@ class BTreeParser(object):
         except:
             raise RuntimeError("Failed to set " + sbtree_name + " subtree up.")
         
-        #if args[0] != '' :
-        #    for arg in args: 
-        #        m_id = arg.split("=",1)[0]
-        #        m_config = arg.split("=",1)[1]
-        #        reconfigured=False
-        #        for node in nodes:
-        #            if node.name == m_id:
-        #                node.reconfigure(node.reconfigure(eval(m_config)))
-        #                reconfigured=True
-        #                break
-        #        if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + sbtree_name)
+        if args[0] != '' :
+            for arg in args: 
+                m_id = arg.split("=",1)[0]
+                m_config = arg.split("=",1)[1]
+                reconfigured=False
+                for node in nodes:
+                    if node.name == m_id:
+                        node.reconfigure(eval(m_config))
+                        reconfigured=True
+                        break
+                if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + sbtree_name)
 
         return subtree
 
@@ -311,7 +311,7 @@ class BTreeParser(object):
         def exitCondition(self, ctx): 
             name = ctx.name().getText() 
             cconfig_name = ctx.cconfig().name().getText()
-            s = name + " = " + "BCondition(bmodel," + "\"" + cconfig_name + "\"" + "," + "\"" + name + "\""
+            s = name + " = " + "BCondition(bmodel," + "\"" + name + "\"" + "," + "\"" + cconfig_name + "\""
             cconfig_params = ""
             if hasattr(ctx.cconfig().params(), '__iter__'):
                 for param in ctx.cconfig().params(): cconfig_params += "," + param.getText()
