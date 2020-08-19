@@ -115,6 +115,7 @@ class SV(Vehicle):
         self.d_eq = None
         self.d_vel_eq = None
         self.d_acc_eq = None
+        self.reversing = False
 
     # def future_state(self, t):
     #     """ Predicts a new state based on time
@@ -207,6 +208,10 @@ class SV(Vehicle):
             self.vehicle_state.y = y_vector[0]
             self.vehicle_state.y_vel = y_vector[1]
             self.vehicle_state.y_acc = y_vector[2]
+            heading = np.array([y_vector[1], x_vector[1]])
+            if self.reversing:
+                heading *= -1
+            self.vehicle_state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
             #sanity check
             #if ( self.vehicle_state.x < self.last_x) :
             #    diff = self.vehicle_state.x - self.last_x
@@ -255,6 +260,8 @@ class SV(Vehicle):
         self.d_vel_eq = to_equation(d_vel_coef)
         d_acc_coef = differentiate(d_vel_coef)
         self.d_acc_eq = to_equation(d_acc_coef)
+
+        self.reversing = plan.reversing
 
         #Correct trajectory progress based
         #on diff planning time and now

@@ -85,7 +85,7 @@ class SVPlanner(object):
         #if (plan.t == 0): #if not valid
         #    return None
         if (self.motion_plan): #if same as current
-            if (np.array_equal(self.motion_plan.get_plan_vector(),plan.get_plan_vector())):
+            if (np.array_equal(self.motion_plan.get_plan_vector(), plan.get_plan_vector())):
                 return None
         #Valid and New:
         self.motion_plan = plan
@@ -149,7 +149,7 @@ class SVPlanner(object):
                 if traj is None:
                     log.warn("plan_maneuver return invalid trajectory.")
                 else:
-                    self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed)
+                    self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed, mconfig.mkey == Maneuver.M_REVERSE)
             else:
                 traj, cand = None, None
 
@@ -256,13 +256,14 @@ class SVPlanner(object):
         traffic_state_sharr.release() #<=========RELEASE
         return header_vector, my_vehicle_state, vehicles
 
-    def write_motion_plan(self, mplan_sharr, traj, cand, state_time, new_frenet_frame):
+    def write_motion_plan(self, mplan_sharr, traj, cand, state_time, new_frenet_frame, reversing):
         if not traj:
             return
         plan = MotionPlan()
         plan.set_trajectory(traj[0], traj[1], traj[2])
         plan.t_start = state_time
         plan.new_frenet_frame = new_frenet_frame
+        plan.reversing = reversing
 
         #write motion plan
         mplan_sharr.acquire() #<=========LOCK

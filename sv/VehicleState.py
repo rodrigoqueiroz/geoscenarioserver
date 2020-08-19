@@ -37,14 +37,14 @@ class VehicleState:
 
     #For easy shared memory parsing
     def get_state_vector(self):
-        arr =  [self.x, self.y,  self.z, 
+        arr =  [self.x, self.y,  self.z,
                 self.x_vel, self.y_vel,
-                self.x_acc, self.y_acc, 
-                self.yaw, 
+                self.x_acc, self.y_acc,
+                self.yaw,
                 self.steer
                 ]
         return arr
-    
+
     def get_frenet_state_vector(self):
         return [
             self.s, self.d,
@@ -59,38 +59,39 @@ class VehicleState:
 
     def get_X(self):
         return [self.x,self.x_vel,self.x_acc]
-    
+
     def get_Y(self):
         return [self.y,self.y_vel,self.y_acc]
-        
+
     def set_X(self, X):
         self.x, self.x_vel, self.x_acc = X
 
     def set_Y(self, Y):
         self.y, self.y_vel, self.y_acc = Y
-    
+
     def get_S(self):
         return [self.s, self.s_vel, self.s_acc]
 
     def set_S(self, S):
         self.s, self.s_vel, self.s_acc = S
-    
+
     def get_D(self):
         return [self.d, self.d_vel, self.d_acc]
-    
+
     def set_D(self, D):
         self.d, self.d_vel, self.d_acc = D
-    
-    
+
+
 
 @dataclass
 class MotionPlan:
-    VECTORSIZE = 14
+    VECTORSIZE = 15
     s_coef:tuple = tuple([0.0,0.0,0.0,0.0,0.0])     #5 coef
     d_coef:tuple = tuple([0.0,0.0,0.0,0.0,0.0,0.0]) #6 coef
     t:float = 0                                     #duration
     t_start:float = 0                               #start time [s]
     new_frenet_frame = False
+    reversing = False
     #Boundaries in Frenet Frame
     #s_start:tuple = [0.0,0.0,0.0]     #start state in s
     #d_start:tuple = [0.0,0.0,0.0]     #start state in d
@@ -102,10 +103,10 @@ class MotionPlan:
         return ([self.s_coef, self.d_coef,self.t])
 
     def set_trajectory(self, s_coef, d_coef, t):
-        self.s_coef = s_coef 
+        self.s_coef = s_coef
         self.d_coef = d_coef
         self.t = t
-        
+
     #For easy shared memory parsing
     def set_plan_vector(self,P):
         self.s_coef = P[0:5]
@@ -113,12 +114,14 @@ class MotionPlan:
         self.t = P[11]
         self.t_start = P[12]
         self.new_frenet_frame = P[13]
-    
+        self.reversing = P[14]
+
     def get_plan_vector(self):
         return np.concatenate([
-            self.s_coef, 
+            self.s_coef,
             self.d_coef,
             np.asarray([self.t]),
             np.asarray([self.t_start]),
-            np.asarray([self.new_frenet_frame])
-            ])
+            np.asarray([self.new_frenet_frame]),
+            np.asarray([self.reversing])
+        ])
