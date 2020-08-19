@@ -6,7 +6,7 @@ import functools
 from sv.ManeuverConfig import *
 from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
-import sv.btree.BTreeParser as BTreeParser
+from sv.btree.BTreeParser import *
 from sv.btree.BTreeLeaves import *
 
 class BehaviorModels(object):
@@ -34,9 +34,8 @@ class BehaviorModels(object):
 
     def build(self):
         
-        self.loaded_btree = open("scenarios/trees/"+self.root_btree_name+".btree",'r').read()
-        parser = BTreeParser.BTreeParser(self.vid)
-        tree = parser.parse_tree(bmodel=self, btree_name=self.root_btree_name, textual_model=self.loaded_btree)
+        parser = BTreeParser(self.vid, bmodel=self)
+        tree = parser.parse_tree(tree_name=self.root_btree_name)
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)
