@@ -1,0 +1,6 @@
+behaviortree lane_change_tree:
+    ?
+        ->
+            condition c_should_cutin( should_cutin(target_lane_id=1) )
+            maneuver m_cutin( MCutInConfig(target_lid=1) )
+        maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=1) )

@@ -31,38 +31,59 @@ import os
     must be handled with a specialized tree (create and modify)
 '''
 
+#class FindNode(VisitorBase):
+#    def __init__(self, nodename):
+#        super(Visitor, self).__init__(full=True)
+#    def run(self, behaviour):
+#        if behaviour.name:
+#            behaviour.logger.debug("%s.run() [%s][%s]" % (self.__class__.__name__, behaviour.feedback_message, behaviour.status))
+#        else:
+#            behaviour.logger.debug("%s.run() [%s]" % (self.__class__.__name__, behaviour.status))
+
+class Subtree(object):
+    def __init__(self, name="", args="", parent="", pos=0):
+        self.name = name 
+        self.args = args
+        self.parent = parent 
+        self.pos = pos
+
 class BTreeParser(object):
     def __init__(self, vid):
         self.vid = vid
+    def load_subtree(self, sbtree_name, bmodel, args):
+        args = args.split(";")
 
-    def load_subtree(self, sbtree_name, **kwargs):
-        #sbtree_path = "./scenarios/trees/"
-        #try:
-        #    s_ff = open(sbtree_path + sbtree_name + ".btree",'r')
-        #except:
-        #    raise RuntimeError("Subtree \'"+ sbtree_name +"\' was not found in the list of available subtrees.")
-        #s_to_parse = s_ff.read()
-        #s_ff.close()
-        #s_lexer = BTreeDSLLexer(InputStream(s_to_parse))
-        #s_parser = BTreeDSLParser(CommonTokenStream(s_lexer))
-        #s_ast = s_parser.behaviorTree()
-        #s_walker = ParseTreeWalker()
-        #s_walker.walk(self.BTreeListener(self.vid, sbtree_name), s_ast)
-#
-        #path="./sv/btree/"
-        #s_fff = open(path+"tmp"+str(self.vid)+sbtree_name+".btree", 'r')
-        #subtree = s_fff.read()
-        #try:
-        #    exec(subtree, globals()) #defines get_tree
-        #    subtree = get_tree(self, bmodel)
-        #except:
-        #    raise RuntimeError("Failed to set " + sbtree_name + " subtree up.")
-        #s_fff.close()
-
-        #update node config based on **kwargs
-        #parser.load_subtree(drive_tree, bmodel,  MVelKeepConfig(), MStopConfig())
-
-        print("Ready to load substreee")
+        sbtree_path = "./scenarios/trees/"
+        try:
+            s_ff = open(sbtree_path + sbtree_name + ".btree",'r')
+        except:
+            raise RuntimeError("Subtree \'"+ sbtree_name +"\' was not found in the list of available subtrees.")
+        s_to_parse = s_ff.read()
+        s_ff.close()
+        s_lexer = BTreeDSLLexer(InputStream(s_to_parse))
+        s_parser = BTreeDSLParser(CommonTokenStream(s_lexer))
+        s_listener = self.BTreeListener(self.vid, sbtree_name)
+        s_ast = s_parser.behaviorTree()
+        ParseTreeWalker().walk(s_listener, s_ast)
+        stree_str = s_listener.getTreeStr()
+        
+        try:
+            exec(stree_str, globals())
+            subtree, nodes = getTreeInstance(self, bmodel)
+        except:
+            raise RuntimeError("Failed to set " + sbtree_name + " subtree up.")
+        
+        #if args[0] != '' :
+        #    for arg in args: 
+        #        m_id = arg.split("=",1)[0]
+        #        m_config = arg.split("=",1)[1]
+        #        reconfigured=False
+        #        for node in nodes:
+        #            if node.name == m_id:
+        #                node.reconfigure(node.reconfigure(eval(m_config)))
+        #                reconfigured=True
+        #                break
+        #        if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + sbtree_name)
 
         return subtree
 
@@ -73,14 +94,25 @@ class BTreeParser(object):
         listener = self.BTreeListener(self.vid, btree_name)
         ParseTreeWalker().walk(listener, ast)
         tree_str = listener.getTreeStr()
-        print(tree_str)
+        subtrees = listener.getSubtrees()
 
         try:
             exec(tree_str, globals())
-            tree = getTreeInstance(self, bmodel)
+            root,nodes = getTreeInstance(self, bmodel)
         except:
             raise RuntimeError("Could not set behavior tree up.")
         
+        tree = trees.BehaviourTree(root=root)
+        for subtree in subtrees:
+            parent = None
+            for node in nodes:
+                if node.name == subtree.parent: 
+                    parent = node
+                    break
+            if parent == None: raise RuntimeError("Parent "+ subtree.parent +" not found.")
+            stree_to_append = self.load_subtree(subtree.name, bmodel, subtree.args)
+            tree.insert_subtree(stree_to_append, parent.id, int(subtree.pos))
+
         return tree
 
     #REUSABLE TREES
@@ -156,6 +188,8 @@ class BTreeParser(object):
             self.vid = vid
             self.name = name
             self.tree = ""
+            self.subtrees = []
+            self.nodes = "["
         
         def genstr(self, i):
             # gen 10 word random string
@@ -181,8 +215,7 @@ class BTreeParser(object):
             raise RuntimeError("No symbol matched (" + symbol + ")")
         
         def postProcessExecStack(self):
-            self.sortExecStack()
-            self.completeInsertSubtree()
+            self.fixSubtreeParentPosition()
 
         def sortExecStack(self):
             aux = []
@@ -194,39 +227,35 @@ class BTreeParser(object):
                 self.exec_stack.remove(aux_item)
                 self.exec_stack.append(aux_item)
         
-        def completeInsertSubtree(self):
+        def fixSubtreeParentPosition(self):
             aux = []
-            del_list = []
-            for item in self.exec_stack:
+            for item in self.exec_stack: # for every auxiliary line starting with ~
                 if re.search("~", item): 
-                    aux2 = item[1:].split(",")
-                    self.exec_stack.remove(item)
-                    for itemm in self.exec_stack:
-                        if re.search(aux2[0], itemm):
-                            del_list.append(itemm)
-                            itemm=itemm.replace("[parent]", aux2[1])
-                            itemm = itemm.replace("[pos]", aux2[2])
-                            aux.append(itemm)
+                    aux = item[1:].split(",")
+                    self.exec_stack.remove(item) #remove auxiliary line from stack
+                    for subtree in self.subtrees:
+                        if subtree.name == aux[0]:
+                            subtree.parent = aux[1]
+                            subtree.pos = aux[2]
+        
+        def getSubtrees(self):
+            return self.subtrees
             
-            for del_item in del_list:
-                self.exec_stack.remove(del_item)
-            
-            for aux_item in aux:
-                self.exec_stack.append(aux_item)
-
         def getTreeStr(self):
-            #print(self.tree)
-            #exec(self.tree, globals())
             return self.tree
         
         def build_tree(self):
             self.tree += "def getTreeInstance(parser, bmodel):\n"
             for cmd in self.exec_stack: self.tree +=  "    " + cmd + "\n"
-            self.tree += "    return tree"
+            self.tree += "    nodes = " 
+            if len(self.nodes) > 1:  self.tree += self.nodes[:-1] + "]\n"
+            else : self.tree += "[]\n"
+            self.tree += "    return root, nodes"
+            #print(self.tree)
 
         def exitBehaviorTree(self, ctx):
-            s = "tree = trees.BehaviourTree(root=root)"
-            self.exec_stack.append(s)
+            #s = "tree = trees.BehaviourTree(root=root)"
+            #self.exec_stack.append(s)
 
             self.postProcessExecStack()
             self.build_tree()
@@ -243,9 +272,9 @@ class BTreeParser(object):
         def exitNodeComposition(self, ctx): 
             nm = self.genstr(ctx.getText())
             op = self.map(ctx.OPERATOR().getText())
-            var = op.lower()[:3] + "_" + nm
+            name = op.lower()[:3] + "_" + nm
             
-            s =  var + " = composites." + op + "(\"" + var + "\")"
+            s =  name + " = composites." + op + "(\"" + name + "\")"
             self.exec_stack.append(s)
             
             aux = []
@@ -258,7 +287,7 @@ class BTreeParser(object):
                             aux.append(node.leafNode().maneuver().name().getText())
                         elif node.leafNode().condition() != None:
                             aux.append(node.leafNode().condition().name().getText())
-                        elif node.leafNode().subtree() != None:     self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+var+","+str(pos))
+                        elif node.leafNode().subtree() != None:     self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+name+","+str(pos))
                         
                     elif node.nodeComposition() != None:
                         aux.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText()))
@@ -266,8 +295,9 @@ class BTreeParser(object):
             else:    
                 aux = "["+self.genstr(ctx.node().getText()) + "]"
 
-            s = var + ".add_children(" + str(aux).replace("\'","") + ")"
+            s = name + ".add_children(" + str(aux).replace("\'","") + ")"
             self.exec_stack.append(s)
+            self.nodes += name + ","
         
         # e.g. stop = ManeuverAction(bmodel, "stop", MStopConfig(time=2, dist=10, decel=3))
         def exitManeuver(self, ctx):
@@ -275,6 +305,7 @@ class BTreeParser(object):
             mconfig = ctx.mconfig().getText()
             s = name + " = " + "ManeuverAction(bmodel," + "\""+ name + "\""+"," + mconfig + ")"
             self.exec_stack.append(s)
+            self.nodes += name + ","
 
         # e.g. endpoint = BCondition(bmodel,"endpoint", "lane_occupied", args)
         def exitCondition(self, ctx): 
@@ -289,15 +320,17 @@ class BTreeParser(object):
             if cconfig_params != "": s += cconfig_params
             s += ")"
             self.exec_stack.append(s)
+            self.nodes += name + ","
+        
         # e.g. tree.insert_subtree(parser.load_subtree(drive_tree, bmodel,  MVelKeepConfig(), MStopConfig()), [parent].id, [pos]))
         def exitSubtree(self, ctx): 
+            name = ctx.name().getText()
             midconfs = ""
             if hasattr(ctx.midconf(), '__iter__'):
-                for idconf in ctx.midconf(): midconfs += ", " + idconf.getText()
+                for idconf in ctx.midconf(): midconfs += idconf.getText() + ";"
+                midconfs = midconfs[:-1] #remove the last ;
             else:    
                 midconfs = ctx.midconf().getText()
             
-            s = "tree.insert_subtree(parser.load_subtree(\""+ctx.name().getText()+"\", bmodel"
-            if midconfs != "": s += midconfs 
-            s += "), [parent].id, [pos])"
-            self.exec_stack.append(s)
+            stree = Subtree(name=name, args=midconfs)
+            self.subtrees.append(stree)

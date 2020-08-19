@@ -50,6 +50,9 @@ class ManeuverAction(behaviour.Behaviour):
         # eg. vel keep and follow
         self.maneuver_completed = False
 
+    def reconfigure(self, new_mconfig):
+        self.mconfig = new_mconfig
+        
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
             If the maneuver is indefinite (e.g. velocity keeping), it returns SUCCESS.

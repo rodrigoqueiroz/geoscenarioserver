@@ -1,13 +1,13 @@
 behaviortree drive_tree:
     ?
-        -> seq_reached_goal
-            condition goal ( reached_goal(lat=20.9784, long=50.7534) )
-            maneuver stop ( MStopConfig() )
-        -> seq_busy_lane
+        ->
+            condition goal ( reached_goal() )
+            maneuver stop_reached_goal ( MStopConfig() )
+        ->
             condition clc( lane_occupied() )
             ?
-                -> seq_lv_stop
+                -> 
                     condition c_lv_stop( lv_stopped() )
-                    maneuver stop ( MStopConfig(time=2) )
-                maneuver follow_lane( MFollowConfig() )   
-        maneuver keep_velocity( MVelKeepConfig(vel=16.0) )
+                    maneuver stops ( MStopConfig() )
+                maneuver follow( MFollowConfig() )   
+        maneuver keep_velocity( MVelKeepConfig(vel=MP(16.0,10,6)) )
