@@ -21,7 +21,7 @@ def main():
 
             tree = parser.behaviorTree()
             walker = ParseTreeWalker()
-            walker.walk(BTreeParser.BTreeListener(1), tree)
+            walker.walk(BTreeParser.BTreeListener(vid=1,name="a"), tree)
         except:
             RuntimeError("Failed at "+ scenario)
         finally:

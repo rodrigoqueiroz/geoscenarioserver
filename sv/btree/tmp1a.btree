@@ -1,0 +1,13 @@
+def get_tree(parser,bmodel):
+    ask_cutin = BCondition(bmodel,"should_cutin","ask_cutin",target_lane_id=1)
+    cutin = ManeuverAction(bmodel,"cutin",MCutInConfig(target_lid=1))
+    seq_tuti = composites.Sequence("seq_tuti")
+    seq_tuti.add_children([ask_cutin, cutin])
+    lane_swerve = ManeuverAction(bmodel,"lane_swerve",MLaneSwerveConfig(target_lid=1))
+    seq_rri = composites.Sequence("seq_rri")
+    seq_rri.add_children([lane_swerve])
+    sel_teni = composites.Selector("sel_teni")
+    sel_teni.add_children([seq_tuti, seq_rri])
+    root = sel_teni
+    tree = trees.BehaviourTree(root=root)
+    return tree

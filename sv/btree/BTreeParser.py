@@ -35,26 +35,57 @@ class BTreeParser(object):
     def __init__(self, vid):
         self.vid = vid
 
+    def load_subtree(self, sbtree_name, **kwargs):
+        sbtree_path = "./scenarios/trees/"
+        try:
+            s_ff = open(sbtree_path + sbtree_name + ".btree",'r')
+        except:
+            raise RuntimeError("Subtree \'"+ sbtree_name +"\' was not found in the list of available subtrees.")
+        s_to_parse = s_ff.read()
+        s_ff.close()
+        s_lexer = BTreeDSLLexer(InputStream(s_to_parse))
+        s_parser = BTreeDSLParser(CommonTokenStream(s_lexer))
+        s_ast = s_parser.behaviorTree()
+        s_walker = ParseTreeWalker()
+        s_walker.walk(self.BTreeListener(self.vid, sbtree_name), s_ast)
+
+        path="./sv/btree/"
+        s_fff = open(path+"tmp"+str(self.vid)+sbtree_name+".btree", 'r')
+        subtree = s_fff.read()
+        try:
+            exec(subtree, globals()) #defines get_tree
+            subtree = get_tree(self, bmodel)
+        except:
+            raise RuntimeError("Failed to set " + sbtree_name + " subtree up.")
+        s_fff.close()
+
+        #update node config based on **kwargs
+        #parser.load_subtree(drive_tree, bmodel,  MVelKeepConfig(), MStopConfig())
+
+        return subtree
+
     def parse_tree(self, bmodel, btree_name, textual_model):
         lexer = BTreeDSLLexer(InputStream(textual_model))
         parser = BTreeDSLParser(CommonTokenStream(lexer))
-
         ast = parser.behaviorTree()
         walker = ParseTreeWalker()
-        walker.walk(self.BTreeListener(self.vid), ast)
+        walker.walk(self.BTreeListener(self.vid, btree_name), ast)
         
         # instantiate the parsed tree
         path="./sv/btree/"
-        ff = open(path+"tmp"+str(self.vid)+".btree", 'r')
+        files_to_remove = ["tmp"+str(self.vid)+btree_name+".btree"] 
+        ff = open(path+"tmp"+str(self.vid)+btree_name+".btree", 'r')
         behavior_tree = ff.read()
-        print(behavior_tree)
+        #print(behavior_tree)
         try:
             exec(behavior_tree, globals()) #defines get_tree
             tree = get_tree(self, bmodel)
         except:
             raise RuntimeError("Could not set behavior tree up.")
         ff.close()
-        os.remove(path+"tmp"+str(self.vid)+".btree")
+
+        for tmpfile in files_to_remove:
+            os.remove(path+tmpfile)
         #return getattr(self,root_btree_name)(bmodel)
         return tree
 
@@ -156,9 +187,10 @@ class BTreeParser(object):
 
     class BTreeListener(BTreeDSLListener):
 
-        def __init__(self, vid):
+        def __init__(self, vid, name):
             self.exec_stack=[]
             self.vid = vid
+            self.name = name
         
         def genstr(self, i):
             # gen 10 word random string
@@ -219,7 +251,7 @@ class BTreeParser(object):
 
         def build_tree(self):
             path="./sv/btree/"
-            of = open(path+'tmp'+str(self.vid)+".btree",'w')
+            of = open(path+'tmp'+str(self.vid)+self.name+".btree",'w')
             of.write("def get_tree(parser,bmodel):\n")
             for item in self.exec_stack:
                 of.write("    "+item+"\n")
@@ -291,14 +323,14 @@ class BTreeParser(object):
             if cconfig_params != "": s += cconfig_params
             s += ")"
             self.exec_stack.append(s)
-
+        # e.g. tree.insert_subtree(parser.load_subtree(drive_tree, bmodel,  MVelKeepConfig(), MStopConfig()), [parent].id, [pos]))
         def exitSubtree(self, ctx): 
             mconfigs = ""
             if hasattr(ctx.mconfig(), '__iter__'):
-                for conf in ctx.mconfig(): mconfigs += "," + conf.getText()
+                for conf in ctx.mconfig(): mconfigs += ", " + conf.getText()
             else:    
                 mconfigs = ctx.mconfig().getText()
-            s = "tree.insert_subtree(parser."+ctx.name().getText()+"(bmodel"
+            s = "tree.insert_subtree(parser.load_subtree("+ctx.name().getText()+", bmodel"
             if mconfigs != "": s += mconfigs 
             s += "), [parent].id, [pos])"
             self.exec_stack.append(s)
