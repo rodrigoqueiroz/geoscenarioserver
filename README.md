@@ -9,6 +9,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - scipy
 - python3-tk
 - python3-sysv-ipc
+- antlr4-python3-runtime
 - [py_trees](https://github.com/splintered-reality/py_trees)
 
 
