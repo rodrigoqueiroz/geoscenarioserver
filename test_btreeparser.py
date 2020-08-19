@@ -21,10 +21,10 @@ def main():
             tree = parser.behaviorTree()
             listener = BTreeParser.BTreeListener(vid=1,name="a")
             ParseTreeWalker().walk(listener, tree)
-            tree = listener.getTreeInstance("")
-            assert(not(tree is None))
+            tree = listener.getTreeStr()
+            print(tree)
         except:
-            RuntimeError("Failed at "+ scenario)
+            raise RuntimeError("Failed at "+ scenario)
         finally:
             print("Scenario " + scenario + " passed!")
     return

@@ -38,10 +38,13 @@ leafNode            : (maneuver | condition | subtree) NL;
 
 condition           : 'condition' name '(' cconfig ')';
 maneuver            : 'maneuver' name '(' mconfig ')';
-subtree             : 'subtree' name '(' (mconfig (',' mconfig)*)? ')';
+subtree             : 'subtree' name '(' (midconf (',' midconf)*)? ')';
+midconf             : mid '=' mconfig;
+
 
 mconfig             : name '(' params* ')';
 cconfig             : name '(' params* ')';
+mid                 : name;
 
 params              : bexpr (',' bexpr)* ;
 bexpr               : name (BOP|ATT) value ;

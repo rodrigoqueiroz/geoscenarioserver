@@ -291,12 +291,13 @@ class BTreeParser(object):
             self.exec_stack.append(s)
         # e.g. tree.insert_subtree(parser.load_subtree(drive_tree, bmodel,  MVelKeepConfig(), MStopConfig()), [parent].id, [pos]))
         def exitSubtree(self, ctx): 
-            mconfigs = ""
-            if hasattr(ctx.mconfig(), '__iter__'):
-                for conf in ctx.mconfig(): mconfigs += ", " + conf.getText()
+            midconfs = ""
+            if hasattr(ctx.midconf(), '__iter__'):
+                for idconf in ctx.midconf(): midconfs += ", " + idconf.getText()
             else:    
-                mconfigs = ctx.mconfig().getText()
+                midconfs = ctx.midconf().getText()
+            
             s = "tree.insert_subtree(parser.load_subtree(\""+ctx.name().getText()+"\", bmodel"
-            if mconfigs != "": s += mconfigs 
+            if midconfs != "": s += midconfs 
             s += "), [parent].id, [pos])"
             self.exec_stack.append(s)
