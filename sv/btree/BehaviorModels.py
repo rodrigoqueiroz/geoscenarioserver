@@ -8,7 +8,6 @@ from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
 import sv.btree.BTreeParser as BTreeParser
 from sv.btree.BTreeLeaves import *
-from sv.btree.DrivePatientlyTree import *
 
 class BehaviorModels(object):
     ''''
