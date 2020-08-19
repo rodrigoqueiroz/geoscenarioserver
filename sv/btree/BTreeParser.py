@@ -36,31 +36,33 @@ class BTreeParser(object):
         self.vid = vid
 
     def load_subtree(self, sbtree_name, **kwargs):
-        sbtree_path = "./scenarios/trees/"
-        try:
-            s_ff = open(sbtree_path + sbtree_name + ".btree",'r')
-        except:
-            raise RuntimeError("Subtree \'"+ sbtree_name +"\' was not found in the list of available subtrees.")
-        s_to_parse = s_ff.read()
-        s_ff.close()
-        s_lexer = BTreeDSLLexer(InputStream(s_to_parse))
-        s_parser = BTreeDSLParser(CommonTokenStream(s_lexer))
-        s_ast = s_parser.behaviorTree()
-        s_walker = ParseTreeWalker()
-        s_walker.walk(self.BTreeListener(self.vid, sbtree_name), s_ast)
-
-        path="./sv/btree/"
-        s_fff = open(path+"tmp"+str(self.vid)+sbtree_name+".btree", 'r')
-        subtree = s_fff.read()
-        try:
-            exec(subtree, globals()) #defines get_tree
-            subtree = get_tree(self, bmodel)
-        except:
-            raise RuntimeError("Failed to set " + sbtree_name + " subtree up.")
-        s_fff.close()
+        #sbtree_path = "./scenarios/trees/"
+        #try:
+        #    s_ff = open(sbtree_path + sbtree_name + ".btree",'r')
+        #except:
+        #    raise RuntimeError("Subtree \'"+ sbtree_name +"\' was not found in the list of available subtrees.")
+        #s_to_parse = s_ff.read()
+        #s_ff.close()
+        #s_lexer = BTreeDSLLexer(InputStream(s_to_parse))
+        #s_parser = BTreeDSLParser(CommonTokenStream(s_lexer))
+        #s_ast = s_parser.behaviorTree()
+        #s_walker = ParseTreeWalker()
+        #s_walker.walk(self.BTreeListener(self.vid, sbtree_name), s_ast)
+#
+        #path="./sv/btree/"
+        #s_fff = open(path+"tmp"+str(self.vid)+sbtree_name+".btree", 'r')
+        #subtree = s_fff.read()
+        #try:
+        #    exec(subtree, globals()) #defines get_tree
+        #    subtree = get_tree(self, bmodel)
+        #except:
+        #    raise RuntimeError("Failed to set " + sbtree_name + " subtree up.")
+        #s_fff.close()
 
         #update node config based on **kwargs
         #parser.load_subtree(drive_tree, bmodel,  MVelKeepConfig(), MStopConfig())
+
+        print("Ready to load substreee")
 
         return subtree
 
@@ -68,25 +70,17 @@ class BTreeParser(object):
         lexer = BTreeDSLLexer(InputStream(textual_model))
         parser = BTreeDSLParser(CommonTokenStream(lexer))
         ast = parser.behaviorTree()
-        walker = ParseTreeWalker()
-        walker.walk(self.BTreeListener(self.vid, btree_name), ast)
-        
-        # instantiate the parsed tree
-        path="./sv/btree/"
-        files_to_remove = ["tmp"+str(self.vid)+btree_name+".btree"] 
-        ff = open(path+"tmp"+str(self.vid)+btree_name+".btree", 'r')
-        behavior_tree = ff.read()
-        #print(behavior_tree)
+        listener = self.BTreeListener(self.vid, btree_name)
+        ParseTreeWalker().walk(listener, ast)
+        tree_str = listener.getTreeStr()
+        print(tree_str)
+
         try:
-            exec(behavior_tree, globals()) #defines get_tree
-            tree = get_tree(self, bmodel)
+            exec(tree_str, globals())
+            tree = getTreeInstance(self, bmodel)
         except:
             raise RuntimeError("Could not set behavior tree up.")
-        ff.close()
-
-        for tmpfile in files_to_remove:
-            os.remove(path+tmpfile)
-        #return getattr(self,root_btree_name)(bmodel)
+        
         return tree
 
     #REUSABLE TREES
@@ -155,42 +149,13 @@ class BTreeParser(object):
     def reverse_tree(self):
         pass
 
-    # SCENARIO SPECIFIC TREES
-
-    #def drive_scenario_tree(self, bmodel):
-    #    #standard driving is 14m/s
-    #    root = self.drive_tree(bmodel)
-    #    return root
-
-    #def lane_change_scenario_tree(self, bmodel):
-    #    # subtrees
-    #    st_lane_change_tree = self.lane_change_tree(bmodel)
-    #    st_drive_tree = self.drive_tree(bmodel)
-    #    # conditions
-    #    # parameters to condition predicate should be passed some other way
-    #    c_sim_time = BCondition(bmodel, "c sim time > 3?", "sim_time", repeat=False, tmin=3, tmax=float('inf'))
-
-    #    seq_lane_change = composites.Sequence("seq do lane change")
-    #    seq_lane_change.add_children([c_sim_time, st_lane_change_tree])
-
-    #    sel_lane_change_or_drive = composites.Selector("sel do lane change or drive")
-    #    sel_lane_change_or_drive.add_children([seq_lane_change, st_drive_tree])
-
-    #    return sel_lane_change_or_drive
-
-    #def fast_driver_scenario_tree(self,bmodel):
-    #    #faster driver (e.g., 16/m/s)
-    #    mvk_config = MVelKeepConfig(vel = MP(16.0))
-    #    root = drive_tree(bmodel,mvk_config=mvk_config)
-
-    #    return root
-
     class BTreeListener(BTreeDSLListener):
 
         def __init__(self, vid, name):
             self.exec_stack=[]
             self.vid = vid
             self.name = name
+            self.tree = ""
         
         def genstr(self, i):
             # gen 10 word random string
@@ -249,14 +214,15 @@ class BTreeParser(object):
             for aux_item in aux:
                 self.exec_stack.append(aux_item)
 
+        def getTreeStr(self):
+            #print(self.tree)
+            #exec(self.tree, globals())
+            return self.tree
+        
         def build_tree(self):
-            path="./sv/btree/"
-            of = open(path+'tmp'+str(self.vid)+self.name+".btree",'w')
-            of.write("def get_tree(parser,bmodel):\n")
-            for item in self.exec_stack:
-                of.write("    "+item+"\n")
-            of.write("    return tree")
-            of.close()
+            self.tree += "def getTreeInstance(parser, bmodel):\n"
+            for cmd in self.exec_stack: self.tree +=  "    " + cmd + "\n"
+            self.tree += "    return tree"
 
         def exitBehaviorTree(self, ctx):
             s = "tree = trees.BehaviourTree(root=root)"
@@ -330,7 +296,7 @@ class BTreeParser(object):
                 for conf in ctx.mconfig(): mconfigs += ", " + conf.getText()
             else:    
                 mconfigs = ctx.mconfig().getText()
-            s = "tree.insert_subtree(parser.load_subtree("+ctx.name().getText()+", bmodel"
+            s = "tree.insert_subtree(parser.load_subtree(\""+ctx.name().getText()+"\", bmodel"
             if mconfigs != "": s += mconfigs 
             s += "), [parent].id, [pos])"
             self.exec_stack.append(s)

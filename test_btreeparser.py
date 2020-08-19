@@ -18,10 +18,11 @@ def main():
             src = in_file.read()
             lexer = BTreeDSLLexer(InputStream(src))
             parser = BTreeDSLParser(CommonTokenStream(lexer))
-
             tree = parser.behaviorTree()
-            walker = ParseTreeWalker()
-            walker.walk(BTreeParser.BTreeListener(vid=1,name="a"), tree)
+            listener = BTreeParser.BTreeListener(vid=1,name="a")
+            ParseTreeWalker().walk(listener, tree)
+            tree = listener.getTreeInstance("")
+            assert(not(tree is None))
         except:
             RuntimeError("Failed at "+ scenario)
         finally:
