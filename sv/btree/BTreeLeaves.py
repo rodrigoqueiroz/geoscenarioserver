@@ -86,6 +86,9 @@ class ManeuverAction(behaviour.Behaviour):
                 )
                 self.mconfig.target_vid = target_vehicle.vid
 
+        elif self.mconfig.mkey == Maneuver.M_STOP_AT:
+            self.mconfig.stop_pos = self.bmodel.planner_state.goal_point_frenet[0]
+
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(

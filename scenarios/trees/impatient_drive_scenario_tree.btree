@@ -6,4 +6,4 @@ BehaviorTree ImpatientDriver:
         ->
             Condition time: key=reached_gap, tmin=100, tmax=120
             Subtree lane_change_tree
-        Subtree drive_tree: MVelKeepConfig(), MStopConfig()
+        Subtree drive_tree

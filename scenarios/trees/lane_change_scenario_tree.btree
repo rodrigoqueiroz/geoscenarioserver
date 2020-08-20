@@ -3,4 +3,4 @@ BehaviorTree LaneChange:
         ->
             Condition sim_time: key=sim_time, repeat=False, tmin=3, tmax=100
             Subtree lane_change_tree
-        Subtree drive_tree: MVelKeepConfig(), MStopConfig()
+        Subtree drive_tree

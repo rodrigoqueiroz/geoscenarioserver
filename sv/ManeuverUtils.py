@@ -51,7 +51,7 @@ def can_perform_lane_change():
 #def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
 #    return False if not goal_point else goal_point[0] - vehicle_state.s < threshold
 
-def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=10, reverse=False):
+def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=20, reverse=False):
     """ Checks if the vehicle has reached or passed the goal point in the frenet frame.
         @param frenet_goal_point:  Arraylike (s,d) goal position in the vehicle's frenet frame
     """

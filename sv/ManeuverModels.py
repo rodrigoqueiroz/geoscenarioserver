@@ -24,6 +24,8 @@ def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_v
         planner = plan_reversing
     elif (man_key == Maneuver.M_STOP):
         planner = plan_stop
+    elif (man_key == Maneuver.M_STOP_AT):
+        planner = plan_stop_at
     elif (man_key == Maneuver.M_FOLLOW):
         planner = plan_following
     elif (man_key == Maneuver.M_LANESWERVE):
@@ -279,41 +281,40 @@ def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return best,list(trajectories)
 
-def plan_stop_at(start_state, mconfig, lane_config, target_pos, vehicles=None, obstacles=None):
+def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
-    #print ('PLAN STOP')
-    if (start_state[0] >= target_pos):
-        print('Stop target position is too close: {}'.format(target_pos - start_state[0]))
-        return None,None
+    log.info('PLAN STOP AT')
+
+    target_pos = mconfig.stop_pos
     #start
     s_start = start_state[:3]
-    d_start = start_state[3:]
-    #time
-    min_t = man_config.time_range[0]
-    max_t = man_config.time_range[1]
-    t_step = PLAN_TIME_STEP
-    #distance
+
+    if start_state[0] >= target_pos:
+        log.warn('Stop target position is too close: {}'.format(target_pos - start_state[0]))
+        return None, None
+
+    if (abs(s_start[1]) <= 0.05):
+        # (s_coef, d_coef, t)
+        return ([ np.array([start_state[0], 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), mconfig.time.value ]), None
 
     #targets
-    target_set = []
+    target_state_set = []
     #generates alternative targets
-    for t in np.arange(min_t, max_t+t_step, t_step):
+    for t in mconfig.time.get_samples():
         #longitudinal movement: goal is to reach vel and acc 0
-        #for si in np.arange(min_s, max_s+s_step, s_step):
-            #s_pos = s_start[0] + si
-            s_target = [target_pos,0,0] #target vel and acc is 0
-            #lateral movement
-            for di in lane_config.get_samples():
-                d_target = [di,0,0]
-                #add target
-                target_set.append((s_target,d_target,t))
+        s_target = [target_pos, 0, 0]
+        #lateral movement
+        for di in lane_config.get_samples():
+            d_target = [di, 0, 0]
+            #add target
+            target_state_set.append((s_target, d_target, t))
 
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
-    return best,list(trajectories)
+    return best, list(trajectories)
 
 
 #===TRAJECTORY OPTIMIZATION ===

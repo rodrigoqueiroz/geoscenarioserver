@@ -59,7 +59,7 @@ class BTreeParser(object):
         return tree
 
     #REUSABLE TREES
-    def drive_tree(self, bmodel, mvk_config=MVelKeepConfig(), mstop_config=MStopConfig()):
+    def drive_tree(self, bmodel, mvk_config=MVelKeepConfig(), mstop_config=MStopAtConfig()):
         #Drive SubTree
         #maneuvers
         m_vk = ManeuverAction(bmodel,"m vel keep", mvk_config)

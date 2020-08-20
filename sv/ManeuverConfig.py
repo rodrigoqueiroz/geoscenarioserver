@@ -18,7 +18,8 @@ class Maneuver(Enum):
     M_LANESWERVE = 3
     M_CUTIN = 4
     M_STOP = 5
-    M_REVERSE = 6
+    M_STOP_AT = 6
+    M_REVERSE = 7
 
 class SamplingMethod(Enum):
     LINEAR = 1     #linear space
@@ -231,9 +232,9 @@ class MStopConfig(MConfig):
 @dataclass
 class MStopAtConfig(MConfig):
     #target
+    time:MP = MP(3.0,10,6)          #[s]
     stop_pos:float = 0              #pos in s [m]
-    distance:float = 10             #[m]
-    mkey:int = Maneuver.M_STOP
+    mkey:int = Maneuver.M_STOP_AT
 
 @dataclass
 class MFollowConfig(MConfig):
