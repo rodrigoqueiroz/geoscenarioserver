@@ -190,6 +190,17 @@ void AGSClient::CreateVehicle(int vid, int remote)
 		//sv->manager = this;
 		//sv->id = vid;
 		gsv.actor = (AActor*) sv;
+
+
+		// add the tag to server vehicles
+		FString GSVehicle = "gsvehicle";
+		FName GSTag = FName(*GSVehicle);
+		gsv.actor->Tags.Add(GSTag);
+
+		// add the tag to publish bbox
+		FString PubBbox = "Bbox:1";
+		FName BboxTag = FName(*PubBbox);
+		gsv.actor->Tags.Add(BboxTag);
 	}
 	//check if success
 	if (gsv.actor != nullptr)

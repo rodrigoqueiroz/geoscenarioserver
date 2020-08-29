@@ -16,6 +16,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	UStaticMeshComponent *Mesh;
+
 public:	
 	ASimVehicle();
 	virtual void Tick(float DeltaTime) override;
