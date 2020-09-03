@@ -1,0 +1,6 @@
+behaviortree reverse_tree:
+    ?
+        ->
+            condition goal ( reached_goal(reverse=True) )
+            maneuver stop_reached_goal ( MStopConfig() )
+        maneuver m_reverse( MReverseConfig() )

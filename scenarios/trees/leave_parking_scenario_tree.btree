@@ -1,6 +1,6 @@
-BehaviorTree LeavingParkScenarioTree:
+behaviortree LeavingParkScenarioTree:
     ?
         ->
-            Condition sim_time: key=sim_time, repeat=False, tmin=0.1, tmax=100
-            Subtree lane_change_tree
-        Subtree drive_tree
+            condition time ( sim_time(repeat=False, tmin=0.1, tmax=100))
+            subtree lane_change_tree
+        subtree drive_tree

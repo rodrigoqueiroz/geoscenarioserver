@@ -1,5 +1,5 @@
-BehaviorTree ReverseScenarioTree:
+behaviortree ReverseScenarioTree:
     ->
-        Subtree reverse_tree
+        subtree reverse_tree
             
         
