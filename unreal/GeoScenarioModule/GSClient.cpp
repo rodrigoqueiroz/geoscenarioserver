@@ -118,9 +118,6 @@ void AGSClient::ReadServerState(float deltaTime)
 	int server_tick_count;
 	int vid;
 	iss >> server_tick_count >> server_delta_time;
-	server_framestat.tick_count = server_tick_count;
-	server_framestat.delta_time = server_delta_time;
-	//UE_LOG(GeoScenarioModule, Log, TEXT("SHM [ tick = %d server_delta_time = %.3f"), server_tick_count, server_delta_time);
 	
 	// parse vehicles
 	while (iss >> vid)
@@ -134,14 +131,15 @@ void AGSClient::ReadServerState(float deltaTime)
 		GSVehicle* gsvptr = vehicles.Find(vid);
 		if (!gsvptr)
 		{
+			UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
+			UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
 			CreateVehicle(vid, remote); 
 			//debug
-			UE_LOG(GeoScenarioModule, Warning, TEXT("Full ISS"));
-			UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			continue;
 		}
 		//
+		gsvptr = vehicles.Find(vid);
 		if (gsvptr && remote == 0)
 		{
 			if (server_framestat.tick_count == server_tick_count) 
@@ -160,10 +158,14 @@ void AGSClient::ReadServerState(float deltaTime)
 				gsvptr->vehicle_state.y_vel = y_vel;
 				gsvptr->vehicle_state.steer = steer;
 			}
-			FVector loc = FVector(gsvptr->vehicle_state.x, gsvptr->vehicle_state.y, GetActorLocation()[2]);
+			FVector loc = FVector(gsvptr->vehicle_state.x, gsvptr->vehicle_state.y, gsvptr->actor->GetActorLocation()[2]);
 			gsvptr->actor->SetActorLocation(loc);
 		}
 	}
+	//Update Server Tick
+	server_framestat.tick_count = server_tick_count;
+	server_framestat.delta_time = server_delta_time;
+	//UE_LOG(GeoScenarioModule, Log, TEXT("SHM [ tick = %d server_delta_time = %.3f"), server_tick_count, server_delta_time);
 }
 
 void AGSClient::CreateVehicle(int vid, int remote)
@@ -172,6 +174,7 @@ void AGSClient::CreateVehicle(int vid, int remote)
 	GSVehicle gsv = GSVehicle();
 	gsv.vid = vid;
 	gsv.remote = remote;
+	gsv.vehicle_state =  VehicleState();
 	if (remote == 1) 
 	{
 		//Find actor with tag
@@ -187,6 +190,17 @@ void AGSClient::CreateVehicle(int vid, int remote)
 		//sv->manager = this;
 		//sv->id = vid;
 		gsv.actor = (AActor*) sv;
+
+
+		// add the tag to server vehicles
+		FString GSVehicle = "gsvehicle";
+		FName GSTag = FName(*GSVehicle);
+		gsv.actor->Tags.Add(GSTag);
+
+		// add the tag to publish bbox
+		FString PubBbox = "Bbox:1";
+		FName BboxTag = FName(*PubBbox);
+		gsv.actor->Tags.Add(BboxTag);
 	}
 	//check if success
 	if (gsv.actor != nullptr)
@@ -262,4 +276,3 @@ void AGSClient::WriteClientState()
 		return;
 	}
 }
-
