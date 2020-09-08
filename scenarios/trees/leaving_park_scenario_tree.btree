@@ -1,0 +1,3 @@
+behaviortree LeavingParkScenarioTree:
+    ->
+        lane_change_scenario_tree: seconds_before_lane_change=1
