@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-105023' action='modify' visible='true' lat='43.47042031759' lon='-80.53846575569'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-105024' action='modify' visible='true' lat='43.47053220456' lon='-80.53841658957' />
+  <node id='-105025' action='modify' visible='true' lat='43.47138192482' lon='-80.53920660755' />
+  <node id='-105031' action='modify' visible='true' lat='43.47170608541' lon='-80.53903660368'>
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-105032' action='modify' visible='true' lat='43.47179075394' lon='-80.53903327027'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Stop line Scenario' />
+    <tag k='timeout' v='60' />
+    <tag k='version' v='2.0' />
+  </node>
+  <way id='-101991' action='modify' visible='true'>
+    <nd ref='-105024' />
+    <nd ref='-105025' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+</osm>
