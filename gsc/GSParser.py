@@ -35,7 +35,7 @@ class GSParser(object):
         self.nodes = {}
         self.ways = []
         self.filename = ''
-        
+
         self.pedestrians = {}
         self.vehicles = {}
         self.staticobjects = {}
@@ -51,7 +51,7 @@ class GSParser(object):
         self.paths = {}
         self.routes = {}
 
-        self.report = Report() 
+        self.report = Report()
 
     def load_geoscenario_file(self, filepath):
         xml_root = xml.etree.ElementTree.parse(filepath).getroot()
@@ -78,28 +78,28 @@ class GSParser(object):
         self.filename = filepath
         #Process Nodes
         for nid, node in self.nodes.items():
-            if "gs" in node.tags: 
+            if "gs" in node.tags:
                 #physical elements
                 if node.tags["gs"] == "staticobject": self.check_static_object(node)  #also way / closedway
                 elif node.tags["gs"] == "pedestrian": self.check_pedestrian(node)
                 elif node.tags["gs"] == "vehicle": self.check_vehicle(node)
                 elif node.tags["gs"] == "trafficlight": self.check_traffic_light(node)
-                #logic elements   
+                #logic elements
                 elif node.tags["gs"] == "origin": self.check_origin(node)
                 elif node.tags["gs"] == "egostart": self.check_ego_start(node)
-                elif node.tags["gs"] == "egogoal": self.check_ego_goal(node) 
+                elif node.tags["gs"] == "egogoal": self.check_ego_goal(node)
                 elif node.tags["gs"] == "location": self.check_location(node) #also way / closedway
                 elif node.tags["gs"] == "metric": self.check_metric(node)
                 elif node.tags["gs"] == "globalconfig": self.check_global_config(node)
-                elif node.tags["gs"] == "trigger": self.check_trigger(node)      
+                elif node.tags["gs"] == "trigger": self.check_trigger(node)
         #Process Ways
         for way in self.ways:
             if "gs" in way.tags:
-                if way.tags["gs"] == "staticobject": self.check_static_object(way)  
-                elif way.tags["gs"] == "location": self.check_location(way) 
-                elif way.tags["gs"] == "path": self.check_path(way) 
-                elif way.tags["gs"] == "route": self.check_route(way) 
-        
+                if way.tags["gs"] == "staticobject": self.check_static_object(way)
+                elif way.tags["gs"] == "location": self.check_location(way)
+                elif way.tags["gs"] == "path": self.check_path(way)
+                elif way.tags["gs"] == "route": self.check_route(way)
+
         #Return result
         return self.isValid
 
@@ -119,13 +119,13 @@ class GSParser(object):
             cart_pt = projector.forward(GPSPoint(node.lat, node.lon, 0.0))
             node.x = cart_pt.x
             node.y = cart_pt.y
-        
+
     def check_static_object(self, n):  # node /  way / area
         mandatory = {"gs","name","area"}
         optional = {"model","height","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.staticobjects[n.tags["name"]] = n
 
     def check_pedestrian(self, n):
@@ -133,7 +133,7 @@ class GSParser(object):
         optional = {"orientation","speed","path","cycles","usespeedprofile","start","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.pedestrians[n.tags["name"]] = n
 
     def check_vehicle(self, n):
@@ -159,7 +159,7 @@ class GSParser(object):
                             self.report.log_error("Element "+n.id +". Invalid speed list " + str(speed_list))
                     else:
                         self.report.log_error("Invalid speed value")
-        
+
         self.vehicles[n.tags["vid"]] = n
 
     def check_traffic_light(self, n):
@@ -167,7 +167,7 @@ class GSParser(object):
         optional = {"duration","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.tlights[n.tags["name"]] = n
          #assert duration match states
 
@@ -180,7 +180,7 @@ class GSParser(object):
         assert len(n.nodes) > 0
         self.paths[n.tags['name']] = n
         return None
-    
+
     def check_route(self, n:Way): #:Way
         mandatory = {"gs","name"}
         optional = {}
@@ -206,9 +206,9 @@ class GSParser(object):
         optional = {"reference","agents", "group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.metrics[n.tags["name"]] = n
-    
+
     def check_ego_start(self, n):
         mandatory = {"gs"}
         optional = {"orientation"}
@@ -216,13 +216,13 @@ class GSParser(object):
         if self.origin is not None:
             self.report.log_error( "Element " + n.id + ": Duplicate Egostart node. Must be unique")
         self.egostart = n;
-        
+
     def check_ego_goal(self, n):
         mandatory = {"gs","name"}
         optional = {"order"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.egogoals[n.tags["name"]] = n
         #todo #assertorder
         #for goal in egogoals:
@@ -232,9 +232,9 @@ class GSParser(object):
         optional = {"continuous","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.locations[n.tags["name"]] = n
-    
+
     def check_global_config(self, n):
         mandatory = {"gs","version","name","lanelet","timeout",}
         optional = {"collision","notes","metric","mutate","optimize","optmetric","plotvid",}
@@ -249,13 +249,13 @@ class GSParser(object):
         "aspeedprofile","alocation","apath","astate" ,"astart","afail","asuccess","delay","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.triggers[n.tags["name"]] = n
 
         #assert owner exist
         #assert target exist
         #assert target can take action
-		
+
 
    #== Aux
 
@@ -264,7 +264,7 @@ class GSParser(object):
         expected_set = set.union(mandatory_set,optional_set)
         tags_list = n.tags.keys()
         actual_set = set(tags_list)
-        
+
         #duplicates
         if ( len(tags_list) != len(actual_set)):
             self.report.log_error("Element {} contains duplicate tags: {}".format(
@@ -290,7 +290,7 @@ class GSParser(object):
 
     def check_uniquename(self,n):
         name = n.tags['name']
-        
+
         self.is_unique_name(n,self.staticobjects)
         self.is_unique_name(n,self.vehicles)
         self.is_unique_name(n,self.pedestrians)

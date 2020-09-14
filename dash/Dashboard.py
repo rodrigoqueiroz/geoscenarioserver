@@ -30,7 +30,7 @@ class Dashboard(object):
 
     def __init__(self, traffic, center_vid):
         self.traffic = traffic
-        self.center_vid = center_vid
+        self.center_vid = int(center_vid)
         self.window = None
 
     def start(self):

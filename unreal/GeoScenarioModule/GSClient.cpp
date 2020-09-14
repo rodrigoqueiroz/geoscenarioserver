@@ -127,7 +127,13 @@ void AGSClient::ReadServerState(float deltaTime)
 		int remote;
 		float x, y, z, yaw, x_vel, y_vel, steer;
 		iss >> remote >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
-		//
+		// Unreal's y axis is inverted from GS server's.
+		y *= -1;
+		y_vel *= -1;
+		yaw -= 90;
+	    // GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
+
+
 		GSVehicle* gsvptr = vehicles.Find(vid);
 		if (!gsvptr)
 		{
@@ -138,7 +144,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			//debug
 			continue;
 		}
-		//
+
 		gsvptr = vehicles.Find(vid);
 		if (gsvptr && remote == 0)
 		{
@@ -148,7 +154,8 @@ void AGSClient::ReadServerState(float deltaTime)
 				//Predict new state based on Unreal tick time
 				gsvptr->vehicle_state.x  = gsvptr->vehicle_state.x + (gsvptr->vehicle_state.x_vel * deltaTime);
 				gsvptr->vehicle_state.y  = gsvptr->vehicle_state.y + (gsvptr->vehicle_state.y_vel * deltaTime);
-			} else 
+			}
+			else 
 			{
 				gsvptr->vehicle_state.x = x;
 				gsvptr->vehicle_state.y = y;
@@ -160,6 +167,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			}
 			FVector loc = FVector(gsvptr->vehicle_state.x, gsvptr->vehicle_state.y, gsvptr->actor->GetActorLocation()[2]);
 			gsvptr->actor->SetActorLocation(loc);
+			gsvptr->actor->SetActorRotation(FRotator(0.0f, yaw, 0.0f));
 		}
 	}
 	//Update Server Tick
@@ -190,7 +198,6 @@ void AGSClient::CreateVehicle(int vid, int remote)
 		//sv->manager = this;
 		//sv->id = vid;
 		gsv.actor = (AActor*) sv;
-
 
 		// add the tag to server vehicles
 		FString GSVehicle = "gsvehicle";

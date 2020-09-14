@@ -20,7 +20,7 @@
     <tag k='timeout' v='180' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-7324' action='modify' visible='true' lat='43.47296204793' lon='-80.5417356693'>
+  <node id='-7324' action='modify' visible='true' lat='43.4681668322' lon='-80.5436763174'>
     <tag k='gs' v='origin' />
   </node>
   <node id='-7326' action='modify' visible='true' lat='43.47439847793' lon='-80.54246962216' />
