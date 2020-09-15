@@ -33,12 +33,12 @@ class Dashboard(object):
         self.center_vid = int(center_vid)
         self.window = None
 
-    def start(self):
+    def start(self, show_dashboard):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
         """
-        if (not SHOW_DASHBOARD):
+        if (not show_dashboard):
             print("Dashboard will not start")
             return
 

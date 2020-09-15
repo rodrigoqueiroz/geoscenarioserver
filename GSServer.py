@@ -48,13 +48,14 @@ def start_server(args, m=MVelKeepConfig()):
     #SIM EXECUTION START
     log.info('SIMULATION START')
     traffic.start()
-    dashboard.start()
+    show_dashboard = SHOW_DASHBOARD and not args.no_dash
+    dashboard.start(show_dashboard)
 
     if WAIT_FOR_INPUT:
         input("waiting for [ENTER]...")
 
     while sync_global.tick():
-        if not dashboard._process.is_alive(): # might/might not be wanted
+        if show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
             break
         try:
             #Update Traffic
@@ -149,5 +150,6 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
+    parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     args = parser.parse_args()
     start_server(args)
