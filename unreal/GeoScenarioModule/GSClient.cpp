@@ -115,13 +115,16 @@ void AGSClient::ReadServerState(float deltaTime)
 	}
 	//parse frame stats
 	float server_delta_time;
-	int server_tick_count;
-	int vid;
-	iss >> server_tick_count >> server_delta_time;
+	int server_tick_count, nvehicles, vid;
+	iss >> server_tick_count >> server_delta_time >> nvehicles;
 	
 	// parse vehicles
-	while (iss >> vid)
+	int vehicles_read = 0;
+	while (vehicles_read < nvehicles)
 	{
+		iss >> vid;
+		vehicles_read++;
+
 		if (vid==0) {continue;} //garbage at the end of string
 
 		int remote;

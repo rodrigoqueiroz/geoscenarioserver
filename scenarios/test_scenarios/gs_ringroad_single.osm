@@ -30,9 +30,29 @@
   <node id='-26' action='modify' visible='true' lat='43.46854916542' lon='-80.54011130815' />
   <node id='-28' action='modify' visible='true' lat='43.47047751797' lon='-80.53844581797' />
   <node id='-30' action='modify' visible='true' lat='43.47174229558' lon='-80.53978963051' />
-  <node id='-62' action='modify' visible='true' lat='43.47224013878' lon='-80.54050308508' />
-  <way id='-64' action='modify' visible='true'>
-    <nd ref='-62' />
+  <node id='-32' action='modify' visible='true' lat='43.47224013878' lon='-80.54050308508' />
+  <node id='-7264' action='modify' visible='true' lat='43.47115708063' lon='-80.54554978193'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='3' />
+  </node>
+  <node id='-7267' action='modify' visible='true' lat='43.46963437487' lon='-80.54399654963'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='cw_route' />
+    <tag k='vid' v='5' />
+  </node>
+  <node id='-7286' action='modify' visible='true' lat='43.47481354478' lon='-80.54302267368' />
+  <node id='-7287' action='modify' visible='true' lat='43.4728910456' lon='-80.54801085063' />
+  <node id='-7288' action='modify' visible='true' lat='43.46652766411' lon='-80.54222635556' />
+  <node id='-7290' action='modify' visible='true' lat='43.47058077293' lon='-80.53846150885' />
+  <way id='-34' action='modify' visible='true'>
+    <nd ref='-32' />
     <nd ref='-10' />
     <nd ref='-12' />
     <nd ref='-14' />
@@ -44,5 +64,13 @@
     <nd ref='-30' />
     <tag k='gs' v='route' />
     <tag k='name' v='north_route' />
+  </way>
+  <way id='-7281' action='modify' visible='true'>
+    <nd ref='-7290' />
+    <nd ref='-7288' />
+    <nd ref='-7287' />
+    <nd ref='-7286' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='cw_route' />
   </way>
 </osm>
