@@ -124,6 +124,10 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     parser.project_nodes(projector)
     lanelet_map.load_lanelet_map(map_file, projector)
 
+    # add remote ego
+    if parser.egostart is not None:
+        sim_traffic.add_remote_vehicle(99, 'Ego', [0.0,0.0,0.0, 0.0,0.0,0.0])
+
     # populate traffic and lanelet routes from file
     for vid, vnode in parser.vehicles.items():
         simvid = int(vid)

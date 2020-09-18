@@ -259,6 +259,7 @@ void AGSClient::WriteClientState()
 	if (!isConnected || cs_shmInfo.shm_id < 0) { return; }
 
 	std::stringstream oss;
+	oss << vehicles.Num() << '\n';
 	for (auto& Elem : vehicles)
 	{
 		//Write out Client Vehicle states
@@ -269,7 +270,10 @@ void AGSClient::WriteClientState()
 			loc[2] = 0.0f;
 			oss << Elem.Key << " " << loc[0] << " " << loc[1] << " " << loc[2] << '\n';
 		}
-		else{ UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Vehicle state to CS ShM. Actor is null."));}
+		else
+		{
+			UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Vehicle state to CS ShM. Actor is null."));
+		}
 	}
 
 	// CS SHM ACQUIRE

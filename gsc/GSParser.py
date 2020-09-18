@@ -198,7 +198,7 @@ class GSParser(object):
         optional = {}
         self.check_tags(n, mandatory, optional)
         if self.origin is not None:
-            self.report.log_error( "Element " + n.id + ": Duplicate origin node. Must be unique in a scenario")
+            self.report.log_error("Element {}: Duplicate origin node. Must be unique in a scenario".format(n.id))
         self.origin = n
 
     def check_metric(self,n):
@@ -212,10 +212,10 @@ class GSParser(object):
     def check_ego_start(self, n):
         mandatory = {"gs"}
         optional = {"orientation"}
-        self.check_tags(n,mandatory, optional)
+        self.check_tags(n, mandatory, optional)
         if self.origin is not None:
-            self.report.log_error( "Element " + n.id + ": Duplicate Egostart node. Must be unique")
-        self.egostart = n;
+            self.report.log_error("Element {}: Duplicate Egostart node. Must be unique".format(n.id))
+        self.egostart = n
 
     def check_ego_goal(self, n):
         mandatory = {"gs","name"}
@@ -240,7 +240,7 @@ class GSParser(object):
         optional = {"collision","notes","metric","mutate","optimize","optmetric","plotvid",}
         self.check_tags(n, mandatory, optional)
         if self.globalconfig is not None:
-            self.report.log_error( "Element " + n.id + ": Duplicate Global Config node. Must be unique")
+            self.report.log_error("Element " + n.id + ": Duplicate Global Config node. Must be unique")
         self.globalconfig = n
 
     def check_trigger(self, n):

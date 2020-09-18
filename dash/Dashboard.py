@@ -18,6 +18,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
+import glog as log
+
 from SimConfig import *
 from util.Utils import *
 from sv.SV import SV, Vehicle
@@ -39,15 +41,15 @@ class Dashboard(object):
             Traffic must have started, otherwise the shared array is not ready
         """
         if (not show_dashboard):
-            print("Dashboard will not start")
+            log.warn("Dashboard will not start")
             return
 
         if not self.traffic:
-            print("Dashboard requires a traffic to start")
+            log.error("Dashboard requires a traffic to start")
             return
 
         if not (self.traffic.traffic_state_sharr):
-            print("Dashboard can not start before traffic")
+            log.error("Dashboard can not start before traffic")
             return
 
         self.nvehicles = len(self.traffic.vehicles)
@@ -74,34 +76,43 @@ class Dashboard(object):
 
             #get data
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
+            tickcount, delta_time, sim_tim = header
+
             #planning data
-            if self.center_vid not in debug_shdata:
+            if self.center_vid in debug_shdata:
+                # Read vehicle debug data from debug_shdata
+                vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[self.center_vid]
+
+                #update stats
+                #map chart dynamic content
+                #self.plot_map_chart(vehicles)
+
+                #Cartesian plot with lanelet
+                self.plot_cartesian_chart(self.center_vid, vehicles, reference_path)
+
+                #Frenet frame plot
+                if FFPLOT_LITE:
+                    self.plot_frenet_chart_lite(vehicle_state, vehicles,self.center_vid)
+                else:
+                    self.plot_frenet_chart(self.center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config)
+
+                #BTree
+                tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(self.center_vid)
+                tree_str += debug_shdata[self.center_vid][1]
+                self.tree_msg.configure(text=tree_str)
+
+            elif self.center_vid in vehicles and vehicles[self.center_vid].is_remote:
+                # A remote vehicle doesn't have a frenet plot or debug data
+                self.plot_cartesian_chart(self.center_vid, vehicles, None)
+
+            else:
+                # Cannot find vehicle with id center_vid, switch to another vehicle
                 if 1 in debug_shdata:
                     self.center_vid = 1
-                    print( "Dash: center vid not in array, auto switch to {}".format(self.center_vid) )
+                    log.warn("Dash: center vid not in array, auto switch to {}".format(self.center_vid))
                 else:
-                    self.center_vid = next(iter(debug_shdata))
-                    print( "Dash: center vid not in array, auto switch to {}".format(self.center_vid) )
-            vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[self.center_vid]
-
-            #update stats
-            tickcount, delta_time, sim_tim = header
-            #map chart dynamic content
-            #self.plot_map_chart(vehicles)
-
-            #Cartesian plot with lanelet
-            self.plot_cartesian_chart(self.center_vid, vehicles, reference_path)
-
-            #Frenet frame plot
-            if FFPLOT_LITE:
-                self.plot_frenet_chart_lite(vehicle_state, vehicles,self.center_vid)
-            else:
-                self.plot_frenet_chart(self.center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config)
-
-            #BTree
-            tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(self.center_vid)
-            tree_str += debug_shdata[self.center_vid][1]
-            self.tree_msg.configure(text=tree_str)
+                    self.center_vid = next(iter(debug_shdata.keys()))
+                    log.warn("Dash: center vid not in array, auto switch to {}".format(self.center_vid))
 
             #Vehicles Table
             self.tab.delete(*self.tab.get_children())
@@ -127,31 +138,35 @@ class Dashboard(object):
     def quit(self):
         self._process.terminate()
 
-
     def change_tab_focus(self, event):
         focus = self.tab.focus()
         if (focus):
             self.center_vid = int(focus)
+            # log.info("Changed focus to {}".format(self.center_vid))
 
     def read_traffic_state(self, traffic_state_sharr, nv):
-        r = nv+1
-        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1
+        r = nv + 1
+        c = int(len(traffic_state_sharr) / r)
 
         traffic_state_sharr.acquire() #<=========LOCK
         #header
         header = traffic_state_sharr[0:3]
+
         #vehicles
         vehicles = {}
         for ri in range(1,r):
             i = ri * c  #first index for row
             vid = traffic_state_sharr[i]
+            remote = traffic_state_sharr[i+1] == 1
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[i+1:i+c]
+            state_vector = traffic_state_sharr[i+2:i+c]
             vehicle = Vehicle(vid)
+            vehicle.is_remote = remote
             vehicle.vehicle_state.set_state_vector(state_vector)
             vehicles[vid] = vehicle
         traffic_state_sharr.release() #<=========RELEASE
-        return header, vehicles,
+
+        return header, vehicles
 
     def read_trajectories(self, traffic):
         trajectories = {}
@@ -175,7 +190,7 @@ class Dashboard(object):
             axis.plot(line[0], line[1], 'b-')
         for line in map_rlines:
             axis.plot(line[0], line[1], 'g-')
-            #print(line)
+            #log.info(line)
         #limit individual axis
         #axis.set_xlim([x_min,x_max])
         #axis.set_ylim([y_min,y_max])
@@ -223,7 +238,7 @@ class Dashboard(object):
             plt.plot(line[0], line[1], 'g-')
 
         #reference path
-        if REFERENCE_PATH:
+        if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
             plt.plot(path_x, path_y, 'b-')
 
@@ -561,7 +576,7 @@ class Dashboard(object):
             tab.heading(col, text=col, anchor='e')
             tab.column(col, anchor="e", width=50, minwidth=50)
 
-        tab.bind('<<TreeviewSelect>>',self.change_tab_focus)
+        tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         self.tab = tab
 
         # vehicle cart

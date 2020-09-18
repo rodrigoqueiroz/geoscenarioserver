@@ -234,7 +234,7 @@ class SVPlanner(object):
 
         nv = self.nvehicles
         r = nv + 1
-        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1
+        c = int(len(traffic_state_sharr) / r)
 
         traffic_state_sharr.acquire() #<=========LOCK
         #header
@@ -245,8 +245,9 @@ class SVPlanner(object):
         for ri in range(1,r):
             i = ri * c  #first index for row
             vid = traffic_state_sharr[i]
+            remote = traffic_state_sharr[i+1]
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[i+1:i+c]
+            state_vector = traffic_state_sharr[i+2:i+c]
             if (vid == self.vid):
                 my_vehicle_state.set_state_vector(state_vector)
             else:
