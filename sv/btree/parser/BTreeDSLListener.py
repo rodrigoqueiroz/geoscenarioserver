@@ -89,6 +89,24 @@ class BTreeDSLListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BTreeDSLParser#error.
+    def enterError(self, ctx:BTreeDSLParser.ErrorContext):
+        pass
+
+    # Exit a parse tree produced by BTreeDSLParser#error.
+    def exitError(self, ctx:BTreeDSLParser.ErrorContext):
+        pass
+
+
+    # Enter a parse tree produced by BTreeDSLParser#delay.
+    def enterDelay(self, ctx:BTreeDSLParser.DelayContext):
+        pass
+
+    # Exit a parse tree produced by BTreeDSLParser#delay.
+    def exitDelay(self, ctx:BTreeDSLParser.DelayContext):
+        pass
+
+
     # Enter a parse tree produced by BTreeDSLParser#mconfig.
     def enterMconfig(self, ctx:BTreeDSLParser.MconfigContext):
         pass
