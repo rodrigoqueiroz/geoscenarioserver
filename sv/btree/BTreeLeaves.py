@@ -3,7 +3,7 @@
 #rqueiroz@uwaterloo.ca
 
 from py_trees import *
-import random
+from random *
 from sv.ManeuverStatus import *
 from sv.btree.BehaviorModels import *
 from sv.ManeuverConfig import *
@@ -11,13 +11,14 @@ import sv.ManeuverUtils
 
 #alternative:
 class BCondition(behaviour.Behaviour):
-    def __init__(self, bmodel, name, condition, repeat=True, **kwargs):
+    def __init__(self, bmodel, name, condition, repeat=True, error=0, **kwargs):
         super(BCondition, self).__init__(name)
         self.name = name
         self.condition = condition
         self.bmodel = bmodel
         self.kwargs = kwargs
         self.repeat = repeat
+        self.error = error
         self.triggered = False
 
     def update(self):
@@ -34,8 +35,16 @@ class BCondition(behaviour.Behaviour):
 
         except KeyError as e:
             raise RuntimeError("Missing condition '" + self.name + "'.")
+        
+        # returns an erroneous status based on the probability configure by error variable
+        if random.Random() < self.error:
+            if status is common.Status.SUCCESS:
+                return common.Status.FAILURE
+            elif status is common.Status.FAILURE:
+                return common.Status.SUCCESS
+            # if the status is RUNNING nothing is done
 
-        return status
+        return status 
 
 
 class ManeuverAction(behaviour.Behaviour):
