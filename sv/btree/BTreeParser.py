@@ -239,8 +239,10 @@ class BTreeListener(BTreeDSLListener):
         name = ctx.name().getText() 
         cconfig_name = ctx.cconfig().name().getText()
         s = name + " = " + "BCondition(parser.bmodel," + "\"" + name + "\"" + "," + "\"" + cconfig_name + "\""
-        s += ", " + ctx.error().getText() 
-        s += ", " + ctx.delay().getText()
+        if ctx.error() != None:
+            s += ", " + ctx.error().getText() 
+        if ctx.delay() != None:
+            s += ", " + ctx.delay().getText()
         cconfig_params = ""
         if hasattr(ctx.cconfig().params(), '__iter__'):
             for param in ctx.cconfig().params(): cconfig_params += "," + param.getText()

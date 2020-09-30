@@ -136,8 +136,6 @@ class SVPlanner(object):
             #log.info('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #log.info((planner_state.vehicle_state.get_S(), planner_state.vehicle_state.get_D()))
             
-            mconfig = injectFault(mconfig)
-
             #Maneuver Tick
             if mconfig and planner_state.lane_config:
                 #replan maneuver
