@@ -234,11 +234,13 @@ class BTreeListener(BTreeDSLListener):
         self.exec_stack.append(s)
         self.nodes += name + ","
 
-    # e.g. endpoint = BCondition(self.bmodel,"endpoint", "lane_occupied", args)
+    # e.g. endpoint = BCondition(self.bmodel,"endpoint", "lane_occupied", error=0.2, delay=0.8, args)
     def exitCondition(self, ctx): 
         name = ctx.name().getText() 
         cconfig_name = ctx.cconfig().name().getText()
         s = name + " = " + "BCondition(parser.bmodel," + "\"" + name + "\"" + "," + "\"" + cconfig_name + "\""
+        s += ", " + ctx.error().getText() 
+        s += ", " + ctx.delay().getText()
         cconfig_params = ""
         if hasattr(ctx.cconfig().params(), '__iter__'):
             for param in ctx.cconfig().params(): cconfig_params += "," + param.getText()
