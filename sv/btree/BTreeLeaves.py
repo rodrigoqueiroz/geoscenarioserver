@@ -28,21 +28,15 @@ class BCondition(behaviour.Behaviour):
         #print("BCondition {} {}".format(self.name,self.kwargs))
         try:
             if self.repeat or not self.triggered:
-                if self.bmodel.test_condition(self.condition, self.kwargs):
+                p = random.random() > self.error
+                # negate xor 
+                if  not (p ^ self.bmodel.test_condition(self.condition, self.kwargs)):
                     #print("SUCCESS")
                     status = common.Status.SUCCESS
                     self.triggered = True
 
         except KeyError as e:
             raise RuntimeError("Missing condition '" + self.name + "'.")
-        
-        # returns an erroneous status based on the probability configure by error variable
-        if random.random() < self.error:
-            if status is common.Status.SUCCESS:
-                return common.Status.FAILURE
-            elif status is common.Status.FAILURE:
-                return common.Status.SUCCESS
-            # if the status is RUNNING nothing is done
 
         return status 
 
