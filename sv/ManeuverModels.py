@@ -218,8 +218,7 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     """
     target_id = mconfig.target_vid
     delta = mconfig.delta_s + mconfig.delta_d
-    # delta = (20, 1, 0) + mconfig.delta_d
-    print(delta)
+
     if (target_id not in vehicles):
         log.warn("Target vehicle {} is not in traffic".format(target_id))
         return None
