@@ -19,8 +19,9 @@ if __name__ == "__main__":
         cs_shm = sysv_ipc.SharedMemory(CS_SHM_KEY)#, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=1024)
         print("ShM CS memory created")
         client_connected = True
-    except sysv_ipc.ExistentialError:
+    except sysv_ipc.ExistentialError as e:
         print("Can't connect to client shared memory.")
+        raise e
 
     vids = []
 
