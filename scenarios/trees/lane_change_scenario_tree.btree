@@ -2,5 +2,5 @@ behaviortree LaneChange:
     ?
         ->
             condition lc( sim_time (repeat=False, tmin=3, tmax=10))
-            subtree lane_change_tree
-        subtree drive_tree
+            subtree lane_change_tree()
+        subtree drive_tree()

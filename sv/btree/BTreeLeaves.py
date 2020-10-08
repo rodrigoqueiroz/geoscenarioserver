@@ -56,7 +56,7 @@ class ManeuverAction(behaviour.Behaviour):
             Maneuver behavior after it is instantiated.
         '''
         self.mconfig = new_mconfig
-        
+
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
             If the maneuver is indefinite (e.g. velocity keeping), it returns SUCCESS.
@@ -91,6 +91,7 @@ class ManeuverAction(behaviour.Behaviour):
                     self.bmodel.planner_state.lane_config.get_neighbour(self.mconfig.target_lid),
                     self.bmodel.planner_state.traffic_vehicles
                 )
+                # TODO check for None
                 self.mconfig.target_vid = target_vehicle.vid
 
         elif self.mconfig.mkey == Maneuver.M_STOP_AT:
