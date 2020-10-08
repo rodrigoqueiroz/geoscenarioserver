@@ -4,6 +4,6 @@ behaviortree drive_tree:
             condition goal ( reached_goal() )
             maneuver stop_reached_goal ( MStopConfig() )
         ->
-            condition c_busy_lane( lane_occupied(), error=0.0, delay=0.6 )
+            condition c_busy_lane( lane_occupied(), error=0.0 )
             maneuver m_follow_leading_v ( MFollowConfig() )   
         maneuver keep_velocity ( MVelKeepConfig(vel=MP(16.0,10,6) ))

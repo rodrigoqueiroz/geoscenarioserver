@@ -4,6 +4,7 @@
 
 from py_trees import *
 import random
+import time
 from sv.ManeuverStatus import *
 from sv.btree.BehaviorModels import *
 from sv.ManeuverConfig import *
@@ -11,7 +12,7 @@ import sv.ManeuverUtils
 
 #alternative:
 class BCondition(behaviour.Behaviour):
-    def __init__(self, bmodel, name, condition, repeat=True, error=0, **kwargs):
+    def __init__(self, bmodel, name, condition, repeat=True, error=0, delay=0, **kwargs):
         super(BCondition, self).__init__(name)
         self.name = name
         self.condition = condition
@@ -19,21 +20,35 @@ class BCondition(behaviour.Behaviour):
         self.kwargs = kwargs
         self.repeat = repeat
         self.error = float(error)
+        self.delay = delay
+        self.trigger_time = True
         self.triggered = False
+        self.tic = 0
+        self.toc = 0 
 
     def update(self):
         self.logger.debug("  %s [BCondition::update()]" % self.name)
         status = common.Status.FAILURE
 
-        #print("BCondition {} {}".format(self.name,self.kwargs))
+        if self.trigger_time: 
+            self.tic = time.perf_counter()
+            self.trigger_time = False
+
+        self.toc = time.perf_counter()
+        elapsed_time = self.toc-self.tic 
+
         try:
             if self.repeat or not self.triggered:
                 p = random.random() > self.error
-                # negate xor 
-                if  not (p ^ self.bmodel.test_condition(self.condition, self.kwargs)):
-                    #print("SUCCESS")
-                    status = common.Status.SUCCESS
-                    self.triggered = True
+                if elapsed_time >= self.delay:
+                    self.trigger_time = True
+                    # negate xor: invert result from test_condition
+                    if  not (p ^ self.bmodel.test_condition(self.condition, self.kwargs)):
+                        status = common.Status.SUCCESS
+                        self.triggered = True
+                else:
+                    status = common.Status.RUNNING
+                    
 
         except KeyError as e:
             raise RuntimeError("Missing condition '" + self.name + "'.")
