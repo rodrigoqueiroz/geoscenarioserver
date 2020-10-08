@@ -8,6 +8,7 @@
 
 from argparse import ArgumentParser
 import glog as log
+import os
 
 from TickSync import TickSync
 from SimTraffic import SimTraffic
@@ -104,8 +105,10 @@ def setup_problem(sim_traffic, sim_config, lanelet_map):
 def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     """ Setup scenario from GeoScenario file
     """
+    full_scenario_path = os.path.join(ROOT_DIR, gsfile)
+
     parser = GSParser()
-    if not parser.load_and_validate_geoscenario(gsfile):
+    if not parser.load_and_validate_geoscenario(full_scenario_path):
         log.error("Error loading GeoScenario file")
         return False
     if parser.globalconfig.tags['version'] < 2.0:
@@ -118,7 +121,7 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
         sim_config.plot_vid = parser.globalconfig.tags['plotvid']
 
     #map
-    map_file = 'scenarios/' + parser.globalconfig.tags['lanelet']
+    map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet'])
     # use origin from gsc file to project nodes to sim frame
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
     parser.project_nodes(projector)

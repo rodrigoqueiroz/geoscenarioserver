@@ -19,6 +19,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
 import glog as log
+import os
 
 from SimConfig import *
 from util.Utils import *
@@ -529,11 +530,11 @@ class Dashboard(object):
         #Content:
         window.title = 'GeoScenario Server'
         str_title = ' GeoScenario Server '
-        img_wise = ImageTk.PhotoImage(Image.open("dash/img/wiselogo.png").resize((83, 40)))
-        img_uw = ImageTk.PhotoImage(Image.open("dash/img/uwlogo.png").resize((100, 40)))
-        img_gs = pimg = ImageTk.PhotoImage(Image.open("dash/img/icons/gs.png").resize((40, 40)))
-        img_veh = ImageTk.PhotoImage(Image.open("dash/img/icons/vehicle.png").resize((100, 47)))
-        img_ego = ImageTk.PhotoImage(Image.open("dash/img/icons/vehicle_ego.png").resize((80, 30)))
+        img_wise = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/wiselogo.png").resize((83, 40)))
+        img_uw = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/uwlogo.png").resize((100, 40)))
+        img_gs = pimg = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/gs.png").resize((40, 40)))
+        img_veh = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle.png").resize((100, 47)))
+        img_ego = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle_ego.png").resize((80, 30)))
 
 
         #Widgets
@@ -602,9 +603,14 @@ class Dashboard(object):
         title_frame.grid(row=0, sticky="nsew")
         stats_frame.grid(row=1, sticky="nsew")
         vehicle_frame.grid(row=2, sticky="nsew")
-        cart_frame.grid(row=0, column=0, sticky="nsew")
-        fren_frame.grid(row=0, column=1, sticky="nsew")
-        bt_frame.grid(row=0, column=2, sticky="nsew")
+
+        # Show enabled plots (left justified)
+        c = 0
+        for cframe, visible in zip([cart_frame, fren_frame, bt_frame], [SHOW_CPLOT, SHOW_FFPLOT, SHOW_BTREE]):
+            if visible:
+                cframe.grid(row=0, column=c, sticky="nsew")
+                c += 1
+
         #white_space.grid(row=0, column=3, sticky="ew")
         global_frame.grid(row=3, sticky="nsew")
         #map_frame.grid(row=0, column=0, sticky="ns")
