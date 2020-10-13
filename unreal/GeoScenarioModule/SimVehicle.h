@@ -21,5 +21,8 @@ protected:
 public:	
 	ASimVehicle();
 	virtual void Tick(float DeltaTime) override;
-	class USkeletalMeshComponent *mesh;
+	// class USkeletalMeshComponent *mesh;
+
+private:
+	void GetBoundingBox(FVector &outPosition, FVector &outExtent, FRotator &outOrientation);
 };
