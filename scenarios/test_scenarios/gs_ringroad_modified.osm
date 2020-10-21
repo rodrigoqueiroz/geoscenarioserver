@@ -47,7 +47,7 @@
   <node id='-24' action='modify' visible='true' lat='43.46871778505' lon='-80.54009083391'>
     <tag k='btree' v='slow_drive_scenario_tree' />
     <tag k='cycles' v='1' />
-    <tag k='gs' v='vehicle' />
+    <tag k='gs' v='vehicledisabled' />
     <tag k='name' v='target' />
     <tag k='route' v='cw_route' />
     <tag k='vid' v='4' />
