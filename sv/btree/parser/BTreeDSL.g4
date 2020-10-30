@@ -50,8 +50,9 @@ mid                 : name;
 
 params              : bexpr (',' bexpr)* ;
 bexpr               : name (BOP|ATT) value ;
-value               : FLOAT | name | func;
+value               : FLOAT | name | func | tupl;
 func                : name '('FLOAT (',' FLOAT)*')';
+tupl                : '('FLOAT (',' FLOAT)*')';
 name                : WS* WORD WS*;
 
 /*

@@ -572,6 +572,7 @@ class BTreeDSLParser ( Parser ):
 
             self.state = 89
             self.match(BTreeDSLParser.T__5)
+
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1146,6 +1147,10 @@ class BTreeDSLParser ( Parser ):
             return self.getTypedRuleContext(BTreeDSLParser.FuncContext,0)
 
 
+        def tupl(self):
+            return self.getTypedRuleContext(BTreeDSLParser.TuplContext,0)
+
+
         def getRuleIndex(self):
             return BTreeDSLParser.RULE_value
 
@@ -1184,6 +1189,12 @@ class BTreeDSLParser ( Parser ):
                 self.enterOuterAlt(localctx, 3)
                 self.state = 160
                 self.func()
+                pass
+
+            elif la_ == 4:
+                self.enterOuterAlt(localctx, 4)
+                self.state = 143
+                self.tupl()
                 pass
 
 

@@ -1,7 +1,10 @@
 behaviortree LaneChange:
     ?
         ->
-            condition ask_cutin(should_cutin(target_lane_id=1))
-            maneuver cutin(MCutInConfig(target_lid=1))
-        ->
-            maneuver lane_swerve(MLaneSwerveConfig(target_lid=1))
+            condition trigger( sim_time (repeat=True, tmin=3))
+            ?
+                ->
+                    condition reached_gap(reached_gap(repeat=False, target_lane_id=-1, meters=2))
+                    maneuver cutin(MCutInConfig(target_lid=-1, delta_s=(5, 1, 0)))
+                subtree drive_tree(keep_velocity=MVelKeepConfig(vel=MP(12.0,10,6)))
+        maneuver stop(MStopConfig())

@@ -8,7 +8,6 @@ import sys
 from antlr_denter.DenterHelper import DenterHelper
 from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
 
-
 def serializedATN():
     with StringIO() as buf:
         buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2\23")

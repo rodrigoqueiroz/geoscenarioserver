@@ -44,9 +44,14 @@ class SimSharedMemory(object):
                 vid, remote, position[0], position[1], position[2],
                 yaw, velocity[0], velocity[1], steering_angle)
 
-        self.ss_sem.acquire(timeout=0)
-        self.ss_shm.write(write_str.encode('utf-8'))
-        self.ss_sem.release()
+        # sysv_ipc.BusyError needs to be caught
+        try:
+            self.ss_sem.acquire(timeout=0)
+            self.ss_shm.write(write_str.encode('utf-8'))
+            self.ss_sem.release()
+        except sysv_ipc.BusyError:
+            log.warn("server state semaphore locked...")
+            return
         # log.info("Shared Memory write\n{}".format(write_str))
 
     def read_client_state(self, nvehicles):
@@ -64,6 +69,9 @@ class SimSharedMemory(object):
             self.cs_sem.release()
         except sysv_ipc.ExistentialError:
             self.is_connected = False
+            return
+        except sysv_ipc.BusyError:
+            log.warn("client state semaphore locked...")
             return
 
         data_str = data.decode("utf-8")
