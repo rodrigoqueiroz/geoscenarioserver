@@ -64,7 +64,7 @@ protected:
 	AActor* FindVehicleActor(int vid);
 	void CreateVehicle(int vid, int remote);
 	void ReadServerState(float deltaTime); 
-	void WriteClientState();
+	void WriteClientState(int tickCount, float deltaTime);
 public:	
 	AGSClient();
 	virtual void Tick(float DeltaTime) override;

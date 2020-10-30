@@ -4,6 +4,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "Components/BoxComponent.h"
 #include "EngineUtils.h"
+#include "GeoScenarioModule.h"
 
 ASimVehicle::ASimVehicle()
 {
@@ -44,7 +45,7 @@ void ASimVehicle::BeginPlay()
     UBoxComponent *Box = NewObject<UBoxComponent>(this);
 
     GetBoundingBox(outPos, outExt, outOrien);
-    // UE_LOG(LogTemp, Log, TEXT("The bounding box out extents: %f, %f, %f"), outExt.X, outExt.Y, outExt.Z);
+    // UE_LOG(GeoScenarioModule, Log, TEXT("The bounding box out extents: %f, %f, %f"), outExt.X, outExt.Y, outExt.Z);
 
 	// Register the box component on the vehicles that interact with ego
     Box->RegisterComponent();
@@ -52,6 +53,10 @@ void ASimVehicle::BeginPlay()
     Box->AttachToComponent(
       RootComponent,
       FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+
+    this->OnActorBeginOverlap.AddDynamic(this, &ASimVehicle::OnOverlap);
+
+    this->isActive = true;
 }
 
 void ASimVehicle::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -64,10 +69,8 @@ void ASimVehicle::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ASimVehicle::GetBoundingBox(FVector &outPosition,
-                            FVector &outExtent,
-                            FRotator &outOrientation) {
-
+void ASimVehicle::GetBoundingBox(FVector &outPosition, FVector &outExtent, FRotator &outOrientation)
+{
     // Get location and rotation of the actor in world coordinate frame to place
     // the bounding box in the correct position
     outPosition = GetActorLocation();
@@ -93,4 +96,39 @@ void ASimVehicle::GetBoundingBox(FVector &outPosition,
         // assuming the origin is intially at the bottom of the mesh
         outPosition.Z += AgentBounds.BoxExtent.Z;
     }
+}
+
+void ASimVehicle::OnOverlap(AActor *self, AActor *other)
+{
+    // UE_LOG(LogTemp, Error, TEXT("OVERLAP"));
+
+    UE_LOG(GeoScenarioModule, Warning,
+            TEXT("GS vehicle %s collided with %s"),
+            *self->GetName(),
+            *other->GetName());
+    this->isActive = false;
+    
+    // Check if collided with a gs vehicle
+    ASimVehicle *otherGSV = Cast<ASimVehicle>(other);
+    if (otherGSV == nullptr) {
+        UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with ego"));
+    } else {
+        UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with GSV"));
+        otherGSV->SetActive(false);
+    }
+}
+
+void ASimVehicle::SetActive(bool active)
+{
+    this->isActive = active;
+}
+
+bool ASimVehicle::GetActive() const
+{
+    return this->isActive;
+}
+
+void ASimVehicle::OnHit(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult& Hit)
+{
+    // UE_LOG(LogTemp, Error, TEXT("COLLISION"));
 }

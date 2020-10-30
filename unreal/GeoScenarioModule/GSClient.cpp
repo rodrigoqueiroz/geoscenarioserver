@@ -36,7 +36,7 @@ void AGSClient::Tick(float DeltaTime)
     framestat.delta_time = DeltaTime;
 	//UE_LOG(GeoScenarioModule, Log, TEXT("GSClient TICK=%d DeltaTime=%f"), framestat.tick_count, framestat.delta_time);
 	ReadServerState(DeltaTime);
-	WriteClientState();
+	WriteClientState(framestat.tick_count, framestat.delta_time);
 }
 
 void AGSClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -263,12 +263,12 @@ AActor* AGSClient::FindVehicleActor(int vid)
 }
 
 
-void AGSClient::WriteClientState()
+void AGSClient::WriteClientState(int tickCount, float deltaTime)
 {
 	if (!isConnected || cs_shmInfo.shm_id < 0) { return; }
 
 	std::stringstream oss;
-	oss << vehicles.Num() << '\n';
+	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << '\n';
 	for (auto& Elem : vehicles)
 	{
 		//Write out Client Vehicle states
@@ -277,7 +277,9 @@ void AGSClient::WriteClientState()
 		{
 			FVector loc = Elem.Value.actor->GetActorLocation();
 			loc[2] = 0.0f;
-			oss << Elem.Key << " " << loc[0] << " " << loc[1] << " " << loc[2] << '\n';
+			ASimVehicle *gsv = Cast<ASimVehicle>(Elem.Value.actor);
+			int active = gsv != nullptr ? (int)(gsv->GetActive()) : 1;
+			oss << Elem.Key << " " << loc[0] << " " << loc[1] << " " << loc[2] << " " << active << '\n';
 		}
 		else
 		{
@@ -285,7 +287,7 @@ void AGSClient::WriteClientState()
 		}
 	}
 
-	// CS SHM ACQUIRE. IPC_NOWAIT means 
+	// CS SHM ACQUIRE
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.p), 1) < 0) {
 		UE_LOG(GeoScenarioModule, Error, TEXT("Acquiring CS semaphore failed. Server disconnected? "));
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));

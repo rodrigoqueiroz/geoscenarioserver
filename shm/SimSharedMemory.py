@@ -31,6 +31,10 @@ class SimSharedMemory(object):
     def write_server_state(self, tick_count, delta_time, vehicles):
         """ Writes to shared memory pose data for each Vehicle.
             @param vehicles:      dictionary of type <int, Vehicle>
+            Shared memory format:
+                tick_count delta_time n_vehicles
+                vid is_remote x y z yaw vx vy steering_angle
+                ...
         """
         if not self.is_connected:
             return
@@ -55,12 +59,15 @@ class SimSharedMemory(object):
         # log.info("Shared Memory write\n{}".format(write_str))
 
     def read_client_state(self, nvehicles):
-        if not self.is_connected:
-            return
+        # header is [tick_count delta_time, n_vehicles]
+        header = None
+        vstates = {}
+        disabled_vehicles = []
 
-        if nvehicles == 0:
-            return
+        if not self.is_connected or nvehicles == 0:
+            return header, vstates, disabled_vehicles
 
+        # Read client shared memory
         try:
             # according to docs this raises a BusyError, so it should be handled.
             # but it hasn't been a problem yet?
@@ -69,52 +76,56 @@ class SimSharedMemory(object):
             self.cs_sem.release()
         except sysv_ipc.ExistentialError:
             self.is_connected = False
-            return
+            return header, vstates, disabled_vehicles
         except sysv_ipc.BusyError:
             log.warn("client state semaphore locked...")
-            return
+            return header, vstates, disabled_vehicles
 
+        # Parse client data
         data_str = data.decode("utf-8")
         data_arr = data_str.split('\n')
-        if len(data_arr) == 0:
+
+        if len(data_arr) == 0 or int.from_bytes(data, byteorder='big') == 0:
+            # log.info("Garbage memory")
             # memory is garbage
-            return
+            return header, vstates, disabled_vehicles
 
-        # the client must see the same number of vehicles as server
         try:
-            nclient_vehicles = int(data_arr[0])
-            if nclient_vehicles != nvehicles:
-                log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
-                    nclient_vehicles,
-                    nvehicles
-                ))
-                log.warn(data_str)
-                return
+            header_str = data_arr[0].split(' ')
+            header = [int(header_str[0]), float(header_str[1]), int(header_str[2])]
+            nclient_vehicles = header[2]
 
-            vstates = {}
             # size = 4
             # if (len(data_arr) < size):
             #     #memory is garbage
             #     return
 
-            for ri in range(1, nvehicles + 1):
-                vid, x, y, z = data_arr[ri].split()
-                # i = ri * size
-                vs = VehicleState()
-                vid = int(vid)
-                vs.x = float(x) / CLIENT_METER_UNIT
-                vs.y = -float(y) / CLIENT_METER_UNIT
-                vs.z = float(z) / CLIENT_METER_UNIT
-                vstates[vid] = vs
+            # the client must see the same number of vehicles as server
+            if nclient_vehicles == nvehicles:
+                for ri in range(1, nvehicles + 1):
+                    vid, x, y, z, is_active = data_arr[ri].split()
+                    vs = VehicleState()
+                    vid = int(vid)
+                    vs.x = float(x) / CLIENT_METER_UNIT
+                    vs.y = -float(y) / CLIENT_METER_UNIT
+                    vs.z = float(z) / CLIENT_METER_UNIT
+                    vstates[vid] = vs
+                    if not int(is_active):
+                        disabled_vehicles.append(vid)
 
+            else:
+                log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
+                    nclient_vehicles,
+                    nvehicles
+                ))
+                log.warn(data_str)
         except Exception:
-            # log.warn("Client state error: garbage memory:")
-            # log.warn(data_str)
-            return
+            # garbage memory
+            pass
 
         # log.info("VSTATES")
         # log.info(vstates)
-        return vstates
+        return header, vstates, disabled_vehicles
 
     def __del__(self):
         self.is_connected = False

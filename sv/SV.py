@@ -20,7 +20,7 @@ from shm.SimSharedMemory import *
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
-    def __init__(self, vid, name = '', btree_root = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
+    def __init__(self, vid, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS, model=None):
         #id
         self.vid = vid
         self.name = name
@@ -46,12 +46,10 @@ class Vehicle(object):
         #remote
         self.is_remote = False
 
-
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
             TODO: predict using history
-            TODO: predict velocity and accel
         """
         state = [
             self.vehicle_state.s + (self.vehicle_state.s_vel * t) + (self.vehicle_state.s_acc * t * t),
@@ -62,6 +60,19 @@ class Vehicle(object):
             self.vehicle_state.d_acc
         ]
         return state
+
+    def update_sim_state(self, new_state, delta_time):
+        # NOTE: this may desync the sim and frenet vehicle state, so this should
+        # only be done for remote vehicles (which don't have a frenet state)
+        if self.is_remote:
+            # update position and estimate velocity
+            vx = (new_state.x - self.vehicle_state.x) / delta_time
+            vy = (new_state.y - self.vehicle_state.y) / delta_time
+            self.vehicle_state.set_X([new_state.x, vx, new_state.x_acc])
+            self.vehicle_state.set_Y([new_state.y, vy, new_state.y_acc])
+            # print((vx, vy))
+        else:
+            log.warn("Cannot update sim state for gs vehicles directly.")
 
     def stop(self):
         pass
@@ -165,7 +176,7 @@ class SV(Vehicle):
         #Compute new state
         self.compute_vehicle_state(delta_time)
 
-    def compute_vehicle_state(self,delta_time):
+    def compute_vehicle_state(self, delta_time):
         """
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
@@ -193,7 +204,6 @@ class SV(Vehicle):
             self.vehicle_state.d_acc = self.d_acc_eq(time)
 
             # Compute sim state using the global path this vehicle is following
-            # TODO: rn the global path isn't changing - its using the centerline of the entire route. needs to change cause lane changes
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
             try:
                 x_vector, y_vector = frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
@@ -218,9 +228,8 @@ class SV(Vehicle):
             #    print ('ERROR: X went backwards. Diff: {:.2}'.format(diff))
             #self.last_x = self.vehicle_state.x
 
-
     def get_frenet_state(self):
-        if self.s_eq == None:
+        if self.s_eq is None:
             return None
         time = self.trajectory_time
         return [self.s_eq(time), self.s_vel_eq(time), self.s_acc_eq(time), self.d_eq(time), self.d_vel_eq(time), self.d_acc_eq(time)]

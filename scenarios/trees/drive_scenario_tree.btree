@@ -1,3 +1,3 @@
 behaviortree Drive:
     ->
-        subtree drive_tree(keep_velocity=MVelKeepConfig(), stop_reached_goal=MStopConfig())
+        subtree drive_tree(keep_velocity=MVelKeepConfig(vel=MP(12, 10, 6)), stop_reached_goal=MStopConfig())
