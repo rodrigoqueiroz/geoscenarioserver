@@ -34,7 +34,7 @@ class BehaviorModels(object):
         self.ref_path_changed = False
 
     def build(self):
-        
+
         parser = BTreeParser(self.vid, bmodel=self)
         tree = parser.parse_tree(tree_name=self.root_btree_name)
 
@@ -104,12 +104,24 @@ class BehaviorModels(object):
             return False
 
         elif condition == "reached_gap":
-            pass
+            target_lane_id = kwargs['target_lane_id']
+            target_lane_config = self.planner_state.lane_config.get_neighbour(target_lane_id)
+            if not target_lane_config:
+                log.warn("No reachable {} lane for lane changing vehicle {}".format(
+                    "LEFT" if target_lane_id == 1 else "RIGHT",
+                    self.vid))
+                return False
+
+            return reached_gap(
+                self.planner_state.vehicle_state,
+                target_lane_config,
+                self.planner_state.traffic_vehicles,
+                kwargs['meters'])
 
         elif condition == "sim_time":
-            if 'tmin' in kwargs and 'tmax' in kwargs:
-                return kwargs['tmin'] < self.planner_state.sim_time < kwargs['tmax']
-            return False
+            tmin = kwargs['tmin'] if 'tmin' in kwargs else 0
+            tmax = kwargs['tmax'] if 'tmax' in kwargs else float('inf')
+            return tmin < self.planner_state.sim_time < tmax
 
         return False
 

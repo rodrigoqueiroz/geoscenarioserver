@@ -1,6 +1,7 @@
 #include "GSClient.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <errno.h>
 #include "EngineUtils.h"
 #include <sstream>
 #include <string>
@@ -51,42 +52,48 @@ void AGSClient::AttemptConnection()
 	// get semaphore instance
 	UE_LOG(GeoScenarioModule, Warning, TEXT("Connecting to GeoScenario Server ..."));
     if ((ss_shmInfo.sem_id = semget(ss_shmInfo.sem_key, 1, 0666)) < 0) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting SS semaphore ID. Server down?\n"));
+        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting SS semaphore ID. Server down?"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	// get shared mem instance
     if ((ss_shmInfo.shm_id = shmget(ss_shmInfo.shm_key, 1024, 0666)) < 0) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting SS memory ID\n"));
+        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting SS memory ID"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	// attach memory to this process's address space
     ss_shmInfo.shm = (char*)shmat(ss_shmInfo.shm_id, NULL, 0);
     if (ss_shmInfo.shm == (char*)-1) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error attaching SS shared memory\n"));
+        UE_LOG(GeoScenarioModule, Error, TEXT("Error attaching SS shared memory"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	
 	//Client State SHM
 	// get semaphore instance
     if ((cs_shmInfo.sem_id = semget(cs_shmInfo.sem_key, 1, 0666)) < 0) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS semaphore ID\n"));
+        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS semaphore ID"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	// get shared mem instance
     if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, 1024, 0666)) < 0) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS memory ID\n"));
+        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS memory ID"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	// attach memory to this process's address space
     cs_shmInfo.shm = (char*)shmat(cs_shmInfo.shm_id, NULL, 0);
     if (cs_shmInfo.shm == (char*)-1) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error attaching CS shared memory\n"));
+        UE_LOG(GeoScenarioModule, Error, TEXT("Error attaching CS shared memory"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	//Connected :)
 	isConnected = true;
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "====>>>>> Connected to GeoScenario Server");
-	UE_LOG(GeoScenarioModule, Warning, TEXT("====>>>>> Connected to GeoScenario Server\n"));
+	UE_LOG(GeoScenarioModule, Warning, TEXT("====>>>>> Connected to GeoScenario Server"));
 	//clear timer
 	GetWorldTimerManager().ClearTimer(ConnectionTimerHandler);
 	return;
@@ -98,8 +105,9 @@ void AGSClient::ReadServerState(float deltaTime)
 
 	// SS SHM ACQUIRE
 	if (semop(ss_shmInfo.sem_id, &(ss_shmInfo.p), 1) < 0) {
-		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot p SS semaphore. Server disconnected? \n"));
-		isConnected = false;
+		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot p SS semaphore. Server disconnected? "));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
+		// isConnected = false;
 		return;
 	}
 	// SS SHM READ
@@ -109,8 +117,9 @@ void AGSClient::ReadServerState(float deltaTime)
 	//ss << iss.rdbuf();
 	// SS SHM RELEASE
 	if (semop(ss_shmInfo.sem_id, &(ss_shmInfo.v), 1) < 0) { 
-		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot v SS semaphore\n"));
-		isConnected = false;
+		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot v SS semaphore"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
+		// isConnected = false;
 		return;
 	}
 	//parse frame stats
@@ -189,13 +198,13 @@ void AGSClient::CreateVehicle(int vid, int remote)
 	if (remote == 1) 
 	{
 		//Find actor with tag
-		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle\n"));
+		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle"));
 		gsv.actor = FindVehicleActor(vid);
 	}
 	else 
 	{	
 		// spawn actor
-		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle\n"));
+		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
 		FVector location = {0.0, 0.0, 0.0};
 		ASimVehicle *sv = (ASimVehicle*)GetWorld()->SpawnActor(ASimVehicle::StaticClass(), &location);
 		//sv->manager = this;
@@ -276,17 +285,18 @@ void AGSClient::WriteClientState()
 		}
 	}
 
-	// CS SHM ACQUIRE
+	// CS SHM ACQUIRE. IPC_NOWAIT means 
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.p), 1) < 0) {
-		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot p CS semaphore. Server disconnected? \n"));
-		perror("p error: ");
+		UE_LOG(GeoScenarioModule, Error, TEXT("Acquiring CS semaphore failed. Server disconnected? "));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
 		return;
 	}
 	// CS SHM WRITE
 	strcpy(cs_shmInfo.shm, oss.str().c_str());
 	// CS SHM RELEASE
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.v), 1) < 0) {
-		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot v CS semaphore\n"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot v CS semaphore"));
+		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
 		return;
 	}
 }
