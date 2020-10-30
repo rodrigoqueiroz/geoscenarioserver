@@ -33,7 +33,7 @@ behaviorTree        : ('behaviortree' name ':' INDENT rootNode NL? DEDENT?)+ EOF
 
 rootNode            : node;
 node                : leafNode | nodeComposition;
-nodeComposition     : OPERATOR INDENT node+ DEDENT;
+nodeComposition     : OPERATOR name? INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
 condition           : 'condition' name '(' cconfig ')';

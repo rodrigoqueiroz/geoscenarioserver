@@ -1,9 +1,9 @@
 behaviortree drive_tree:
-    ?
-        ->
+    ? drive_until_reach_goal
+        -> stop_when_reach_goal
             condition goal ( reached_goal() )
             maneuver stop_reached_goal ( MStopConfig() )
-        ->
+        -> follow_if_busy_lane
             condition c_busy_lane( lane_occupied() )
             maneuver m_follow_leading_v ( MFollowConfig() )   
         maneuver keep_velocity ( MVelKeepConfig(vel=MP(16.0,10,6)) )

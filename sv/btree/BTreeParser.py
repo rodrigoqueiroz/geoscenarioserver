@@ -191,14 +191,22 @@ class BTreeListener(BTreeDSLListener):
         if node.leafNode() != None:
             raise RuntimeError("The root node must be an operator (e.g. '?', '->', '||').")
         elif node.nodeComposition() != None:
-            var = self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+            nodeComp_op = self.map(node.nodeComposition().OPERATOR().getText())
+            if node.nodeComposition().name() == None:
+                var = nodeComp_op.lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+            else:
+                var = node.nodeComposition().name().getText()
         s = "root = " + var
         self.exec_stack.append(s)
 
-    def exitNodeComposition(self, ctx): 
-        nm = self.genstr(ctx.getText())
+    def exitNodeComposition(self, ctx):
+
         op = self.map(ctx.OPERATOR().getText())
-        name = op.lower()[:3] + "_" + nm
+
+        if(ctx.name() == None): 
+            name = op.lower()[:3] + "_" + self.genstr(ctx.getText())
+        else:
+            name = ctx.name().getText()
         
         s =  name + " = composites." + op + "(\"" + name + "\")"
         self.exec_stack.append(s)
@@ -217,10 +225,21 @@ class BTreeListener(BTreeDSLListener):
                         self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+name+","+str(pos))
                     
                 elif node.nodeComposition() != None:
-                    aux.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText()))
+                    nodeComp_op = self.map(node.nodeComposition().OPERATOR().getText())
+                    if node.nodeComposition().name() == None:
+                        nodeComp_name = nodeComp_op.lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+                    else:
+                        nodeComp_name = node.nodeComposition().name().getText()
+
+                    aux.append(nodeComp_name)
                 pos += 1
-        else:    
-            aux = "["+self.genstr(ctx.node().getText()) + "]"
+        else:
+            if ctx.node().name() == None:
+                ref = self.genstr(ctx.node().getText())
+            else:
+                ref = ctx.node().name().getText()
+
+            aux = "["+ ref + "]"
 
         s = name + ".add_children(" + str(aux).replace("\'","") + ")"
         self.exec_stack.append(s)
