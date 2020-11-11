@@ -263,7 +263,7 @@ class MCutInConfig(MConfig):
     target_lid:int = None
     time:MP = MP(4.0,10,6)
     delta_s:tuple = (10,5,0)        #(s, vel, acc)
-    delta_d:tuple = (0,5,0)         #(s, vel, acc)
+    delta_d:tuple = (0,0,0)         #(d, vel, acc)
     mkey:int = Maneuver.M_CUTIN
 
     def __post_init__(self):

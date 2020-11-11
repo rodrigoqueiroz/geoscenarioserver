@@ -35,7 +35,10 @@ void AGSClient::Tick(float DeltaTime)
 	framestat.tick_count++;
     framestat.delta_time = DeltaTime;
 	//UE_LOG(GeoScenarioModule, Log, TEXT("GSClient TICK=%d DeltaTime=%f"), framestat.tick_count, framestat.delta_time);
+	// Update vehicles coming from the server
 	ReadServerState(DeltaTime);
+	// Update states of remote vehicles
+	UpdateRemoteVehicleStates(DeltaTime);
 	WriteClientState(framestat.tick_count, framestat.delta_time);
 }
 
@@ -188,6 +191,28 @@ void AGSClient::ReadServerState(float deltaTime)
 	//UE_LOG(GeoScenarioModule, Log, TEXT("SHM [ tick = %d server_delta_time = %.3f"), server_tick_count, server_delta_time);
 }
 
+void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
+{
+	for (auto& elem : vehicles)
+	{
+		GSVehicle &gsv = elem.Value;
+		if (gsv.remote == 0) continue;
+
+		// Update the vehicle's vehicle_state based on its actor's location.
+		// Actual movement of the vehicle is updated in another class.
+		// Need to ensure remote movement is finished before reading its state
+		// Maybe using a different component with a different tick group?
+		FVector loc = gsv.actor->GetActorLocation();
+		// update velocity
+		gsv.vehicle_state.x_vel = (loc[0] - gsv.vehicle_state.x) / deltaTime;
+		gsv.vehicle_state.y_vel = (loc[1] - gsv.vehicle_state.y) / deltaTime;
+		// update position
+		gsv.vehicle_state.x = loc[0];
+		gsv.vehicle_state.y = loc[1];
+		gsv.vehicle_state.z = loc[2];
+	}
+}
+
 void AGSClient::CreateVehicle(int vid, int remote)
 {
 	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d remote=%d"), vid, remote);
@@ -200,6 +225,10 @@ void AGSClient::CreateVehicle(int vid, int remote)
 		//Find actor with tag
 		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle"));
 		gsv.actor = FindVehicleActor(vid);
+		FVector loc = gsv.actor->GetActorLocation();
+		gsv.vehicle_state.x = loc[0];
+		gsv.vehicle_state.y = loc[1];
+		gsv.vehicle_state.z = loc[2];
 	}
 	else 
 	{	
@@ -271,15 +300,19 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << '\n';
 	for (auto& Elem : vehicles)
 	{
+		GSVehicle &gsv = Elem.Value;
 		//Write out Client Vehicle states
 		//todo: include full state
-		if (Elem.Value.actor != nullptr)
+		if (gsv.actor != nullptr)
 		{
-			FVector loc = Elem.Value.actor->GetActorLocation();
+			FVector loc = gsv.actor->GetActorLocation();
 			loc[2] = 0.0f;
-			ASimVehicle *gsv = Cast<ASimVehicle>(Elem.Value.actor);
-			int active = gsv != nullptr ? (int)(gsv->GetActive()) : 1;
-			oss << Elem.Key << " " << loc[0] << " " << loc[1] << " " << loc[2] << " " << active << '\n';
+			ASimVehicle *sv = Cast<ASimVehicle>(gsv.actor);
+			int active = sv != nullptr ? (int)(sv->GetActive()) : 1;
+			oss << Elem.Key << " "
+				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
+				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " "
+				<< active << '\n';
 		}
 		else
 		{

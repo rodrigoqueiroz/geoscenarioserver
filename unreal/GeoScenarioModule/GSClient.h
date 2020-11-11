@@ -63,8 +63,10 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	AActor* FindVehicleActor(int vid);
 	void CreateVehicle(int vid, int remote);
-	void ReadServerState(float deltaTime); 
+	void ReadServerState(float deltaTime);
+	void UpdateRemoteVehicleStates(float deltaTime);
 	void WriteClientState(int tickCount, float deltaTime);
+
 public:	
 	AGSClient();
 	virtual void Tick(float DeltaTime) override;

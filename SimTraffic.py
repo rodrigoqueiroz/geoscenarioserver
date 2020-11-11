@@ -43,8 +43,7 @@ class SimTraffic(object):
         self.vehicles[vid] = v
 
     def add_remote_vehicle(self, vid, name, start_state):
-        v = Vehicle(vid, name=name, start_state=start_state, radius=1.0)
-        v.is_remote = True
+        v = RV(vid, name=name, start_state=start_state, radius=1.0)
         self.vehicles[vid] = v
 
     def start(self):
@@ -72,10 +71,6 @@ class SimTraffic(object):
         if header is not None:
             client_tick_count, client_delta_time, n_vehicles = header
             if self.sim_client_tick_count < client_tick_count:
-                if self.sim_client_tick_count + 1 != client_tick_count:
-                    # there may be skipped frames
-                    # print("skipped {} frames".format(client_tick_count - self.sim_client_tick_count))
-                    pass
                 self.sim_client_tick_count = client_tick_count
                 new_client_state = True
 
@@ -105,7 +100,7 @@ class SimTraffic(object):
 
         #Update Dynamic Agents
         for vid in self.vehicles:
-            #update remote Agents if new state is available
+            #update remote agents if new state is available
             if self.vehicles[vid].is_remote and vid in vstates:
                 if new_client_state:
                     self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
