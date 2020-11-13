@@ -298,7 +298,7 @@ class RV(Vehicle):
         # set filtered velocity but not position - should set pos also?
         self.vehicle_state.set_X([new_state.x, velocity[0], new_state.x_acc])
         self.vehicle_state.set_Y([new_state.y, velocity[1], new_state.y_acc])
-        # log.info(np.linalg.norm(np.array([self.vehicle_state.x_vel, self.vehicle_state.y_vel])))
+        # log.info(str(np.linalg.norm([self.vehicle_state.x_vel, self.vehicle_state.y_vel])))
 
     def get_kalman_state_estimate(self, new_state, current_state, delta_time):
         # Init current state as [position velocity]T

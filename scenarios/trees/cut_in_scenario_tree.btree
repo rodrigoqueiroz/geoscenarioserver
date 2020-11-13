@@ -4,7 +4,7 @@ behaviortree LaneChange:
             condition trigger( sim_time (repeat=True, tmin=4))
             ?
                 ->
-                    condition reached_gap(reached_gap(repeat=False, target_lane_id=-1, meters=0))
-                    maneuver cutin(MCutInConfig(target_lid=-1, delta_s=(-5, -5, 0)))
-                subtree drive_tree(keep_velocity=MVelKeepConfig(vel=MP(15.0,10,6)))
+                    condition reached_gap(reached_gap(repeat=False, target_lane_id=-1, meters=10))
+                    maneuver cutin(MCutInConfig(target_lid=-1, delta_s=(-5, -10, 0)))
+                subtree drive_tree(keep_velocity=MVelKeepConfig(vel=MP(14.0,10,6)))
         maneuver stop(MStopConfig())
