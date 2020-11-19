@@ -4,12 +4,19 @@
 # ---------------------------------------------
 # UTILS
 # --------------------------------------------
-from math import sqrt, exp , trunc
+from math import sqrt, exp, trunc
 from matplotlib import pyplot as plt
 import uuid
 import numpy as np
 from scipy.stats import truncnorm
+from itertools import tee
 
+
+#Iterates an iter by pairs
+def pairwise(iterable):
+    i, j = tee(iterable, 2)
+    next(j, None)
+    return zip(i, j)
 
 #Truncates a vector of numbers
 def truncate_vector(numbers, digits):

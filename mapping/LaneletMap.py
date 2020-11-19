@@ -7,24 +7,18 @@
 # --------------------------------------------
 
 import lanelet2
-from lanelet2.core import getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet
-from lanelet2.geometry import distance, boundingBox2d, inside, toArcCoordinates, project, length2d
+from lanelet2.core import getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight
+from lanelet2.geometry import distance, boundingBox2d, inside, toArcCoordinates, project, length2d, findNearest
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType
 
 from matplotlib import pyplot as plt
-from itertools import tee
 import numpy as np
 import glog as log
-
 from typing import List
 
-
-def pairwise(iterable):
-    i, j = tee(iterable, 2)
-    next(j, None)
-    return zip(i, j)
+from util.Utils import pairwise
 
 
 class LaneletMap(object):
@@ -49,6 +43,18 @@ class LaneletMap(object):
         # returns first following lanelet
         following = self.routing_graph.following(lanelet)
         return following[0] if following else None
+
+    def get_traffic_light_by_position(self, x, y):
+        # search nearest two reg elem's for a traffic light and return the closer
+        point = BasicPoint2d(x, y)
+        # findNearest returns List[(dist,re)]
+        nearest_res = findNearest(self.lanelet_map.regulatoryElementLayer, point, 2)
+        tls = list(filter(lambda res: isinstance(res[1], TrafficLight), nearest_res))
+
+        if len(tls) > 0:
+            return tls[0][1]
+
+        return None
 
     @staticmethod
     def get_left_in_route(route, lanelet):
