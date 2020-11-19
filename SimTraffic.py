@@ -78,24 +78,7 @@ class SimTraffic(object):
         #Disabled vehicles indicate a collision and simulation should be stopped
         if len(disabled_vehicles) > 0:
             # print sim state and exit
-            log.info("Collision between vehicles {}".format(disabled_vehicles))
-            state_str = "GSS crash report:\n"
-            for vid in vstates:
-                # Need to use server state for gs vehicles and client state for remote vehicles
-                state = vstates[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
-
-                state_str += (
-                    "VID {}:\n"
-                    "   state       {}\n"
-                    "   position    ({},{},{})\n"
-                    "   speed       {}\n"
-                ).format(
-                    vid,
-                    "DISABLED" if vid in disabled_vehicles else "ACTIVE",
-                    state.x, state.y, state.z,
-                    np.linalg.norm([state.x_vel, state.y_vel])
-                )
-            log.info(state_str)
+            self.log_sim_state(vstates, disabled_vehicles)
             return -1
 
         #Update Dynamic Agents
@@ -158,3 +141,23 @@ class SimTraffic(object):
         #Write out simulator state
         if (self.sim_client_shm):
             self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles)
+
+    def log_sim_state(self, client_vehicle_states, disabled_vehicles):
+        log.info("Collision between vehicles {}".format(disabled_vehicles))
+        state_str = "GSS crash report:\n"
+        for vid in client_vehicle_states:
+            # Need to use server state for gs vehicles and client state for remote vehicles
+            state = client_vehicle_states[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
+
+            state_str += (
+                "VID {}:\n"
+                "   state       {}\n"
+                "   position    ({},{},{})\n"
+                "   speed       {}\n"
+            ).format(
+                vid,
+                "DISABLED" if vid in disabled_vehicles else "ACTIVE",
+                state.x, state.y, state.z,
+                np.linalg.norm([state.x_vel, state.y_vel])
+            )
+        log.info(state_str)
