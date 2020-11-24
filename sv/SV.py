@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 import math
 import sys
 import glog as log
+import numpy as np
 from TickSync import TickSync
 from SimConfig import *
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
@@ -17,10 +18,12 @@ from sv.SVPlanner import *
 from sv.VehicleState import *
 from mapping.LaneletMap import LaneletMap
 from shm.SimSharedMemory import *
+from util.Utils import kalman
+
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
-    def __init__(self, vid, name = '', btree_root = '', start_state = [0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0], radius = VEHICLE_RADIUS, model = None):
+    def __init__(self, vid, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS, model=None):
         #id
         self.vid = vid
         self.name = name
@@ -46,12 +49,10 @@ class Vehicle(object):
         #remote
         self.is_remote = False
 
-
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
             TODO: predict using history
-            TODO: predict velocity and accel
         """
         state = [
             self.vehicle_state.s + (self.vehicle_state.s_vel * t) + (self.vehicle_state.s_acc * t * t),
@@ -62,6 +63,12 @@ class Vehicle(object):
             self.vehicle_state.d_acc
         ]
         return state
+
+    def update_sim_state(self, new_state, delta_time):
+        # NOTE: this may desync the sim and frenet vehicle state, so this should
+        # only be done for remote vehicles (which don't have a frenet state)
+        if not self.is_remote:
+            log.warn("Cannot update sim state for gs vehicles directly.")
 
     def stop(self):
         pass
@@ -165,7 +172,7 @@ class SV(Vehicle):
         #Compute new state
         self.compute_vehicle_state(delta_time)
 
-    def compute_vehicle_state(self,delta_time):
+    def compute_vehicle_state(self, delta_time):
         """
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
@@ -193,7 +200,6 @@ class SV(Vehicle):
             self.vehicle_state.d_acc = self.d_acc_eq(time)
 
             # Compute sim state using the global path this vehicle is following
-            # TODO: rn the global path isn't changing - its using the centerline of the entire route. needs to change cause lane changes
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.vehicle_state.x, self.vehicle_state.y, self.lanelet_route)
             try:
                 x_vector, y_vector = frenet_to_sim_frame(self.global_path, self.vehicle_state.get_S(), self.vehicle_state.get_D())
@@ -218,9 +224,8 @@ class SV(Vehicle):
             #    print ('ERROR: X went backwards. Diff: {:.2}'.format(diff))
             #self.last_x = self.vehicle_state.x
 
-
     def get_frenet_state(self):
-        if self.s_eq == None:
+        if self.s_eq is None:
             return None
         time = self.trajectory_time
         return [self.s_eq(time), self.s_vel_eq(time), self.s_acc_eq(time), self.d_eq(time), self.d_vel_eq(time), self.d_acc_eq(time)]
@@ -271,3 +276,63 @@ class SV(Vehicle):
         if (diff>0):
             self.trajectory_time += diff
         # print('new s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
+
+
+class RV(Vehicle):
+    def __init__(self, vid, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS):
+        super(RV, self).__init__(vid, name=name, start_state=start_state, radius=radius)
+
+        self.is_remote = True
+        self.P = np.identity(2) * 0.5 # some large error
+        # experiment w these values
+        self.POS_VAR = 0.01 ** 2
+        self.VEL_VAR = 0.1 ** 2
+        self.SENSOR_VAR = 0.01 ** 2
+
+    def update_sim_state(self, new_state, delta_time):
+        # NOTE: this may desync the sim and frenet vehicle state, so this should
+        # only be done for remote vehicles (which don't have a frenet state)
+
+        position, velocity = self.get_kalman_state_estimate(new_state, self.vehicle_state, delta_time)
+
+        # set filtered velocity but not position - should set pos also?
+        self.vehicle_state.set_X([new_state.x, velocity[0], new_state.x_acc])
+        self.vehicle_state.set_Y([new_state.y, velocity[1], new_state.y_acc])
+        # log.info(str(np.linalg.norm([self.vehicle_state.x_vel, self.vehicle_state.y_vel])))
+
+    def get_kalman_state_estimate(self, new_state, current_state, delta_time):
+        # Init current state as [position velocity]T
+        x = np.array([
+            [current_state.x, current_state.y],
+            [current_state.x_vel, current_state.y_vel]
+        ])
+        # current observation
+        z = np.array([
+            [new_state.x, new_state.y]
+        ])
+        # Init matrices for kalman filter
+        # Dynamics matrix
+        F = np.array([
+            [1, delta_time],
+            [0, 1]
+        ])
+        # Measurement matrix (we only measure position)
+        H = np.array([[1, 0]])
+        # Error in prediction
+        Q = np.array([
+            [self.POS_VAR, 0],
+            [0, self.VEL_VAR]
+        ])
+        # Error in measurement
+        R = np.array([self.SENSOR_VAR])
+
+        x, self.P = kalman(x, z, self.P, F, H, Q, R)
+        return x[0], x[1]
+
+    def get_low_pass_state_estimate(self, new_state, delta_time):
+        # simple velocity estimate - not used
+        v = np.array([new_state.x_vel, new_state.y_vel])
+        v_prev = np.array([self.vehicle_state.x_vel, self.vehicle_state.y_vel])
+        k = 0.85
+        v = (1 - k) * v_prev + k * v
+        return [new_state.x, new_state.y], v

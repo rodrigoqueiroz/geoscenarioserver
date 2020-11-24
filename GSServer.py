@@ -60,11 +60,13 @@ def start_server(args, m=MVelKeepConfig()):
             break
         try:
             #Update Traffic
-            traffic.tick(
+            sim_status = traffic.tick(
                 sync_global.tick_count,
                 sync_global.delta_time,
                 sync_global.sim_time
             )
+            if sim_status < 0:
+                break
         except KeyboardInterrupt:
             break
 

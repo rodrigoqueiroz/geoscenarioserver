@@ -30,7 +30,7 @@ def logistic(x):
 def to_equation(coefficients):
     def f(t):
         total = 0.0
-        for i, coef in enumerate(coefficients): 
+        for i, coef in enumerate(coefficients):
             total += coef * t ** i
         return total
     return f
@@ -47,4 +47,16 @@ def get_truncated_normal(mean, sd, lo, up):
     return truncnorm.rvs(
         (lo - mean) / sd, (up - mean) / sd, loc=mean, scale=sd)
 
+def kalman(x, z, P, F, H, Q, R):
+    F_t = np.transpose(F)
+    H_t = np.transpose(H)
+    # prediction step
+    x_pred = F @ x
+    P_pred = F @ (P @ F_t) + Q
+    # Kalman gain
+    K = P_pred @ (H_t / (R + H @ (P_pred @ H_t))) # R * vel_pred^2? yes
+    # update estimation
+    x_new = x_pred + K @ (z - H @ x_pred)
+    P_new = P_pred - K @ (H @ P_pred)
 
+    return x_new, P_new
