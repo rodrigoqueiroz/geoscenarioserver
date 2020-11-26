@@ -36,11 +36,13 @@ node                : leafNode | nodeComposition;
 nodeComposition     : OPERATOR INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
-condition           : 'condition' name '(' cconfig ')';
+condition           : 'condition' name '(' cconfig (',' error)? (',' delay)? ')';
 maneuver            : 'maneuver' name '(' mconfig ')';
 subtree             : 'subtree' name '(' (midconf (',' midconf)*)? ')';
 midconf             : mid '=' mconfig;
 
+error               : 'error' '=' FLOAT;
+delay               : 'delay' '=' FLOAT;
 
 mconfig             : name '(' params* ')';
 cconfig             : name '(' params* ')';

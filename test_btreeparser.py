@@ -10,23 +10,25 @@ from sv.btree.BTreeParser import *
 def main():
     
     path= "scenarios/trees/"
-    scenarios = ["drive_scenario_tree.btree", "fast_drive_scenario_tree.btree", "impatient_drive_scenario_tree.btree", "lane_change_scenario_tree.btree"]
+    scenarios = ["drive_tree.btree","drive_scenario_tree.btree", "fast_drive_scenario_tree.btree", "impatient_drive_scenario_tree.btree", "lane_change_scenario_tree.btree"]
     
     for scenario in scenarios:
+        print("***** Testing " + scenario + " *****")
         try:
             in_file = open(path+scenario, 'r')
             src = in_file.read()
             lexer = BTreeDSLLexer(InputStream(src))
             parser = BTreeDSLParser(CommonTokenStream(lexer))
             tree = parser.behaviorTree()
-            listener = BTreeParser.BTreeListener(vid=1,name="a")
-            ParseTreeWalker().walk(listener, tree)
-            tree = listener.getTreeStr()
-            print(tree)
+            #listener = BTreeParser(vid=1,bmodel=None)
+            #ParseTreeWalker().walk(listener, tree)
+            #tree = tree.getTreeStr()
+            #print(tree)
         except:
             raise RuntimeError("Failed at "+ scenario)
         finally:
             print("Scenario " + scenario + " passed!")
+            print("**************" + len(scenario)*"*" + "*****")
     return
 
 if __name__ == '__main__':
