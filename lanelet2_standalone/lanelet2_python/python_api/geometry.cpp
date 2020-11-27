@@ -7,6 +7,8 @@
 #include <lanelet2_core/geometry/Polygon.h>
 #include <lanelet2_core/geometry/RegulatoryElement.h>
 
+#include "converter.h"
+
 using namespace boost::python;
 using namespace lanelet;
 
@@ -15,8 +17,11 @@ using HybridLs2d = ConstHybridLineString2d;
 
 template <typename PrimT>
 auto wrapFindNearest() {
-  using Sig = std::vector<std::pair<double, PrimT>> (*)(PrimitiveLayer<PrimT>&, const BasicPoint2d&, unsigned);
+  using ResultT = std::vector<std::pair<double, PrimT>>;
+  using Sig = ResultT (*)(PrimitiveLayer<PrimT>&, const BasicPoint2d&, unsigned);
   auto func = static_cast<Sig>(lanelet::geometry::findNearest);
+  converters::PairConverter<std::pair<double, PrimT>>();
+  converters::VectorToListConverter<ResultT>();
   return def("findNearest", func);
 }
 

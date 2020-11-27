@@ -163,13 +163,17 @@ class GSParser(object):
         self.vehicles[n.tags["vid"]] = n
 
     def check_traffic_light(self, n):
-        mandatory = {"gs","name","states"}
-        optional = {"duration","group"}
+        mandatory = {"gs","name","states","duration"}
+        optional = {"group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
         self.tlights[n.tags["name"]] = n
-         #assert duration match states
+
+        # ensure no. states match no. durations
+        nstates = len(n.tags["states"].split(','))
+        ndurations = len(n.tags["duration"].split(',')) if isinstance(n.tags["duration"], str) else 1
+        assert nstates == ndurations
 
     def check_path(self, n:Way): #:Way
         mandatory = {"gs","name"}

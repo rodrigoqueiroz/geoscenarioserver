@@ -4,8 +4,8 @@
 
 from py_trees import *
 import random
-from sv.ManeuverStatus import *
-from sv.btree.BehaviorModels import *
+
+from sv.ManeuverStatus import ManeuverStatus
 from sv.ManeuverConfig import *
 import sv.ManeuverUtils
 
@@ -42,7 +42,7 @@ class ManeuverAction(behaviour.Behaviour):
     def __init__(self, bmodel, name, mconfig, **kwargs):
         super(ManeuverAction, self).__init__(name)
         self.name = name
-        self.bmodel:BehaviorModels = bmodel
+        self.bmodel = bmodel
         self.mconfig = mconfig
         self.kwargs = kwargs
         # self.status = common.Status.SUCCESS
@@ -95,7 +95,15 @@ class ManeuverAction(behaviour.Behaviour):
                 self.mconfig.target_vid = target_vehicle.vid
 
         elif self.mconfig.mkey == Maneuver.M_STOP_AT:
-            self.mconfig.stop_pos = self.bmodel.planner_state.goal_point_frenet[0]
+            # If stopping at goal, set stop_pos to the goal point's s value
+            if self.mconfig.stop_type == StopAtType.GOAL:
+                self.mconfig.stop_pos = self.bmodel.planner_state.goal_point_frenet[0]
+            # If stopping at a stop line, find a regulatory element with a stop line applying to this vehicle
+            elif self.mconfig.stop_type == StopAtType.STOP_LINE:
+                for re_state in self.bmodel.planner_state.regulatory_elements:
+                    if 'stop_position' in re_state._fields:
+                        self.mconfig.stop_pos = re_state.stop_position[0]
+                        break
 
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed:

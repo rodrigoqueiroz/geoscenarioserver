@@ -12,10 +12,12 @@ import threading
 import math
 import numpy as np
 import glog as log
+
 from shm.SimSharedMemory import *
 from TickSync import TickSync
 from sv.SV import *
 from sv.SVPlanner import *
+from TrafficLight import TrafficLight
 
 class SimTraffic(object):
 
@@ -27,13 +29,15 @@ class SimTraffic(object):
         self.vehicles = {}  #dictionary for direct access using vid
         self.static_objects = {}
         self.pedestrians = {}
-
+        self.traffic_lights = {}    #geoscenario TrafficLights by corresponding lanelet2 TrafficLight id
+        
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
 
         #Internal ShM
         self.traffic_state_sharr = None
+        self.traffic_light_sharr = None
         self.debug_shdata = None
 
     def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root="drive_tree", start_state_in_frenet=False):
@@ -53,6 +57,9 @@ class SimTraffic(object):
         v = RV(vid, name=name, start_state=start_state, radius=1.0)
         self.vehicles[vid] = v
 
+    def add_traffic_light(self, tl_re, states, durations):
+        self.traffic_lights[tl_re.id] = TrafficLight(states, durations)
+
     def start(self):
         nv = len(self.vehicles)
         #Creates Shared Memory Blocks to publish all vehicles'state.
@@ -64,7 +71,8 @@ class SimTraffic(object):
             vehicle = self.vehicles[vid]
             #if not vehicle.is_remote:
             if isinstance(vehicle, SV):
-                vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr, self.debug_shdata)
+                vehicle.start_planner(
+                    nv, self.sim_config, self.traffic_state_sharr, self.traffic_light_sharr, self.debug_shdata)
 
     def stop_all(self):
         for vid in self.vehicles:
@@ -74,38 +82,20 @@ class SimTraffic(object):
         nv = len(self.vehicles)
 
         #Read Client
-        if CLIENT_SHM:
-            new_client_state = False
-            header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
-            if header is not None:
-                client_tick_count, client_delta_time, n_vehicles = header
-                if self.sim_client_tick_count < client_tick_count:
-                    self.sim_client_tick_count = client_tick_count
-                    new_client_state = True
+        new_client_state = False
+        header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
+        if header is not None:
+            client_tick_count, client_delta_time, n_vehicles = header
+            if self.sim_client_tick_count < client_tick_count:
+                self.sim_client_tick_count = client_tick_count
+                new_client_state = True
 
-            #Check for client-side collisions
-            #Disabled vehicles indicate a collision and simulation should be stopped
-            if len(disabled_vehicles) > 0:
-                # print sim state and exit
-                log.info("Collision between vehicles {}".format(disabled_vehicles))
-                state_str = "GSS crash report:\n"
-                for vid in vstates:
-                    # Need to use server state for gs vehicles and client state for remote vehicles
-                    state = vstates[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
-
-                    state_str += (
-                        "VID {}:\n"
-                        "   state       {}\n"
-                        "   position    ({},{},{})\n"
-                        "   speed       {}\n"
-                    ).format(
-                        vid,
-                        "DISABLED" if vid in disabled_vehicles else "ACTIVE",
-                        state.x, state.y, state.z,
-                        np.linalg.norm([state.x_vel, state.y_vel])
-                    )
-                log.info(state_str)
-                return -1
+        #Check for client-side collisions
+        #Disabled vehicles indicate a collision and simulation should be stopped
+        if len(disabled_vehicles) > 0:
+            # print sim state and exit
+            self.log_sim_state(vstates, disabled_vehicles)
+            return -1
 
         #Update Dynamic Agents
         for vid in self.vehicles:
@@ -124,6 +114,10 @@ class SimTraffic(object):
         #Update static elements (obstacles)
         #TODO
 
+        #Update traffic light states
+        for lid, tl in self.traffic_lights.items():
+            tl.tick(tick_count, delta_time, sim_time)
+
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
 
@@ -141,6 +135,7 @@ class SimTraffic(object):
         r = nv + 1 #+1 for header
         c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 + 1 #+1 for vid
         self.traffic_state_sharr = Array('f', r * c)
+        self.traffic_light_sharr = Array('i', len(self.traffic_lights) * 2) #List[(id, color)]
 
         #Internal Debug Shared Data
         self.debug_shdata = Manager().dict()
@@ -168,7 +163,34 @@ class SimTraffic(object):
             ri += 1
         self.traffic_state_sharr.release() #<=========RELEASE
 
+        # update traffic light state
+        # Arrays should be automatically thread-safe
+        traffic_light_states = []
+        for lid, tl in self.traffic_lights.items():
+            traffic_light_states += [lid, tl.current_color.value]
+        self.traffic_light_sharr[:] = traffic_light_states
+
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
             self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles)
+
+    def log_sim_state(self, client_vehicle_states, disabled_vehicles):
+        log.info("Collision between vehicles {}".format(disabled_vehicles))
+        state_str = "GSS crash report:\n"
+        for vid in client_vehicle_states:
+            # Need to use server state for gs vehicles and client state for remote vehicles
+            state = client_vehicle_states[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
+
+            state_str += (
+                "VID {}:\n"
+                "   state       {}\n"
+                "   position    ({},{},{})\n"
+                "   speed       {}\n"
+            ).format(
+                vid,
+                "DISABLED" if vid in disabled_vehicles else "ACTIVE",
+                state.x, state.y, state.z,
+                np.linalg.norm([state.x_vel, state.y_vel])
+            )
+        log.info(state_str)

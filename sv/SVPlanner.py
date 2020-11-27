@@ -9,40 +9,32 @@ import numpy as np
 import random
 import datetime
 import time
-from dataclasses import dataclass
 from multiprocessing import shared_memory, Process, Lock, Array, Manager
-from typing import Tuple, Dict, List
+from typing import Dict, List
 import glog as log
+from copy import copy
 
 from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
-from sv.VehicleState import *
+from sv.VehicleState import VehicleState, MotionPlan
 from sv.ManeuverConfig import *
-from sv.ManeuverModels import *
-from sv.btree.BTreeModel import * # Deprecated
+from sv.ManeuverModels import plan_maneuver
+# from sv.btree.BTreeModel import * # Deprecated
 #from sv.btree.BTreeFactory import *
-from sv.btree.BehaviorModels import *
+from sv.btree.BehaviorModels import BehaviorModels
+from sv.SVPlannerState import PlannerState, TrafficLightState
 # import sv.SV
 from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
-
-
-@dataclass
-class PlannerState:
-    sim_time: float
-    vehicle_state: VehicleState
-    lane_config: LaneConfig
-    traffic_vehicles: Dict
-    pedestrians: List
-    obstacles: List
-    goal_point: Tuple[float,float] = None
-    goal_point_frenet: Tuple[float,float] = None
+from util.Utils import pairwise
+import lanelet2.core
 
 
 class SVPlanner(object):
-    def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr, debug_shdata):
+    def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr, traffic_light_sharr, debug_shdata):
         #MainProcess space:
         self._process = None
         self._traffic_state_sharr = traffic_state_sharr
+        self._traffic_light_sharr = traffic_light_sharr
         self._debug_shdata = debug_shdata
         self._mplan_sharr = None
         self.motion_plan = None
@@ -103,15 +95,17 @@ class SVPlanner(object):
         self.btree_model = BehaviorModels(self.vid, self.btree_root)
 
         while sync_planner.tick():
+            # Get sim state from main process
             header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             state_time = header[2]
+            traffic_light_states = self.read_traffic_light_states()
 
             if self.reference_path is None:
                 self.reference_path = self.laneletmap.get_global_path_for_route(
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
 
-            # Get traffic and lane config in current frenet frame
-            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles)
+            # Get traffic, lane config and regulatory elements in current frenet frame
+            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_light_states)
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
@@ -127,7 +121,7 @@ class SVPlanner(object):
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
 
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles)
+                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_light_states)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -164,7 +158,12 @@ class SVPlanner(object):
         # shm_vs.close()
         # shm_vp.close()
 
-    def get_planner_state(self, planner_tick:TickSync, vehicle_state:VehicleState, traffic_vehicles:List):
+    def get_planner_state(
+            self,
+            planner_tick:TickSync,
+            vehicle_state:VehicleState,
+            traffic_vehicles:List,
+            traffic_light_states:Dict):
         """ Transforms vehicle_state and all traffic vehicles to the current frenet frame, and generates other
             frame-dependent planning data like current lane config and goal.
         """
@@ -174,7 +173,7 @@ class SVPlanner(object):
         vehicle_state.set_D(d_vector)
 
         # update lane config based on current (possibly outdated) reference frame
-        lane_config = self.read_map(vehicle_state, self.reference_path)
+        lane_config, reg_elems = self.read_map(vehicle_state, self.reference_path, traffic_light_states)
         if not lane_config:
             # No map data for current position
             log.warn("no lane config")
@@ -196,11 +195,12 @@ class SVPlanner(object):
             lane_config=lane_config,
             goal_point_frenet=goal_point_frenet,
             traffic_vehicles=traffic_vehicles,
+            regulatory_elements=reg_elems,
             pedestrians=None,
             obstacles=None
         )
 
-    def read_map(self, vehicle_state, reference_path):
+    def read_map(self, vehicle_state, reference_path, traffic_light_states):
         """ Builds a lane config centered around the closest lanelet to vehicle_state lying
             on the reference_path.
         """
@@ -227,7 +227,24 @@ class SVPlanner(object):
             lower_lane_config = LaneConfig(-1, 30, middle_lane_config.right_bound, middle_lane_config.right_bound - lower_lane_width)
             middle_lane_config.set_right_lane(lower_lane_config)
 
-        return middle_lane_config
+        # Get regulatory elements acting on this lanelet
+        reg_elems = cur_ll.regulatoryElements
+        reg_elem_states = []
+        for re in reg_elems:
+            if isinstance(re, lanelet2.core.TrafficLight):
+                # lanelet2 traffic lights must have a corresponding state from the main process
+                if re.id not in traffic_light_states:
+                    continue
+
+                stop_linestring = re.parameters['ref_line']
+                # choose the closest point on the stop line as the stop position
+                stop_pos = min(
+                    sim_to_frenet_position(self.reference_path, stop_linestring[0][0].x, stop_linestring[0][0].y),
+                    sim_to_frenet_position(self.reference_path, stop_linestring[0][-1].x, stop_linestring[0][-1].y),
+                    key=lambda p: p[0])
+                reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
+
+        return middle_lane_config, reg_elem_states
 
     def read_traffic_state(self, traffic_state_sharr):
         from sv.SV import Vehicle
@@ -256,6 +273,16 @@ class SVPlanner(object):
                 vehicles[vid] = vehicle
         traffic_state_sharr.release() #<=========RELEASE
         return header_vector, my_vehicle_state, vehicles
+
+    def read_traffic_light_states(self):
+        # should be automatically thread-safe
+        tl_states = copy(self._traffic_light_sharr[:])
+        traffic_light_states = {}
+
+        for lid, state in pairwise(tl_states):
+            traffic_light_states[lid] = state
+
+        return traffic_light_states
 
     def write_motion_plan(self, mplan_sharr, traj, cand, state_time, new_frenet_frame, reversing):
         if not traj:
