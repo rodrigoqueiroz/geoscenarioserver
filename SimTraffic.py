@@ -12,10 +12,12 @@ import threading
 import math
 import numpy as np
 import glog as log
+
 from shm.SimSharedMemory import *
 from TickSync import TickSync
 from sv.SV import *
 from sv.SVPlanner import *
+from TrafficLight import TrafficLight
 
 class SimTraffic(object):
 
@@ -23,14 +25,15 @@ class SimTraffic(object):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
 
-        self.vehicles = {}  #dictionary for direct access using vid
+        self.vehicles = {}          #dictionary for direct access using vid
         self.static_objects = {}
-
+        self.traffic_lights = {}    #geoscenario TrafficLights by corresponding lanelet2 TrafficLight id
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
         #Internal ShM
         self.traffic_state_sharr = None
+        self.traffic_light_sharr = None
         self.debug_shdata = None
 
     def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root="drive_tree", start_state_in_frenet=False):
@@ -46,6 +49,9 @@ class SimTraffic(object):
         v = RV(vid, name=name, start_state=start_state, radius=1.0)
         self.vehicles[vid] = v
 
+    def add_traffic_light(self, tl_re, states, durations):
+        self.traffic_lights[tl_re.id] = TrafficLight(states, durations)
+
     def start(self):
         nv = len(self.vehicles)
         #Creates Shared Memory Blocks to publish all vehicles'state.
@@ -56,7 +62,8 @@ class SimTraffic(object):
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
             if not vehicle.is_remote:
-                vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr, self.debug_shdata)
+                vehicle.start_planner(
+                    nv, self.sim_config, self.traffic_state_sharr, self.traffic_light_sharr, self.debug_shdata)
 
     def stop_all(self):
         for vid in self.vehicles:
@@ -94,6 +101,10 @@ class SimTraffic(object):
         #Update static elements (obstacles)
         #TODO
 
+        #Update traffic light states
+        for lid, tl in self.traffic_lights.items():
+            tl.tick(tick_count, delta_time, sim_time)
+
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
 
@@ -110,6 +121,7 @@ class SimTraffic(object):
         r = nv + 1 #+1 for header
         c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 + 1 #+1 for vid
         self.traffic_state_sharr = Array('f', r * c)
+        self.traffic_light_sharr = Array('i', len(self.traffic_lights) * 2) #List[(id, color)]
 
         #Internal Debug Shared Data
         self.debug_shdata = Manager().dict()
@@ -136,6 +148,13 @@ class SimTraffic(object):
             self.traffic_state_sharr[i+2:i+c] = sv
             ri += 1
         self.traffic_state_sharr.release() #<=========RELEASE
+
+        # update traffic light state
+        # Arrays should be automatically thread-safe
+        traffic_light_states = []
+        for lid, tl in self.traffic_lights.items():
+            traffic_light_states += [lid, tl.current_color.value]
+        self.traffic_light_sharr[:] = traffic_light_states
 
         #Shm for external Simulator (Unreal)
         #Write out simulator state

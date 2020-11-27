@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
 
 from py_trees import *
 import functools
@@ -9,6 +10,9 @@ from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
 from sv.btree.BTreeParser import *
 from sv.btree.BTreeLeaves import *
+from sv.SVPlannerState import TrafficLightState
+from TrafficLight import TrafficLightColor
+
 
 class BehaviorModels(object):
     ''''
@@ -91,6 +95,7 @@ class BehaviorModels(object):
                 log.warn("No reachable {} lane for lane changing vehicle {}".format(
                     "LEFT" if target_lane_id == 1 else "RIGHT",
                     self.vid))
+                return False
 
             return is_lane_occupied(
                 self.planner_state.vehicle_state,
@@ -122,6 +127,13 @@ class BehaviorModels(object):
             tmin = kwargs['tmin'] if 'tmin' in kwargs else 0
             tmax = kwargs['tmax'] if 'tmax' in kwargs else float('inf')
             return tmin < self.planner_state.sim_time < tmax
+
+        elif condition == "traffic_light_red":
+            for re_state in self.planner_state.regulatory_elements:
+                if isinstance(re_state, TrafficLightState):
+                    # check if light is red and we're close enough
+                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < 35 \
+                        and re_state.color == TrafficLightColor.Red
 
         return False
 
