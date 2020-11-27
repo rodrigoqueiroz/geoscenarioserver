@@ -22,13 +22,16 @@ class SimTraffic(object):
     def __init__(self, laneletmap, sim_config):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
-
+        
+        #Dyn agents
         self.vehicles = {}  #dictionary for direct access using vid
         self.static_objects = {}
+        self.pedestrians = {}
 
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
+
         #Internal ShM
         self.traffic_state_sharr = None
         self.debug_shdata = None
@@ -41,6 +44,10 @@ class SimTraffic(object):
             log.error("Failed to initialize vehicle {}".format(vid))
             raise e
         self.vehicles[vid] = v
+    
+    def add_trajectory_vehicle(self, vid, name, start_state, trajectory):
+        v = TV(vid, name, start_state, trajectory, self.lanelet_map)
+        self.vehicles[vid] = v
 
     def add_remote_vehicle(self, vid, name, start_state):
         v = RV(vid, name=name, start_state=start_state, radius=1.0)
@@ -52,10 +59,11 @@ class SimTraffic(object):
         self.create_traffic_state_shm()
         self.write_traffic_state(0.0,0.0,0.0)
 
-        #Start SV Planners
+        #Start Vehicles
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
-            if not vehicle.is_remote:
+            #if not vehicle.is_remote:
+            if isinstance(vehicle, SV):
                 vehicle.start_planner(nv, self.sim_config, self.traffic_state_sharr, self.debug_shdata)
 
     def stop_all(self):
@@ -66,37 +74,38 @@ class SimTraffic(object):
         nv = len(self.vehicles)
 
         #Read Client
-        new_client_state = False
-        header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
-        if header is not None:
-            client_tick_count, client_delta_time, n_vehicles = header
-            if self.sim_client_tick_count < client_tick_count:
-                self.sim_client_tick_count = client_tick_count
-                new_client_state = True
+        if CLIENT_SHM:
+            new_client_state = False
+            header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
+            if header is not None:
+                client_tick_count, client_delta_time, n_vehicles = header
+                if self.sim_client_tick_count < client_tick_count:
+                    self.sim_client_tick_count = client_tick_count
+                    new_client_state = True
 
-        #Check for client-side collisions
-        #Disabled vehicles indicate a collision and simulation should be stopped
-        if len(disabled_vehicles) > 0:
-            # print sim state and exit
-            log.info("Collision between vehicles {}".format(disabled_vehicles))
-            state_str = "GSS crash report:\n"
-            for vid in vstates:
-                # Need to use server state for gs vehicles and client state for remote vehicles
-                state = vstates[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
+            #Check for client-side collisions
+            #Disabled vehicles indicate a collision and simulation should be stopped
+            if len(disabled_vehicles) > 0:
+                # print sim state and exit
+                log.info("Collision between vehicles {}".format(disabled_vehicles))
+                state_str = "GSS crash report:\n"
+                for vid in vstates:
+                    # Need to use server state for gs vehicles and client state for remote vehicles
+                    state = vstates[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
 
-                state_str += (
-                    "VID {}:\n"
-                    "   state       {}\n"
-                    "   position    ({},{},{})\n"
-                    "   speed       {}\n"
-                ).format(
-                    vid,
-                    "DISABLED" if vid in disabled_vehicles else "ACTIVE",
-                    state.x, state.y, state.z,
-                    np.linalg.norm([state.x_vel, state.y_vel])
-                )
-            log.info(state_str)
-            return -1
+                    state_str += (
+                        "VID {}:\n"
+                        "   state       {}\n"
+                        "   position    ({},{},{})\n"
+                        "   speed       {}\n"
+                    ).format(
+                        vid,
+                        "DISABLED" if vid in disabled_vehicles else "ACTIVE",
+                        state.x, state.y, state.z,
+                        np.linalg.norm([state.x_vel, state.y_vel])
+                    )
+                log.info(state_str)
+                return -1
 
         #Update Dynamic Agents
         for vid in self.vehicles:
@@ -105,8 +114,12 @@ class SimTraffic(object):
                 if new_client_state:
                     self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
 
-            #tick vehicle
+            #tick vehicle (all types)
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
+        
+        #pedestrians:
+        for pid in self.pedestrians:
+            self.pedestrians[vid].tick(tick_count, delta_time, sim_time)
 
         #Update static elements (obstacles)
         #TODO
@@ -120,7 +133,8 @@ class SimTraffic(object):
     #Shared Memory:
     def create_traffic_state_shm(self):
         #External Sim (Unreal) ShM
-        self.sim_client_shm = SimSharedMemory()
+        if CLIENT_SHM:
+            self.sim_client_shm = SimSharedMemory()
 
         #Internal ShM
         nv = len(self.vehicles)

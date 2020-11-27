@@ -79,7 +79,21 @@ class Dashboard(object):
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
             tickcount, delta_time, sim_tim = header
 
-            #planning data
+            #find a valid vehicle to center map and show motion plan in frenet frame (if possible)
+            vid = None
+            if self.center_vid in vehicles:
+                if vehicles[self.center_vid].visible:
+                    vid = self.center_vid
+            if vid is None:
+                # Cannot find vehicle with id center_vid, switch focus to any valid vehicle
+                if len(vehicles) > 0:
+                    self.center_vid = next(iter(vehicles.keys()))
+                    log.warn("Dash: center vid not in array, auto switch to vid {}".format(self.center_vid))
+
+            #cartesian map
+            self.plot_cartesian_chart(self.center_vid, vehicles, None)
+
+            
             if self.center_vid in debug_shdata:
                 # Read vehicle debug data from debug_shdata
                 vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[self.center_vid]
@@ -102,18 +116,22 @@ class Dashboard(object):
                 tree_str += debug_shdata[self.center_vid][1]
                 self.tree_msg.configure(text=tree_str)
 
-            elif self.center_vid in vehicles and vehicles[self.center_vid].is_remote:
-                # A remote vehicle doesn't have a frenet plot or debug data
-                self.plot_cartesian_chart(self.center_vid, vehicles, None)
-
+            
+            
+            
+                
+            
+            # Cannot find vehicle with id center_vid, switch focus to any valid vehicle
+            elif len(debug_shdata) > 0:
+                self.center_vid = next(iter(debug_shdata.keys()))
+                log.warn("Dash: center vid not in array, auto switch to SV {}".format(self.center_vid))
+            elif len(vehicles) > 0:
+                self.center_vid = next(iter(vehicles.keys()))
+                log.warn("Dash: center vid not in array, auto switch to TV {}".format(self.center_vid))
             else:
-                # Cannot find vehicle with id center_vid, switch to another vehicle
-                if 1 in debug_shdata:
-                    self.center_vid = 1
-                    log.warn("Dash: center vid not in array, auto switch to {}".format(self.center_vid))
-                else:
-                    self.center_vid = next(iter(debug_shdata.keys()))
-                    log.warn("Dash: center vid not in array, auto switch to {}".format(self.center_vid))
+                #nothing to show
+                #TODO: clean charts
+                continue
 
             #Vehicles Table
             self.tab.delete(*self.tab.get_children())
@@ -123,7 +141,9 @@ class Dashboard(object):
                 truncate_vector(sv,2)
                 sv = [vid] + sv
                 self.tab.insert('', 'end', int(vid), values=(sv))
-            self.tab.selection_set(self.center_vid)
+            if self.tab.exists(self.center_vid==True):
+                self.tab.selection_set(self.center_vid)
+            
 
             #Sub vehicle plot
             #todo: transform into log chart, instead of projected trajectory
@@ -228,8 +248,8 @@ class Dashboard(object):
 
         #boundaries
         x_min = vehicle_state.x - (CPLOT_SIZE/2)
-        y_min = vehicle_state.y - (CPLOT_SIZE/2)
         x_max = vehicle_state.x + (CPLOT_SIZE/2)
+        y_min = vehicle_state.y - (CPLOT_SIZE/2)
         y_max = vehicle_state.y + (CPLOT_SIZE/2)
 
         #road
@@ -253,7 +273,7 @@ class Dashboard(object):
             plt.plot(x, y, 'bv')
             circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
             plt.gca().add_artist(circle1)
-            label = "vid {}".format(vid)
+            label = "v {}".format(vid)
             plt.gca().text(x+1, y+1, label, style='italic')
             # vehicle direction - /2 for aesthetics
             vx = vs.x_vel
@@ -290,12 +310,14 @@ class Dashboard(object):
         #layout
         plt.xlim(x_min,x_max)
         plt.ylim(y_min,y_max)
+        plt.xlabel('X')
+        plt.ylabel('Y')
         plt.gca().set_aspect('equal', adjustable='box')
-        plt.gca().xaxis.set_visible(False)
-        plt.gca().yaxis.set_visible(False)
-        plt.margins(1,1)
-        plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
-        #fig.tight_layout(pad=0.05)
+        plt.gca().xaxis.set_visible(True)
+        plt.gca().yaxis.set_visible(True)
+        plt.margins(0,0)
+        #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
+        #fig.tight_layout(pad=0.1)
 
     def plot_frenet_chart(self, center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config):
         #Frenet Frame plot
@@ -509,22 +531,22 @@ class Dashboard(object):
         window.grid_columnconfigure(0, weight=1)
 
         #Containers:
-        title_frame = tk.Frame(window, width = 1300, height = 40, bg = "orange")
-        stats_frame = tk.Frame(window, width = 1300, height = 40, bg = "white")
-        vehicle_frame = tk.Frame(window, width = 1300, height = 500, bg = "white")
-        global_frame = tk.Frame(window, width = 1300, height = 500, bg = "white")
+        title_frame = tk.Frame(window, width = 1500, height = 40, bg = "orange")
+        stats_frame = tk.Frame(window, width = 1500, height = 40, bg = "lightgrey")
+        vehicle_frame = tk.Frame(window, width = 1500, height = 600, bg = "white")
+        global_frame = tk.Frame(window, width = 1500, height = 600, bg = "white")
         #vehicle sub containers
         vehicle_frame.grid_rowconfigure(1, weight=1)
         vehicle_frame.grid_columnconfigure(2, weight=1)
-        cart_frame = tk.Frame(vehicle_frame, width = 400, height = 500, bg = "white")
-        fren_frame = tk.Frame(vehicle_frame, width = 600, height = 500, bg = "white")
-        bt_frame = tk.Frame(vehicle_frame, width = 300, height = 500, bg = "white")
+        cart_frame = tk.Frame(vehicle_frame, width = 600, height = 600, bg = "white")
+        fren_frame = tk.Frame(vehicle_frame, width = 600, height = 600, bg = "white")
+        bt_frame = tk.Frame(vehicle_frame, width = 300, height = 600, bg = "white")
         #white_space = tk.Frame(vehicle_frame, width = 10, height = 500, bg = "white")
         #global sub containers
         global_frame.grid_rowconfigure(0, weight=1)
         global_frame.grid_columnconfigure(0, weight=1)
         #map_frame = tk.Frame(global_frame, width = 500, height = 300, bg = "green")
-        tab_frame = tk.Frame(global_frame, width = 1000, height = 300, bg = "blue")
+        tab_frame = tk.Frame(global_frame, width = 1000, height = 400, bg = "blue")
 
 
         #Content:
@@ -582,13 +604,13 @@ class Dashboard(object):
 
         # vehicle cart
         fig_cart = plt.figure(2)
-        fig_cart.set_size_inches(4,4,forward=True)
+        #fig_cart.set_size_inches(6,4,forward=True)
         self.cart_canvas = FigureCanvasTkAgg(fig_cart, cart_frame)
         self.cart_canvas.get_tk_widget().pack()
 
         # vehicle frenet
         fig_fren = plt.figure(3)
-        fig_fren.set_size_inches(6,4,forward=True)
+        #fig_fren.set_size_inches(6,4,forward=True)
         self.fren_canvas = FigureCanvasTkAgg(fig_fren, fren_frame)
         self.fren_canvas.get_tk_widget().pack()
 

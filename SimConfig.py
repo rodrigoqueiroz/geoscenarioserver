@@ -29,7 +29,7 @@ FFPLOT_LENGTH = 50			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
 #Cartesian
 SHOW_CPLOT = True           #whether to show the cartesian plot
-CPLOT_SIZE = 80				#cartesian plot: road length in meters (shorter=better performance)
+CPLOT_SIZE = 100			#cartesian plot: road length in meters (shorter=better performance)
 VEH_STAT_CHART = False      #(!HEAVY) Vehicle Stat Chart. Limited to PLOT_VID
 VEH_TRAJ_CHART = False      #(!HEAVY) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
 REFERENCE_PATH = True      #reference path indicating the frenet frame for the vehicle
@@ -52,10 +52,12 @@ OBJ_COLLISION = False      	#If true, collision between vehicles and static obje
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
+CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943
 CS_SEM_KEY = 933433
+SHM_SIZE = 1024
 
 @dataclass
 class SimConfig:

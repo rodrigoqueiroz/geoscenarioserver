@@ -48,6 +48,7 @@ class Vehicle(object):
         self.model = model
         #remote
         self.is_remote = False
+        self.visible = True
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
@@ -86,7 +87,7 @@ class Vehicle(object):
         return self.vid, remote, position, velocity, self.vehicle_state.yaw, self.vehicle_state.steer
 
 
-# A Simulated Vehicle
+# A Simulated Driver-Vehicle (dynamic behavior)
 class SV(Vehicle):
     def __init__(self, vid, name, btree_root, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model=None):
         #Map
@@ -277,7 +278,7 @@ class SV(Vehicle):
             self.trajectory_time += diff
         # print('new s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
 
-
+#A remote vehicle
 class RV(Vehicle):
     def __init__(self, vid, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS):
         super(RV, self).__init__(vid, name=name, start_state=start_state, radius=radius)
@@ -336,3 +337,41 @@ class RV(Vehicle):
         k = 0.85
         v = (1 - k) * v_prev + k * v
         return [new_state.x, new_state.y], v
+
+#A trajectory following vehicle
+class TV(Vehicle):
+    def __init__(self, vid, name, start_state, trajectory, lanelet_map, radius=VEHICLE_RADIUS):
+        super(TV, self).__init__(vid, name, start_state, radius=radius)
+        self.lanelet_map = lanelet_map
+        self.trajectory = trajectory
+        self.is_remote = False
+        self.visible = False
+        self.vehicle_state.set_X([-10000, 0, 0]) #forcing
+        self.vehicle_state.set_Y([-10000,0,0])
+
+    def tick(self, tick_count, delta_time, sim_time):
+        Vehicle.tick(self, tick_count, delta_time, sim_time)
+        if self.trajectory:
+            start_time = float(self.trajectory[0][2]) #first node
+            end_time = self.trajectory[-1][2] #last node
+            traj_time = end_time - start_time
+            if sim_time > end_time:
+                #vanish. Need to optimize this by setting vehicles as not visible and removing all calculations with it
+                self.vehicle_state.set_X([-10000, 0, 0])
+                self.vehicle_state.set_Y([-10000,0,0])
+                self.visible = False
+            elif True: #start_time > sim_time:
+                for node in self.trajectory:
+                    node_time = float(node[2])
+                    #time_in_trajectory = node_time - start_time
+                    #if time_in_trajectory > sim_time:
+                    if node_time > sim_time:
+                        self.visible = True
+                        self.vehicle_state.set_X([node[0], 0, 0]) #fix this, not real X velocity
+                        self.vehicle_state.set_Y([node[1], 0, 0])
+                        break;
+
+            
+        
+
+    

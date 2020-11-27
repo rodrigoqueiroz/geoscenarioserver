@@ -136,21 +136,42 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     # populate traffic and lanelet routes from file
     for vid, vnode in parser.vehicles.items():
         simvid = int(vid)
-        btree_root = vnode.tags['btree']
-        myroute = vnode.tags['route']
+        #A vehicle can either follow a route (dynamic driving) or a path (static trajectory)
+        if 'route' in vnode.tags:
+            myroute = vnode.tags['route']
+            btree_root = "drive_tree" #default
+            if 'btree' in vnode.tags:
+                btree_root = vnode.tags['btree']
+            try:
+                # NOTE may not want to prepend vehicle node, in case the user starts the vehicle in the middle of the path
+                route_nodes = parser.routes[myroute].nodes
+                lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
+                sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
+            except Exception as e:
+                log.error("Route generation failed for route {}.".format(myroute))
+                raise e
 
-        try:
-            # NOTE may not want to prepend vehicle node, in case the user starts the vehicle in the middle of the path
-            route_nodes = parser.routes[myroute].nodes
-            lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
-            sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
-        except Exception as e:
-            log.error("Route generation failed for route {}.".format(myroute))
-            raise e
-
-        sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
-        sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
+            sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
+            sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
                                 sim_config.lanelet_routes[simvid], btree_root)
+        
+        #todo: change to a new trajectory type to not conflict with GeoScenario1 path
+        elif 'path' in vnode.tags:
+            try:
+                mypath = vnode.tags['path']
+                path_nodes = parser.paths[mypath].nodes
+                trajectory = [ (node.x, node.y, node.tags['time']) for node in path_nodes ] 
+                #print ("TRAJECTORY:")
+                #print (trajectory)
+            except Exception as e:
+                log.error("Trajectory generation failed for path {}.".format(mypath))
+                raise e
+            #sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0,vnode.y,0.0,0.0], trajectory)
+            sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
+
+        
+
+            
     return True
 
 
