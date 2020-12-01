@@ -1336,6 +1336,10 @@
   <node id='-6831' action='modify' visible='true' lat='43.47797592496' lon='-80.5194918845' />
   <node id='-6833' action='modify' visible='true' lat='43.47798400268' lon='-80.51947200616' />
   <node id='-6835' action='modify' visible='true' lat='43.47799900415' lon='-80.51948552343' />
+  <node id='-6899' action='modify' visible='true' lat='43.47785904184' lon='-80.51947848733' />
+  <node id='-6900' action='modify' visible='true' lat='43.47785863385' lon='-80.51946049551' />
+  <node id='-6902' action='modify' visible='true' lat='43.4778476182' lon='-80.51946274449' />
+  <node id='-6904' action='modify' visible='true' lat='43.4778476182' lon='-80.51947286488' />
   <way id='-896' visible='true'>
     <nd ref='-8' />
     <nd ref='-718' />
@@ -2311,6 +2315,13 @@
     <nd ref='-6835' />
     <nd ref='-6830' />
   </way>
+  <way id='-6901' action='modify' visible='true'>
+    <nd ref='-6899' />
+    <nd ref='-6900' />
+    <nd ref='-6902' />
+    <nd ref='-6904' />
+    <nd ref='-6899' />
+  </way>
   <relation id='-1194' visible='true'>
     <member type='way' ref='-1148' role='left' />
     <member type='way' ref='-1150' role='right' />
@@ -3183,7 +3194,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1358' visible='true'>
+  <relation id='-1358' action='modify' visible='true'>
+    <member type='relation' ref='-6920' role='regulatory_element' />
     <member type='way' ref='-1116' role='left' />
     <member type='way' ref='-1096' role='right' />
     <member type='way' ref='-1138' role='stop_line' />
@@ -3309,6 +3321,12 @@
   <relation id='-6843' action='modify' visible='true'>
     <member type='way' ref='-6832' role='refers' />
     <member type='way' ref='-1136' role='ref_line' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='-6920' action='modify' visible='true'>
+    <member type='way' ref='-6901' role='refers' />
+    <member type='way' ref='-1138' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
