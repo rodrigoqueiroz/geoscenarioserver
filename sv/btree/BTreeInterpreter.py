@@ -90,6 +90,7 @@ class BTreeInterpreter(object):
 
     def reconfigure_nodes(self, tree_name, nodes, args=""):
         if(args != ""):
+            print("reconfiguring " + tree_name + " with args= " + args)
             args = args.split(";")
             if args[0] != '' :
                 for arg in args:
@@ -104,32 +105,32 @@ class BTreeInterpreter(object):
                     if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + tree_name)
 
     def link_subtrees(self, tree_name, tree, nodes, subtrees, args=""):
-
-        self.reconfigure_nodes(tree_name, nodes, args)
-
         for subtree in subtrees:
+            print("linking subtree " + subtree.name)
             parent = None
             for node in nodes:
                 if node.name == subtree.parent:
                     parent = node
                     break
             if parent == None: raise RuntimeError("Parent "+ subtree.parent +" not found.")
-            stree_to_append = self.build_subtree(subtree.name, subtree.args).root
+            stree_to_append = self.build_subtree(subtree).root
             tree.insert_subtree(stree_to_append, parent.id, int(subtree.pos))
 
         return tree
 
-    def build_subtree(self, subtree_name, args=""):
-        subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(subtree_name)
+    def build_subtree(self, _subtree):
+        name=_subtree.name
+        args=_subtree.args
+        subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(name)
+        if subtree_nodes: self.reconfigure_nodes(name, subtree_nodes, args)
         subtree = trees.BehaviourTree(root=subtree_root)
-        self.reconfigure_nodes(subtree_nodes, args)
-        subtree = self.link_subtrees(subtree_name, subtree, subtree_nodes, subtree_subtrees)
+        if subtree_subtrees: subtree = self.link_subtrees(name, subtree, subtree_nodes, subtree_subtrees, args)
         return subtree
 
     def build_tree(self, tree_name):
         root, nodes, subtrees = self.interpret_tree(tree_name)
         tree = trees.BehaviourTree(root=root)
-        tree = self.link_subtrees(tree_name, tree, nodes, subtrees)
+        if subtrees: tree = self.link_subtrees(tree_name, tree, nodes, subtrees)
         return tree
 
     
