@@ -11,10 +11,11 @@ import time
 import glog as log
 from dataclasses import dataclass
 #from multiprocessing import Pool as ThreadPool
-from sv.CostFunctions import *
+from sv.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.ManeuverConfig import *
 from SimConfig import *
-from util.Utils import *
+import util.Utils
+
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
     #Micro maneuver layer
@@ -251,7 +252,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     STOP
     Stop can be a stop request by time, deceleration, or distance from current pos.
     """
-    #print ('PLAN STOP')
+    # log.info('PLAN STOP')
     s_start = start_state[:3]
     target_t = mconfig.time.value
     target_decel = mconfig.decel.value
@@ -298,7 +299,7 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
 
     if (abs(s_start[1]) <= 0.05):
         # (s_coef, d_coef, t)
-        return ([ np.array([start_state[0], 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), mconfig.time.value ]), None
+        return ([np.array([start_state[0], 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), mconfig.time.value]), None
 
     #targets
     target_state_set = []
@@ -313,6 +314,7 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
             target_state_set.append((s_target, d_target, t))
 
     best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    # log.info("target stop {}, actual {}".format(target_pos, to_equation(best[0])(best[-1])))
     return best, list(trajectories)
 
 
@@ -321,25 +323,27 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
 def optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles):
     """
     Generates and select the best trajectory for the maneuver.
-    Returns the resulting trajectory and a list of candidates for debug pruposes.
+    Returns the resulting trajectory and a list of candidates for debug purposes.
     """
     #find trajectories
     trajectories = []
     trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))
 
     #evaluate feasibility
-    f_trajectories = []
-    for traj in trajectories:
+    f_trajectories_and_targets = []
+    for traj, target_state in zip(trajectories, target_state_set):
         if maneuver_feasibility(start_state, traj, mconfig, lane_config, vehicles, obstacles):
-           f_trajectories.append(traj)
-    #print ("{} feasible trajectories from {}".format( len(f_trajectories), len(trajectories)))
-    if len(f_trajectories)==0:
+            f_trajectories_and_targets.append((traj, target_state))
+    #print ("{} feasible trajectories from {}".format( len(f_trajectories_and_targets), len(trajectories)))
+    if len(f_trajectories_and_targets) == 0:
         log.error("No feasible trajectory to select")
         return None, trajectories
 
     #select best by total cost
-    best = min(f_trajectories, key=lambda traj: maneuver_cost(start_state, traj, mconfig, lane_config, vehicles, obstacles))
-    return best, trajectories
+    # best = min(f_trajectories, key=lambda traj: maneuver_cost(start_state, traj, mconfig, lane_config, vehicles, obstacles))
+    best = min(f_trajectories_and_targets, key=lambda pair:
+               maneuver_cost(start_state, pair[0], pair[1], mconfig, lane_config, vehicles, obstacles))
+    return best[0], trajectories
 
 #===POLYNOMIAL FITTING===
 

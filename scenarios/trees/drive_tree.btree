@@ -4,7 +4,7 @@ behaviortree drive_tree:
             condition goal ( reached_goal( threshold=25 ) )
             maneuver stop_reached_goal ( MStopAtConfig() )
         ->
-            condition redlight ( traffic_light_red() )
+            condition redlight ( traffic_light_red( threshold=40 ) )
             maneuver stop_red_light ( MStopAtConfig( stop_type=3 ) )
         ->
             condition c_busy_lane( lane_occupied() )

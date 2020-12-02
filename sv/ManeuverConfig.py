@@ -195,6 +195,7 @@ class MConfig:
         'total_long_acc_cost':      1,
         'total_lat_acc_cost':       1,
         'proximity_cost':           0,
+        'progress_cost':            0,
     }
     expected_offset_per_sec = 0.5   # [m]
     expected_long_acc_per_sec = 1   # [m/s/s]
@@ -237,10 +238,22 @@ class MStopConfig(MConfig):
 @dataclass
 class MStopAtConfig(MConfig):
     #target
-    time:MP = MP(3.0,10,6)          #[s]
+    time:MP = MP(3.0,100,6)          #[s]
     stop_pos:float = 0              #pos in s [m]
     mkey:int = Maneuver.M_STOP_AT
     stop_type:int = StopAtType.GOAL
+
+    cost_weight = {
+        'time_cost':                1,
+        'effic_cost':               1,
+        'lane_offset_cost':         1,
+        'total_long_jerk_cost':     1,
+        'total_lat_jerk_cost':      1,
+        'total_long_acc_cost':      1,
+        'total_lat_acc_cost':       1,
+        'proximity_cost':           0,
+        'progress_cost':            10,
+    }
 
 @dataclass
 class MFollowConfig(MConfig):

@@ -132,7 +132,8 @@ class BehaviorModels(object):
             for re_state in self.planner_state.regulatory_elements:
                 if isinstance(re_state, TrafficLightState):
                     # check if light is red and we're close enough
-                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < 35 \
+                    threshold = kwargs['threshold'] if 'threshold' in kwargs else 40
+                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
                         and re_state.color == TrafficLightColor.Red
 
         return False
