@@ -39,27 +39,43 @@ class Subtree(object):
         self.pos = pos
 
 # might still need naming refactorings
-class BTreeParser(object):
+class BTreeInterpreter(object):
     def __init__(self, vid, bmodel):
         self.vid = vid
         self.bmodel = bmodel
 
-    def gen_func(self, tree_name, _input):
+    def text2pytree(self, tree_name, _input):
         '''
-            Transformation from input syntax to function
-            ready to be instantiated.
+            Transformation from text to tree
+            ready to be instantiated, according to pytree.
         '''
         lexer = BTreeDSLLexer(InputStream(_input))
         parser = BTreeDSLParser(CommonTokenStream(lexer))
         listener = BTreeListener(self.vid, tree_name)
         ast = parser.behaviorTree()
         ParseTreeWalker().walk(listener, ast)
-        function = listener.getTreeStr()
+        pytree = listener.getTreeStr()
         subtrees = listener.getSubtrees()
 
-        return function, subtrees
+        return pytree, subtrees
 
-    def load_tree(self, path, tree_name):
+    def execute(self, pytree):
+        '''
+            Creates an instance of the behavior tree by
+            _exec_cuting the passed function.
+        '''
+        try:
+            exec(pytree, globals())
+            root, nodes = getPyTree(self)
+        except:
+            raise RuntimeError("Could not instantiate tree.")
+
+        return root, nodes
+
+    def interpret_tree(self, tree_name):
+        ''' Instantiates a tree from the name.'''
+        loaded_tree = ""
+        path = "scenarios/trees/"
         try:
             f = open(os.path.join(ROOT_DIR, path, tree_name + ".btree"),'r')
         except Exception:
@@ -68,32 +84,11 @@ class BTreeParser(object):
             loaded_tree = f.read()
             f.close()
 
-        return loaded_tree
-
-    def create_instance(self, func):
-        '''
-            Creates an instance of the behavior tree by
-            _exec_cuting the passed function.
-        '''
-        try:
-            exec(func, globals())
-            tree, nodes = getTreeInstance(self)
-        except:
-            raise RuntimeError("Could not instantiate tree.")
-
-        return tree, nodes
-
-    def instantiate(self, tree_name):
-        ''' Instantiates a tree from the name.'''
-        _input = self.load_tree(path="scenarios/trees/", tree_name=tree_name)
-        func, subtrees = self.gen_func(tree_name, _input)
-        root, nodes = self.create_instance(func)
+        pytree, subtrees = self.text2pytree(tree_name, loaded_tree)
+        root, nodes = self.execute(pytree)
         return root, nodes, subtrees
 
-    def parse_tree(self, tree_name, args=""):
-
-        root, nodes, subtrees = self.instantiate(tree_name)
-
+    def reconfigure_nodes(self, tree_name, nodes, args=""):
         if(args != ""):
             args = args.split(";")
             if args[0] != '' :
@@ -108,7 +103,10 @@ class BTreeParser(object):
                             break
                     if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + tree_name)
 
-        tree = trees.BehaviourTree(root=root)
+    def link_subtrees(self, tree_name, tree, nodes, subtrees, args=""):
+
+        self.reconfigure_nodes(tree_name, nodes, args)
+
         for subtree in subtrees:
             parent = None
             for node in nodes:
@@ -116,10 +114,25 @@ class BTreeParser(object):
                     parent = node
                     break
             if parent == None: raise RuntimeError("Parent "+ subtree.parent +" not found.")
-            stree_to_append = self.parse_tree(subtree.name, subtree.args).root
+            stree_to_append = self.build_subtree(subtree.name, subtree.args).root
             tree.insert_subtree(stree_to_append, parent.id, int(subtree.pos))
 
         return tree
+
+    def build_subtree(self, subtree_name, args=""):
+        subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(subtree_name)
+        subtree = trees.BehaviourTree(root=subtree_root)
+        self.reconfigure_nodes(subtree_nodes, args)
+        subtree = self.link_subtrees(subtree_name, subtree, subtree_nodes, subtree_subtrees)
+        return subtree
+
+    def build_tree(self, tree_name):
+        root, nodes, subtrees = self.interpret_tree(tree_name)
+        tree = trees.BehaviourTree(root=root)
+        tree = self.link_subtrees(tree_name, tree, nodes, subtrees)
+        return tree
+
+    
 
 class BTreeListener(BTreeDSLListener):
 
@@ -175,7 +188,7 @@ class BTreeListener(BTreeDSLListener):
         return self.tree
 
     def buildTreeFunc(self):
-        self.tree += "def getTreeInstance(parser):\n"
+        self.tree += "def getPyTree(parser):\n"
         for cmd in self.exec_stack: self.tree +=  "    " + cmd + "\n"
         self.tree += "    nodes = "
         if len(self.nodes) > 1:  self.tree += self.nodes[:-1] + "]\n"

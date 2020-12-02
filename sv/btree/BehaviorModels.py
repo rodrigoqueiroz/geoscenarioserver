@@ -8,7 +8,7 @@ import glog as log
 from sv.ManeuverConfig import *
 from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
-from sv.btree.BTreeParser import *
+from sv.btree.BTreeInterpreter import *
 from sv.btree.BTreeLeaves import *
 from sv.SVPlannerState import TrafficLightState
 from TrafficLight import TrafficLightColor
@@ -39,8 +39,8 @@ class BehaviorModels(object):
 
     def build(self):
 
-        parser = BTreeParser(self.vid, bmodel=self)
-        tree = parser.parse_tree(tree_name=self.root_btree_name)
+        interpreter = BTreeInterpreter(self.vid, bmodel=self)
+        tree = interpreter.build_tree(tree_name=self.root_btree_name)
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)
