@@ -114,17 +114,27 @@ class BTreeInterpreter(object):
             args = args.split(";")
             if args[0] != '' :
                 for arg in args:
-                    m_id = arg.split("=",1)[0]
-                    m_config = arg.split("=",1)[1]
+                    arr = arg.split("=",1)
+                    id = arr[0]
+                    config = arr[1]
+                    args=None
+                    if config.find(",args=(") != -1: 
+                        arr2=config.split(",args=(")
+                        config=arr2[0]
+                        args= arr2[1][:-1] #gets the second parameter without the last character which should be a ')'
                     reconfigured=False
                     
                     for node in nodes:
-                        if node.name == m_id:
-                            node.reconfigure(eval(m_config))
+                        if node.name == id:
+                            if(args is None): 
+                                node.reconfigure(eval(config))
+                            else: 
+                                #print(config + "    "+ args)
+                                node.reconfigure(config, args)
                             reconfigured=True
                             break
                     
-                    if not reconfigured: print(m_id + " node could not be found in " + tree_name)
+                    if not reconfigured: print(id + " node could not be found in " + tree_name)
 
     def link_subtrees(self, tree, nodes, subtrees):        
         for subtree in subtrees:
