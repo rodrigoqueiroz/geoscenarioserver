@@ -20,6 +20,13 @@ class BCondition(behaviour.Behaviour):
         self.repeat = repeat
         self.triggered = False
 
+    def reconfigure(self, condition):
+        ''' Some situations require that the conditions are updated. 
+            This method enables the reconfiguration of the
+            Condition behavior after it is instantiated.
+        '''
+        self.condition = condition
+
     def update(self):
         self.logger.debug("  %s [BCondition::update()]" % self.name)
         status = common.Status.FAILURE

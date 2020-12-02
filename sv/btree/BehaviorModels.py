@@ -41,6 +41,7 @@ class BehaviorModels(object):
 
         interpreter = BTreeInterpreter(self.vid, bmodel=self)
         tree = interpreter.build_tree(tree_name=self.root_btree_name)
+        interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1)")
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)

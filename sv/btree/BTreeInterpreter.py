@@ -43,6 +43,7 @@ class BTreeInterpreter(object):
     def __init__(self, vid, bmodel):
         self.vid = vid
         self.bmodel = bmodel
+        self.tree = None
 
     def text2pytree(self, tree_name, _input):
         '''
@@ -88,7 +89,27 @@ class BTreeInterpreter(object):
         root, nodes = self.execute(pytree)
         return root, nodes, subtrees
 
-    def reconfigure_nodes(self, tree_name, nodes, args=""):
+    def collect_nodes(self,tree):
+        nodes = []
+        if not tree.root.children: return [] 
+
+        for child in tree.root.children:
+            nodes += self.collect_children(child)
+
+        return nodes
+  
+    def collect_children(self, node):
+        nodes = []
+        if not node.children: nodes.append(node)
+        else: 
+            for child in node.children:
+                nodes += self.collect_children(child)
+        
+        return nodes
+
+    def reconfigure_nodes(self, tree_name, tree, args=""):
+        nodes = self.collect_nodes(tree)
+
         if(args != ""):
             args = args.split(";")
             if args[0] != '' :
@@ -96,14 +117,16 @@ class BTreeInterpreter(object):
                     m_id = arg.split("=",1)[0]
                     m_config = arg.split("=",1)[1]
                     reconfigured=False
+                    
                     for node in nodes:
                         if node.name == m_id:
                             node.reconfigure(eval(m_config))
                             reconfigured=True
                             break
-                    if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + tree_name)
+                    
+                    if not reconfigured: print(m_id + " node could not be found in " + tree_name)
 
-    def link_subtrees(self, tree_name, tree, nodes, subtrees, args=""):
+    def link_subtrees(self, tree, nodes, subtrees):        
         for subtree in subtrees:
             parent = None
             for node in nodes:
@@ -120,15 +143,16 @@ class BTreeInterpreter(object):
         name=_subtree.name
         args=_subtree.args
         subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(name)
-        if subtree_nodes: self.reconfigure_nodes(name, subtree_nodes, args)
         subtree = trees.BehaviourTree(root=subtree_root)
-        if subtree_subtrees: subtree = self.link_subtrees(name, subtree, subtree_nodes, subtree_subtrees, args)
+        if subtree_nodes: self.reconfigure_nodes(name, subtree, args)
+        if subtree_subtrees: subtree = self.link_subtrees(subtree, subtree_nodes, subtree_subtrees)
         return subtree
 
     def build_tree(self, tree_name):
         root, nodes, subtrees = self.interpret_tree(tree_name)
         tree = trees.BehaviourTree(root=root)
-        if subtrees: tree = self.link_subtrees(tree_name, tree, nodes, subtrees)
+        if subtrees: tree = self.link_subtrees(tree, nodes, subtrees)
+        self.tree=tree
         return tree
 
     
