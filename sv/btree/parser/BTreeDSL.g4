@@ -6,7 +6,8 @@ tokens { INDENT, DEDENT }
 
 @lexer::header{
 from antlr_denter.DenterHelper import DenterHelper
-from BTreeDSLParser import BTreeDSLParser
+from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
+
 }
 @lexer::members {
 class BTreeDSLDenter(DenterHelper):
