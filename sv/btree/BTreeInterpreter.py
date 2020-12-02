@@ -90,7 +90,6 @@ class BTreeInterpreter(object):
 
     def reconfigure_nodes(self, tree_name, nodes, args=""):
         if(args != ""):
-            print("reconfiguring " + tree_name + " with args= " + args)
             args = args.split(";")
             if args[0] != '' :
                 for arg in args:
@@ -106,7 +105,6 @@ class BTreeInterpreter(object):
 
     def link_subtrees(self, tree_name, tree, nodes, subtrees, args=""):
         for subtree in subtrees:
-            print("linking subtree " + subtree.name)
             parent = None
             for node in nodes:
                 if node.name == subtree.parent:
