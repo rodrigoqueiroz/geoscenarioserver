@@ -7,7 +7,7 @@ from __future__ import annotations  #Must be first Include. Will be standard in 
 from dataclasses import dataclass
 from SimConfig import *
 from util.Utils import *
-from enum import Enum
+from enum import Enum, IntEnum
 import random
 import numpy as np
 
@@ -21,10 +21,15 @@ class Maneuver(Enum):
     M_STOP_AT = 6
     M_REVERSE = 7
 
+class StopAtType(IntEnum):
+    S_POS = 1        #stop at a particular position in the frenet frame
+    GOAL = 2         #stop at the vehicle's goal point
+    STOP_LINE = 3    #stop at the stop line of a regulatory element, if any applies
+
 class SamplingMethod(Enum):
-    LINEAR = 1     #linear space
-    UNIFORM = 2    #random from uniform distribution
-    NORMAL = 3     #random from gaussian
+    LINEAR = 1      #linear space
+    UNIFORM = 2     #random from uniform distribution
+    NORMAL = 3      #random from gaussian
 
 
 @dataclass
@@ -235,6 +240,7 @@ class MStopAtConfig(MConfig):
     time:MP = MP(3.0,10,6)          #[s]
     stop_pos:float = 0              #pos in s [m]
     mkey:int = Maneuver.M_STOP_AT
+    stop_type:int = StopAtType.GOAL
 
 @dataclass
 class MFollowConfig(MConfig):
@@ -263,7 +269,7 @@ class MCutInConfig(MConfig):
     target_lid:int = None
     time:MP = MP(4.0,10,6)
     delta_s:tuple = (10,5,0)        #(s, vel, acc)
-    delta_d:tuple = (0,5,0)         #(s, vel, acc)
+    delta_d:tuple = (0,0,0)         #(d, vel, acc)
     mkey:int = Maneuver.M_CUTIN
 
     def __post_init__(self):

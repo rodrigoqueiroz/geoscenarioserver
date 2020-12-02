@@ -23,6 +23,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	// class USkeletalMeshComponent *mesh;
 
+	void SetActive(bool active);
+	bool GetActive() const;
+
 private:
 	void GetBoundingBox(FVector &outPosition, FVector &outExtent, FRotator &outOrientation);
+
+	UFUNCTION()
+	void OnOverlap(AActor *self, AActor *other);
+
+	UFUNCTION()
+	void OnHit(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult& Hit);
+
+	bool isActive = false;
 };

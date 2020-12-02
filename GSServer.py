@@ -12,6 +12,7 @@ import os
 
 from TickSync import TickSync
 from SimTraffic import SimTraffic
+from TrafficLight import TrafficLightColor
 from dash.Dashboard import *
 from mapping.LaneletMap import *
 from lanelet2.projection import UtmProjector
@@ -60,11 +61,13 @@ def start_server(args, m=MVelKeepConfig()):
             break
         try:
             #Update Traffic
-            traffic.tick(
+            sim_status = traffic.tick(
                 sync_global.tick_count,
                 sync_global.delta_time,
                 sync_global.sim_time
             )
+            if sim_status < 0:
+                break
         except KeyboardInterrupt:
             break
 
@@ -149,6 +152,15 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
         sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
         sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
                                 sim_config.lanelet_routes[simvid], btree_root)
+
+    # add traffic lights
+    for name, tnode in parser.tlights.items():
+        # link the traffic light reg elem to the traffic light state from GS
+        tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
+        states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
+        durations = list(map(float, str(tnode.tags['duration']).split(',')))
+        sim_traffic.add_traffic_light(tl_reg_elem, states, durations)
+
     return True
 
 

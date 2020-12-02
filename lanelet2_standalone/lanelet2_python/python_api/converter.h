@@ -1,6 +1,7 @@
 // FROM
 // https://github.com/drodri/cppcon2016/blob/master/pythoncpp/boost/converter.h
 #include <lanelet2_core/utility/Optional.h>
+
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/indexing_suite.hpp>
 #include <boost/variant/static_visitor.hpp>
@@ -65,7 +66,17 @@ struct IterableConverter {
   }
 
   /// @brief Check if PyObject is iterable.
-  static void* convertible(PyObject* object) { return PyObject_GetIter(object) != nullptr ? object : nullptr; }
+  static void* convertible(PyObject* object) {
+    auto* it = PyObject_GetIter(object);
+    if (it != nullptr) {
+      Py_DECREF(it);
+      return object;
+    }
+    if (PyErr_ExceptionMatches(PyExc_TypeError) != 0) {
+      PyErr_Clear();
+    }
+    return nullptr;
+  }
 
   /// @brief Convert iterable PyObject to C++ container type.
   ///
@@ -116,9 +127,6 @@ struct ToOptionalConverter {
   template <typename OptionalT>
   static void construct(PyObject* object, boost::python::converter::rvalue_from_python_stage1_data* data) {
     namespace python = boost::python;
-    // Object is a borrowed reference, so create a handle indicting it is
-    // borrowed for proper reference counting.
-    python::handle<> handle(python::borrowed(object));
     using StorageType = python::converter::rvalue_from_python_storage<lanelet::Optional<OptionalT>>;
     void* storage = reinterpret_cast<StorageType*>(data)->storage.bytes;  // NOLINT
 
@@ -176,7 +184,9 @@ struct WeakToObject {
 
 template <typename T1, typename T2>
 struct PairToPythonConverter {
-  static PyObject* convert(const std::pair<T1, T2>& pair) { return incref(make_tuple(pair.first, pair.second).ptr()); }
+  static PyObject* convert(const std::pair<T1, T2>& pair) {
+    return py::incref(py::make_tuple(pair.first, pair.second).ptr());
+  }
 };
 
 template <typename T1, typename T2>
@@ -197,7 +207,7 @@ struct PythonToPairConverter {
     py::tuple tuple(py::borrowed(obj));
     using StorageType = py::converter::rvalue_from_python_storage<std::pair<T1, T2>>;
     void* storage = reinterpret_cast<StorageType*>(data)->storage.bytes;  // NOLINT
-    new (storage) std::pair<T1, T2>(py::extract<T1>(tuple[0]), py::extract<T2>(tuple[1]));
+    new (storage) std::pair<T1, T2>(py::extract<T1>(tuple[0])(), py::extract<T2>(tuple[1])());
     data->convertible = storage;
   }
 };

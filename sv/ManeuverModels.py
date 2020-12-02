@@ -287,9 +287,8 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
-    log.info('PLAN STOP AT')
-
     target_pos = mconfig.stop_pos
+    # log.info('PLAN STOP AT ' + str(target_pos))
     #start
     s_start = start_state[:3]
 
