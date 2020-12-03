@@ -1320,10 +1320,26 @@
   <node id='-886' visible='true' lat='43.47807876198' lon='-80.52010679126'>
     <tag k='elevation' v='None' />
   </node>
-  <node id='-888' action='modify' visible='true' lat='43.47813965405' lon='-80.51977886908' />
-  <node id='-890' action='modify' visible='true' lat='43.47812476448' lon='-80.51976327441' />
-  <node id='-892' action='modify' visible='true' lat='43.47813369822' lon='-80.51973618893' />
-  <node id='-894' action='modify' visible='true' lat='43.47814918337' lon='-80.5197517836' />
+  <node id='-888' action='modify' visible='true' lat='43.47805772309' lon='-80.52003251664' />
+  <node id='-890' action='modify' visible='true' lat='43.4780428335' lon='-80.52001692197' />
+  <node id='-892' action='modify' visible='true' lat='43.47805176725' lon='-80.51998983649' />
+  <node id='-894' action='modify' visible='true' lat='43.47806725243' lon='-80.52000543116' />
+  <node id='-6407' action='modify' visible='true' lat='43.47813905667' lon='-80.51977181058' />
+  <node id='-6408' action='modify' visible='true' lat='43.47814655738' lon='-80.51974477605' />
+  <node id='-6413' action='modify' visible='true' lat='43.47813328688' lon='-80.51973364418' />
+  <node id='-6415' action='modify' visible='true' lat='43.47812578617' lon='-80.51975988358' />
+  <node id='-6484' action='modify' visible='true' lat='43.47776904352' lon='-80.5197763485' />
+  <node id='-6485' action='modify' visible='true' lat='43.47775750389' lon='-80.51976839716' />
+  <node id='-6487' action='modify' visible='true' lat='43.47776500465' lon='-80.51974931396' />
+  <node id='-6489' action='modify' visible='true' lat='43.47777654428' lon='-80.51975965069' />
+  <node id='-6830' action='modify' visible='true' lat='43.47798919549' lon='-80.51950222123' />
+  <node id='-6831' action='modify' visible='true' lat='43.47797592496' lon='-80.5194918845' />
+  <node id='-6833' action='modify' visible='true' lat='43.47798400268' lon='-80.51947200616' />
+  <node id='-6835' action='modify' visible='true' lat='43.47799900415' lon='-80.51948552343' />
+  <node id='-6899' action='modify' visible='true' lat='43.47785904184' lon='-80.51947848733' />
+  <node id='-6900' action='modify' visible='true' lat='43.47785863385' lon='-80.51946049551' />
+  <node id='-6902' action='modify' visible='true' lat='43.4778476182' lon='-80.51946274449' />
+  <node id='-6904' action='modify' visible='true' lat='43.4778476182' lon='-80.51947286488' />
   <way id='-896' visible='true'>
     <nd ref='-8' />
     <nd ref='-718' />
@@ -1891,8 +1907,7 @@
     <nd ref='-832' />
     <nd ref='-740' />
   </way>
-  <way id='-1032' visible='true'>
-    <nd ref='-652' />
+  <way id='-1032' action='modify' visible='true'>
     <nd ref='-802' />
     <nd ref='-866' />
     <nd ref='-870' />
@@ -1936,10 +1951,9 @@
     <nd ref='-692' />
     <nd ref='-206' />
   </way>
-  <way id='-1046' visible='true'>
+  <way id='-1046' action='modify' visible='true'>
     <nd ref='-694' />
     <nd ref='-696' />
-    <nd ref='-164' />
   </way>
   <way id='-1048' visible='true'>
     <nd ref='-698' />
@@ -2100,10 +2114,9 @@
     <nd ref='-122' />
     <nd ref='-694' />
   </way>
-  <way id='-1114' visible='true'>
+  <way id='-1114' action='modify' visible='true'>
     <nd ref='-148' />
     <nd ref='-800' />
-    <nd ref='-262' />
   </way>
   <way id='-1116' visible='true'>
     <nd ref='-138' />
@@ -2268,6 +2281,47 @@
     <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
+  <way id='-6409' action='modify' visible='true'>
+    <nd ref='-6407' />
+    <nd ref='-6408' />
+    <nd ref='-6413' />
+    <nd ref='-6415' />
+    <nd ref='-6407' />
+    <tag k='type' v='traffic_light' />
+  </way>
+  <way id='-6486' action='modify' visible='true'>
+    <nd ref='-6484' />
+    <nd ref='-6485' />
+    <nd ref='-6487' />
+    <nd ref='-6489' />
+    <nd ref='-6484' />
+  </way>
+  <way id='-6712' action='modify' visible='true'>
+    <nd ref='-800' />
+    <nd ref='-262' />
+  </way>
+  <way id='-6734' action='modify' visible='true'>
+    <nd ref='-696' />
+    <nd ref='-164' />
+  </way>
+  <way id='-6738' action='modify' visible='true'>
+    <nd ref='-652' />
+    <nd ref='-802' />
+  </way>
+  <way id='-6832' action='modify' visible='true'>
+    <nd ref='-6830' />
+    <nd ref='-6831' />
+    <nd ref='-6833' />
+    <nd ref='-6835' />
+    <nd ref='-6830' />
+  </way>
+  <way id='-6901' action='modify' visible='true'>
+    <nd ref='-6899' />
+    <nd ref='-6900' />
+    <nd ref='-6902' />
+    <nd ref='-6904' />
+    <nd ref='-6899' />
+  </way>
   <relation id='-1194' visible='true'>
     <member type='way' ref='-1148' role='left' />
     <member type='way' ref='-1150' role='right' />
@@ -2348,7 +2402,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1218' visible='true'>
+  <relation id='-1218' action='modify' visible='true'>
+    <member type='relation' ref='-6843' role='regulatory_element' />
     <member type='way' ref='-1080' role='left' />
     <member type='way' ref='-1088' role='right' />
     <member type='way' ref='-1136' role='stop_line' />
@@ -2359,7 +2414,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1220' visible='true'>
+  <relation id='-1220' action='modify' visible='true'>
+    <member type='relation' ref='-6843' role='regulatory_element' />
     <member type='way' ref='-1088' role='left' />
     <member type='way' ref='-896' role='right' />
     <member type='way' ref='-1136' role='stop_line' />
@@ -2370,7 +2426,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1222' visible='true'>
+  <relation id='-1222' action='modify' visible='true'>
+    <member type='relation' ref='-6843' role='regulatory_element' />
     <member type='way' ref='-896' role='left' />
     <member type='way' ref='-898' role='right' />
     <member type='way' ref='-1136' role='stop_line' />
@@ -2381,7 +2438,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1224' visible='true'>
+  <relation id='-1224' action='modify' visible='true'>
+    <member type='relation' ref='-6843' role='regulatory_element' />
     <member type='way' ref='-898' role='left' />
     <member type='way' ref='-1082' role='right' />
     <member type='way' ref='-1136' role='stop_line' />
@@ -2424,7 +2482,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1232' visible='true'>
+  <relation id='-1232' action='modify' visible='true'>
+    <member type='relation' ref='-6431' role='regulatory_element' />
     <member type='way' ref='-908' role='left' />
     <member type='way' ref='-906' role='right' />
     <member type='way' ref='-1132' role='stop_line' />
@@ -2435,7 +2494,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1234' visible='true'>
+  <relation id='-1234' action='modify' visible='true'>
+    <member type='relation' ref='-6431' role='regulatory_element' />
     <member type='way' ref='-906' role='left' />
     <member type='way' ref='-904' role='right' />
     <member type='way' ref='-1132' role='stop_line' />
@@ -2446,7 +2506,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1236' visible='true'>
+  <relation id='-1236' action='modify' visible='true'>
+    <member type='relation' ref='-6431' role='regulatory_element' />
     <member type='way' ref='-904' role='left' />
     <member type='way' ref='-902' role='right' />
     <member type='way' ref='-1132' role='stop_line' />
@@ -2457,7 +2518,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1238' visible='true'>
+  <relation id='-1238' action='modify' visible='true'>
+    <member type='relation' ref='-6431' role='regulatory_element' />
     <member type='way' ref='-902' role='left' />
     <member type='way' ref='-1092' role='right' />
     <member type='way' ref='-1132' role='stop_line' />
@@ -2995,10 +3057,10 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1334' visible='true'>
+  <relation id='-1334' action='modify' visible='true'>
     <member type='relation' ref='-1202' role='' />
     <member type='relation' ref='-1208' role='' />
-    <member type='way' ref='-1046' role='left' />
+    <member type='way' ref='-6734' role='left' />
     <member type='way' ref='-1032' role='right' />
     <member type='way' ref='-1142' role='stop_line' />
     <tag k='lane_type' v='driving' />
@@ -3008,11 +3070,11 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1336' visible='true'>
+  <relation id='-1336' action='modify' visible='true'>
     <member type='relation' ref='-1202' role='' />
     <member type='relation' ref='-1208' role='' />
-    <member type='way' ref='-1114' role='left' />
-    <member type='way' ref='-1046' role='right' />
+    <member type='way' ref='-6712' role='left' />
+    <member type='way' ref='-6734' role='right' />
     <member type='way' ref='-1142' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
@@ -3110,7 +3172,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1354' visible='true'>
+  <relation id='-1354' action='modify' visible='true'>
+    <member type='relation' ref='-6508' role='regulatory_element' />
     <member type='way' ref='-1112' role='left' />
     <member type='way' ref='-1110' role='right' />
     <tag k='lane_type' v='driving' />
@@ -3120,7 +3183,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1356' visible='true'>
+  <relation id='-1356' action='modify' visible='true'>
+    <member type='relation' ref='-6508' role='regulatory_element' />
     <member type='way' ref='-1096' role='left' />
     <member type='way' ref='-1112' role='right' />
     <tag k='lane_type' v='driving' />
@@ -3130,7 +3194,8 @@
     <tag k='speed_limit' v='50' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-1358' visible='true'>
+  <relation id='-1358' action='modify' visible='true'>
+    <member type='relation' ref='-6920' role='regulatory_element' />
     <member type='way' ref='-1116' role='left' />
     <member type='way' ref='-1096' role='right' />
     <member type='way' ref='-1138' role='stop_line' />
@@ -3226,5 +3291,43 @@
     <member type='way' ref='-1192' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='-6431' action='modify' visible='true'>
+    <member type='way' ref='-6409' role='refers' />
+    <member type='way' ref='-1132' role='ref_line' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='-6508' action='modify' visible='true'>
+    <member type='way' ref='-6486' role='refers' />
+    <member type='way' ref='-1142' role='ref_line' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='-6774' action='modify' visible='true'>
+    <member type='relation' ref='-6508' role='regulatory_element' />
+    <member type='way' ref='-6738' role='right' />
+    <member type='way' ref='-1046' role='left' />
+    <tag k='lane_type' v='driving' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='-6778' action='modify' visible='true'>
+    <member type='relation' ref='-6508' role='regulatory_element' />
+    <member type='way' ref='-1114' role='left' />
+    <member type='way' ref='-1046' role='right' />
+    <tag k='lane_type' v='driving' />
+    <tag k='type' v='lanelet' />
+  </relation>
+  <relation id='-6843' action='modify' visible='true'>
+    <member type='way' ref='-6832' role='refers' />
+    <member type='way' ref='-1136' role='ref_line' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='-6920' action='modify' visible='true'>
+    <member type='way' ref='-6901' role='refers' />
+    <member type='way' ref='-1138' role='ref_line' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
   </relation>
 </osm>

@@ -104,6 +104,7 @@ class ManeuverAction(behaviour.Behaviour):
                     if 'stop_position' in re_state._fields:
                         self.mconfig.stop_pos = re_state.stop_position[0]
                         break
+                    # TODO: determine whether stop pos should be behind leading vehicles instead
 
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed:

@@ -23,7 +23,7 @@
   <node id='-26' action='modify' visible='true' lat='43.47766483113' lon='-80.51939390079'>
     <tag k='btree' v='drive_scenario_tree' />
     <tag k='cycles' v='2' />
-    <tag k='gs' v='vehicle' />
+    <tag k='gs' v='vehiclenot' />
     <tag k='name' v='ego_placeholder' />
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
@@ -36,20 +36,38 @@
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-30' action='modify' visible='true' lat='43.47813871747' lon='-80.51975919814'>
+  <node id='-30' action='modify' visible='true' lat='43.47805505557' lon='-80.5200104603'>
     <tag k='duration' v='10,2,1' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='light_1' />
     <tag k='states' v='R,G,Y' />
   </node>
-  <way id='-32' action='modify' visible='true'>
+  <node id='-32' action='modify' visible='true' lat='43.47813459418' lon='-80.51975109799'>
+    <tag k='duration' v='10,2,1' />
+    <tag k='gs' v='traffic_light' />
+    <tag k='name' v='light_2' />
+    <tag k='states' v='R,G,Y' />
+  </node>
+  <node id='-34' action='modify' visible='true' lat='43.47798554352' lon='-80.51948513542'>
+    <tag k='duration' v='10,2,1' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='light_3' />
+    <tag k='states' v='R,G,Y' />
+  </node>
+  <node id='-36' action='modify' visible='true' lat='43.47776522755' lon='-80.51976249891'>
+    <tag k='duration' v='10,2,1' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='light_4' />
+    <tag k='states' v='R,G,Y' />
+  </node>
+  <way id='-38' action='modify' visible='true'>
     <nd ref='-8' />
     <nd ref='-10' />
     <nd ref='-16' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
   </way>
-  <way id='-34' action='modify' visible='true'>
+  <way id='-40' action='modify' visible='true'>
     <nd ref='-18' />
     <nd ref='-20' />
     <nd ref='-22' />

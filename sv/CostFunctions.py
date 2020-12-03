@@ -43,7 +43,7 @@ def maneuver_feasibility(start_state, trajectory,  mconfig, lane_config:LaneConf
 
 #=============================== MANEUVER COST
 
-def maneuver_cost(start_state, trajectory, mconfig, lane_config:LaneConfig, vehicles, obstacles):
+def maneuver_cost(start_state, trajectory, target_state, mconfig, lane_config:LaneConfig, vehicles, obstacles):
     C = []
     for cost in mconfig.cost_weight:
         k = mconfig.cost_weight[cost]
@@ -55,6 +55,9 @@ def maneuver_cost(start_state, trajectory, mconfig, lane_config:LaneConfig, vehi
             elif cost == 'effic_cost':
                 if hasattr(mconfig ,'vel'):
                     C.append( k * effic_cost(trajectory, mconfig.vel.value))
+            #goal
+            elif cost == 'progress_cost':
+                C.append( k * progress_cost(start_state, trajectory, target_state))
             elif cost == 'lane_offset_cost':
                 C.append( k * lane_offset_cost(trajectory, lane_config, mconfig.expected_offset_per_sec))
             #jerk
@@ -95,6 +98,32 @@ def time_cost(trajectory, target_t):
     _, _, T = trajectory
     diff =  float(abs(T-target_t))
     return logistic( diff / target_t)
+
+def progress_cost(start_state, trajectory, target_state):
+    '''Penalizes trajectories that end away from the target state'''
+    s_coef, d_coef, T = trajectory
+    # TODO add velocity and acc comparisons also?
+    end_arr = np.array([
+        to_equation(s_coef)(T),
+        to_equation(d_coef)(T)
+    ])
+    target_arr = np.array([
+        target_state[0][0],
+        target_state[1][0]
+    ])
+    diff = end_arr - target_arr
+    if diff[0] < 0:
+        # harshly penalize overshooting trajectories
+        cost = 1
+    else:
+        rel_error = np.linalg.norm() / np.linalg.norm(target_arr)
+        cost = logistic(rel_error)
+    # print("target stop {}, actual {}, cost {}".format(
+    #     target_state[0][0],
+    #     end_arr[0],
+    #     cost
+    # ))
+    return cost
 
 #Road geometry Cost:
 
