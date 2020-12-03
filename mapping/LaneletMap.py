@@ -7,8 +7,8 @@
 # --------------------------------------------
 
 import lanelet2
-from lanelet2.core import getId, BasicPoint2d, Point3d, Point2d, BoundingBox2d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight
-from lanelet2.geometry import distance, boundingBox2d, inside, toArcCoordinates, project, length2d, findNearest
+from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight
+from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType
@@ -46,15 +46,55 @@ class LaneletMap(object):
 
     def get_traffic_light_by_position(self, x, y):
         # search nearest two reg elem's for a traffic light and return the closer
-        point = BasicPoint2d(x, y)
+        #point = BasicPoint2d(x, y)
         # findNearest returns List[(dist,re)]
-        nearest_res = findNearest(self.lanelet_map.regulatoryElementLayer, point, 2)
-        tls = list(filter(lambda res: isinstance(res[1], TrafficLight), nearest_res))
-
-        if len(tls) > 0:
-            return tls[0][1]
-
+        
+        #error here:
+        #nearest_res = findNearest(self.lanelet_map.regulatoryElementLayer, point, 2) 
+        #tls = list(filter(lambda res: isinstance(res[1], TrafficLight), nearest_res))
+        #if len(tls) > 0:
+        #    return tls[0][1]
+        #return None
+        
+        #temp workaround:
+        #tls = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
+        p = BasicPoint2d(x,y)
+        p2 = BasicPoint2d(x+1,y+1)
+        searchbox = BoundingBox2d(p, p2)
+        intersecting_res = self.lanelet_map.regulatoryElementLayer.search(searchbox)
+        tls = list(filter(lambda res: isinstance(res, TrafficLight), intersecting_res))
+        for tl in tls:
+            #for p in self.lanelet_map.lineStringLayer[tl.stopLine.id]:
+            #    print(p)
+            #todo: check if point intersects with line string from the physical light
+            #lights = tl.trafficLights #LineString3d
+            #for light in lights:
+                #l = to2D(light) #ConstLineString2d
+                #bb = boundingBox2d(l)
+                #inter = intersects2d(p ,l)
+                #print(inter)
+                #dist = distance(l,p)
+                #print(dist)
+            return tl
         return None
+
+    def get_traffic_light_pos(self, id):
+        tl = self.lanelet_map.regulatoryElementLayer[id]
+        x = 0
+        y = 0
+        data = []
+        if tl:
+            for physical_ligh in tl.trafficLights: #LineString3d
+                x = physical_ligh[0].x #LineString3d node 0
+                y = physical_ligh[0].y  
+            line = self.lanelet_map.lineStringLayer[tl.stopLine.id]
+            xs = [pt.x for pt in line]
+            ys = [pt.y for pt in line]
+            data = [xs,ys]
+        return x,y,data
+            
+            
+
 
     @staticmethod
     def get_left_in_route(route, lanelet):

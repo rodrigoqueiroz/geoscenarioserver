@@ -96,7 +96,11 @@ class SVPlanner(object):
 
         while sync_planner.tick():
             # Get sim state from main process
-            header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
+            #header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
+            header, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
+            vehicle_state = traffic_vehicles.pop(self.vid, None).vehicle_state #removes self state
+            
+
             state_time = header[2]
             traffic_light_states = self.read_traffic_light_states()
 
@@ -258,21 +262,24 @@ class SVPlanner(object):
         header_vector = traffic_state_sharr[0:3]
         #vehicles
         vehicles = {}
-        my_vehicle_state = VehicleState()
         for ri in range(1,r):
             i = ri * c  #first index for row
+
             vid = traffic_state_sharr[i]
-            remote = traffic_state_sharr[i+1]
+            type = traffic_state_sharr[i+1]
+            visible = traffic_state_sharr[i+2]
+            if visible == 0.0:
+                continue
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[i+2:i+c]
-            if (vid == self.vid):
-                my_vehicle_state.set_state_vector(state_vector)
-            else:
-                vehicle = Vehicle(vid)
-                vehicle.vehicle_state.set_state_vector(state_vector)
-                vehicles[vid] = vehicle
+            state_vector = traffic_state_sharr[i+3:i+c]
+
+            vehicle = Vehicle(vid, type)
+            vehicle.visible =  True if visible is 1.0 else False
+            vehicle.vehicle_state.set_state_vector(state_vector)
+            vehicles[vid] = vehicle
+
         traffic_state_sharr.release() #<=========RELEASE
-        return header_vector, my_vehicle_state, vehicles
+        return header_vector, vehicles
 
     def read_traffic_light_states(self):
         # should be automatically thread-safe

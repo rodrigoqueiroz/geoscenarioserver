@@ -23,10 +23,21 @@ from util.Utils import kalman
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(object):
-    def __init__(self, vid, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS, model=None):
+    #vehicle types
+    SDV_TYPE = 0
+    RV_TYPE = 1
+    TV_TYPE = 2
+
+    def __init__(self, vid, type, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS, model=None):
         #id
         self.vid = vid
         self.name = name
+        self.radius = radius
+        self.model = model
+        self.type = type
+
+        self.visible = True
+        
         #state
         #start state in sim frame
         self.vehicle_state = VehicleState()
@@ -43,12 +54,7 @@ class Vehicle(object):
         self.vehicle_state.d = frenet_state[3]
         self.vehicle_state.d_vel = frenet_state[4]
         self.vehicle_state.d_acc = frenet_state[5]
-        #stats
-        self.radius = radius
-        self.model = model
-        #remote
-        self.is_remote = False
-        self.visible = True
+
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
@@ -68,11 +74,14 @@ class Vehicle(object):
     def update_sim_state(self, new_state, delta_time):
         # NOTE: this may desync the sim and frenet vehicle state, so this should
         # only be done for remote vehicles (which don't have a frenet state)
-        if not self.is_remote:
+        if self.type is not Vehicle.RV_TYPE:
             log.warn("Cannot update sim state for gs vehicles directly.")
 
     def stop(self):
         pass
+
+    def remove(self):
+        self.visible = False
 
     def tick(self, tick_count, delta_time, sim_time):
         pass
@@ -83,8 +92,8 @@ class Vehicle(object):
         z = round((self.vehicle_state.y * CLIENT_METER_UNIT))
         position = [x, y, z]
         velocity = [self.vehicle_state.x_vel, self.vehicle_state.y_vel]
-        remote = 1 if self.is_remote else 0
-        return self.vid, remote, position, velocity, self.vehicle_state.yaw, self.vehicle_state.steer
+        #remote = 1 if self.is_remote else 0
+        return self.vid, type, position, velocity, self.vehicle_state.yaw, self.vehicle_state.steer
 
 
 # A Simulated Driver-Vehicle (dynamic behavior)
@@ -95,18 +104,18 @@ class SV(Vehicle):
         # list of lanelet ids we want this vehicle to follow
         self.lanelet_route = lanelet_route
         self.global_path = None
-
+        
         if start_state_in_frenet:
             # assume frenet start_state is relative to the first lane of the route
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
             # compute sim state
             x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:])
-            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, radius=radius, model=model)
+            Vehicle.__init__(self, vid, Vehicle.SDV_TYPE, name, start_state=(x_vector+y_vector), frenet_state=start_state, radius=radius, model=model)
         else:
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, x=start_state[0], y=start_state[3])
             # Compute frenet state corresponding to start_state
             s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
-            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), radius=radius, model=model)
+            Vehicle.__init__(self, vid, Vehicle.SDV_TYPE, name, start_state=start_state, frenet_state=(s_vector + d_vector), radius=radius, model=model)
         # print("{} init'd with {}, {}".format(vid, self.vehicle_state.s, self.vehicle_state.d))
 
         #Planning
@@ -150,11 +159,10 @@ class SV(Vehicle):
             traffic_state_sharr,
             traffic_light_sharr,
             debug_shdata):
-        """For simulated vehicles controlled by SVPlanner.
-            If a planner is started, the vehicle can't have a remote.
-            Use either option (start_planner or start_remote).
+        """For SDV models controlled by SVPlanner.
+            If a planner is started, the vehicle can't be a remote.
         """
-        self.is_remote = False
+        #self.is_remote = False
         self.sv_planner = SVPlanner(
             self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config,
             traffic_state_sharr, traffic_light_sharr, debug_shdata
@@ -290,9 +298,7 @@ class SV(Vehicle):
 #A remote vehicle
 class RV(Vehicle):
     def __init__(self, vid, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS):
-        super(RV, self).__init__(vid, name=name, start_state=start_state, radius=radius)
-
-        self.is_remote = True
+        super(RV, self).__init__(vid, Vehicle.RV_TYPE, name=name, start_state=start_state, radius=radius)
         self.P = np.identity(2) * 0.5 # some large error
         # experiment w these values
         self.POS_VAR = 0.01 ** 2
@@ -350,35 +356,48 @@ class RV(Vehicle):
 #A trajectory following vehicle
 class TV(Vehicle):
     def __init__(self, vid, name, start_state, trajectory, lanelet_map, radius=VEHICLE_RADIUS):
-        super(TV, self).__init__(vid, name, start_state, radius=radius)
+        super(TV, self).__init__(vid, Vehicle.TV_TYPE, name, start_state, radius=radius)
         self.lanelet_map = lanelet_map
         self.trajectory = trajectory
-        self.is_remote = False
         self.visible = False
-        self.vehicle_state.set_X([-10000, 0, 0]) #forcing
-        self.vehicle_state.set_Y([-10000,0,0])
+        self.vehicle_state.set_X([9999, 0, 0]) #forcing
+        self.vehicle_state.set_Y([9999,0,0])
 
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
+            
         if self.trajectory:
             start_time = float(self.trajectory[0][2]) #first node
-            end_time = self.trajectory[-1][2] #last node
+            end_time = float(self.trajectory[-1][2]) #last node
             traj_time = end_time - start_time
-            if sim_time > end_time:
-                #vanish. Need to optimize this by setting vehicles as not visible and removing all calculations with it
-                self.vehicle_state.set_X([-10000, 0, 0])
-                self.vehicle_state.set_Y([-10000,0,0])
-                self.visible = False
-            elif True: #start_time > sim_time:
+
+            #During trajectory
+            if start_time <= sim_time <= end_time:
                 for node in self.trajectory:
                     node_time = float(node[2])
                     #time_in_trajectory = node_time - start_time
                     #if time_in_trajectory > sim_time:
-                    if node_time > sim_time:
-                        self.visible = True
-                        self.vehicle_state.set_X([node[0], 0, 0]) #fix this, not real X velocity
-                        self.vehicle_state.set_Y([node[1], 0, 0])
-                        break;
+                    if node_time < sim_time:
+                        continue
+                    #closest after current sim time
+                    #TODO: interpolate taking the difference between closest node time and sim time
+                    #print("closest node time {} >= simtime {}".format(node_time,sim_time))
+                    #print(node)
+                    if not self.visible:
+                        log.warn("vid {} is now VISIBLE".format(self.vid))
+                    self.visible = True
+                    self.vehicle_state.set_X([node[0], 0, 0]) #fix this, not real X velocity
+                    self.vehicle_state.set_Y([node[1], 0, 0])
+                    break
+            #After trajectory
+            if sim_time > end_time:
+                #vanish. Need to optimize this by setting vehicles as not visible and removing all calculations with it
+                self.vehicle_state.set_X([-9999, 0, 0])
+                self.vehicle_state.set_Y([-9999,0,0])
+                if self.visible:
+                    log.warn("vid {} is now INVISIBLE".format(self.vid))
+                self.visible = False            
+                        
 
             
         

@@ -69,8 +69,7 @@ class SimTraffic(object):
         #Start Vehicles
         for vid in self.vehicles:
             vehicle = self.vehicles[vid]
-            #if not vehicle.is_remote:
-            if isinstance(vehicle, SV):
+            if vehicle.type == Vehicle.SDV_TYPE:
                 vehicle.start_planner(
                     nv, self.sim_config, self.traffic_state_sharr, self.traffic_light_sharr, self.debug_shdata)
 
@@ -82,29 +81,30 @@ class SimTraffic(object):
         nv = len(self.vehicles)
 
         #Read Client
-        new_client_state = False
-        header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
-        if header is not None:
-            client_tick_count, client_delta_time, n_vehicles = header
-            if self.sim_client_tick_count < client_tick_count:
-                self.sim_client_tick_count = client_tick_count
-                new_client_state = True
+        if (self.sim_client_shm):
+            new_client_state = False
+            header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
+            if header is not None:
+                client_tick_count, client_delta_time, n_vehicles = header
+                if self.sim_client_tick_count < client_tick_count:
+                    self.sim_client_tick_count = client_tick_count
+                    new_client_state = True
+            #Check for client-side collisions
+            #Disabled vehicles indicate a collision and simulation should be stopped
+            if len(disabled_vehicles) > 0:
+                # print sim state and exit
+                self.log_sim_state(vstates, disabled_vehicles)
+                return -1
 
-        #Check for client-side collisions
-        #Disabled vehicles indicate a collision and simulation should be stopped
-        if len(disabled_vehicles) > 0:
-            # print sim state and exit
-            self.log_sim_state(vstates, disabled_vehicles)
-            return -1
-
-        #Update Dynamic Agents
+            #Update Remote Dynamic Agents
+            for vid in self.vehicles:
+                #update remote agents if new state is available
+                if self.vehicles[vid].type is Vehicle.RV_TYPE and vid in vstates:
+                    if new_client_state:
+                        self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
+        
+        #tick vehicle (all types)
         for vid in self.vehicles:
-            #update remote agents if new state is available
-            if self.vehicles[vid].is_remote and vid in vstates:
-                if new_client_state:
-                    self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
-
-            #tick vehicle (all types)
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
         
         #pedestrians:
@@ -133,7 +133,7 @@ class SimTraffic(object):
         #Internal ShM
         nv = len(self.vehicles)
         r = nv + 1 #+1 for header
-        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 1 + 1 #+1 for vid
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 3 #+3 for vid, type, visible
         self.traffic_state_sharr = Array('f', r * c)
         self.traffic_light_sharr = Array('i', len(self.traffic_lights) * 2) #List[(id, color)]
 
@@ -154,12 +154,13 @@ class SimTraffic(object):
         self.traffic_state_sharr[0:3] = header_vector
         #vehicles
         ri = 1 #row index, start at 1 for header
-        for vid, vehicle in self.vehicles.items():
+        for vid, vehicle in sorted(self.vehicles.items()):
             sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
             i = ri * c  #first index for row
             self.traffic_state_sharr[i] = self.vehicles[vid].vid
-            self.traffic_state_sharr[i+1] = 1 if self.vehicles[vid].is_remote else 0
-            self.traffic_state_sharr[i+2:i+c] = sv
+            self.traffic_state_sharr[i+1] = self.vehicles[vid].type
+            self.traffic_state_sharr[i+2] = 1 if self.vehicles[vid].visible else 0
+            self.traffic_state_sharr[i+3:i+c] = sv
             ri += 1
         self.traffic_state_sharr.release() #<=========RELEASE
 
@@ -180,7 +181,7 @@ class SimTraffic(object):
         state_str = "GSS crash report:\n"
         for vid in client_vehicle_states:
             # Need to use server state for gs vehicles and client state for remote vehicles
-            state = client_vehicle_states[vid] if self.vehicles[vid].is_remote else self.vehicles[vid].vehicle_state
+            state = client_vehicle_states[vid] if self.vehicles[vid].type is Vehicle.RV_TYPE else self.vehicles[vid].vehicle_state
 
             state_str += (
                 "VID {}:\n"
