@@ -22,10 +22,10 @@ SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Op
 DASH_RATE = 30              #dash tick rate. Max is traffic rate.
 PLOT_VID = 1               	#vehicle to center the main plot arouund, if not defined by scenario.
                             #Make sure there exists a vehicle with this id
-
+#Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
-MPLOT_SIZE = 100			    #cartesian plot: road length in meters (shorter=better performance)
-#Frenet
+MPLOT_SIZE = 100			 #map plot: road length in meters (shorter=better performance)
+#Frenet Map
 SHOW_FFPLOT = True          #whether to show the frenet frame plot
 FFPLOT_ASPECT = False  		#frenet frame plot: keep S and D aspect ratio (same scale)
 FFPLOT_LENGTH = 50			#frenet frame plot: road length (s) in meters
@@ -60,13 +60,14 @@ SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943
 CS_SEM_KEY = 933433
-SHM_SIZE = 1024
+SHM_SIZE = 2048
 
 @dataclass
 class SimConfig:
     lanelet_routes:Dict = field(default_factory=dict)
     goal_points:Dict = field(default_factory=dict)
     scenario_name:str = "Unamed scenario"
+    map_name:str = "Unknown map"
     timeout:int = TIMEOUT
     traffic_rate:int = TRAFFIC_RATE
     plot_vid:int = PLOT_VID

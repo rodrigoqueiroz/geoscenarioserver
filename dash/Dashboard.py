@@ -82,22 +82,27 @@ class Dashboard(object):
             #get data
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
             traffic_lights = self.read_traffic_light_states()
-            tickcount, delta_time, sim_tim = header
+            tickcount, delta_time, sim_time = header
+            config_txt = "Scenario: {}   |   Map: {}".format(self.traffic.sim_config.scenario_name,self.traffic.sim_config.map_name)
+            config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
+            config_txt += "\nTick#: {}   |   SimTime: {:.3}   |   DeltaTime: {:.3}".format(tickcount,sim_time,delta_time) 
+
+            
+            self.scenario_config_lb['text'] = config_txt
+            #self.scenario_stats_lb['text'] = stat_txt
 
             #traffic lights
             #todo: timetable with all lights
             #print(light_state)
 
-            if len(vehicles) == 0:
-                #empyt list, nothing to show
-                #TODO: clean vehicle charts and table
-                continue
-            
             #Global Map
-            self.plot_map_chart(vehicles,traffic_lights)
+            if SHOW_MPLOT:
+                self.plot_map_chart(vehicles,traffic_lights)
 
             #Vehicles Table
-            self.tab.delete(*self.tab.get_children())
+            current_set = self.tab.get_children()
+            if current_set:
+                self.tab.delete(*current_set)
             for vid in vehicles:
                 vehicle = vehicles[vid]
                 visible = 1 if vehicles[vid].visible else 0
@@ -108,56 +113,48 @@ class Dashboard(object):
             if self.tab.exists(self.center_vid):
                 self.tab.selection_set(self.center_vid)
 
-            
-            #find a valid vehicle to center map and show motion plan in frenet frame (if possible)
+            #Focus Vehicle charts and btree:
+            self.clear_vehicle_charts()
+            self.tree_msg.configure(text= "")
+
+            #find a valid vehicle to focus plots and btree (if available)
             vid = None
             if self.center_vid in vehicles:
                 if vehicles[self.center_vid].visible:
                     vid = int(self.center_vid)
-            if vid is None:
-                for tentative_id in vehicles:
-                    if vehicles[tentative_id].visible:
-                        log.warn("Dash: center vid {} not in array or not visible, auto switch to {}".format(self.center_vid,tentative_id))
-                        vid = self.center_vid = tentative_id
-                        break
-            if vid is None:
-                #nothing to show
-                #TODO: clean charts and table
-                self.window.update()
-                continue
+            #if vid is None:
+            #    for tentative_id in vehicles:
+            #        if vehicles[tentative_id].visible:
+            #            log.warn("Dash: center vid {} not in array or not visible, auto switch to {}".format(self.center_vid,tentative_id))
+            #            vid = self.center_vid = tentative_id
+            #            break
             
-            #print(vid)
-            #print(self.center_vid)
-            #vehicles with planner: cartesian, frenet chart and behavior tree
-            if vid in debug_shdata:
-                #read vehicle planning data from debug_shdata
-                vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[vid]
-                
-                #cartesian plot with lanelet map
-                self.plot_cartesian_chart(vid, vehicles, reference_path)
+            if vid:
+                #vehicles with planner: cartesian, frenet chart and behavior tree
+                if vid in debug_shdata:
+                    #read vehicle planning data from debug_shdata
+                    vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[vid]
+                    
+                    #cartesian plot with lanelet map
+                    if SHOW_CPLOT:
+                        self.plot_cartesian_chart(vid, vehicles, reference_path, traffic_lights)
 
-                #frenet frame plot
-                if FFPLOT_LITE:
-                    self.plot_frenet_chart_lite(vehicle_state, vehicles,vid)
+                    #frenet frame plot
+                    if SHOW_FFPLOT:
+                        self.plot_frenet_chart(vid, vehicle_state, traj, cand, traffic_vehicles, lane_config, traffic_lights)
+
+                    #behavior tree
+                    tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(vid)
+                    tree_str += debug_shdata[vid][1]
+                    self.tree_msg.configure(text=tree_str)
+                #vehicles without planner:
                 else:
-                    self.plot_frenet_chart(vid, vehicle_state, traj, cand, traffic_vehicles, lane_config)
+                    self.plot_cartesian_chart(vid, vehicles)
 
-                #behavior tree
-                tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(vid)
-                tree_str += debug_shdata[vid][1]
-                self.tree_msg.configure(text=tree_str)
-            
-            #vehicles without planner:
-            else:
-                #print("vid not in debug keys {}".format(debug_shdata.keys()))
-                self.plot_cartesian_chart(vid, vehicles, None)
-                #TODO: clean frenet plot
-                self.tree_msg.configure(text= "")
-
-            #Sub vehicle plot
-            #todo: transform into log chart, instead of projected trajectory
-            # if VEH_TRAJ_CHART:
-            #     self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)
+                #Sub vehicle plot
+                #todo: transform into log chart, instead of projected trajectory
+                # if VEH_TRAJ_CHART:
+                #     self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)
 
             self.cart_canvas.draw()
             self.fren_canvas.draw()
@@ -188,7 +185,7 @@ class Dashboard(object):
         for ri in range(1,r):
             i = ri * c  #first index for row
 
-            vid = traffic_state_sharr[i]
+            vid = int(traffic_state_sharr[i])
             type = traffic_state_sharr[i+1]
             visible = traffic_state_sharr[i+2]
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
@@ -254,53 +251,21 @@ class Dashboard(object):
         x_max = (MPLOT_SIZE/2)
         y_max = (MPLOT_SIZE/2)
 
-        #road
-        #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
-        data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
-        for line in data:
-            plt.plot(line[0], line[1], color = '#cccccc') #'g-'
-
-        #reg elements
-        #lights
-        print(traffic_light_states)
-        for lid,state in traffic_light_states.items():
-            if (lid>0): # error in light state reading causing this [-6431, 1, -6843, 1] to become this {-6431: 1, 1: -6843, -6843: 1}
-                continue
-            #find physical light locations
-            x,y,line = self.lanelet_map.get_traffic_light_pos(lid)
-            print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
-            TrafficLightColor
-            if state == TrafficLightColor.Red:
-                colorcode = 'ro'
-                colorcode_line = 'r'
-            if state == TrafficLightColor.Green:
-                colorcode = 'go'
-                colorcode_line = 'g'
-            if state == TrafficLightColor.Yellow:
-                colorcode = 'yo'
-                colorcode_line = 'y'
-            plt.plot(x, y, colorcode, markersize=6)
-            label = "{}".format(lid)
-            plt.gca().text(x+1, y+1, label, style='italic')
-            plt.plot(line[0], line[1], color = colorcode_line)
-
-            #circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
-        print("done")
-
-        #stop signs
+        self.plot_road(x_min,x_max,y_min,y_max,traffic_light_states)
 
         #all vehicles
         for vid, vehicle in vehicles.items():
             if not vehicle.visible:
                 continue
+            colorcode = self.get_color_code(vehicle.type)
             x = vehicle.vehicle_state.x
             y = vehicle.vehicle_state.y
             if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-                plt.plot(x, y, 'k.', markersize=1)
-                circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
+                plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
+                circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10)
                 plt.gca().add_artist(circle1)
                 label = "v{}".format(vid)
-                plt.gca().text(x+1, y+1, label, style='italic')
+                plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
         #layout
         plt.xlim(x_min,x_max)
@@ -314,77 +279,47 @@ class Dashboard(object):
         fig.tight_layout(pad=0.0)
 
 
-    def plot_cartesian_chart(self, center_vid, vehicles, reference_path):
-
-        vehicle_state = vehicles[self.center_vid].vehicle_state
-
+    def plot_cartesian_chart(self, center_vid, vehicles, reference_path = None, traffic_lights = None):
         #-Vehicle focus cartesian plot
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
         #boundaries
-        x_min = vehicle_state.x - (CPLOT_SIZE/2)
-        x_max = vehicle_state.x + (CPLOT_SIZE/2)
-        y_min = vehicle_state.y - (CPLOT_SIZE/2)
-        y_max = vehicle_state.y + (CPLOT_SIZE/2)
+        x_min = vehicles[center_vid].vehicle_state.x - (CPLOT_SIZE/2)
+        x_max = vehicles[center_vid].vehicle_state.x + (CPLOT_SIZE/2)
+        y_min = vehicles[center_vid].vehicle_state.y - (CPLOT_SIZE/2)
+        y_max = vehicles[center_vid].vehicle_state.y + (CPLOT_SIZE/2)
 
         #road
-        #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
-        data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
-        for line in data:
-            plt.plot(line[0], line[1], color = '#cccccc')
+        self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
 
         #reference path
         if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
-            plt.plot(path_x, path_y, 'b-')
-
-        #other vehicles
+            plt.plot(path_x, path_y, 'b--', alpha=0.5, zorder=0)
+            #505050
+        
+        #all vehicles
         for vid, vehicle in vehicles.items():
-            if (vid == center_vid): #skip main
-                continue
             if not vehicle.visible:
                 continue
+            colorcode = self.get_color_code(vehicle.type)
             vs = vehicle.vehicle_state
             x = vs.x
             y = vs.y
             if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-                plt.plot(x, y, 'bv')
-                circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
+                plt.plot(x, y, colorcode+'.',markersize=2, zorder=10)
+                circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False,zorder=10)
                 plt.gca().add_artist(circle1)
-                label = "v {}".format(vid)
-                plt.gca().text(x+1, y+1, label, style='italic')
+                label = "v{}".format(vid)
+                plt.gca().text(x+1, y+1, label, style='italic',zorder=10)
                 # vehicle direction - /2 for aesthetics
                 vx = vs.x_vel
                 vy = vs.y_vel
                 if vs.s_vel < 0:
                     vx = -vx
                     vy = -vy
-                plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1)
-
-        #main vehicle
-        vs = vehicle_state
-        vid = center_vid
-        x = vs.x
-        y = vs.y
-        plt.plot(x, y, 'bv')
-        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color='b', fill=False)
-        plt.gca().add_artist(circle1)
-        label = "vid {}".format(vid)
-        plt.gca().text(x+1, y+1, label, style='italic')
-        # vehicle direction - /2 for aesthetics
-        vx = vs.x_vel
-        vy = vs.y_vel
-        if vs.s_vel < 0:
-            vx = -vx
-            vy = -vy
-        plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1)
-        #plt.arrow(x, y, vehicle.vehicle_state.x_acc, vehicle.vehicle_state.y_acc, head_width=1, head_length=1)
-            # plot global path
-            #if vehicle.global_path:
-            #    for pt in vehicle.global_path:
-            #        plt.plot(pt.x, pt.y, 'bo')
-
+                plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
 
         #layout
         plt.xlim(x_min,x_max)
@@ -398,15 +333,50 @@ class Dashboard(object):
         #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
         #fig.tight_layout(pad=0.1)
 
-    def plot_frenet_chart(self, center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config):
+    def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
+        
+        #road lines:
+        #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
+        data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
+        for line in data:
+            plt.plot(line[0], line[1], color = '#cccccc',zorder=0)
+        
+        #pedestrian marking
+
+        #regulatory elements:
+        
+        #lights
+        if traffic_light_states:
+            for lid,state in traffic_light_states.items():
+                if (lid>0): # error in light state reading causing this [-6431, 1, -6843, 1] to become this {-6431: 1, 1: -6843, -6843: 1}
+                    continue
+                #find physical light locations
+                x,y,line = self.lanelet_map.get_traffic_light_pos(lid)
+                #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
+                if state == TrafficLightColor.Red:
+                    colorcode = 'r'
+                if state == TrafficLightColor.Green:
+                    colorcode = 'g'
+                if state == TrafficLightColor.Yellow:
+                    colorcode = 'y'
+                plt.plot(x, y, 'ks', markersize=8, zorder=5) #black square
+                plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
+                label = "{}".format(lid)
+                plt.gca().text(x+1, y+1, label, style='italic')
+                plt.plot(line[0], line[1], color = colorcode, zorder=5)
+        
+        #signs
+
+
+    def plot_frenet_chart(self, center_vid, vehicle_state, traj, cand, traffic_vehicles, lane_config,traffic_lights):
         #Frenet Frame plot
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
         gca = plt.gca()
 
         #road
-        plt.axhline(lane_config.left_bound, color="black", linestyle='--')
-        plt.axhline(lane_config.right_bound, color="black", linestyle='--')
+        plt.axhline(lane_config.left_bound, color="k", linestyle='-', zorder=0)
+        plt.axhline(lane_config.right_bound, color="k", linestyle='-', zorder=0)
         plt.title("Frenet Frame. Vehicle {}:".format(center_vid))
         plt.xlabel('S')
         plt.ylabel('D')
@@ -415,9 +385,10 @@ class Dashboard(object):
         for vid in traffic_vehicles:
             #if not traffic_vehicles[vid].visible:
             #    continue
+            colorcode = self.get_color_code(traffic_vehicles[vid].type)
             vs = traffic_vehicles[vid].vehicle_state
-            plt.plot( vs.s, vs.d, "v")
-            circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
+            plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
+            circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5)
             gca.add_artist(circle1)
             #label = "vid {}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
             label = "vid {}".format(int(vid))
@@ -433,18 +404,18 @@ class Dashboard(object):
         vs = vehicle_state
         vid = center_vid
 
-        plt.plot( vs.s, vs.d, "v")
-        circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
+        plt.plot( vs.s, vs.d, ".",zorder=20)
+        circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False, zorder=20)
         gca.add_artist(circle1)
         #label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
-        label = "vid {}".format(int(vid))
-        gca.text(vs.s, vs.d+1.5, label)
+        label = "v{}".format(int(vid))
+        gca.text(vs.s, vs.d+1.5, label,zorder=20)
 
         # update lane config based on current (possibly outdated) reference frame
         #lane_config = self.read_map(vehicle_state, self.reference_path)
 
         #layout
-        plt.grid(True)
+        #plt.grid(True)
         #center plot around main vehicle
         x_lim_a = vs.s - ( (1/3) * FFPLOT_LENGTH )   #1/3 before vehicle
         x_lim_b = vs.s + ( (2/3) * FFPLOT_LENGTH )   #2/3 ahead
@@ -454,55 +425,25 @@ class Dashboard(object):
         #fig.patch.set_facecolor('lightgray')
         #fig.tight_layout(pad=0.05)
 
+    
+    def get_color_code(self,vehicle_type):
+        colorcode = 'k' #black
 
-    def plot_frenet_chart_lite(self,vehicles,center_vid):
-        #Frenet Frame plot
+        if vehicle_type == Vehicle.SDV_TYPE:
+            colorcode = 'b' #blue
+        elif vehicle_type == Vehicle.RV_TYPE:
+            colorcode = 'g' #green
+        elif vehicle_type == Vehicle.TV_TYPE:
+            colorcode = 'k' #black
+
+        return colorcode
+    
+    def clear_vehicle_charts(self):
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
-
-        #road
-        #todo: get actual lanelet boundaries and transform to frenet
-        #0 lines
-        plt.axhline(0, color="black")
-        plt.axvline(0, color="black")
-        #Lane lines
-        #plt.axhline(0, color="gray")
-        #plt.axhline(4, color="gray")
-        #plt.axhline(8, color="gray")
-        #lables
-        plt.xlabel('S')
-        plt.ylabel('D')
-        #plt.xlim(hv.start_state[0] - area,  hv.start_state[0] + area)
-        #plt.title("v(m/s):" + str(c_speed * 3.6)[0:4])
-
-        #main vehicle
-        vehicle = vehicles[center_vid]
-        vs = vehicle.vehicle_state
-
-        gca = plt.gca()
-        plt.plot( vs.s, vs.d, "v")
-        circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False)
-        gca.add_artist(circle1)
-        label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
-        gca.text(vs.s, vs.d+1.5, label, style='italic')
-
-
-        # update lane config based on current (possibly outdated) reference frame
-        #lane_config = self.read_map(vehicle_state, self.reference_path)
-
-        #other vehicles, from main vehicle POV:
-
-        #layout
-        plt.grid(True)
-        #Center plot around main vehicle
-        x_lim_a = vs.s - ( (1/3) * FFPLOT_LENGTH )   #1/3 before vehicle
-        x_lim_b = vs.s + ( (2/3) * FFPLOT_LENGTH )   #2/3 ahead
-        plt.xlim(x_lim_a,x_lim_b)
-        plt.ylim(-8,8)
-        #plt.gca().set_aspect('equal', adjustable='box')
-        #fig.patch.set_facecolor('lightgray')
-        #fig.tight_layout(pad=0.05)
-
+        fig = plt.figure(Dashboard.CART_FIG_ID)
+        plt.cla()
+        
 
     @staticmethod
     def plot_trajectory(s_coef, d_coef, T,tcolor='grey'):
@@ -608,34 +549,36 @@ class Dashboard(object):
     def create_gui(self):
         #Window
         window = tk.Tk()
-        window.grid_rowconfigure(0, weight=1)
-        window.grid_columnconfigure(0, weight=1)
+        window.geometry("1600x900")
 
         # Main containers:
         # title frame
         # stats frame
         # global frame  [  map  | table  ]
         # vehicle frame [  cart | frenet | btree ]
-        title_frame = tk.Frame(window, width = 1200, height = 40, bg = "orange")
-        stats_frame = tk.Frame(window, width = 1200, height = 40, bg = "lightgrey")
-        global_frame = tk.Frame(window, width = 1200, height = 600, bg = "white")
-        vehicle_frame = tk.Frame(window, width = 1200, height = 400, bg = "white")
+        title_frame = tk.Frame(window, width = 1200, height = 50, bg = "black")
         title_frame.grid(row=0, sticky="nsew")
-        stats_frame.grid(row=1, sticky="nsew")
-        global_frame.grid(row=2, sticky="nsew")
-        vehicle_frame.grid(row=3, sticky="nsew")
+        #tk.ttk.Separator(window,orient=tk.HORIZONTAL).grid(row=1, column=0, sticky='ew' )
+
+        stats_frame = tk.Frame(window, width = 1200, height = 50, bg = "white")
+        stats_frame.grid(row=2, sticky="nsew")
+        tk.ttk.Separator(window,orient=tk.HORIZONTAL).grid(row=3, column=0, sticky='ew' )
+
+        global_frame = tk.Frame(window, width = 1200, height = 300, bg = "white")
+        global_frame.grid(row=4, sticky="nsew")
+        tk.ttk.Separator(window,orient=tk.HORIZONTAL).grid(row=5, column=0, sticky='ew' )
+
+        vehicle_frame = tk.Frame(window, width = 1200, height = 300, bg = "white")
+        vehicle_frame.grid(row=6, sticky="nsew")
 
         #global sub containers
-        global_frame.grid_rowconfigure(1, weight=1) #config
-        global_frame.grid_columnconfigure(2, weight=1)
-        map_frame = tk.Frame(global_frame, width = 600, height = 600, bg = "red") #create
-        tab_frame = tk.Frame(global_frame, width = 700, height = 600, bg = "blue")
+        map_frame = tk.Frame(global_frame, width = 600, height = 300, bg = "red") #create
         map_frame.grid(row=0, column=1, sticky="nsew") #set pos
+
+        tab_frame = tk.Frame(global_frame, width = 1000, height = 300, bg = "blue")
         tab_frame.grid(row=0, column=2, sticky="nsew")
         
         #vehicle sub containers
-        vehicle_frame.grid_rowconfigure(1, weight=1)
-        vehicle_frame.grid_columnconfigure(3, weight=1)
         cart_frame = tk.Frame(vehicle_frame, width = 400, height = 300, bg = "white")
         fren_frame = tk.Frame(vehicle_frame, width = 400, height = 300, bg = "white")
         bt_frame = tk.Frame(vehicle_frame, width = 400, height = 300, bg = "white")
@@ -649,31 +592,28 @@ class Dashboard(object):
         # Content:
         window.title = 'GeoScenario Server'
         str_title = ' GeoScenario Server '
-        img_wise = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/wiselogo.png").resize((83, 40)))
-        img_uw = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/uwlogo.png").resize((100, 40)))
+        img_logos = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/logos.png").resize((380, 50)))
         img_gs = pimg = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/gs.png").resize((40, 40)))
         img_veh = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle.png").resize((100, 47)))
         img_ego = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle_ego.png").resize((80, 30)))
+        
         # Widgets
         # title
-        lb = tk.Label(title_frame, text=str_title, bg = "orange")
-        lb.configure(font=Font(family="OpenSans", size=24))
-        lb_uw = tk.Label(title_frame, image=img_uw)
-        lb_uw.photo = img_uw    #holding a ref to avoid photo garbage collected
-        lb_wise = tk.Label(title_frame, image=img_wise)
-        lb_wise.photo = img_wise #holding a ref to avoid photo garbage collected
-        tree_msg= tk.Message(bt_frame,text='', anchor='s',
-                                    width=300,
-                                    bg='white',foreground='black')
-        self.tree_msg = tree_msg
-        #layout
+        lb = tk.Label(title_frame, text=str_title, bg = "black", fg="white",font=('OpenSans', 30))
         lb.pack(side = 'left')
-        lb_uw.pack(side = "right")
-        lb_wise.pack(side = "right")
-        #tree_msg.pack()
-        tree_msg.grid(row=0,column=0, sticky='nsew')
+
+        lb_logos = tk.Label(title_frame, image=img_logos)
+        lb_logos.img_ref = img_logos #holding a ref to avoid photo garbage collected
+        lb_logos.pack(side='right')
 
         # stats container:
+        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', 10), anchor="w", justify=tk.LEFT)
+        scenario_config_lb.pack(side = 'left')
+        self.scenario_config_lb = scenario_config_lb
+
+        #scenario_stats_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', 12), anchor="e", justify=tk.RIGHT)
+        #scenario_stats_lb.pack(side = 'right')
+        #self.scenario_stats_lb = scenario_stats_lb
 
         # global container:
         
@@ -717,6 +657,11 @@ class Dashboard(object):
         self.fren_canvas = FigureCanvasTkAgg(fig_fren, fren_frame)
         self.fren_canvas.get_tk_widget().pack()
 
+        tree_msg= tk.Message(bt_frame,text='', anchor='s',
+                                    width=300,
+                                    bg='white',foreground='black')
+        self.tree_msg = tree_msg
+        tree_msg.grid(row=0,column=0, sticky='nsew')
 
         #General plot Layout
         matplotlib.rc('font', size=8)

@@ -129,6 +129,7 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map):
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
     parser.project_nodes(projector)
     lanelet_map.load_lanelet_map(map_file, projector)
+    sim_config.map_name = parser.globalconfig.tags['lanelet']
 
     # add remote ego
     if parser.egostart is not None:
