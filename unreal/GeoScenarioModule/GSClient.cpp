@@ -3,6 +3,7 @@
 #include <sys/shm.h>
 #include <errno.h>
 #include "EngineUtils.h"
+#include "Misc/DateTime.h"
 #include <sstream>
 #include <string>
 
@@ -40,6 +41,26 @@ void AGSClient::Tick(float DeltaTime)
 	// Update states of remote vehicles
 	UpdateRemoteVehicleStates(DeltaTime);
 	WriteClientState(framestat.tick_count, framestat.delta_time);
+
+	// log for experiments
+	std::stringstream oss;
+	
+	for (auto& Elem : vehicles)
+	{
+		GSVehicle &gsv = Elem.Value;
+		//Write out Client Vehicle states
+		//todo: include full state
+		if (gsv.actor != nullptr)
+		{
+			FVector loc = gsv.actor->GetActorLocation();
+			loc[2] = 0.0f;
+			oss << Elem.Key << " "
+				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
+				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << '\n';
+		}
+	}
+
+	UE_LOG(GeoScenarioModule, Log, TEXT("%s | %s"), *FString(oss.str().c_str()), *FDateTime::Now().ToString());
 }
 
 void AGSClient::EndPlay(const EEndPlayReason::Type EndPlayReason)

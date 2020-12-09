@@ -50,6 +50,7 @@ class SVPlanner(object):
         self.reference_path = None
         self.btree_root = btree_root
         self.btree_model = None
+        self.mconfig = None
 
     def start(self):
         #Create Shared arrray for Plan
@@ -129,6 +130,37 @@ class SVPlanner(object):
 
             #log.info('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #log.info((planner_state.vehicle_state.get_S(), planner_state.vehicle_state.get_D()))
+
+            # new maneuver
+            if self.mconfig and self.mconfig.mkey != mconfig.mkey:
+                log.info("VID {} started maneuver {}".format(self.vid, mconfig.mkey.name))
+                # print sv state and deltas
+                state_str = (
+                    "VID {}:\n"
+                    "   position    s={:.3f} sim=({:.3f},{:.3f})\n"
+                    "   speed       {:.3f}\n"
+                ).format(
+                    self.vid,
+                    vehicle_state.s,
+                    vehicle_state.x, vehicle_state.y,
+                    vehicle_state.s_vel
+                )
+                for vid, tvehicle in traffic_vehicles.items():
+                    state_str += (
+                        "VID {}:\n"
+                        "   position    {:.3f}\n"
+                        "   speed       {:.3f}\n"
+                        "   delta dist  {:.3f}\n"
+                        "   delta vel   {:.3f}\n"
+                    ).format(
+                        vid,
+                        tvehicle.vehicle_state.s,
+                        tvehicle.vehicle_state.s_vel,
+                        vehicle_state.s - tvehicle.vehicle_state.s,
+                        vehicle_state.s_vel - tvehicle.vehicle_state.s_vel
+                    )
+                log.info(state_str)
+            self.mconfig = mconfig
 
             #Maneuver Tick
             if mconfig and planner_state.lane_config:
