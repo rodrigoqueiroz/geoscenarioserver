@@ -116,7 +116,7 @@ def progress_cost(start_state, trajectory, target_state):
         # harshly penalize overshooting trajectories
         cost = 1
     else:
-        rel_error = np.linalg.norm() / np.linalg.norm(target_arr)
+        rel_error = np.linalg.norm(diff) / np.linalg.norm(target_arr)
         cost = logistic(rel_error)
     # print("target stop {}, actual {}, cost {}".format(
     #     target_state[0][0],
