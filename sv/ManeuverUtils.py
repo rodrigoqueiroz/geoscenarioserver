@@ -145,7 +145,7 @@ def reached_gap(vehicle_state, target_lane_config, traffic_vehicles, meters):
     if target_vehicle is None:
         log.warn("No target vehicle in {} lane.".format('LEFT' if target_lane_config.id == 1 else 'RIGHT'))
         return True
-    gap = vehicle_state.s - target_vehicle.vehicle_state.s
+    gap = vehicle_state.s - VEHICLE_RADIUS - (target_vehicle.vehicle_state.s + VEHICLE_RADIUS)
     return gap > meters
 
 #def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
