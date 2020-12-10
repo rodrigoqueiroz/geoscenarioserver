@@ -226,7 +226,6 @@ class LaneletMap(object):
             ys = [pt.y for pt in lanelet.leftBound]
             plt.plot(xs, ys, 'g-')
 
-
     def plot_lanelet_ids(self, lanelet_ids):
         for ll_id in lanelet_ids:
             LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
@@ -236,6 +235,17 @@ class LaneletMap(object):
             # LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
             LaneletMap.plot_ll(ll)
 
+    def get_route_lines(self, route):
+        data = []
+
+        lines = route.laneletMap().lineStringLayer
+
+        for line in lines:
+            xs = [pt.x for pt in line]
+            ys = [pt.y for pt in line]
+            data.append([xs,ys])
+
+        return data
 
     @staticmethod
     def plot_ll(lanelet):

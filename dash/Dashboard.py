@@ -31,9 +31,10 @@ class Dashboard(object):
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
 
-    def __init__(self, traffic, center_vid):
+    def __init__(self, traffic, sim_config):
         self.traffic = traffic
-        self.center_vid = int(center_vid)
+        self.center_vid = int(sim_config.plot_vid)
+        self.sim_config = sim_config
         self.window = None
 
     def start(self, show_dashboard):
@@ -235,6 +236,7 @@ class Dashboard(object):
         #road
         #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
         data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
+        # data = self.lanelet_map.get_route_lines(self.sim_config.lanelet_routes[self.center_vid])
         for line in data:
             plt.plot(line[0], line[1], 'g-')
 
