@@ -30,9 +30,38 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
         log.warn("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
         return None, None
 
-    return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lane_config.id))
+    # measure diff in target s and s_vel
+    if mconfig.target_v is None:
+        target_vehicle_state = traffic_vehicles[mconfig.target_vid].vehicle_state
+    else:
+        target_vehicle_state = mconfig.target_v.vehicle_state
+    goal_state = np.array([
+        mconfig.delta_s[0] + target_vehicle_state.s,
+        mconfig.delta_d[0] + target_vehicle_state.d,
+        mconfig.delta_s[1] + target_vehicle_state.s_vel
+    ])
+    cur_state = np.array([
+        vehicle_state.s,
+        vehicle_state.d,
+        vehicle_state.s_vel
+    ])
+    # If we need to reverse the maneuver must be canceled
+    # if goal_state[2] < 0:
+    #     print(str(mconfig.delta_s[1]) + ' ' + str(target_vehicle_state.s_vel))
+    #     return True
 
-def lane_swerve_or_cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig, traffic_vehicles):
+    print("target: " + str(goal_state))
+    print("cur: " + str(cur_state))
+    # just try ending on delta d diff and some vel o
+    err_vector = (cur_state - goal_state) / goal_state
+    print("err: " + str(err_vector))
+    # dont work cause used future state before
+    return abs(err_vector[1]) < 0.1 and abs(err_vector[0]) < 0.1 and abs(err_vector[2]) < 0.1
+    # rel_error = np.linalg.norm(cur_state - goal_state) / np.linalg.norm(goal_state)
+    # return rel_error < 0.1
+    # return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lane_config.id))
+
+def lane_swerve_or_cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MConfig, traffic_vehicles):
     if type(mconfig) == MLaneSwerveConfig:
         return lane_swerve_completed(vehicle_state, lane_config, mconfig)
     elif type(mconfig) == MCutInConfig:
