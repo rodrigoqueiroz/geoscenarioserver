@@ -149,9 +149,11 @@ class LaneletMap(object):
             # filter results for lanelets containing the point
             intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
             if len(intersecting_lls) > 1:
-                raise Exception("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                     (x,y), [ll.id for ll in intersecting_lls]))
-
+                return intersecting_lls[1]
+                #raise Exception("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #    (x,y), [ll.id for ll in intersecting_lls]))
         return intersecting_lls[0]
 
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):

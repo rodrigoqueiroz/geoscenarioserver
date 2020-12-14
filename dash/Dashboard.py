@@ -105,10 +105,10 @@ class Dashboard(object):
                 self.tab.delete(*current_set)
             for vid in vehicles:
                 vehicle = vehicles[vid]
-                visible = 1 if vehicles[vid].visible else 0
+                sim_state =vehicles[vid].sim_state
                 sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
                 truncate_vector(sv,2)
-                sv = [vid] + [visible] + sv
+                sv = [vid] + [sim_state] + sv
                 self.tab.insert('', 'end', int(vid), values=(sv))
             if self.tab.exists(self.center_vid):
                 self.tab.selection_set(self.center_vid)
@@ -120,12 +120,12 @@ class Dashboard(object):
             #find a valid vehicle to focus plots and btree (if available)
             vid = None
             if self.center_vid in vehicles:
-                if vehicles[self.center_vid].visible:
+                if vehicles[self.center_vid].sim_state is Vehicle.ACTIVE or vehicles[self.center_vid].sim_state is Vehicle.INVISIBLE:
                     vid = int(self.center_vid)
             #if vid is None:
             #    for tentative_id in vehicles:
-            #        if vehicles[tentative_id].visible:
-            #            log.warn("Dash: center vid {} not in array or not visible, auto switch to {}".format(self.center_vid,tentative_id))
+            #        if vehicles[tentative_id].active:
+            #            log.warn("Dash: center vid {} not in array or not active, auto switch to {}".format(self.center_vid,tentative_id))
             #            vid = self.center_vid = tentative_id
             #            break
             
@@ -184,17 +184,13 @@ class Dashboard(object):
         #my_vehicle_state = VehicleState()
         for ri in range(1,r):
             i = ri * c  #first index for row
-
             vid = int(traffic_state_sharr[i])
-            type = traffic_state_sharr[i+1]
-            visible = traffic_state_sharr[i+2]
-            # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[i+3:i+c]
+            type = int(traffic_state_sharr[i+1])
             vehicle = Vehicle(vid, type)
-            vehicle.visible =  True if visible == 1.0 else False
-            vehicle.vehicle_state.set_state_vector(state_vector)
+            vehicle.sim_state =  int(traffic_state_sharr[i+2])
+            # state vector contains the vehicle's sim state and frenet state in its OWN ref path
+            vehicle.vehicle_state.set_state_vector(traffic_state_sharr[i+3:i+c])
             vehicles[vid] = vehicle
-
         traffic_state_sharr.release() #<=========RELEASE
 
         return header_vector, vehicles
@@ -252,17 +248,23 @@ class Dashboard(object):
         y_max = (MPLOT_SIZE/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_light_states)
+        
 
         #all vehicles
         for vid, vehicle in vehicles.items():
-            if not vehicle.visible:
+            if vehicle.sim_state is Vehicle.ACTIVE:
+                my_alpha = 1.0
+            elif vehicle.sim_state is Vehicle.INVISIBLE:
+                my_alpha = 0.2
+            elif vehicle.sim_state is Vehicle.INACTIVE:
                 continue
+
             colorcode = self.get_color_code(vehicle.type)
             x = vehicle.vehicle_state.x
             y = vehicle.vehicle_state.y
             if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                 plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
-                circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10)
+                circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=my_alpha)
                 plt.gca().add_artist(circle1)
                 label = "v{}".format(vid)
                 plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
@@ -301,7 +303,7 @@ class Dashboard(object):
         
         #all vehicles
         for vid, vehicle in vehicles.items():
-            if not vehicle.visible:
+            if vehicle.sim_state is Vehicle.INACTIVE:
                 continue
             colorcode = self.get_color_code(vehicle.type)
             vs = vehicle.vehicle_state
@@ -383,7 +385,7 @@ class Dashboard(object):
 
         #other vehicles, from main vehicle POV:
         for vid in traffic_vehicles:
-            #if not traffic_vehicles[vid].visible:
+            #if not traffic_vehicles[vid].active:
             #    continue
             colorcode = self.get_color_code(traffic_vehicles[vid].type)
             vs = traffic_vehicles[vid].vehicle_state
@@ -625,7 +627,7 @@ class Dashboard(object):
         
         # table
         tab = ttk.Treeview(tab_frame)
-        tab['columns'] = ('vid', 'vis', 
+        tab['columns'] = ('vid', 'sim_st', 
                             'x','y','z',
                             'x_vel','y_vel',
                             'x_acc','y_acc',

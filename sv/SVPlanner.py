@@ -98,7 +98,12 @@ class SVPlanner(object):
             # Get sim state from main process
             #header, vehicle_state, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
             header, traffic_vehicles = self.read_traffic_state(traffic_state_sharr)
-            vehicle_state = traffic_vehicles.pop(self.vid, None).vehicle_state #removes self state
+
+            if self.vid in traffic_vehicles:
+                vehicle_state = traffic_vehicles.pop(self.vid, None).vehicle_state #removes self state
+            else:
+                #vehicle state not available. Vehicle can be inactive.
+                continue
             
 
             state_time = header[2]
@@ -264,20 +269,17 @@ class SVPlanner(object):
         vehicles = {}
         for ri in range(1,r):
             i = ri * c  #first index for row
-
             vid = traffic_state_sharr[i]
             type = traffic_state_sharr[i+1]
-            visible = traffic_state_sharr[i+2]
-            if visible == 0.0:
-                continue
+            sim_state = traffic_state_sharr[i+2]
+            if int(sim_state) is not Vehicle.ACTIVE: 
+                continue #only active vehicles are considered during planning
+            vehicle = Vehicle(vid, type)
+            vehicle.sim_state = sim_state
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[i+3:i+c]
-
-            vehicle = Vehicle(vid, type)
-            vehicle.visible =  True if visible is 1.0 else False
             vehicle.vehicle_state.set_state_vector(state_vector)
             vehicles[vid] = vehicle
-
         traffic_state_sharr.release() #<=========RELEASE
         return header_vector, vehicles
 

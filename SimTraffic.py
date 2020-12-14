@@ -51,6 +51,7 @@ class SimTraffic(object):
     
     def add_trajectory_vehicle(self, vid, name, start_state, trajectory):
         v = TV(vid, name, start_state, trajectory, self.lanelet_map)
+        v.simtraffic = self
         self.vehicles[vid] = v
 
     def add_remote_vehicle(self, vid, name, start_state):
@@ -133,7 +134,7 @@ class SimTraffic(object):
         #Internal ShM
         nv = len(self.vehicles)
         r = nv + 1 #+1 for header
-        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 3 #+3 for vid, type, visible
+        c = VehicleState.VECTORSIZE + VehicleState.FRENET_VECTOR_SIZE + 3 #+3 for vid, type, sim state
         self.traffic_state_sharr = Array('f', r * c)
         self.traffic_light_sharr = Array('i', len(self.traffic_lights) * 2) #List[(id, color)]
 
@@ -159,7 +160,7 @@ class SimTraffic(object):
             i = ri * c  #first index for row
             self.traffic_state_sharr[i] = self.vehicles[vid].vid
             self.traffic_state_sharr[i+1] = self.vehicles[vid].type
-            self.traffic_state_sharr[i+2] = 1 if self.vehicles[vid].visible else 0
+            self.traffic_state_sharr[i+2] = self.vehicles[vid].sim_state
             self.traffic_state_sharr[i+3:i+c] = sv
             ri += 1
         self.traffic_state_sharr.release() #<=========RELEASE

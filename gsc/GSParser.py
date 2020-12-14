@@ -159,8 +159,8 @@ class GSParser(object):
                             self.report.log_error("Element "+n.id +". Invalid speed list " + str(speed_list))
                     else:
                         self.report.log_error("Invalid speed value")
-
-        self.vehicles[n.tags["vid"]] = n
+        vid = int(n.tags["vid"])
+        self.vehicles[vid] = n
 
     def check_traffic_light(self, n):
         mandatory = {"gs","name","states","duration"}
