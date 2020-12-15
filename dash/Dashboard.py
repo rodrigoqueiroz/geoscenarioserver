@@ -355,6 +355,7 @@ class Dashboard(object):
                 #find physical light locations
                 x,y,line = self.lanelet_map.get_traffic_light_pos(lid)
                 #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
+                
                 if state == TrafficLightColor.Red:
                     colorcode = 'r'
                 if state == TrafficLightColor.Green:
@@ -362,9 +363,16 @@ class Dashboard(object):
                 if state == TrafficLightColor.Yellow:
                     colorcode = 'y'
                 plt.plot(x, y, 'ks', markersize=8, zorder=5) #black square
-                plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
-                label = "{}".format(lid)
-                plt.gca().text(x+1, y+1, label, style='italic')
+                type = self.traffic.traffic_lights[lid].type
+                if type == 'default':
+                    plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
+                elif type == 'left':
+                    plt.plot(x, y, colorcode+'<', markersize=6, zorder=5)
+                elif type == 'right':
+                    plt.plot(x, y, colorcode+'>', markersize=6, zorder=5)
+
+                label = "{}".format(self.traffic.traffic_lights[lid].name)
+                plt.gca().text(x+1, y, label, style='italic')
                 plt.plot(line[0], line[1], color = colorcode, zorder=5)
         
         #signs

@@ -58,8 +58,8 @@ class SimTraffic(object):
         v = RV(vid, name=name, start_state=start_state, radius=1.0)
         self.vehicles[vid] = v
 
-    def add_traffic_light(self, tl_re, states, durations):
-        self.traffic_lights[tl_re.id] = TrafficLight(states, durations)
+    def add_traffic_light(self, tl_re, name, type, states, durations):
+        self.traffic_lights[tl_re.id] = TrafficLight(name, type, states, durations)
 
     def start(self):
         nv = len(self.vehicles)

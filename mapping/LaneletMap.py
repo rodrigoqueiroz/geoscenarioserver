@@ -44,6 +44,19 @@ class LaneletMap(object):
         following = self.routing_graph.following(lanelet)
         return following[0] if following else None
 
+    def get_traffic_light_by_name(self, name):
+        #filter regulatory elemments for TL only
+        tl_res = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
+        for tl_re in tl_res:
+            #physical lights in the re
+            for tl in tl_re.trafficLights: 
+                tlname = tl.attributes['name']
+                if name.casefold() == tlname.casefold():
+                    print(name+" and "+tlname)
+                    return tl_re
+        return None
+
+
     def get_traffic_light_by_position(self, x, y):
         # search nearest two reg elem's for a traffic light and return the closer
         #point = BasicPoint2d(x, y)
@@ -82,7 +95,7 @@ class LaneletMap(object):
         tl = self.lanelet_map.regulatoryElementLayer[id]
         x = 0
         y = 0
-        data = []
+        linepoints = []
         if tl:
             for physical_ligh in tl.trafficLights: #LineString3d
                 x = physical_ligh[0].x #LineString3d node 0
@@ -90,8 +103,8 @@ class LaneletMap(object):
             line = self.lanelet_map.lineStringLayer[tl.stopLine.id]
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
-            data = [xs,ys]
-        return x,y,data
+            linepoints = [xs,ys]
+        return x,y,linepoints
             
             
 

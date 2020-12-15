@@ -26,7 +26,9 @@ TRAFFIC_LIGHT_COLOR_FROM_STRING = {
 
 
 class TrafficLight:
-    def __init__(self, states, durations):
+    def __init__(self, name, type, states, durations):
+        self.name = name
+        self.type = type
         self.current_color = states[0]
         self.states = states
         self.durations = durations

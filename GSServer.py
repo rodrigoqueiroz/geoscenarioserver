@@ -177,12 +177,13 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map, evalua
 
     # add traffic lights
     for name, tnode in parser.tlights.items():
+        type = tnode.tags['type']
         # link the traffic light reg elem to the traffic light state from GS
-        tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
+        #tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
+        tl_reg_elem = lanelet_map.get_traffic_light_by_name(name)
         states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        sim_traffic.add_traffic_light(tl_reg_elem, states, durations)
-
+        sim_traffic.add_traffic_light(tl_reg_elem, name, type, states, durations)
     return True
 
 
@@ -245,11 +246,14 @@ def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
 
     # add traffic lights
     for name, tnode in parser.tlights.items():
+        name = ltnode.tags['name']
+        type = ltnode.tags['type']
         # link the traffic light reg elem to the traffic light state from GS
-        tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
+        #tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
+        tl_reg_elem = lanelet_map.get_traffic_light_by_name(name)
         states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        sim_traffic.add_traffic_light(tl_reg_elem, states, durations)
+        sim_traffic.add_traffic_light(tl_reg_elem, name, type, states, durations)
 
     return True
 
