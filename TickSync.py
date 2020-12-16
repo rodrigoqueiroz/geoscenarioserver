@@ -11,7 +11,7 @@ import datetime
 import time
 
 class TickSync():
-    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = ""):
+    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
         self.tick_rate = rate
@@ -20,10 +20,11 @@ class TickSync():
         self.block = block
         self.verbose = verbose
         self.label = label
+        self.sim_start_time = sim_start_time
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
         self.tick_count = 0
-        self.sim_time = 0.0                 #Total simulation time since start() [s]
+        self.sim_time = 0          #Total simulation time since start() [s]
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
@@ -46,7 +47,7 @@ class TickSync():
             self._tick_start_clock = now
             #Update globals
             self.tick_count+=1
-            self.sim_time = 0.0
+            self.sim_time = self.sim_start_time #starting time by config
             self.print('{:05.2f}s {} Tick {:3}# START'.
                     format(self.sim_time,self.label,self.tick_count))
             return True
@@ -68,7 +69,8 @@ class TickSync():
         self.drift = self.delta_time - self.expected_tick_duration        #diff from expected time
         self._tick_start_clock = now
         #Update globals
-        self.sim_time = (now - self._sim_start_clock).total_seconds()
+        passed_time = (now - self._sim_start_clock).total_seconds()
+        self.sim_time =  self.sim_start_time + passed_time
         self.tick_count+=1
         #Check timeout
         if (self.timeout):
