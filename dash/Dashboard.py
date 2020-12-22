@@ -30,6 +30,7 @@ class Dashboard(object):
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
+    TRAJ_FIG_ID = 4
 
     def __init__(self, traffic, sim_config):
         self.traffic = traffic
@@ -103,6 +104,11 @@ class Dashboard(object):
                 tree_str += debug_shdata[self.center_vid][1]
                 self.tree_msg.configure(text=tree_str)
 
+                #Sub vehicle plot
+                #todo: transform into log chart, instead of projected trajectory
+                if VEH_TRAJ_CHART:
+                    self.plot_vehicle_sd(traj, cand)
+
             elif self.center_vid in vehicles and vehicles[self.center_vid].is_remote:
                 # A remote vehicle doesn't have a frenet plot or debug data
                 self.plot_cartesian_chart(self.center_vid, vehicles, None)
@@ -126,13 +132,9 @@ class Dashboard(object):
                 self.tab.insert('', 'end', int(vid), values=(sv))
             self.tab.selection_set(self.center_vid)
 
-            #Sub vehicle plot
-            #todo: transform into log chart, instead of projected trajectory
-            # if VEH_TRAJ_CHART:
-            #     self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)
-
             self.cart_canvas.draw()
             self.fren_canvas.draw()
+            self.traj_canvas.draw()
             #self.vcanvas.draw()
 
             self.window.update()
@@ -417,76 +419,79 @@ class Dashboard(object):
         #plot trajectory curve
         plt.plot(X,Y,color=tcolor)
 
-
     @staticmethod
-    def plot_vehicle_sd(trajectory):
+    def plot_vehicle_sd(trajectory, cand):
         if not trajectory:
             return
         s_coef = trajectory[0]
         d_coef = trajectory[1]
         T = trajectory[2]
 
-        fig = plt.figure(2)
+        fig = plt.figure(Dashboard.TRAJ_FIG_ID)
         #adjust layout
         plt.tight_layout(pad=0.1)
-        fig.set_size_inches(10,2)
+        # fig.set_size_inches(4,4)
 
-        nrows = 1
-        ncols = 6
-        i = 0
+        nrows = 3
+        ncols = 1
+        i = 1
         #S(t) curve
-        #plt.subplot(nrows,ncols,i)
-        #plt.cla()
-        #plot_curve(s_coef,T, 'S', 'T')
-        #   S Vel(t) curve
+        plt.subplot(nrows,ncols,i)
+        plt.cla()
+        Dashboard.plot_curve(s_coef,T, 'S', 'T', 'T (s)')
+        #S Vel(t) curve
         i+=1
         plt.subplot(nrows,ncols,i)
         plt.cla()
         plt.xlim(0,int(round(T)))
-        plt.ylim(-30,30)
+        plt.ylim(-15,15)
         s_vel_coef = differentiate(s_coef)
-        plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
-        #   S Acc(t) curve
+        Dashboard.plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
+
+        # #   S Acc(t) curve
         i+=1
         s_acc_coef = differentiate(s_vel_coef)
         plt.subplot(nrows,ncols,i)
         plt.cla()
         plt.xlim(0,int(round(T)))
         plt.ylim(-8,8)
-        plot_curve(s_acc_coef,T,'Long Acc (m/ss)', '', 'T (s)')
+        # if cand:
+        #     for t in cand:
+        #         Dashboard.plot_curve(differentiate(differentiate(t[0])),t[2],'Long Vel (m/s)', '', 'T (s)', color='grey')
+        Dashboard.plot_curve(s_acc_coef,T,'Long Acc (m/ss)', '', 'T (s)', color='black')
         #   S Jerk(t) curve
         #i+=1
         #s_jerk_coef = differentiate(s_acc_coef)
         #plt.subplot(1,8,4)
-        #plot_curve(s_jerk_coef,T,'Jerk', 'T')
+        #Dashboard.plot_curve(s_jerk_coef,T,'Jerk', 'T')
         #   D(t) curve
         #i+=1
         #plt.subplot(nrows,ncols,i)
         #plt.cla()
-        #plot_curve(d_coef,T, 'D', 'T')
+        #Dashboard.plot_curve(d_coef,T, 'D', 'T')
         #   D Vel(t) curve
         i+=1
-        d_vel_coef = differentiate(d_coef)
-        plt.subplot(nrows,ncols,i)
-        plt.cla()
-        plt.xlim(0,int(round(T)))
-        plt.ylim(-2,2)
-        plot_curve(d_vel_coef,T, 'Lat Vel (m/s)', '', 'T (s)')
+        # d_vel_coef = differentiate(d_coef)
+        # plt.subplot(nrows,ncols,i)
+        # plt.cla()
+        # plt.xlim(0,int(round(T)))
+        # plt.ylim(-2,2)
+        # Dashboard.plot_curve(d_vel_coef,T, 'Lat Vel (m/s)', '', 'T (s)')
         #   D Acc(t) curve
         i+=1
-        d_acc_coef = differentiate(d_vel_coef)
-        plt.subplot(nrows,ncols,i)
-        plt.cla()
-        plt.xlim(0,int(round(T)))
-        plt.ylim(-2,2)
-        plot_curve(d_acc_coef,T, 'Lat Acc (m/ss)', '', 'T (s)')
+        # d_acc_coef = differentiate(d_vel_coef)
+        # plt.subplot(nrows,ncols,i)
+        # plt.cla()
+        # plt.xlim(0,int(round(T)))
+        # plt.ylim(-2,2)
+        # Dashboard.plot_curve(d_acc_coef,T, 'Lat Acc (m/ss)', '', 'T (s)')
         #D Jerk(t) curve
         #d_jerk_coef = differentiate(d_acc_coef)
         #plt.subplot(1,8,8)
-        #plot_curve(d_jerk_coef,T,'Jerk', T )
+        #Dashboard.plot_curve(d_jerk_coef,T,'Jerk', T )
 
     @staticmethod
-    def plot_curve(coef, T, title, ylabel,xlabel):
+    def plot_curve(coef, T, title, ylabel, xlabel, color="black"):
         #layout
         plt.title(title)
         plt.ylabel(ylabel)
@@ -502,7 +507,7 @@ class Dashboard(object):
             X.append(t)
             Y.append(eq(t))
             t += 0.25
-        plt.plot(X,Y,color="black")
+        plt.plot(X,Y,color=color)
 
     def create_gui(self):
         #Window
@@ -513,7 +518,7 @@ class Dashboard(object):
         #Containers:
         title_frame = tk.Frame(window, width = 1300, height = 40, bg = "orange")
         stats_frame = tk.Frame(window, width = 1300, height = 40, bg = "white")
-        vehicle_frame = tk.Frame(window, width = 1300, height = 500, bg = "white")
+        vehicle_frame = tk.Frame(window, width = 1400, height = 500, bg = "white")
         global_frame = tk.Frame(window, width = 1300, height = 500, bg = "white")
         #vehicle sub containers
         vehicle_frame.grid_rowconfigure(1, weight=1)
@@ -521,6 +526,7 @@ class Dashboard(object):
         cart_frame = tk.Frame(vehicle_frame, width = 400, height = 500, bg = "white")
         fren_frame = tk.Frame(vehicle_frame, width = 600, height = 500, bg = "white")
         bt_frame = tk.Frame(vehicle_frame, width = 300, height = 500, bg = "white")
+        traj_frame = tk.Frame(vehicle_frame, width = 200, height = 500, bg = "white")
         #white_space = tk.Frame(vehicle_frame, width = 10, height = 500, bg = "white")
         #global sub containers
         global_frame.grid_rowconfigure(0, weight=1)
@@ -594,6 +600,11 @@ class Dashboard(object):
         self.fren_canvas = FigureCanvasTkAgg(fig_fren, fren_frame)
         self.fren_canvas.get_tk_widget().pack()
 
+        # vehicle traj
+        fig_traj = plt.figure(4)
+        fig_traj.set_size_inches(4,4,forward=True)
+        self.traj_canvas = FigureCanvasTkAgg(fig_traj, traj_frame)
+        self.traj_canvas.get_tk_widget().pack()
 
         #Container layout
         #--------------------------
@@ -608,7 +619,7 @@ class Dashboard(object):
 
         # Show enabled plots (left justified)
         c = 0
-        for cframe, visible in zip([cart_frame, fren_frame, bt_frame], [SHOW_CPLOT, SHOW_FFPLOT, SHOW_BTREE]):
+        for cframe, visible in zip([cart_frame, fren_frame, bt_frame, traj_frame], [SHOW_CPLOT, SHOW_FFPLOT, SHOW_BTREE, SHOW_TRAJ]):
             if visible:
                 cframe.grid(row=0, column=c, sticky="nsew")
                 c += 1

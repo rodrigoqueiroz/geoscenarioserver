@@ -31,10 +31,12 @@ FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified vers
 SHOW_CPLOT = True           #whether to show the cartesian plot
 CPLOT_SIZE = 80				#cartesian plot: road length in meters (shorter=better performance)
 VEH_STAT_CHART = False      #(!HEAVY) Vehicle Stat Chart. Limited to PLOT_VID
-VEH_TRAJ_CHART = False      #(!HEAVY) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
+VEH_TRAJ_CHART = True      #(!HEAVY) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
 REFERENCE_PATH = True      #reference path indicating the frenet frame for the vehicle
 #BTree
 SHOW_BTREE = True           #whether to show the current behaviour tree
+# trajectory plots
+SHOW_TRAJ = True
 
 #Collision
 COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collision math and lane boundary checks
