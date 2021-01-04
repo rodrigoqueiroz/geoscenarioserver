@@ -156,7 +156,7 @@ class SVPlanner(object):
                         vid,
                         tvehicle.vehicle_state.s,
                         tvehicle.vehicle_state.s_vel,
-                        vehicle_state.s - tvehicle.vehicle_state.s,
+                        vehicle_state.s - tvehicle.vehicle_state.s - 2*VEHICLE_RADIUS,
                         vehicle_state.s_vel - tvehicle.vehicle_state.s_vel
                     )
                 log.info(state_str)
@@ -173,7 +173,8 @@ class SVPlanner(object):
                                             planner_state.lane_config,
                                             planner_state.traffic_vehicles)
                 if traj is None:
-                    log.warn("plan_maneuver return invalid trajectory.")
+                    # log.warn("plan_maneuver return invalid trajectory.")
+                    pass
                 else:
                     self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed, mconfig.mkey == Maneuver.M_REVERSE)
             else:
@@ -183,8 +184,14 @@ class SVPlanner(object):
             # change ref path format for pickling (maybe always keep it like this?)
             debug_ref_path = [(pt.x, pt.y) for pt in self.reference_path]
             debug_shdata[int(self.vid)] = (
-                planner_state.vehicle_state, snapshot_tree, traj, cand, planner_state.traffic_vehicles,
-                planner_state.lane_config, debug_ref_path)
+                planner_state.vehicle_state,
+                snapshot_tree,
+                (mplan_sharr[:6], mplan_sharr[6:12], mplan_sharr[12]),
+                cand,
+                planner_state.traffic_vehicles,
+                planner_state.lane_config,
+                debug_ref_path
+            )
 
         log.info('PLANNER PROCESS END')
         # shm_vs.close()
