@@ -36,7 +36,7 @@ REFERENCE_PATH = True      #reference path indicating the frenet frame for the v
 #BTree
 SHOW_BTREE = True           #whether to show the current behaviour tree
 # trajectory plots
-SHOW_TRAJ = True
+SHOW_TRAJ = False
 
 #Collision
 COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collision math and lane boundary checks

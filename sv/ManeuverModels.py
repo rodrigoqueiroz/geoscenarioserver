@@ -15,6 +15,7 @@ from sv.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.ManeuverConfig import *
 from SimConfig import *
 import util.Utils
+from typing import Callable
 
 
 def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
@@ -66,7 +67,7 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
 
     #print ('Targets: {}'.format(len(target_state_set)))
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return best, list(trajectories)
 
 def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles=None, obstacles=None):
@@ -89,7 +90,7 @@ def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, 
                 #add target
                 target_state_set.append((s_target,d_target,t))
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return best, list(trajectories)
 
 def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, obstacles=None):
@@ -136,7 +137,9 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
         # If leading vehicle is slower than some threshold velocity, our
         # target is to stop.
         if abs(s_lv[1]) > 1.5:
-            if following_too_close:
+            # NOTE: this was used to explicitly decelerate the vehicle when it got too close, after
+            # fixing traj generation this doesn't seem needed...
+            if False:
                 # decelerate for t seconds to increase time gap
                 # s_target[2] = acc
                 # s_target[1] = s_start[1] + acc * t
@@ -166,13 +169,22 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
                 s_target[0] = s_lv[0] - (time_gap * s_lv[1])
                 s_target[1] = s_lv[1]
                 s_target[2] = s_lv[2]
+        else:
+            # stop some meters behind stopped vehicle
+            s_target[0] = leading_vehicle.vehicle_state.s - 5 - VEHICLE_RADIUS * 2
+            # log.info("leading stopped")
         #lateral movement
         for di in lane_config.get_samples():
             d_target = [di,0,0]
             #add target
             target_state_set.append((s_target,d_target,t))
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    # if best:
+    #     log.info("starting FOLLOW: {:.3f} {:.3f} {:.3f}".format(start_state[0], start_state[1], start_state[2]))
+    #     log.info("targetting end {:.3f} {:.3f} {:.3f} at t={:.3f}".format(best_target[0][0], best_target[0][1], best_target[0][2], best_target[-1]))
+    # else:
+    #     log.info("No FOLLOW traj")
     return best, list(trajectories)
 
 
@@ -209,7 +221,7 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
             d_target = [di,0,0] #no lateral movement expected at the end
             target_state_set.append((s_target,d_target,t))
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
     return best, list(trajectories)
 
 
@@ -236,15 +248,32 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
     target_state_set = []
     for t in mconfig.time.get_samples():
         #main goal is relative to target vehicle predicted final position
-        goal_state_relative = np.array(vehicles[target_id].future_state(t)) + np.array(delta)
-        s_target = goal_state_relative[:3]
-        for di in target_lane_config.get_samples():
-            # no lateral movement expected at the end
-            d_target = [di, 0, 0]
-            target_state_set.append((s_target, d_target, t))
+        state_relative_to = vehicles[target_id].future_state(t)
+        # log.info("cuttee future state at t={}: {:.3f} {:.3f} {:.3f}".format(t, state_relative_to[0], state_relative_to[1], state_relative_to[2]))
+        goal_state_relative = np.array(state_relative_to) + np.array(delta)
+        goal_state_relative[0] += 2 * VEHICLE_RADIUS
+        # log.info("with delta: {:.3f} {:.3f} {:.3f}".format(goal_state_relative[0], goal_state_relative[1], goal_state_relative[2]))
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
-    return best,list(trajectories)
+        # sample in s
+        s_samples = []
+        for i in range(3):
+            ds = (mconfig.delta_s_sampling[i][0] / 100) * goal_state_relative[i]
+            s_samples.append(
+                np.linspace(goal_state_relative[i] - ds, goal_state_relative[i] + ds, num=mconfig.delta_s_sampling[i][1])
+            )
+        # log.info("s samples {}".format(s_samples))
+        for s in s_samples[0]:
+            for s_vel in s_samples[1]:
+                for s_acc in s_samples[2]:
+                    s_target = np.array([s, s_vel, s_acc])
+                    for di in target_lane_config.get_samples():
+                        # no lateral movement expected at the end
+                        d_target = [di, 0, 0]
+                        target_state_set.append((s_target, d_target, t))
+
+    # log.info("targets: {}".format(["({:.3f} {:.3f} {:.3f})".format(t[0][0], t[0][1], t[0][2]) for t in target_state_set]))
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
+    return best, list(trajectories)
 
 
 def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
@@ -260,7 +289,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
 
     if (abs(s_start[1]) <= 0.05):
         # (s_coef, d_coef, t)
-        return ([ np.array([start_state[0], 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), target_t ]), None
+        return ([ np.array([start_state[0], 0, 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), target_t ]), None
 
     #generate alternative targets:
     target_state_set = []
@@ -279,7 +308,7 @@ def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
     # for i in target_state_set:
     #    print(i)
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
     return best,list(trajectories)
 
 def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
@@ -293,13 +322,14 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
     #start
     s_start = start_state[:3]
 
-    if start_state[0] >= target_pos:
-        log.warn('Stop target position is too close: {}'.format(target_pos - start_state[0]))
+    # within a certain distance generating new trajectory doesn't make sense
+    if abs(start_state[0] - target_pos) < 1:
+        # log.warn('Stop target position is too close: {}'.format(target_pos - start_state[0]))
         return None, None
 
     if (abs(s_start[1]) <= 0.05):
         # (s_coef, d_coef, t)
-        return ([np.array([start_state[0], 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), mconfig.time.value]), None
+        return ([np.array([start_state[0], 0, 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), mconfig.time.value]), None
 
     #targets
     target_state_set = []
@@ -313,8 +343,9 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
             #add target
             target_state_set.append((s_target, d_target, t))
 
-    best, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
-    # log.info("target stop {}, actual {}".format(target_pos, to_equation(best[0])(best[-1])))
+    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    # if best:
+    #     log.info("target stop {}, actual {}".format(target_pos, to_equation(best[0])(best[-1])))
     return best, list(trajectories)
 
 
@@ -327,44 +358,30 @@ def optimized_trajectory(start_state, target_state_set, mconfig, lane_config, ve
     """
     #find trajectories
     trajectories = []
-    trajectories = list(map(find_trajectory, zip(itertools.repeat(start_state), target_state_set)))
+    quintic_maneuvers = [Maneuver.M_CUTIN, Maneuver.M_FOLLOW, Maneuver.M_STOP_AT]
+    traj_solver = find_trajectory if mconfig.mkey in quintic_maneuvers else \
+        lambda x: find_trajectory(x, s_solver=quartic_polynomial_solver)
+    trajectories = list(map(traj_solver, zip(itertools.repeat(start_state), target_state_set)))
 
     #evaluate feasibility
     f_trajectories_and_targets = []
     for traj, target_state in zip(trajectories, target_state_set):
-        if maneuver_feasibility(start_state, traj, mconfig, lane_config, vehicles, obstacles):
+        if maneuver_feasibility(start_state, traj, target_state, mconfig, lane_config, vehicles, obstacles):
             f_trajectories_and_targets.append((traj, target_state))
     #print ("{} feasible trajectories from {}".format( len(f_trajectories_and_targets), len(trajectories)))
     if len(f_trajectories_and_targets) == 0:
-        log.error("No feasible trajectory to select")
-        return None, trajectories
+        # log.error("No feasible trajectory to select")
+        return None, None, trajectories
 
     #select best by total cost
     # best = min(f_trajectories, key=lambda traj: maneuver_cost(start_state, traj, mconfig, lane_config, vehicles, obstacles))
     best = min(f_trajectories_and_targets, key=lambda pair:
                maneuver_cost(start_state, pair[0], pair[1], mconfig, lane_config, vehicles, obstacles))
-    return best[0], trajectories
+
+    # returning only feasible trajectories
+    return best[0], best[1], [f[0] for f in f_trajectories_and_targets]
 
 #===POLYNOMIAL FITTING===
-
-def find_trajectory(traj_bounds):
-    """
-    Fits a jerk optimal trajectory between two points in s and d.
-    Returns a tuple representing the trajectory in the form of polynomial coefficients:
-    s_coef for quartic polynomial (longtudinal), d_coef for quintic polynomial (lateral), and time in [s].
-    """
-    unzip_traj_bounds = list(traj_bounds)
-    start_state = unzip_traj_bounds[0]
-    target_state = unzip_traj_bounds[1]
-    #print(start_state)
-    #print(target)
-
-    s_target, d_target, t = target_state
-    s_start = start_state[:3]
-    d_start = start_state[3:]
-    s_coef = quartic_polynomial_solver(s_start, s_target, t)
-    d_coef = quintic_polynomial_solver(d_start, d_target, t)
-    return tuple([s_coef, d_coef, t])
 
 def quintic_polynomial_solver(start, end, T):
     """
@@ -408,5 +425,27 @@ def quartic_polynomial_solver(start, end, T):
                 end[2] - c_2
                 ])
     a_3_4 = np.linalg.solve(A,B)
-    alphas = np.concatenate([np.array([a_0, a_1, a_2]), a_3_4])
+    # append 0 as the 6th coefficient
+    alphas = np.concatenate([np.array([a_0, a_1, a_2]), a_3_4, [0]])
     return alphas
+
+def find_trajectory(traj_bounds,
+                    s_solver:Callable = quintic_polynomial_solver,
+                    d_solver:Callable = quintic_polynomial_solver):
+    """
+    Fits a jerk optimal trajectory between two points in s and d.
+    Returns a tuple representing the trajectory in the form of polynomial coefficients:
+    s_coef for quartic polynomial (longtudinal), d_coef for quintic polynomial (lateral), and time in [s].
+    """
+    unzip_traj_bounds = list(traj_bounds)
+    start_state = unzip_traj_bounds[0]
+    target_state = unzip_traj_bounds[1]
+    #print(start_state)
+    #print(target)
+
+    s_target, d_target, t = target_state
+    s_start = start_state[:3]
+    d_start = start_state[3:]
+    s_coef = s_solver(s_start, s_target, t)
+    d_coef = d_solver(d_start, d_target, t)
+    return tuple([s_coef, d_coef, t])
