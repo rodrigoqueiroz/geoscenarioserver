@@ -1,7 +1,7 @@
 behaviortree drive_tree:
     ?
         ->
-            condition goal ( reached_goal( threshold=25 ) )
+            condition goal ( reached_goal( threshold=35 ) )
             maneuver stop_reached_goal ( MStopAtConfig() )
         ->
             condition redlight ( traffic_light_red( threshold=40 ) )
