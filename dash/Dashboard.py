@@ -21,6 +21,7 @@ from PIL import Image, ImageTk
 import glog as log
 import os
 from copy import copy
+import csv
 
 from SimConfig import *
 from util.Utils import *
@@ -37,6 +38,7 @@ class Dashboard(object):
         self.traffic = traffic
         self.center_vid = int(center_vid)
         self.window = None
+        
         
 
     def start(self, show_dashboard):
@@ -87,9 +89,9 @@ class Dashboard(object):
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
             config_txt += "\nTick#: {}   |   SimTime: {:.3}   |   DeltaTime: {:.3}".format(tickcount,sim_time,delta_time) 
 
-            
+
             self.scenario_config_lb['text'] = config_txt
-            #self.scenario_stats_lb['text'] = stat_txt
+            #self.scenario_stats_lb['text'] = stat_txts
 
             #traffic lights
             #todo: timetable with all lights
@@ -165,6 +167,7 @@ class Dashboard(object):
 
     def quit(self):
         self._process.terminate()
+        
 
     def change_tab_focus(self, event):
         focus = self.tab.focus()
@@ -210,6 +213,7 @@ class Dashboard(object):
             plan = traffic.vehicles[vid].sv_planner.get_plan()
             trajectories[vid] = plan.get_trajectory()
         return trajectories
+
 
     def pre_plot_map_chart(self):
         #Map pre plot: static primitives only

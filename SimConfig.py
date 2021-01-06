@@ -24,7 +24,7 @@ PLOT_VID = 1               	#vehicle to center the main plot arouund, if not def
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
-MPLOT_SIZE = 60			    #map plot: road length in meters (shorter=better performance)
+MPLOT_SIZE = 80			    #map plot: road length in meters (shorter=better performance)
 #Frenet Map
 SHOW_FFPLOT = True          #whether to show the frenet frame plot
 FFPLOT_ASPECT = False  		#frenet frame plot: keep S and D aspect ratio (same scale)
@@ -50,6 +50,9 @@ PLANNER_RATE = 5            #Planner tick rate
 
 VEH_COLLISION = False      	#If true, collision between vehicles with be considered during planning.
 OBJ_COLLISION = False      	#If true, collision between vehicles and static objects on the road with be considered during planning.
+
+#Evaluation
+WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])

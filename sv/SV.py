@@ -60,6 +60,8 @@ class Vehicle(object):
         self.vehicle_state.d_vel = frenet_state[4]
         self.vehicle_state.d_acc = frenet_state[5]
 
+                
+
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
@@ -373,31 +375,38 @@ class TV(Vehicle):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
             
         if self.trajectory:
-            start_time = float(self.trajectory[0][2]) #first node
-            end_time = float(self.trajectory[-1][2]) #last node
+            start_time = float(self.trajectory[0].time) #first node
+            end_time = float(self.trajectory[-1].time) #last node
             traj_time = end_time - start_time
-
             #During trajectory
             if start_time <= sim_time <= end_time:
-                for node in self.trajectory:
-                    node_time = float(node[2])
-                    #time_in_trajectory = node_time - start_time
-                    #if time_in_trajectory > sim_time:
-                    if node_time < sim_time:
+                #for node in self.trajectory:
+                for i in range(len(self.trajectory)):
+                    node = self.trajectory[i]
+                    if node.time < sim_time:
                         continue
                     #closest after current sim time
                     #TODO: interpolate taking the difference between closest node time and sim time
                     #print("closest node time {} >= simtime {}".format(node_time,sim_time))
-                    #print(node)
                     if self.sim_state is Vehicle.INACTIVE:
                         log.warn("vid {} is now ACTIVE".format(self.vid))
                         self.sim_state = Vehicle.ACTIVE
                         if self.ghost_mode:
                             self.sim_state = Vehicle.INVISIBLE
                             log.warn("vid {} is now INVISIBLE".format(self.vid))
-                            self.simtraffic.vehicles[-self.vid].sim_state = Vehicle.ACTIVE #workaround
-                    self.vehicle_state.set_X([node[0], 0, 0]) #fix this, not real X velocity
-                    self.vehicle_state.set_Y([node[1], 0, 0])
+                            #workaround for evaluation only
+                            if -self.vid in self.simtraffic.vehicles:
+                                self.simtraffic.vehicles[-self.vid].sim_state = Vehicle.ACTIVE 
+                    #Update Vehicle State
+                    if (i>1):
+                        prevnode =  self.trajectory[i-1]
+                        xvel = (node.x - prevnode.x) / (node.time - prevnode.time)
+                        yvel = (node.y - prevnode.y) / (node.time - prevnode.time)
+                    else:
+                        xvel = yvel = 0
+                    xacc = yacc = 0 #todo
+                    self.vehicle_state.set_X([node.x, xvel, xacc])
+                    self.vehicle_state.set_Y([node.y, yvel, xacc])
                     break
             #After trajectory
             if sim_time > end_time:
@@ -407,6 +416,10 @@ class TV(Vehicle):
                 if self.sim_state is Vehicle.ACTIVE or self.sim_state is Vehicle.INVISIBLE:
                     log.warn("vid {} is now INACTIVE".format(self.vid))
                     self.sim_state = Vehicle.INACTIVE
+                    #workaround for evaluation only
+                    if -self.vid in self.simtraffic.vehicles:
+                        self.simtraffic.vehicles[-self.vid].sim_state = Vehicle.INACTIVE 
+                
             
         
 

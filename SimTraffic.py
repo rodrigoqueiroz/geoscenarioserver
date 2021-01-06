@@ -12,7 +12,7 @@ import threading
 import math
 import numpy as np
 import glog as log
-
+import csv
 from shm.SimSharedMemory import *
 from TickSync import TickSync
 from sv.SV import *
@@ -39,6 +39,9 @@ class SimTraffic(object):
         self.traffic_state_sharr = None
         self.traffic_light_sharr = None
         self.debug_shdata = None
+
+        #Traffic Log
+        self.vehicles_log = {}
 
     def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root="drive_tree", start_state_in_frenet=False):
         try:
@@ -75,8 +78,10 @@ class SimTraffic(object):
                     nv, self.sim_config, self.traffic_state_sharr, self.traffic_light_sharr, self.debug_shdata)
 
     def stop_all(self):
+        self.write_log_trajectories()
         for vid in self.vehicles:
             self.vehicles[vid].stop()
+        
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
@@ -123,6 +128,7 @@ class SimTraffic(object):
         self.write_traffic_state(tick_count, delta_time, sim_time)
 
         #log.info(self.debug_shdata)
+        self.log_trajectories(tick_count, delta_time, sim_time)
         return 0
 
     #Shared Memory:
@@ -196,3 +202,26 @@ class SimTraffic(object):
                 np.linalg.norm([state.x_vel, state.y_vel])
             )
         log.info(state_str)
+
+
+    def log_trajectories(self,tick_count,sim_time, delta_time):
+        if WRITE_TRAJECTORIES:
+            for vid, vehicle in sorted(self.vehicles.items()):
+                #if vehicle.type == Vehicle.SDV_TYPE or vehicle.type == Vehicle.TV_TYPE:
+                if vehicle.sim_state == Vehicle.ACTIVE or vehicle.sim_state == Vehicle.INVISIBLE:
+                    sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
+                    line =[vid, vehicle.type,vehicle.sim_state, tick_count, sim_time, delta_time] + sv
+                    if vid not in self.vehicles_log:
+                        self.vehicles_log[vid] = []
+                    self.vehicles_log[vid].append(line)
+
+    def write_log_trajectories(self):
+        if WRITE_TRAJECTORIES:
+            #print("Log all trajectories: ")
+            for vid,vlog in self.vehicles_log.items():
+                filename = "eval/traj_log/v_{}.csv".format(vid)
+                with open(filename,mode='w') as csv_file:
+                    csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    #vlog.sort()
+                    for line in vlog:
+                        csv_writer.writerow(line)

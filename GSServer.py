@@ -19,6 +19,7 @@ from lanelet2.projection import UtmProjector
 from SimConfig import SimConfig
 from gsc.GSParser import GSParser
 from sv.ManeuverConfig import *
+from eval.EvaluationSim import *
 
 def start_server(args, m=MVelKeepConfig()):
     # log.setLevel("INFO")
@@ -169,11 +170,26 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map, evalua
                                 sim_config.lanelet_routes[simvid], btree_root)
         
         #todo: change to a new trajectory type to not conflict with GeoScenario1 path
+            
         elif 'path' in vnode.tags:
             try:
+                class Node:
+                    x:float
+                    y:float
+                    time:float
+                #mypath = vnode.tags['path']
+                #path_nodes = parser.paths[mypath].nodes
+                #trajectory = [ (node.x, node.y, node.tags['time']) for node in path_nodes ] 
                 mypath = vnode.tags['path']
                 path_nodes = parser.paths[mypath].nodes
-                trajectory = [ (node.x, node.y, node.tags['time']) for node in path_nodes ] 
+                trajectory = []
+                for node in path_nodes:
+                    nd = Node()
+                    nd.x = float(node.x)
+                    nd.y = float(node.y)
+                    nd.time = float(node.tags['time'])
+                    trajectory.append(nd) 
+                sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
             except Exception as e:
                 log.error("Trajectory generation failed for path {}.".format(mypath))
                 raise e
@@ -191,9 +207,10 @@ def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map, evalua
     return True
 
 
-def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
-    """ Setup scenario for Evaluation
-    """
+""" def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
+
+    #Setup scenario for Evaluation
+    
     full_scenario_path = os.path.join(ROOT_DIR, gsfile)
     parser = GSParser()
     if not parser.load_and_validate_geoscenario(full_scenario_path):
@@ -231,7 +248,7 @@ def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
         sim_traffic.add_traffic_light(tl_reg_elem, name, type, states, durations)
 
-    return True
+    return True """
 
 def add_route_vehicle(simvid, parser, lanelet_map, sim_traffic,sim_config):
     #Dynamic vehicles:
@@ -257,15 +274,23 @@ def add_route_vehicle(simvid, parser, lanelet_map, sim_traffic,sim_config):
 
 def add_trajectory_vehicle(simvid, parser, lanelet_map, sim_traffic, sim_config, static_to_dynamic = False, evaluation_mode = False):
     #Vehicles following predefined trajectory
+    class Node:
+        x:float
+        y:float
+        time:float
+        pass
     vnode = parser.vehicles[simvid]
     if 'path' in vnode.tags:
-        try:
-            mypath = vnode.tags['path']
-            path_nodes = parser.paths[mypath].nodes
-            trajectory = [ (node.x, node.y, node.tags['time']) for node in path_nodes ] 
-        except Exception as e:
-            log.error("Trajectory generation failed for path {}.".format(mypath))
-            raise e
+        mypath = vnode.tags['path']
+        path_nodes = parser.paths[mypath].nodes
+        trajectory = []
+        for node in path_nodes:
+            nd = Node()
+            nd.x = float(node.x)
+            nd.y = float(node.y)
+            nd.time = float(node.tags['time'])
+            print(nd)
+            trajectory.append(nd) 
 
         if not static_to_dynamic:
             sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
@@ -294,40 +319,7 @@ def add_trajectory_vehicle(simvid, parser, lanelet_map, sim_traffic, sim_config,
                 sim_traffic.add_trajectory_vehicle(-simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
                 sim_traffic.vehicles[-simvid].ghost_mode = True
            
-         
-    def add_vehicle2(simvid,parser):
-        vnode = parser.vehicles[simvid]
-        if 'path' in vnode.tags:
-            try:
-                mypath = vnode.tags['path']
-                path_nodes = parser.paths[mypath].nodes
-                trajectory = [ (node.x, node.y, node.tags['time']) for node in path_nodes ] 
-            except Exception as e:
-                log.error("Trajectory generation failed for path {}.".format(mypath))
-                raise e
-            #sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
-            #create dynamic vehicle from trajectory one
-            btree_root = "drive_tree" #default
-            myroute = mypath
-            try:
-                route_nodes = [ path_nodes[0], path_nodes[-1]]
-                speed = path_nodes[0].tags['speed']
-                lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
-                print("route_nodes {} \nstart speed {} \nlanelets in route {} ".format(route_nodes,speed,lanelets_in_route))
-                sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
-            except Exception as e:
-                log.error("Route generation failed for route {}.".format(myroute))
-                raise e
-            sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
-            sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-                                sim_config.lanelet_routes[simvid], btree_root)
-            sim_traffic.vehicles[simvid].sim_state = Vehicle.INACTIVE
-            sim_traffic.add_trajectory_vehicle(-simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
-            sim_traffic.vehicles[-simvid].ghost_mode = True
-
-
-
-
+    
 
 if __name__ == "__main__":
     parser = ArgumentParser()

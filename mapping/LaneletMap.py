@@ -52,7 +52,7 @@ class LaneletMap(object):
             for tl in tl_re.trafficLights: 
                 tlname = tl.attributes['name']
                 if name.casefold() == tlname.casefold():
-                    print(name+" and "+tlname)
+                    #print(name+" and "+tlname)
                     return tl_re
         return None
 
