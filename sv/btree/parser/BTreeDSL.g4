@@ -6,7 +6,8 @@ tokens { INDENT, DEDENT }
 
 @lexer::header{
 from antlr_denter.DenterHelper import DenterHelper
-from BTreeDSLParser import BTreeDSLParser
+from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
+
 }
 @lexer::members {
 class BTreeDSLDenter(DenterHelper):
@@ -33,7 +34,7 @@ behaviorTree        : ('behaviortree' name ':' INDENT rootNode NL? DEDENT?)+ EOF
 
 rootNode            : node;
 node                : leafNode | nodeComposition;
-nodeComposition     : OPERATOR INDENT node+ DEDENT;
+nodeComposition     : OPERATOR name? INDENT node+ DEDENT;
 leafNode            : (maneuver | condition | subtree) NL;
 
 condition           : 'condition' name '(' cconfig ')';

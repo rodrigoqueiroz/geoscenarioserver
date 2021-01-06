@@ -8,7 +8,7 @@ import glog as log
 from sv.ManeuverConfig import *
 from sv.ManeuverUtils import *
 # from sv.SVPlanner import PlannerState
-from sv.btree.BTreeParser import *
+from sv.btree.BTreeInterpreter import *
 from sv.btree.BTreeLeaves import *
 from sv.SVPlannerState import TrafficLightState
 from TrafficLight import TrafficLightColor
@@ -39,8 +39,23 @@ class BehaviorModels(object):
 
     def build(self):
 
-        parser = BTreeParser(self.vid, bmodel=self)
-        tree = parser.parse_tree(tree_name=self.root_btree_name)
+        interpreter = BTreeInterpreter(self.vid, bmodel=self)
+        tree = interpreter.build_tree(tree_name=self.root_btree_name)
+        '''
+        args format:
+            For maneuvers always write m_id=MConfig(x=1,y=2)
+                where m_id is the same identifier used in the behavior tree,
+                      MConfig is a maneuver configuration,
+                      x and y are parameters from the maneuver configuration
+
+            For conditions always write c_id=name,args=(x=1,y=2)
+                where c_id is the same identifier used in the behavior tree,
+                      name is the name of the condition used in the behavior tree,
+                      and x=1,y=2 are the arguments for the condition.
+            Example: args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)"
+        '''
+        #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
+
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)

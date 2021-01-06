@@ -39,27 +39,44 @@ class Subtree(object):
         self.pos = pos
 
 # might still need naming refactorings
-class BTreeParser(object):
+class BTreeInterpreter(object):
     def __init__(self, vid, bmodel):
         self.vid = vid
         self.bmodel = bmodel
+        self.tree = None
 
-    def gen_func(self, tree_name, _input):
+    def text2pytree(self, tree_name, _input):
         '''
-            Transformation from input syntax to function
-            ready to be instantiated.
+            Transformation from text to tree
+            ready to be instantiated, according to pytree.
         '''
         lexer = BTreeDSLLexer(InputStream(_input))
         parser = BTreeDSLParser(CommonTokenStream(lexer))
         listener = BTreeListener(self.vid, tree_name)
         ast = parser.behaviorTree()
         ParseTreeWalker().walk(listener, ast)
-        function = listener.getTreeStr()
+        pytree = listener.getTreeStr()
         subtrees = listener.getSubtrees()
 
-        return function, subtrees
+        return pytree, subtrees
 
-    def load_tree(self, path, tree_name):
+    def execute(self, pytree):
+        '''
+            Creates an instance of the behavior tree by
+            _exec_cuting the passed function.
+        '''
+        try:
+            exec(pytree, globals())
+            root, nodes = getPyTree(self)
+        except:
+            raise RuntimeError("Could not instantiate tree.")
+
+        return root, nodes
+
+    def interpret_tree(self, tree_name):
+        ''' Instantiates a tree from the name.'''
+        loaded_tree = ""
+        path = "scenarios/trees/"
         try:
             f = open(os.path.join(ROOT_DIR, path, tree_name + ".btree"),'r')
         except Exception:
@@ -68,47 +85,58 @@ class BTreeParser(object):
             loaded_tree = f.read()
             f.close()
 
-        return loaded_tree
-
-    def create_instance(self, func):
-        '''
-            Creates an instance of the behavior tree by
-            _exec_cuting the passed function.
-        '''
-        try:
-            exec(func, globals())
-            tree, nodes = getTreeInstance(self)
-        except:
-            raise RuntimeError("Could not instantiate tree.")
-
-        return tree, nodes
-
-    def instantiate(self, tree_name):
-        ''' Instantiates a tree from the name.'''
-        _input = self.load_tree(path="scenarios/trees/", tree_name=tree_name)
-        func, subtrees = self.gen_func(tree_name, _input)
-        root, nodes = self.create_instance(func)
+        pytree, subtrees = self.text2pytree(tree_name, loaded_tree)
+        root, nodes = self.execute(pytree)
         return root, nodes, subtrees
 
-    def parse_tree(self, tree_name, args=""):
+    def collect_nodes(self,tree):
+        nodes = []
+        if not tree.root.children: return [] 
 
-        root, nodes, subtrees = self.instantiate(tree_name)
+        for child in tree.root.children:
+            nodes += self.collect_children(child)
+
+        return nodes
+  
+    def collect_children(self, node):
+        nodes = []
+        if not node.children: nodes.append(node)
+        else: 
+            for child in node.children:
+                nodes += self.collect_children(child)
+        
+        return nodes
+
+    def reconfigure_nodes(self, tree_name, tree, args=""):
+        nodes = self.collect_nodes(tree)
 
         if(args != ""):
             args = args.split(";")
             if args[0] != '' :
                 for arg in args:
-                    m_id = arg.split("=",1)[0]
-                    m_config = arg.split("=",1)[1]
+                    arr = arg.split("=",1)
+                    id = arr[0]
+                    config = arr[1]
+                    args=None
+                    if config.find(",args=(") != -1: 
+                        arr2=config.split(",args=(")
+                        config=arr2[0]
+                        args= arr2[1][:-1] #gets the second parameter without the last character which should be a ')'
                     reconfigured=False
+                    
                     for node in nodes:
-                        if node.name == m_id:
-                            node.reconfigure(eval(m_config))
+                        if node.name == id:
+                            if(args is None): 
+                                node.reconfigure(eval(config))
+                            else: 
+                                #print(config + "    "+ args)
+                                node.reconfigure(config, args)
                             reconfigured=True
                             break
-                    if not reconfigured: raise RuntimeError(m_id + " node could not be found in " + tree_name)
+                    
+                    if not reconfigured: print(id + " node could not be found in " + tree_name)
 
-        tree = trees.BehaviourTree(root=root)
+    def link_subtrees(self, tree, nodes, subtrees):        
         for subtree in subtrees:
             parent = None
             for node in nodes:
@@ -116,10 +144,28 @@ class BTreeParser(object):
                     parent = node
                     break
             if parent == None: raise RuntimeError("Parent "+ subtree.parent +" not found.")
-            stree_to_append = self.parse_tree(subtree.name, subtree.args).root
+            stree_to_append = self.build_subtree(subtree).root
             tree.insert_subtree(stree_to_append, parent.id, int(subtree.pos))
 
         return tree
+
+    def build_subtree(self, _subtree):
+        name=_subtree.name
+        args=_subtree.args
+        subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(name)
+        subtree = trees.BehaviourTree(root=subtree_root)
+        if subtree_nodes: self.reconfigure_nodes(name, subtree, args)
+        if subtree_subtrees: subtree = self.link_subtrees(subtree, subtree_nodes, subtree_subtrees)
+        return subtree
+
+    def build_tree(self, tree_name):
+        root, nodes, subtrees = self.interpret_tree(tree_name)
+        tree = trees.BehaviourTree(root=root)
+        if subtrees: tree = self.link_subtrees(tree, nodes, subtrees)
+        self.tree=tree
+        return tree
+
+    
 
 class BTreeListener(BTreeDSLListener):
 
@@ -175,7 +221,7 @@ class BTreeListener(BTreeDSLListener):
         return self.tree
 
     def buildTreeFunc(self):
-        self.tree += "def getTreeInstance(parser):\n"
+        self.tree += "def getPyTree(parser):\n"
         for cmd in self.exec_stack: self.tree +=  "    " + cmd + "\n"
         self.tree += "    nodes = "
         if len(self.nodes) > 1:  self.tree += self.nodes[:-1] + "]\n"
@@ -191,15 +237,23 @@ class BTreeListener(BTreeDSLListener):
         if node.leafNode() != None:
             raise RuntimeError("The root node must be an operator (e.g. '?', '->', '||').")
         elif node.nodeComposition() != None:
-            var = self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+            nodeComp_op = self.map(node.nodeComposition().OPERATOR().getText())
+            if node.nodeComposition().name() == None:
+                var = nodeComp_op.lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+            else:
+                var = node.nodeComposition().name().getText()
         s = "root = " + var
         self.exec_stack.append(s)
 
     def exitNodeComposition(self, ctx):
-        nm = self.genstr(ctx.getText())
-        op = self.map(ctx.OPERATOR().getText())
-        name = op.lower()[:3] + "_" + nm
 
+        op = self.map(ctx.OPERATOR().getText())
+
+        if(ctx.name() == None): 
+            name = op.lower()[:3] + "_" + self.genstr(ctx.getText())
+        else:
+            name = ctx.name().getText()
+        
         s =  name + " = composites." + op + "(\"" + name + "\")"
         self.exec_stack.append(s)
 
@@ -217,10 +271,21 @@ class BTreeListener(BTreeDSLListener):
                         self.exec_stack.append("~" + node.leafNode().subtree().name().getText()+","+name+","+str(pos))
 
                 elif node.nodeComposition() != None:
-                    aux.append(self.map(node.nodeComposition().OPERATOR().getText()).lower()[:3] + "_" + self.genstr(node.nodeComposition().getText()))
+                    nodeComp_op = self.map(node.nodeComposition().OPERATOR().getText())
+                    if node.nodeComposition().name() == None:
+                        nodeComp_name = nodeComp_op.lower()[:3] + "_" + self.genstr(node.nodeComposition().getText())
+                    else:
+                        nodeComp_name = node.nodeComposition().name().getText()
+
+                    aux.append(nodeComp_name)
                 pos += 1
         else:
-            aux = "["+self.genstr(ctx.node().getText()) + "]"
+            if ctx.node().name() == None:
+                ref = self.genstr(ctx.node().getText())
+            else:
+                ref = ctx.node().name().getText()
+
+            aux = "["+ ref + "]"
 
         s = name + ".add_children(" + str(aux).replace("\'","") + ")"
         self.exec_stack.append(s)
