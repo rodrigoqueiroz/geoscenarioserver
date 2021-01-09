@@ -43,9 +43,9 @@ class SimTraffic(object):
         #Traffic Log
         self.vehicles_log = {}
 
-    def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root="drive_tree", start_state_in_frenet=False):
+    def add_vehicle(self, vid, name, start_state, lanelet_route, btree_root="drive_tree", btree_reconfig = '', start_state_in_frenet=False):
         try:
-            v = SV(vid, name, btree_root, start_state, 1.0, self.lanelet_map, lanelet_route,
+            v = SV(vid, name, btree_root, btree_reconfig, start_state, 1.0, self.lanelet_map, lanelet_route,
                    start_state_in_frenet=start_state_in_frenet)
         except Exception as e:
             log.error("Failed to initialize vehicle {}".format(vid))

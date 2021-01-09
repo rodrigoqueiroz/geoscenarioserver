@@ -252,7 +252,7 @@ class Dashboard(object):
         y_max = (MPLOT_SIZE/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_light_states)
-        
+
 
         #all vehicles
         for vid, vehicle in vehicles.items():

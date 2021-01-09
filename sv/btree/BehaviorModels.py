@@ -23,11 +23,11 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name):
+    def __init__(self, vid, root_btree_name, reconfig = ""):
         self.vid = vid
         self.root_btree_name = root_btree_name
         #Build Tree
-        self.tree = self.build()
+        self.tree = self.build(reconfig)
         #print(self)
         #Runtime status:
         self.planner_state = None
@@ -37,7 +37,7 @@ class BehaviorModels(object):
         self.current_mconfig = None
         self.ref_path_changed = False
 
-    def build(self):
+    def build(self,reconfig):
 
         interpreter = BTreeInterpreter(self.vid, bmodel=self)
         tree = interpreter.build_tree(tree_name=self.root_btree_name)
@@ -54,8 +54,12 @@ class BehaviorModels(object):
                       and x=1,y=2 are the arguments for the condition.
             Example: args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)"
         '''
-        #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
 
+        if reconfig !="":
+            log.info("Behavior model will be reconfigured {}".format(reconfig))
+            #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
+            interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args=reconfig)
+            
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)

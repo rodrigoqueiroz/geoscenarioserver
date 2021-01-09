@@ -30,7 +30,7 @@ import lanelet2.core
 
 
 class SVPlanner(object):
-    def __init__(self, vid, btree_root, nvehicles, laneletmap, sim_config, traffic_state_sharr, traffic_light_sharr, debug_shdata):
+    def __init__(self, vid, btree_root, btree_reconfig, nvehicles, laneletmap, sim_config, traffic_state_sharr, traffic_light_sharr, debug_shdata):
         #MainProcess space:
         self._process = None
         self._traffic_state_sharr = traffic_state_sharr
@@ -49,6 +49,7 @@ class SVPlanner(object):
         # Reference path that the planner will use for all transformations and planning
         self.reference_path = None
         self.btree_root = btree_root
+        self.btree_reconfig = btree_reconfig
         self.btree_model = None
 
     def start(self):
@@ -92,7 +93,7 @@ class SVPlanner(object):
 
         #self.btree_model = BTreeModel(self.vid, self.btree_root)
         #self.btree_model = BTreeFactory(self.vid, self.btree_root).build_tree()
-        self.btree_model = BehaviorModels(self.vid, self.btree_root)
+        self.btree_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig)
 
         while sync_planner.tick():
             # Get sim state from main process

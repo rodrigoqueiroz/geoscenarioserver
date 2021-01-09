@@ -33,14 +33,15 @@ class Vehicle(object):
     ACTIVE = 1            #vehicle is in simulation and visible to other vehicles
     INVISIBLE = 2         #vehicle is in simulation but NOT visible to other vehicles (for reference)
 
-    def __init__(self, vid, type, name='', btree_root='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], radius=VEHICLE_RADIUS, model=None):
+    def __init__(self, vid, type, name='', btree_root='', btree_reconfig = '',
+                start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], 
+                radius=VEHICLE_RADIUS, model=None):
         #id
         self.vid = vid
         self.name = name
         self.radius = radius
         self.model = model
         self.type = type
-
         self.sim_state = Vehicle.ACTIVE
         
         #state
@@ -105,7 +106,7 @@ class Vehicle(object):
 
 # A Simulated Driver-Vehicle (dynamic behavior)
 class SV(Vehicle):
-    def __init__(self, vid, name, btree_root, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model=None):
+    def __init__(self, vid, name, btree_root, btree_reconfig, start_state, radius, lanelet_map, lanelet_route, start_state_in_frenet=False, model=None):
         #Map
         self.lanelet_map = lanelet_map
         # list of lanelet ids we want this vehicle to follow
@@ -129,6 +130,7 @@ class SV(Vehicle):
         self.sv_planner = None
         #behavior
         self.btree_root = btree_root
+        self.btree_reconfig = btree_reconfig
         #Trajectory
         self.trajectory = None          #coefs + time[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]]
         self.trajectory_time = 0        #consumed time
@@ -170,7 +172,7 @@ class SV(Vehicle):
             If a planner is started, the vehicle can't be a remote.
         """
         self.sv_planner = SVPlanner(
-            self.vid, self.btree_root, nvehicles, self.lanelet_map, sim_config,
+            self.vid, self.btree_root, self.btree_reconfig, nvehicles, self.lanelet_map, sim_config,
             traffic_state_sharr, traffic_light_sharr, debug_shdata
         )
         self.sv_planner.start()
@@ -417,8 +419,8 @@ class TV(Vehicle):
                     log.warn("vid {} is now INACTIVE".format(self.vid))
                     self.sim_state = Vehicle.INACTIVE
                     #workaround for evaluation only
-                    if -self.vid in self.simtraffic.vehicles:
-                        self.simtraffic.vehicles[-self.vid].sim_state = Vehicle.INACTIVE 
+                    #if -self.vid in self.simtraffic.vehicles:
+                    #    self.simtraffic.vehicles[-self.vid].sim_state = Vehicle.INACTIVE 
                 
             
         
