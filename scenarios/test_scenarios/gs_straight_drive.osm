@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-1969306' action='modify' visible='true' lat='49.00805702541' lon='8.45686019288'>
+  <node id='-1969306' action='modify' visible='true' lat='49.00755397299' lon='8.45783876538'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
@@ -18,7 +18,7 @@
     <tag k='route' v='right_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-1969310' action='modify' visible='true' lat='49.00799752878' lon='8.45686298113'>
+  <node id='-1969310' action='modify' visible='true' lat='49.00752282715' lon='8.45783712069'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
