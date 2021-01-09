@@ -175,12 +175,7 @@ def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
             evid = -vid
             btree_root = "drive_tree_eval" #default
             reconfig = {}
-            reconfig['keep_velocity'] = "MVelKeepConfig(vel=MP({},10,6)), time=MP({},10,3)".format(ts.target_vel, ts.time_to_target_vel)
-            #reconfig['']
-            #reconfig['']
-            print ("reconfig")
-            print (reconfig)
-            
+            btree_reconfig = "keep_velocity=MVelKeepConfig(vel=MP({},10,6), time=MP({},10,3))".format(ts.target_vel, ts.time_to_target_vel)
             try:
                 route_nodes = [ trajectory[0], trajectory[-1]]
                 speed = 10
@@ -192,8 +187,10 @@ def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
                 continue
                 
             sim_config.goal_points[evid] = (route_nodes[-1].x, route_nodes[-1].y)
-            sim_traffic.add_vehicle(evid, '-'+veh_name, [trajectory[0].x,0.0,0.0, trajectory[0].y,0.0,0.0],                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-                                sim_config.lanelet_routes[evid], btree_root)
+            sim_traffic.add_vehicle(evid, '-'+veh_name, 
+                                    [trajectory[0].x,0.0,0.0, trajectory[0].y,0.0,0.0], 
+                                    sim_config.lanelet_routes[evid], 
+                                    btree_root, btree_reconfig)
             #start as inactive until the original trajectory starts
             sim_traffic.vehicles[evid].sim_state = Vehicle.INACTIVE
             
