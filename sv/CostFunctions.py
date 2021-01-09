@@ -11,7 +11,7 @@ from SimConfig import *
 
 #=============================== FEASIBILITY
 
-def maneuver_feasibility(start_state, trajectory,  mconfig, lane_config:LaneConfig, vehicles, obstacles):
+def maneuver_feasibility(start_state, trajectory, target_state, mconfig, lane_config:LaneConfig, vehicles, obstacles):
 
     for c in mconfig.feasibility_constraints:
         if mconfig.feasibility_constraints[c] > 0:
@@ -25,10 +25,11 @@ def maneuver_feasibility(start_state, trajectory,  mconfig, lane_config:LaneConf
                     return False
             #acc
             elif c == 'max_long_acc':
-                if max_acc_cost(trajectory, mconfig.max_acc) > 0:
+                if max_long_acc_cost(trajectory, mconfig.max_long_acc) > 0:
+                    print("max_long_acc REJECT")
                     return False
             elif c == 'max_lat_acc':
-                if max_acc_cost(trajectory, mconfig.max_lat_acc) > 0:
+                if max_lat_acc_cost(trajectory, mconfig.max_lat_acc) > 0:
                     return False
             #jerk
             elif c == 'max_lat_jerk':
@@ -36,6 +37,9 @@ def maneuver_feasibility(start_state, trajectory,  mconfig, lane_config:LaneConf
                     return False
             elif c == 'max_long_jerk':
                 if max_long_jerk_cost(trajectory, mconfig.max_long_jerk) > 0:
+                    return False
+            elif c == 'direction':
+                if direction_cost(trajectory, start_state, target_state) > 0:
                     return False
             else:
                 raise NotImplementedError("Feasibility function {} not implemented".format(c))
@@ -100,7 +104,9 @@ def time_cost(trajectory, target_t):
     return logistic( diff / target_t)
 
 def progress_cost(start_state, trajectory, target_state):
-    '''Penalizes trajectories that end away from the target state'''
+    '''Penalizes trajectories that end away from the target state.
+    NOTE: This may not applyto stop_at anymore!
+    '''
     s_coef, d_coef, T = trajectory
     # TODO add velocity and acc comparisons also?
     end_arr = np.array([
@@ -231,7 +237,7 @@ def max_lat_acc_cost(trajectory, expected_max_acc):
     _, d_coef, T = trajectory
     return max_acc_cost(d_coef, T, expected_max_acc)
 
-def max_acc_cost(x_coef, T, expected_acc_per_sec):
+def max_acc_cost(x_coef, T, expected_max_acc):
     acc = to_equation(differentiate(differentiate(x_coef)))
     all_accs = []
     dt = float(T) / 100.0
@@ -265,6 +271,21 @@ def total_acc_cost(x_coef, T, expected_acc_per_sec):
     acc_per_sec = total_acc / T
     return logistic(acc_per_sec / expected_acc_per_sec )
 
+def direction_cost(trajectory, start_state, target_state):
+    ''' Rejects trajectories that have a backwards component. '''
+    s_coef, _, T = trajectory
+    # if end state is before start state
+    if start_state[0] > to_equation(s_coef)(T):
+        return 1
+    # if velocity is negative at any point
+    s_vel = to_equation(differentiate(s_coef))
+    dt = float(T) / 100.0
+    for i in range(100):
+        t = dt * i
+        if s_vel(t) < 0:
+            return 1
+
+    return 0
 
 #Proximity Cost:
 

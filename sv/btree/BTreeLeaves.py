@@ -57,7 +57,7 @@ class ManeuverAction(behaviour.Behaviour):
         self.mconfig = mconfig
         self.kwargs = kwargs
         # self.status = common.Status.SUCCESS
-        # Some maneuvers can "finish" (eg. lane change) while some are indefinite
+        # Some maneuvers can "finish" (eg. lane change and cutin) while some are indefinite
         # eg. vel keep and follow
         self.maneuver_completed = False
 
@@ -117,6 +117,7 @@ class ManeuverAction(behaviour.Behaviour):
                         break
                     # TODO: determine whether stop pos should be behind leading vehicles instead
 
+        # Handle completion of lane swerve/cutin maneuver
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(

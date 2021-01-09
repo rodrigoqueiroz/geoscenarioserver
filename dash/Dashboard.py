@@ -33,10 +33,12 @@ class Dashboard(object):
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
+    TRAJ_FIG_ID = 4
 
-    def __init__(self, traffic, center_vid ):
+    def __init__(self, traffic, sim_config):
         self.traffic = traffic
-        self.center_vid = int(center_vid)
+        self.center_vid = int(sim_config.plot_vid)
+        self.sim_config = sim_config
         self.window = None
         
         
@@ -80,8 +82,12 @@ class Dashboard(object):
         while sync_dash.tick():
             if not self.window:
                 return
+            
+            #clear
+            self.clear_vehicle_charts()
+            self.tree_msg.configure(text= "")
 
-            #get data
+            #get new data
             header, vehicles = self.read_traffic_state(traffic_state_sharr,self.nvehicles)
             traffic_lights = self.read_traffic_light_states()
             tickcount, delta_time, sim_time = header
@@ -89,80 +95,45 @@ class Dashboard(object):
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
             config_txt += "\nTick#: {}   |   SimTime: {:.3}   |   DeltaTime: {:.3}".format(tickcount,sim_time,delta_time) 
 
-
+            #config/stats
             self.scenario_config_lb['text'] = config_txt
-            #self.scenario_stats_lb['text'] = stat_txts
 
             #traffic lights
-            #todo: timetable with all lights
-            #print(light_state)
+            #print(light_state) TODO: timetable with all lights
 
-            #Global Map
+            #global Map
             if SHOW_MPLOT:
                 self.plot_map_chart(vehicles,traffic_lights)
 
-            #Vehicles Table
-            current_set = self.tab.get_children()
-            if current_set:
-                self.tab.delete(*current_set)
-            for vid in vehicles:
-                vehicle = vehicles[vid]
-                sim_state =vehicles[vid].sim_state
-                sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
-                truncate_vector(sv,2)
-                sv = [vid] + [sim_state] + sv
-                self.tab.insert('', 'end', int(vid), values=(sv))
-            if self.tab.exists(self.center_vid):
-                self.tab.selection_set(self.center_vid)
+            #vehicles table
+            self.update_table(vehicles)
 
-            #Focus Vehicle charts and btree:
-            self.clear_vehicle_charts()
-            self.tree_msg.configure(text= "")
-
-            #find a valid vehicle to focus plots and btree (if available)
+            #find valid vehicle to focus plots and btree (if available)
             vid = None
             if self.center_vid in vehicles:
                 if vehicles[self.center_vid].sim_state is Vehicle.ACTIVE or vehicles[self.center_vid].sim_state is Vehicle.INVISIBLE:
                     vid = int(self.center_vid)
-            #if vid is None:
-            #    for tentative_id in vehicles:
-            #        if vehicles[tentative_id].active:
-            #            log.warn("Dash: center vid {} not in array or not active, auto switch to {}".format(self.center_vid,tentative_id))
-            #            vid = self.center_vid = tentative_id
-            #            break
-            
             if vid:
                 #vehicles with planner: cartesian, frenet chart and behavior tree
                 if vid in debug_shdata:
                     #read vehicle planning data from debug_shdata
                     vehicle_state, _, traj, cand, traffic_vehicles, lane_config, reference_path = debug_shdata[vid]
-                    
-                    #cartesian plot with lanelet map
-                    if SHOW_CPLOT:
+                    if SHOW_CPLOT: #cartesian plot with lanelet map
                         self.plot_cartesian_chart(vid, vehicles, reference_path, traffic_lights)
-
-                    #frenet frame plot
-                    if SHOW_FFPLOT:
+                    if SHOW_FFPLOT: #frenet frame plot
                         self.plot_frenet_chart(vid, vehicle_state, traj, cand, traffic_vehicles, lane_config, traffic_lights)
-
+                    if VEH_TRAJ_CHART: #vehicle traj plot
+                        self.plot_vehicle_sd(traj, cand)
                     #behavior tree
-                    tree_str = "==== Behavior Tree. Vehicle {} ====\n\n".format(vid)
-                    tree_str += debug_shdata[vid][1]
-                    self.tree_msg.configure(text=tree_str)
-                #vehicles without planner:
+                    self.tree_msg.configure(text="==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, debug_shdata[vid][1]))
                 else:
+                    #vehicles without planner:
                     self.plot_cartesian_chart(vid, vehicles)
-
-                #Sub vehicle plot
-                #todo: transform into log chart, instead of projected trajectory
-                # if VEH_TRAJ_CHART:
-                #     self.plot_vehicle_sd(traffic.vehicles[centerplot_veh_id].trajectory)
 
             self.cart_canvas.draw()
             self.fren_canvas.draw()
+            self.traj_canvas.draw()
             self.map_canvas.draw()
-            #self.vcanvas.draw()
-
             self.window.update()
 
     def quit(self):
@@ -173,7 +144,7 @@ class Dashboard(object):
         focus = self.tab.focus()
         if (focus):
             self.center_vid = int(focus)
-            # log.info("Changed focus to {}".format(self.center_vid))
+            #log.info("Changed focus to {}".format(self.center_vid))
 
     def read_traffic_state(self, traffic_state_sharr, nv):
         r = nv + 1
@@ -214,6 +185,19 @@ class Dashboard(object):
             trajectories[vid] = plan.get_trajectory()
         return trajectories
 
+    def update_table(self, vehicles):
+        current_set = self.tab.get_children()
+        if current_set:
+            self.tab.delete(*current_set)
+        for vid in vehicles:
+            vehicle = vehicles[vid]
+            sim_state =vehicles[vid].sim_state
+            sv = vehicle.vehicle_state.get_state_vector() + vehicle.vehicle_state.get_frenet_state_vector()
+            truncate_vector(sv,2)
+            sv = [vid] + [sim_state] + sv
+            self.tab.insert('', 'end', int(vid), values=(sv))
+        if self.tab.exists(self.center_vid):
+            self.tab.selection_set(self.center_vid)
 
     def pre_plot_map_chart(self):
         #Map pre plot: static primitives only
@@ -457,6 +441,8 @@ class Dashboard(object):
         plt.cla()
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
+        fig = plt.figure(Dashboard.TRAJ_FIG_ID)
+        plt.cla()
         
 
     @staticmethod
@@ -473,76 +459,79 @@ class Dashboard(object):
         #plot trajectory curve
         plt.plot(X,Y,color=tcolor)
 
-
     @staticmethod
-    def plot_vehicle_sd(trajectory):
+    def plot_vehicle_sd(trajectory, cand):
         if not trajectory:
             return
         s_coef = trajectory[0]
         d_coef = trajectory[1]
         T = trajectory[2]
 
-        fig = plt.figure(2)
+        fig = plt.figure(Dashboard.TRAJ_FIG_ID)
         #adjust layout
         plt.tight_layout(pad=0.1)
-        fig.set_size_inches(10,2)
+        # fig.set_size_inches(4,4)
 
-        nrows = 1
-        ncols = 6
-        i = 0
+        nrows = 3
+        ncols = 1
+        i = 1
         #S(t) curve
-        #plt.subplot(nrows,ncols,i)
-        #plt.cla()
-        #plot_curve(s_coef,T, 'S', 'T')
-        #   S Vel(t) curve
+        plt.subplot(nrows,ncols,i)
+        plt.cla()
+        Dashboard.plot_curve(s_coef,T, 'S', 'T', 'T (s)')
+        #S Vel(t) curve
         i+=1
         plt.subplot(nrows,ncols,i)
         plt.cla()
         plt.xlim(0,int(round(T)))
-        plt.ylim(-30,30)
+        plt.ylim(-15,15)
         s_vel_coef = differentiate(s_coef)
-        plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
-        #   S Acc(t) curve
+        Dashboard.plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
+
+        # #   S Acc(t) curve
         i+=1
         s_acc_coef = differentiate(s_vel_coef)
         plt.subplot(nrows,ncols,i)
         plt.cla()
         plt.xlim(0,int(round(T)))
         plt.ylim(-8,8)
-        plot_curve(s_acc_coef,T,'Long Acc (m/ss)', '', 'T (s)')
+        # if cand:
+        #     for t in cand:
+        #         Dashboard.plot_curve(differentiate(differentiate(t[0])),t[2],'Long Vel (m/s)', '', 'T (s)', color='grey')
+        Dashboard.plot_curve(s_acc_coef,T,'Long Acc (m/ss)', '', 'T (s)', color='black')
         #   S Jerk(t) curve
         #i+=1
         #s_jerk_coef = differentiate(s_acc_coef)
         #plt.subplot(1,8,4)
-        #plot_curve(s_jerk_coef,T,'Jerk', 'T')
+        #Dashboard.plot_curve(s_jerk_coef,T,'Jerk', 'T')
         #   D(t) curve
         #i+=1
         #plt.subplot(nrows,ncols,i)
         #plt.cla()
-        #plot_curve(d_coef,T, 'D', 'T')
+        #Dashboard.plot_curve(d_coef,T, 'D', 'T')
         #   D Vel(t) curve
         i+=1
-        d_vel_coef = differentiate(d_coef)
-        plt.subplot(nrows,ncols,i)
-        plt.cla()
-        plt.xlim(0,int(round(T)))
-        plt.ylim(-2,2)
-        plot_curve(d_vel_coef,T, 'Lat Vel (m/s)', '', 'T (s)')
+        # d_vel_coef = differentiate(d_coef)
+        # plt.subplot(nrows,ncols,i)
+        # plt.cla()
+        # plt.xlim(0,int(round(T)))
+        # plt.ylim(-2,2)
+        # Dashboard.plot_curve(d_vel_coef,T, 'Lat Vel (m/s)', '', 'T (s)')
         #   D Acc(t) curve
         i+=1
-        d_acc_coef = differentiate(d_vel_coef)
-        plt.subplot(nrows,ncols,i)
-        plt.cla()
-        plt.xlim(0,int(round(T)))
-        plt.ylim(-2,2)
-        plot_curve(d_acc_coef,T, 'Lat Acc (m/ss)', '', 'T (s)')
+        # d_acc_coef = differentiate(d_vel_coef)
+        # plt.subplot(nrows,ncols,i)
+        # plt.cla()
+        # plt.xlim(0,int(round(T)))
+        # plt.ylim(-2,2)
+        # Dashboard.plot_curve(d_acc_coef,T, 'Lat Acc (m/ss)', '', 'T (s)')
         #D Jerk(t) curve
         #d_jerk_coef = differentiate(d_acc_coef)
         #plt.subplot(1,8,8)
-        #plot_curve(d_jerk_coef,T,'Jerk', T )
+        #Dashboard.plot_curve(d_jerk_coef,T,'Jerk', T )
 
     @staticmethod
-    def plot_curve(coef, T, title, ylabel,xlabel):
+    def plot_curve(coef, T, title, ylabel, xlabel, color="black"):
         #layout
         plt.title(title)
         plt.ylabel(ylabel)
@@ -558,7 +547,7 @@ class Dashboard(object):
             X.append(t)
             Y.append(eq(t))
             t += 0.25
-        plt.plot(X,Y,color="black")
+        plt.plot(X,Y,color=color)
 
     def create_gui(self):
         #Window
@@ -593,9 +582,11 @@ class Dashboard(object):
         tab_frame.grid(row=0, column=2, sticky="nsew")
         
         #vehicle sub containers
-        cart_frame = tk.Frame(vehicle_frame, width = 400, height = 300, bg = "white")
-        fren_frame = tk.Frame(vehicle_frame, width = 400, height = 300, bg = "white")
-        bt_frame = tk.Frame(vehicle_frame, width = 400, height = 300, bg = "white")
+        cart_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
+        fren_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
+        bt_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
+        traj_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
+
         # Show enabled plots (left justified)
         c = 0
         for cframe, visible in zip([cart_frame, fren_frame, bt_frame], [SHOW_CPLOT, SHOW_FFPLOT, SHOW_BTREE]):
@@ -671,6 +662,12 @@ class Dashboard(object):
         self.fren_canvas = FigureCanvasTkAgg(fig_fren, fren_frame)
         self.fren_canvas.get_tk_widget().pack()
 
+        # vehicle traj
+        fig_traj = plt.figure(Dashboard.TRAJ_FIG_ID)
+        fig_traj.set_size_inches(4,4,forward=True)
+        self.traj_canvas = FigureCanvasTkAgg(fig_traj, traj_frame)
+        self.traj_canvas.get_tk_widget().pack()
+        
         tree_msg= tk.Message(bt_frame,text='', anchor='s',
                                     width=300,
                                     bg='white',foreground='black')

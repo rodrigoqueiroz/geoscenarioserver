@@ -51,6 +51,7 @@ class SVPlanner(object):
         self.btree_root = btree_root
         self.btree_reconfig = btree_reconfig
         self.btree_model = None
+        self.mconfig = None
 
     def start(self):
         #Create Shared arrray for Plan
@@ -140,6 +141,37 @@ class SVPlanner(object):
             #log.info('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
             #log.info((planner_state.vehicle_state.get_S(), planner_state.vehicle_state.get_D()))
 
+            # new maneuver
+            if self.mconfig and self.mconfig.mkey != mconfig.mkey:
+                log.info("VID {} started maneuver {}".format(self.vid, mconfig.mkey.name))
+                # print sv state and deltas
+                state_str = (
+                    "VID {}:\n"
+                    "   position    s={:.3f} sim=({:.3f},{:.3f})\n"
+                    "   speed       {:.3f}\n"
+                ).format(
+                    self.vid,
+                    vehicle_state.s,
+                    vehicle_state.x, vehicle_state.y,
+                    vehicle_state.s_vel
+                )
+                for vid, tvehicle in traffic_vehicles.items():
+                    state_str += (
+                        "VID {}:\n"
+                        "   position    {:.3f}\n"
+                        "   speed       {:.3f}\n"
+                        "   delta dist  {:.3f}\n"
+                        "   delta vel   {:.3f}\n"
+                    ).format(
+                        vid,
+                        tvehicle.vehicle_state.s,
+                        tvehicle.vehicle_state.s_vel,
+                        vehicle_state.s - tvehicle.vehicle_state.s - 2*VEHICLE_RADIUS,
+                        vehicle_state.s_vel - tvehicle.vehicle_state.s_vel
+                    )
+                log.info(state_str)
+            self.mconfig = mconfig
+
             #Maneuver Tick
             if mconfig and planner_state.lane_config:
                 #replan maneuver
@@ -151,7 +183,8 @@ class SVPlanner(object):
                                             planner_state.lane_config,
                                             planner_state.traffic_vehicles)
                 if traj is None:
-                    log.warn("plan_maneuver return invalid trajectory.")
+                    # log.warn("plan_maneuver return invalid trajectory.")
+                    pass
                 else:
                     self.write_motion_plan(mplan_sharr, traj, cand, state_time, ref_path_changed, mconfig.mkey == Maneuver.M_REVERSE)
             else:
@@ -161,8 +194,14 @@ class SVPlanner(object):
             # change ref path format for pickling (maybe always keep it like this?)
             debug_ref_path = [(pt.x, pt.y) for pt in self.reference_path]
             debug_shdata[int(self.vid)] = (
-                planner_state.vehicle_state, snapshot_tree, traj, cand, planner_state.traffic_vehicles,
-                planner_state.lane_config, debug_ref_path)
+                planner_state.vehicle_state,
+                snapshot_tree,
+                (mplan_sharr[:6], mplan_sharr[6:12], mplan_sharr[12]),
+                cand,
+                planner_state.traffic_vehicles,
+                planner_state.lane_config,
+                debug_ref_path
+            )
 
         log.info('PLANNER PROCESS END')
         # shm_vs.close()

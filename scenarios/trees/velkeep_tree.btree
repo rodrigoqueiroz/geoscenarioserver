@@ -1,0 +1,3 @@
+behaviortree velkeep_tree:
+    ->
+        maneuver keep_velocity ( MVelKeepConfig(vel=MP(7.0,10,6)) )

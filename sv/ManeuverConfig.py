@@ -10,6 +10,7 @@ from util.Utils import *
 from enum import Enum, IntEnum
 import random
 import numpy as np
+from typing import Dict
 
 
 class Maneuver(Enum):
@@ -177,16 +178,18 @@ class MConfig:
     '''
     #feasibility_weight defines what functions will be used
     #to remove trajectories from candidate set [binary 0-1]
-    feasibility_constraints = {
+    feasibility_constraints: Dict = field(default_factory=lambda:{
         'max_lat_jerk':        0,
         'max_long_jerk':       0,
-        'max_acc':             0,
+        'max_long_acc':        1,
+        'max_lat_acc':         0,
         'collision':           0,
         'off_lane':            1,
-    }
+        'direction':           1,
+    })
     #cost_weight defines what cost functions will be used
     #to select trajectories from candidate set [cost > 0]
-    cost_weight = {
+    cost_weight: Dict = field(default_factory=lambda:{
         'time_cost':                1,
         'effic_cost':               1,
         'lane_offset_cost':         1,
@@ -196,7 +199,7 @@ class MConfig:
         'total_lat_acc_cost':       1,
         'proximity_cost':           0,
         'progress_cost':            0,
-    }
+    })
     expected_offset_per_sec = 0.5   # [m]
     expected_long_acc_per_sec = 1   # [m/s/s]
     expected_lat_acc_per_sec = 1    # [m/s/s]
@@ -206,15 +209,15 @@ class MConfig:
     #Feasibility constraints
     max_long_jerk = 10              # maximum longitudinal jerk [m/s/s/s]
     max_lat_jerk = 10               # maximum lateral jerk [m/s/s/s]
-    max_long_acc = 5.0              # maximum longitudinal acceleration [m/s/s]
+    max_long_acc = 6.0              # maximum longitudinal acceleration [m/s/s]
     max_lat_acc = 4.9               # maximum lateral acceleration [m/s/s]
 
 
 @dataclass
 class MVelKeepConfig(MConfig):
     vel:MP = MP(10.0,10,6)              #velocity in [m/s] as MP
-    time:MP = MP(3.0,10,3)              #duration in [s] as MP
-    time_lowvel:MP = MP(10.0,10,3)       #duration in [s] as MP when starting
+    time:MP = MP(3.0,20,3)              #duration in [s] as MP
+    time_lowvel:MP = MP(10.0,20,3)       #duration in [s] as MP when starting
     vel_threshold:float = 6             #upper bound for lowvel in [m/s]
     mkey:int = Maneuver.M_VELKEEP
 
@@ -223,6 +226,9 @@ class MReverseConfig(MConfig):
     vel:MP = MP(5.0,10,6)           #velocity in [m/s] as MP
     time:MP = MP(4.0,10,3)          #duration in [s] as MP
     mkey:int = Maneuver.M_REVERSE
+
+    def __post_init__(self):
+        self.feasibility_constraints['direction'] = 0
 
 @dataclass
 class MStopConfig(MConfig):
@@ -243,24 +249,12 @@ class MStopAtConfig(MConfig):
     mkey:int = Maneuver.M_STOP_AT
     stop_type:int = StopAtType.GOAL
 
-    cost_weight = {
-        'time_cost':                1,
-        'effic_cost':               1,
-        'lane_offset_cost':         1,
-        'total_long_jerk_cost':     1,
-        'total_lat_jerk_cost':      1,
-        'total_long_acc_cost':      1,
-        'total_lat_acc_cost':       1,
-        'proximity_cost':           0,
-        'progress_cost':            10,
-    }
-
 @dataclass
 class MFollowConfig(MConfig):
     #target
     target_vid:int = None           #target vehicle id
-    time:MP = MP(3.0,10,6)          #duration in [s] as MP
-    time_gap:float = 2.0            #[s]
+    time:MP = MP(4.0,50,6)          #duration in [s] as MP
+    time_gap:float = 3.0            #[s]
     decel:MP = MP(5.0,10,6)         #[m/s2]
     mkey:int = Maneuver.M_FOLLOW
 
@@ -282,6 +276,7 @@ class MCutInConfig(MConfig):
     target_lid:int = None
     time:MP = MP(4.0,10,6)
     delta_s:tuple = (10,5,0)        #(s, vel, acc)
+    delta_s_sampling = [(10,5), (0,1), (0,1)]
     delta_d:tuple = (0,0,0)         #(d, vel, acc)
     mkey:int = Maneuver.M_CUTIN
 

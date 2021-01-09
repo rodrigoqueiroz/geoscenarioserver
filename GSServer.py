@@ -56,7 +56,7 @@ def start_server(args, m=MVelKeepConfig()):
     sync_global.set_timeout(sim_config.timeout)
 
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config.plot_vid)
+    dashboard = Dashboard(traffic, sim_config)
 
     #SIM EXECUTION START
     log.info('SIMULATION START')
