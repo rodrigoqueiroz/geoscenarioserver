@@ -40,10 +40,11 @@ class Subtree(object):
 
 # might still need naming refactorings
 class BTreeInterpreter(object):
-    def __init__(self, vid, bmodel):
+    def __init__(self, vid, bmodel, path):
         self.vid = vid
         self.bmodel = bmodel
         self.tree = None
+        self.path = path
 
     def text2pytree(self, tree_name, _input):
         '''
@@ -76,9 +77,8 @@ class BTreeInterpreter(object):
     def interpret_tree(self, tree_name):
         ''' Instantiates a tree from the name.'''
         loaded_tree = ""
-        path = "scenarios/trees/"
         try:
-            f = open(os.path.join(ROOT_DIR, path, tree_name + ".btree"),'r')
+            f = open(os.path.join(self.path, tree_name + '.btree'),'r')
         except Exception:
             raise Exception("Tree \'{}\' was not found in {}".format(tree_name, path))
         finally:

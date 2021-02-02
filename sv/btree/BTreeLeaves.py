@@ -4,8 +4,7 @@
 
 from py_trees import *
 import random
-
-from sv.ManeuverStatus import ManeuverStatus
+from TickSync import TickSync
 from sv.ManeuverConfig import *
 import sv.ManeuverUtils
 
@@ -19,6 +18,7 @@ class BCondition(behaviour.Behaviour):
         self.kwargs = kwargs
         self.repeat = repeat
         self.triggered = False
+        self.ts = None
 
     def reconfigure(self, condition, args):
         ''' Some situations require that the conditions are updated. 
@@ -34,11 +34,19 @@ class BCondition(behaviour.Behaviour):
     def update(self):
         self.logger.debug("  %s [BCondition::update()]" % self.name)
         status = common.Status.FAILURE
-
         #print("BCondition {} {}".format(self.name,self.kwargs))
         try:
             if self.repeat or not self.triggered:
-                if self.bmodel.test_condition(self.condition, self.kwargs):
+                if self.condition == "wait": #return SUCC while waiting
+                    if not self.ts:
+                        time = self.kwargs['time']
+                        self.ts = TickSync()
+                        self.ts.set_timeout(time)
+                        print("Create wait condition {}".format(self.ts.sim_time))
+                    if self.ts.tick():
+                        print("timeout {}".format(self.ts.sim_time))
+                        status = common.Status.SUCCESS
+                elif self.bmodel.test_condition(self.condition, self.kwargs):
                     #print("SUCCESS")
                     status = common.Status.SUCCESS
                     self.triggered = True
@@ -90,7 +98,7 @@ class ManeuverAction(behaviour.Behaviour):
                 self.bmodel.planner_state.lane_config,
                 self.bmodel.planner_state.traffic_vehicles)
             if leading_vehicle is not None:
-                self.mconfig.target_vid = leading_vehicle.vid
+                self.mconfig.target_vid = leading_vehicle.id
             else:
                 status = common.Status.FAILURE
 
@@ -103,17 +111,17 @@ class ManeuverAction(behaviour.Behaviour):
                     self.bmodel.planner_state.traffic_vehicles
                 )
                 # TODO check for None
-                self.mconfig.target_vid = target_vehicle.vid
+                self.mconfig.target_vid = target_vehicle.id
 
-        elif self.mconfig.mkey == Maneuver.M_STOP_AT:
+        elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
-            if self.mconfig.stop_type == StopAtType.GOAL:
-                self.mconfig.stop_pos = self.bmodel.planner_state.goal_point_frenet[0]
+            if self.mconfig.type == MStopConfig.Type.GOAL:
+                self.mconfig.pos = self.bmodel.planner_state.goal_point_frenet[0]
             # If stopping at a stop line, find a regulatory element with a stop line applying to this vehicle
-            elif self.mconfig.stop_type == StopAtType.STOP_LINE:
+            elif self.mconfig.type == MStopConfig.Type.STOP_LINE:
                 for re_state in self.bmodel.planner_state.regulatory_elements:
                     if 'stop_position' in re_state._fields:
-                        self.mconfig.stop_pos = re_state.stop_position[0]
+                        self.mconfig.pos = re_state.stop_position[0]
                         break
                     # TODO: determine whether stop pos should be behind leading vehicles instead
 

@@ -7,10 +7,9 @@ import functools
 import glog as log
 from sv.ManeuverConfig import *
 from sv.ManeuverUtils import *
-# from sv.SVPlanner import PlannerState
 from sv.btree.BTreeInterpreter import *
 from sv.btree.BTreeLeaves import *
-from sv.SVPlannerState import TrafficLightState
+from sv.SDVPlannerState import TrafficLightState
 from TrafficLight import TrafficLightColor
 
 
@@ -23,12 +22,11 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name, reconfig = ""):
+    def __init__(self, vid, root_btree, reconfig = ""):
         self.vid = vid
-        self.root_btree_name = root_btree_name
+        self.root_btree = root_btree
         #Build Tree
         self.tree = self.build(reconfig)
-        #print(self)
         #Runtime status:
         self.planner_state = None
         self.leading_vid = 0
@@ -39,27 +37,34 @@ class BehaviorModels(object):
 
     def build(self,reconfig):
 
-        interpreter = BTreeInterpreter(self.vid, bmodel=self)
-        tree = interpreter.build_tree(tree_name=self.root_btree_name)
-        '''
-        args format:
-            For maneuvers always write m_id=MConfig(x=1,y=2)
-                where m_id is the same identifier used in the behavior tree,
-                      MConfig is a maneuver configuration,
-                      x and y are parameters from the maneuver configuration
+        #if it's defined by btree file. Use interpreter.
+        if '.btree' in self.root_btree:
+            path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "scenarios/", self.root_btree)))
+            file_noext = os.path.splitext(file)[0]
+            interpreter = BTreeInterpreter(self.vid, bmodel=self, path = path)
+            tree = interpreter.build_tree(tree_name=file_noext)
+            '''
+            args format:
+                For maneuvers always write m_id=MConfig(x=1,y=2)
+                    where m_id is the same identifier used in the behavior tree,
+                        MConfig is a maneuver configuration,
+                        x and y are parameters from the maneuver configuration
 
-            For conditions always write c_id=name,args=(x=1,y=2)
-                where c_id is the same identifier used in the behavior tree,
-                      name is the name of the condition used in the behavior tree,
-                      and x=1,y=2 are the arguments for the condition.
-            Example: args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)"
-        '''
+                For conditions always write c_id=name,args=(x=1,y=2)
+                    where c_id is the same identifier used in the behavior tree,
+                        name is the name of the condition used in the behavior tree,
+                        and x=1,y=2 are the arguments for the condition.
+                Example: args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)"
+            '''
 
-        if reconfig !="":
-            log.info("Behavior model will be reconfigured {}".format(reconfig))
-            #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
-            interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args=reconfig)
-            
+            if reconfig !="":
+                log.info("Behavior model will be reconfigured {}".format(reconfig))
+                #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
+                interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args=reconfig)
+        else:
+            interpreter = BTreeInterpreter(self.vid, bmodel=self)
+            tree = interpreter.build_tree_from_code(tree_name=self.root_btree)
+            pass 
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)
@@ -92,10 +97,12 @@ class BehaviorModels(object):
     def set_ref_path_changed(self, val):
         self.ref_path_changed = val
 
+    
     def test_condition(self, condition, kwargs):
         '''Built-in condition checks
            TODO: add logic combinations with multiple conditions
         '''
+
         if condition == "reached_goal":
             return has_reached_goal_frenet(self.planner_state.vehicle_state, self.planner_state.goal_point_frenet, **kwargs)
 
@@ -104,7 +111,9 @@ class BehaviorModels(object):
                 self.vid,
                 self.planner_state.vehicle_state,
                 self.planner_state.traffic_vehicles,
-                self.planner_state.lane_config)
+                self.planner_state.lane_config,
+                kwargs['time_gap'] if 'time_gap' in kwargs else 5 ,
+                kwargs['distance_gap'] if 'distance_gap' in kwargs else 30 )
             return lane_occupied
 
         elif condition == "should_cutin":
@@ -151,10 +160,17 @@ class BehaviorModels(object):
             for re_state in self.planner_state.regulatory_elements:
                 if isinstance(re_state, TrafficLightState):
                     # check if light is red and we're close enough
-                    threshold = kwargs['threshold'] if 'threshold' in kwargs else 40
+                    threshold = kwargs['distance'] if 'distance' in kwargs else 40
                     return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
                         and re_state.color == TrafficLightColor.Red
 
+        elif condition == "traffic_light_green":
+            for re_state in self.planner_state.regulatory_elements:
+                if isinstance(re_state, TrafficLightState):
+                    # check if light is red and we're close enough
+                    threshold = kwargs['distance'] if 'distance' in kwargs else 40
+                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
+                        and re_state.color == TrafficLightColor.Green
         return False
 
 
