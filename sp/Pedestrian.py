@@ -6,7 +6,6 @@
 import glog as log
 from SimConfig import *
 from util.Utils import *
-from sv.SVPlanner import *
 from Actor import *
 from shm.SimSharedMemory import *
 from util.Utils import kalman
