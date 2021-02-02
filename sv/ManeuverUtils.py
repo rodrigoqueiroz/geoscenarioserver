@@ -9,6 +9,7 @@
 from sv.ManeuverConfig import *
 from SimConfig import *
 import numpy as np
+from Actor import *
 import glog as log
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
@@ -25,7 +26,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
     return current_lane.id == mconfig.target_lid
 
 def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig, traffic_vehicles):
-    target_lane_config = lane_config.get_current_lane(traffic_vehicles[mconfig.target_vid].vehicle_state.d)
+    target_lane_config = lane_config.get_current_lane(traffic_vehicles[mconfig.target_vid].state.d)
     if not target_lane_config:
         log.warn("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
         return None, None
@@ -50,10 +51,10 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
                 "   delta vel   {:.3f}\n"
             ).format(
                 vid,
-                tvehicle.vehicle_state.s,
-                tvehicle.vehicle_state.s_vel,
-                vehicle_state.s - tvehicle.vehicle_state.s - 2*VEHICLE_RADIUS,
-                vehicle_state.s_vel - tvehicle.vehicle_state.s_vel
+                tvehicle.state.s,
+                tvehicle.state.s_vel,
+                vehicle_state.s - tvehicle.state.s - 2*VEHICLE_RADIUS,
+                vehicle_state.s_vel - tvehicle.state.s_vel
             )
         log.info(state_str)
 
@@ -126,7 +127,7 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
     leading_vehicle = get_leading_vehicle(vehicle_state, lane_config, other_vehicles)
 
     if leading_vehicle is not None:
-        dist = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
+        dist = leading_vehicle.state.s - VEHICLE_RADIUS - vehicle_state.s - VEHICLE_RADIUS
         if dist < 0:
             log.error("distance to leading vehicle zero!")
 
@@ -134,9 +135,10 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
 
         # Enter following range if below threshold for distance gap or time gap.
         if (dist < distance_gap) or (0 <= time_to_leader < time_gap):
-            # print("{} is leading by {}".format(leading_vehicle.vid, current_gap))
             is_following = True
-            leading_vid = leading_vehicle.vid
+            leading_vid = leading_vehicle.id
+            print("{} is leading. Distance {}, time gap {}".format(
+                leading_vehicle.id, dist, time_to_leader))
 
     return is_following, leading_vid
 
@@ -146,7 +148,7 @@ def is_lane_occupied(vehicle_state, lane_config, traffic_vehicles, threshold=50)
     smin = vehicle_state.s - threshold
     smax = vehicle_state.s + threshold
     vehicles_in_lane = list(filter(
-        lambda v: smin < v.vehicle_state.s < smax,
+        lambda v: smin < v.state.s < smax,
         get_vehicles_in_lane(lane_config, traffic_vehicles)
     ))
 
@@ -157,7 +159,7 @@ def get_vehicles_in_lane(lane_config, traffic_vehicles):
 
     vehicles = []
     for vid, traffic_vehicle in traffic_vehicles.items():
-        other_vehicle_lane = lane_config.get_current_lane(traffic_vehicle.vehicle_state.d)
+        other_vehicle_lane = lane_config.get_current_lane(traffic_vehicle.state.d)
         if other_vehicle_lane and other_vehicle_lane.id == lane_config.id:
             vehicles.append(traffic_vehicle)
     return vehicles
@@ -172,20 +174,20 @@ def get_leading_vehicle(vehicle_state, lane_config, traffic_vehicles):
     log.check_notnone(cur_lane)
 
     vehicles_ahead = list(filter(
-        lambda v: v.vehicle_state.s > vehicle_state.s,
+        lambda v: v.state.s > vehicle_state.s,
         get_vehicles_in_lane(cur_lane, traffic_vehicles)
     ))
 
     if len(vehicles_ahead) == 0:
         return None
 
-    return min(vehicles_ahead, key=lambda v: v.vehicle_state.s)
+    return min(vehicles_ahead, key=lambda v: v.state.s)
 
 def get_closest_vehicle_in_lane(vehicle_state, lane_config, traffic_vehicles):
     vehicles_in_lane = get_vehicles_in_lane(lane_config, traffic_vehicles)
     if len(vehicles_in_lane) == 0:
         return None
-    return min(vehicles_in_lane, key=lambda v: abs(v.vehicle_state.s - vehicle_state.s))
+    return min(vehicles_in_lane, key=lambda v: abs(v.state.s - v.state.s))
 
 def reached_gap(vehicle_state, target_lane_config, traffic_vehicles, meters):
     """ determines whether `vehicle_state` is `meters` ahead of the
@@ -195,7 +197,7 @@ def reached_gap(vehicle_state, target_lane_config, traffic_vehicles, meters):
     if target_vehicle is None:
         log.warn("No target vehicle in {} lane.".format('LEFT' if target_lane_config.id == 1 else 'RIGHT'))
         return True
-    gap = vehicle_state.s - VEHICLE_RADIUS - (target_vehicle.vehicle_state.s + VEHICLE_RADIUS)
+    gap = vehicle_state.s - VEHICLE_RADIUS - (target_vehicle.state.s + VEHICLE_RADIUS)
     return gap > meters
 
 #def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
@@ -215,13 +217,13 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=4):
     dist = float('inf')
     nearest = list()
     for vid, adversary_vehicle in vehicles.items():
-        a_current_lane = lane_config.get_current_lane(adversary_vehicle.vehicle_state.d)
+        a_current_lane = lane_config.get_current_lane(adversary_vehicle.state.d)
 
         #if they are both in the same lane
         if s_current_lane == a_current_lane:
             # and the adv is ahead of the subj (within the thresh)
-            if subject_vehicle_state.s < adversary_vehicle.vehicle_state.s and adversary_vehicle.vehicle_state.s < subject_vehicle_state.s + threshold:
-                diff = adversary_vehicle.vehicle_state.s - subject_vehicle_state.s
+            if subject_vehicle_state.s < adversary_vehicle.state.s and adversary_vehicle.state.s < subject_vehicle_state.s + threshold:
+                diff = adversary_vehicle.state.s - subject_vehicle_state.s
                 if diff < dist:
                     dist = diff
                     nearest = [vid,adversary_vehicle]
@@ -229,10 +231,10 @@ def get_vehicle_ahead(vehicle_state, lane_config, vehicles, threshold=4):
     return nearest
 
 def is_stopped(traffic_vehicle):
-    return abs(traffic_vehicle.vehicle_state.s_vel) < 0.05
+    return abs(traffic_vehicle.state.s_vel) < 0.05
 
 def is_slow_vehicle(subject_vehicle, traffic_vehicle):
-    return subject_vehicle.s_vel > traffic_vehicle.vehicle_state.s_vel
+    return subject_vehicle.s_vel > traffic_vehicle.state.s_vel
 
 def reached_acceptance_gap(vehicle_state, lane_config, vehicles, threshold=1):
     ''' Analyzes (frenet coordinates) whether is there an adversary vehicle
@@ -245,7 +247,7 @@ def reached_acceptance_gap(vehicle_state, lane_config, vehicles, threshold=1):
     s_current_lane = lane_config.get_current_lane(subject_vehicle_state.d)
     reached = True
     for vid, adversary_vehicle in vehicles.items():
-        adversary_vehicle_state = adversary_vehicle.vehicle_state
+        adversary_vehicle_state = adversary_vehicle.state
 
         a_current_lane = lane_config.get_current_lane(adversary_vehicle_state.d)
         if (a_current_lane is None or a_current_lane.id - 1 != s_current_lane): continue #makes sure not to compare with irrelevant vehicles (-1 is hardcoded)

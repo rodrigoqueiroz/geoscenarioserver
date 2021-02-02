@@ -19,13 +19,7 @@ class Maneuver(Enum):
     M_LANESWERVE = 3
     M_CUTIN = 4
     M_STOP = 5
-    M_STOP_AT = 6
-    M_REVERSE = 7
-
-class StopAtType(IntEnum):
-    S_POS = 1        #stop at a particular position in the frenet frame
-    GOAL = 2         #stop at the vehicle's goal point
-    STOP_LINE = 3    #stop at the stop line of a regulatory element, if any applies
+    M_REVERSE = 6
 
 class SamplingMethod(Enum):
     LINEAR = 1      #linear space
@@ -44,7 +38,7 @@ class LaneConfig:
     right_bound:float = 0           #d
     _left_lane: LaneConfig = None
     _right_lane: LaneConfig = None
-    nsamples:int = 2                #number of sampling points on the lane width for lateral planning
+    nsamples:int = 4                #number of sampling points on the lane width for lateral planning
     sampling:int = SamplingMethod.UNIFORM
     sigma:float = 1                 #std dev for sampling from normal
 
@@ -183,21 +177,21 @@ class MConfig:
         'max_long_jerk':       0,
         'max_long_acc':        1,
         'max_lat_acc':         0,
-        'collision':           0,
+        'collision':           1,
         'off_lane':            1,
-        'direction':           1,
+        'direction':           0,
     })
     #cost_weight defines what cost functions will be used
     #to select trajectories from candidate set [cost > 0]
     cost_weight: Dict = field(default_factory=lambda:{
         'time_cost':                1,
         'effic_cost':               1,
-        'lane_offset_cost':         1,
+        'lane_offset_cost':         3,
         'total_long_jerk_cost':     1,
         'total_lat_jerk_cost':      1,
         'total_long_acc_cost':      1,
         'total_lat_acc_cost':       1,
-        'proximity_cost':           0,
+        'proximity_cost':           10, #10 
         'progress_cost':            0,
     })
     expected_offset_per_sec = 0.5   # [m]
@@ -215,10 +209,11 @@ class MConfig:
 
 @dataclass
 class MVelKeepConfig(MConfig):
-    vel:MP = MP(10.0,10,6)              #velocity in [m/s] as MP
+    vel:MP = MP(14.0,10,3)              #velocity in [m/s] as MP
     time:MP = MP(3.0,20,3)              #duration in [s] as MP
-    time_lowvel:MP = MP(10.0,20,3)       #duration in [s] as MP when starting
-    vel_threshold:float = 6             #upper bound for lowvel in [m/s]
+    #time_lowvel:MP = MP(6.0,10,3)       #duration in [s] as MP when starting
+    #vel_threshold:float = 7             #upper bound for lowvel in [m/s]
+    max_diff:float = 10.0                 #max vel diff (current to target).
     mkey:int = Maneuver.M_VELKEEP
 
 @dataclass
@@ -230,30 +225,31 @@ class MReverseConfig(MConfig):
     def __post_init__(self):
         self.feasibility_constraints['direction'] = 0
 
-@dataclass
-class MStopConfig(MConfig):
-    #target
-    time:MP = MP(3.0,10,6)          #[s]
-    distance:MP = MP(10.0,10,6)     #[s]
-    decel:MP = MP(9.0)
-    #during
-    min_decel:float = 9.0           #[g]
-    max_decel:float = 9.0           #[g]
-    mkey:int = Maneuver.M_STOP
 
 @dataclass
-class MStopAtConfig(MConfig):
+class MStopConfig(MConfig):
+    class Type(IntEnum):
+        NOW = 0         #stop with no particular position. Use decel to adjust behavior.
+        S_POS = 1       #stop at a particular position in the frenet frame
+        GOAL = 2        #stop at the vehicle's goal point
+        STOP_LINE = 3   #stop at the stop line of a regulatory element, if any applies
+
     #target
-    time:MP = MP(3.0,100,6)          #[s]
-    stop_pos:float = 0              #pos in s [m]
-    mkey:int = Maneuver.M_STOP_AT
-    stop_type:int = StopAtType.GOAL
+    type:int = Type.GOAL #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
+    pos:float = 0.0                 #pos in s [m]
+    distance:float = 0.0            #distance to stop_pos in [m]
+    #time:MP = MP(3.0,40,6)         #[s]
+    mkey:int = Maneuver.M_STOP
+
+    def __post_init__(self):
+        self.max_long_acc = 12.0
+    
 
 @dataclass
 class MFollowConfig(MConfig):
     #target
     target_vid:int = None           #target vehicle id
-    time:MP = MP(4.0,50,6)          #duration in [s] as MP
+    time:MP = MP(4.0,10,6)          #duration in [s] as MP
     time_gap:float = 3.0            #[s]
     decel:MP = MP(5.0,10,6)         #[m/s2]
     mkey:int = Maneuver.M_FOLLOW

@@ -4,21 +4,19 @@
 # GEOSCENARIO Micro Maneuver Models for Motion Planning
 # --------------------------------------------
 import numpy as np
-import random
+from copy import copy
 import itertools
-import datetime
-import time
 import glog as log
-from dataclasses import dataclass
 #from multiprocessing import Pool as ThreadPool
 from sv.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.ManeuverConfig import *
 from SimConfig import *
-import util.Utils
+from Actor import *
 from typing import Callable
+from sv.ManeuverUtils import *
 
 
-def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_vehicles):
+def plan_maneuver(man_key, mconfig, vehicle_state, lane_config, vehicles, pedestrians, static_objects):
     #Micro maneuver layer
     if (man_key == Maneuver.M_VELKEEP):
         planner = plan_velocity_keeping
@@ -26,8 +24,6 @@ def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_v
         planner = plan_reversing
     elif (man_key == Maneuver.M_STOP):
         planner = plan_stop
-    elif (man_key == Maneuver.M_STOP_AT):
-        planner = plan_stop_at
     elif (man_key == Maneuver.M_FOLLOW):
         planner = plan_following
     elif (man_key == Maneuver.M_LANESWERVE):
@@ -35,30 +31,32 @@ def plan_maneuver(man_key, mconfig, vehicle_frenet_state, lane_config, traffic_v
     elif (man_key == Maneuver.M_CUTIN):
         planner = plan_cutin
 
-    best, trajectories = planner(vehicle_frenet_state, mconfig, lane_config, traffic_vehicles, None)
-    return best, trajectories
+    return planner(vehicle_state, mconfig, lane_config, vehicles, pedestrians, static_objects)
+    
 
-def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneConfig, vehicles=None, obstacles=None):
+def plan_velocity_keeping(vehicle_state:VehicleState, mconfig:MVelKeepConfig, lane_config:LaneConfig, vehicles=None,  pedestrians = None, static_objects=None):
     """
     VELOCITY KEEPING
     Driving with no vehicle directly ahead
     No target point, but needs to adapt to a desired velocity
     """
     #print ('Maneuver: Velocity Keeping')
-    s_start = start_state[:3]
-    d_start = start_state[3:]
-    if (s_start[1] > mconfig.vel_threshold):
-        target_time = mconfig.time
+    s_start = vehicle_state.get_S()
+    d_start = vehicle_state.get_D()
+    
+    #cap target vel to maximum difference
+    #this will smooth the trajectory when starting
+    if (mconfig.vel.value - vehicle_state.s_vel) > mconfig.max_diff:
+        target_vel = copy(mconfig.vel)
+        target_vel.value = vehicle_state.s_vel + mconfig.max_diff
     else:
-        target_time = mconfig.time_lowvel
-        print("use low vel")
-    target_vel = mconfig.vel.value
+        target_vel =  mconfig.vel
 
     #generate alternative targets:
     target_state_set = []
-    for t in target_time.get_samples():
+    for t in mconfig.time.get_samples():
         #longitudinal movement: goal is to reach velocity
-        for vel in mconfig.vel.get_samples():
+        for vel in target_vel.get_samples():
             s_target = [0,vel,0] #pos not relevant
             #lateral movement
             for di in lane_config.get_samples():
@@ -68,16 +66,20 @@ def plan_velocity_keeping(start_state, mconfig:MVelKeepConfig, lane_config:LaneC
 
     #print ('Targets: {}'.format(len(target_state_set)))
 
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
-    return best, list(trajectories)
+    best, best_target, candidates, unfeasible = optimized_trajectory(
+        vehicle_state, target_state_set, mconfig, lane_config, vehicles, pedestrians, static_objects, 
+        s_solver=quartic_polynomial_solver)
+    return best, candidates, unfeasible
 
-def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles=None, obstacles=None):
+def plan_reversing(vehicle_state:VehicleState, mconfig:MReverseConfig, lane_config:LaneConfig, vehicles=None, pedestrians = None, static_objects=None):
     """
     REVERSING
     Driving in reverse
     No target point, but needs to adapt to a desired velocity
     """
     #print ('Maneuver: Reverse')
+    s_start = vehicle_state.get_S()
+    d_start = vehicle_state.get_D()
 
     #generate alternative targets:
     target_state_set = []
@@ -91,10 +93,12 @@ def plan_reversing(start_state, mconfig:MReverseConfig, lane_config:LaneConfig, 
                 #add target
                 target_state_set.append((s_target,d_target,t))
 
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
-    return best, list(trajectories)
+    best, best_target, candidates, unfeasible = optimized_trajectory(
+        vehicle_state, target_state_set, mconfig, lane_config, vehicles, pedestrians, static_objects,
+        s_solver=quartic_polynomial_solver)
+    return best, candidates, unfeasible
 
-def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, obstacles=None):
+def plan_following(vehicle_state:VehicleState, mconfig:MFollowConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, static_objects=None):
     """
     VEHICLE FOLLOWING
     Moving target point, requiring a certain temporal safety distance to the vehicle ahead (constant time gap law).
@@ -102,8 +106,8 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
     """
     # log.info('Maneuver:  Vehicle Following {}'.format(mconfig.target_vid))
 
-    s_start = start_state[:3]
-    d_start = start_state[3:]
+    s_start = vehicle_state.get_S()
+    d_start = vehicle_state.get_D()
     target_vid = mconfig.target_vid
     target_t = mconfig.time.value
     time_gap = mconfig.time_gap
@@ -114,16 +118,16 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
         return
     leading_vehicle = vehicles[target_vid]
     #Is target ahead?
-    if (s_start[0] >= leading_vehicle.vehicle_state.s):
+    if (s_start[0] >= leading_vehicle.state.s):
         return
     #Is target on the same lane?
-    if lane_config.get_current_lane(d_start[0]).id != lane_config.get_current_lane(leading_vehicle.vehicle_state.d).id:
+    if lane_config.get_current_lane(d_start[0]).id != lane_config.get_current_lane(leading_vehicle.state.d).id:
         log.warn("Leading vehicle {} is on a different lane.".format(target_vid))
         return
 
     # check if we need to deccel to increase gap, for the case when both vehicles
     # have positive velocity.
-    dist_between_vehicles = leading_vehicle.vehicle_state.s - VEHICLE_RADIUS - s_start[0] - VEHICLE_RADIUS
+    dist_between_vehicles = leading_vehicle.state.s - VEHICLE_RADIUS - s_start[0] - VEHICLE_RADIUS
     ttc = dist_between_vehicles / abs(s_start[1]) if s_start[1] != 0 else float('inf')
     following_too_close = ttc < mconfig.time_gap
 
@@ -172,7 +176,7 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
                 s_target[2] = s_lv[2]
         else:
             # stop some meters behind stopped vehicle
-            s_target[0] = leading_vehicle.vehicle_state.s - 5 - VEHICLE_RADIUS * 2
+            s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2
             # log.info("leading stopped")
         #lateral movement
         for di in lane_config.get_samples():
@@ -180,23 +184,26 @@ def plan_following(start_state, mconfig:MFollowConfig, lane_config:LaneConfig, v
             #add target
             target_state_set.append((s_target,d_target,t))
 
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    best, best_target, candidates, unfeasible = optimized_trajectory(
+        vehicle_state, target_state_set, mconfig, lane_config, vehicles, pedestrians, static_objects,
+        s_solver = quintic_polynomial_solver)
     # if best:
     #     log.info("starting FOLLOW: {:.3f} {:.3f} {:.3f}".format(start_state[0], start_state[1], start_state[2]))
     #     log.info("targetting end {:.3f} {:.3f} {:.3f} at t={:.3f}".format(best_target[0][0], best_target[0][1], best_target[0][2], best_target[-1]))
     # else:
     #     log.info("No FOLLOW traj")
-    return best, list(trajectories)
+    return best, candidates, unfeasible
 
 
-def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, obstacles=None):
+def plan_laneswerve(vehicle_state:VehicleState, mconfig:MLaneSwerveConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, static_objects=None):
     """
     LANE CHANGE SWERVE
     Swerve maneuver to another lane
     No vehicles affecting the lane change, except in case of collision detection (if Collision is on).
     """
     #print ('Maneuver: Lane Change Swerve')
-    s_start = start_state[:3]
+    s_start = vehicle_state.get_S()
+    d_start = vehicle_state.get_D()
     target_lid = mconfig.target_lid
 
     #Find target lane
@@ -222,11 +229,13 @@ def plan_laneswerve(start_state, mconfig:MLaneSwerveConfig, lane_config:LaneConf
             d_target = [di,0,0] #no lateral movement expected at the end
             target_state_set.append((s_target,d_target,t))
 
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
-    return best, list(trajectories)
+    best, best_target, candidates, unfeasible = optimized_trajectory(
+        vehicle_state, target_state_set, mconfig, target_lane_config, vehicles, pedestrians, static_objects,
+        s_solver = quartic_polynomial_solver)
+    return best, candidates, unfeasible
 
 
-def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, obstacles=None):
+def plan_cutin(vehicle_state:VehicleState, mconfig:MCutInConfig, lane_config:LaneConfig, vehicles=None, pedestrians=None, static_objects=None):
     """
     CUT-IN LANE SWERVE
     """
@@ -237,7 +246,7 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
         log.warn("Target vehicle {} is not in traffic".format(target_id))
         return None
 
-    target_lane_config = lane_config.get_current_lane(vehicles[target_id].vehicle_state.d)
+    target_lane_config = lane_config.get_current_lane(vehicles[target_id].state.d)
     if not target_lane_config:
         log.warn("Target vehicle {} is not in an adjacent lane".format(target_id))
         return None, None
@@ -273,64 +282,66 @@ def plan_cutin(start_state, mconfig:MCutInConfig, lane_config:LaneConfig, vehicl
                         target_state_set.append((s_target, d_target, t))
 
     # log.info("targets: {}".format(["({:.3f} {:.3f} {:.3f})".format(t[0][0], t[0][1], t[0][2]) for t in target_state_set]))
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, target_lane_config, vehicles, obstacles)
-    return best, list(trajectories)
+    best, best_target, candidates, unfeasible = optimized_trajectory(
+        vehicle_state, target_state_set, mconfig, target_lane_config, vehicles, pedestrians, static_objects,
+        s_solver = quintic_polynomial_solver)
+    return best, candidates, unfeasible
 
 
-def plan_stop(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
-    """
-    STOP
-    Stop can be a stop request by time, deceleration, or distance from current pos.
-    """
-    # log.info('PLAN STOP')
-    s_start = start_state[:3]
-    target_t = mconfig.time.value
-    target_decel = mconfig.decel.value
-    target_distance = mconfig.distance.value
-
-    if (abs(s_start[1]) <= 0.05):
-        # (s_coef, d_coef, t)
-        return ([ np.array([start_state[0], 0, 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), target_t ]), None
-
-    #generate alternative targets:
-    target_state_set = []
-    for t in mconfig.time.get_samples():
-        for dist in mconfig.distance.get_samples():
-            #longitudinal movement: goal is to reach velocity aand acc 0
-            s_pos = s_start[0] + dist
-            s_target = [s_pos,0,0]
-            #lateral movement
-            for di in lane_config.get_samples():
-                d_target = [di,0,0]
-                #add target
-                target_state_set.append((s_target,d_target,t))
-
-    # print ('Targets: {}'.format(len(target_state_set)))
-    # for i in target_state_set:
-    #    print(i)
-
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
-    return best,list(trajectories)
-
-def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=None):
+def plan_stop(vehicle_state:VehicleState, mconfig:MStopConfig, lane_config:LaneConfig, vehicles=None, pedestrians = None, static_objects=None):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
-    target_pos = mconfig.stop_pos
-    # log.info('PLAN STOP AT ' + str(target_pos))
+    #log.info('PLAN STOP' + str(mconfig.pos))
+
     #start
-    s_start = start_state[:3]
+    s_start = vehicle_state.get_S()
+    d_start = vehicle_state.get_D()
 
-    # within a certain distance generating new trajectory doesn't make sense
-    if abs(start_state[0] - target_pos) < 1:
-        # log.warn('Stop target position is too close: {}'.format(target_pos - start_state[0]))
-        return None, None
-
+    #Already stopped?
     if (abs(s_start[1]) <= 0.05):
         # (s_coef, d_coef, t)
-        return ([np.array([start_state[0], 0, 0, 0, 0, 0]), np.array([start_state[3], 0, 0, 0, 0, 0]), mconfig.time.value]), None
+        return ([np.array([vehicle_state.s, 0, 0, 0, 0, 0]), np.array([vehicle_state.d, 0, 0, 0, 0, 0]), 0]), None, None
+    
+
+    #adjust target pos to vehicle length
+    target_pos = mconfig.pos - VEHICLE_RADIUS -  mconfig.distance
+
+    #adjust target pos to possible dynamic elements:
+    lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
+    if lv:
+        max_pos = lv.state.s - VEHICLE_RADIUS*3
+        if target_pos > max_pos:
+            print('Stop target {} adjusted to lead {}. New target {}'.format(target_pos, lv.state.s, max_pos))
+            target_pos = max_pos
+    
+    #assuming uniform acceleration
+    stop_distance = target_pos - s_start[0]
+    expected_time = (2*stop_distance) / (vehicle_state.s_vel)
+    #larget bound >40% recommended for safely finding a suitable stop time
+    mconfig.time = MP(expected_time,40,6) 
+    
+    # within a certain distance generating new trajectory doesn't make sense
+    if abs(target_pos - vehicle_state.s) < 1:
+        log.warn('Stop target position is too close. diff={}'.format(target_pos - vehicle_state.s))
+        #mconfig.type = MStopConfig.Type.NOW
+        return None, None, None
+        
+
+    # when vehicle is past the target point, switch to STOP NOW
+    if (target_pos - vehicle_state.s) < 0:
+        log.warn('Stop target position behind. diff={}. Switch to Stop NOW'.format(target_pos - vehicle_state.s))
+        mconfig.type = MStopConfig.Type.NOW
+        
+    
+    #solver depends on stop type
+    if mconfig.type == MStopConfig.Type.NOW:
+        s_solver = quartic_polynomial_solver
+    else:
+        s_solver = quintic_polynomial_solver
+
 
     #targets
     target_state_set = []
@@ -344,43 +355,54 @@ def plan_stop_at(start_state, mconfig, lane_config, vehicles=None, obstacles=Non
             #add target
             target_state_set.append((s_target, d_target, t))
 
-    best, best_target, trajectories = optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles)
+    best, best_target, candidates, unfeasible = optimized_trajectory(
+        vehicle_state, target_state_set, mconfig, lane_config, vehicles, pedestrians, static_objects,
+        s_solver = s_solver)
     # if best:
     #     log.info("target stop {}, actual {}".format(target_pos, to_equation(best[0])(best[-1])))
-    return best, list(trajectories)
+    return best, candidates, unfeasible
 
 
 #===TRAJECTORY OPTIMIZATION ===
 
-def optimized_trajectory(start_state, target_state_set, mconfig, lane_config, vehicles, obstacles):
+def optimized_trajectory(vehicle_state:VehicleState, target_state_set, 
+                        mconfig, lane_config:LaneConfig, 
+                        vehicles, pedestrians, static_objects, s_solver):
     """
     Generates and select the best trajectory for the maneuver.
     Returns the resulting trajectory and a list of candidates for debug purposes.
     """
+    start_state = np.concatenate([vehicle_state.get_S(),vehicle_state.get_D()])
     #find trajectories
     trajectories = []
-    quintic_maneuvers = [Maneuver.M_CUTIN, Maneuver.M_FOLLOW, Maneuver.M_STOP_AT]
-    traj_solver = find_trajectory if mconfig.mkey in quintic_maneuvers else \
-        lambda x: find_trajectory(x, s_solver=quartic_polynomial_solver)
+    #quintic_maneuvers = [Maneuver.M_CUTIN, Maneuver.M_FOLLOW, Maneuver.M_STOP]
+    #traj_solver = find_trajectory if mconfig.mkey in quintic_maneuvers else \
+    #    lambda x: find_trajectory(x, s_solver=quartic_polynomial_solver)
+
+    traj_solver = lambda x: find_trajectory(x, s_solver)
     trajectories = list(map(traj_solver, zip(itertools.repeat(start_state), target_state_set)))
 
     #evaluate feasibility
     f_trajectories_and_targets = []
+    uf_trajectories_and_targets = []
     for traj, target_state in zip(trajectories, target_state_set):
-        if maneuver_feasibility(start_state, traj, target_state, mconfig, lane_config, vehicles, obstacles):
+        if maneuver_feasibility(start_state, traj, target_state, mconfig, lane_config, vehicles, pedestrians, static_objects):
             f_trajectories_and_targets.append((traj, target_state))
+        else:
+            uf_trajectories_and_targets.append((traj, target_state))
     #print ("{} feasible trajectories from {}".format( len(f_trajectories_and_targets), len(trajectories)))
     if len(f_trajectories_and_targets) == 0:
         log.error("No feasible trajectory to select")
-        return None, None, trajectories
+        #log.info(str(start_state) + str(mconfig.time))
+        return None, None, [], trajectories
 
     #select best by total cost
-    # best = min(f_trajectories, key=lambda traj: maneuver_cost(start_state, traj, mconfig, lane_config, vehicles, obstacles))
+    # best = min(f_trajectories, key=lambda traj: maneuver_cost(start_state, traj, mconfig, lane_config, vehicles, static_objects))
     best = min(f_trajectories_and_targets, key=lambda pair:
-               maneuver_cost(start_state, pair[0], pair[1], mconfig, lane_config, vehicles, obstacles))
+               maneuver_cost(start_state, pair[0], pair[1], mconfig, lane_config, vehicles, pedestrians, static_objects))
 
-    # returning only feasible trajectories
-    return best[0], best[1], [f[0] for f in f_trajectories_and_targets]
+    # returning best, target, candidates (feasible trajectories), and unfeasible for debug
+    return best[0], best[1], [f[0] for f in f_trajectories_and_targets], [f[0] for f in uf_trajectories_and_targets]
 
 #===POLYNOMIAL FITTING===
 
