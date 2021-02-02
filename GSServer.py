@@ -3,56 +3,46 @@
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
 # GeoScenario Server
-# Controls the problem setup and traffic simulation loop
+# Starts the Server and controls the traffic simulation loop
 # --------------------------------------------
 
 from argparse import ArgumentParser
-import glog as log
-import os
-
 from TickSync import TickSync
 from SimTraffic import SimTraffic
-from TrafficLight import TrafficLightColor
+from SimConfig import SimConfig
 from dash.Dashboard import *
 from mapping.LaneletMap import *
+from ScenarioSetup import *
 from lanelet2.projection import UtmProjector
-from SimConfig import SimConfig
-from gsc.GSParser import GSParser
-from sv.ManeuverConfig import *
-from eval.EvaluationSim import *
+import glog as log
 
 def start_server(args, m=MVelKeepConfig()):
     # log.setLevel("INFO")
-
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
     traffic = SimTraffic(lanelet_map, sim_config)
-
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
         return
-
-    # Scenario SETUP
-    if not args.gsfile:
-        #Direct setup
-        setup_problem(traffic, sim_config, lanelet_map)
-    else:
-        if args.eval_vid == "":
-            #Using GeoScenario XML files (GSParser)
-            if not setup_problem_from_file(args.gsfile, traffic, sim_config, lanelet_map):
-                return
+    
+    # SCENARIO SETUP
+    if args.gsfile:
+        if '.osm' in args.gsfile:
+            #GeoScenario XML files (GSParser)
+            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map)
         else:
-            if not setup_evaluation(args.gsfile, traffic, sim_config, lanelet_map, args.eval_vid):
-                return
-            
-        
+            #Direct setup
+            res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
+    else: 
+        res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
 
-    if args.ff_sim_time:
-        time = float(args.ff_sim_time)
-        sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", sim_start_time = time)
-    else:
-        sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
+    if not res:
+        log.error("Failed to load scenario")
+        return
+       
+    
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(sim_config.timeout)
 
     #GUI / Debug screen
@@ -70,264 +60,38 @@ def start_server(args, m=MVelKeepConfig()):
     while sync_global.tick():
         if show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
             break
-        try:
+        #try:
             #Update Traffic
-            sim_status = traffic.tick(
-                sync_global.tick_count,
-                sync_global.delta_time,
-                sync_global.sim_time
-            )
-            if sim_status < 0:
-                break
-        except KeyboardInterrupt:
+        sim_status = traffic.tick(
+            sync_global.tick_count,
+            sync_global.delta_time,
+            sync_global.sim_time
+        )
+        if sim_status < 0:
             break
-
+        #except Exception as e:
+        #    log.error(e)
+        #    break
+        
     traffic.stop_all()
     dashboard.quit()
+   
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario server shutdown')
 
 def verify_map_file(map_file, lanelet_map:LaneletMap):
-    # TODO: origin needs to be close to the map
     projector = UtmProjector(lanelet2.io.Origin(43.0, -80))
     lanelet_map.load_lanelet_map(map_file, projector)
 
-def setup_problem(sim_traffic, sim_config, lanelet_map):
-    """ Setup scenario directly
-    """
-    sim_config.scenario_name = "MyScenario"
-    sim_config.timeout = 10
-    map_file = "scenarios/maps/ll2_round.osm"
-    projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4))
-    #map
-    lanelet_map.load_lanelet_map(map_file, projector)
-    #traffic.add_vehicle( 1, 'V1', [ref_path[1].x,0.0,0.0, ref_path[1].y,0.0,0.0],
-    #    sim_config.lanelet_routes[1], BT_VELKEEP)
-    #traffic.add_remote_vehicle(1, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-    #traffic.add_remote_vehicle(2, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
 
-    #traffic.add_remote_vehicle(x, 'Ego', [0.0,0.0,0.0, 1.0,0.0,0.0])
-
-    #adding vehicle at the start of a lanelet
-    #traffic.add_vehicle(2, 'V2', [4.0,0.0,0.0, 0.0,0.0,0.0],
-    #    sim_config.lanelet_routes[1], 'drive_tree')
-    #traffic.add_vehicle(3, 'V3', [8,0.0,0.0, 0.0,0.0,0.0],
-    #        sim_config.lanelet_routes[2], 'drive_tree')
-
-
-def setup_problem_from_file(gsfile, sim_traffic, sim_config, lanelet_map, evaluation_mode = False):
-    """ Setup scenario from GeoScenario file
-    """
-    full_scenario_path = os.path.join(ROOT_DIR, gsfile)
-
-    parser = GSParser()
-    if not parser.load_and_validate_geoscenario(full_scenario_path):
-        log.error("Error loading GeoScenario file")
-        return False
-    if parser.globalconfig.tags['version'] < 2.0:
-        log.error("GSServer requires GeoScenario 2.0 or newer")
-        return False
-
-    sim_config.scenario_name = parser.globalconfig.tags['name']
-    sim_config.timeout = parser.globalconfig.tags['timeout']
-    if 'plotvid' in parser.globalconfig.tags:
-        sim_config.plot_vid = parser.globalconfig.tags['plotvid']
-
-    #map
-    map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet'])
-    # use origin from gsc file to project nodes to sim frame
-    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
-    parser.project_nodes(projector)
-    lanelet_map.load_lanelet_map(map_file, projector)
-    sim_config.map_name = parser.globalconfig.tags['lanelet']
-
-    # add remote ego
-    if parser.egostart is not None:
-        sim_traffic.add_remote_vehicle(99, 'Ego', [0.0,0.0,0.0, 0.0,0.0,0.0])
-    
-    # populate traffic and lanelet routes from file
-    
-    for vid, vnode in parser.vehicles.items():
-        simvid = int(vid)
-        #A vehicle can either follow a route (dynamic driving) or a path (static trajectory)
-        if 'route' in vnode.tags:
-            myroute = vnode.tags['route']
-            btree_root = "drive_tree" #default
-            if 'btree' in vnode.tags:
-                btree_root = vnode.tags['btree']
-            try:
-                # NOTE may not want to prepend vehicle node, in case the user starts the vehicle in the middle of the path
-                route_nodes = parser.routes[myroute].nodes
-                lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
-                sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
-            except Exception as e:
-                log.error("Route generation failed for route {}.".format(myroute))
-                raise e
-
-            sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
-            sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
-                                sim_config.lanelet_routes[simvid], btree_root)
-        
-        #todo: change to a new trajectory type to not conflict with GeoScenario1 path
-            
-        elif 'path' in vnode.tags:
-            try:
-                class Node:
-                    x:float
-                    y:float
-                    time:float
-                #mypath = vnode.tags['path']
-                #path_nodes = parser.paths[mypath].nodes
-                #trajectory = [ (node.x, node.y, node.tags['time']) for node in path_nodes ] 
-                mypath = vnode.tags['path']
-                path_nodes = parser.paths[mypath].nodes
-                trajectory = []
-                for node in path_nodes:
-                    nd = Node()
-                    nd.x = float(node.x)
-                    nd.y = float(node.y)
-                    nd.time = float(node.tags['time'])
-                    trajectory.append(nd) 
-                sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
-            except Exception as e:
-                log.error("Trajectory generation failed for path {}.".format(mypath))
-                raise e
-            sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
-
-    # add traffic lights
-    for name, tnode in parser.tlights.items():
-        type = tnode.tags['type']
-        # link the traffic light reg elem to the traffic light state from GS
-        #tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
-        tl_reg_elem = lanelet_map.get_traffic_light_by_name(name)
-        states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
-        durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        sim_traffic.add_traffic_light(tl_reg_elem, name, type, states, durations)
-    return True
-
-
-""" def setup_evaluation(gsfile, sim_traffic, sim_config, lanelet_map, eval_vid):
-
-    #Setup scenario for Evaluation
-    
-    full_scenario_path = os.path.join(ROOT_DIR, gsfile)
-    parser = GSParser()
-    if not parser.load_and_validate_geoscenario(full_scenario_path):
-        log.error("Error loading GeoScenario file")
-        return False
-    if parser.globalconfig.tags['version'] < 2.0:
-        log.error("GSServer requires GeoScenario 2.0 or newer")
-        return False
-
-    sim_config.scenario_name = parser.globalconfig.tags['name']
-    sim_config.timeout = parser.globalconfig.tags['timeout']
-    if 'plotvid' in parser.globalconfig.tags:
-        sim_config.plot_vid = parser.globalconfig.tags['plotvid']
-
-    #map
-    map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet'])
-    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon))
-    parser.project_nodes(projector)
-    lanelet_map.load_lanelet_map(map_file, projector)
-    sim_config.map_name = parser.globalconfig.tags['lanelet']
-
-    # populate traffic and lanelet routes from file
-    #A vehicle can either follow a route (dynamic driving) or a path (static trajectory)
-
-    add_trajectory_vehicle(int(eval_vid), parser,lanelet_map, sim_traffic, sim_config, static_to_dynamic = True, evaluation_mode = True)
-    #add_trajectory_vehicle(49, parser,lanelet_map,sim_traffic,sim_config)
-
-    # add traffic lights
-    for name, tnode in parser.tlights.items():
-        type = tnode.tags['type']
-        # link the traffic light reg elem to the traffic light state from GS
-        #tl_reg_elem = lanelet_map.get_traffic_light_by_position(tnode.x, tnode.y)
-        tl_reg_elem = lanelet_map.get_traffic_light_by_name(name)
-        states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
-        durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        sim_traffic.add_traffic_light(tl_reg_elem, name, type, states, durations)
-
-    return True """
-
-def add_route_vehicle(simvid, parser, lanelet_map, sim_traffic,sim_config):
-    #Dynamic vehicles:
-    vnode = parser.vehicles[simvid]
-    if 'route' in vnode.tags:
-        myroute = vnode.tags['route']
-        btree_root = "drive_tree" #default
-        if 'btree' in vnode.tags:
-            btree_root = vnode.tags['btree']
-        try:
-            # NOTE may not want to prepend vehicle node, in case the user starts the vehicle in the middle of the path
-            route_nodes = parser.routes[myroute].nodes
-            lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
-            sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
-        except Exception as e:
-            log.error("Route generation failed for route {}.".format(myroute))
-            raise e
-
-        sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
-        sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],
-                            sim_config.lanelet_routes[simvid], btree_root)
-    
-
-def add_trajectory_vehicle(simvid, parser, lanelet_map, sim_traffic, sim_config, static_to_dynamic = False, evaluation_mode = False):
-    #Vehicles following predefined trajectory
-    class Node:
-        x:float
-        y:float
-        time:float
-        pass
-    vnode = parser.vehicles[simvid]
-    if 'path' in vnode.tags:
-        mypath = vnode.tags['path']
-        path_nodes = parser.paths[mypath].nodes
-        trajectory = []
-        for node in path_nodes:
-            nd = Node()
-            nd.x = float(node.x)
-            nd.y = float(node.y)
-            nd.time = float(node.tags['time'])
-            print(nd)
-            trajectory.append(nd) 
-
-        if not static_to_dynamic:
-            sim_traffic.add_trajectory_vehicle(simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
-        
-        else:
-            #create dynamic vehicle in same trajectory
-            btree_root = "drive_tree" #default
-            myroute = mypath
-            try:
-                route_nodes = [ path_nodes[0], path_nodes[-1]]
-                speed = path_nodes[0].tags['speed']
-                lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]
-                print("route_nodes {} \nstart speed {} \nlanelets in route {} ".format(route_nodes,speed,lanelets_in_route))
-                sim_config.lanelet_routes[simvid] = lanelet_map.get_route_via(lanelets_in_route)
-            except Exception as e:
-                log.error("Route generation failed for route {}.".format(myroute))
-                raise e
-            sim_config.goal_points[simvid] = (route_nodes[-1].x, route_nodes[-1].y)
-            sim_traffic.add_vehicle(simvid, vnode.tags['name'], [vnode.x,0.0,0.0, vnode.y,0.0,0.0],                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-                                sim_config.lanelet_routes[simvid], btree_root)
-            
-            if evaluation_mode:
-                #start as inactive until the original trajectory starts
-                sim_traffic.vehicles[simvid].sim_state = Vehicle.INACTIVE   
-                #add original trajectory vehicle as a ghost vehicle for reference
-                sim_traffic.add_trajectory_vehicle(-simvid, vnode.tags['name'], [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory)
-                sim_traffic.vehicles[-simvid].ghost_mode = True
-           
-    
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file. If no file is provided, the GSServer will load a scenario from code")
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
-    parser.add_argument("-e", "--eval", dest="eval_vid", default="", help="Vehicle Id for evaluation run")
-    parser.add_argument("-ff", "--fastforward", dest="ff_sim_time", default="", help="Sim start time for fast forward simulation")
+    
     args = parser.parse_args()
     start_server(args)
