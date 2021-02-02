@@ -1,5 +1,5 @@
 import sysv_ipc
-from sv.VehicleState import *
+from Actor import *
 from SimConfig import *
 import glog as log
 
@@ -43,7 +43,7 @@ class SimSharedMemory(object):
         write_str = "{} {} {}\n".format(tick_count, delta_time, len(vehicles))
         # write vehicle states
         for svid in vehicles:
-            vid, remote, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
+            vid, remote, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
                 vid, remote, position[0], position[1], position[2],
                 yaw, velocity[0], velocity[1], steering_angle)
