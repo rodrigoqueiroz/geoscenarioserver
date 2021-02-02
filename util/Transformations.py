@@ -10,6 +10,7 @@ from math import copysign
 from lanelet2.core import BasicPoint2d, ConstLineString2d, ConstLineString3d
 from lanelet2.geometry import toArcCoordinates
 from typing import List
+from scipy import interpolate
 
 
 class OutsideRefPathException(Exception):
@@ -29,6 +30,15 @@ def vector_interp(a, b, t):
 def frenet_to_sim_position(ref_path:ConstLineString3d, s:float, d:float):
     sim_position = None
     arclen = 0
+
+
+    #x_points = [ ref_path[i].x for i in range(len(ref_path) ]
+    #y_points = [ ref_path[i].y for i in range(len(ref_path) ]
+
+    #tck = interpolate.splrep(x_points, y_points)
+    #x = s
+    #interpolate.splev(x, tck)
+    #print(len(ref_path))
 
     for i in range(len(ref_path) - 1):
         p = ref_path[i]

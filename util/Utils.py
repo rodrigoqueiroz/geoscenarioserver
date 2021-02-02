@@ -4,7 +4,7 @@
 # ---------------------------------------------
 # UTILS
 # --------------------------------------------
-from math import sqrt, exp, trunc
+from math import sqrt, exp, trunc, sin, cos, hypot
 from matplotlib import pyplot as plt
 import uuid
 import numpy as np
@@ -67,3 +67,20 @@ def kalman(x, z, P, F, H, Q, R):
     P_new = P_pred - K @ (H @ P_pred)
 
     return x_new, P_new
+
+def speed_to_vel(speed, angle):
+    x_vel = speed*cos(angle) 
+    y_vel = speed*sin(angle)
+    return x_vel, y_vel
+
+def distance_2p(x1,y1,x2,y2):
+    dist = hypot(x2 - x1, y2 - y1)
+    return dist
+
+#Calculates distance from line (x1,y1,x2,y2) to point (xp, yp)
+def distance_point_line(x1,y1,x2,y2, xp, yp):
+    p1=np.array([x1,y1])
+    p2=np.array([x2,y2])
+    p3=np.array([xp,yp])
+    d=np.cross(p2-p1,p3-p1)/np.linalg.norm(p2-p1)
+    return abs(d)
