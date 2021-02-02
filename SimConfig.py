@@ -20,15 +20,15 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
 DASH_RATE = 30              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1               	#vehicle to center the main plot arouund, if not defined by scenario.
+PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
-MPLOT_SIZE = 80			    #map plot: road length in meters (shorter=better performance)
+MPLOT_SIZE = 100			#map plot: road length in meters (shorter=better performance)
 #Frenet Map
 SHOW_FFPLOT = True          #whether to show the frenet frame plot
 FFPLOT_ASPECT = False  		#frenet frame plot: keep S and D aspect ratio (same scale)
-FFPLOT_LENGTH = 50			#frenet frame plot: road length (s) in meters
+FFPLOT_LENGTH = 60			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
 #Cartesian
 SHOW_CPLOT = True           #whether to show the cartesian plot
@@ -49,9 +49,14 @@ COLLISION_CORNER_RADIUS = 0.2   #radius for each corner
 
 #Planning
 PLANNER_RATE = 5            #Planner tick rate
-
+#Collision
+#collision and proximity cost have a great impacto on performance. 
+#For example, if the scenario does not require object avoidance, you can turn it off.
 VEH_COLLISION = False      	#If true, collision between vehicles with be considered during planning.
+PED_COLLISION = False       #If true, collision between vehicles and pedestrians on the road with be considered during planning.
 OBJ_COLLISION = False      	#If true, collision between vehicles and static objects on the road with be considered during planning.
+TRAJECTORY_SPLIT = 10       #In how many parts a trajectory is split for verification. Higher(100) = better precision, but impacts performance.
+
 
 #Evaluation
 WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files

@@ -8,16 +8,17 @@ import numpy as np
 from sv.ManeuverConfig import *
 from util.Utils import *
 from SimConfig import *
+from sp.Pedestrian import *
 
 #=============================== FEASIBILITY
 
-def maneuver_feasibility(start_state, trajectory, target_state, mconfig, lane_config:LaneConfig, vehicles, obstacles):
+def maneuver_feasibility(start_state, trajectory, target_state, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
 
     for c in mconfig.feasibility_constraints:
         if mconfig.feasibility_constraints[c] > 0:
             #collision
             if c == 'collision':
-                if collision_cost(start_state, trajectory, lane_config, vehicles) > 0:
+                if collision_cost(start_state, trajectory, lane_config, vehicles,pedestrians,static_objects) > 0:
                     return False
             #off road
             elif c == 'off_lane':
@@ -26,7 +27,6 @@ def maneuver_feasibility(start_state, trajectory, target_state, mconfig, lane_co
             #acc
             elif c == 'max_long_acc':
                 if max_long_acc_cost(trajectory, mconfig.max_long_acc) > 0:
-                    print("max_long_acc REJECT")
                     return False
             elif c == 'max_lat_acc':
                 if max_lat_acc_cost(trajectory, mconfig.max_lat_acc) > 0:
@@ -47,8 +47,9 @@ def maneuver_feasibility(start_state, trajectory, target_state, mconfig, lane_co
 
 #=============================== MANEUVER COST
 
-def maneuver_cost(start_state, trajectory, target_state, mconfig, lane_config:LaneConfig, vehicles, obstacles):
+def maneuver_cost(start_state, trajectory, target_state, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
     C = []
+    prox_cost = 0
     for cost in mconfig.cost_weight:
         k = mconfig.cost_weight[cost]
         if k > 0:
@@ -76,7 +77,7 @@ def maneuver_cost(start_state, trajectory, target_state, mconfig, lane_config:La
                 C.append( k * total_lat_acc_cost(trajectory, mconfig.expected_lat_acc_per_sec))
             #proximity
             elif cost == 'proximity_cost':
-                C.append( k * proximity_cost(start_state, trajectory, lane_config, vehicles ))
+                C.append(k * proximity_cost(start_state, trajectory, lane_config, vehicles, pedestrians, static_objects ))
             else:
                 raise NotImplementedError("Cost function {} not implemented".format(cost))
     return sum(C)
@@ -89,13 +90,16 @@ def maneuver_cost(start_state, trajectory, target_state, mconfig, lane_config:La
 def effic_cost(trajectory,target_vel):
     '''Penalizes low average velocity'''
     s_coef, _, T = trajectory
-    vel = to_equation(differentiate(s_coef))
-    total = 0
-    dt = float(T) / 100.0
-    for ti in range(100):
-        total += vel(ti)
-    avg_vel = float(total) / 100
-    return logistic( (target_vel - avg_vel) / avg_vel)
+    fs = to_equation(s_coef)
+    distance = (fs(T) - fs(0))
+    avg_vel = distance / T
+    #method2:
+    #total = 0
+    #dt = float(T) / 100.0
+    #for ti in range(100):
+    #    total += vel(ti)
+    #avg_vel = float(total) / 100
+    return logistic( 2*(target_vel-avg_vel) / avg_vel)
 
 def time_cost(trajectory, target_t):
     '''Penalizes trajectories longer or shorter than target time.'''
@@ -287,59 +291,190 @@ def direction_cost(trajectory, start_state, target_state):
 
     return 0
 
-#Proximity Cost:
+#Proximity Costs:
 
-def collision_cost(start_state, trajectory, lane_config, vehicles):
+def collision_cost(start_state, trajectory, lane_config, vehicles, pedestrians, objects):
     '''Penalizes collision (binary function)'''
-    if (vehicles == None):
-        return 0
+    min_vehicle_distance = (2*VEHICLE_RADIUS)
+    min_pedestrian_distance = (VEHICLE_RADIUS + Pedestrian.PEDESTRIAN_RADIUS)
+    min_objects_distance = VEHICLE_RADIUS
+    #split from 10-100. Higher will heavily affect performance
+    ptrajectory = project_trajectory(trajectory, split = TRAJECTORY_SPLIT) 
     #check nearest
-    nearest = nearest_to_vehicles_ahead(start_state, trajectory, lane_config, vehicles)
-    if nearest < 2*VEHICLE_RADIUS:
-        return 1
-    else:
-        return 0
+    if VEH_COLLISION:
+        if vehicles:
+            nearest = nearest_to_vehicles_ahead(start_state, ptrajectory, lane_config, vehicles)
+            if nearest < min_vehicle_distance:
+                #print("too close to vehicle")    
+                return 1
+    if PED_COLLISION:
+        if pedestrians:
+            nearest = nearest_to_pedestrians_ahead(start_state, ptrajectory, lane_config, pedestrians)
+            if nearest < min_pedestrian_distance:
+                #print("too close to pedestrian")    
+                return 1
+    if OBJ_COLLISION:
+        if objects:
+            nearest = nearest_to_objects_ahead(start_state, ptrajectory, lane_config, objects)
+            if nearest < min_objects_distance:
+                #print("too close to object (dist={})".format(nearest))    
+                return 1
+    return 0
 
-def proximity_cost(start_state, trajectory, lane_config, vehicles):
-    '''Penalizes proximity to other vehicles'''
-    if (vehicles == None):
-        return 0.0
+def proximity_cost(start_state, trajectory, lane_config, vehicles,pedestrians,objects):
+    '''Penalizes proximity to other actors'''
+    min_vehicle_distance = (2*VEHICLE_RADIUS)
+    min_pedestrian_distance = (VEHICLE_RADIUS + Pedestrian.PEDESTRIAN_RADIUS)
+    min_object_distance = VEHICLE_RADIUS
+    cost_v = cost_p = cost_o = 0
+    ptrajectory = project_trajectory(trajectory, split = TRAJECTORY_SPLIT) 
     #check nearest
-    nearest = nearest_to_vehicles_ahead(start_state, trajectory, lane_config, vehicles)
-    return logistic(2*VEHICLE_RADIUS / nearest)
+    if vehicles: 
+        nearest = nearest_to_vehicles_ahead(start_state, ptrajectory, lane_config, vehicles)
+        cost_v = logistic(min_vehicle_distance / nearest) if nearest < 10 else 0
+    if pedestrians:
+        nearest = nearest_to_pedestrians_ahead(start_state, ptrajectory, lane_config, pedestrians)
+        cost_p = logistic(min_pedestrian_distance / nearest) if nearest < 10 else 0
+    if objects:
+        nearest = nearest_to_objects_ahead(start_state, ptrajectory, lane_config, objects)
+        cost_o = logistic(min_object_distance / nearest) if nearest < 10 else 0
+    cost = max([cost_v,cost_p,cost_o])
+    #if cost > 0:
+    #    print("veh {} |  ped  {} |  obj {}".format(cost_v, cost_p,cost_o))
+    return cost
 
 
-def nearest_to_vehicles_ahead(start_state, trajectory, lane_config, vehicles):
-    '''Calculates the closest distance to any vehicle ahead during a trajectory'''
+def nearest_to_vehicles_ahead(start_state, ptrajectory, lane_config, vehicles):
+    '''Calculates the closest distance to any vehicle ahead'''
     closest = 999999
     s = start_state[0]
     d = start_state[3]
     left = lane_config.left_bound
     right = lane_config.right_bound
-    for k, v in vehicles.items():
-        #if close
-        if ( abs(v.vehicle_state.s - s) < 40):
-            #if same lane
-            if (left > v.vehicle_state.d > right):
-                #if ahead
-                if (v.vehicle_state.s > s):
-                    #print("vehicle {} is ahead".format(k))
-                    d = nearest_approach(trajectory,v)
-                    if d < closest:
-                        closest = d
+    for id, v in vehicles.items():
+        #if close and ahead and same lane
+        if ( abs(v.state.s - s) < 60) and (v.state.s > s) and (left > v.state.d > right):
+            d = nearest_projected(ptrajectory,v)
+            if d < closest:
+                closest = d
     return closest
 
-def nearest_approach(trajectory, vehicle):
+def nearest_to_pedestrians_ahead(start_state, ptrajectory, lane_config, pedestrians):
+    '''Calculates the closest distance to any pedestrian ahead'''
+    closest = 999999
+    s = start_state[0]
+    d = start_state[3]
+    left = lane_config.left_bound
+    right = lane_config.right_bound
+    for id, p in pedestrians.items():
+        #if close and ahead and same lane (not sure if it should only check pedestrians within lateral boundaries)
+        if ( abs(p.state.s - s) < 60) and (p.state.s > s) and (left > p.state.d > right):
+            #print("vehicle {} is ahead".format(k))
+            d = nearest_projected(ptrajectory,p)
+            if d < closest:
+                closest = d
+    return closest
+
+
+
+def nearest_projected(ptrajectory, actor):
+    '''Calculates the closest distance to a given actor during a trajectory.
+        Relies on actor.future_state() to work
+    '''
+    closest = 999999
+    for i in range(len(ptrajectory)):
+        t = ptrajectory[i][0]
+        s = ptrajectory[i][1]
+        d = ptrajectory[i][4]
+        targ_s, _, _, targ_d, _, _ = actor.future_state(t)
+        dist = sqrt((s-targ_s)**2 + (d-targ_d)**2)
+        if dist < closest:
+            closest = dist
+    return closest
+
+
+def nearest_to_objects_ahead(start_state, ptrajectory, lane_config, objects, split = 10):
+    '''Calculates the closest distance to any static objects ahead during a trajectory'''
+    closest = 999999
+    s = start_state[0]
+    d = start_state[3]
+    left = lane_config.left_bound
+    right = lane_config.right_bound
+    for id, o in objects.items():
+        #if close and ahead and same lane
+        if ( abs(o.s - s) < 100) and (o.s > s) and (left > o.d > right):
+            for i in range(len(ptrajectory)):
+                s = ptrajectory[i][1]
+                d= ptrajectory[i][4]
+                dist = sqrt( ( s - o.s )**2 + ( d - o.d)**2 )
+                if dist < closest:
+                    closest = dist
+    return closest
+
+def project_trajectory(trajectory,split):
+    '''Project trajectory from start to goal and split in equally distributed parts.
+        Higher split returns more measures, but impact performance'''
+    s_coeff,d_coeff,T = trajectory    
+    s_vel_coeff = differentiate(s_coeff)
+    s_acc_coeff = differentiate(s_vel_coeff)
+    d_vel_coeff = differentiate(d_coeff)
+    d_acc_coeff = differentiate(d_vel_coeff)
+    fs = to_equation(s_coeff)
+    fs_vel = to_equation(s_vel_coeff)
+    fs_acc = to_equation(s_acc_coeff)
+    fd = to_equation(d_coeff)
+    fd_vel = to_equation(d_vel_coeff)
+    fd_acc = to_equation(d_acc_coeff)
+    projected = []
+    for i in range(split):
+        t = float(i) / split * T
+        s = fs(t)
+        s_vel = fs_vel(t)
+        s_acc = fs_acc(t) 
+        d = fd(t)
+        d_vel = fd_vel(t)
+        d_acc = fd_acc(t) 
+        projected.append([t,s,s_vel,s_acc,d,d_vel,d_acc])
+    return projected
+
+""" 
+
+def nearest(trajectory, actor, split):
+    '''Calculates the closest distance to a given actor during a trajectory.
+        Relies on actor.future_state() to work
+    '''
     closest = 999999
     s_,d_,T = trajectory
     s = to_equation(s_)
     d = to_equation(d_)
-    for i in range(100):
-        t = float(i) / 100 * T
+    for i in range(split):
+        t = float(i) / split * T
         cur_s = s(t)
         cur_d = d(t)
-        targ_s, _, _, targ_d, _, _ = vehicle.future_state(t)
+        targ_s, _, _, targ_d, _, _ = actor.future_state(t)
         dist = sqrt((cur_s-targ_s)**2 + (cur_d-targ_d)**2)
         if dist < closest:
             closest = dist
     return closest
+
+def nearest_to_objects_ahead(start_state, trajectory, lane_config, objects, split = 10):
+    '''Calculates the closest distance to any static objects ahead during a trajectory'''
+    closest = 999999
+    s = start_state[0]
+    d = start_state[3]
+    left = lane_config.left_bound
+    right = lane_config.right_bound
+    for id, o in objects.items():
+        #if close and ahead and same lane
+        if ( abs(o.s - s) < 100) and (o.s > s) and (left > o.d > right):
+            s_,d_,T = trajectory
+            fs = to_equation(s_)
+            fd = to_equation(d_)
+            for i in range(split):
+                t = float(i) / split * T
+                cur_s = fs(t)
+                cur_d = fd(t)
+                dist = sqrt((cur_s-o.s)**2 + (cur_d-o.d)**2)
+                if dist < closest:
+                    closest = dist
+    return closest """
