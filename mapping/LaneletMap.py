@@ -57,40 +57,6 @@ class LaneletMap(object):
         return None
 
 
-    def get_traffic_light_by_position(self, x, y):
-        # search nearest two reg elem's for a traffic light and return the closer
-        #point = BasicPoint2d(x, y)
-        # findNearest returns List[(dist,re)]
-        
-        #error here:
-        #nearest_res = findNearest(self.lanelet_map.regulatoryElementLayer, point, 2) 
-        #tls = list(filter(lambda res: isinstance(res[1], TrafficLight), nearest_res))
-        #if len(tls) > 0:
-        #    return tls[0][1]
-        #return None
-        
-        #temp workaround:
-        #tls = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
-        p = BasicPoint2d(x,y)
-        p2 = BasicPoint2d(x+1,y+1)
-        searchbox = BoundingBox2d(p, p2)
-        intersecting_res = self.lanelet_map.regulatoryElementLayer.search(searchbox)
-        tls = list(filter(lambda res: isinstance(res, TrafficLight), intersecting_res))
-        for tl in tls:
-            #for p in self.lanelet_map.lineStringLayer[tl.stopLine.id]:
-            #    print(p)
-            #todo: check if point intersects with line string from the physical light
-            #lights = tl.trafficLights #LineString3d
-            #for light in lights:
-                #l = to2D(light) #ConstLineString2d
-                #bb = boundingBox2d(l)
-                #inter = intersects2d(p ,l)
-                #print(inter)
-                #dist = distance(l,p)
-                #print(dist)
-            return tl
-        return None
-
     def get_traffic_light_pos(self, id):
         tl = self.lanelet_map.regulatoryElementLayer[id]
         x = 0
@@ -136,6 +102,7 @@ class LaneletMap(object):
     def get_route_via(self, lanelets:List[Lanelet]):
         assert len(lanelets) >= 2
 
+        #for i in range(len(lanelets)):
         if len(lanelets) > 2:
             route = self.routing_graph.getRouteVia(lanelets[0], lanelets[1:-1], lanelets[-1])
         else:
@@ -165,8 +132,6 @@ class LaneletMap(object):
                 log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                     (x,y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
-                #raise Exception("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                #    (x,y), [ll.id for ll in intersecting_lls]))
         return intersecting_lls[0]
 
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
@@ -201,6 +166,7 @@ class LaneletMap(object):
 
             @return:    list of lanelet2.core.Point3d
         """
+
         # if a position is not given, take the first lanelet in the shortest path
         # otherwise find the lanelet we are in in the shortest path
         cur_ll = lanelet_route.shortestPath()[0] if x is None or y is None \
