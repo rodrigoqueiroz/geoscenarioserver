@@ -50,6 +50,7 @@ class GSParser(object):
         self.triggers = {}
         self.paths = {}
         self.routes = {}
+        self.trajectories = {}
 
         self.report = Report()
 
@@ -99,6 +100,7 @@ class GSParser(object):
                 elif way.tags["gs"] == "location": self.check_location(way)
                 elif way.tags["gs"] == "path": self.check_path(way)
                 elif way.tags["gs"] == "route": self.check_route(way)
+                elif way.tags["gs"] == "trajectory": self.check_trajectory(way)
 
         #Return result
         return self.isValid
@@ -107,16 +109,12 @@ class GSParser(object):
         for osm_tag in osm_node.findall('tag'):
             v = osm_tag.get('v')
             node.tags[osm_tag.get('k')] = float(v) if Utils.is_number(v) else v
-            # if v == 'origin':
-            #     print(osm_tag.get('k'))
-            #     print(node.tags['gs'])
 
-    def project_nodes(self, projector):
+    def project_nodes(self, projector, altitude):
         assert len(self.nodes) > 0
 
         for node_id, node in self.nodes.items():
-            # NOTE: no altitude information
-            cart_pt = projector.forward(GPSPoint(node.lat, node.lon, 0.0))
+            cart_pt = projector.forward(GPSPoint(node.lat, node.lon, altitude))
             node.x = cart_pt.x
             node.y = cart_pt.y
 
@@ -129,19 +127,18 @@ class GSParser(object):
         self.staticobjects[n.tags["name"]] = n
 
     def check_pedestrian(self, n):
-        mandatory = {"gs","name"}
-        optional = {"orientation","speed","path","cycles","usespeedprofile","start","group"}
+        mandatory = {"gs","pid","name"}
+        optional = {"orientation","model","btype","trajectory", "esource", "eid",
+                    "speed","path","cycles","usespeedprofile","start","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
-        self.pedestrians[n.tags["name"]] = n
+        self.pedestrians[n.tags["pid"]] = n
 
     def check_vehicle(self, n):
         mandatory = {"gs","vid","name"}
-        optional = {
-            "orientation","speed","path","cycles",
-            "usespeedprofile","start","group", "simid",
-            "btree", "route"}
+        optional = { "orientation","model","btype","trajectory","route","btree", "esource", "eid",
+                    "speed","path","cycles","usespeedprofile","start","group",}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
@@ -163,12 +160,12 @@ class GSParser(object):
         self.vehicles[vid] = n
 
     def check_traffic_light(self, n):
-        mandatory = {"gs","name","states","duration"}
-        optional = {"group"}
+        mandatory = {"gs","name","states",}
+        optional = {"group","duration","interval"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-
-        self.tlights[n.tags["name"]] = n
+        
+        self.tlights[n.tags['name']] = n
 
         # ensure no. states match no. durations
         nstates = len(n.tags["states"].split(','))
@@ -193,6 +190,16 @@ class GSParser(object):
         #todo: check nd and their ids
         assert len(n.nodes) > 0
         self.routes[n.tags['name']] = n
+        return None
+
+    def check_trajectory(self, n:Way): #:Way
+        mandatory = {"gs","name"}
+        optional = {}
+        self.check_tags(n, mandatory, optional)
+        self.check_uniquename(n)
+        #todo: check nd and their ids
+        assert len(n.nodes) > 0
+        self.trajectories[n.tags['name']] = n
         return None
 
     #== Logical
@@ -291,7 +298,7 @@ class GSParser(object):
        #todo: check nd attributes, and  if nodes exist
        return None
 
-
+    
     def check_uniquename(self,n):
         name = n.tags['name']
 
@@ -325,5 +332,9 @@ class GSParser(object):
             print (x,':', self.pedestrians[x])
             for y in self.pedestrians[x].tags:
                 print (y, ':', self.pedestrians[x].tags[y])
+        for x in self.vehicles:
+            print (x,':', self.vehicles[x])
+            for y in self.vehicles[x].tags:
+                print (y, ':', self.vehicles[x].tags[y])
 
 

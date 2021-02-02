@@ -1,5 +1,6 @@
-__author__ = "Rodrigo Queiroz"
-__email__ = "rqueiroz@gsd.uwaterloo.ca"
+#!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+# ---------------------------------------------
 
 class Report(object):
 

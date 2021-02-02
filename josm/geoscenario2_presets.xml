@@ -42,6 +42,9 @@
 
 	<item name="Origin" icon="origin.png" type="node" preset_name_label="true">
 		<key key="gs" value="origin" />
+		<label text="Scenario coverage around origin point" />
+		<text key="area" text="Area" default="100"/>
+		<text key="altitude" text="Altitude" default="300"/>
 	</item>
 
 
@@ -127,11 +130,27 @@
 		<label text="GeoScenario Pedestrian" />
 		<item_separator />
 
+		<text key="pid" text="* PID " />
 		<text key="name" text="* Name " />
+		<text key="orientation" text="Orientation[](deg)" />
+		<text key="model" text="Model" />
+		<combo key="btype" text="Behavior Type:" values="TP,EP,PP" default="" />
 		<item_separator />
 
-		<label text="Initial Attributes" />
-		<text key="orientation" text="Orientation[](deg)" />
+		<label text="TP (trajectory-based pedestrian)" />
+		<label text="Pedestrians following a timed trajectory" />
+		<text key="trajectory" text="Trajectory ID" />
+		
+		<item_separator />
+
+		<label text="EP (external pedestrian)"/>
+		<label text="Pedestrian behavior is handled outside GeoScenario." />
+		<text key="esource" text="Behavior source" />
+		<text key="eid" text="External ID" />
+
+		<item_separator />
+
+		<label text="PP (path-based pedestrian)" />
 		<text key="speed" text="Speed[](km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
@@ -155,15 +174,29 @@
 		<text key="vid" text="* VID " />
 		<text key="name" text="* Name " />
 		<text key="orientation" text="Orientation[](deg)" />
+		<text key="model" text="Model" />
+		<combo key="btype" text="Behavior Type:" values="SDV,TV,EV,PV" default="" />
 		<item_separator />
 
-		<label text="Dynamic Behavior (SimVehicle)"/>
+		<label text="SDV Model (GeoScenario Simulated Driver-Vehicle Model) "/>
+		<label text="Vehicles running SDV Models for dynamic behavior" />
 		<text key="route" text="Route ID" />
 		<text key="btree" text="BehaviorTree (root)" />
-		<check key="remote" text="Remote Vehicle?" />
 		<item_separator />
 
-		<label text="Fixed Behavior"/>
+		<label text="TV (trajectory-based vehicles)"/>
+		<label text="Vehicles following a timed trajectory" />
+		<text key="trajectory" text="Trajectory ID" />
+		<item_separator />
+
+		<label text="EV (external vehicle)"/>
+		<label text="Vehicle behavior is handled outside GeoScenario." />
+		<text key="esource" text="Behavior source" />
+		<text key="eid" text="External ID" />
+		<item_separator />
+
+		<label text="PV (path-based vehicles)"/>
+		<label text="Vehicles following a path with a constant speed, or following a speed profile" />
 		<text key="speed" text="Speed[](km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 for infinite)" default="1" />
@@ -178,18 +211,32 @@
 
 
 
-	<!-- PATHS AND LOCATIONS -->
+	<!-- ROUTES, TRAJECTORIES, PATHS -->
 
-	<item name="Route" type="way"  icon="path.png" preset_name_label="true">
-		<key key="gs" value="route" />
+	<item name="Trajectory" type="way"  icon="path.png" preset_name_label="true">
+		<key key="gs" value="trajectory" />
 		<space/>
-		<label text="GeoScenario Route for Dynamic Agents" />
+		<label text="GeoScenario trajectory for dynamic agents" />
 		<item_separator />
 		
 		<text key="name" text="Name " />
 		<item_separator />
 
-		<text key="group" text="Group (list) " />
+		<text key="group" text="Group []" />
+		<item_separator />
+
+  	</item>
+
+	<item name="Route" type="way"  icon="path.png" preset_name_label="true">
+		<key key="gs" value="route" />
+		<space/>
+		<label text="GeoScenario route for dynamic agents" />
+		<item_separator />
+		
+		<text key="name" text="Name " />
+		<item_separator />
+
+		<text key="group" text="Group []" />
 		<item_separator />
 
   	</item>
@@ -197,14 +244,14 @@
    <item name="Path" type="way"  icon="path.png" preset_name_label="true">
 		<key key="gs" value="path" />
 		<space/>
-		<label text="GeoScenario Path for Dynamic Agents" />
+		<label text="GeoScenario path for dynamic agents" />
 		<item_separator />
 		
 		<text key="name" text="Name " />
 		<check key="abstract" text="Abstract" default="off"/>
 		<item_separator />
 
-		<text key="group" text="Group (list) " />
+		<text key="group" text="Group []" />
 		<item_separator />
 
   	</item>
@@ -219,12 +266,22 @@
 		<text key="timetoacceleration" text="Time to acceleration" />
   	</item>
 
+	<item name="Trajectory Node" type="node"  preset_name_label="true">
+		<label text="Trajectory node for a path" />
+		<key key="gs" value="tnode" />
+		<item_separator />
+		<text key="time" text="Time" />
+		<text key="orientation" text="Orientation" />
+		<text key="speed" text="Speed" />
+  	</item>
+
+	<!-- LOCATIONS -->
 
   	<item name="Location" type="node,way"  icon="location.png" preset_name_label="true">
 		<key key="gs" value="location" />
 		<key key="area" value="no" />
 		<space/>
-		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers" />
+		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers. Can be used to tag points of interest." />
 		<item_separator />
 
 		<text key="name" text="*Name " />
@@ -300,7 +357,7 @@
   </item>
 	
 
-
+<!-- DYNAMIC REGULATORY ELEMENTS-->
 
 
 <item name="Traffic Light" type="node"  icon="trafficlight.png" preset_name_label="true" >
@@ -313,6 +370,7 @@
 		<item_separator />
 		<text key="states" text="*States (in order)[]"  default="green,yellow,red"/>
 		<text key="duration" text="Duration[]"  default="15,3,15"/>
+		<text key="interval" text="Interval[]"  default="0,15,18,33"/>
 		<item_separator />
 
 		<text key="group" text="Group []" />

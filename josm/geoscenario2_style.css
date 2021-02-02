@@ -85,7 +85,7 @@ way[gs=route] {
     text: "name";
     width: 3;
     color: blue;
-    dashes: 15,15;
+    dashes: 20,20;
     dashes-background-color: alpha;
     text-position: line;
     text-offset: 5;
@@ -93,8 +93,21 @@ way[gs=route] {
     text-color: blue;
     text-halo-color: white;
     text-halo-radius: 2;
+    direction: true;
 }
 
+way[gs=trajectory]{
+    width: 3;
+    color: blue;
+    text: "name";
+    text-position: line;
+    text-offset: 5;
+    font-size: 12;
+    text-color: blue;
+    text-halo-color: white;
+    text-halo-radius: 2;
+    direction: true;
+}
 
 way[gs=path] {
     width: 3;
@@ -124,11 +137,19 @@ way[gs=path][abstract=yes]{
 }
 
 node[nodespeed]{
-    text: eval(concat( "sp:", tag("nodespeed"),",", tag("nodeacceleration")));
+    text: eval(concat( "sp=", tag("nodespeed"),",", tag("nodeacceleration")));
     font-size: 16;
     text-color: black;
     symbol-shape: circle;
     symbol-size: (tag("nodespeed")/3)+5; 
+}
+
+node[trajectorynode][gs=tnode]{
+    text: eval(concat( "t=", tag("time"),",", tag("nodeacceleration")));
+    font-size: 16;
+    text-color: black;
+    symbol-shape: circle;
+    symbol-size: (tag("time")/3)+5; 
 }
 
 node[gs=staticobject] {
