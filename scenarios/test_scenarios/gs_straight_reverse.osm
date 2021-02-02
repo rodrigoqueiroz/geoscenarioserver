@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-1969330' action='modify' visible='true' lat='49.00786131385' lon='8.45736107875'>
+  <node id='-5005201' action='modify' visible='true' lat='49.0078525168' lon='8.45770708371'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
@@ -8,31 +8,32 @@
     <tag k='timeout' v='10' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-1969333' action='modify' visible='true' lat='49.00750807596' lon='8.45751937072'>
+  <node id='-5005202' action='modify' visible='true' lat='49.00750807596' lon='8.45751937072'>
     <tag k='agentspeed' v='1' />
   </node>
-  <node id='-1969334' action='modify' visible='true' lat='49.00817624551' lon='8.45835927518'>
+  <node id='-5005203' action='modify' visible='true' lat='49.00817624551' lon='8.45835927518'>
     <tag k='agentspeed' v='0' />
   </node>
-  <node id='-1969335' action='modify' visible='true' lat='49.00750211699' lon='8.4574959883'>
+  <node id='-5005204' action='modify' visible='true' lat='49.00750211699' lon='8.4574959883'>
     <tag k='agentspeed' v='5' />
   </node>
-  <node id='-1969338' action='modify' visible='true' lat='49.00740596584' lon='8.4573683575'>
-    <tag k='btree' v='reverse_scenario_tree' />
+  <node id='-5005205' action='modify' visible='true' lat='49.00788980558' lon='8.45800940545'>
+    <tag k='btree' v='trees/st_reverse.btree' />
+    <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='reversing_vehicle' />
     <tag k='orientation' v='325' />
     <tag k='route' v='right_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-1969339' action='modify' visible='true' lat='49.00790482164' lon='8.45736112446'>
+  <node id='-5005206' action='modify' visible='true' lat='49.00779221939' lon='8.4576990828'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <way id='-1947480' action='modify' visible='true'>
-    <nd ref='-1969333' />
-    <nd ref='-1969335' />
-    <nd ref='-1969334' />
+  <way id='-1947891' action='modify' visible='true'>
+    <nd ref='-5005202' />
+    <nd ref='-5005204' />
+    <nd ref='-5005203' />
     <tag k='gs' v='route' />
     <tag k='name' v='right_route' />
   </way>

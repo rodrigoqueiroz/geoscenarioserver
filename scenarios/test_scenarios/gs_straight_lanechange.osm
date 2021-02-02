@@ -1,38 +1,31 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-1969322' action='modify' visible='true' lat='49.00805702541' lon='8.45686019288'>
+  <node id='-5145118' action='modify' visible='true' lat='49.00796377698' lon='8.45773191081'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
-    <tag k='name' v='Straight Road Scenario using pytree' />
-    <tag k='timeout' v='30' />
+    <tag k='name' v='Lane change test scenario' />
+    <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-1969323' action='modify' visible='true' lat='49.00745181635' lon='8.45742981836' />
-  <node id='-1969324' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088' />
-  <node id='-1969325' action='modify' visible='true' lat='49.00724842708' lon='8.45715193688'>
-    <tag k='btree' v='lane_change_scenario_tree' />
+  <node id='-5145119' action='modify' visible='true' lat='49.00746149318' lon='8.45736544534' />
+  <node id='-5145120' action='modify' visible='true' lat='49.00840056832' lon='8.45856982859' />
+  <node id='-5145121' action='modify' visible='true' lat='49.00741293364' lon='8.45729409396'>
+    <tag k='btree' v='trees/st_lanechange.btree' />
+    <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
     <tag k='orientation' v='325' />
     <tag k='route' v='right_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-1969326' action='modify' visible='true' lat='49.00799752878' lon='8.45686298113'>
+  <node id='-5145122' action='modify' visible='true' lat='49.00788844556' lon='8.45773201685'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-1969327' action='modify' visible='true' lat='49.00740092367' lon='8.45736019324'>
-    <tag k='btree' v='drive_scenario_tree' />
-    <tag k='gs' v='vehicle' />
-    <tag k='name' v='v2' />
-    <tag k='orientation' v='325' />
-    <tag k='route' v='right_route' />
-    <tag k='vid' v='2' />
-  </node>
-  <way id='-1947478' action='modify' visible='true'>
-    <nd ref='-1969323' />
-    <nd ref='-1969324' />
+  <way id='-1947900' action='modify' visible='true'>
+    <nd ref='-5145119' />
+    <nd ref='-5145120' />
     <tag k='gs' v='route' />
     <tag k='name' v='right_route' />
   </way>

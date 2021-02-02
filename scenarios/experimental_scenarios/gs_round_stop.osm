@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5149258' action='modify' visible='true' lat='49.00306767106' lon='8.4247432702'>
+    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-5149259' action='modify' visible='true' lat='49.00355305436' lon='8.42429828807' />
+  <node id='-5149260' action='modify' visible='true' lat='49.00359800617' lon='8.42548135166'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_round.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Stop line Scenario' />
+    <tag k='timeout' v='60' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5149261' action='modify' visible='true' lat='49.00351353424' lon='8.42548104236'>
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5149262' action='modify' visible='true' lat='49.00319368144' lon='8.42478254016' />
+  <node id='-5149319' action='modify' visible='true' lat='49.003414357' lon='8.42464819416' />
+  <way id='-1948477' action='modify' visible='true'>
+    <nd ref='-5149262' />
+    <nd ref='-5149319' />
+    <nd ref='-5149259' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+</osm>

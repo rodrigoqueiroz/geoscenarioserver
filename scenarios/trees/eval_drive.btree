@@ -1,0 +1,6 @@
+behaviortree eval_drive:
+    ?
+        ->
+            condition c_vehicle_ahead( lane_occupied() )
+            maneuver m_follow_lead ( MFollowConfig() )
+        maneuver m_vkeeping ( MVelKeepConfig(vel=MP(16.0,10,6)) )

@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5005014' action='modify' visible='true' lat='49.00761555267' lon='8.45777573347'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='name' v='Straight Road Drive and Obstacles' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5005017' action='modify' visible='true' lat='49.00725781895' lon='8.4570859424'>
+    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='left_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-5005018' action='modify' visible='true' lat='49.00758115529' lon='8.45777709595'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5005020' action='modify' visible='true' lat='49.00727991761' lon='8.45713372968' />
+  <node id='-5005021' action='modify' visible='true' lat='49.00830811807' lon='8.45846000253' />
+  <node id='-5005026' action='modify' visible='true' lat='49.00753311261' lon='8.45743752882'>
+    <tag k='area' v='no' />
+    <tag k='gs' v='staticobject' />
+    <tag k='name' v='obstacle' />
+  </node>
+  <node id='-5005027' action='modify' visible='true' lat='49.00781132032' lon='8.45785125956'>
+    <tag k='area' v='no' />
+    <tag k='gs' v='staticobject' />
+    <tag k='name' v='obstacle2' />
+  </node>
+  <way id='-1947864' action='modify' visible='true'>
+    <nd ref='-5005020' />
+    <nd ref='-5005021' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route' />
+  </way>
+</osm>

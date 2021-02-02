@@ -1,0 +1,18 @@
+behaviortree handle_traffic_light:
+    ?
+    	->
+            condition c_busy_lane( lane_occupied(time_gap=3, distance_gap=20) )
+            maneuver m_follow_lead ( MFollowConfig())
+        ->
+        	condition c_red_light ( red_light() )
+            maneuver m_stop_redlight ( MStopConfig( type=3) )						
+        ->
+        	condition c_green_light ( red_light() )
+        	    ?
+                    ->
+                        condition c_busy_lane( lane_occupied(time_gap=3, distance_gap=20) )									
+                        maneuver m_follow_lead ( MFollowConfig())	
+                    ->
+			            condition c_lag ( delay( time=2.0) )
+			            maneuver m_vkeeping ( MVelKeepConfig())
+        maneuver m_vkeeping ( MVelKeepConfig())

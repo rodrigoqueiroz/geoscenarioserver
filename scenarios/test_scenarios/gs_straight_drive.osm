@@ -1,46 +1,51 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-1969306' action='modify' visible='true' lat='49.00755397299' lon='8.45783876538'>
+  <node id='-2610798' action='modify' visible='true' lat='49.00776334359' lon='8.45755981564'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
     <tag k='name' v='Straight Road Drive and Follow Scenario' />
-    <tag k='timeout' v='30' />
+    <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-1969307' action='modify' visible='true' lat='49.00745181635' lon='8.45742981836' />
-  <node id='-1969308' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088' />
-  <node id='-1969309' action='modify' visible='true' lat='49.0072406645' lon='8.45706515528'>
-    <tag k='btree' v='fast_drive_scenario_tree' />
+  <node id='-2610799' action='modify' visible='true' lat='49.0072573996' lon='8.45719914838' />
+  <node id='-2610800' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088' />
+  <node id='-2610801' action='modify' visible='true' lat='49.00725078123' lon='8.45706917859'>
+    <tag k='btree' v='trees/st_driveslow.btree' />
+    <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
     <tag k='orientation' v='325' />
-    <tag k='route' v='right_route' />
+    <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-1969310' action='modify' visible='true' lat='49.00752282715' lon='8.45783712069'>
+  <node id='-2610802' action='modify' visible='true' lat='49.00769375801' lon='8.45755581371'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
     <tag k='gs' v='origin' />
-    <tag k='name' v='origin' />
   </node>
-  <node id='-1969311' action='modify' visible='true' lat='49.00740092367' lon='8.45736019324'>
-    <tag k='btree' v='drive_scenario_tree' />
+  <node id='-2610803' action='modify' visible='true' lat='49.00722234162' lon='8.45714561652'>
+    <tag k='btree' v='trees/st_drivefast.btree' />
+    <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
     <tag k='name' v='v2' />
     <tag k='orientation' v='325' />
     <tag k='route' v='right_route' />
     <tag k='vid' v='2' />
   </node>
-  <node id='-1969312' action='modify' visible='true' lat='49.00727991761' lon='8.45713372968' />
-  <node id='-1969313' action='modify' visible='true' lat='49.0080328032' lon='8.45809740573' />
-  <way id='-1947474' action='modify' visible='true'>
-    <nd ref='-1969307' />
-    <nd ref='-1969308' />
+  <node id='-2610804' action='modify' visible='true' lat='49.00727991761' lon='8.45713372968' />
+  <node id='-2610805' action='modify' visible='true' lat='49.00830811807' lon='8.45846000253' />
+  <way id='-1947481' action='modify' visible='true'>
+    <nd ref='-2610799' />
+    <nd ref='-2610800' />
     <tag k='gs' v='route' />
     <tag k='name' v='right_route' />
   </way>
-  <way id='-1947475' action='modify' visible='true'>
-    <nd ref='-1969312' />
-    <nd ref='-1969313' />
+  <way id='-1947482' action='modify' visible='true'>
+    <nd ref='-2610804' />
+    <nd ref='-2610805' />
     <tag k='gs' v='route' />
     <tag k='name' v='left_route' />
   </way>

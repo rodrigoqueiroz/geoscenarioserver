@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2653776' action='modify' visible='true' lat='43.47138530796' lon='-80.54650732482'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicledisabled' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='4' />
+  </node>
+  <node id='-2653777' action='modify' visible='true' lat='43.47300476029' lon='-80.54173413491'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_modified.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Campus ring road stress test' />
+    <tag k='plotvid' v='5' />
+    <tag k='timeout' v='300' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2653778' action='modify' visible='true' lat='43.4681668322' lon='-80.5436763174'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-2653779' action='modify' visible='true' lat='43.47115708063' lon='-80.54554978193'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicledisabled' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='3' />
+  </node>
+  <node id='-2653780' action='modify' visible='true' lat='43.46871515959' lon='-80.54003734612'>
+    <tag k='btree' v='cut_in_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='cw_route' />
+    <tag k='vid' v='5' />
+  </node>
+  <node id='-2653781' action='modify' visible='true' lat='43.46791316582' lon='-80.54044567403' />
+  <node id='-2653782' action='modify' visible='true' lat='43.46860186619' lon='-80.5400975123' />
+  <node id='-2653783' action='modify' visible='true' lat='43.46868066609' lon='-80.54012148922'>
+    <tag k='gs' v='egostart' />
+    <tag k='name' v='egostart' />
+  </node>
+  <node id='-2653784' action='modify' visible='true' lat='43.46871778505' lon='-80.54009083391'>
+    <tag k='btree' v='slow_drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicledisabled' />
+    <tag k='name' v='target' />
+    <tag k='route' v='cw_route' />
+    <tag k='vid' v='4' />
+  </node>
+  <node id='-2653785' action='modify' visible='true' lat='43.46864009606' lon='-80.54013240569'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicledisabled' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='cw_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <way id='-102010' action='modify' visible='true'>
+    <nd ref='-2653782' />
+    <nd ref='-2653781' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='cw_route' />
+  </way>
+</osm>
