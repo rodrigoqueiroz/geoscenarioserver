@@ -25,9 +25,9 @@ install_python_dependencies()
     # does not solve the error.
     sudo ln -sfn /usr/lib/python3/dist-packages/apt_pkg.cpython-36m-x86_64-linux-gnu.so /usr/lib/python3/dist-packages/apt_pkg.so
     # Ensure we have pip3
-    sudo apt-get install -qq python3-pip python3-tk python3-sysv-ipc
+    sudo apt-get install -qq python3-pip
     # Install the required dependencies for GeoScenario Server
-    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime
+    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime python3-tk sysv-ipc
 }
 
 install_lanelet2()
