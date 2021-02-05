@@ -12,16 +12,21 @@ main()
 
 install_python_dependencies()
 {
-    # ensure we have Python3.8
+    # Ensure we have Python3.8
     sudo apt-get install -qq python3.8
-    # make it the default version for the system
-    # give the user ability to switch back to Python3.6 easily
+    # Make it the default version for the system
+    # Give the user ability to switch back to Python3.6 easily
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
-    # give Python3.8 a higher priority so that it's chosen by default
+    # Give Python3.8 a higher priority so that it's chosen by default
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
-    # ensure we have pip3
+    # Fix 'apt update' error "ModuleNotFoundError: No module named 'apt_pkg'"
+    # Note:
+    # $ sudo apt-get install python3-apt --reinstall
+    # does not solve the error.
+    sudo ln -sfn /usr/lib/python3/dist-packages/apt_pkg.cpython-36m-x86_64-linux-gnu.so /usr/lib/python3/dist-packages/apt_pkg.so
+    # Ensure we have pip3
     sudo apt-get install -qq python3-pip python3-tk python3-sysv-ipc
-    # install the required dependencies for GeoScenario Server
+    # Install the required dependencies for GeoScenario Server
     pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime
 }
 
