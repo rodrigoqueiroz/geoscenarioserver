@@ -1,29 +1,34 @@
 #   GeoScenario Server
 Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees and Maneuver Models.
 
-## Dependencies:
-- python 3.8
+## Dependencies
+
+Python 3.8 and pip3
+
+### Python packages
 - numpy
 - glog
 - matplotlib
 - scipy
+- [py_trees](https://github.com/splintered-reality/py_trees)
+
+### Apt packages
 - python3-tk
 - python3-sysv-ipc
 - antlr4-python3-runtime
-- [py_trees](https://github.com/splintered-reality/py_trees)
 
+### ROS packages
 
-#### Lanelet Dependencies:
-- [lanelet2](https://github.com/yuzhangbit/lanelet2_standalone)
-- Boost 1.58 (does not compile with Boost 1.6.5 or newer)
-- eigen3
-- pugixml
-- boost-python3
-- geographiclib
+- ros-melodic-lanelet2
 
+To automatically install the dependencies and to configure Python 3.8 as
+the default version for the command `python3`, execute
+```
+bash scripts/install_dependencies.bash
+```
 
 ## Running
-- run `python GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
+- run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 ```
 optional arguments:
   -h, --help            show this help message and exit
