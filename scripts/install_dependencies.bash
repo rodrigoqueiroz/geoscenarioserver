@@ -12,8 +12,16 @@ main()
 
 install_python_dependencies()
 {
+    # ensure we have Python3.8
+    sudo apt-get install -qq python3.8
+    # make it the default version for the system
+    # give the user ability to switch back to Python3.6 easily
+    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
+    # give Python3.8 a higher priority so that it's chosen by default
+    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
     # ensure we have pip3
     sudo apt-get install -qq python3-pip python3-tk python3-sysv-ipc
+    # install the required dependencies for GeoScenario Server
     sudo pip3 -q install numpy scipy glog matplotlib
 }
 
@@ -32,6 +40,5 @@ install_lanelet2()
         echo "Unsupported Ubuntu version ${UBUNTU_DISTRO}."
     fi
 }
-
 
 main
