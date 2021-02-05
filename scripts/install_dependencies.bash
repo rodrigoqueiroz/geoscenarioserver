@@ -13,7 +13,7 @@ main()
 install_python_dependencies()
 {
     # Ensure we have Python3.8
-    sudo apt-get install -qq python3.8
+    sudo apt-get install -qq python3.8 python3.8-venv
     # Make it the default version for the system
     # Give the user ability to switch back to Python3.6 easily
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
