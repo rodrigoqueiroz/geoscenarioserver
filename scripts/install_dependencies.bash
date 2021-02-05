@@ -16,9 +16,8 @@ install_python_dependencies()
     # Create a virtual environment
     cd $REPO_DIR
     python3.8 -m venv .venv
-    activate_venv
     # Install the required dependencies for GeoScenario Server
-    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc antlr-denter
+    python3.8 -m pip -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc antlr-denter
 }
 
 install_lanelet2_python38()
