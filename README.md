@@ -11,10 +11,8 @@ Python 3.8 and pip3
 - matplotlib
 - scipy
 - [py_trees](https://github.com/splintered-reality/py_trees)
-
-### Apt packages
-- python3-tk
-- python3-sysv-ipc
+- tk
+- sysv-ipc
 - antlr4-python3-runtime
 
 ### ROS packages
