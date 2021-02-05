@@ -1,4 +1,6 @@
-scenarios//plots/*
+catkin_ws
+.venv
+scenarios/plots/*
 scenarios/logs/*
 *__pycache__/
 **/build/
