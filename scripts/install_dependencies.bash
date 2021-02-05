@@ -12,13 +12,13 @@ activate_venv()
 install_python_dependencies()
 {
     # Ensure we have Python3.8 and pip3
-    sudo apt-get install -qq python3.8 python3.8-dev python3.8-venv python3-pip
+    sudo apt-get install -qq python3.8 python3.8-dev python3.8-venv python3.8-tk python3-pip
     # Create a virtual environment
     cd $REPO_DIR
     python3.8 -m venv .venv
     activate_venv
     # Install the required dependencies for GeoScenario Server
-    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc
+    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc antlr-denter
 }
 
 install_lanelet2_python38()
