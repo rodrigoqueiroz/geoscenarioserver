@@ -27,7 +27,7 @@ install_python_dependencies()
     # Ensure we have pip3
     sudo apt-get install -qq python3-pip
     # Install the required dependencies for GeoScenario Server
-    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime python3-tk sysv-ipc
+    pip3 -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc
 }
 
 install_lanelet2()
