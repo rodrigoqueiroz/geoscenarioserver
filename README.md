@@ -3,7 +3,13 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ## Dependencies
 
-Python 3.8 and pip3
+### Apt packages
+
+- python3.8
+- python3.8-dev
+- python3.8-venv
+- python3.8-tk
+- python3-pip
 
 ### Python packages
 - numpy
@@ -14,10 +20,7 @@ Python 3.8 and pip3
 - tk
 - sysv-ipc
 - antlr4-python3-runtime
-
-### ROS packages
-
-- ros-melodic-lanelet2
+- antlr-denter
 
 To automatically install the dependencies and to configure Python 3.8 as
 the default version for the command `python3`, execute
