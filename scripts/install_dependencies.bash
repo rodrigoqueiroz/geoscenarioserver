@@ -14,7 +14,7 @@ install_python_dependencies()
 {
     # ensure we have pip3
     sudo apt-get install -qq python3-pip python3-tk python3-sysv-ipc
-    sudo pip3 install numpy scipy glog matplotlib
+    sudo pip3 -q install numpy scipy glog matplotlib
 }
 
 install_lanelet2()
