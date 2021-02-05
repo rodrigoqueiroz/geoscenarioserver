@@ -12,6 +12,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - python3-pip
 
 ### Python packages
+
 - numpy
 - glog
 - matplotlib
@@ -21,6 +22,10 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - sysv-ipc
 - antlr4-python3-runtime
 - antlr-denter
+
+### Source packages
+
+- Lanelet2 (submodule)
 
 To automatically install the dependencies and to configure Python 3.8 as
 the default version for the command `python3`, execute
