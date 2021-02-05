@@ -23,6 +23,8 @@ install_python_dependencies()
 install_lanelet2_python38()
 {
     cd $REPO_DIR
+    # In the case the repository was not cloned recursively
+    git submodule update --init
     activate_venv
     mkdir -p $REPO_DIR/catkin_ws/src
     ln -sfn $REPO_DIR/Lanelet2 $REPO_DIR/catkin_ws/src/Lanelet2
