@@ -37,6 +37,11 @@ install_lanelet2_python38()
 
 install_lanelet2_binary()
 {
+    if which rosversion > /dev/null && [[ $(rosversion -d) == "<unknown>" ]]; then
+        echo "No ROS distribution was found. Please be sure that setup.bash is sourced."
+        exit 1
+    fi
+
     sudo apt-get -qq install libpugixml-dev
     UBUNTU_DISTRO=$(lsb_release -s -c)
     if [[ "${UBUNTU_DISTRO}" == "xenial" ]]; then
@@ -48,6 +53,7 @@ install_lanelet2_binary()
         sudo apt-get -qq install "ros-noetic-mrt-cmake-modules" "ros-noetic-lanelet2"
     else
         echo "Unsupported Ubuntu version ${UBUNTU_DISTRO}."
+        exit 1
     fi
 }
 
