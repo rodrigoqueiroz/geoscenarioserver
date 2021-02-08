@@ -8,7 +8,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - python3.8
 - python3.8-dev
 - python3.8-venv
-- python3.8-tk
+- python3-tk
 - python3-pip
 
 ### Python packages
@@ -27,14 +27,13 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 - Lanelet2 (submodule)
 
-To automatically install the dependencies and to configure Python 3.8 as
-the default version for the command `python3`, execute
+To automatically install the dependencies, execute
 ```
 bash scripts/install_dependencies.bash
 ```
 
 ## Running
-- run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
+- run `python3.8 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 ```
 optional arguments:
   -h, --help            show this help message and exit
