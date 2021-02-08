@@ -1,0 +1,3 @@
+[submodule "Lanelet2"]
+	path = Lanelet2
+	url = https://github.com/fzi-forschungszentrum-informatik/Lanelet2.git
