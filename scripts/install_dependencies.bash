@@ -38,23 +38,11 @@ install_lanelet2_python38()
 install_lanelet2_binary()
 {
     if which rosversion > /dev/null && [[ $(rosversion -d) == "<unknown>" ]]; then
-        echo "No ROS distribution was found. Please be sure that setup.bash is sourced."
+        echo "No ROS distribution was found. Please ensure that setup.bash is sourced."
         exit 1
     fi
-
-    sudo apt-get -qq install libpugixml-dev
-    UBUNTU_DISTRO=$(lsb_release -s -c)
-    if [[ "${UBUNTU_DISTRO}" == "xenial" ]]; then
-        # For Xenial, get the submodules and will build
-        git submodule update --init --recursive
-    elif [[ "${UBUNTU_DISTRO}" == "bionic" ]]; then
-        sudo apt-get -qq install "ros-melodic-mrt-cmake-modules" "ros-melodic-lanelet2"
-    elif [[ "${UBUNTU_DISTRO}" == "focal" ]]; then
-        sudo apt-get -qq install "ros-noetic-mrt-cmake-modules" "ros-noetic-lanelet2"
-    else
-        echo "Unsupported Ubuntu version ${UBUNTU_DISTRO}."
-        exit 1
-    fi
+    ROS_VERSION=$(rosversion -ds)
+    sudo apt-get -qq install libpugixml-dev "ros-${ROS_VERSION}-mrt-cmake-modules" "ros-${ROS_VERSION}-lanelet2"
 }
 
 install_python_dependencies
