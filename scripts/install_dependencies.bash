@@ -12,7 +12,7 @@ activate_venv()
 install_python_dependencies()
 {
     # Ensure we have Python3.8 and pip3
-    sudo apt-get install -qq python3.8 python3.8-dev python3.8-venv python3.8-tk python3-pip
+    sudo apt-get install -qq python3.8 python3.8-dev python3.8-venv python3-tk python3-pip
     # Create a virtual environment
     cd $REPO_DIR
     python3.8 -m venv .venv
@@ -52,5 +52,5 @@ install_lanelet2_binary()
 }
 
 install_python_dependencies
-install_lanelet2_python38
 install_lanelet2_binary
+install_lanelet2_python38
