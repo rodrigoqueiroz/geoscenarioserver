@@ -29,8 +29,8 @@ install_lanelet2_python38()
     mkdir -p $REPO_DIR/catkin_ws/src
     ln -sfn $REPO_DIR/Lanelet2 $REPO_DIR/catkin_ws/src/Lanelet2
     cd $REPO_DIR/catkin_ws
+    catkin init --workspace .
     export DESTDIR="$REPO_DIR/catkin_ws/install"
-    catkin init --workspace $REPO_DIR/catkin_ws
     catkin config --workspace $REPO_DIR/catkin_ws \
                   --install \
                   -i /opt/ros/lanelet2 \
