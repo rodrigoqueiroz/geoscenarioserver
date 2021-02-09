@@ -29,15 +29,14 @@ install_lanelet2_python38()
     mkdir -p $REPO_DIR/catkin_ws/src
     ln -sfn $REPO_DIR/Lanelet2 $REPO_DIR/catkin_ws/src/Lanelet2
     cd $REPO_DIR/catkin_ws
+    catkin init --workspace .
     export DESTDIR="$REPO_DIR/catkin_ws/install"
-    catkin init --workspace $REPO_DIR/catkin_ws
-    catkin config --workspace $REPO_DIR/catkin_ws \
-                  --install \
+    catkin config --install \
                   -i /opt/ros/lanelet2 \
                   --cmake-args -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.8 \
                   -DTARGET_INSTALL_DIR="/opt/ros/lanelet2" > /dev/null
     pip3 -q install catkin_pkg rospkg
-    catkin build --workspace $REPO_DIR/catkin_ws
+    catkin build
 }
 
 install_lanelet2_binary()
