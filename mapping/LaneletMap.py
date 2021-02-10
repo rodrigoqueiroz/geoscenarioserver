@@ -149,7 +149,7 @@ class LaneletMap(object):
         """
         ret = None
         # NOTE use laneletMap() requires a fix to python bindings
-        for ll in lanelet_route.laneletMap().laneletLayer:
+        for ll in lanelet_route.laneletSubmap().laneletMap().laneletLayer:
             if inside(ll, BasicPoint2d(x, y)):
                 ret = ll
                 break
