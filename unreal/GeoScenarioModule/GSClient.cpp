@@ -7,10 +7,11 @@
 #include <sstream>
 #include <string>
 
-const key_t SHM_KEY = 123456;
-const key_t SEM_KEY = 346565;
-const key_t CS_SHM_KEY = 333943;
-const key_t CS_SEM_KEY = 933433;
+const key_t  SHM_KEY = 123456;
+const key_t  SEM_KEY = 346565;
+const key_t  CS_SHM_KEY = 333943;
+const key_t  CS_SEM_KEY = 933433;
+const size_t SHM_SIZE = 2048;
 
 AGSClient::AGSClient()
 {
@@ -81,7 +82,7 @@ void AGSClient::AttemptConnection()
         return;
     }
 	// get shared mem instance
-    if ((ss_shmInfo.shm_id = shmget(ss_shmInfo.shm_key, 1024, 0666)) < 0) {
+    if ((ss_shmInfo.shm_id = shmget(ss_shmInfo.shm_key, SHM_SIZE, 0666)) < 0) {
         UE_LOG(GeoScenarioModule, Error, TEXT("Error getting SS memory ID"));
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
@@ -102,7 +103,7 @@ void AGSClient::AttemptConnection()
         return;
     }
 	// get shared mem instance
-    if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, 1024, 0666)) < 0) {
+    if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, SHM_SIZE, 0666)) < 0) {
         UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS memory ID"));
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
