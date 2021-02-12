@@ -30,7 +30,7 @@ class Vehicle(Actor):
     TV_TYPE = 3
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id,name, start_state,frenet_state)
+        super().__init__(id,name, start_state,frenet_state, VehicleState())
         self.type = Vehicle.N_TYPE
         self.radius = VEHICLE_RADIUS
 
