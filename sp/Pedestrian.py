@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 #rqueiroz@uwaterloo.ca
+#slarter@uwaterloo.ca
 # --------------------------------------------
 # SIMULATED PEDESTRIANS
 # --------------------------------------------
+import numpy as np
+import random
 import glog as log
 from SimConfig import *
 from util.Utils import *
 from Actor import *
 from shm.SimSharedMemory import *
 from util.Utils import kalman
+from util.Transformations import normalize
 
 
 # Base class for Pedestrians
@@ -18,11 +22,12 @@ class Pedestrian(Actor):
     TP_TYPE = 1
     PP_TYPE = 2
     EP_TYPE = 3
+    SP_TYPE = 4
 
     PEDESTRIAN_RADIUS = 0.2
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id, name,start_state)
+        super().__init__(id, name, start_state)
         self.type = Pedestrian.N_TYPE
         self.radius = Pedestrian.PEDESTRIAN_RADIUS
         
@@ -63,4 +68,46 @@ class TP(Pedestrian):
         self.follow_trajectory(sim_time, self.trajectory)
 
 
-                    
+class SP(Pedestrian):
+    """
+    A path following pedestrian (dynamic behavior)
+    """
+
+    def __init__(self, id, name, start_state, destination):
+        super().__init__(id, name, start_state)
+        self.type = Pedestrian.SP_TYPE
+        self.destination = np.asarray(destination)
+        self.desired_speed = random.uniform(0.8,1.5)
+        self.mass = random.uniform(50,80)
+        self.char_time = random.uniform(8,16) # characteristic time
+
+    def tick(self, tick_count, delta_time, sim_time):
+        Pedestrian.tick(self, tick_count, delta_time, sim_time)
+        self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
+
+    def update_position_SFM(self, curr_pos, curr_vel):
+        direction = np.array(normalize(self.destination - curr_pos))
+        desired_vel = direction * self.desired_speed
+
+        delta_vel = desired_vel - curr_vel
+
+        # if delta_vel is close enough to zero, assign value zero
+        if np.allclose(delta_vel, np.zeros(2)):
+            delta_vel = np.zeros(2)
+
+        dt = 1 / TRAFFIC_RATE
+
+        # forces acting on pedestrian
+        f_adapt = (delta_vel * self.mass) / self.char_time
+        f_other_ped = np.zeros(2)
+        f_walls = np.zeros(2)
+
+        f_sum = f_adapt + f_other_ped + f_walls
+
+        curr_acc = f_sum / self.mass
+        curr_vel += curr_acc*dt
+        curr_pos += curr_vel * dt
+
+        self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
+        self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
+

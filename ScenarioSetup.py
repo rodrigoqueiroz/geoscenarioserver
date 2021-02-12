@@ -149,6 +149,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         pid = int(pid)
         name = pnode.tags['name']
         start_state = [pnode.x,0.0,0.0, pnode.y,0.0,0.0]                    #start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
+        # destination = 
         btype = pnode.tags['btype'].lower() if 'btype' in pnode.tags else ''
         
         
@@ -172,6 +173,23 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
                 pedestrian = TP(pid, name, start_state,trajectory)
+                sim_traffic.add_pedestrian(pedestrian)
+            except Exception as e:
+                log.error("Failed to initialize pedestrian {}".format(pid))
+                raise e
+        # Simulated pedestrian
+        elif btype == 'sp':
+            if 'route' not in pnode.tags:
+                log.error("SP {} requires a route .".format(pid))
+                continue
+            try:
+                p_route = pnode.tags['route']
+                #btree_root = pnode.tags['btree'] if 'btree' in pnode.tags else "walk_tree" # a behavior tree file (.btree) inside scenarios/btrees/
+                route_nodes = parser.routes[p_route].nodes
+                #lanelets_in_route = [lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes]   # a valid lanelet route
+                #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(lanelets_in_route)
+                sim_config.goal_points[pid] = (route_nodes[-1].x, route_nodes[-1].y)
+                pedestrian = SP(pid, name, start_state, list(sim_config.goal_points[pid]))
                 sim_traffic.add_pedestrian(pedestrian)
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))

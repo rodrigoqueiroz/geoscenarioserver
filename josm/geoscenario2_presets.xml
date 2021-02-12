@@ -140,14 +140,12 @@
 		<label text="TP (trajectory-based pedestrian)" />
 		<label text="Pedestrians following a timed trajectory" />
 		<text key="trajectory" text="Trajectory ID" />
-		
 		<item_separator />
 
 		<label text="EP (external pedestrian)"/>
 		<label text="Pedestrian behavior is handled outside GeoScenario." />
 		<text key="esource" text="Behavior source" />
 		<text key="eid" text="External ID" />
-
 		<item_separator />
 
 		<label text="PP (path-based pedestrian)" />
@@ -156,6 +154,12 @@
 		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
 		<text key="usespeedprofile" text="Use Speed Profile (y/n)" />
 		<check key="start" text="Start In Motion" />
+		<item_separator />
+
+		<label text="SP (simulated dynamic behavior pedestrian)" />
+		<label text="Pedestrians running BT models for dynamic behavior" />
+		<text key="btree" text="BehaviorTree (root)" />
+		<text key="route" text="Route ID" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
