@@ -14,6 +14,7 @@ from TickSync import TickSync
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
+import datetime
 from PIL import Image, ImageTk
 import glog as log
 from SimTraffic import *
@@ -78,9 +79,12 @@ class Dashboard(object):
             #get new data
             header, vehicles, pedestrians, traffic_lights,static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
+            sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
-            config_txt += "\nTick#: {}   |   SimTime: {:.3}   |   DeltaTime: {:.3}".format(tickcount,sim_time,delta_time) 
+            config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time) 
+            
+            
 
             #config/stats
             self.scenario_config_lb['text'] = config_txt
