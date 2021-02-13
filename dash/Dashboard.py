@@ -76,7 +76,7 @@ class Dashboard(object):
             self.tree_msg.configure(text= "")
 
             #get new data
-            header, vehicles, pedestrians, traffic_lights,static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
+            header, vehicles, pedestrians, traffic_lights,static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
