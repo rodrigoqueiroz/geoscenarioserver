@@ -338,11 +338,26 @@ class Dashboard(object):
             x = obj.s
             y = obj.d
             #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-            plt.plot(x, y, 'kX',markersize=4, zorder=10)
+            plt.plot(x, y, 'kx',markersize=6, zorder=10)
             label = "{}".format(oid)
             plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
+
+        #re
+        for re in regulatory_elements:
+            if isinstance(re, TrafficLightState):
+                colorcode,_ = self.get_color_by_type('trafficlight',re.color)
+                x, y = re.stop_position
+                plt.axvline(x, color= colorcode, linestyle='-', zorder=0)
+            else:
+                print(re)
+        
+
         #main vehicle
+        x,y = goal_point_frenet[0],goal_point_frenet[1]
+        #plt.plot(x, 'go',markersize=6, zorder=10)
+        plt.axvline(x, color="k", linestyle='-', zorder=0)
+        plt.gca().text(x+1, y+1, "goal", style='italic', zorder=10)
         if cand:
             for t in cand:
                 Dashboard.plot_trajectory(t[0], t[1], t[2], 'grey')
