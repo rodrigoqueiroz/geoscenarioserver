@@ -26,7 +26,7 @@ ASimVehicle::ASimVehicle()
 
     // SetActorEnableCollision(true);
 
-	FString MeshName = "/ScenarioManager/MiscAssets/Static/Vehicles/SUV/SUVMesh.SUVMesh";
+	FString MeshName = "/Game/Agents/Vehicles/SUV/SUVMesh.SUVMesh";
 	UStaticMesh *MeshAsset = Cast<UStaticMesh>(
       StaticLoadObject(UStaticMesh::StaticClass(), NULL, *MeshName));
     Mesh->SetStaticMesh(MeshAsset);
@@ -107,7 +107,7 @@ void ASimVehicle::OnOverlap(AActor *self, AActor *other)
             *self->GetName(),
             *other->GetName());
     this->isActive = false;
-    
+
     // Check if collided with a gs vehicle
     ASimVehicle *otherGSV = Cast<ASimVehicle>(other);
     if (otherGSV == nullptr) {
