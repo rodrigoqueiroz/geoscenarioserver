@@ -47,7 +47,7 @@ class Vehicle(Actor):
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
         #remote = 1 if self.is_remote else 0
-        return self.id, type, position, velocity, self.state.angle, self.state.steer
+        return self.id, self.type, position, velocity, self.state.angle, self.state.steer
 
 
 class SDV(Vehicle):
