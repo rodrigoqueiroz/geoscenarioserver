@@ -4,43 +4,61 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
-activate_venv()
-{
-    source $REPO_DIR/.venv/bin/activate
-}
-
 install_python_dependencies()
 {
+    echo ""
+    echo "Installing Python3.8 and other packages"
+    echo ""
     # Ensure we have Python3.8 and pip3
-    sudo apt-get install -qq python3.8 python3.8-dev python3.8-venv python3-tk python3-pip
-    # Create a virtual environment
-    cd $REPO_DIR
-    python3.8 -m venv .venv
-    # Install the required dependencies for GeoScenario Server
+    sudo apt-get install -qq python3.8 python3.8-dev python3-tk python3-pip
+
+    echo ""
+    echo "Installing the required dependencies for catkin for Python3.8"
+    echo ""
+    python3.8 -m pip -q install catkin_pkg rospkg
+
+    echo ""
+    echo "Installing the required dependencies for GeoScenario Server for Python3.8"
+    echo ""
     python3.8 -m pip -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc antlr-denter
 }
 
 install_lanelet2_python38()
 {
+    echo ""
+    echo "Installing Lanelet2 library from source for Python3.8..."
+    echo ""
     cd $REPO_DIR
     # In the case the repository was not cloned recursively
     git submodule update --init
-    activate_venv
+
+    # temporarily switch to Python3.8 for the catkin build
+    alias python=/usr/bin/python3.8
+    alias python3=/usr/bin/python3.8
+
     mkdir -p $REPO_DIR/catkin_ws/src
     ln -sfn $REPO_DIR/Lanelet2 $REPO_DIR/catkin_ws/src/Lanelet2
     cd $REPO_DIR/catkin_ws
     catkin init --workspace .
     export DESTDIR="$REPO_DIR/catkin_ws/install"
-    catkin config --install \
-                  -i /opt/ros/lanelet2 \
+    catkin config --extend /opt/ros/melodic \
+                  --merge-devel \
+                  --install-space /opt/ros/lanelet2 \
+                  --install \
                   --cmake-args -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.8 \
                   -DTARGET_INSTALL_DIR="/opt/ros/lanelet2" > /dev/null
-    pip3 -q install catkin_pkg rospkg
     catkin build
+    echo ""
+    echo "The final catkin config:"
+    echo ""
+    catkin config
 }
 
 install_lanelet2_binary()
 {
+    echo ""
+    echo "Installing Lanelet2 library from ROS binaries..."
+    echo ""
     if which rosversion > /dev/null && [[ $(rosversion -d) == "<unknown>" ]]; then
         echo "No ROS distribution was found. Please ensure that setup.bash is sourced."
         exit 1
@@ -52,3 +70,7 @@ install_lanelet2_binary()
 install_python_dependencies
 install_lanelet2_binary
 install_lanelet2_python38
+
+echo ""
+echo "Successfully installed GeoScenario Server dependencies."
+echo ""
