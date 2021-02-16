@@ -49,19 +49,19 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
 
     #========= Traffic lights 
     for name, tnode in parser.tlights.items():
-        atype = tnode.tags['type'] if 'type' in tnode.tags else 'default'
+        type = tnode.tags['type'] if 'type' in tnode.tags else 'default'
         states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        if atype == 'left':
+        if type == 'left':
             tl_type = TrafficLightType.left
-        elif atype == 'right':
+        elif type == 'right':
             tl_type = TrafficLightType.right
-        elif atype == 'pedestrian':
+        elif type == 'pedestrian':
             tl_type = TrafficLightType.pedestrian
         else: 
             tl_type = TrafficLightType.default
         #name must match a traffic light in the lanelet map with tag 'name'
-        tl = TL(name, states, durations, atype = tl_type)
+        tl = TL(name, states, durations, type = tl_type)
         sim_traffic.add_traffic_light(tl)
     
     #=========  Ego (External Vehicle)
