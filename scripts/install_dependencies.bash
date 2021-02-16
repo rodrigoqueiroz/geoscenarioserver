@@ -52,6 +52,14 @@ install_lanelet2_python38()
     echo "The final catkin config:"
     echo ""
     catkin config
+    echo ""
+    echo "Fixing paths in the binaries:"
+    echo ""
+    ORIGINAL_PATH="$REPO_DIR/catkin_ws/install/"
+    NEW_PATH="/"
+    find "$ORIGINAL_PATH" -type f \
+           \( -name "*.cmake" -o -name "*.pc" -o -name "*.sh" -o -name _setup_util.py \) \
+           -print0 | xargs -0 sed -i "s|$ORIGINAL_PATH|$NEW_PATH|g"
 }
 
 install_lanelet2_binary()
