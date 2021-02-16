@@ -167,7 +167,7 @@ void AGSClient::ReadServerState(float deltaTime)
 		// Unreal's y axis is inverted from GS server's.
 		y *= -1;
 		y_vel *= -1;
-		yaw -= 90;
+		//yaw -= 90;
 	    // GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
 
 
