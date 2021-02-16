@@ -266,12 +266,12 @@ class SimTraffic(object):
         for r in range(start,end):
             i = r * c  #first index for row
             vid = int(traffic_state_sharr[i])
-            atype = int(traffic_state_sharr[i+1])
+            type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
             if not include_inactives and  sim_state is ActorSimState.INACTIVE: 
                 continue
             vehicle = Vehicle(vid)
-            vehicle.type = atype
+            vehicle.type = type
             vehicle.sim_state = sim_state
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[ i+3 : i+18 ]
@@ -284,12 +284,12 @@ class SimTraffic(object):
         for r in range(start,end):
             i = r * c  #first index for row
             pid = int(traffic_state_sharr[i])
-            atype = int(traffic_state_sharr[i+1])
+            type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
             if not include_inactives and  sim_state is ActorSimState.INACTIVE: 
                 continue
             pedestrian = Pedestrian(pid)
-            pedestrian.type = atype
+            pedestrian.type = type
             pedestrian.sim_state = sim_state
             # state vector contains the sim state
             state_vector = traffic_state_sharr[ i+3 : i+17 ]

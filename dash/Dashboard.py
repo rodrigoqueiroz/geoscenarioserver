@@ -223,12 +223,12 @@ class Dashboard(object):
                 #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
                 colorcode,_ = self.get_color_by_type('trafficlight',state)
                 plt.plot(x, y, 'ks', markersize=8, zorder=4) #black square
-                atype = self.sim_traffic.traffic_lights[lid].type
-                if atype == TrafficLightType.default:
+                type = self.sim_traffic.traffic_lights[lid].type
+                if type == TrafficLightType.default:
                     plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
-                elif atype == TrafficLightType.left:
+                elif type == TrafficLightType.left:
                     plt.plot(x, y, colorcode+'<', markersize=6, zorder=5)
-                elif atype == TrafficLightType.right:
+                elif type == TrafficLightType.right:
                     plt.plot(x, y, colorcode+'>', markersize=6, zorder=5)
 
                 label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
@@ -375,29 +375,29 @@ class Dashboard(object):
         #fig.tight_layout(pad=0.05)
 
     
-    def get_color_by_type(self,actor,atype,sim_state = None):
+    def get_color_by_type(self,actor,type,sim_state = None):
         #color
         colorcode = 'k' #black
         if actor== 'vehicle':
-            if atype == Vehicle.SDV_TYPE:
+            if type == Vehicle.SDV_TYPE:
                 colorcode = 'b' #blue
-            elif atype == Vehicle.EV_TYPE:
+            elif type == Vehicle.EV_TYPE:
                 colorcode = 'g' #green
-            elif atype == Vehicle.TV_TYPE:
+            elif type == Vehicle.TV_TYPE:
                 colorcode = 'k' #black
         elif actor== 'pedestrian':
-            if atype == Pedestrian.EP_TYPE:
+            if type == Pedestrian.EP_TYPE:
                 colorcode = 'r' #red
-            elif atype == Pedestrian.TP_TYPE:
+            elif type == Pedestrian.TP_TYPE:
                 colorcode = 'r' #bred
-            elif atype == Pedestrian.PP_TYPE:
+            elif type == Pedestrian.PP_TYPE:
                 colorcode = 'r' #red
         elif actor== 'trafficlight':
-            if atype == TrafficLightColor.Red:
+            if type == TrafficLightColor.Red:
                     colorcode = 'r'
-            if atype == TrafficLightColor.Green:
+            if type == TrafficLightColor.Green:
                 colorcode = 'g'
-            if atype == TrafficLightColor.Yellow:
+            if type == TrafficLightColor.Yellow:
                 colorcode = 'y'
         #alpha      
         alpha = 1.0          
