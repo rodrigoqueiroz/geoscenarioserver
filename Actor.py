@@ -125,9 +125,9 @@ class ActorState:
     y_vel:float = 0.0
     y_acc:float = 0.0
 
-    #z:float = 0.0
-    #z_vel:float = 0.0
-    #z_acc:float = 0.0
+    z:float = 0.0
+    z_vel:float = 0.0
+    z_acc:float = 0.0
   
     #frenet state
     s:float = 0.0
