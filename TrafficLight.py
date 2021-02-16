@@ -31,7 +31,7 @@ TRAFFIC_LIGHT_COLOR_FROM_STRING = {
 
 
 class TrafficLight:
-    def __init__(self, name, states:list, durations:list = None, intervals:list = None, type = TrafficLightType.default):
+    def __init__(self, name, states:list, durations:list = None, intervals:list = None, atype = TrafficLightType.default):
         '''
             Traffic lights can be assigned with duration or interval for each state. 
             @param durations:  time [s] in each state. States and durations must match in size and order. 
@@ -41,7 +41,7 @@ class TrafficLight:
         self.name = name
         self.current_color = states[0]
         self.states = states
-        self.type = type
+        self.type = atype
         
         # intervals in sim time for each state
         if intervals is not None:

@@ -33,7 +33,7 @@ class SimSharedMemory(object):
             @param vehicles:      dictionary of type <int, Vehicle>
             Shared memory format:
                 tick_count delta_time n_vehicles
-                vid is_remote x y z yaw vx vy steering_angle
+                vid atype x y z yaw vx vy steering_angle
                 ...
         """
         if not self.is_connected:
@@ -43,9 +43,9 @@ class SimSharedMemory(object):
         write_str = "{} {} {}\n".format(tick_count, delta_time, len(vehicles))
         # write vehicle states
         for svid in vehicles:
-            vid, remote, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
+            vid, atype, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
-                vid, remote, position[0], position[1], position[2],
+                vid, atype, position[0], position[1], position[2],
                 yaw, velocity[0], velocity[1], steering_angle)
 
         # sysv_ipc.BusyError needs to be caught
