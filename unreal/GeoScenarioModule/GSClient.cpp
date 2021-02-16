@@ -182,8 +182,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		gsvptr = vehicles.Find(vid);
-		if (gsvptr && type == 0)
+		if (type == 1)
 		{
 			if (server_framestat.tick_count == server_tick_count) 
 			{
