@@ -169,7 +169,7 @@ class SDV(Vehicle):
             heading = np.array([y_vector[1], x_vector[1]])
             if self.reversing:
                 heading *= -1
-            self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
+            self.state.angle = math.degrees(math.atan2(heading[1], heading[0]))
             #sanity check
             #if ( self.state.x < self.last_x) :
             #    diff = self.state.x - self.last_x
