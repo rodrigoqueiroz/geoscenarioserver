@@ -34,7 +34,7 @@ struct VehicleState
 struct GSVehicle
 {
 	int vid = -1;
-	int remote = 0;
+	int type = 0;
 	VehicleState vehicle_state;
 	AActor* actor;
 };
@@ -62,7 +62,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	AActor* FindVehicleActor(int vid);
-	void CreateVehicle(int vid, int remote);
+	void CreateVehicle(int vid, int type);
 	void ReadServerState(float deltaTime);
 	void UpdateRemoteVehicleStates(float deltaTime);
 	void WriteClientState(int tickCount, float deltaTime);

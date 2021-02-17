@@ -10,7 +10,7 @@ import numpy as np
 import glog as log
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], state=None):
         self.id = id
         self.name = name
         self.sim_state = ActorSimState.ACTIVE
@@ -22,7 +22,7 @@ class Actor(object):
 
         #state
         #start state in sim frame
-        self.state = ActorState()
+        self.state = state or ActorState()
         self.state.x = start_state[0]
         self.state.x_vel = start_state[1]
         self.state.x_acc = start_state[2]
@@ -125,9 +125,9 @@ class ActorState:
     y_vel:float = 0.0
     y_acc:float = 0.0
 
-    #z:float = 0.0
-    #z_vel:float = 0.0
-    #z_acc:float = 0.0
+    z:float = 0.0
+    z_vel:float = 0.0
+    z_acc:float = 0.0
   
     #frenet state
     s:float = 0.0

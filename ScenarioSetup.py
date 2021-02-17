@@ -61,7 +61,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         else: 
             tl_type = TrafficLightType.default
         #name must match a traffic light in the lanelet map with tag 'name'
-        tl = TL(name, states, durations, type = tl_type)         
+        tl = TL(name, states, durations, type = tl_type)
         sim_traffic.add_traffic_light(tl)
     
     #=========  Ego (External Vehicle)

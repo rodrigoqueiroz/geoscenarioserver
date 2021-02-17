@@ -7,10 +7,11 @@
 #include <sstream>
 #include <string>
 
-const key_t SHM_KEY = 123456;
-const key_t SEM_KEY = 346565;
-const key_t CS_SHM_KEY = 333943;
-const key_t CS_SEM_KEY = 933433;
+const key_t  SHM_KEY = 123456;
+const key_t  SEM_KEY = 346565;
+const key_t  CS_SHM_KEY = 333943;
+const key_t  CS_SEM_KEY = 933433;
+const size_t SHM_SIZE = 2048;
 
 AGSClient::AGSClient()
 {
@@ -81,7 +82,7 @@ void AGSClient::AttemptConnection()
         return;
     }
 	// get shared mem instance
-    if ((ss_shmInfo.shm_id = shmget(ss_shmInfo.shm_key, 1024, 0666)) < 0) {
+    if ((ss_shmInfo.shm_id = shmget(ss_shmInfo.shm_key, SHM_SIZE, 0666)) < 0) {
         UE_LOG(GeoScenarioModule, Error, TEXT("Error getting SS memory ID"));
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
@@ -102,7 +103,7 @@ void AGSClient::AttemptConnection()
         return;
     }
 	// get shared mem instance
-    if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, 1024, 0666)) < 0) {
+    if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, SHM_SIZE, 0666)) < 0) {
         UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS memory ID"));
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
@@ -160,9 +161,9 @@ void AGSClient::ReadServerState(float deltaTime)
 
 		if (vid==0) {continue;} //garbage at the end of string
 
-		int remote;
+		int type;
 		float x, y, z, yaw, x_vel, y_vel, steer;
-		iss >> remote >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
+		iss >> type >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
 		// Unreal's y axis is inverted from GS server's.
 		y *= -1;
 		y_vel *= -1;
@@ -176,13 +177,12 @@ void AGSClient::ReadServerState(float deltaTime)
 			UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
 			UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
-			CreateVehicle(vid, remote); 
+			CreateVehicle(vid, type);
 			//debug
 			continue;
 		}
 
-		gsvptr = vehicles.Find(vid);
-		if (gsvptr && remote == 0)
+		if (type == 1)
 		{
 			if (server_framestat.tick_count == server_tick_count) 
 			{
@@ -217,7 +217,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
-		if (gsv.remote == 0) continue;
+		if (gsv.type == 0) continue;
 
 		// Update the vehicle's vehicle_state based on its actor's location.
 		// Actual movement of the vehicle is updated in another class.
@@ -234,25 +234,15 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	}
 }
 
-void AGSClient::CreateVehicle(int vid, int remote)
+void AGSClient::CreateVehicle(int vid, int type)
 {
-	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d remote=%d"), vid, remote);
+	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d type=%d"), vid, type);
 	GSVehicle gsv = GSVehicle();
 	gsv.vid = vid;
-	gsv.remote = remote;
+	gsv.type = type;
 	gsv.vehicle_state =  VehicleState();
-	if (remote == 1) 
+	if (type == 1) // SDV
 	{
-		//Find actor with tag
-		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle"));
-		gsv.actor = FindVehicleActor(vid);
-		FVector loc = gsv.actor->GetActorLocation();
-		gsv.vehicle_state.x = loc[0];
-		gsv.vehicle_state.y = loc[1];
-		gsv.vehicle_state.z = loc[2];
-	}
-	else 
-	{	
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
 		FVector location = {0.0, 0.0, 0.0};
@@ -271,12 +261,22 @@ void AGSClient::CreateVehicle(int vid, int remote)
 		FName BboxTag = FName(*PubBbox);
 		gsv.actor->Tags.Add(BboxTag);
 	}
+	else // EV, TV
+	{
+		//Find actor with tag
+		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle"));
+		gsv.actor = FindVehicleActor(vid);
+		FVector loc = gsv.actor->GetActorLocation();
+		gsv.vehicle_state.x = loc[0];
+		gsv.vehicle_state.y = loc[1];
+		gsv.vehicle_state.z = loc[2];
+	}
 	//check if success
 	if (gsv.actor != nullptr)
 	{
 		vehicles.Add(vid, gsv);
 	}
-	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d remote=%d"), vid, remote);}
+	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d type=%d"), vid, type);}
 }
 
 
@@ -333,7 +333,7 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			oss << Elem.Key << " "
 				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
 				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " "
-				<< active << '\n';
+				<< /*active*/ 1 << '\n';
 		}
 		else
 		{
