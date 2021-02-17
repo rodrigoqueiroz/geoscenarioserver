@@ -333,7 +333,7 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			oss << Elem.Key << " "
 				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
 				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " "
-				<< active << '\n';
+				<< /*active*/ 1 << '\n';
 		}
 		else
 		{
