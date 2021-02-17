@@ -38,34 +38,21 @@ install_lanelet2_python38()
 
     mkdir -p $REPO_DIR/catkin_ws/src
     ln -sfn $REPO_DIR/Lanelet2 $REPO_DIR/catkin_ws/src/Lanelet2
-    cd $REPO_DIR/catkin_ws
-    catkin init --workspace .
-    export DESTDIR="$REPO_DIR/catkin_ws/install"
-    catkin config --extend /opt/ros/melodic \
-                  --merge-devel \
-                  --install-space /opt/ros/lanelet2 \
-                  --install \
-                  --cmake-args -DCMAKE_BUILD_TYPE=Release -DPYTHON_VERSION=3.8 \
-                  -DTARGET_INSTALL_DIR="/opt/ros/lanelet2" > /dev/null
-    catkin build
-    echo ""
-    echo "The final catkin config:"
-    echo ""
-    catkin config
-    echo ""
-    echo "Fixing paths in the binaries:"
-    echo ""
-    INSTALL_PATH="$REPO_DIR/catkin_ws/install/"
-    NEW_PATH="/"
-    find "$INSTALL_PATH" -type f \
-           \( -name "*.cmake" -o -name "*.pc" -o -name "*.sh" -o -name _setup_util.py \) \
-           -print0 | xargs -0 sed -i "s|$INSTALL_PATH|$NEW_PATH|g"
 
-    DEVEL_PATH="$REPO_DIR/catkin_ws/devel/"
-    NEW_PATH="/"
-    find "$INSTALL_PATH" -type f \
-           -name SOURCES.txt \
-           -print0 | xargs -0 sed -i "s|$DEVEL_PATH|$NEW_PATH|g"
+    source "$SCRIPT_DIR/catkin_utils.bash"
+
+    local CATKIN_DIR="$REPO_DIR/catkin_ws"
+
+    create_catkin_workspace $CATKIN_DIR
+
+    build_catkin_workspace $CATKIN_DIR --clean
+
+    # Allow for errors in order not to exit this script
+    set +e
+    set +o pipefail
+    fix_paths_in_install_space $CATKIN_DIR
+    set -e
+    set -o pipefail
 }
 
 install_lanelet2_binary()
