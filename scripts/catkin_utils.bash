@@ -75,14 +75,14 @@ fix_paths_in_install_space()
     NEW_PATH="/"
     find "$INSTALL_PATH" -type f \
            \( -name "*.cmake" -o -name "*.pc" -o -name "*.sh" -o -name _setup_util.py \) \
-           -print0 | xargs -0 sed --quiet --in-place "s|$INSTALL_PATH|$NEW_PATH|g"
+           -print0 | xargs -0 sed --in-place "s|$INSTALL_PATH|$NEW_PATH|g"
 
     DEVEL_PATH="$CATKIN_DIR/devel/"
     NEW_PATH="/"
     echo "2. Replacing $DEVEL_PATH in SOURCES.txt with /..."
     find "$INSTALL_PATH" -type f \
            -name SOURCES.txt \
-           -print0 | xargs -0 sed --quiet --in-place "s|$DEVEL_PATH|$NEW_PATH|g"
+           -print0 | xargs -0 sed --in-place "s|$DEVEL_PATH|$NEW_PATH|g"
 
      echo ""
      echo "Successfully fixed paths in the install space ${INSTALL_PATH}"
