@@ -1,0 +1,9 @@
+behaviortree drive_tree:
+    ?
+        ->
+            condition c_redlight ( traffic_light_red( threshold=40 ) )
+            maneuver m_stop_redlight ( MStopConfig( type=3 ) )
+        ->
+            condition c_busy_lane( lane_occupied() )
+            maneuver m_follow_lead ( MFollowConfig() )
+        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(14.0,10,6)) )

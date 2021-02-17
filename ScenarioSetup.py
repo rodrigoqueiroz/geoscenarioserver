@@ -149,7 +149,6 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         pid = int(pid)
         name = pnode.tags['name']
         start_state = [pnode.x,0.0,0.0, pnode.y,0.0,0.0]                    #start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
-        # destination = 
         btype = pnode.tags['btype'].lower() if 'btype' in pnode.tags else ''
         
         

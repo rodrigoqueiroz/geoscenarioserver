@@ -28,7 +28,7 @@ class SimSharedMemory(object):
             log.error("Error creating Shared Memory")
             self.is_connected = False
 
-    def write_server_state(self, tick_count, delta_time, vehicles):
+    def write_server_state(self, tick_count, delta_time, vehicles, pedestrians):
         """ Writes to shared memory pose data for each Vehicle.
             @param vehicles:      dictionary of type <int, Vehicle>
             Shared memory format:
@@ -40,13 +40,19 @@ class SimSharedMemory(object):
             return
 
         # write tick count and deltatime
-        write_str = "{} {} {}\n".format(tick_count, delta_time, len(vehicles))
+        write_str = "{} {} {} {}\n".format(tick_count, delta_time, len(vehicles), len(pedestrians))
         # write vehicle states
         for svid in vehicles:
             vid, remote, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
                 vid, remote, position[0], position[1], position[2],
                 yaw, velocity[0], velocity[1], steering_angle)
+
+        for spid in pedestrians:
+            pid, ptype, position, velocity, angle = pedestrians[spid].get_sim_state()
+            write_str += "{} {} {} {} {} {} {} {}\n".format(
+                pid, ptype, position[0], position[1], position[2],
+                velocity[0], velocity[1], angle)
 
         # sysv_ipc.BusyError needs to be caught
         try:
@@ -58,14 +64,16 @@ class SimSharedMemory(object):
             return
         # log.info("Shared Memory write\n{}".format(write_str))
 
-    def read_client_state(self, nvehicles):
-        # header is [tick_count delta_time, n_vehicles]
+    def read_client_state(self, nvehicles, npedestrians):
+        # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
         header = None
         vstates = {}
+        pstates = {}
         disabled_vehicles = []
+        disabled_pedestrians = []
 
         if not self.is_connected or nvehicles == 0:
-            return header, vstates, disabled_vehicles
+            return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
         # Read client shared memory
         try:
@@ -76,10 +84,10 @@ class SimSharedMemory(object):
             self.cs_sem.release()
         except sysv_ipc.ExistentialError:
             self.is_connected = False
-            return header, vstates, disabled_vehicles
+            return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
         except sysv_ipc.BusyError:
             log.warn("client state semaphore locked...")
-            return header, vstates, disabled_vehicles
+            return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
         # Parse client data
         data_str = data.decode("utf-8")
@@ -88,12 +96,13 @@ class SimSharedMemory(object):
         if len(data_arr) == 0 or int.from_bytes(data, byteorder='big') == 0:
             # log.info("Garbage memory")
             # memory is garbage
-            return header, vstates, disabled_vehicles
+            return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
         try:
             header_str = data_arr[0].split(' ')
-            header = [int(header_str[0]), float(header_str[1]), int(header_str[2])]
+            header = [int(header_str[0]), float(header_str[1]), int(header_str[2]), int(header_str[3])]
             nclient_vehicles = header[2]
+            nclient_pedestrians = header[3]
 
             # size = 4
             # if (len(data_arr) < size):
@@ -121,13 +130,34 @@ class SimSharedMemory(object):
                     nvehicles
                 ))
                 log.warn(data_str)
+
+            if nclient_pedestrians == npedestrians:
+                for ri in range(nvehicles + 1, nvehicles + npedestrians + 1):
+                    pid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
+                    ps = PedestrianState()
+                    pid = int(pid)
+                    ps.x = float(x) / CLIENT_METER_UNIT
+                    ps.y = -float(y) / CLIENT_METER_UNIT
+                    ps.z = float(z) / CLIENT_METER_UNIT
+                    ps.x_vel = float(x_vel) / CLIENT_METER_UNIT
+                    ps.y_vel = -float(y_vel) / CLIENT_METER_UNIT
+                    pstates[pid] = ps
+                    if not int(is_active):
+                        disabled_pedestrians.append(pid)
+            else:
+                log.warn("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(
+                    nclient_pedestrians,
+                    npedestrians
+                ))
+                log.warn(data_str)
+
         except Exception:
             # garbage memory
             pass
 
         # log.info("VSTATES")
         # log.info(vstates)
-        return header, vstates, disabled_vehicles
+        return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
     def __del__(self):
         self.is_connected = False

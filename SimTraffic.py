@@ -61,6 +61,8 @@ class SimTraffic(object):
 
     def add_pedestrian(self, p:Pedestrian):
         self.pedestrians[p.id] = p
+        p.sim_traffic = self
+        p.sim_config = self.sim_config
 
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
@@ -93,7 +95,7 @@ class SimTraffic(object):
         #Read Client
         if (self.sim_client_shm):
             new_client_state = False
-            header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
+            header, vstates, pstates, disabled_vehicles, disabled_pedestrians = self.sim_client_shm.read_client_state(nv)
             if header is not None:
                 client_tick_count, client_delta_time, n_vehicles = header
                 if self.sim_client_tick_count < client_tick_count:
@@ -194,7 +196,7 @@ class SimTraffic(object):
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
-            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles)
+            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrian)
 
 
 

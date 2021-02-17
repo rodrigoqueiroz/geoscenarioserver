@@ -13,6 +13,7 @@ from Actor import *
 from shm.SimSharedMemory import *
 from util.Utils import kalman
 from util.Transformations import normalize
+from SimTraffic import *
 
 
 # Base class for Pedestrians
@@ -44,7 +45,7 @@ class Pedestrian(Actor):
         z = 0.0
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
-        return self.id, type, position, velocity, self.state.angle
+        return self.id, self.type, position, velocity, self.state.angle
 
 
 class TP(Pedestrian):
@@ -77,9 +78,13 @@ class SP(Pedestrian):
         super().__init__(id, name, start_state)
         self.type = Pedestrian.SP_TYPE
         self.destination = np.asarray(destination)
-        self.desired_speed = random.uniform(0.8,1.5)
+        #self.desired_speed = random.uniform(0.8,1.5)
+        self.desired_speed = 1.5
         self.mass = random.uniform(50,80)
+        self.radius = 1
         self.char_time = random.uniform(8,16) # characteristic time
+        self.bodyFactor = 120000
+        self.slideFricFactor = 240000
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
@@ -97,10 +102,23 @@ class SP(Pedestrian):
 
         dt = 1 / TRAFFIC_RATE
 
-        # forces acting on pedestrian
-        f_adapt = (delta_vel * self.mass) / self.char_time
         f_other_ped = np.zeros(2)
         f_walls = np.zeros(2)
+
+        # placeholder until I can read border data from traffic
+        walls = []
+
+        # attracting force towards destination
+        f_adapt = (delta_vel * self.mass) / self.char_time
+
+        # repulsive forces from other pedestrians
+        for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
+            f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped)
+
+        # repulsive forces from walls (borders)
+        for wall in walls:
+            f_walls += self.wall_interaction()
+        
 
         f_sum = f_adapt + f_other_ped + f_walls
 
@@ -110,4 +128,28 @@ class SP(Pedestrian):
 
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
+
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A=4.5, gamma=0.35, n=2.0, n_prime=3.0, lambda_w=2.0):
+        other_pos = np.array([other_ped.state.x, other_ped.state.y])
+        other_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
+
+        eij = normalize(other_pos - curr_pos)
+        Dij = lambda_w * (curr_vel - other_vel) + eij
+        tij = normalize(Dij)
+        nij = np.array([-tij[1], tij[0]])
+
+        dij = np.linalg.norm(curr_pos - other_pos)
+        dot_product = max(min(np.dot(tij, eij), 1.0), -1.0) # stay within [-1,1] domain
+        theta = np.arccos(dot_product)
+
+        B = gamma * np.linalg.norm(Dij)
+        
+        fij = -A*np.exp(-dij/B) * (np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
+
+        return fij
+
+    def wall_interaction(self):
+        wij = np.zeros(2)
+
+        return wij
 
