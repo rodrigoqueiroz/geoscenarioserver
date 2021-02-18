@@ -610,7 +610,7 @@ class Dashboard(object):
                             'y', 'y_vel', 'y_acc',
                             's', 's_vel', 's_acc',
                             'd', 'd_vel', 'd_acc',
-                            'angle')
+                            'yaw')
         tab.heading("#0", text='id', anchor='w')
         tab.column("#0", anchor="w" , width=100)
         for col in tab['columns']:

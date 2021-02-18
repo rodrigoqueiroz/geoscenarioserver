@@ -13,757 +13,757 @@
     <tag k='name' v='origin' />
   </node>
   <node id='-2603486' visible='true' lat='43.47818790254' lon='-80.52007256807'>
-    <tag k='angle' v='5.318' />
+    <tag k='yaw' v='5.318' />
     <tag k='speed' v='37.5678' />
     <tag k='time' v='9.843167' />
   </node>
   <node id='-2603487' visible='true' lat='43.478185281' lon='-80.52007011583'>
-    <tag k='angle' v='5.3181' />
+    <tag k='yaw' v='5.3181' />
     <tag k='speed' v='37.5696' />
     <tag k='time' v='9.876533' />
   </node>
   <node id='-2603488' visible='true' lat='43.47818265945' lon='-80.52006766358'>
-    <tag k='angle' v='5.3182' />
+    <tag k='yaw' v='5.3182' />
     <tag k='speed' v='37.5729' />
     <tag k='time' v='9.9099' />
   </node>
   <node id='-2603489' visible='true' lat='43.47818012795' lon='-80.52006521062'>
-    <tag k='angle' v='5.3182' />
+    <tag k='yaw' v='5.3182' />
     <tag k='speed' v='37.5784' />
     <tag k='time' v='9.943267' />
   </node>
   <node id='-2603490' visible='true' lat='43.4781775064' lon='-80.52006275838'>
-    <tag k='angle' v='5.3183' />
+    <tag k='yaw' v='5.3183' />
     <tag k='speed' v='37.5869' />
     <tag k='time' v='9.976633' />
   </node>
   <node id='-2603491' visible='true' lat='43.47817488538' lon='-80.52006042978'>
-    <tag k='angle' v='5.3183' />
+    <tag k='yaw' v='5.3183' />
     <tag k='speed' v='37.5981' />
     <tag k='time' v='10.01' />
   </node>
   <node id='-2603492' visible='true' lat='43.47817235387' lon='-80.52005797682'>
-    <tag k='angle' v='5.3184' />
+    <tag k='yaw' v='5.3184' />
     <tag k='speed' v='37.6111' />
     <tag k='time' v='10.043367' />
   </node>
   <node id='-2603493' visible='true' lat='43.47816973233' lon='-80.52005552457'>
-    <tag k='angle' v='5.3185' />
+    <tag k='yaw' v='5.3185' />
     <tag k='speed' v='37.6258' />
     <tag k='time' v='10.076733' />
   </node>
   <node id='-2603494' visible='true' lat='43.47816720082' lon='-80.52005307162'>
-    <tag k='angle' v='5.3187' />
+    <tag k='yaw' v='5.3187' />
     <tag k='speed' v='37.6426' />
     <tag k='time' v='10.1101' />
   </node>
   <node id='-2603495' visible='true' lat='43.47816457928' lon='-80.52005061937'>
-    <tag k='angle' v='5.3188' />
+    <tag k='yaw' v='5.3188' />
     <tag k='speed' v='37.6621' />
     <tag k='time' v='10.143467' />
   </node>
   <node id='-2603496' visible='true' lat='43.47816195825' lon='-80.52004829077'>
-    <tag k='angle' v='5.3189' />
+    <tag k='yaw' v='5.3189' />
     <tag k='speed' v='37.6843' />
     <tag k='time' v='10.176833' />
   </node>
   <node id='-2603497' visible='true' lat='43.47815942675' lon='-80.52004583782'>
-    <tag k='angle' v='5.3191' />
+    <tag k='yaw' v='5.3191' />
     <tag k='speed' v='37.7087' />
     <tag k='time' v='10.2102' />
   </node>
   <node id='-2603498' visible='true' lat='43.4781568052' lon='-80.52004338557'>
-    <tag k='angle' v='5.3193' />
+    <tag k='yaw' v='5.3193' />
     <tag k='speed' v='37.7348' />
     <tag k='time' v='10.243567' />
   </node>
   <node id='-2603499' visible='true' lat='43.4781542737' lon='-80.52004093262'>
-    <tag k='angle' v='5.3195' />
+    <tag k='yaw' v='5.3195' />
     <tag k='speed' v='37.7624' />
     <tag k='time' v='10.276933' />
   </node>
   <node id='-2603500' visible='true' lat='43.47815165215' lon='-80.52003848037'>
-    <tag k='angle' v='5.3197' />
+    <tag k='yaw' v='5.3197' />
     <tag k='speed' v='37.7911' />
     <tag k='time' v='10.3103' />
   </node>
   <node id='-2603501' visible='true' lat='43.47814912065' lon='-80.52003602742'>
-    <tag k='angle' v='5.3199' />
+    <tag k='yaw' v='5.3199' />
     <tag k='speed' v='37.8211' />
     <tag k='time' v='10.343667' />
   </node>
   <node id='-2603502' visible='true' lat='43.47814649962' lon='-80.52003369882'>
-    <tag k='angle' v='5.3201' />
+    <tag k='yaw' v='5.3201' />
     <tag k='speed' v='37.8575' />
     <tag k='time' v='10.377033' />
   </node>
   <node id='-2603503' visible='true' lat='43.47814387807' lon='-80.52003124658'>
-    <tag k='angle' v='5.3204' />
+    <tag k='yaw' v='5.3204' />
     <tag k='speed' v='37.8967' />
     <tag k='time' v='10.4104' />
   </node>
   <node id='-2603504' visible='true' lat='43.47814134657' lon='-80.52002879362'>
-    <tag k='angle' v='5.3206' />
+    <tag k='yaw' v='5.3206' />
     <tag k='speed' v='37.9383' />
     <tag k='time' v='10.443767' />
   </node>
   <node id='-2603505' visible='true' lat='43.47813872502' lon='-80.52002634138'>
-    <tag k='angle' v='5.3209' />
+    <tag k='yaw' v='5.3209' />
     <tag k='speed' v='37.9822' />
     <tag k='time' v='10.477133' />
   </node>
   <node id='-2603506' visible='true' lat='43.47813610348' lon='-80.52002388914'>
-    <tag k='angle' v='5.3212' />
+    <tag k='yaw' v='5.3212' />
     <tag k='speed' v='38.029' />
     <tag k='time' v='10.5105' />
   </node>
   <node id='-2603507' visible='true' lat='43.47813357197' lon='-80.52002143618'>
-    <tag k='angle' v='5.3215' />
+    <tag k='yaw' v='5.3215' />
     <tag k='speed' v='38.0796' />
     <tag k='time' v='10.543867' />
   </node>
   <node id='-2603508' visible='true' lat='43.47813095042' lon='-80.52001898394'>
-    <tag k='angle' v='5.3218' />
+    <tag k='yaw' v='5.3218' />
     <tag k='speed' v='38.1341' />
     <tag k='time' v='10.577233' />
   </node>
   <node id='-2603509' visible='true' lat='43.47812832836' lon='-80.52001640805'>
-    <tag k='angle' v='5.3221' />
+    <tag k='yaw' v='5.3221' />
     <tag k='speed' v='38.191' />
     <tag k='time' v='10.6106' />
   </node>
   <node id='-2603510' visible='true' lat='43.47812570681' lon='-80.52001395581'>
-    <tag k='angle' v='5.3225' />
+    <tag k='yaw' v='5.3225' />
     <tag k='speed' v='38.2493' />
     <tag k='time' v='10.643967' />
   </node>
   <node id='-2603511' visible='true' lat='43.47812308527' lon='-80.52001150357'>
-    <tag k='angle' v='5.3228' />
+    <tag k='yaw' v='5.3228' />
     <tag k='speed' v='38.308' />
     <tag k='time' v='10.677333' />
   </node>
   <node id='-2603512' visible='true' lat='43.47812046372' lon='-80.52000905133'>
-    <tag k='angle' v='5.3231' />
+    <tag k='yaw' v='5.3231' />
     <tag k='speed' v='38.3676' />
     <tag k='time' v='10.7107' />
   </node>
   <node id='-2603513' visible='true' lat='43.47811784166' lon='-80.52000647544'>
-    <tag k='angle' v='5.3234' />
+    <tag k='yaw' v='5.3234' />
     <tag k='speed' v='38.4284' />
     <tag k='time' v='10.744067' />
   </node>
   <node id='-2603514' visible='true' lat='43.47811522011' lon='-80.5200040232'>
-    <tag k='angle' v='5.3237' />
+    <tag k='yaw' v='5.3237' />
     <tag k='speed' v='38.4895' />
     <tag k='time' v='10.777433' />
   </node>
   <node id='-2603515' visible='true' lat='43.47811250801' lon='-80.52000144803'>
-    <tag k='angle' v='5.3239' />
+    <tag k='yaw' v='5.3239' />
     <tag k='speed' v='38.5498' />
     <tag k='time' v='10.8108' />
   </node>
   <node id='-2603516' visible='true' lat='43.47810988646' lon='-80.51999899579'>
-    <tag k='angle' v='5.3242' />
+    <tag k='yaw' v='5.3242' />
     <tag k='speed' v='38.6083' />
     <tag k='time' v='10.844167' />
   </node>
   <node id='-2603517' visible='true' lat='43.47810726439' lon='-80.5199964199'>
-    <tag k='angle' v='5.3244' />
+    <tag k='yaw' v='5.3244' />
     <tag k='speed' v='38.6656' />
     <tag k='time' v='10.877533' />
   </node>
   <node id='-2603518' visible='true' lat='43.47810455229' lon='-80.51999384473'>
-    <tag k='angle' v='5.3246' />
+    <tag k='yaw' v='5.3246' />
     <tag k='speed' v='38.7218' />
     <tag k='time' v='10.9109' />
   </node>
   <node id='-2603519' visible='true' lat='43.47810193022' lon='-80.51999126885'>
-    <tag k='angle' v='5.3247' />
+    <tag k='yaw' v='5.3247' />
     <tag k='speed' v='38.7762' />
     <tag k='time' v='10.944267' />
   </node>
   <node id='-2603520' visible='true' lat='43.47809921864' lon='-80.51998881732'>
-    <tag k='angle' v='5.3249' />
+    <tag k='yaw' v='5.3249' />
     <tag k='speed' v='38.8276' />
     <tag k='time' v='10.977633' />
   </node>
   <node id='-2603521' visible='true' lat='43.47809650653' lon='-80.51998624215'>
-    <tag k='angle' v='5.325' />
+    <tag k='yaw' v='5.325' />
     <tag k='speed' v='38.875' />
     <tag k='time' v='11.011' />
   </node>
   <node id='-2603522' visible='true' lat='43.47809388446' lon='-80.51998366626'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='38.9188' />
     <tag k='time' v='11.044367' />
   </node>
   <node id='-2603523' visible='true' lat='43.47809117236' lon='-80.51998109109'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='38.9592' />
     <tag k='time' v='11.077733' />
   </node>
   <node id='-2603524' visible='true' lat='43.47808846025' lon='-80.51997851592'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='38.996' />
     <tag k='time' v='11.1111' />
   </node>
   <node id='-2603525' visible='true' lat='43.47808574815' lon='-80.51997594075'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='39.0283' />
     <tag k='time' v='11.144467' />
   </node>
   <node id='-2603526' visible='true' lat='43.47808312608' lon='-80.51997336487'>
-    <tag k='angle' v='5.325' />
+    <tag k='yaw' v='5.325' />
     <tag k='speed' v='39.055' />
     <tag k='time' v='11.177833' />
   </node>
   <node id='-2603527' visible='true' lat='43.47808041398' lon='-80.5199707897'>
-    <tag k='angle' v='5.3249' />
+    <tag k='yaw' v='5.3249' />
     <tag k='speed' v='39.076' />
     <tag k='time' v='11.2112' />
   </node>
   <node id='-2603528' visible='true' lat='43.47807770187' lon='-80.51996821453'>
-    <tag k='angle' v='5.3248' />
+    <tag k='yaw' v='5.3248' />
     <tag k='speed' v='39.0916' />
     <tag k='time' v='11.244567' />
   </node>
   <node id='-2603529' visible='true' lat='43.47807498976' lon='-80.51996563936'>
-    <tag k='angle' v='5.3246' />
+    <tag k='yaw' v='5.3246' />
     <tag k='speed' v='39.1026' />
     <tag k='time' v='11.277933' />
   </node>
   <node id='-2603530' visible='true' lat='43.47807227766' lon='-80.51996306419'>
-    <tag k='angle' v='5.3244' />
+    <tag k='yaw' v='5.3244' />
     <tag k='speed' v='39.1094' />
     <tag k='time' v='11.3113' />
   </node>
   <node id='-2603531' visible='true' lat='43.47806956555' lon='-80.51996048902'>
-    <tag k='angle' v='5.3241' />
+    <tag k='yaw' v='5.3241' />
     <tag k='speed' v='39.1121' />
     <tag k='time' v='11.344667' />
   </node>
   <node id='-2603532' visible='true' lat='43.47806685344' lon='-80.51995791385'>
-    <tag k='angle' v='5.3239' />
+    <tag k='yaw' v='5.3239' />
     <tag k='speed' v='39.1104' />
     <tag k='time' v='11.378033' />
   </node>
   <node id='-2603533' visible='true' lat='43.4780642319' lon='-80.51995546161'>
-    <tag k='angle' v='5.3235' />
+    <tag k='yaw' v='5.3235' />
     <tag k='speed' v='39.104' />
     <tag k='time' v='11.4114' />
   </node>
   <node id='-2603534' visible='true' lat='43.47806151979' lon='-80.51995288644'>
-    <tag k='angle' v='5.3232' />
+    <tag k='yaw' v='5.3232' />
     <tag k='speed' v='39.0938' />
     <tag k='time' v='11.444767' />
   </node>
   <node id='-2603535' visible='true' lat='43.47805880768' lon='-80.51995031128'>
-    <tag k='angle' v='5.3228' />
+    <tag k='yaw' v='5.3228' />
     <tag k='speed' v='39.081' />
     <tag k='time' v='11.478133' />
   </node>
   <node id='-2603536' visible='true' lat='43.47805609558' lon='-80.51994773611'>
-    <tag k='angle' v='5.3223' />
+    <tag k='yaw' v='5.3223' />
     <tag k='speed' v='39.0664' />
     <tag k='time' v='11.5115' />
   </node>
   <node id='-2603537' visible='true' lat='43.47805338347' lon='-80.51994516094'>
-    <tag k='angle' v='5.3219' />
+    <tag k='yaw' v='5.3219' />
     <tag k='speed' v='39.0496' />
     <tag k='time' v='11.544867' />
   </node>
   <node id='-2603538' visible='true' lat='43.4780507614' lon='-80.51994258506'>
-    <tag k='angle' v='5.3214' />
+    <tag k='yaw' v='5.3214' />
     <tag k='speed' v='39.0304' />
     <tag k='time' v='11.578233' />
   </node>
   <node id='-2603539' visible='true' lat='43.47804804982' lon='-80.51994013354'>
-    <tag k='angle' v='5.3209' />
+    <tag k='yaw' v='5.3209' />
     <tag k='speed' v='39.0093' />
     <tag k='time' v='11.6116' />
   </node>
   <node id='-2603540' visible='true' lat='43.47804533771' lon='-80.51993755837'>
-    <tag k='angle' v='5.3204' />
+    <tag k='yaw' v='5.3204' />
     <tag k='speed' v='38.9876' />
     <tag k='time' v='11.644967' />
   </node>
   <node id='-2603541' visible='true' lat='43.4780426256' lon='-80.5199349832'>
-    <tag k='angle' v='5.3198' />
+    <tag k='yaw' v='5.3198' />
     <tag k='speed' v='38.9661' />
     <tag k='time' v='11.678333' />
   </node>
   <node id='-2603542' visible='true' lat='43.47804000405' lon='-80.51993253097'>
-    <tag k='angle' v='5.3193' />
+    <tag k='yaw' v='5.3193' />
     <tag k='speed' v='38.9445' />
     <tag k='time' v='11.7117' />
   </node>
   <node id='-2603543' visible='true' lat='43.47803729195' lon='-80.5199299558'>
-    <tag k='angle' v='5.3187' />
+    <tag k='yaw' v='5.3187' />
     <tag k='speed' v='38.9223' />
     <tag k='time' v='11.745067' />
   </node>
   <node id='-2603544' visible='true' lat='43.4780346704' lon='-80.51992750357'>
-    <tag k='angle' v='5.3181' />
+    <tag k='yaw' v='5.3181' />
     <tag k='speed' v='38.9004' />
     <tag k='time' v='11.778433' />
   </node>
   <node id='-2603545' visible='true' lat='43.47803195829' lon='-80.5199249284'>
-    <tag k='angle' v='5.3176' />
+    <tag k='yaw' v='5.3176' />
     <tag k='speed' v='38.8799' />
     <tag k='time' v='11.8118' />
   </node>
   <node id='-2603546' visible='true' lat='43.47802933674' lon='-80.51992247617'>
-    <tag k='angle' v='5.317' />
+    <tag k='yaw' v='5.317' />
     <tag k='speed' v='38.8616' />
     <tag k='time' v='11.845167' />
   </node>
   <node id='-2603547' visible='true' lat='43.47802662464' lon='-80.519919901'>
-    <tag k='angle' v='5.3164' />
+    <tag k='yaw' v='5.3164' />
     <tag k='speed' v='38.8452' />
     <tag k='time' v='11.878533' />
   </node>
   <node id='-2603548' visible='true' lat='43.47802400309' lon='-80.51991744877'>
-    <tag k='angle' v='5.3158' />
+    <tag k='yaw' v='5.3158' />
     <tag k='speed' v='38.8305' />
     <tag k='time' v='11.9119' />
   </node>
   <node id='-2603549' visible='true' lat='43.4780212915' lon='-80.51991499725'>
-    <tag k='angle' v='5.3152' />
+    <tag k='yaw' v='5.3152' />
     <tag k='speed' v='38.8178' />
     <tag k='time' v='11.945267' />
   </node>
   <node id='-2603550' visible='true' lat='43.47801866995' lon='-80.51991254502'>
-    <tag k='angle' v='5.3147' />
+    <tag k='yaw' v='5.3147' />
     <tag k='speed' v='38.8084' />
     <tag k='time' v='11.978633' />
   </node>
   <node id='-2603551' visible='true' lat='43.47801595785' lon='-80.51990996985'>
-    <tag k='angle' v='5.3141' />
+    <tag k='yaw' v='5.3141' />
     <tag k='speed' v='38.803' />
     <tag k='time' v='12.012' />
   </node>
   <node id='-2603552' visible='true' lat='43.4780133363' lon='-80.51990751762'>
-    <tag k='angle' v='5.3135' />
+    <tag k='yaw' v='5.3135' />
     <tag k='speed' v='38.8018' />
     <tag k='time' v='12.045367' />
   </node>
   <node id='-2603553' visible='true' lat='43.47801062471' lon='-80.5199050661'>
-    <tag k='angle' v='5.313' />
+    <tag k='yaw' v='5.313' />
     <tag k='speed' v='38.8043' />
     <tag k='time' v='12.078733' />
   </node>
   <node id='-2603554' visible='true' lat='43.47800800316' lon='-80.51990261387'>
-    <tag k='angle' v='5.3124' />
+    <tag k='yaw' v='5.3124' />
     <tag k='speed' v='38.8104' />
     <tag k='time' v='12.1121' />
   </node>
   <node id='-2603555' visible='true' lat='43.47800529105' lon='-80.5199000387'>
-    <tag k='angle' v='5.3119' />
+    <tag k='yaw' v='5.3119' />
     <tag k='speed' v='38.8203' />
     <tag k='time' v='12.145467' />
   </node>
   <node id='-2603556' visible='true' lat='43.4780026695' lon='-80.51989758647'>
-    <tag k='angle' v='5.3114' />
+    <tag k='yaw' v='5.3114' />
     <tag k='speed' v='38.8346' />
     <tag k='time' v='12.178833' />
   </node>
   <node id='-2603557' visible='true' lat='43.47799995792' lon='-80.51989513495'>
-    <tag k='angle' v='5.3109' />
+    <tag k='yaw' v='5.3109' />
     <tag k='speed' v='38.8536' />
     <tag k='time' v='12.2122' />
   </node>
   <node id='-2603558' visible='true' lat='43.47799733637' lon='-80.51989268272'>
-    <tag k='angle' v='5.3104' />
+    <tag k='yaw' v='5.3104' />
     <tag k='speed' v='38.8773' />
     <tag k='time' v='12.245567' />
   </node>
   <node id='-2603559' visible='true' lat='43.47799462478' lon='-80.51989023121'>
-    <tag k='angle' v='5.3099' />
+    <tag k='yaw' v='5.3099' />
     <tag k='speed' v='38.9047' />
     <tag k='time' v='12.278933' />
   </node>
   <node id='-2603560' visible='true' lat='43.47799191319' lon='-80.51988777969'>
-    <tag k='angle' v='5.3094' />
+    <tag k='yaw' v='5.3094' />
     <tag k='speed' v='38.9353' />
     <tag k='time' v='12.3123' />
   </node>
   <node id='-2603561' visible='true' lat='43.47798920108' lon='-80.51988520452'>
-    <tag k='angle' v='5.3089' />
+    <tag k='yaw' v='5.3089' />
     <tag k='speed' v='38.9683' />
     <tag k='time' v='12.345667' />
   </node>
   <node id='-2603562' visible='true' lat='43.47798657953' lon='-80.51988275229'>
-    <tag k='angle' v='5.3085' />
+    <tag k='yaw' v='5.3085' />
     <tag k='speed' v='39.0041' />
     <tag k='time' v='12.379033' />
   </node>
   <node id='-2603563' visible='true' lat='43.47798386794' lon='-80.51988030078'>
-    <tag k='angle' v='5.308' />
+    <tag k='yaw' v='5.308' />
     <tag k='speed' v='39.0429' />
     <tag k='time' v='12.4124' />
   </node>
   <node id='-2603564' visible='true' lat='43.47798115636' lon='-80.51987784926'>
-    <tag k='angle' v='5.3075' />
+    <tag k='yaw' v='5.3075' />
     <tag k='speed' v='39.0843' />
     <tag k='time' v='12.445767' />
   </node>
   <node id='-2603565' visible='true' lat='43.47797844425' lon='-80.5198752741'>
-    <tag k='angle' v='5.3071' />
+    <tag k='yaw' v='5.3071' />
     <tag k='speed' v='39.1274' />
     <tag k='time' v='12.479133' />
   </node>
   <node id='-2603566' visible='true' lat='43.47797573266' lon='-80.51987282258'>
-    <tag k='angle' v='5.3066' />
+    <tag k='yaw' v='5.3066' />
     <tag k='speed' v='39.1714' />
     <tag k='time' v='12.5125' />
   </node>
   <node id='-2603567' visible='true' lat='43.47797302107' lon='-80.51987037107'>
-    <tag k='angle' v='5.3062' />
+    <tag k='yaw' v='5.3062' />
     <tag k='speed' v='39.2165' />
     <tag k='time' v='12.545867' />
   </node>
   <node id='-2603568' visible='true' lat='43.47797030948' lon='-80.51986791955'>
-    <tag k='angle' v='5.3058' />
+    <tag k='yaw' v='5.3058' />
     <tag k='speed' v='39.2631' />
     <tag k='time' v='12.579233' />
   </node>
   <node id='-2603569' visible='true' lat='43.47796759737' lon='-80.51986534439'>
-    <tag k='angle' v='5.3053' />
+    <tag k='yaw' v='5.3053' />
     <tag k='speed' v='39.3107' />
     <tag k='time' v='12.6126' />
   </node>
   <node id='-2603570' visible='true' lat='43.47796479574' lon='-80.51986289359'>
-    <tag k='angle' v='5.3049' />
+    <tag k='yaw' v='5.3049' />
     <tag k='speed' v='39.3585' />
     <tag k='time' v='12.645967' />
   </node>
   <node id='-2603571' visible='true' lat='43.47796208363' lon='-80.51986031843'>
-    <tag k='angle' v='5.3044' />
+    <tag k='yaw' v='5.3044' />
     <tag k='speed' v='39.4057' />
     <tag k='time' v='12.679333' />
   </node>
   <node id='-2603572' visible='true' lat='43.47795937204' lon='-80.51985786691'>
-    <tag k='angle' v='5.3039' />
+    <tag k='yaw' v='5.3039' />
     <tag k='speed' v='39.4525' />
     <tag k='time' v='12.7127' />
   </node>
   <node id='-2603573' visible='true' lat='43.47795657041' lon='-80.51985541611'>
-    <tag k='angle' v='5.3035' />
+    <tag k='yaw' v='5.3035' />
     <tag k='speed' v='39.4993' />
     <tag k='time' v='12.746067' />
   </node>
   <node id='-2603574' visible='true' lat='43.4779538583' lon='-80.51985284095'>
-    <tag k='angle' v='5.303' />
+    <tag k='yaw' v='5.303' />
     <tag k='speed' v='39.5457' />
     <tag k='time' v='12.779433' />
   </node>
   <node id='-2603575' visible='true' lat='43.47795105668' lon='-80.51985039015'>
-    <tag k='angle' v='5.3025' />
+    <tag k='yaw' v='5.3025' />
     <tag k='speed' v='39.5906' />
     <tag k='time' v='12.8128' />
   </node>
   <node id='-2603576' visible='true' lat='43.47794834457' lon='-80.51984781499'>
-    <tag k='angle' v='5.3021' />
+    <tag k='yaw' v='5.3021' />
     <tag k='speed' v='39.6333' />
     <tag k='time' v='12.846167' />
   </node>
   <node id='-2603577' visible='true' lat='43.47794554294' lon='-80.51984536419'>
-    <tag k='angle' v='5.3016' />
+    <tag k='yaw' v='5.3016' />
     <tag k='speed' v='39.6734' />
     <tag k='time' v='12.879533' />
   </node>
   <node id='-2603578' visible='true' lat='43.47794274079' lon='-80.51984278974'>
-    <tag k='angle' v='5.3011' />
+    <tag k='yaw' v='5.3011' />
     <tag k='speed' v='39.7117' />
     <tag k='time' v='12.9129' />
   </node>
   <node id='-2603579' visible='true' lat='43.47793993916' lon='-80.51984033894'>
-    <tag k='angle' v='5.3006' />
+    <tag k='yaw' v='5.3006' />
     <tag k='speed' v='39.749' />
     <tag k='time' v='12.946267' />
   </node>
   <node id='-2603580' visible='true' lat='43.47793722705' lon='-80.51983776378'>
-    <tag k='angle' v='5.3' />
+    <tag k='yaw' v='5.3' />
     <tag k='speed' v='39.7854' />
     <tag k='time' v='12.979633' />
   </node>
   <node id='-2603581' visible='true' lat='43.4779344249' lon='-80.51983518934'>
-    <tag k='angle' v='5.2995' />
+    <tag k='yaw' v='5.2995' />
     <tag k='speed' v='39.8206' />
     <tag k='time' v='13.013' />
   </node>
   <node id='-2603582' visible='true' lat='43.47793162327' lon='-80.51983273854'>
-    <tag k='angle' v='5.2989' />
+    <tag k='yaw' v='5.2989' />
     <tag k='speed' v='39.8537' />
     <tag k='time' v='13.046367' />
   </node>
   <node id='-2603583' visible='true' lat='43.47792882112' lon='-80.5198301641'>
-    <tag k='angle' v='5.2984' />
+    <tag k='yaw' v='5.2984' />
     <tag k='speed' v='39.8851' />
     <tag k='time' v='13.079733' />
   </node>
   <node id='-2603584' visible='true' lat='43.47792601949' lon='-80.5198277133'>
-    <tag k='angle' v='5.2978' />
+    <tag k='yaw' v='5.2978' />
     <tag k='speed' v='39.9161' />
     <tag k='time' v='13.1131' />
   </node>
   <node id='-2603585' visible='true' lat='43.47792321734' lon='-80.51982513885'>
-    <tag k='angle' v='5.2972' />
+    <tag k='yaw' v='5.2972' />
     <tag k='speed' v='39.9479' />
     <tag k='time' v='13.146467' />
   </node>
   <node id='-2603586' visible='true' lat='43.47792041571' lon='-80.51982268805'>
-    <tag k='angle' v='5.2967' />
+    <tag k='yaw' v='5.2967' />
     <tag k='speed' v='39.9816' />
     <tag k='time' v='13.179833' />
   </node>
   <node id='-2603587' visible='true' lat='43.47791761356' lon='-80.51982011361'>
-    <tag k='angle' v='5.2961' />
+    <tag k='yaw' v='5.2961' />
     <tag k='speed' v='40.0172' />
     <tag k='time' v='13.2132' />
   </node>
   <node id='-2603588' visible='true' lat='43.47791481193' lon='-80.51981766281'>
-    <tag k='angle' v='5.2955' />
+    <tag k='yaw' v='5.2955' />
     <tag k='speed' v='40.0535' />
     <tag k='time' v='13.246567' />
   </node>
   <node id='-2603589' visible='true' lat='43.4779120103' lon='-80.51981521201'>
-    <tag k='angle' v='5.2949' />
+    <tag k='yaw' v='5.2949' />
     <tag k='speed' v='40.089' />
     <tag k='time' v='13.279933' />
   </node>
   <node id='-2603590' visible='true' lat='43.47790920815' lon='-80.51981263757'>
-    <tag k='angle' v='5.2942' />
+    <tag k='yaw' v='5.2942' />
     <tag k='speed' v='40.1228' />
     <tag k='time' v='13.3133' />
   </node>
   <node id='-2603591' visible='true' lat='43.47790640652' lon='-80.51981018677'>
-    <tag k='angle' v='5.2936' />
+    <tag k='yaw' v='5.2936' />
     <tag k='speed' v='40.1551' />
     <tag k='time' v='13.346667' />
   </node>
   <node id='-2603592' visible='true' lat='43.47790360437' lon='-80.51980761233'>
-    <tag k='angle' v='5.2929' />
+    <tag k='yaw' v='5.2929' />
     <tag k='speed' v='40.1871' />
     <tag k='time' v='13.380033' />
   </node>
   <node id='-2603593' visible='true' lat='43.47790080274' lon='-80.51980516153'>
-    <tag k='angle' v='5.2923' />
+    <tag k='yaw' v='5.2923' />
     <tag k='speed' v='40.2182' />
     <tag k='time' v='13.4134' />
   </node>
   <node id='-2603594' visible='true' lat='43.47789800111' lon='-80.51980271074'>
-    <tag k='angle' v='5.2917' />
+    <tag k='yaw' v='5.2917' />
     <tag k='speed' v='40.2465' />
     <tag k='time' v='13.446767' />
   </node>
   <node id='-2603595' visible='true' lat='43.47789519896' lon='-80.51980013629'>
-    <tag k='angle' v='5.291' />
+    <tag k='yaw' v='5.291' />
     <tag k='speed' v='40.2708' />
     <tag k='time' v='13.480133' />
   </node>
   <node id='-2603596' visible='true' lat='43.47789239732' lon='-80.5197976855'>
-    <tag k='angle' v='5.2905' />
+    <tag k='yaw' v='5.2905' />
     <tag k='speed' v='40.291' />
     <tag k='time' v='13.5135' />
   </node>
   <node id='-2603597' visible='true' lat='43.47788959569' lon='-80.5197952347'>
-    <tag k='angle' v='5.2899' />
+    <tag k='yaw' v='5.2899' />
     <tag k='speed' v='40.3084' />
     <tag k='time' v='13.546867' />
   </node>
   <node id='-2603598' visible='true' lat='43.47788679354' lon='-80.51979266026'>
-    <tag k='angle' v='5.2894' />
+    <tag k='yaw' v='5.2894' />
     <tag k='speed' v='40.3225' />
     <tag k='time' v='13.580233' />
   </node>
   <node id='-2603599' visible='true' lat='43.47788390187' lon='-80.51979021018'>
-    <tag k='angle' v='5.2889' />
+    <tag k='yaw' v='5.2889' />
     <tag k='speed' v='40.3316' />
     <tag k='time' v='13.6136' />
   </node>
   <node id='-2603600' visible='true' lat='43.47788110024' lon='-80.51978775938'>
-    <tag k='angle' v='5.2885' />
+    <tag k='yaw' v='5.2885' />
     <tag k='speed' v='40.3345' />
     <tag k='time' v='13.646967' />
   </node>
   <node id='-2603601' visible='true' lat='43.47787829809' lon='-80.51978518494'>
-    <tag k='angle' v='5.2882' />
+    <tag k='yaw' v='5.2882' />
     <tag k='speed' v='40.3312' />
     <tag k='time' v='13.680333' />
   </node>
   <node id='-2603602' visible='true' lat='43.47787540642' lon='-80.51978273486'>
-    <tag k='angle' v='5.288' />
+    <tag k='yaw' v='5.288' />
     <tag k='speed' v='40.3229' />
     <tag k='time' v='13.7137' />
   </node>
   <node id='-2603603' visible='true' lat='43.47787260479' lon='-80.51978028406'>
-    <tag k='angle' v='5.2878' />
+    <tag k='yaw' v='5.2878' />
     <tag k='speed' v='40.3092' />
     <tag k='time' v='13.747067' />
   </node>
   <node id='-2603604' visible='true' lat='43.4778697126' lon='-80.51977771034'>
-    <tag k='angle' v='5.2878' />
+    <tag k='yaw' v='5.2878' />
     <tag k='speed' v='40.2882' />
     <tag k='time' v='13.780433' />
   </node>
   <node id='-2603605' visible='true' lat='43.47786682093' lon='-80.51977526026'>
-    <tag k='angle' v='5.2878' />
+    <tag k='yaw' v='5.2878' />
     <tag k='speed' v='40.2584' />
     <tag k='time' v='13.8138' />
   </node>
   <node id='-2603606' visible='true' lat='43.47786401877' lon='-80.51977268582'>
-    <tag k='angle' v='5.288' />
+    <tag k='yaw' v='5.288' />
     <tag k='speed' v='40.2204' />
     <tag k='time' v='13.847167' />
   </node>
   <node id='-2603607' visible='true' lat='43.47786112658' lon='-80.51977011209'>
-    <tag k='angle' v='5.2882' />
+    <tag k='yaw' v='5.2882' />
     <tag k='speed' v='40.1762' />
     <tag k='time' v='13.880533' />
   </node>
   <node id='-2603608' visible='true' lat='43.47785823491' lon='-80.51976766201'>
-    <tag k='angle' v='5.2885' />
+    <tag k='yaw' v='5.2885' />
     <tag k='speed' v='40.1249' />
     <tag k='time' v='13.9139' />
   </node>
   <node id='-2603609' visible='true' lat='43.47785534272' lon='-80.51976508828'>
-    <tag k='angle' v='5.2889' />
+    <tag k='yaw' v='5.2889' />
     <tag k='speed' v='40.0629' />
     <tag k='time' v='13.947267' />
   </node>
   <node id='-2603610' visible='true' lat='43.47785254109' lon='-80.51976263749'>
-    <tag k='angle' v='5.2894' />
+    <tag k='yaw' v='5.2894' />
     <tag k='speed' v='39.9862' />
     <tag k='time' v='13.980633' />
   </node>
   <node id='-2603611' visible='true' lat='43.4778496489' lon='-80.51976006377'>
-    <tag k='angle' v='5.29' />
+    <tag k='yaw' v='5.29' />
     <tag k='speed' v='39.8913' />
     <tag k='time' v='14.014' />
   </node>
   <node id='-2603612' visible='true' lat='43.47784684727' lon='-80.51975761297'>
-    <tag k='angle' v='5.2908' />
+    <tag k='yaw' v='5.2908' />
     <tag k='speed' v='39.7776' />
     <tag k='time' v='14.047367' />
   </node>
   <node id='-2603613' visible='true' lat='43.47784395507' lon='-80.51975503925'>
-    <tag k='angle' v='5.2916' />
+    <tag k='yaw' v='5.2916' />
     <tag k='speed' v='39.6491' />
     <tag k='time' v='14.080733' />
   </node>
   <node id='-2603614' visible='true' lat='43.47784115344' lon='-80.51975258846'>
-    <tag k='angle' v='5.2925' />
+    <tag k='yaw' v='5.2925' />
     <tag k='speed' v='39.5096' />
     <tag k='time' v='14.1141' />
   </node>
   <node id='-2603615' visible='true' lat='43.47783835129' lon='-80.51975001402'>
-    <tag k='angle' v='5.2936' />
+    <tag k='yaw' v='5.2936' />
     <tag k='speed' v='39.3621' />
     <tag k='time' v='14.147467' />
   </node>
   <node id='-2603616' visible='true' lat='43.47783554966' lon='-80.51974756323'>
-    <tag k='angle' v='5.2948' />
+    <tag k='yaw' v='5.2948' />
     <tag k='speed' v='39.2063' />
     <tag k='time' v='14.180833' />
   </node>
   <node id='-2603617' visible='true' lat='43.47783274803' lon='-80.51974511244'>
-    <tag k='angle' v='5.2961' />
+    <tag k='yaw' v='5.2961' />
     <tag k='speed' v='39.0385' />
     <tag k='time' v='14.2142' />
   </node>
   <node id='-2603618' visible='true' lat='43.47782994588' lon='-80.519742538'>
-    <tag k='angle' v='5.2976' />
+    <tag k='yaw' v='5.2976' />
     <tag k='speed' v='38.8591' />
     <tag k='time' v='14.247567' />
   </node>
   <node id='-2603619' visible='true' lat='43.47782723428' lon='-80.5197400865'>
-    <tag k='angle' v='5.2991' />
+    <tag k='yaw' v='5.2991' />
     <tag k='speed' v='38.6732' />
     <tag k='time' v='14.280933' />
   </node>
   <node id='-2603620' visible='true' lat='43.47782443265' lon='-80.5197376357'>
-    <tag k='angle' v='5.3008' />
+    <tag k='yaw' v='5.3008' />
     <tag k='speed' v='38.4862' />
     <tag k='time' v='14.3143' />
   </node>
   <node id='-2603621' visible='true' lat='43.47782172106' lon='-80.5197351842'>
-    <tag k='angle' v='5.3025' />
+    <tag k='yaw' v='5.3025' />
     <tag k='speed' v='38.3005' />
     <tag k='time' v='14.347667' />
   </node>
   <node id='-2603622' visible='true' lat='43.47781900947' lon='-80.5197327327'>
-    <tag k='angle' v='5.3044' />
+    <tag k='yaw' v='5.3044' />
     <tag k='speed' v='38.2196' />
     <tag k='time' v='14.381033' />
   </node>
   <node id='-2603623' visible='true' lat='43.47781638792' lon='-80.51973028048'>
-    <tag k='angle' v='5.3063' />
+    <tag k='yaw' v='5.3063' />
     <tag k='speed' v='38.132' />
     <tag k='time' v='14.4144' />
   </node>
   <node id='-2603624' visible='true' lat='43.47781367632' lon='-80.51972782898'>
-    <tag k='angle' v='5.3083' />
+    <tag k='yaw' v='5.3083' />
     <tag k='speed' v='38.0374' />
     <tag k='time' v='14.447767' />
   </node>
   <node id='-2603625' visible='true' lat='43.47781105477' lon='-80.51972537676'>
-    <tag k='angle' v='5.3103' />
+    <tag k='yaw' v='5.3103' />
     <tag k='speed' v='37.937' />
     <tag k='time' v='14.481133' />
   </node>
   <node id='-2603626' visible='true' lat='43.47780852378' lon='-80.51972304748'>
-    <tag k='angle' v='5.3123' />
+    <tag k='yaw' v='5.3123' />
     <tag k='speed' v='37.8322' />
     <tag k='time' v='14.5145' />
   </node>
   <node id='-2603627' visible='true' lat='43.47780590223' lon='-80.51972059526'>
-    <tag k='angle' v='5.315' />
+    <tag k='yaw' v='5.315' />
     <tag k='speed' v='37.7231' />
     <tag k='time' v='14.547867' />
   </node>
   <node id='-2603628' visible='true' lat='43.47780346127' lon='-80.51971826526'>
-    <tag k='angle' v='5.3169' />
+    <tag k='yaw' v='5.3169' />
     <tag k='speed' v='37.6074' />
     <tag k='time' v='14.581233' />
   </node>
   <node id='-2603629' visible='true' lat='43.47780093028' lon='-80.51971593598'>
-    <tag k='angle' v='5.3185' />
+    <tag k='yaw' v='5.3185' />
     <tag k='speed' v='37.4847' />
     <tag k='time' v='14.6146' />
   </node>
   <node id='-2603630' visible='true' lat='43.47779848933' lon='-80.51971360598'>
-    <tag k='angle' v='5.3196' />
+    <tag k='yaw' v='5.3196' />
     <tag k='speed' v='37.3565' />
     <tag k='time' v='14.647967' />
   </node>
   <node id='-2603631' visible='true' lat='43.47779604838' lon='-80.51971127599'>
-    <tag k='angle' v='5.3205' />
+    <tag k='yaw' v='5.3205' />
     <tag k='speed' v='37.2243' />
     <tag k='time' v='14.681333' />
   </node>
   <node id='-2603632' visible='true' lat='43.47779360794' lon='-80.51970906963'>
-    <tag k='angle' v='5.3215' />
+    <tag k='yaw' v='5.3215' />
     <tag k='speed' v='37.088' />
     <tag k='time' v='14.7147' />
   </node>
   <node id='-2603633' visible='true' lat='43.47779125703' lon='-80.51970673893'>
-    <tag k='angle' v='5.3215' />
+    <tag k='yaw' v='5.3215' />
     <tag k='speed' v='36.9451' />
     <tag k='time' v='14.748067' />
   </node>
   <node id='-2603634' visible='true' lat='43.47778881608' lon='-80.51970440893'>
-    <tag k='angle' v='5.3224' />
+    <tag k='yaw' v='5.3224' />
     <tag k='speed' v='36.795' />
     <tag k='time' v='14.781433' />
   </node>
   <node id='-2603635' visible='true' lat='43.47778646568' lon='-80.51970220186'>
-    <tag k='angle' v='5.3232' />
+    <tag k='yaw' v='5.3232' />
     <tag k='speed' v='36.6397' />
     <tag k='time' v='14.8148' />
   </node>
   <node id='-2603636' visible='true' lat='43.47778402473' lon='-80.51969987187'>
-    <tag k='angle' v='5.3239' />
+    <tag k='yaw' v='5.3239' />
     <tag k='speed' v='36.4817' />
     <tag k='time' v='14.848167' />
   </node>
@@ -774,482 +774,482 @@
     <tag k='vid' v='28' />
   </node>
   <node id='-2603638' visible='true' lat='43.47818636823' lon='-80.52007171467'>
-    <tag k='angle' v='5.325' />
+    <tag k='yaw' v='5.325' />
     <tag k='speed' v='63.124' />
     <tag k='time' v='15.849167' />
   </node>
   <node id='-2603639' visible='true' lat='43.47818202865' lon='-80.52006754492'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='63.1006' />
     <tag k='time' v='15.882533' />
   </node>
   <node id='-2603640' visible='true' lat='43.47817768908' lon='-80.52006337518'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='63.0761' />
     <tag k='time' v='15.9159' />
   </node>
   <node id='-2603641' visible='true' lat='43.47817335002' lon='-80.52005932908'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='63.0498' />
     <tag k='time' v='15.949267' />
   </node>
   <node id='-2603642' visible='true' lat='43.47816901045' lon='-80.52005515934'>
-    <tag k='angle' v='5.3251' />
+    <tag k='yaw' v='5.3251' />
     <tag k='speed' v='63.021' />
     <tag k='time' v='15.982633' />
   </node>
   <node id='-2603643' visible='true' lat='43.47816467087' lon='-80.5200509896'>
-    <tag k='angle' v='5.3252' />
+    <tag k='yaw' v='5.3252' />
     <tag k='speed' v='62.9902' />
     <tag k='time' v='16.016' />
   </node>
   <node id='-2603644' visible='true' lat='43.47816033182' lon='-80.5200469435'>
-    <tag k='angle' v='5.3252' />
+    <tag k='yaw' v='5.3252' />
     <tag k='speed' v='62.9579' />
     <tag k='time' v='16.049367' />
   </node>
   <node id='-2603645' visible='true' lat='43.47815599224' lon='-80.52004277376'>
-    <tag k='angle' v='5.3253' />
+    <tag k='yaw' v='5.3253' />
     <tag k='speed' v='62.9244' />
     <tag k='time' v='16.082733' />
   </node>
   <node id='-2603646' visible='true' lat='43.47815165267' lon='-80.52003860402'>
-    <tag k='angle' v='5.3253' />
+    <tag k='yaw' v='5.3253' />
     <tag k='speed' v='62.8891' />
     <tag k='time' v='16.1161' />
   </node>
   <node id='-2603647' visible='true' lat='43.47814731361' lon='-80.52003455792'>
-    <tag k='angle' v='5.3254' />
+    <tag k='yaw' v='5.3254' />
     <tag k='speed' v='62.8514' />
     <tag k='time' v='16.149467' />
   </node>
   <node id='-2603648' visible='true' lat='43.47814297404' lon='-80.52003038819'>
-    <tag k='angle' v='5.3255' />
+    <tag k='yaw' v='5.3255' />
     <tag k='speed' v='62.8113' />
     <tag k='time' v='16.182833' />
   </node>
   <node id='-2603649' visible='true' lat='43.47813863446' lon='-80.52002621845'>
-    <tag k='angle' v='5.3256' />
+    <tag k='yaw' v='5.3256' />
     <tag k='speed' v='62.7694' />
     <tag k='time' v='16.2162' />
   </node>
   <node id='-2603650' visible='true' lat='43.47813438545' lon='-80.52002217164'>
-    <tag k='angle' v='5.3258' />
+    <tag k='yaw' v='5.3258' />
     <tag k='speed' v='62.7261' />
     <tag k='time' v='16.249567' />
   </node>
   <node id='-2603651' visible='true' lat='43.47813004587' lon='-80.5200180019'>
-    <tag k='angle' v='5.3259' />
+    <tag k='yaw' v='5.3259' />
     <tag k='speed' v='62.6813' />
     <tag k='time' v='16.282933' />
   </node>
   <node id='-2603652' visible='true' lat='43.4781257063' lon='-80.52001383217'>
-    <tag k='angle' v='5.3261' />
+    <tag k='yaw' v='5.3261' />
     <tag k='speed' v='62.635' />
     <tag k='time' v='16.3163' />
   </node>
   <node id='-2603653' visible='true' lat='43.47812145728' lon='-80.52000978536'>
-    <tag k='angle' v='5.3262' />
+    <tag k='yaw' v='5.3262' />
     <tag k='speed' v='62.587' />
     <tag k='time' v='16.349667' />
   </node>
   <node id='-2603654' visible='true' lat='43.4781171177' lon='-80.52000561563'>
-    <tag k='angle' v='5.3264' />
+    <tag k='yaw' v='5.3264' />
     <tag k='speed' v='62.5138' />
     <tag k='time' v='16.383033' />
   </node>
   <node id='-2603655' visible='true' lat='43.47811286869' lon='-80.52000156882'>
-    <tag k='angle' v='5.3266' />
+    <tag k='yaw' v='5.3266' />
     <tag k='speed' v='62.4361' />
     <tag k='time' v='16.4164' />
   </node>
   <node id='-2603656' visible='true' lat='43.47810852963' lon='-80.51999752274'>
-    <tag k='angle' v='5.3268' />
+    <tag k='yaw' v='5.3268' />
     <tag k='speed' v='62.3547' />
     <tag k='time' v='16.449767' />
   </node>
   <node id='-2603657' visible='true' lat='43.47810428009' lon='-80.51999335229'>
-    <tag k='angle' v='5.327' />
+    <tag k='yaw' v='5.327' />
     <tag k='speed' v='62.2706' />
     <tag k='time' v='16.483133' />
   </node>
   <node id='-2603658' visible='true' lat='43.47810003107' lon='-80.51998930549'>
-    <tag k='angle' v='5.3272' />
+    <tag k='yaw' v='5.3272' />
     <tag k='speed' v='62.1843' />
     <tag k='time' v='16.5165' />
   </node>
   <node id='-2603659' visible='true' lat='43.4780956915' lon='-80.51998513575'>
-    <tag k='angle' v='5.3274' />
+    <tag k='yaw' v='5.3274' />
     <tag k='speed' v='62.0952' />
     <tag k='time' v='16.549867' />
   </node>
   <node id='-2603660' visible='true' lat='43.47809144248' lon='-80.51998108896'>
-    <tag k='angle' v='5.3276' />
+    <tag k='yaw' v='5.3276' />
     <tag k='speed' v='62.0032' />
     <tag k='time' v='16.583233' />
   </node>
   <node id='-2603661' visible='true' lat='43.47808719346' lon='-80.51997704216'>
-    <tag k='angle' v='5.3278' />
+    <tag k='yaw' v='5.3278' />
     <tag k='speed' v='61.9094' />
     <tag k='time' v='16.6166' />
   </node>
   <node id='-2603662' visible='true' lat='43.47808294444' lon='-80.51997299536'>
-    <tag k='angle' v='5.3281' />
+    <tag k='yaw' v='5.3281' />
     <tag k='speed' v='61.8151' />
     <tag k='time' v='16.649967' />
   </node>
   <node id='-2603663' visible='true' lat='43.47807869543' lon='-80.51996894856'>
-    <tag k='angle' v='5.3283' />
+    <tag k='yaw' v='5.3283' />
     <tag k='speed' v='61.721' />
     <tag k='time' v='16.683333' />
   </node>
   <node id='-2603664' visible='true' lat='43.47807453645' lon='-80.51996490105'>
-    <tag k='angle' v='5.3285' />
+    <tag k='yaw' v='5.3285' />
     <tag k='speed' v='61.6267' />
     <tag k='time' v='16.7167' />
   </node>
   <node id='-2603665' visible='true' lat='43.47807028691' lon='-80.51996073061'>
-    <tag k='angle' v='5.3287' />
+    <tag k='yaw' v='5.3287' />
     <tag k='speed' v='61.5318' />
     <tag k='time' v='16.750067' />
   </node>
   <node id='-2603666' visible='true' lat='43.47806612845' lon='-80.51995680674'>
-    <tag k='angle' v='5.3289' />
+    <tag k='yaw' v='5.3289' />
     <tag k='speed' v='61.4374' />
     <tag k='time' v='16.783433' />
   </node>
   <node id='-2603667' visible='true' lat='43.47806187943' lon='-80.51995275995'>
-    <tag k='angle' v='5.3291' />
+    <tag k='yaw' v='5.3291' />
     <tag k='speed' v='61.3448' />
     <tag k='time' v='16.8168' />
   </node>
   <node id='-2603668' visible='true' lat='43.47805772045' lon='-80.51994871244'>
-    <tag k='angle' v='5.3292' />
+    <tag k='yaw' v='5.3292' />
     <tag k='speed' v='61.2546' />
     <tag k='time' v='16.850167' />
   </node>
   <node id='-2603669' visible='true' lat='43.47805356147' lon='-80.51994466493'>
-    <tag k='angle' v='5.3292' />
+    <tag k='yaw' v='5.3292' />
     <tag k='speed' v='61.1663' />
     <tag k='time' v='16.883533' />
   </node>
   <node id='-2603670' visible='true' lat='43.4780494025' lon='-80.51994061743'>
-    <tag k='angle' v='5.3292' />
+    <tag k='yaw' v='5.3292' />
     <tag k='speed' v='61.0798' />
     <tag k='time' v='16.9169' />
   </node>
   <node id='-2603671' visible='true' lat='43.47804524404' lon='-80.51993669356'>
-    <tag k='angle' v='5.3291' />
+    <tag k='yaw' v='5.3291' />
     <tag k='speed' v='60.996' />
     <tag k='time' v='16.950267' />
   </node>
   <node id='-2603672' visible='true' lat='43.47804108506' lon='-80.51993264606'>
-    <tag k='angle' v='5.329' />
+    <tag k='yaw' v='5.329' />
     <tag k='speed' v='60.9162' />
     <tag k='time' v='16.983633' />
   </node>
   <node id='-2603673' visible='true' lat='43.4780369266' lon='-80.5199287222'>
-    <tag k='angle' v='5.3287' />
+    <tag k='yaw' v='5.3287' />
     <tag k='speed' v='60.8411' />
     <tag k='time' v='17.017' />
   </node>
   <node id='-2603674' visible='true' lat='43.47803276762' lon='-80.51992467469'>
-    <tag k='angle' v='5.3284' />
+    <tag k='yaw' v='5.3284' />
     <tag k='speed' v='60.7701' />
     <tag k='time' v='17.050367' />
   </node>
   <node id='-2603675' visible='true' lat='43.4780286992' lon='-80.51992075012'>
-    <tag k='angle' v='5.328' />
+    <tag k='yaw' v='5.328' />
     <tag k='speed' v='60.7031' />
     <tag k='time' v='17.083733' />
   </node>
   <node id='-2603676' visible='true' lat='43.47802454074' lon='-80.51991682626'>
-    <tag k='angle' v='5.3275' />
+    <tag k='yaw' v='5.3275' />
     <tag k='speed' v='60.6412' />
     <tag k='time' v='17.1171' />
   </node>
   <node id='-2603677' visible='true' lat='43.47802038176' lon='-80.51991277876'>
-    <tag k='angle' v='5.327' />
+    <tag k='yaw' v='5.327' />
     <tag k='speed' v='60.586' />
     <tag k='time' v='17.150467' />
   </node>
   <node id='-2603678' visible='true' lat='43.47801631333' lon='-80.51990885419'>
-    <tag k='angle' v='5.3264' />
+    <tag k='yaw' v='5.3264' />
     <tag k='speed' v='60.5388' />
     <tag k='time' v='17.183833' />
   </node>
   <node id='-2603679' visible='true' lat='43.47801215487' lon='-80.51990493033'>
-    <tag k='angle' v='5.3258' />
+    <tag k='yaw' v='5.3258' />
     <tag k='speed' v='60.4996' />
     <tag k='time' v='17.2172' />
   </node>
   <node id='-2603680' visible='true' lat='43.47800808645' lon='-80.51990100577'>
-    <tag k='angle' v='5.325' />
+    <tag k='yaw' v='5.325' />
     <tag k='speed' v='60.4675' />
     <tag k='time' v='17.250567' />
   </node>
   <node id='-2603681' visible='true' lat='43.47800392799' lon='-80.51989708191'>
-    <tag k='angle' v='5.3242' />
+    <tag k='yaw' v='5.3242' />
     <tag k='speed' v='60.4421' />
     <tag k='time' v='17.283933' />
   </node>
   <node id='-2603682' visible='true' lat='43.47799976953' lon='-80.51989315806'>
-    <tag k='angle' v='5.3234' />
+    <tag k='yaw' v='5.3234' />
     <tag k='speed' v='60.4228' />
     <tag k='time' v='17.3173' />
   </node>
   <node id='-2603683' visible='true' lat='43.47799570111' lon='-80.51988923349'>
-    <tag k='angle' v='5.3224' />
+    <tag k='yaw' v='5.3224' />
     <tag k='speed' v='60.4101' />
     <tag k='time' v='17.350667' />
   </node>
   <node id='-2603684' visible='true' lat='43.47799154265' lon='-80.51988530963'>
-    <tag k='angle' v='5.3214' />
+    <tag k='yaw' v='5.3214' />
     <tag k='speed' v='60.4051' />
     <tag k='time' v='17.384033' />
   </node>
   <node id='-2603685' visible='true' lat='43.47798738418' lon='-80.51988138578'>
-    <tag k='angle' v='5.3204' />
+    <tag k='yaw' v='5.3204' />
     <tag k='speed' v='60.4073' />
     <tag k='time' v='17.4174' />
   </node>
   <node id='-2603686' visible='true' lat='43.47798331628' lon='-80.51987758486'>
-    <tag k='angle' v='5.3192' />
+    <tag k='yaw' v='5.3192' />
     <tag k='speed' v='60.4147' />
     <tag k='time' v='17.450767' />
   </node>
   <node id='-2603687' visible='true' lat='43.47797915782' lon='-80.51987366101'>
-    <tag k='angle' v='5.318' />
+    <tag k='yaw' v='5.318' />
     <tag k='speed' v='60.4251' />
     <tag k='time' v='17.484133' />
   </node>
   <node id='-2603688' visible='true' lat='43.47797499936' lon='-80.51986973716'>
-    <tag k='angle' v='5.3167' />
+    <tag k='yaw' v='5.3167' />
     <tag k='speed' v='60.4376' />
     <tag k='time' v='17.5175' />
   </node>
   <node id='-2603689' visible='true' lat='43.47797084141' lon='-80.51986593695'>
-    <tag k='angle' v='5.3154' />
+    <tag k='yaw' v='5.3154' />
     <tag k='speed' v='60.453' />
     <tag k='time' v='17.550867' />
   </node>
   <node id='-2603690' visible='true' lat='43.47796668295' lon='-80.5198620131'>
-    <tag k='angle' v='5.314' />
+    <tag k='yaw' v='5.314' />
     <tag k='speed' v='60.4716' />
     <tag k='time' v='17.584233' />
   </node>
   <node id='-2603691' visible='true' lat='43.47796252449' lon='-80.51985808925'>
-    <tag k='angle' v='5.3126' />
+    <tag k='yaw' v='5.3126' />
     <tag k='speed' v='60.4917' />
     <tag k='time' v='17.6176' />
   </node>
   <node id='-2603692' visible='true' lat='43.47795836654' lon='-80.51985428904'>
-    <tag k='angle' v='5.3112' />
+    <tag k='yaw' v='5.3112' />
     <tag k='speed' v='60.5108' />
     <tag k='time' v='17.650967' />
   </node>
   <node id='-2603693' visible='true' lat='43.47795420808' lon='-80.5198503652'>
-    <tag k='angle' v='5.3097' />
+    <tag k='yaw' v='5.3097' />
     <tag k='speed' v='60.5278' />
     <tag k='time' v='17.684333' />
   </node>
   <node id='-2603694' visible='true' lat='43.4779499601' lon='-80.5198465657'>
-    <tag k='angle' v='5.3083' />
+    <tag k='yaw' v='5.3083' />
     <tag k='speed' v='60.5436' />
     <tag k='time' v='17.7177' />
   </node>
   <node id='-2603695' visible='true' lat='43.47794580163' lon='-80.51984264186'>
-    <tag k='angle' v='5.3069' />
+    <tag k='yaw' v='5.3069' />
     <tag k='speed' v='60.5585' />
     <tag k='time' v='17.751067' />
   </node>
   <node id='-2603696' visible='true' lat='43.47794155365' lon='-80.51983884237'>
-    <tag k='angle' v='5.3055' />
+    <tag k='yaw' v='5.3055' />
     <tag k='speed' v='60.5709' />
     <tag k='time' v='17.784433' />
   </node>
   <node id='-2603697' visible='true' lat='43.47793730515' lon='-80.51983491923'>
-    <tag k='angle' v='5.3042' />
+    <tag k='yaw' v='5.3042' />
     <tag k='speed' v='60.5783' />
     <tag k='time' v='17.8178' />
   </node>
   <node id='-2603698' visible='true' lat='43.4779331472' lon='-80.51983111903'>
-    <tag k='angle' v='5.3029' />
+    <tag k='yaw' v='5.3029' />
     <tag k='speed' v='60.5797' />
     <tag k='time' v='17.851167' />
   </node>
   <node id='-2603699' visible='true' lat='43.47792889922' lon='-80.51982731954'>
-    <tag k='angle' v='5.3018' />
+    <tag k='yaw' v='5.3018' />
     <tag k='speed' v='60.5762' />
     <tag k='time' v='17.884533' />
   </node>
   <node id='-2603700' visible='true' lat='43.47792465071' lon='-80.51982339641'>
-    <tag k='angle' v='5.3007' />
+    <tag k='yaw' v='5.3007' />
     <tag k='speed' v='60.5679' />
     <tag k='time' v='17.9179' />
   </node>
   <node id='-2603701' visible='true' lat='43.47792040273' lon='-80.51981959693'>
-    <tag k='angle' v='5.2996' />
+    <tag k='yaw' v='5.2996' />
     <tag k='speed' v='60.5528' />
     <tag k='time' v='17.951267' />
   </node>
   <node id='-2603702' visible='true' lat='43.47791606418' lon='-80.51981567451'>
-    <tag k='angle' v='5.2987' />
+    <tag k='yaw' v='5.2987' />
     <tag k='speed' v='60.5284' />
     <tag k='time' v='17.984633' />
   </node>
   <node id='-2603703' visible='true' lat='43.4779118162' lon='-80.51981187502'>
-    <tag k='angle' v='5.2978' />
+    <tag k='yaw' v='5.2978' />
     <tag k='speed' v='60.4935' />
     <tag k='time' v='18.018' />
   </node>
   <node id='-2603704' visible='true' lat='43.47790756821' lon='-80.51980807554'>
-    <tag k='angle' v='5.297' />
+    <tag k='yaw' v='5.297' />
     <tag k='speed' v='60.4491' />
     <tag k='time' v='18.051367' />
   </node>
   <node id='-2603705' visible='true' lat='43.47790332023' lon='-80.51980427605'>
-    <tag k='angle' v='5.2962' />
+    <tag k='yaw' v='5.2962' />
     <tag k='speed' v='60.3956' />
     <tag k='time' v='18.084733' />
   </node>
   <node id='-2603706' visible='true' lat='43.47789907224' lon='-80.51980047657'>
-    <tag k='angle' v='5.2955' />
+    <tag k='yaw' v='5.2955' />
     <tag k='speed' v='60.3312' />
     <tag k='time' v='18.1181' />
   </node>
   <node id='-2603707' visible='true' lat='43.4778947337' lon='-80.51979655415'>
-    <tag k='angle' v='5.2949' />
+    <tag k='yaw' v='5.2949' />
     <tag k='speed' v='60.2532' />
     <tag k='time' v='18.151467' />
   </node>
   <node id='-2603708' visible='true' lat='43.47789048571' lon='-80.51979275467'>
-    <tag k='angle' v='5.2944' />
+    <tag k='yaw' v='5.2944' />
     <tag k='speed' v='60.1584' />
     <tag k='time' v='18.184833' />
   </node>
   <node id='-2603709' visible='true' lat='43.47788623824' lon='-80.51978907883'>
-    <tag k='angle' v='5.2939' />
+    <tag k='yaw' v='5.2939' />
     <tag k='speed' v='60.0455' />
     <tag k='time' v='18.2182' />
   </node>
   <node id='-2603710' visible='true' lat='43.47788199026' lon='-80.51978527935'>
-    <tag k='angle' v='5.2935' />
+    <tag k='yaw' v='5.2935' />
     <tag k='speed' v='59.9172' />
     <tag k='time' v='18.251567' />
   </node>
   <node id='-2603711' visible='true' lat='43.47787774227' lon='-80.51978147987'>
-    <tag k='angle' v='5.2932' />
+    <tag k='yaw' v='5.2932' />
     <tag k='speed' v='59.7777' />
     <tag k='time' v='18.284933' />
   </node>
   <node id='-2603712' visible='true' lat='43.47787358433' lon='-80.51977767967'>
-    <tag k='angle' v='5.293' />
+    <tag k='yaw' v='5.293' />
     <tag k='speed' v='59.6315' />
     <tag k='time' v='18.3183' />
   </node>
   <node id='-2603713' visible='true' lat='43.47786933686' lon='-80.51977400384'>
-    <tag k='angle' v='5.2928' />
+    <tag k='yaw' v='5.2928' />
     <tag k='speed' v='59.4801' />
     <tag k='time' v='18.351667' />
   </node>
   <node id='-2603714' visible='true' lat='43.47786508887' lon='-80.51977020436'>
-    <tag k='angle' v='5.2927' />
+    <tag k='yaw' v='5.2927' />
     <tag k='speed' v='59.3208' />
     <tag k='time' v='18.385033' />
   </node>
   <node id='-2603715' visible='true' lat='43.47786093144' lon='-80.51976652781'>
-    <tag k='angle' v='5.2927' />
+    <tag k='yaw' v='5.2927' />
     <tag k='speed' v='59.1533' />
     <tag k='time' v='18.4184' />
   </node>
   <node id='-2603716' visible='true' lat='43.4778567735' lon='-80.51976272762'>
-    <tag k='angle' v='5.2928' />
+    <tag k='yaw' v='5.2928' />
     <tag k='speed' v='58.9809' />
     <tag k='time' v='18.451767' />
   </node>
   <node id='-2603717' visible='true' lat='43.47785261607' lon='-80.51975905107'>
-    <tag k='angle' v='5.2929' />
+    <tag k='yaw' v='5.2929' />
     <tag k='speed' v='58.8082' />
     <tag k='time' v='18.485133' />
   </node>
   <node id='-2603718' visible='true' lat='43.47784845864' lon='-80.51975537453'>
-    <tag k='angle' v='5.2931' />
+    <tag k='yaw' v='5.2931' />
     <tag k='speed' v='58.6371' />
     <tag k='time' v='18.5185' />
   </node>
   <node id='-2603719' visible='true' lat='43.47784430121' lon='-80.51975169798'>
-    <tag k='angle' v='5.2933' />
+    <tag k='yaw' v='5.2933' />
     <tag k='speed' v='58.5569' />
     <tag k='time' v='18.551867' />
   </node>
   <node id='-2603720' visible='true' lat='43.47784023383' lon='-80.51974802072'>
-    <tag k='angle' v='5.2936' />
+    <tag k='yaw' v='5.2936' />
     <tag k='speed' v='58.471' />
     <tag k='time' v='18.585233' />
   </node>
   <node id='-2603721' visible='true' lat='43.47783607692' lon='-80.51974446783'>
-    <tag k='angle' v='5.2939' />
+    <tag k='yaw' v='5.2939' />
     <tag k='speed' v='58.3792' />
     <tag k='time' v='18.6186' />
   </node>
   <node id='-2603722' visible='true' lat='43.47783200953' lon='-80.51974079057'>
-    <tag k='angle' v='5.2943' />
+    <tag k='yaw' v='5.2943' />
     <tag k='speed' v='58.2825' />
     <tag k='time' v='18.651967' />
   </node>
   <node id='-2603723' visible='true' lat='43.4778280327' lon='-80.51973723624'>
-    <tag k='angle' v='5.2946' />
+    <tag k='yaw' v='5.2946' />
     <tag k='speed' v='58.1823' />
     <tag k='time' v='18.685333' />
   </node>
   <node id='-2603724' visible='true' lat='43.47782405535' lon='-80.51973355827'>
-    <tag k='angle' v='5.295' />
+    <tag k='yaw' v='5.295' />
     <tag k='speed' v='58.0784' />
     <tag k='time' v='18.7187' />
   </node>
   <node id='-2603725' visible='true' lat='43.47782007852' lon='-80.51973000395'>
-    <tag k='angle' v='5.2954' />
+    <tag k='yaw' v='5.2954' />
     <tag k='speed' v='57.9692' />
     <tag k='time' v='18.752067' />
   </node>
   <node id='-2603726' visible='true' lat='43.47781610221' lon='-80.51972657327'>
-    <tag k='angle' v='5.2957' />
+    <tag k='yaw' v='5.2957' />
     <tag k='speed' v='57.8541' />
     <tag k='time' v='18.785433' />
   </node>
   <node id='-2603727' visible='true' lat='43.47781212539' lon='-80.51972301895'>
-    <tag k='angle' v='5.296' />
+    <tag k='yaw' v='5.296' />
     <tag k='speed' v='57.7347' />
     <tag k='time' v='18.8188' />
   </node>
   <node id='-2603728' visible='true' lat='43.4778082386' lon='-80.51971946391'>
-    <tag k='angle' v='5.2963' />
+    <tag k='yaw' v='5.2963' />
     <tag k='speed' v='57.6125' />
     <tag k='time' v='18.852167' />
   </node>
   <node id='-2603729' visible='true' lat='43.47780435233' lon='-80.51971603252'>
-    <tag k='angle' v='5.2966' />
+    <tag k='yaw' v='5.2966' />
     <tag k='speed' v='57.4875' />
     <tag k='time' v='18.885533' />
   </node>
   <node id='-2603730' visible='true' lat='43.4778003755' lon='-80.5197124782'>
-    <tag k='angle' v='5.2967' />
+    <tag k='yaw' v='5.2967' />
     <tag k='speed' v='57.3573' />
     <tag k='time' v='18.9189' />
   </node>
   <node id='-2603731' visible='true' lat='43.47779648871' lon='-80.51970892317'>
-    <tag k='angle' v='5.2968' />
+    <tag k='yaw' v='5.2968' />
     <tag k='speed' v='57.2217' />
     <tag k='time' v='18.952267' />
   </node>
   <node id='-2603732' visible='true' lat='43.47779260244' lon='-80.51970549178'>
-    <tag k='angle' v='5.2969' />
+    <tag k='yaw' v='5.2969' />
     <tag k='speed' v='57.0831' />
     <tag k='time' v='18.985633' />
   </node>
   <node id='-2603733' visible='true' lat='43.47778871565' lon='-80.51970193675'>
-    <tag k='angle' v='5.297' />
+    <tag k='yaw' v='5.297' />
     <tag k='speed' v='56.9443' />
     <tag k='time' v='19.019' />
   </node>
@@ -1260,1607 +1260,1607 @@
     <tag k='vid' v='34' />
   </node>
   <node id='-2603735' visible='true' lat='43.47818146921' lon='-80.52006297431'>
-    <tag k='angle' v='5.3676' />
+    <tag k='yaw' v='5.3676' />
     <tag k='speed' v='9.7605' />
     <tag k='time' v='38.371667' />
   </node>
   <node id='-2603736' visible='true' lat='43.47818101693' lon='-80.52006248329'>
-    <tag k='angle' v='5.3676' />
+    <tag k='yaw' v='5.3676' />
     <tag k='speed' v='9.8522' />
     <tag k='time' v='38.405033' />
   </node>
   <node id='-2603737' visible='true' lat='43.47818065521' lon='-80.52006211521'>
-    <tag k='angle' v='5.3671' />
+    <tag k='yaw' v='5.3671' />
     <tag k='speed' v='9.9321' />
     <tag k='time' v='38.4384' />
   </node>
   <node id='-2603738' visible='true' lat='43.47818020294' lon='-80.52006162419'>
-    <tag k='angle' v='5.3671' />
+    <tag k='yaw' v='5.3671' />
     <tag k='speed' v='10.0007' />
     <tag k='time' v='38.471767' />
   </node>
   <node id='-2603739' visible='true' lat='43.47817975066' lon='-80.52006113317'>
-    <tag k='angle' v='5.3666' />
+    <tag k='yaw' v='5.3666' />
     <tag k='speed' v='10.0582' />
     <tag k='time' v='38.505133' />
   </node>
   <node id='-2603740' visible='true' lat='43.47817920834' lon='-80.52006064286'>
-    <tag k='angle' v='5.366' />
+    <tag k='yaw' v='5.366' />
     <tag k='speed' v='10.1062' />
     <tag k='time' v='38.5385' />
   </node>
   <node id='-2603741' visible='true' lat='43.47817857495' lon='-80.52005990598'>
-    <tag k='angle' v='5.3654' />
+    <tag k='yaw' v='5.3654' />
     <tag k='speed' v='10.1466' />
     <tag k='time' v='38.571867' />
   </node>
   <node id='-2603742' visible='true' lat='43.47817785151' lon='-80.5200591698'>
-    <tag k='angle' v='5.3648' />
+    <tag k='yaw' v='5.3648' />
     <tag k='speed' v='10.1804' />
     <tag k='time' v='38.605233' />
   </node>
   <node id='-2603743' visible='true' lat='43.47817703752' lon='-80.5200583107'>
-    <tag k='angle' v='5.3642' />
+    <tag k='yaw' v='5.3642' />
     <tag k='speed' v='10.2071' />
     <tag k='time' v='38.6386' />
   </node>
   <node id='-2603744' visible='true' lat='43.47817622352' lon='-80.52005745159'>
-    <tag k='angle' v='5.3635' />
+    <tag k='yaw' v='5.3635' />
     <tag k='speed' v='10.2267' />
     <tag k='time' v='38.671967' />
   </node>
   <node id='-2603745' visible='true' lat='43.47817549957' lon='-80.52005659177'>
-    <tag k='angle' v='5.3628' />
+    <tag k='yaw' v='5.3628' />
     <tag k='speed' v='10.2391' />
     <tag k='time' v='38.705333' />
   </node>
   <node id='-2603746' visible='true' lat='43.47817468609' lon='-80.52005585631'>
-    <tag k='angle' v='5.362' />
+    <tag k='yaw' v='5.362' />
     <tag k='speed' v='10.2454' />
     <tag k='time' v='38.7387' />
   </node>
   <node id='-2603747' visible='true' lat='43.47817396214' lon='-80.5200549965'>
-    <tag k='angle' v='5.3605' />
+    <tag k='yaw' v='5.3605' />
     <tag k='speed' v='10.2469' />
     <tag k='time' v='38.772067' />
   </node>
   <node id='-2603748' visible='true' lat='43.4781732387' lon='-80.52005426032'>
-    <tag k='angle' v='5.3597' />
+    <tag k='yaw' v='5.3597' />
     <tag k='speed' v='10.2443' />
     <tag k='time' v='38.805433' />
   </node>
   <node id='-2603749' visible='true' lat='43.47817242523' lon='-80.52005352486'>
-    <tag k='angle' v='5.3589' />
+    <tag k='yaw' v='5.3589' />
     <tag k='speed' v='10.2386' />
     <tag k='time' v='38.8388' />
   </node>
   <node id='-2603750' visible='true' lat='43.47817170127' lon='-80.52005266505'>
-    <tag k='angle' v='5.3581' />
+    <tag k='yaw' v='5.3581' />
     <tag k='speed' v='10.23' />
     <tag k='time' v='38.872167' />
   </node>
   <node id='-2603751' visible='true' lat='43.47817097784' lon='-80.52005192887'>
-    <tag k='angle' v='5.3573' />
+    <tag k='yaw' v='5.3573' />
     <tag k='speed' v='10.3441' />
     <tag k='time' v='38.905533' />
   </node>
   <node id='-2603752' visible='true' lat='43.47817016384' lon='-80.52005106977'>
-    <tag k='angle' v='5.3566' />
+    <tag k='yaw' v='5.3566' />
     <tag k='speed' v='10.4607' />
     <tag k='time' v='38.9389' />
   </node>
   <node id='-2603753' visible='true' lat='43.47816944041' lon='-80.5200503336'>
-    <tag k='angle' v='5.3552' />
+    <tag k='yaw' v='5.3552' />
     <tag k='speed' v='10.5776' />
     <tag k='time' v='38.972267' />
   </node>
   <node id='-2603754' visible='true' lat='43.47816871697' lon='-80.52004959742'>
-    <tag k='angle' v='5.3545' />
+    <tag k='yaw' v='5.3545' />
     <tag k='speed' v='10.6776' />
     <tag k='time' v='39.005633' />
   </node>
   <node id='-2603755' visible='true' lat='43.4781679035' lon='-80.52004886196'>
-    <tag k='angle' v='5.3538' />
+    <tag k='yaw' v='5.3538' />
     <tag k='speed' v='10.743' />
     <tag k='time' v='39.039' />
   </node>
   <node id='-2603756' visible='true' lat='43.47816717954' lon='-80.52004800215'>
-    <tag k='angle' v='5.3532' />
+    <tag k='yaw' v='5.3532' />
     <tag k='speed' v='10.7588' />
     <tag k='time' v='39.072367' />
   </node>
   <node id='-2603757' visible='true' lat='43.47816645611' lon='-80.52004726597'>
-    <tag k='angle' v='5.3518' />
+    <tag k='yaw' v='5.3518' />
     <tag k='speed' v='10.7247' />
     <tag k='time' v='39.105733' />
   </node>
   <node id='-2603758' visible='true' lat='43.47816573267' lon='-80.5200465298'>
-    <tag k='angle' v='5.3507' />
+    <tag k='yaw' v='5.3507' />
     <tag k='speed' v='10.6552' />
     <tag k='time' v='39.1391' />
   </node>
   <node id='-2603759' visible='true' lat='43.47816500924' lon='-80.52004579363'>
-    <tag k='angle' v='5.35' />
+    <tag k='yaw' v='5.35' />
     <tag k='speed' v='10.5675' />
     <tag k='time' v='39.172467' />
   </node>
   <node id='-2603760' visible='true' lat='43.4781642858' lon='-80.52004505746'>
-    <tag k='angle' v='5.3492' />
+    <tag k='yaw' v='5.3492' />
     <tag k='speed' v='10.4795' />
     <tag k='time' v='39.205833' />
   </node>
   <node id='-2603761' visible='true' lat='43.47816356289' lon='-80.52004444493'>
-    <tag k='angle' v='5.3481' />
+    <tag k='yaw' v='5.3481' />
     <tag k='speed' v='10.4001' />
     <tag k='time' v='39.2392' />
   </node>
   <node id='-2603762' visible='true' lat='43.47816292949' lon='-80.52004370805'>
-    <tag k='angle' v='5.3473' />
+    <tag k='yaw' v='5.3473' />
     <tag k='speed' v='10.3228' />
     <tag k='time' v='39.272567' />
   </node>
   <node id='-2603763' visible='true' lat='43.47816220605' lon='-80.52004297187'>
-    <tag k='angle' v='5.3465' />
+    <tag k='yaw' v='5.3465' />
     <tag k='speed' v='10.2419' />
     <tag k='time' v='39.305933' />
   </node>
   <node id='-2603764' visible='true' lat='43.47816157318' lon='-80.52004235864'>
-    <tag k='angle' v='5.3457' />
+    <tag k='yaw' v='5.3457' />
     <tag k='speed' v='10.1577' />
     <tag k='time' v='39.3393' />
   </node>
   <node id='-2603765' visible='true' lat='43.47816084974' lon='-80.52004162246'>
-    <tag k='angle' v='5.3452' />
+    <tag k='yaw' v='5.3452' />
     <tag k='speed' v='10.0712' />
     <tag k='time' v='39.372667' />
   </node>
   <node id='-2603766' visible='true' lat='43.47816021687' lon='-80.52004100922'>
-    <tag k='angle' v='5.3447' />
+    <tag k='yaw' v='5.3447' />
     <tag k='speed' v='9.9827' />
     <tag k='time' v='39.406033' />
   </node>
   <node id='-2603767' visible='true' lat='43.47815949395' lon='-80.5200403967'>
-    <tag k='angle' v='5.345' />
+    <tag k='yaw' v='5.345' />
     <tag k='speed' v='9.8916' />
     <tag k='time' v='39.4394' />
   </node>
   <node id='-2603768' visible='true' lat='43.47815886056' lon='-80.52003965981'>
-    <tag k='angle' v='5.3452' />
+    <tag k='yaw' v='5.3452' />
     <tag k='speed' v='9.7977' />
     <tag k='time' v='39.472767' />
   </node>
   <node id='-2603769' visible='true' lat='43.47815822768' lon='-80.52003904657'>
-    <tag k='angle' v='5.3451' />
+    <tag k='yaw' v='5.3451' />
     <tag k='speed' v='9.7012' />
     <tag k='time' v='39.506133' />
   </node>
   <node id='-2603770' visible='true' lat='43.47815750476' lon='-80.52003843405'>
-    <tag k='angle' v='5.3457' />
+    <tag k='yaw' v='5.3457' />
     <tag k='speed' v='9.6031' />
     <tag k='time' v='39.5395' />
   </node>
   <node id='-2603771' visible='true' lat='43.47815687189' lon='-80.52003782081'>
-    <tag k='angle' v='5.3459' />
+    <tag k='yaw' v='5.3459' />
     <tag k='speed' v='9.5035' />
     <tag k='time' v='39.572867' />
   </node>
   <node id='-2603772' visible='true' lat='43.47815623901' lon='-80.52003720757'>
-    <tag k='angle' v='5.3462' />
+    <tag k='yaw' v='5.3462' />
     <tag k='speed' v='9.4019' />
     <tag k='time' v='39.606233' />
   </node>
   <node id='-2603773' visible='true' lat='43.47815560613' lon='-80.52003659433'>
-    <tag k='angle' v='5.3475' />
+    <tag k='yaw' v='5.3475' />
     <tag k='speed' v='9.2984' />
     <tag k='time' v='39.6396' />
   </node>
   <node id='-2603774' visible='true' lat='43.47815497326' lon='-80.52003598109'>
-    <tag k='angle' v='5.3484' />
+    <tag k='yaw' v='5.3484' />
     <tag k='speed' v='9.1934' />
     <tag k='time' v='39.672967' />
   </node>
   <node id='-2603775' visible='true' lat='43.47815434038' lon='-80.52003536785'>
-    <tag k='angle' v='5.35' />
+    <tag k='yaw' v='5.35' />
     <tag k='speed' v='9.0875' />
     <tag k='time' v='39.706333' />
   </node>
   <node id='-2603776' visible='true' lat='43.4781537075' lon='-80.52003475461'>
-    <tag k='angle' v='5.3518' />
+    <tag k='yaw' v='5.3518' />
     <tag k='speed' v='8.9809' />
     <tag k='time' v='39.7397' />
   </node>
   <node id='-2603777' visible='true' lat='43.47815307463' lon='-80.52003414137'>
-    <tag k='angle' v='5.3526' />
+    <tag k='yaw' v='5.3526' />
     <tag k='speed' v='8.874' />
     <tag k='time' v='39.773067' />
   </node>
   <node id='-2603778' visible='true' lat='43.47815244175' lon='-80.52003352814'>
-    <tag k='angle' v='5.3546' />
+    <tag k='yaw' v='5.3546' />
     <tag k='speed' v='8.7674' />
     <tag k='time' v='39.806433' />
   </node>
   <node id='-2603779' visible='true' lat='43.47815180939' lon='-80.52003303854'>
-    <tag k='angle' v='5.3566' />
+    <tag k='yaw' v='5.3566' />
     <tag k='speed' v='8.6619' />
     <tag k='time' v='39.8398' />
   </node>
   <node id='-2603780' visible='true' lat='43.47815126656' lon='-80.52003242459'>
-    <tag k='angle' v='5.3576' />
+    <tag k='yaw' v='5.3576' />
     <tag k='speed' v='8.5576' />
     <tag k='time' v='39.873167' />
   </node>
   <node id='-2603781' visible='true' lat='43.47815063368' lon='-80.52003181135'>
-    <tag k='angle' v='5.3596' />
+    <tag k='yaw' v='5.3596' />
     <tag k='speed' v='8.4543' />
     <tag k='time' v='39.906533' />
   </node>
   <node id='-2603782' visible='true' lat='43.47815009136' lon='-80.52003132105'>
-    <tag k='angle' v='5.3624' />
+    <tag k='yaw' v='5.3624' />
     <tag k='speed' v='8.352' />
     <tag k='time' v='39.9399' />
   </node>
   <node id='-2603783' visible='true' lat='43.47814945849' lon='-80.52003070781'>
-    <tag k='angle' v='5.3642' />
+    <tag k='yaw' v='5.3642' />
     <tag k='speed' v='8.2499' />
     <tag k='time' v='39.973267' />
   </node>
   <node id='-2603784' visible='true' lat='43.47814891617' lon='-80.5200302175'>
-    <tag k='angle' v='5.3662' />
+    <tag k='yaw' v='5.3662' />
     <tag k='speed' v='8.1471' />
     <tag k='time' v='40.006633' />
   </node>
   <node id='-2603785' visible='true' lat='43.47814837334' lon='-80.52002960355'>
-    <tag k='angle' v='5.3646' />
+    <tag k='yaw' v='5.3646' />
     <tag k='speed' v='8.0429' />
     <tag k='time' v='40.04' />
   </node>
   <node id='-2603786' visible='true' lat='43.47814783102' lon='-80.52002911324'>
-    <tag k='angle' v='5.3639' />
+    <tag k='yaw' v='5.3639' />
     <tag k='speed' v='7.9372' />
     <tag k='time' v='40.073367' />
   </node>
   <node id='-2603787' visible='true' lat='43.4781472887' lon='-80.52002862294'>
-    <tag k='angle' v='5.3631' />
+    <tag k='yaw' v='5.3631' />
     <tag k='speed' v='7.8299' />
     <tag k='time' v='40.106733' />
   </node>
   <node id='-2603788' visible='true' lat='43.47814674586' lon='-80.52002800899'>
-    <tag k='angle' v='5.3626' />
+    <tag k='yaw' v='5.3626' />
     <tag k='speed' v='7.7206' />
     <tag k='time' v='40.1401' />
   </node>
   <node id='-2603789' visible='true' lat='43.47814620355' lon='-80.52002751868'>
-    <tag k='angle' v='5.3615' />
+    <tag k='yaw' v='5.3615' />
     <tag k='speed' v='7.6088' />
     <tag k='time' v='40.173467' />
   </node>
   <node id='-2603790' visible='true' lat='43.47814575127' lon='-80.52002702766'>
-    <tag k='angle' v='5.3607' />
+    <tag k='yaw' v='5.3607' />
     <tag k='speed' v='7.495' />
     <tag k='time' v='40.206833' />
   </node>
   <node id='-2603791' visible='true' lat='43.47814520895' lon='-80.52002653735'>
-    <tag k='angle' v='5.3605' />
+    <tag k='yaw' v='5.3605' />
     <tag k='speed' v='7.3796' />
     <tag k='time' v='40.2402' />
   </node>
   <node id='-2603792' visible='true' lat='43.47814475668' lon='-80.52002604634'>
-    <tag k='angle' v='5.3595' />
+    <tag k='yaw' v='5.3595' />
     <tag k='speed' v='7.2624' />
     <tag k='time' v='40.273567' />
   </node>
   <node id='-2603793' visible='true' lat='43.4781443044' lon='-80.52002555532'>
-    <tag k='angle' v='5.3587' />
+    <tag k='yaw' v='5.3587' />
     <tag k='speed' v='7.1425' />
     <tag k='time' v='40.306933' />
   </node>
   <node id='-2603794' visible='true' lat='43.47814385212' lon='-80.5200250643'>
-    <tag k='angle' v='5.3584' />
+    <tag k='yaw' v='5.3584' />
     <tag k='speed' v='7.0196' />
     <tag k='time' v='40.3403' />
   </node>
   <node id='-2603795' visible='true' lat='43.47814339985' lon='-80.52002457328'>
-    <tag k='angle' v='5.3581' />
+    <tag k='yaw' v='5.3581' />
     <tag k='speed' v='6.8939' />
     <tag k='time' v='40.373667' />
   </node>
   <node id='-2603796' visible='true' lat='43.47814294757' lon='-80.52002408226'>
-    <tag k='angle' v='5.3562' />
+    <tag k='yaw' v='5.3562' />
     <tag k='speed' v='6.7661' />
     <tag k='time' v='40.407033' />
   </node>
   <node id='-2603797' visible='true' lat='43.47814249529' lon='-80.52002359124'>
-    <tag k='angle' v='5.3557' />
+    <tag k='yaw' v='5.3557' />
     <tag k='speed' v='6.6358' />
     <tag k='time' v='40.4404' />
   </node>
   <node id='-2603798' visible='true' lat='43.47814204301' lon='-80.52002310022'>
-    <tag k='angle' v='5.3552' />
+    <tag k='yaw' v='5.3552' />
     <tag k='speed' v='6.5022' />
     <tag k='time' v='40.473767' />
   </node>
   <node id='-2603799' visible='true' lat='43.4781416813' lon='-80.52002273214'>
-    <tag k='angle' v='5.3547' />
+    <tag k='yaw' v='5.3547' />
     <tag k='speed' v='6.3651' />
     <tag k='time' v='40.507133' />
   </node>
   <node id='-2603800' visible='true' lat='43.47814122902' lon='-80.52002224112'>
-    <tag k='angle' v='5.3535' />
+    <tag k='yaw' v='5.3535' />
     <tag k='speed' v='6.2245' />
     <tag k='time' v='40.5405' />
   </node>
   <node id='-2603801' visible='true' lat='43.47814077674' lon='-80.5200217501'>
-    <tag k='angle' v='5.3529' />
+    <tag k='yaw' v='5.3529' />
     <tag k='speed' v='6.0808' />
     <tag k='time' v='40.573867' />
   </node>
   <node id='-2603802' visible='true' lat='43.47814041451' lon='-80.52002125837'>
-    <tag k='angle' v='5.3534' />
+    <tag k='yaw' v='5.3534' />
     <tag k='speed' v='5.9342' />
     <tag k='time' v='40.607233' />
   </node>
   <node id='-2603803' visible='true' lat='43.47814005279' lon='-80.52002089028'>
-    <tag k='angle' v='5.3522' />
+    <tag k='yaw' v='5.3522' />
     <tag k='speed' v='5.7841' />
     <tag k='time' v='40.6406' />
   </node>
   <node id='-2603804' visible='true' lat='43.47813969055' lon='-80.52002039855'>
-    <tag k='angle' v='5.3515' />
+    <tag k='yaw' v='5.3515' />
     <tag k='speed' v='5.6307' />
     <tag k='time' v='40.673967' />
   </node>
   <node id='-2603805' visible='true' lat='43.47813923827' lon='-80.52001990753'>
-    <tag k='angle' v='5.3502' />
+    <tag k='yaw' v='5.3502' />
     <tag k='speed' v='5.4743' />
     <tag k='time' v='40.707333' />
   </node>
   <node id='-2603806' visible='true' lat='43.47813887656' lon='-80.52001953945'>
-    <tag k='angle' v='5.3494' />
+    <tag k='yaw' v='5.3494' />
     <tag k='speed' v='5.316' />
     <tag k='time' v='40.7407' />
   </node>
   <node id='-2603807' visible='true' lat='43.47813860488' lon='-80.52001917065'>
-    <tag k='angle' v='5.35' />
+    <tag k='yaw' v='5.35' />
     <tag k='speed' v='5.1555' />
     <tag k='time' v='40.774067' />
   </node>
   <node id='-2603808' visible='true' lat='43.47813824264' lon='-80.52001867892'>
-    <tag k='angle' v='5.3486' />
+    <tag k='yaw' v='5.3486' />
     <tag k='speed' v='4.9911' />
     <tag k='time' v='40.807433' />
   </node>
   <node id='-2603809' visible='true' lat='43.47813788092' lon='-80.52001831083'>
-    <tag k='angle' v='5.3478' />
+    <tag k='yaw' v='5.3478' />
     <tag k='speed' v='4.8207' />
     <tag k='time' v='40.8408' />
   </node>
   <node id='-2603810' visible='true' lat='43.47813760925' lon='-80.52001794203'>
-    <tag k='angle' v='5.3478' />
+    <tag k='yaw' v='5.3478' />
     <tag k='speed' v='4.6176' />
     <tag k='time' v='40.874167' />
   </node>
   <node id='-2603811' visible='true' lat='43.47813724753' lon='-80.52001757395'>
-    <tag k='angle' v='5.3469' />
+    <tag k='yaw' v='5.3469' />
     <tag k='speed' v='4.4136' />
     <tag k='time' v='40.907533' />
   </node>
   <node id='-2603812' visible='true' lat='43.47813697585' lon='-80.52001720515'>
-    <tag k='angle' v='5.346' />
+    <tag k='yaw' v='5.346' />
     <tag k='speed' v='4.2132' />
     <tag k='time' v='40.9409' />
   </node>
   <node id='-2603813' visible='true' lat='43.47813670417' lon='-80.52001683635'>
-    <tag k='angle' v='5.346' />
+    <tag k='yaw' v='5.346' />
     <tag k='speed' v='4.0112' />
     <tag k='time' v='40.974267' />
   </node>
   <node id='-2603814' visible='true' lat='43.47813643301' lon='-80.5200165912'>
-    <tag k='angle' v='5.345' />
+    <tag k='yaw' v='5.345' />
     <tag k='speed' v='3.8139' />
     <tag k='time' v='41.007633' />
   </node>
   <node id='-2603815' visible='true' lat='43.47813625138' lon='-80.52001622169'>
-    <tag k='angle' v='5.345' />
+    <tag k='yaw' v='5.345' />
     <tag k='speed' v='3.6253' />
     <tag k='time' v='41.041' />
   </node>
   <node id='-2603816' visible='true' lat='43.47813598022' lon='-80.52001597653'>
-    <tag k='angle' v='5.3437' />
+    <tag k='yaw' v='5.3437' />
     <tag k='speed' v='3.4439' />
     <tag k='time' v='41.074367' />
   </node>
   <node id='-2603817' visible='true' lat='43.47813579858' lon='-80.52001560702'>
-    <tag k='angle' v='5.344' />
+    <tag k='yaw' v='5.344' />
     <tag k='speed' v='3.2663' />
     <tag k='time' v='41.107733' />
   </node>
   <node id='-2603818' visible='true' lat='43.47813552742' lon='-80.52001536187'>
-    <tag k='angle' v='5.344' />
+    <tag k='yaw' v='5.344' />
     <tag k='speed' v='3.0911' />
     <tag k='time' v='41.1411' />
   </node>
   <node id='-2603819' visible='true' lat='43.4781353463' lon='-80.520015116'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='2.9174' />
     <tag k='time' v='41.174467' />
   </node>
   <node id='-2603820' visible='true' lat='43.47813516519' lon='-80.52001487014'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='2.7448' />
     <tag k='time' v='41.207833' />
   </node>
   <node id='-2603821' visible='true' lat='43.47813507463' lon='-80.52001474721'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='2.5738' />
     <tag k='time' v='41.2412' />
   </node>
   <node id='-2603822' visible='true' lat='43.47813489351' lon='-80.52001450134'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='2.4047' />
     <tag k='time' v='41.274567' />
   </node>
   <node id='-2603823' visible='true' lat='43.47813480295' lon='-80.52001437841'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='2.2387' />
     <tag k='time' v='41.307933' />
   </node>
   <node id='-2603824' visible='true' lat='43.47813462235' lon='-80.52001425619'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='2.0774' />
     <tag k='time' v='41.3413' />
   </node>
   <node id='-2603825' visible='true' lat='43.47813453179' lon='-80.52001413325'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.9217' />
     <tag k='time' v='41.374667' />
   </node>
   <node id='-2603826' visible='true' lat='43.47813462183' lon='-80.52001413254'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.7712' />
     <tag k='time' v='41.408033' />
   </node>
   <node id='-2603827' visible='true' lat='43.47813462183' lon='-80.52001413254'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.6256' />
     <tag k='time' v='41.4414' />
   </node>
   <node id='-2603828' visible='true' lat='43.47813471239' lon='-80.52001425547'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.4858' />
     <tag k='time' v='41.474767' />
   </node>
   <node id='-2603829' visible='true' lat='43.47813471239' lon='-80.52001425547'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.3533' />
     <tag k='time' v='41.508133' />
   </node>
   <node id='-2603830' visible='true' lat='43.47813471239' lon='-80.52001425547'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.2296' />
     <tag k='time' v='41.5415' />
   </node>
   <node id='-2603831' visible='true' lat='43.47813480295' lon='-80.52001437841'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.1146' />
     <tag k='time' v='41.574867' />
   </node>
   <node id='-2603832' visible='true' lat='43.47813480295' lon='-80.52001437841'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='1.0076' />
     <tag k='time' v='41.608233' />
   </node>
   <node id='-2603833' visible='true' lat='43.47813489351' lon='-80.52001450134'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='0.9083' />
     <tag k='time' v='41.6416' />
   </node>
   <node id='-2603834' visible='true' lat='43.47813489351' lon='-80.52001450134'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='0.8165' />
     <tag k='time' v='41.674967' />
   </node>
   <node id='-2603835' visible='true' lat='43.47813498355' lon='-80.52001450063'>
-    <tag k='angle' v='5.3417' />
+    <tag k='yaw' v='5.3417' />
     <tag k='speed' v='0.7326' />
     <tag k='time' v='41.708333' />
   </node>
   <node id='-2603836' visible='true' lat='43.47813498407' lon='-80.52001462427'>
-    <tag k='angle' v='5.3415' />
+    <tag k='yaw' v='5.3415' />
     <tag k='speed' v='0.6565' />
     <tag k='time' v='41.7417' />
   </node>
   <node id='-2603837' visible='true' lat='43.47813498407' lon='-80.52001462427'>
-    <tag k='angle' v='5.3415' />
+    <tag k='yaw' v='5.3415' />
     <tag k='speed' v='0.5876' />
     <tag k='time' v='41.775067' />
   </node>
   <node id='-2603838' visible='true' lat='43.47813507411' lon='-80.52001462356'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.5261' />
     <tag k='time' v='41.808433' />
   </node>
   <node id='-2603839' visible='true' lat='43.47813507411' lon='-80.52001462356'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.4728' />
     <tag k='time' v='41.8418' />
   </node>
   <node id='-2603840' visible='true' lat='43.47813507463' lon='-80.52001474721'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.4284' />
     <tag k='time' v='41.875167' />
   </node>
   <node id='-2603841' visible='true' lat='43.47813507463' lon='-80.52001474721'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.4189' />
     <tag k='time' v='41.908533' />
   </node>
   <node id='-2603842' visible='true' lat='43.47813507463' lon='-80.52001474721'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.4117' />
     <tag k='time' v='41.9419' />
   </node>
   <node id='-2603843' visible='true' lat='43.47813516467' lon='-80.52001474649'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.4026' />
     <tag k='time' v='41.975267' />
   </node>
   <node id='-2603844' visible='true' lat='43.47813516467' lon='-80.52001474649'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3976' />
     <tag k='time' v='42.008633' />
   </node>
   <node id='-2603845' visible='true' lat='43.47813516467' lon='-80.52001474649'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3905' />
     <tag k='time' v='42.042' />
   </node>
   <node id='-2603846' visible='true' lat='43.47813516519' lon='-80.52001487014'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3777' />
     <tag k='time' v='42.075367' />
   </node>
   <node id='-2603847' visible='true' lat='43.47813516519' lon='-80.52001487014'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3607' />
     <tag k='time' v='42.108733' />
   </node>
   <node id='-2603848' visible='true' lat='43.47813525523' lon='-80.52001486943'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3424' />
     <tag k='time' v='42.1421' />
   </node>
   <node id='-2603849' visible='true' lat='43.47813525523' lon='-80.52001486943'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3245' />
     <tag k='time' v='42.175467' />
   </node>
   <node id='-2603850' visible='true' lat='43.47813525523' lon='-80.52001486943'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.3087' />
     <tag k='time' v='42.208833' />
   </node>
   <node id='-2603851' visible='true' lat='43.47813525575' lon='-80.52001499307'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2963' />
     <tag k='time' v='42.2422' />
   </node>
   <node id='-2603852' visible='true' lat='43.47813534579' lon='-80.52001499236'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.287' />
     <tag k='time' v='42.275567' />
   </node>
   <node id='-2603853' visible='true' lat='43.47813534579' lon='-80.52001499236'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2797' />
     <tag k='time' v='42.308933' />
   </node>
   <node id='-2603854' visible='true' lat='43.47813534579' lon='-80.52001499236'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2734' />
     <tag k='time' v='42.3423' />
   </node>
   <node id='-2603855' visible='true' lat='43.47813534579' lon='-80.52001499236'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2663' />
     <tag k='time' v='42.375667' />
   </node>
   <node id='-2603856' visible='true' lat='43.47813543634' lon='-80.52001511529'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.26' />
     <tag k='time' v='42.409033' />
   </node>
   <node id='-2603857' visible='true' lat='43.47813543634' lon='-80.52001511529'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2546' />
     <tag k='time' v='42.4424' />
   </node>
   <node id='-2603858' visible='true' lat='43.47813543634' lon='-80.52001511529'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.25' />
     <tag k='time' v='42.475767' />
   </node>
   <node id='-2603859' visible='true' lat='43.47813543634' lon='-80.52001511529'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2453' />
     <tag k='time' v='42.509133' />
   </node>
   <node id='-2603860' visible='true' lat='43.47813543634' lon='-80.52001511529'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.2398' />
     <tag k='time' v='42.5425' />
   </node>
   <node id='-2603861' visible='true' lat='43.47813543634' lon='-80.52001511529'>
-    <tag k='angle' v='5.3429' />
+    <tag k='yaw' v='5.3429' />
     <tag k='speed' v='0.233' />
     <tag k='time' v='42.575867' />
   </node>
   <node id='-2603862' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.225' />
     <tag k='time' v='42.609233' />
   </node>
   <node id='-2603863' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.2161' />
     <tag k='time' v='42.6426' />
   </node>
   <node id='-2603864' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.2065' />
     <tag k='time' v='42.675967' />
   </node>
   <node id='-2603865' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1963' />
     <tag k='time' v='42.709333' />
   </node>
   <node id='-2603866' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1856' />
     <tag k='time' v='42.7427' />
   </node>
   <node id='-2603867' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1743' />
     <tag k='time' v='42.776067' />
   </node>
   <node id='-2603868' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1627' />
     <tag k='time' v='42.809433' />
   </node>
   <node id='-2603869' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1512' />
     <tag k='time' v='42.8428' />
   </node>
   <node id='-2603870' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1404' />
     <tag k='time' v='42.876167' />
   </node>
   <node id='-2603871' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1306' />
     <tag k='time' v='42.909533' />
   </node>
   <node id='-2603872' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1214' />
     <tag k='time' v='42.9429' />
   </node>
   <node id='-2603873' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1126' />
     <tag k='time' v='42.976267' />
   </node>
   <node id='-2603874' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.1043' />
     <tag k='time' v='43.009633' />
   </node>
   <node id='-2603875' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0962' />
     <tag k='time' v='43.043' />
   </node>
   <node id='-2603876' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0885' />
     <tag k='time' v='43.076367' />
   </node>
   <node id='-2603877' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0811' />
     <tag k='time' v='43.109733' />
   </node>
   <node id='-2603878' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0741' />
     <tag k='time' v='43.1431' />
   </node>
   <node id='-2603879' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0675' />
     <tag k='time' v='43.176467' />
   </node>
   <node id='-2603880' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0613' />
     <tag k='time' v='43.209833' />
   </node>
   <node id='-2603881' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0554' />
     <tag k='time' v='43.2432' />
   </node>
   <node id='-2603882' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0498' />
     <tag k='time' v='43.276567' />
   </node>
   <node id='-2603883' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0446' />
     <tag k='time' v='43.309933' />
   </node>
   <node id='-2603884' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0398' />
     <tag k='time' v='43.3433' />
   </node>
   <node id='-2603885' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0356' />
     <tag k='time' v='43.376667' />
   </node>
   <node id='-2603886' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0329' />
     <tag k='time' v='43.410033' />
   </node>
   <node id='-2603887' visible='true' lat='43.4781355269' lon='-80.52001523822'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0298' />
     <tag k='time' v='43.4434' />
   </node>
   <node id='-2603888' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0269' />
     <tag k='time' v='43.476767' />
   </node>
   <node id='-2603889' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0242' />
     <tag k='time' v='43.510133' />
   </node>
   <node id='-2603890' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0218' />
     <tag k='time' v='43.5435' />
   </node>
   <node id='-2603891' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0194' />
     <tag k='time' v='43.576867' />
   </node>
   <node id='-2603892' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0171' />
     <tag k='time' v='43.610233' />
   </node>
   <node id='-2603893' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0149' />
     <tag k='time' v='43.6436' />
   </node>
   <node id='-2603894' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0131' />
     <tag k='time' v='43.676967' />
   </node>
   <node id='-2603895' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0116' />
     <tag k='time' v='43.710333' />
   </node>
   <node id='-2603896' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0105' />
     <tag k='time' v='43.7437' />
   </node>
   <node id='-2603897' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.01' />
     <tag k='time' v='43.777067' />
   </node>
   <node id='-2603898' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0098' />
     <tag k='time' v='43.810433' />
   </node>
   <node id='-2603899' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0098' />
     <tag k='time' v='43.8438' />
   </node>
   <node id='-2603900' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0097' />
     <tag k='time' v='43.877167' />
   </node>
   <node id='-2603901' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0094' />
     <tag k='time' v='43.910533' />
   </node>
   <node id='-2603902' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0088' />
     <tag k='time' v='43.9439' />
   </node>
   <node id='-2603903' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0081' />
     <tag k='time' v='43.977267' />
   </node>
   <node id='-2603904' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0075' />
     <tag k='time' v='44.010633' />
   </node>
   <node id='-2603905' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.007' />
     <tag k='time' v='44.044' />
   </node>
   <node id='-2603906' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0065' />
     <tag k='time' v='44.077367' />
   </node>
   <node id='-2603907' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0062' />
     <tag k='time' v='44.110733' />
   </node>
   <node id='-2603908' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.006' />
     <tag k='time' v='44.1441' />
   </node>
   <node id='-2603909' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0058' />
     <tag k='time' v='44.177467' />
   </node>
   <node id='-2603910' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0056' />
     <tag k='time' v='44.210833' />
   </node>
   <node id='-2603911' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0054' />
     <tag k='time' v='44.2442' />
   </node>
   <node id='-2603912' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0053' />
     <tag k='time' v='44.277567' />
   </node>
   <node id='-2603913' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0052' />
     <tag k='time' v='44.310933' />
   </node>
   <node id='-2603914' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0052' />
     <tag k='time' v='44.3443' />
   </node>
   <node id='-2603915' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0051' />
     <tag k='time' v='44.377667' />
   </node>
   <node id='-2603916' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0051' />
     <tag k='time' v='44.411033' />
   </node>
   <node id='-2603917' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0051' />
     <tag k='time' v='44.4444' />
   </node>
   <node id='-2603918' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0051' />
     <tag k='time' v='44.477767' />
   </node>
   <node id='-2603919' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0051' />
     <tag k='time' v='44.511133' />
   </node>
   <node id='-2603920' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.005' />
     <tag k='time' v='44.5445' />
   </node>
   <node id='-2603921' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0049' />
     <tag k='time' v='44.577867' />
   </node>
   <node id='-2603922' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0048' />
     <tag k='time' v='44.611233' />
   </node>
   <node id='-2603923' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0047' />
     <tag k='time' v='44.6446' />
   </node>
   <node id='-2603924' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0046' />
     <tag k='time' v='44.677967' />
   </node>
   <node id='-2603925' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0044' />
     <tag k='time' v='44.711333' />
   </node>
   <node id='-2603926' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0043' />
     <tag k='time' v='44.7447' />
   </node>
   <node id='-2603927' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0042' />
     <tag k='time' v='44.778067' />
   </node>
   <node id='-2603928' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0041' />
     <tag k='time' v='44.811433' />
   </node>
   <node id='-2603929' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.004' />
     <tag k='time' v='44.8448' />
   </node>
   <node id='-2603930' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0038' />
     <tag k='time' v='44.878167' />
   </node>
   <node id='-2603931' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0037' />
     <tag k='time' v='44.911533' />
   </node>
   <node id='-2603932' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0037' />
     <tag k='time' v='44.9449' />
   </node>
   <node id='-2603933' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0037' />
     <tag k='time' v='44.978267' />
   </node>
   <node id='-2603934' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0037' />
     <tag k='time' v='45.011633' />
   </node>
   <node id='-2603935' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0036' />
     <tag k='time' v='45.045' />
   </node>
   <node id='-2603936' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0036' />
     <tag k='time' v='45.078367' />
   </node>
   <node id='-2603937' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0035' />
     <tag k='time' v='45.111733' />
   </node>
   <node id='-2603938' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0034' />
     <tag k='time' v='45.1451' />
   </node>
   <node id='-2603939' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0033' />
     <tag k='time' v='45.178467' />
   </node>
   <node id='-2603940' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0031' />
     <tag k='time' v='45.211833' />
   </node>
   <node id='-2603941' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.003' />
     <tag k='time' v='45.2452' />
   </node>
   <node id='-2603942' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0029' />
     <tag k='time' v='45.278567' />
   </node>
   <node id='-2603943' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0028' />
     <tag k='time' v='45.311933' />
   </node>
   <node id='-2603944' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0028' />
     <tag k='time' v='45.3453' />
   </node>
   <node id='-2603945' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='45.378667' />
   </node>
   <node id='-2603946' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='45.412033' />
   </node>
   <node id='-2603947' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='45.4454' />
   </node>
   <node id='-2603948' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='45.478767' />
   </node>
   <node id='-2603949' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='45.512133' />
   </node>
   <node id='-2603950' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='45.5455' />
   </node>
   <node id='-2603951' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='45.578867' />
   </node>
   <node id='-2603952' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='45.612233' />
   </node>
   <node id='-2603953' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='45.6456' />
   </node>
   <node id='-2603954' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.678967' />
   </node>
   <node id='-2603955' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.712333' />
   </node>
   <node id='-2603956' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.7457' />
   </node>
   <node id='-2603957' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.779067' />
   </node>
   <node id='-2603958' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.812433' />
   </node>
   <node id='-2603959' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.8458' />
   </node>
   <node id='-2603960' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.879167' />
   </node>
   <node id='-2603961' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.912533' />
   </node>
   <node id='-2603962' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.9459' />
   </node>
   <node id='-2603963' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='45.979267' />
   </node>
   <node id='-2603964' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='46.012633' />
   </node>
   <node id='-2603965' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='46.046' />
   </node>
   <node id='-2603966' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.079367' />
   </node>
   <node id='-2603967' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.112733' />
   </node>
   <node id='-2603968' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.1461' />
   </node>
   <node id='-2603969' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.179467' />
   </node>
   <node id='-2603970' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.212833' />
   </node>
   <node id='-2603971' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='46.2462' />
   </node>
   <node id='-2603972' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='46.279567' />
   </node>
   <node id='-2603973' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='46.312933' />
   </node>
   <node id='-2603974' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0028' />
     <tag k='time' v='46.3463' />
   </node>
   <node id='-2603975' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0028' />
     <tag k='time' v='46.379667' />
   </node>
   <node id='-2603976' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0028' />
     <tag k='time' v='46.413033' />
   </node>
   <node id='-2603977' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0027' />
     <tag k='time' v='46.4464' />
   </node>
   <node id='-2603978' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='46.479767' />
   </node>
   <node id='-2603979' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.513133' />
   </node>
   <node id='-2603980' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='46.5465' />
   </node>
   <node id='-2603981' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='46.579867' />
   </node>
   <node id='-2603982' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='46.613233' />
   </node>
   <node id='-2603983' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='46.6466' />
   </node>
   <node id='-2603984' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='46.679967' />
   </node>
   <node id='-2603985' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='46.713333' />
   </node>
   <node id='-2603986' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='46.7467' />
   </node>
   <node id='-2603987' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='46.780067' />
   </node>
   <node id='-2603988' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='46.813433' />
   </node>
   <node id='-2603989' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='46.8468' />
   </node>
   <node id='-2603990' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='46.880167' />
   </node>
   <node id='-2603991' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='46.913533' />
   </node>
   <node id='-2603992' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='46.9469' />
   </node>
   <node id='-2603993' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='46.980267' />
   </node>
   <node id='-2603994' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='47.013633' />
   </node>
   <node id='-2603995' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0026' />
     <tag k='time' v='47.047' />
   </node>
   <node id='-2603996' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0025' />
     <tag k='time' v='47.080367' />
   </node>
   <node id='-2603997' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='47.113733' />
   </node>
   <node id='-2603998' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0024' />
     <tag k='time' v='47.1471' />
   </node>
   <node id='-2603999' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='47.180467' />
   </node>
   <node id='-2604000' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='47.213833' />
   </node>
   <node id='-2604001' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0023' />
     <tag k='time' v='47.2472' />
   </node>
   <node id='-2604002' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.280567' />
   </node>
   <node id='-2604003' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.313933' />
   </node>
   <node id='-2604004' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.3473' />
   </node>
   <node id='-2604005' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.002' />
     <tag k='time' v='47.380667' />
   </node>
   <node id='-2604006' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.414033' />
   </node>
   <node id='-2604007' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.4474' />
   </node>
   <node id='-2604008' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.480767' />
   </node>
   <node id='-2604009' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.514133' />
   </node>
   <node id='-2604010' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.5475' />
   </node>
   <node id='-2604011' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.580867' />
   </node>
   <node id='-2604012' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.614233' />
   </node>
   <node id='-2604013' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.6476' />
   </node>
   <node id='-2604014' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.680967' />
   </node>
   <node id='-2604015' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.714333' />
   </node>
   <node id='-2604016' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.7477' />
   </node>
   <node id='-2604017' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.781067' />
   </node>
   <node id='-2604018' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.814433' />
   </node>
   <node id='-2604019' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.8478' />
   </node>
   <node id='-2604020' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.881167' />
   </node>
   <node id='-2604021' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0022' />
     <tag k='time' v='47.914533' />
   </node>
   <node id='-2604022' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0021' />
     <tag k='time' v='47.9479' />
   </node>
   <node id='-2604023' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0019' />
     <tag k='time' v='47.981267' />
   </node>
   <node id='-2604024' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0018' />
     <tag k='time' v='48.014633' />
   </node>
   <node id='-2604025' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.048' />
   </node>
   <node id='-2604026' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.081367' />
   </node>
   <node id='-2604027' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.114733' />
   </node>
   <node id='-2604028' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.1481' />
   </node>
   <node id='-2604029' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.181467' />
   </node>
   <node id='-2604030' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.214833' />
   </node>
   <node id='-2604031' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.2482' />
   </node>
   <node id='-2604032' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.281567' />
   </node>
   <node id='-2604033' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.314933' />
   </node>
   <node id='-2604034' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0018' />
     <tag k='time' v='48.3483' />
   </node>
   <node id='-2604035' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.381667' />
   </node>
   <node id='-2604036' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.415033' />
   </node>
   <node id='-2604037' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0017' />
     <tag k='time' v='48.4484' />
   </node>
   <node id='-2604038' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.481767' />
   </node>
   <node id='-2604039' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.515133' />
   </node>
   <node id='-2604040' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='48.5485' />
   </node>
   <node id='-2604041' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.581867' />
   </node>
   <node id='-2604042' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.615233' />
   </node>
   <node id='-2604043' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.6486' />
   </node>
   <node id='-2604044' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.681967' />
   </node>
   <node id='-2604045' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.715333' />
   </node>
   <node id='-2604046' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.7487' />
   </node>
   <node id='-2604047' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0014' />
     <tag k='time' v='48.782067' />
   </node>
   <node id='-2604048' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0014' />
     <tag k='time' v='48.815433' />
   </node>
   <node id='-2604049' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0013' />
     <tag k='time' v='48.8488' />
   </node>
   <node id='-2604050' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0013' />
     <tag k='time' v='48.882167' />
   </node>
   <node id='-2604051' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0014' />
     <tag k='time' v='48.915533' />
   </node>
   <node id='-2604052' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0014' />
     <tag k='time' v='48.9489' />
   </node>
   <node id='-2604053' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0015' />
     <tag k='time' v='48.982267' />
   </node>
   <node id='-2604054' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='49.015633' />
   </node>
   <node id='-2604055' visible='true' lat='43.47813561694' lon='-80.52001523751'>
-    <tag k='angle' v='5.3426' />
+    <tag k='yaw' v='5.3426' />
     <tag k='speed' v='0.0016' />
     <tag k='time' v='49.049' />
   </node>

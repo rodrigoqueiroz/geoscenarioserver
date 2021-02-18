@@ -117,7 +117,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                     nd.y = float(node.y)
                     nd.time = float(node.tags['time'])
                     nd.speed = float(node.tags['speed']) if ('speed' in node.tags) else None
-                    nd.angle = float(node.tags['angle']) if ('angle' in node.tags) else None
+                    nd.yaw = float(node.tags['yaw']) if ('yaw' in node.tags) else None
                     trajectory.append(nd)
                 vehicle = TV(vid = vid,                                     #<= must ne integer                             
                             name = name,                                    #vehicle name
@@ -168,7 +168,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                     nd.time = float(node.tags['time'])
                     nd.x = float(node.x)
                     nd.y = float(node.y)
-                    nd.angle = float(node.tags['angle']) if 'angle' in node.tags else None
+                    nd.yaw = float(node.tags['yaw']) if 'yaw' in node.tags else None
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
                 pedestrian = TP(pid, name, start_state,trajectory)
@@ -258,7 +258,7 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
         time:float
         x:float
         y:float
-        angle:float
+        yaw:float
         speed:float
         
     trajectory = [TNode(0.00, 0,0,0), TNode(0.01, 1,0,0.90) ] #...
