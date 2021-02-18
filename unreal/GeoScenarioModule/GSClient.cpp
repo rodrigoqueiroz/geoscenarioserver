@@ -161,9 +161,9 @@ void AGSClient::ReadServerState(float deltaTime)
 
 		if (vid==0) {continue;} //garbage at the end of string
 
-		int type;
+		int v_type;
 		float x, y, z, yaw, x_vel, y_vel, steer;
-		iss >> type >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
+		iss >> v_type >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
 		// Unreal's y axis is inverted from GS server's.
 		y *= -1;
 		y_vel *= -1;
@@ -177,12 +177,12 @@ void AGSClient::ReadServerState(float deltaTime)
 			UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
 			UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
-			CreateVehicle(vid, type);
+			CreateVehicle(vid, v_type);
 			//debug
 			continue;
 		}
 
-		if (type == 1)
+		if (v_type == 1)
 		{
 			if (server_framestat.tick_count == server_tick_count) 
 			{
@@ -217,7 +217,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
-		if (gsv.type == 0) continue;
+		if (gsv.v_type == 0) continue;
 
 		// Update the vehicle's vehicle_state based on its actor's location.
 		// Actual movement of the vehicle is updated in another class.
@@ -234,14 +234,14 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	}
 }
 
-void AGSClient::CreateVehicle(int vid, int type)
+void AGSClient::CreateVehicle(int vid, int v_type)
 {
-	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d type=%d"), vid, type);
+	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d v_type=%d"), vid, v_type);
 	GSVehicle gsv = GSVehicle();
 	gsv.vid = vid;
-	gsv.type = type;
+	gsv.v_type = v_type;
 	gsv.vehicle_state =  VehicleState();
-	if (type == 1) // SDV
+	if (v_type == 1) // SDV
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
@@ -276,7 +276,7 @@ void AGSClient::CreateVehicle(int vid, int type)
 	{
 		vehicles.Add(vid, gsv);
 	}
-	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d type=%d"), vid, type);}
+	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d v_type=%d"), vid, v_type);}
 }
 
 
