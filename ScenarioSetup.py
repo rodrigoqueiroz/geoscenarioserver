@@ -49,14 +49,14 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
 
     #========= Traffic lights 
     for name, tnode in parser.tlights.items():
-        tl_type = tnode.tags['type'] if 'type' in tnode.tags else 'default'
+        tltype = tnode.tags['type'] if 'type' in tnode.tags else 'default'
         states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        if tl_type == 'left':
+        if tltype == 'left':
             tl_type = TrafficLightType.left
-        elif tl_type == 'right':
+        elif tltype == 'right':
             tl_type = TrafficLightType.right
-        elif tl_type == 'pedestrian':
+        elif tltype == 'pedestrian':
             tl_type = TrafficLightType.pedestrian
         else: 
             tl_type = TrafficLightType.default
