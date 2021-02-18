@@ -7,7 +7,7 @@
   </node>
   <node id='-1133020' action='modify' visible='true' lat='43.43566802396' lon='-80.58219187814'>
     <tag k='gs' v='egostart' />
-    <tag k='orientation' v='45' />
+    <tag k='yaw' v='45' />
     <tag k='rotation' v='45' />
   </node>
   <node id='-1133022' action='modify' visible='true' lat='43.43463161839' lon='-80.58102473684'>
@@ -17,7 +17,7 @@
     <tag k='cycles' v='1' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='ped_1' />
-    <tag k='orientation' v='45' />
+    <tag k='yaw' v='45' />
     <tag k='path' v='ped_1_path' />
     <tag k='speed' v='[5.0:8.0]' />
     <tag k='start' v='no' />
