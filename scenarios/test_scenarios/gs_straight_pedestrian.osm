@@ -14,7 +14,7 @@
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='orientation' v='325' />
+    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
   </node>
@@ -27,19 +27,19 @@
   <node id='-5145451' action='modify' visible='true' lat='49.00800286229' lon='8.45800134479' />
   <node id='-5145452' action='modify' visible='true' lat='49.00755482368' lon='8.45740003019'>
     <tag k='gs' v='tnode' />
-    <tag k='orientation' v='320' />
+    <tag k='yaw' v='320' />
     <tag k='speed' v='5' />
     <tag k='time' v='0' />
   </node>
   <node id='-5145453' action='modify' visible='true' lat='49.00757986515' lon='8.45742899844'>
     <tag k='gs' v='tnode' />
-    <tag k='orientation' v='320' />
+    <tag k='yaw' v='320' />
     <tag k='speed' v='5' />
     <tag k='time' v='1' />
   </node>
   <node id='-5145454' action='modify' visible='true' lat='49.00762692639' lon='8.45749141185'>
     <tag k='gs' v='tnode' />
-    <tag k='orientation' v='320' />
+    <tag k='yaw' v='320' />
     <tag k='speed' v='5' />
     <tag k='time' v='3' />
   </node>
@@ -54,7 +54,7 @@
   </node>
   <node id='-5145595' action='modify' visible='true' lat='49.0076037089' lon='8.45745898716'>
     <tag k='gs' v='tnode' />
-    <tag k='orientation' v='320' />
+    <tag k='yaw' v='320' />
     <tag k='speed' v='5' />
     <tag k='time' v='2' />
   </node>

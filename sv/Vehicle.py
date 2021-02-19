@@ -30,7 +30,7 @@ class Vehicle(Actor):
     TV_TYPE = 3
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id,name, start_state,frenet_state)
+        super().__init__(id,name, start_state,frenet_state, VehicleState())
         self.type = Vehicle.N_TYPE
         self.radius = VEHICLE_RADIUS
 
@@ -47,7 +47,7 @@ class Vehicle(Actor):
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
         #remote = 1 if self.is_remote else 0
-        return self.vid, type, position, velocity, self.state.angle, self.state.steer
+        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
 
 
 class SDV(Vehicle):

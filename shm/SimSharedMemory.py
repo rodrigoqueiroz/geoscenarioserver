@@ -16,12 +16,12 @@ class SimSharedMemory(object):
             # create a semaphore and SHM for for Serve State
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
             log.info("ShM SS semaphore created")
-            self.ss_shm = sysv_ipc.SharedMemory(self.ss_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=1024)
+            self.ss_shm = sysv_ipc.SharedMemory(self.ss_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
             log.info("ShM SS memory created")
             # create a semaphore and SHM for for Client State
             self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
             log.info("ShM CS semaphore created")
-            self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=1024)
+            self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
             log.info("ShM CS memory created")
             self.is_connected = True
         except sysv_ipc.Error:
@@ -34,7 +34,7 @@ class SimSharedMemory(object):
             @param pedestrians:      dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count delta_time n_vehicles
-                vid is_remote x y z yaw vx vy steering_angle
+                vid v_type x y z yaw vx vy steering_angle
                 ...
         """
         if not self.is_connected:
@@ -44,9 +44,9 @@ class SimSharedMemory(object):
         write_str = "{} {} {} {}\n".format(tick_count, delta_time, len(vehicles), len(pedestrians))
         # write vehicle states
         for svid in vehicles:
-            vid, remote, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
+            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
-                vid, remote, position[0], position[1], position[2],
+                vid, v_type, position[0], position[1], position[2],
                 yaw, velocity[0], velocity[1], steering_angle)
 
         for spid in pedestrians:

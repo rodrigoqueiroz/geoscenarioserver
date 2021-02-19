@@ -16,7 +16,7 @@
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='orientation' v='325' />
+    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
   </node>
@@ -31,7 +31,7 @@
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v2' />
-    <tag k='orientation' v='325' />
+    <tag k='yaw' v='325' />
     <tag k='route' v='right_route' />
     <tag k='vid' v='2' />
   </node>

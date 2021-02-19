@@ -128,7 +128,7 @@ class GSParser(object):
 
     def check_pedestrian(self, n):
         mandatory = {"gs","pid","name"}
-        optional = {"orientation","model","btype","trajectory", "esource", "eid",
+        optional = {"yaw","model","btype","trajectory", "esource", "eid",
                     "speed","path","cycles","usespeedprofile","start","group"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
@@ -137,7 +137,7 @@ class GSParser(object):
 
     def check_vehicle(self, n):
         mandatory = {"gs","vid","name"}
-        optional = { "orientation","model","btype","trajectory","route","btree", "esource", "eid",
+        optional = { "yaw","model","btype","trajectory","route","btree", "esource", "eid",
                     "speed","path","cycles","usespeedprofile","start","group",}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
@@ -222,7 +222,7 @@ class GSParser(object):
 
     def check_ego_start(self, n):
         mandatory = {"gs"}
-        optional = {"orientation"}
+        optional = {"yaw"}
         self.check_tags(n, mandatory, optional)
         if self.origin is not None:
             self.report.log_error("Element {}: Duplicate Egostart node. Must be unique".format(n.id))

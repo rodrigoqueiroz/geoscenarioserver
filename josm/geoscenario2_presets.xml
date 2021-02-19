@@ -69,7 +69,7 @@
   		
   	<item name="Ego Start" icon="ego.png" type="node" preset_name_label="true">
 		<key key="gs" value="egostart" />
-		<text key="orientation" text="* Orientation(deg)" />
+		<text key="yaw" text="* Yaw(deg)" />
 		<space/>
 		<label text="Ego's starting position" />
   	</item>
@@ -132,7 +132,7 @@
 
 		<text key="pid" text="* PID " />
 		<text key="name" text="* Name " />
-		<text key="orientation" text="Orientation[](deg)" />
+		<text key="yaw" text="Yaw[](deg)" />
 		<text key="model" text="Model" />
 		<combo key="btype" text="Behavior Type:" values="TP,EP,PP" default="" />
 		<item_separator />
@@ -177,7 +177,7 @@
 
 		<text key="vid" text="* VID " />
 		<text key="name" text="* Name " />
-		<text key="orientation" text="Orientation[](deg)" />
+		<text key="yaw" text="Yaw[](deg)" />
 		<text key="model" text="Model" />
 		<combo key="btype" text="Behavior Type:" values="SDV,TV,EV,PV" default="" />
 		<item_separator />
@@ -275,7 +275,7 @@
 		<key key="gs" value="tnode" />
 		<item_separator />
 		<text key="time" text="Time" />
-		<text key="orientation" text="Orientation" />
+		<text key="yaw" text="Yaw" />
 		<text key="speed" text="Speed" />
   	</item>
 

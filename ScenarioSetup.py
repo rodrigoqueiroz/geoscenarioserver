@@ -49,19 +49,19 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
 
     #========= Traffic lights 
     for name, tnode in parser.tlights.items():
-        type = tnode.tags['type'] if 'type' in tnode.tags else 'default'
+        tltype = tnode.tags['type'] if 'type' in tnode.tags else 'default'
         states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        if type == 'left':
+        if tltype == 'left':
             tl_type = TrafficLightType.left
-        elif type == 'right':
+        elif tltype == 'right':
             tl_type = TrafficLightType.right
-        elif type == 'pedestrian':
+        elif tltype == 'pedestrian':
             tl_type = TrafficLightType.pedestrian
         else: 
             tl_type = TrafficLightType.default
         #name must match a traffic light in the lanelet map with tag 'name'
-        tl = TL(name, states, durations, type = tl_type)         
+        tl = TL(name, states, durations, tl_type = tl_type)
         sim_traffic.add_traffic_light(tl)
     
     #=========  Ego (External Vehicle)
@@ -117,7 +117,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                     nd.y = float(node.y)
                     nd.time = float(node.tags['time'])
                     nd.speed = float(node.tags['speed']) if ('speed' in node.tags) else None
-                    nd.angle = float(node.tags['angle']) if ('angle' in node.tags) else None
+                    nd.yaw = float(node.tags['yaw']) if ('yaw' in node.tags) else None
                     trajectory.append(nd)
                 vehicle = TV(vid = vid,                                     #<= must ne integer                             
                             name = name,                                    #vehicle name
@@ -168,7 +168,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                     nd.time = float(node.tags['time'])
                     nd.x = float(node.x)
                     nd.y = float(node.y)
-                    nd.angle = float(node.tags['angle']) if 'angle' in node.tags else None
+                    nd.yaw = float(node.tags['yaw']) if 'yaw' in node.tags else None
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
                 pedestrian = TP(pid, name, start_state,trajectory)
@@ -275,7 +275,7 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
         time:float
         x:float
         y:float
-        angle:float
+        yaw:float
         speed:float
         
     trajectory = [TNode(0.00, 0,0,0), TNode(0.01, 1,0,0.90) ] #...
