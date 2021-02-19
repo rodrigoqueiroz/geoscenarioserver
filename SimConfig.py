@@ -76,6 +76,7 @@ SHM_SIZE = 2048
 class SimConfig:
     lanelet_routes:Dict = field(default_factory=dict)
     goal_points:Dict = field(default_factory=dict)
+    pedestrian_goal_points:Dict = field(default_factory=dict)
     scenario_name:str = "Unamed scenario"
     map_name:str = "Unknown map"
     timeout:int = TIMEOUT

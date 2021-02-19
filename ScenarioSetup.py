@@ -187,8 +187,8 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 route_nodes = parser.routes[p_route].nodes
                 #lanelets_in_route = [lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes]   # a valid lanelet route
                 #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(lanelets_in_route)
-                sim_config.goal_points[pid] = (route_nodes[-1].x, route_nodes[-1].y)
-                pedestrian = SP(pid, name, start_state, list(sim_config.goal_points[pid]))
+                sim_config.pedestrian_goal_points[pid] = (route_nodes[-1].x, route_nodes[-1].y)
+                pedestrian = SP(pid, name, start_state, list(sim_config.pedestrian_goal_points[pid]))
                 sim_traffic.add_pedestrian(pedestrian)
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
