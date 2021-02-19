@@ -91,11 +91,12 @@ class SimTraffic(object):
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
+        np = len(self.pedestrians)
 
         #Read Client
         if (self.sim_client_shm):
             new_client_state = False
-            header, vstates, pstates, disabled_vehicles, disabled_pedestrians = self.sim_client_shm.read_client_state(nv)
+            header, vstates, pstates, disabled_vehicles, disabled_pedestrians = self.sim_client_shm.read_client_state(nv, np)
             if header is not None:
                 client_tick_count, client_delta_time, n_vehicles = header
                 if self.sim_client_tick_count < client_tick_count:
@@ -196,7 +197,7 @@ class SimTraffic(object):
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
-            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrian)
+            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrians)
 
 
 

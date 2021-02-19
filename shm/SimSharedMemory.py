@@ -31,6 +31,7 @@ class SimSharedMemory(object):
     def write_server_state(self, tick_count, delta_time, vehicles, pedestrians):
         """ Writes to shared memory pose data for each Vehicle.
             @param vehicles:      dictionary of type <int, Vehicle>
+            @param pedestrians:      dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count delta_time n_vehicles
                 vid is_remote x y z yaw vx vy steering_angle
