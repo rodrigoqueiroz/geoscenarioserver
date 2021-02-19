@@ -60,7 +60,7 @@ install_lanelet2_binary()
     echo ""
     echo "Installing Lanelet2 library from ROS binaries..."
     echo ""
-    if which rosversion > /dev/null && [[ $(rosversion -d) == "<unknown>" ]]; then
+    if ! which rosversion > /dev/null || [[ $(rosversion -sd) == "<unknown>" ]]; then
         echo "No ROS distribution was found. Please ensure that setup.bash is sourced."
         exit 1
     fi
