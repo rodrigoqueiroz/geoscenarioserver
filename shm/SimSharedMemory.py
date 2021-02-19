@@ -33,8 +33,9 @@ class SimSharedMemory(object):
             @param vehicles:      dictionary of type <int, Vehicle>
             @param pedestrians:      dictionary of type <int, Pedestrian>
             Shared memory format:
-                tick_count delta_time n_vehicles
-                vid v_type x y z yaw vx vy steering_angle
+                tick_count delta_time n_vehicles n_pedestrians
+                vid v_type x y z vx vy yaw  steering_angle
+                pid p_type x y z vx vy yaw
                 ...
         """
         if not self.is_connected:
@@ -50,9 +51,9 @@ class SimSharedMemory(object):
                 yaw, velocity[0], velocity[1], steering_angle)
 
         for spid in pedestrians:
-            pid, ptype, position, velocity, yaw = pedestrians[spid].get_sim_state()
+            pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
             write_str += "{} {} {} {} {} {} {} {}\n".format(
-                pid, ptype, position[0], position[1], position[2],
+                pid, p_type, position[0], position[1], position[2],
                 velocity[0], velocity[1], yaw)
 
         # sysv_ipc.BusyError needs to be caught
