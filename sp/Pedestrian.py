@@ -71,7 +71,7 @@ class TP(Pedestrian):
 
 class SP(Pedestrian):
     """
-    A path following pedestrian (dynamic behavior)
+    A pedestrian following a dynamic behavior model based on the Social Force Model (SFM)
     """
 
     def __init__(self, id, name, start_state, destination):
@@ -91,6 +91,10 @@ class SP(Pedestrian):
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
 
     def update_position_SFM(self, curr_pos, curr_vel):
+        '''
+        Paper with details on SFM formulas: https://royalsocietypublishing.org/doi/full/10.1098/rspb.2009.0405
+        This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
+        '''
         direction = np.array(normalize(self.destination - curr_pos))
         desired_vel = direction * self.desired_speed
 
@@ -129,7 +133,10 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A=4.5, gamma=0.35, n=2.0, n_prime=3.0, lambda_w=2.0):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A=4.5, gamma=0.35, n=2.0, n_prime=3.0, lambda_w=2.0, epsilon=0.005):
+        '''
+        Calculates repulsive forces between pedestrians
+        ''' 
         other_pos = np.array([other_ped.state.x, other_ped.state.y])
         other_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
 
@@ -143,6 +150,8 @@ class SP(Pedestrian):
         theta = np.arccos(dot_product)
 
         B = gamma * np.linalg.norm(Dij)
+
+        theta += B*epsilon
         
         fij = -A*np.exp(-dij/B) * (np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
 

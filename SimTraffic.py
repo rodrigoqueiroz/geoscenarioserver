@@ -86,7 +86,7 @@ class SimTraffic(object):
         for vid in self.vehicles:
             self.vehicles[vid].stop()
         for pid in self.pedestrians:
-            self.vehicles[pid].stop()
+            self.pedestrians[pid].stop()
         
 
     def tick(self, tick_count, delta_time, sim_time):

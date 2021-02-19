@@ -49,10 +49,10 @@ class SimSharedMemory(object):
                 yaw, velocity[0], velocity[1], steering_angle)
 
         for spid in pedestrians:
-            pid, ptype, position, velocity, angle = pedestrians[spid].get_sim_state()
+            pid, ptype, position, velocity, yaw = pedestrians[spid].get_sim_state()
             write_str += "{} {} {} {} {} {} {} {}\n".format(
                 pid, ptype, position[0], position[1], position[2],
-                velocity[0], velocity[1], angle)
+                velocity[0], velocity[1], yaw)
 
         # sysv_ipc.BusyError needs to be caught
         try:
