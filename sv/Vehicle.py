@@ -47,7 +47,7 @@ class Vehicle(Actor):
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
         #remote = 1 if self.is_remote else 0
-        return self.id, self.type, position, velocity, self.state.angle, self.state.steer
+        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
 
 
 class SDV(Vehicle):
@@ -169,7 +169,7 @@ class SDV(Vehicle):
             heading = np.array([y_vector[1], x_vector[1]])
             if self.reversing:
                 heading *= -1
-            self.state.angle = math.degrees(math.atan2(heading[1], heading[0]))
+            self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
             #sanity check
             #if ( self.state.x < self.last_x) :
             #    diff = self.state.x - self.last_x
