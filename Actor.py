@@ -106,7 +106,7 @@ class TrajNode:
     y:float = 0.0
     time:float = 0.0
     speed:float = 0.0
-    angle:float = 0.0
+    yaw:float = 0.0
 
 @dataclass
 class ActorSimState(IntEnum):
@@ -137,8 +137,8 @@ class ActorState:
     d_vel:float = 0.0
     d_acc:float = 0.0
     
-    #orientation
-    angle:float = 0.0
+    #the direction the actor is facing
+    yaw:float = 0.0
 
     
     #For easy shared memory parsing
@@ -155,11 +155,11 @@ class ActorState:
         self.set_Y(arr[3:6])
         self.set_S(arr[6:9])
         self.set_D(arr[9:12])
-        self.angle = arr[13]
+        self.yaw = arr[13]
 
     #For easy shared memory parsing
     def get_state_vector(self):
-        combined = self.get_cart_state_vector() + self.get_frenet_state_vector() + [self.angle]
+        combined = self.get_cart_state_vector() + self.get_frenet_state_vector() + [self.yaw]
         return combined
 
     def get_X(self):

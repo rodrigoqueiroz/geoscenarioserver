@@ -16,7 +16,7 @@
   </node>
   <node id='-115' action='modify' visible='true' lat='49.00383720662' lon='8.42391586435'>
     <tag k='gs' v='egostart' />
-    <tag k='orientation' v='45' />
+    <tag k='yaw' v='45' />
     <tag k='rotation' v='45' />
   </node>
   <node id='-117' action='modify' visible='true' lat='49.00295975322' lon='8.42471711431'>
@@ -39,7 +39,7 @@
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
-    <tag k='orientation' v='0' />
+    <tag k='yaw' v='0' />
     <tag k='route' v='route left' />
     <tag k='speed' v='30' />
     <tag k='start' v='yes' />
@@ -53,7 +53,7 @@
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
-    <tag k='orientation' v='0' />
+    <tag k='yaw' v='0' />
     <tag k='route' v='route right' />
     <tag k='speed' v='30' />
     <tag k='start' v='yes' />

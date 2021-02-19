@@ -63,12 +63,12 @@ class TrajNode:
     y:float = 0.0
     time:float = 0.0
     speed:float = 0.0
-    angle:float = 0.0
+    yaw:float = 0.0
 
 @dataclass
 class TrajStats:
     start_time:float = 0.0
-    start_angle:float = 0.0
+    start_yaw:float = 0.0
     start_speed:float = 0.0
     start_vel_x:float  = 0.0
     start_vel_y:float = 0.0
@@ -151,12 +151,12 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     # add traffic lights
     for name, tnode in parser.tlights.items():
-        type = tnode.tags['type']
+        tltype = tnode.tags['type']
         # link the traffic light reg elem to the traffic light state from GS
         tl_reg_elem = lanelet_map.get_traffic_light_by_name(name)
         states = list(map(TrafficLightColor.from_str, tnode.tags['states'].split(',')))
         durations = list(map(float, str(tnode.tags['duration']).split(',')))
-        sim_traffic.add_traffic_light(tl_reg_elem, name, type, states, durations)
+        sim_traffic.add_traffic_light(tl_reg_elem, name, tltype, states, durations)
 
     #========================== Load Scenario
 
@@ -273,8 +273,8 @@ def query_track(vid, c, projector):
         node.x = cart_pt.x
         node.y = cart_pt.y
         node.speed = float(step[3]) / 3.6 #NOTE: assuming speed from DB is km/h
-        node.angle = float(step[7]) #degrees(float(step[7]))  #NOTE: assuming angle from DB is radians and UTM84
-        node.xvel, node.yvel = speed_to_vel(node.speed, node.angle)
+        node.yaw = float(step[7]) #degrees(float(step[7]))  #NOTE: assuming angle from DB is radians and UTM84
+        node.xvel, node.yvel = speed_to_vel(node.speed, node.yaw)
         #node.tan_acc = float(step[4])
         #node.lat_acc = float(step[5])
         
@@ -301,8 +301,8 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     ts.min_speed = min(trajectory,key=lambda x:x.speed).speed
     ts.max_speed = max(trajectory,key=lambda x:x.speed).speed
     ts.avg_speed = sum([ node.speed for node in trajectory]) / len(trajectory)
-    ts.start_angle = trajectory[0].angle
-    ts.start_vel_x, ts.start_vel_y = speed_to_vel(trajectory[0].speed, trajectory[0].angle)
+    ts.start_yaw = trajectory[0].yaw
+    ts.start_vel_x, ts.start_vel_y = speed_to_vel(trajectory[0].speed, trajectory[0].yaw)
     for node in trajectory:
         if node.speed <= 0.01:
             ts.stop_time = node.time
