@@ -604,18 +604,18 @@ class Dashboard(object):
         self.map_canvas.get_tk_widget().pack()
         
         # table
-        tab = ttk.Treeview(tab_frame)
-        tab['columns'] = ('id', 'sim_st', 
-                            'x', 'x_vel', 'x_acc',
-                            'y', 'y_vel', 'y_acc',
-                            's', 's_vel', 's_acc',
-                            'd', 'd_vel', 'd_acc',
-                            'yaw')
-        tab.heading("#0", text='id', anchor='w')
-        tab.column("#0", anchor="w" , width=100)
+        tab = ttk.Treeview(tab_frame, show=['headings'])
+        tab['columns'] = (
+            'id', 'sim_st',
+            'x', 'x_vel', 'x_acc',
+            'y', 'y_vel', 'y_acc',
+            's', 's_vel', 's_acc',
+            'd', 'd_vel', 'd_acc',
+            'yaw'
+        )
         for col in tab['columns']:
-            tab.heading(col, text=col, anchor='e')
-            tab.column(col, anchor="e", width=50, minwidth=50)
+            tab.heading(col, text=col, anchor='center')
+            tab.column(col, anchor='center', width=65, minwidth=65)
         tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
