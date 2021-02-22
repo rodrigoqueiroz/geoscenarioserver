@@ -169,7 +169,7 @@ class SimTraffic(object):
         #vehicles
         ri = 1 #row index, start at 1 for header
         for vid, vehicle in sorted(self.vehicles.items()):
-            sv = vehicle.state.get_state_vector() + vehicle.state.get_frenet_state_vector()
+            sv = vehicle.state.get_state_vector()
             i = ri * c  #first index for row
             self.traffic_state_sharr[ i ] = vid
             self.traffic_state_sharr[ i+1 ] = vehicle.type
