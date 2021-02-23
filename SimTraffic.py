@@ -169,7 +169,7 @@ class SimTraffic(object):
         #vehicles
         ri = 1 #row index, start at 1 for header
         for vid, vehicle in sorted(self.vehicles.items()):
-            sv = vehicle.state.get_state_vector() + vehicle.state.get_frenet_state_vector()
+            sv = vehicle.state.get_state_vector()
             i = ri * c  #first index for row
             self.traffic_state_sharr[ i ] = vid
             self.traffic_state_sharr[ i+1 ] = vehicle.type
@@ -277,7 +277,7 @@ class SimTraffic(object):
             vehicle.type = v_type
             vehicle.sim_state = sim_state
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[ i+3 : i+18 ]
+            state_vector = traffic_state_sharr[ i+3 : i+16 ]
             vehicle.state.set_state_vector(state_vector)
             vehicles[vid] = vehicle
         
@@ -295,7 +295,7 @@ class SimTraffic(object):
             pedestrian.type = p_type
             pedestrian.sim_state = sim_state
             # state vector contains the sim state
-            state_vector = traffic_state_sharr[ i+3 : i+17 ]
+            state_vector = traffic_state_sharr[ i+3 : i+16 ]
             pedestrian.state.set_state_vector(state_vector)
             pedestrians[pid] = pedestrian
         

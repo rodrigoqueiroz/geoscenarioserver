@@ -155,7 +155,7 @@ class ActorState:
         self.set_Y(arr[3:6])
         self.set_S(arr[6:9])
         self.set_D(arr[9:12])
-        self.yaw = arr[13]
+        self.yaw = arr[12]
 
     #For easy shared memory parsing
     def get_state_vector(self):
