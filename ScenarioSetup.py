@@ -251,7 +251,7 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
     try:
         vehicle = SDV(vid = vid,                                     #<= must ne integer                             
                     name = "my_sample_vehicle",                     #vehicle name
-                    btree_root = "drive_tree",                           #a behavior tree file (.btree) inside scenarios/btrees/
+                    btree_root = "drive_tree",                           #a behavior tree file (.btree) inside btrees/
                     start_state =  [vehicle_start.x,0.0,0.0, vehicle_start.y,0.0,0.0],          #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
                     lanelet_map = lanelet_map, 
                     lanelet_route = sim_config.lanelet_routes[vid])    #a valid lanelet route
