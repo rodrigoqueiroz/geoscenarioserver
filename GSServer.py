@@ -19,12 +19,23 @@ import glog as log
 def start_server(args, m=MVelKeepConfig()):
     # log.setLevel("INFO")
     log.info('GeoScenario server START')
-    lanelet_map = LaneletMap()
+    lanelet_map = LaneletMap() #creates an empty lanelet map
+
+    if args.verify_map != "": #loads the map specified at path but then returns
+        verify_map_file(args.verify_map, lanelet_map) 
+        return
+    
+    if args.map_path != "": #loads the lanelet map specified at path and continues
+        projector = UtmProjector(lanelet2.io.Origin(43.0, -80))
+        lanelet_map.load_lanelet_map(args.map_path, projector) 
+
+    #if args.btree_locations: #adds locations to search for btrees
+        #for location in btree_locations:
+            #how do I get to BehaviourModels from here with the locations?
+
     sim_config = SimConfig()
     traffic = SimTraffic(lanelet_map, sim_config)
-    if args.verify_map != "":
-        verify_map_file(args.verify_map, lanelet_map)
-        return
+    
     
     # SCENARIO SETUP
     if args.gsfile:
@@ -92,6 +103,8 @@ if __name__ == "__main__":
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
+    parser.add_argument("-m", "--map_path", dest="map_path", default="", help="provide a lanelet map path")
+    parser.add_argument("-b", "--btree_locations", dest="btree_locations", default="", help="a list of additional locations to search for btrees in")
     
     args = parser.parse_args()
     start_server(args)

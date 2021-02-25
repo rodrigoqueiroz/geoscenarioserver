@@ -94,6 +94,7 @@ class SVPlanner(object):
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
+        #TODO: Pass in multiple btrees folders, in order of priority
         self.behavior_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig)
 
         while sync_planner.tick():

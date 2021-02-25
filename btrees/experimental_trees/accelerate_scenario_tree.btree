@@ -1,0 +1,5 @@
+behaviortree AccerlerateSlowly:
+    ?
+        ->
+            condition start( sim_time (repeat=False, tmin=4, tmax=100))
+            subtree drive_tree:

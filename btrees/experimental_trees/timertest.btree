@@ -1,0 +1,17 @@
+behaviortree drive_tree:
+    ?
+        ->
+            condition goal ( reached_goal( threshold=35 ) )
+            maneuver stop_goal ( MStopConfig(type=2) )
+        ->
+            condition redlight ( traffic_light_red( threshold=40 ) )
+            ?
+                ->
+                    condition c_busy_lane( lane_occupied() )
+                    maneuver m_follow_lead ( MFollowConfig() )
+                maneuver stop_redlight ( MStopConfig( type=3 ) )
+        ->
+            condition c_busy_lane( lane_occupied() )
+            maneuver m_follow_lead ( MFollowConfig() )
+        maneuver m_keepvel ( MVelKeepConfig(vel=MP(16.0,10,6)) )
+

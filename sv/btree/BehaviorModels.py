@@ -23,6 +23,7 @@ class BehaviorModels(object):
     '''
 
     def __init__(self, vid, root_btree, reconfig = ""):
+        #TODO: Pass in multiple btrees folders, in order of priority
         self.vid = vid
         self.root_btree = root_btree
         #Build Tree
@@ -39,7 +40,7 @@ class BehaviorModels(object):
 
         #if it's defined by btree file. Use interpreter.
         if '.btree' in self.root_btree:
-            path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "scenarios/", self.root_btree)))
+            path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, self.root_btree)))
             file_noext = os.path.splitext(file)[0]
             interpreter = BTreeInterpreter(self.vid, bmodel=self, path = path)
             tree = interpreter.build_tree(tree_name=file_noext)
