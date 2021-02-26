@@ -24,13 +24,9 @@ def start_server(args, m=MVelKeepConfig()):
     if args.verify_map != "": #loads the map specified at path but then returns
         verify_map_file(args.verify_map, lanelet_map) 
         return
-    
-    if args.map_path != "": #loads the lanelet map specified at path and continues
-        projector = UtmProjector(lanelet2.io.Origin(43.0, -80))
-        lanelet_map.load_lanelet_map(args.map_path, projector) 
 
-    #if args.btree_locations: #adds locations to search for btrees
-        #for location in btree_locations:
+    #if args.btree-paths: #adds locations to search for btrees
+        #for location in btree-paths:
             #how do I get to BehaviourModels from here with the locations?
 
     sim_config = SimConfig()
@@ -41,12 +37,12 @@ def start_server(args, m=MVelKeepConfig()):
     if args.gsfile:
         if '.osm' in args.gsfile:
             #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map)
+            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path)
         else:
             #Direct setup
-            res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
+            res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map, args.map_path)
     else: 
-        res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
+        res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map, args.map_path)
 
     if not res:
         log.error("Failed to load scenario")
@@ -103,8 +99,8 @@ if __name__ == "__main__":
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
-    parser.add_argument("-m", "--map_path", dest="map_path", default="", help="provide a lanelet map path")
-    parser.add_argument("-b", "--btree_locations", dest="btree_locations", default="", help="a list of additional locations to search for btrees in")
+    parser.add_argument("-m", "--map-path", dest="map-path", default="", help="provide a lanelet map path")
+    parser.add_argument("-b", "--btree-paths", dest="btree-paths", default="", help="a list of additional locations to search for btrees in")
     
     args = parser.parse_args()
     start_server(args)

@@ -18,7 +18,7 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
-def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, evaluation_mode = False):
+def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, evaluation_mode = False, map_file):
     """ Setup scenario from GeoScenario file
     """
     #========= Parse GeoScenario File
@@ -39,7 +39,8 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         sim_config.plot_vid = parser.globalconfig.tags['plotvid']
 
     #========= Map
-    map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet'])
+    if map_file == "":
+        map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet'])
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
@@ -205,23 +206,24 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
     #Finished
     return True
 
-def load_geoscenario_from_code(scenario_name:str, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
+def load_geoscenario_from_code(scenario_name:str, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_file):
     """ Setup scenario directly from code
         Add more entries as more scenarios are added
     """
     log.info("Loading GeoScenario from code: {}".format(scenario_name))
     if scenario_name == '':
         log.info("No scenario was given. Loading sample scenario")
-        return sample_scenario(sim_traffic, sim_config, lanelet_map)
+        return sample_scenario(sim_traffic, sim_config, lanelet_map, map_file)
     elif scenario_name == 'my_scenario':
-        return my_scenario(sim_traffic, sim_config, lanelet_map)
+        return my_scenario(sim_traffic, sim_config, lanelet_map, map_file)
 
-def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
+def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap), map_file:
     """ Sample scenario using a Lanelet map
     """
     #Map
-    projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4, 0.0))    
-    map_file = "maps/ll2_mapping_example.osm"
+    projector = UtmProjector(lanelet2.io.Origin(49.0, 8.4, 0.0))
+    if map_file == "":    
+        map_file = "maps/ll2_mapping_example.osm"
     map_file = os.path.join(ROOT_DIR, 'scenarios',map_file)
     lanelet_map.load_lanelet_map(map_file, projector)
     sim_config.scenario_name = "MyScenario"
