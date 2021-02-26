@@ -90,7 +90,7 @@ class SDV(Vehicle):
         self.reversing = False
 
 
-    def start_planner(self):
+    def start_planner(self, btree_paths):
             #nvehicles,
             #,
             #traffic_state_sharr,
@@ -100,7 +100,7 @@ class SDV(Vehicle):
             If a planner is started, the vehicle can't be a remote.
         """
         self.sv_planner = SVPlanner(self, self.sim_traffic)
-        self.sv_planner.start()
+        self.sv_planner.start(btree_paths)
 
     def stop(self):
         if self.sv_planner:

@@ -22,9 +22,10 @@ from TrafficLight import TrafficLight
 
 class SimTraffic(object):
 
-    def __init__(self, laneletmap, sim_config):
+    def __init__(self, laneletmap, sim_config, btree_paths):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
+        self.btree_paths = btree_paths
         
         #Dyn agents
         self.vehicles = {}  #dictionary for direct access using vid
@@ -79,7 +80,7 @@ class SimTraffic(object):
             if vehicle.type == Vehicle.SDV_TYPE:
                 #vehicle.start_planner(
                 #    nv, self.sim_config, self.traffic_state_sharr, self.traffic_pedestrian_sharr, self.traffic_light_sharr, self.debug_shdata)
-                vehicle.start_planner()
+                vehicle.start_planner(btree_paths)
 
     def stop_all(self):
         self.write_log_trajectories()

@@ -22,7 +22,7 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree, reconfig = ""):
+    def __init__(self, vid, root_btree, reconfig = "", btree_paths):
         #TODO: Pass in multiple btrees folders, in order of priority
         self.vid = vid
         self.root_btree = root_btree
@@ -35,15 +35,26 @@ class BehaviorModels(object):
         #decision
         self.current_mconfig = None
         self.ref_path_changed = False
+        self.btree_paths = btree_paths
 
-    def build(self,reconfig):
-
-        #if it's defined by btree file. Use interpreter.
-        if '.btree' in self.root_btree:
-            path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, self.root_btree)))
+    def interpret_btree(self, btree):
+            path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, self.btree)))
             file_noext = os.path.splitext(file)[0]
             interpreter = BTreeInterpreter(self.vid, bmodel=self, path = path)
             tree = interpreter.build_tree(tree_name=file_noext)
+            return tree
+
+    def build(self,reconfig):
+        #if it's defined by btree file, Use interpreter.
+        #interpret btree_paths instead of root if btree_paths given
+        btree_found = False
+        if btree_paths:
+            for string current_path in btree_paths:
+                if (not btree_found) and '.btree' in self.current_path:
+                    btree_found = True #makes earlier items in the list take priority
+                    tree = self.interpret_btree(current_path)
+        else if '.btree' in self.root_btree:
+            self.interpret_btree(self.root_btree)
             '''
             args format:
                 For maneuvers always write m_id=MConfig(x=1,y=2)

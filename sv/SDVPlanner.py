@@ -50,7 +50,7 @@ class SVPlanner(object):
         self.behavior_model = None
         self.mconfig = None
 
-    def start(self):
+    def start(self, btree_paths):
         #Create Shared arrray for Plan
         c = MotionPlan.VECTORSIZE
         self._mplan_sharr = Array('f', c)
@@ -60,6 +60,7 @@ class SVPlanner(object):
             self._mplan_sharr, 
             self._debug_shdata), daemon=True)
         self._process.start()
+        self.btree_paths = btree_paths
 
     def stop(self):
         if self._process:
@@ -95,7 +96,7 @@ class SVPlanner(object):
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         #TODO: Pass in multiple btrees folders, in order of priority
-        self.behavior_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig)
+        self.behavior_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig, self.btree_paths)
 
         while sync_planner.tick():
             # Get sim state from main process
