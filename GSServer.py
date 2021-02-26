@@ -99,8 +99,8 @@ if __name__ == "__main__":
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
-    parser.add_argument("-m", "--map-path", dest="map-path", default="", help="provide a lanelet map path")
-    parser.add_argument("-b", "--btree-paths", dest="btree-paths", default="", help="a list of additional locations to search for btrees in")
+    parser.add_argument("-m", "--map-path", dest="map_path", default="", help="provide a lanelet map path")
+    parser.add_argument("-b", "--btree-paths", dest="btree_paths", default="", help="a list of additional locations to search for btrees in")
     
     args = parser.parse_args()
     start_server(args)
