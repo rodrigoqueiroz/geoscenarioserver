@@ -5,12 +5,12 @@
 # GEOSCENARIO SIMULATION VEHICLE PLANNER
 # --------------------------------------------
 
+import datetime
 import numpy as np
 from multiprocessing import shared_memory, Process, Lock, Array, Manager
 from typing import Dict, List
 import glog as log
 from copy import copy
-
 from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
 from sv.ManeuverConfig import *
@@ -24,6 +24,7 @@ from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position
 import lanelet2.core
 from mapping.LaneletMap import *
 from Actor import *
+from sv.FrenetTrajectory import *
 from SimTraffic import *
 
 
@@ -35,7 +36,6 @@ class SVPlanner(object):
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
         self._debug_shdata = sim_traffic.debug_shdata
         self._mplan_sharr = None
-        self.motion_plan = None
         #Shared space
         self.vid = int(sdv.id)
         self.laneletmap:LaneletMap = sim_traffic.lanelet_map
@@ -51,8 +51,8 @@ class SVPlanner(object):
         self.mconfig = None
 
     def start(self):
-        #Create Shared arrray for Plan
-        c = MotionPlan.VECTORSIZE
+        #Create shared arrray for Motion Plan
+        c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
         #Process based
         self._process = Process(target=self.run_planner_process, args=(
@@ -72,18 +72,17 @@ class SVPlanner(object):
         # the old path. This could be solved by adding a 'frame' variable to the shared array, like
         # a sim frame position that can be used to compute the reference path when the SV notices it's
         # changed. Unlike `new_frenet_frame` this won't be a per-tick variable.
+
         plan = MotionPlan()
         self._mplan_sharr.acquire() #<=========LOCK
-        plan.set_plan_vector(self._mplan_sharr[:])
+        plan.set_plan_vector(copy(self._mplan_sharr[:]))
         self._mplan_sharr.release() #<=========RELEASE
-        #if (plan.t == 0): #if not valid
-        #    return None
-        if (self.motion_plan): #if same as current
-            if (np.array_equal(self.motion_plan.get_plan_vector(), plan.get_plan_vector())):
-                return None
-        #Valid and New:
-        self.motion_plan = plan
-        return self.motion_plan
+        #if empty
+        if (plan.trajectory.T == 0): 
+            return None
+        #Valid:
+        return plan
+        
 
     #==SUB PROCESS=============================================
 
@@ -95,19 +94,20 @@ class SVPlanner(object):
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig)
-
+        
         while sync_planner.tick():
+            TickSync.clock_log("Planner: start")
             # Get sim state from main process
             # All objects are copies and can be changed
-            header, traffic_vehicles, traffic_pedestrians,traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr,False)
+            header, traffic_vehicles, traffic_pedestrians,traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
             state_time = header[2]
-
             if self.vid in traffic_vehicles:
                 vehicle_state = traffic_vehicles.pop(self.vid, None).state #removes self state
             else:
                 #vehicle state not available. Vehicle can be inactive.
                 continue
-            
+            TickSync.clock_log("Planner: read traffic")
+
             if self.reference_path is None:
                 self.reference_path = self.laneletmap.get_global_path_for_route(
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
@@ -117,9 +117,11 @@ class SVPlanner(object):
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
+            TickSync.clock_log("Planner: traffic state")
 
             #BTree Tick - using frenet state and lane config based on old ref path
             mconfig, ref_path_changed, snapshot_tree = self.behavior_model.tick(planner_state)
+            TickSync.clock_log("Planner: behavior")
 
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
             if ref_path_changed:
@@ -134,9 +136,7 @@ class SVPlanner(object):
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
                 mconfig, _, snapshot_tree = self.behavior_model.tick(planner_state)
-
-            #log.info('Plan {} at time {} and FRENET STATE:'.format(self.vid, state_time))
-            #log.info((planner_state.vehicle_state.get_S(), planner_state.vehicle_state.get_D()))
+            TickSync.clock_log("Planner: new ref path")
 
             # new maneuver
             if self.mconfig and self.mconfig.mkey != mconfig.mkey:
@@ -168,39 +168,51 @@ class SVPlanner(object):
                     )
                 log.info(state_str)
             self.mconfig = mconfig
-
             #Maneuver Tick
             if mconfig and planner_state.lane_config:
                 #replan maneuver
-                traj, cand, unf = plan_maneuver( mconfig.mkey,
+                #traj, cand, unf = plan_maneuver( mconfig.mkey,
+                frenet_traj, cand = plan_maneuver(self.vid, 
                                             mconfig,
                                             planner_state.vehicle_state,
-                                            #np.concatenate([
-                                                #planner_state.vehicle_state.get_S(),
-                                                #planner_state.vehicle_state.get_D()]),
                                             planner_state.lane_config,
                                             planner_state.traffic_vehicles,
                                             planner_state.pedestrians,
                                             planner_state.static_objects)
-                if traj is None:
-                    # log.warn("plan_maneuver return invalid trajectory.")
+                if frenet_traj is None:
+                    log.warn("plan_maneuver return invalid trajectory.")
                     pass
                 else:
-                    self.write_motion_plan(mplan_sharr, traj, state_time, ref_path_changed, mconfig.mkey == Maneuver.M_REVERSE)
+                    plan = MotionPlan()
+                    plan.trajectory = frenet_traj
+                    plan.start_time = state_time
+                    plan.new_frenet_frame = ref_path_changed
+                    plan.reversing = mconfig.mkey == Maneuver.M_REVERSE
+                    self.write_motion_plan(mplan_sharr, plan)
+                    if plan.trajectory.T > 0.0: #only for non zero traj
+                        #print("planner {} wrote".format(self.vid))
+                        #print(plan)
+                        self.last_plan = plan
             else:
-                traj, cand, unf = None, None
+                traj, cand = None, None
+            TickSync.clock_log("Planner: maneuver")
 
-            #Write down debug info (for Dahsboard and Log)
-            # change ref path format for pickling (maybe always keep it like this?)
-            debug_ref_path = [(pt.x, pt.y) for pt in self.reference_path]
-            debug_shdata[int(self.vid)] = (
-                planner_state,
-                snapshot_tree,
-                debug_ref_path,
-                (mplan_sharr[:6], mplan_sharr[6:12], mplan_sharr[12]),
-                cand,
-                unf
-            )
+            if self.sim_config.show_dashboard:
+                #Write down debug info (for Dahsboard and Log)
+                # change ref path format for pickling (maybe always keep it like this?)
+                debug_ref_path = [(pt.x, pt.y) for pt in self.reference_path]
+                debug_shdata[int(self.vid)] = (
+                    planner_state,
+                    snapshot_tree,
+                    debug_ref_path,
+                    (mplan_sharr[:6], mplan_sharr[6:12], mplan_sharr[12]),
+                    [traj.array_format() for traj in cand if traj.feasible] if cand else None,
+                    [traj.array_format() for traj in cand if not traj.feasible] if cand else None
+                )
+
+            TickSync.clock_log("Planner: debug")
+            #TickSync.print_clock_log()
+            
 
         log.info('PLANNER PROCESS END')
         
@@ -304,18 +316,13 @@ class SVPlanner(object):
 
         return middle_lane_config, reg_elem_states
 
-    def write_motion_plan(self, mplan_sharr, traj, state_time, new_frenet_frame, reversing):
-        if not traj:
+    def write_motion_plan(self, mplan_sharr, plan:MotionPlan): 
+        if not plan:
             return
-        plan = MotionPlan()
-        plan.set_trajectory(traj[0], traj[1], traj[2])
-        plan.t_start = state_time
-        plan.new_frenet_frame = new_frenet_frame
-        plan.reversing = reversing
-
         #write motion plan
         mplan_sharr.acquire() #<=========LOCK
         mplan_sharr[:] = plan.get_plan_vector()
         #print('Writting Sh Data VP')
         #print(mplan_sharr)
         mplan_sharr.release() #<=========RELEASE
+        
