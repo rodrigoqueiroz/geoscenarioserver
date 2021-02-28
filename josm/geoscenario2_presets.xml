@@ -180,8 +180,13 @@
 
 		<label text="SDV Model (GeoScenario Simulated Driver-Vehicle Model) "/>
 		<label text="Vehicles running SDV Models for dynamic behavior" />
-		<text key="route" text="Route ID" />
 		<text key="btree" text="BehaviorTree (root)" />
+		<text key="route" text="Route ID" />
+		<label text="Start State: choose between cartesian or frenet format:" />
+		<text key="start_cartesian" text="Cartesian" />
+		<text key="start_frenet" text="Frenet" />
+		<label text="cartesian [x_vel,y_vel,x_acc,y_acc] in  m/s and m/s/s" />
+		<label text="frenet [long_vel,long_acc,lat_vel,lat_acc] in  m/s and m/s/s" />
 		<item_separator />
 
 		<label text="TV (trajectory-based vehicles)"/>
