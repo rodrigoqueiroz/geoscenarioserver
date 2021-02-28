@@ -24,9 +24,9 @@ from util.Utils import kalman
 # Vehicle base class for remote control or simulation.
 class Vehicle(Actor):
     #vehicle types
-    N_TYPE = 0  #neutral
-    SDV_TYPE = 1
-    EV_TYPE = 2
+    N_TYPE = 0      #neutral
+    SDV_TYPE = 1    
+    EV_TYPE = 2         
     TV_TYPE = 3
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
@@ -47,7 +47,7 @@ class Vehicle(Actor):
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
         #remote = 1 if self.is_remote else 0
-        return self.vid, type, position, velocity, self.state.angle, self.state.steer
+        return self.id, type, position, velocity, self.state.angle, 0.0 #self.state.steer #steer still not available
 
 
 class SDV(Vehicle):
@@ -76,26 +76,10 @@ class SDV(Vehicle):
         #Behavior
         self.btree_root = btree_root
         self.btree_reconfig = ""
-        #Trajectory
-        self.trajectory = None          #coefs + time[[0,0,0,0,0,0],[0,0,0,0,0,0],[0]]
-        self.trajectory_time = 0        #consumed time
-        self.cand_trajectories = None   #plotting only
-        self.unf_trajectories = None   #plotting only
-        self.s_eq = None
-        self.s_vel_eq = None
-        self.s_acc_eq = None
-        self.d_eq = None
-        self.d_vel_eq = None
-        self.d_acc_eq = None
-        self.reversing = False
+        self.motion_plan = None
 
 
     def start_planner(self):
-            #nvehicles,
-            #,
-            #traffic_state_sharr,
-            #traffic_light_sharr,
-            #debug_shdata):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
@@ -113,14 +97,13 @@ class SDV(Vehicle):
         if self.sv_planner:
             plan = self.sv_planner.get_plan()
             if plan:
-                if plan.t != 0:
+                if plan.trajectory.T != 0:
                     self.set_new_motion_plan(plan, sim_time)
                     if plan.new_frenet_frame:
                         # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
                         self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.state.x, self.state.y)
                 else:
                     self.set_new_motion_plan(plan, sim_time)
-
             #Compute new state
             self.compute_vehicle_state(delta_time)
 
@@ -129,27 +112,21 @@ class SDV(Vehicle):
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
         """
-        if (self.trajectory):
-            self.trajectory_time += delta_time
-            time = self.trajectory_time
+        if (self.motion_plan):
+            self.motion_plan.trajectory.consumed_time += delta_time
+            time = self.motion_plan.trajectory.consumed_time
 
-            if (time > self.trajectory[2]): #exceed total traj time
+            #exceed total traj time
+            #if this happens, the planner is stuck and can't generate new trajectories.
+            #note: add an emergency break as a backup plan
+            if (time > self.motion_plan.trajectory.T): 
+                #log.error("Vehicle {} can not exceed trajectory time".format(self.id))
                 return
 
-            # sanity check
-            # if self.s_eq(time) < self.state.s:
-            #     print ('ERROR: S went backwards from {:.2} to {:.2}'.format(self.state.s, self.s_eq(time)))
-            #     raise Exception()
-            # else:
-            #     print ('S: {:.2}'.format(self.s_eq(time)))
-
             # update frenet state
-            self.state.s = self.s_eq(time)
-            self.state.s_vel = self.s_vel_eq(time)
-            self.state.s_acc = self.s_acc_eq(time)
-            self.state.d = self.d_eq(time)
-            self.state.d_vel = self.d_vel_eq(time)
-            self.state.d_acc = self.d_acc_eq(time)
+            new_state = self.motion_plan.trajectory.get_state_at(time) 
+            self.state.set_S(new_state[:3])
+            self.state.set_D(new_state[3:])
 
             # Compute sim state using the global path this vehicle is following
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.state.x, self.state.y, self.lanelet_route)
@@ -157,7 +134,8 @@ class SDV(Vehicle):
                 x_vector, y_vector = frenet_to_sim_frame(self.global_path, self.state.get_S(), self.state.get_D())
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
-                raise e
+                log.error("Outside of path. Vehicle reached goal?")
+                #raise e
 
             # update sim state
             self.state.x = x_vector[0]
@@ -167,14 +145,10 @@ class SDV(Vehicle):
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
             heading = np.array([y_vector[1], x_vector[1]])
-            if self.reversing:
+            if self.motion_plan.reversing:
                 heading *= -1
             self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
-            #sanity check
-            #if ( self.state.x < self.last_x) :
-            #    diff = self.state.x - self.last_x
-            #    print ('ERROR: X went backwards. Diff: {:.2}'.format(diff))
-            #self.last_x = self.state.x
+            
 
     def get_frenet_state(self):
         if self.s_eq is None:
@@ -187,47 +161,33 @@ class SDV(Vehicle):
         """
         pass
 
-    def set_new_motion_plan(self, plan, sim_time):
+    def set_new_motion_plan(self, plan:MotionPlan, sim_time):
         """
-        Set a new trajectory to start following immediately.
-        candidates: save computed trajectories for visualization and debug
+        Set a new Motion Plan with a trajectory to start following immediately.
         """
-        if (plan.t == 0):
-            self.trajectory = None
+        
+        if (plan.trajectory.T == 0):
+            self.motion_plan = None
             return
-
-        # if self.s_eq:
-        #     print('current s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
-        trajectory = plan.get_trajectory()
-
-        s_coef,d_coef,_ = trajectory
-        self.trajectory = trajectory
-        self.trajectory_time = 0
-        #self.cand_trajectories = candidates
-        #Pre-compute derivatives and equations for execution
-        #S
-        self.s_eq = to_equation(s_coef)
-        s_vel_coef = differentiate(s_coef)
-        self.s_vel_eq = to_equation(s_vel_coef)
-        s_acc_coef = differentiate(s_vel_coef)
-        self.s_acc_eq = to_equation(s_acc_coef)
-        #D
-        self.d_eq = to_equation(d_coef)
-        d_vel_coef = differentiate(d_coef)
-        self.d_vel_eq = to_equation(d_vel_coef)
-        d_acc_coef = differentiate(d_vel_coef)
-        self.d_acc_eq = to_equation(d_acc_coef)
-
-        self.reversing = plan.reversing
-
+        
+        plan.trajectory.consumed_time = 0
         #Correct trajectory progress based
         #on diff planning time and now
-        diff = sim_time - plan.t_start
-        # print('Plan start {}, now is {}'.format(plan.t_start, sim_time))
-        # print('Advance traj in {} s'.format(diff))
+        diff = sim_time - plan.start_time
         if (diff > 0):
-            self.trajectory_time += diff
-        # print('new s {} at t {}'.format(self.s_eq(self.trajectory_time), self.trajectory_time))
+            plan.trajectory.consumed_time += diff
+            #print("NEW PLAN: SIM_TIME {} PLAN_TIME {} DIFF {} CONSUMED {}".format(sim_time,plan.start_time,diff, plan.trajectory.consumed_time))
+        
+        #print("NEW PLAN: SIM_TIME {} PLAN_TIME {} s {} traj s_start{} traj s_consum {}".format(
+        #    sim_time,
+        #    plan.start_time,
+        #    self.state.s,
+        #    plan.trajectory.fs(0),
+        #    plan.trajectory.fs(plan.trajectory.consumed_time))
+        #    )
+
+        self.motion_plan = plan
+        
 
 
 class EV(Vehicle):
@@ -310,8 +270,9 @@ class TV(Vehicle):
         
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
+        self.follow_trajectory(sim_time, self.trajectory)
             
-        if self.trajectory:
+        """ if self.trajectory:
             start_time = float(self.trajectory[0].time) #first node
             end_time = float(self.trajectory[-1].time) #last node
             traj_time = end_time - start_time
@@ -324,14 +285,15 @@ class TV(Vehicle):
                         continue
                     #TODO: interpolate taking the difference between closest node time and sim time
                     if self.sim_state is ActorSimState.INACTIVE:
-                        log.warn("vid {} is now ACTIVE".format(self.vid))
+                        log.warn("vid {} is now ACTIVE".format(self.id))
                         self.sim_state = ActorSimState.ACTIVE
                         if self.ghost_mode:
                             self.sim_state = ActorSimState.INVISIBLE
-                            log.warn("vid {} is now INVISIBLE".format(self.vid))
+                            log.warn("vid {} is now INVISIBLE".format(self.id))
                             #workaround for evaluation only
-                            if -self.vid in self.simt_traffic.vehicles:
-                                self.sim_traffic.vehicles[-self.vid].sim_state = ActorSimState.ACTIVE 
+                            if -self.id in self.sim_traffic.vehicles:
+                                self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE 
+                                log.warn("vid {} is now ACTIVE".format(-self.id))
                     xacc = yacc = 0
                     self.state.set_X([node.x, node.xvel, xacc])
                     self.state.set_Y([node.y, node.yvel, yacc])
@@ -344,10 +306,8 @@ class TV(Vehicle):
                     if self.sim_state is ActorSimState.ACTIVE:
                         self.remove()
                 else:
-                    self.force_stop()
+                    self.force_stop() """
                     
-                
-            
-        
 
-    
+
+     
