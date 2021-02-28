@@ -39,15 +39,12 @@ class Dashboard(object):
         
         
 
-    def start(self, show_dashboard):
+    def start(self):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
         """
-        if (not show_dashboard):
-            log.warn("Dashboard will not start")
-            return
-
+        
         if not self.sim_traffic:
             log.error("Dashboard requires a traffic to start")
             return
