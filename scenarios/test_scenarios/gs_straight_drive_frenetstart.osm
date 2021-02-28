@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2645830' action='modify' visible='true' lat='49.00747743813' lon='8.45711993336'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='name' v='Straight Road Drive and Follow Scenario' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2645831' action='modify' visible='true' lat='49.00726025868' lon='8.45718707844' />
+  <node id='-2645832' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088' />
+  <node id='-2645833' action='modify' visible='true' lat='49.00725737909' lon='8.45710807062'>
+    <tag k='btree' v='trees/st_driveslow.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='central_route' />
+    <tag k='start_frenet' v='20,0,0,0,0,0' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-2645834' action='modify' visible='true' lat='49.00743600296' lon='8.45712129585'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-2645835' action='modify' visible='true' lat='49.0072419153' lon='8.4571627156'>
+    <tag k='btree' v='trees/st_driveslow.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v3' />
+    <tag k='orientation' v='325' />
+    <tag k='route' v='right_route' />
+    <tag k='start_frenet' v='0,0,0,0,0,0' />
+    <tag k='vid' v='3' />
+  </node>
+  <node id='-2645836' action='modify' visible='true' lat='49.00727903789' lon='8.45712903582' />
+  <node id='-2645837' action='modify' visible='true' lat='49.00816235206' lon='8.45828129331' />
+  <node id='-2645838' action='modify' visible='true' lat='49.00729972481' lon='8.45710179305' />
+  <node id='-2645839' action='modify' visible='true' lat='49.00818215891' lon='8.45824935668' />
+  <node id='-2645875' action='modify' visible='true' lat='49.00740225504' lon='8.45720853589' />
+  <way id='-1947500' action='modify' visible='true'>
+    <nd ref='-2645831' />
+    <nd ref='-2645832' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='right_route' />
+  </way>
+  <way id='-1947501' action='modify' visible='true'>
+    <nd ref='-2645836' />
+    <nd ref='-2645837' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='central_route' />
+  </way>
+  <way id='-1947502' action='modify' visible='true'>
+    <nd ref='-2645838' />
+    <nd ref='-2645839' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route' />
+  </way>
+</osm>
