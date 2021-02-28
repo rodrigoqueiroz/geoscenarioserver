@@ -11,6 +11,28 @@ import datetime
 import time
 
 class TickSync():
+
+    _start_clock = None
+    _last_log = 0.0
+    _logs = []
+
+    def clock_log(label):
+        now = datetime.datetime.now()
+        if TickSync._start_clock is None:
+            TickSync._start_clock = now
+            TickSync._last_log = now
+            log = [label,0.0,0.0]
+        else:
+            total = format((now - TickSync._start_clock).total_seconds(),'.4f')
+            delta = format((now - TickSync._last_log).total_seconds(),'.4f')
+            log = [label,total,delta]
+        TickSync._logs.append(log)
+        TickSync._last_log = now
+    
+    def print_clock_log():
+        for log in TickSync._logs:
+            print (log)
+    
     def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
@@ -82,5 +104,6 @@ class TickSync():
                     format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         return True
 
+    
 
    
