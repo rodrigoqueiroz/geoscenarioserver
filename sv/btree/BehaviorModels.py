@@ -59,8 +59,8 @@ class BehaviorModels(object):
 
             if reconfig !="":
                 log.info("Behavior model will be reconfigured {}".format(reconfig))
-                #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
-                interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args=reconfig)
+                #interpreter.reconfigure_nodes(tree_name=self.root_btree,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
+                interpreter.reconfigure_nodes(tree_name=self.root_btree,tree=tree, args=reconfig)
         else:
             interpreter = BTreeInterpreter(self.vid, bmodel=self)
             tree = interpreter.build_tree_from_code(tree_name=self.root_btree)

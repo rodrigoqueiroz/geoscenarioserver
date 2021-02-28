@@ -80,7 +80,7 @@ class BTreeInterpreter(object):
         try:
             f = open(os.path.join(self.path, tree_name + '.btree'),'r')
         except Exception:
-            raise Exception("Tree \'{}\' was not found in {}".format(tree_name, path))
+            raise Exception("Tree \'{}\' was not found in {}".format(tree_name, self.path))
         finally:
             loaded_tree = f.read()
             f.close()
