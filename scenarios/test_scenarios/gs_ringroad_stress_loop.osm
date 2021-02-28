@@ -15,7 +15,7 @@
   <node id='-5149172' action='modify' visible='true' lat='43.47300476029' lon='-80.54173413491'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='maps/experimental_maps/lanelet2_ringroad.osm' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Campus ring road stress test' />
     <tag k='timeout' v='180' />

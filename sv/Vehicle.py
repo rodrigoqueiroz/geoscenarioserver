@@ -30,7 +30,7 @@ class Vehicle(Actor):
     TV_TYPE = 3
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id,name, start_state,frenet_state)
+        super().__init__(id,name, start_state,frenet_state, VehicleState())
         self.type = Vehicle.N_TYPE
         self.radius = VEHICLE_RADIUS
 
@@ -47,7 +47,7 @@ class Vehicle(Actor):
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
         #remote = 1 if self.is_remote else 0
-        return self.id, type, position, velocity, self.state.angle, 0.0 #self.state.steer #steer still not available
+        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
 
 
 class SDV(Vehicle):
@@ -272,41 +272,6 @@ class TV(Vehicle):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         self.follow_trajectory(sim_time, self.trajectory)
             
-        """ if self.trajectory:
-            start_time = float(self.trajectory[0].time) #first node
-            end_time = float(self.trajectory[-1].time) #last node
-            traj_time = end_time - start_time
-            #During trajectory
-            if start_time <= sim_time <= end_time:
-                #for node in self.trajectory:
-                for i in range(len(self.trajectory)):
-                    node = self.trajectory[i]
-                    if node.time < sim_time:
-                        continue
-                    #TODO: interpolate taking the difference between closest node time and sim time
-                    if self.sim_state is ActorSimState.INACTIVE:
-                        log.warn("vid {} is now ACTIVE".format(self.id))
-                        self.sim_state = ActorSimState.ACTIVE
-                        if self.ghost_mode:
-                            self.sim_state = ActorSimState.INVISIBLE
-                            log.warn("vid {} is now INVISIBLE".format(self.id))
-                            #workaround for evaluation only
-                            if -self.id in self.sim_traffic.vehicles:
-                                self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE 
-                                log.warn("vid {} is now ACTIVE".format(-self.id))
-                    xacc = yacc = 0
-                    self.state.set_X([node.x, node.xvel, xacc])
-                    self.state.set_Y([node.y, node.yvel, yacc])
-                    break
-            #After trajectory, stay in last position get removed
-            if sim_time > end_time:
-                if not self.keep_active:
-                    self.state.set_X([-9999, 0, 0])
-                    self.state.set_Y([-9999,0,0])
-                    if self.sim_state is ActorSimState.ACTIVE:
-                        self.remove()
-                else:
-                    self.force_stop() """
                     
 
 

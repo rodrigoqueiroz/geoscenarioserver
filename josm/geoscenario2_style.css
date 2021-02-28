@@ -35,7 +35,7 @@ node[gs=origin] {
 node[gs=egostart] {
     icon-image:"vehicle_ego.png" ;
     icon-width: 64;
-    icon-rotation: degree_to_radians(tag("orientation"));
+    icon-rotation: degree_to_radians(tag("yaw"));
     text: eval("EGO");
     text-offset-x: -50;
     text-offset-y: 35;
@@ -51,7 +51,7 @@ node[gs=egogoal] {
 node[gs=pedestrian] {
     icon-image: "pedestrian_black.png" ;
     icon-width: 20;
-    text: eval(concat( "P: ", tag("name"), " (", tag("orientation"),"°, ", tag("speed"), " km/h)"));
+    text: eval(concat( "P: ", tag("name"), " (", tag("yaw"),"°, ", tag("speed"), " km/h)"));
     text-offset-x: -30;
     text-offset-y: 35;
 }
@@ -59,7 +59,7 @@ node[gs=pedestrian] {
 
 node[gs=vehicle] {
     icon-image: "vehicle_black.png";   
-    icon-rotation: degree_to_radians(tag("orientation"));
+    icon-rotation: degree_to_radians(tag("yaw"));
     icon-width: 64;
     text: eval(concat( "V: ", tag("vid"), " ", tag("name"), " bt:", tag("btree"), " (", tag("speed"), " km/h)" ," )" ));
     text-offset-x: -50;

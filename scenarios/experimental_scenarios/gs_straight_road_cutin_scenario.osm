@@ -15,7 +15,7 @@
   </node>
   <node id='-12' action='modify' visible='true' lat='49.00841978917' lon='8.45727445199'>
     <tag k='gs' v='egostart' />
-    <tag k='orientation' v='45' />
+    <tag k='yaw' v='45' />
     <tag k='rotation' v='45' />
   </node>
   <node id='-14' action='modify' visible='true' lat='49.00730754336' lon='8.45723535821'>
@@ -37,7 +37,7 @@
     <tag k='btree' v='lanechange_scenario_tree' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='lane_change_vehicle' />
-    <tag k='orientation' v='325' />
+    <tag k='yaw' v='325' />
     <tag k='route' v='right_route' />
     <tag k='vid' v='2' />
   </node>
@@ -49,7 +49,7 @@
     <tag k='btree' v='drive_scenario_tree' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='ego_placeholder' />
-    <tag k='orientation' v='325' />
+    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
   </node>

@@ -61,6 +61,8 @@ class SimTraffic(object):
 
     def add_pedestrian(self, p:Pedestrian):
         self.pedestrians[p.id] = p
+        p.sim_traffic = self
+        p.sim_config = self.sim_config
 
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
@@ -84,16 +86,17 @@ class SimTraffic(object):
         for vid in self.vehicles:
             self.vehicles[vid].stop()
         for pid in self.pedestrians:
-            self.vehicles[pid].stop()
+            self.pedestrians[pid].stop()
         
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
+        np = len(self.pedestrians)
 
         #Read Client
         if (self.sim_client_shm):
             new_client_state = False
-            header, vstates, disabled_vehicles = self.sim_client_shm.read_client_state(nv)
+            header, vstates, pstates, disabled_vehicles, disabled_pedestrians = self.sim_client_shm.read_client_state(nv, np)
             if header is not None:
                 client_tick_count, client_delta_time, n_vehicles = header
                 if self.sim_client_tick_count < client_tick_count:
@@ -194,7 +197,7 @@ class SimTraffic(object):
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
-            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles)
+            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrians)
 
 
 
@@ -269,16 +272,16 @@ class SimTraffic(object):
         for r in range(start,end):
             i = r * c  #first index for row
             vid = int(traffic_state_sharr[i])
-            type = int(traffic_state_sharr[i+1])
+            v_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE: 
                     continue
             vehicle = Vehicle(vid)
-            vehicle.type = type
+            vehicle.type = v_type
             vehicle.sim_state = sim_state
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[ i+3 : i+18 ]
+            state_vector = traffic_state_sharr[ i+3 : i+16 ]
             vehicle.state.set_state_vector(state_vector)
             vehicles[vid] = vehicle
         
@@ -288,16 +291,16 @@ class SimTraffic(object):
         for r in range(start,end):
             i = r * c  #first index for row
             pid = int(traffic_state_sharr[i])
-            type = int(traffic_state_sharr[i+1])
+            p_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE: 
                         continue
             pedestrian = Pedestrian(pid)
-            pedestrian.type = type
+            pedestrian.type = p_type
             pedestrian.sim_state = sim_state
             # state vector contains the sim state
-            state_vector = traffic_state_sharr[ i+3 : i+17 ]
+            state_vector = traffic_state_sharr[ i+3 : i+16 ]
             pedestrian.state.set_state_vector(state_vector)
             pedestrians[pid] = pedestrian
         

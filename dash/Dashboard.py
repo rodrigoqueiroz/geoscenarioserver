@@ -224,12 +224,12 @@ class Dashboard(object):
                 #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
                 colorcode,_ = self.get_color_by_type('trafficlight',state)
                 plt.plot(x, y, 'ks', markersize=8, zorder=4) #black square
-                type = self.sim_traffic.traffic_lights[lid].type
-                if type == TrafficLightType.default:
+                tl_type = self.sim_traffic.traffic_lights[lid].type
+                if tl_type == TrafficLightType.default:
                     plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
-                elif type == TrafficLightType.left:
+                elif tl_type == TrafficLightType.left:
                     plt.plot(x, y, colorcode+'<', markersize=6, zorder=5)
-                elif type == TrafficLightType.right:
+                elif tl_type == TrafficLightType.right:
                     plt.plot(x, y, colorcode+'>', markersize=6, zorder=5)
 
                 label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
@@ -391,29 +391,29 @@ class Dashboard(object):
         #fig.tight_layout(pad=0.05)
 
     
-    def get_color_by_type(self,actor,type,sim_state = None):
+    def get_color_by_type(self,actor,a_type,sim_state = None):
         #color
         colorcode = 'k' #black
         if actor== 'vehicle':
-            if type == Vehicle.SDV_TYPE:
+            if a_type == Vehicle.SDV_TYPE:
                 colorcode = 'b' #blue
-            elif type == Vehicle.EV_TYPE:
+            elif a_type == Vehicle.EV_TYPE:
                 colorcode = 'g' #green
-            elif type == Vehicle.TV_TYPE:
+            elif a_type == Vehicle.TV_TYPE:
                 colorcode = 'k' #black
         elif actor== 'pedestrian':
-            if type == Pedestrian.EP_TYPE:
+            if a_type == Pedestrian.EP_TYPE:
                 colorcode = 'r' #red
-            elif type == Pedestrian.TP_TYPE:
+            elif a_type == Pedestrian.TP_TYPE:
                 colorcode = 'r' #bred
-            elif type == Pedestrian.PP_TYPE:
+            elif a_type == Pedestrian.PP_TYPE:
                 colorcode = 'r' #red
         elif actor== 'trafficlight':
-            if type == TrafficLightColor.Red:
+            if a_type == TrafficLightColor.Red:
                     colorcode = 'r'
-            if type == TrafficLightColor.Green:
+            if a_type == TrafficLightColor.Green:
                 colorcode = 'g'
-            if type == TrafficLightColor.Yellow:
+            if a_type == TrafficLightColor.Yellow:
                 colorcode = 'y'
         #alpha      
         alpha = 1.0          
@@ -620,18 +620,18 @@ class Dashboard(object):
         self.map_canvas.get_tk_widget().pack()
         
         # table
-        tab = ttk.Treeview(tab_frame)
-        tab['columns'] = ('id', 'sim_st', 
-                            'x', 'x_vel', 'x_acc',
-                            'y', 'y_vel', 'y_acc',
-                            's', 's_vel', 's_acc',
-                            'd', 'd_vel', 'd_acc',
-                            'angle')
-        tab.heading("#0", text='id', anchor='w')
-        tab.column("#0", anchor="w" , width=100)
+        tab = ttk.Treeview(tab_frame, show=['headings'])
+        tab['columns'] = (
+            'id', 'sim_st',
+            'x', 'x_vel', 'x_acc',
+            'y', 'y_vel', 'y_acc',
+            's', 's_vel', 's_acc',
+            'd', 'd_vel', 'd_acc',
+            'yaw'
+        )
         for col in tab['columns']:
-            tab.heading(col, text=col, anchor='e')
-            tab.column(col, anchor="e", width=50, minwidth=50)
+            tab.heading(col, text=col, anchor='center')
+            tab.column(col, anchor='center', width=65, minwidth=65)
         tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
