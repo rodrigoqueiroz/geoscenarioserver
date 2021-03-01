@@ -22,7 +22,7 @@ def start_server(args, m=MVelKeepConfig()):
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
     traffic = SimTraffic(lanelet_map, sim_config)
-    if args.verify_map != "":
+    if args.verify_map == "":
         verify_map_file(args.verify_map, lanelet_map)
         return
 
