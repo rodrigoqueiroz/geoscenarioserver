@@ -18,7 +18,7 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
-def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, evaluation_mode = False):
+def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, evaluation_mode = False, map_path):
     """ Setup scenario from GeoScenario file
     """
     #========= Parse GeoScenario File
@@ -39,7 +39,10 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         sim_config.plot_vid = parser.globalconfig.tags['plotvid']
 
     #========= Map
-    map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet'])
+    if map_path != "":
+        map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet']) #use default map path
+    else:
+        map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
