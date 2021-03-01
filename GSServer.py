@@ -30,7 +30,7 @@ def start_server(args, m=MVelKeepConfig()):
             #how do I get to BehaviourModels from here with the locations?
 
     sim_config = SimConfig()
-    btree_list = btree_paths.split(",") #allows for multiple paths, seperated by commas
+    btree_list = btree_paths.split(":") #allows for multiple paths, seperated by commas
     traffic = SimTraffic(lanelet_map, sim_config, btree_list)
     
     
