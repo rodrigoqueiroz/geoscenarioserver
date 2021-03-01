@@ -25,6 +25,9 @@ def start_server(args, m=MVelKeepConfig()):
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
         return
+
+    if args.no_dash:
+        sim_config.show_dashboard = False
     
     # SCENARIO SETUP
     if args.gsfile:
@@ -40,38 +43,39 @@ def start_server(args, m=MVelKeepConfig()):
     if not res:
         log.error("Failed to load scenario")
         return
-       
-    
+
     sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(sim_config.timeout)
-
-    #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config)
 
     #SIM EXECUTION START
     log.info('SIMULATION START')
     traffic.start()
-    show_dashboard = SHOW_DASHBOARD and not args.no_dash
-    dashboard.start(show_dashboard)
+
+    #GUI / Debug screen
+    dashboard = Dashboard(traffic, sim_config)
+    if sim_config.show_dashboard:
+        dashboard.start()
+    else:
+        log.warn("Dashboard will not start")
 
     if WAIT_FOR_INPUT:
         input("waiting for [ENTER]...")
 
     while sync_global.tick():
-        if show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+        if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
             break
-        #try:
+        try:
             #Update Traffic
-        sim_status = traffic.tick(
-            sync_global.tick_count,
-            sync_global.delta_time,
-            sync_global.sim_time
-        )
-        if sim_status < 0:
+            sim_status = traffic.tick(
+                sync_global.tick_count,
+                sync_global.delta_time,
+                sync_global.sim_time
+            )
+            if sim_status < 0:
+                break
+        except Exception as e:
+            log.error(e)
             break
-        #except Exception as e:
-        #    log.error(e)
-        #    break
         
     traffic.stop_all()
     dashboard.quit()

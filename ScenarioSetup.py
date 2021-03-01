@@ -76,12 +76,49 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
     for vid, vnode in parser.vehicles.items():
         vid = int(vid)   #<= must ne integer                             
         name = vnode.tags['name']   #vehicle name
-        start_state = [vnode.x,0.0,0.0, vnode.y,0.0,0.0]                #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
+        start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]  
+        start_in_frenet = False
+        
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
 
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
-
+            #start state
+            if 'start_cartesian' in vnode.tags:
+                start_cartesian = vnode.tags['start_cartesian']
+                gs_sc = start_cartesian.split(',')
+                print(gs_sc)
+                if len (gs_sc) != 4:
+                    log.error("start state in Cartesian must have 4 values [x_vel,x_acc,y_vel,y_acc].")
+                    continue
+                x = vnode.x
+                y = vnode.y
+                x_vel = float(gs_sc[0].strip())
+                x_acc = float(gs_sc[1].strip())
+                y_vel = float(gs_sc[2].strip())
+                y_acc = float(gs_sc[3].strip())
+                start_state = [x,x_vel,x_acc,y,y_vel,y_acc]     #vehicle start state in cartesian frame
+                print(start_state)
+                
+            if 'start_frenet' in vnode.tags:
+                # assume frenet start_state is relative to the first lane of the route
+                start_in_frenet = True
+                start_frenet = vnode.tags['start_frenet']
+                gs_sf = start_frenet.split(',')
+                print(gs_sf)
+                if len (gs_sf) != 6:
+                    log.error("start state in Frenet must have 6 values [s,s_vel,s_acc,d,d_vel,d_acc].")
+                    continue
+                s = float(gs_sf[0])
+                s_vel = float(gs_sf[1].strip())
+                s_acc = float(gs_sf[2].strip())
+                d = float(gs_sf[3])
+                d_vel = float(gs_sf[4].strip())
+                d_acc = float(gs_sf[5].strip())
+                start_state = [s,s_vel,s_acc,d,d_vel,d_acc]     #vehicle start state in frenet frame
+                print(start_state)
+           
+            #route
             if 'route' not in vnode.tags:
                 log.error("SDV {} requires a route .".format(vid))
                 continue
@@ -96,7 +133,10 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 log.error("Route generation failed for route {}.".format(myroute))
                 raise e
             try:
-                vehicle = SDV(vid, name, btree_root, start_state , lanelet_map, sim_config.lanelet_routes[vid])    
+                vehicle = SDV(  vid, name, btree_root, start_state , 
+                                lanelet_map, sim_config.lanelet_routes[vid], 
+                                start_state_in_frenet=start_in_frenet
+                            )
                 if 'btconfig' in vnode.tags:
                     vehicle.btree_reconfig = vnode.tags['btconfig'] 
                 sim_traffic.add_vehicle(vehicle)
@@ -133,7 +173,9 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         
         # Path Vehicle (PV)
         elif btype == 'pv':
-            log.error("Path-based vehicles are still not supported in GeoScenario Server {}".format(vid))
+            vehicle = Vehicle(vid, name, start_state)
+            sim_traffic.add_vehicle(vehicle)
+            log.warning("Path-based vehicles are still not supported in GeoScenario Server {}".format(vid))
             continue
         
         # External Vehicle (EV)

@@ -37,15 +37,20 @@ class BCondition(behaviour.Behaviour):
         #print("BCondition {} {}".format(self.name,self.kwargs))
         try:
             if self.repeat or not self.triggered:
+                #wait condition
                 if self.condition == "wait": #return SUCC while waiting
+                    time = float(self.kwargs['time'])
+                    if time <=0:
+                        return status
                     if not self.ts:
-                        time = self.kwargs['time']
+                        time = float(self.kwargs['time'])
                         self.ts = TickSync()
                         self.ts.set_timeout(time)
                         print("Create wait condition {}".format(self.ts.sim_time))
                     if self.ts.tick():
-                        print("timeout {}".format(self.ts.sim_time))
+                        print("wait condition timeout {}".format(self.ts.sim_time))
                         status = common.Status.SUCCESS
+                #other conditions
                 elif self.bmodel.test_condition(self.condition, self.kwargs):
                     #print("SUCCESS")
                     status = common.Status.SUCCESS

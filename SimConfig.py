@@ -59,6 +59,7 @@ TRAJECTORY_SPLIT = 10       #In how many parts a trajectory is split for verific
 
 
 #Evaluation
+EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
@@ -82,3 +83,4 @@ class SimConfig:
     timeout:int = TIMEOUT
     traffic_rate:int = TRAFFIC_RATE
     plot_vid:int = PLOT_VID
+    show_dashboard:bool = SHOW_DASHBOARD

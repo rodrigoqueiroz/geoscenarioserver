@@ -14,6 +14,7 @@ from TickSync import TickSync
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
+import datetime
 from PIL import Image, ImageTk
 import glog as log
 from SimTraffic import *
@@ -38,15 +39,12 @@ class Dashboard(object):
         
         
 
-    def start(self, show_dashboard):
+    def start(self):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
         """
-        if (not show_dashboard):
-            log.warn("Dashboard will not start")
-            return
-
+        
         if not self.sim_traffic:
             log.error("Dashboard requires a traffic to start")
             return
@@ -76,11 +74,14 @@ class Dashboard(object):
             self.tree_msg.configure(text= "")
 
             #get new data
-            header, vehicles, pedestrians, traffic_lights,static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
+            header, vehicles, pedestrians, traffic_lights,static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
+            sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
-            config_txt += "\nTick#: {}   |   SimTime: {:.3}   |   DeltaTime: {:.3}".format(tickcount,sim_time,delta_time) 
+            config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time) 
+            
+            
 
             #config/stats
             self.scenario_config_lb['text'] = config_txt
@@ -334,11 +335,26 @@ class Dashboard(object):
             x = obj.s
             y = obj.d
             #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-            plt.plot(x, y, 'kX',markersize=4, zorder=10)
+            plt.plot(x, y, 'kx',markersize=6, zorder=10)
             label = "{}".format(oid)
             plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
+
+        #re
+        for re in regulatory_elements:
+            if isinstance(re, TrafficLightState):
+                colorcode,_ = self.get_color_by_type('trafficlight',re.color)
+                x, y = re.stop_position
+                plt.axvline(x, color= colorcode, linestyle='-', zorder=0)
+            else:
+                print(re)
+        
+
         #main vehicle
+        x,y = goal_point_frenet[0],goal_point_frenet[1]
+        #plt.plot(x, 'go',markersize=6, zorder=10)
+        plt.axvline(x, color="k", linestyle='-', zorder=0)
+        plt.gca().text(x+1, y+1, "goal", style='italic', zorder=10)
         if cand:
             for t in cand:
                 Dashboard.plot_trajectory(t[0], t[1], t[2], 'grey')

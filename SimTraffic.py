@@ -10,12 +10,12 @@
 from multiprocessing import shared_memory, Lock, Manager, Array
 import numpy as np
 import glog as log
+from copy import copy
 import csv
-from pathlib import Path
 from shm.SimSharedMemory import *
 from TickSync import TickSync
 from Actor import *
-from sv.Vehicle import *
+from sv.Vehicle import Vehicle
 from sp.Pedestrian import *
 from TrafficLight import TrafficLight
 
@@ -227,8 +227,9 @@ class SimTraffic(object):
         if WRITE_TRAJECTORIES:
             for vid, vehicle in sorted(self.vehicles.items()):
                 if vehicle.sim_state == ActorSimState.ACTIVE or vehicle.sim_state == ActorSimState.INVISIBLE:
-                    sv = vehicle.state.get_state_vector() + vehicle.state.get_frenet_state_vector()
-                    line =[vid, vehicle.type,vehicle.sim_state, tick_count, sim_time, delta_time] + sv
+                    sv = vehicle.state.get_state_vector()
+                    line = [vid, vehicle.type,int(vehicle.sim_state), tick_count, sim_time, delta_time] + sv
+                    
                     if vid not in self.vehicles_log:
                         self.vehicles_log[vid] = []
                     self.vehicles_log[vid].append(line)
@@ -242,13 +243,15 @@ class SimTraffic(object):
                 with open(filename,mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #vlog.sort()
+                    titleline =['id', 'type','sim_state', 'tick_count', 'sim_time', 'delta_time',
+                        'x', 'x_vel', 'x_acc', 'y',  'y_vel', 'y_acc', 's', 's_vel', 's_acc','d', 'd_vel', 'd_acc', 'angle']
+                    csv_writer.writerow(titleline)
                     for line in vlog:
                         csv_writer.writerow(line)
 
 
-
     #For independent processes:
-    def read_traffic_state(self, traffic_state_sharr, include_inactives):
+    def read_traffic_state(self, traffic_state_sharr, actives_only = True):
         '''
         Read traffic state using sharred arrays
         Each process reading the state must store it's own 
@@ -271,8 +274,9 @@ class SimTraffic(object):
             vid = int(traffic_state_sharr[i])
             v_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
-            if not include_inactives and  sim_state is ActorSimState.INACTIVE: 
-                continue
+            if actives_only:
+                if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE: 
+                    continue
             vehicle = Vehicle(vid)
             vehicle.type = v_type
             vehicle.sim_state = sim_state
@@ -289,8 +293,9 @@ class SimTraffic(object):
             pid = int(traffic_state_sharr[i])
             p_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
-            if not include_inactives and  sim_state is ActorSimState.INACTIVE: 
-                continue
+            if actives_only:
+                if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE: 
+                        continue
             pedestrian = Pedestrian(pid)
             pedestrian.type = p_type
             pedestrian.sim_state = sim_state
