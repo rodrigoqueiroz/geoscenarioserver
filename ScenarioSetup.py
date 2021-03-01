@@ -18,7 +18,7 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
-def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, evaluation_mode = False, map_path):
+def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path):
     """ Setup scenario from GeoScenario file
     """
     #========= Parse GeoScenario File
