@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-1959733' action='modify' visible='true' lat='43.47539462673' lon='-80.53855767589' />
+  <node id='-1959734' action='modify' visible='true' lat='43.47490547327' lon='-80.53953552541'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='nhtsa/maps/lanelet2_roads_around_campus.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Lane change same direction scenario' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-1959735' action='modify' visible='true' lat='43.47484523897' lon='-80.53945035028'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-1959736' action='modify' visible='true' lat='43.47527286371' lon='-80.53863142266' />
+  <node id='-1959737' action='modify' visible='true' lat='43.47485844265' lon='-80.5383196966' />
+  <node id='-1959738' action='modify' visible='true' lat='43.4758167801' lon='-80.53903160151' />
+  <node id='-1959739' action='modify' visible='true' lat='43.47483212012' lon='-80.538292806'>
+    <tag k='btree' v='nhtsa/behavior/drive_scenario_tree.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-1959740' action='modify' visible='true' lat='43.47539252847' lon='-80.53856356266'>
+    <tag k='btree' v='nhtsa/behavior/reverse_scenario_tree.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='red_light_runner' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <way id='-1946396' action='modify' visible='true'>
+    <nd ref='-1959736' />
+    <nd ref='-1959733' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1946397' action='modify' visible='true'>
+    <nd ref='-1959737' />
+    <nd ref='-1959738' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>
