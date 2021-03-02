@@ -36,7 +36,7 @@ class BehaviorModels(object):
 
     def btree_search(self, tree_name):
         #TODO: add all -b tree locations here
-        btree_locations = ["sv","sp"]
+        btree_locations = ["sdv","sp"]
         for btree_path in btree_locations:
             if os.path.isfile(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)):
                 print ("Using a btree from" + btree_path)
