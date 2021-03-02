@@ -39,7 +39,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
         sim_config.plot_vid = parser.globalconfig.tags['plotvid']
 
     #========= Map
-    if map_path != "":
+    if map_path == "":
         map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet']) #use default map path
     else:
         map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
