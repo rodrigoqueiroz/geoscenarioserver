@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.8
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
@@ -28,7 +28,7 @@ def start_server(args, m=MVelKeepConfig()):
 
     if args.no_dash:
         sim_config.show_dashboard = False
-    
+
     # SCENARIO SETUP
     if args.gsfile:
         if '.osm' in args.gsfile:
@@ -37,7 +37,7 @@ def start_server(args, m=MVelKeepConfig()):
         else:
             #Direct setup
             res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
-    else: 
+    else:
         res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
 
     if not res:
@@ -76,10 +76,10 @@ def start_server(args, m=MVelKeepConfig()):
         except Exception as e:
             log.error(e)
             break
-        
+
     traffic.stop_all()
     dashboard.quit()
-   
+
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario server shutdown')
@@ -98,6 +98,6 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-m", "--map-path", dest="map_path", default="", help="Overrides the path in which the map file can be found")
 
-    
+
     args = parser.parse_args()
     start_server(args)
