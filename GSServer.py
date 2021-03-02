@@ -21,7 +21,9 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
-    traffic = SimTraffic(lanelet_map, sim_config)
+    #TODO: add all -b tree locations here
+    btree_locations = [os.path.join(ROOT_DIR, "btrees")]
+    traffic = SimTraffic(lanelet_map, sim_config, btree_locations)
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
         return

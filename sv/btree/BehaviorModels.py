@@ -21,9 +21,10 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree, reconfig = ""):
+    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = ""):
+        self.btree_locations = btree_locations
         self.vid = vid
-        self.root_btree = root_btree
+        self.root_btree_name = root_btree_name
         #Build Tree
         self.tree = self.build(reconfig)
         #Runtime status:
@@ -34,25 +35,23 @@ class BehaviorModels(object):
         self.current_mconfig = None
         self.ref_path_changed = False
 
-    def btree_search(self, tree_name):
-        #TODO: add all -b tree locations here
-        btree_locations = ["sdv","sp"]
+    def find_btree(self, tree_name, btree_locations):
         for btree_path in btree_locations:
             if os.path.isfile(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)):
                 print ("Using a btree from" + btree_path)
                 path,file = os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)))
                 return path,file
         #Btree not found in any location
-        print ("Btree file not available")
+        print ("Btree file not found in any provided location")
         return False,False
         
 
     def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
-        if '.btree' in self.root_btree:
-            path,file = self.btree_search(self.root_btree)
+        if '.btree' in self.root_btree_name:
+            path,file = self.find_btree(self.root_btree_name, self.btree_locations)
             if path == False: #btree file search unsuccessful
-                path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", self.root_btree)))
+                path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", self.root_btree_name)))
 
             file_noext = os.path.splitext(file)[0]
             interpreter = BTreeInterpreter(self.vid, bmodel=self, path=path)
@@ -74,12 +73,12 @@ class BehaviorModels(object):
 
             if reconfig !="":
                 log.info("Behavior model will be reconfigured {}".format(reconfig))
-                #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
-                interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args=reconfig)
+                #interpreter.reconfigure_nodes(tree_name=self.root_btree_name_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
+                interpreter.reconfigure_nodes(tree_name=self.root_btree_name_name,tree=tree, args=reconfig)
 
         else: #btree file not given properly. TODO: add build_tree_from_code
             interpreter = BTreeInterpreter(self.vid, bmodel=self)
-            tree = interpreter.build_tree_from_code(tree_name=self.root_btree)
+            tree = interpreter.build_tree_from_code(tree_name=self.root_btree_name)
             pass 
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
