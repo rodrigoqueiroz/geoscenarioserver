@@ -12,7 +12,6 @@ from sv.btree.BTreeLeaves import *
 from sv.SDVPlannerState import TrafficLightState
 from TrafficLight import TrafficLightColor
 
-
 class BehaviorModels(object):
     ''''
         Behavior Layer using a simplified version from BTree/BTreeFactory.
@@ -35,14 +34,30 @@ class BehaviorModels(object):
         self.current_mconfig = None
         self.ref_path_changed = False
 
-    def build(self,reconfig):
+    def btree_search(self, tree_name):
+        #TODO: add all -b tree locations here
+        btree_locations = ["sv","sp"]
+        for btree_path in btree_locations:
+            if os.path.isfile(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)):
+                print ("Using a btree from" + btree_path)
+                path,file = os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)))
+                return path,file
+        #Btree not found in any location
+        print ("Btree file not available")
+        return False,False
+        
 
+    def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
         if '.btree' in self.root_btree:
-            path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "scenarios/", self.root_btree)))
+            path,file = self.btree_search(self.root_btree)
+            if path == False: #btree file search unsuccessful
+                path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", self.root_btree)))
+
             file_noext = os.path.splitext(file)[0]
-            interpreter = BTreeInterpreter(self.vid, bmodel=self, path = path)
+            interpreter = BTreeInterpreter(self.vid, bmodel=self, path=path)
             tree = interpreter.build_tree(tree_name=file_noext)
+
             '''
             args format:
                 For maneuvers always write m_id=MConfig(x=1,y=2)
@@ -59,9 +74,10 @@ class BehaviorModels(object):
 
             if reconfig !="":
                 log.info("Behavior model will be reconfigured {}".format(reconfig))
-                #interpreter.reconfigure_nodes(tree_name=self.root_btree,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
-                interpreter.reconfigure_nodes(tree_name=self.root_btree,tree=tree, args=reconfig)
-        else:
+                #interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
+                interpreter.reconfigure_nodes(tree_name=self.root_btree_name,tree=tree, args=reconfig)
+
+        else: #btree file not given properly. TODO: add build_tree_from_code
             interpreter = BTreeInterpreter(self.vid, bmodel=self)
             tree = interpreter.build_tree_from_code(tree_name=self.root_btree)
             pass 

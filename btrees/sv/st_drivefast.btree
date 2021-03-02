@@ -1,0 +1,3 @@
+behaviortree st_driveslow:
+    ->
+        subtree drive( m_keepvelocity=MVelKeepConfig(vel=MP(16, 10, 6),max_diff=12.0) )
