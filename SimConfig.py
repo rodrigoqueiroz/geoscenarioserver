@@ -48,7 +48,11 @@ COLL_TYPE_CORNERS = False       #vehicle is computed as 4 circles on the corners
 COLLISION_CORNER_RADIUS = 0.2   #radius for each corner
 
 #Planning
-PLANNER_RATE = 5            #Planner tick rate
+PLANNER_RATE = 4                     #Planner tick rate
+USE_FIXED_PLANNING_TIME = False
+PLANNING_TIME = 0.100                #Must be less than 1/PLANNTER_RATE
+MIN_PLANNING_TIME = 0.060
+MAX_PLANNING_TIME = 0.200            #Must be less than 1/PLANNTER_RATE
 #Collision
 #collision and proximity cost have a great impacto on performance. 
 #For example, if the scenario does not require object avoidance, you can turn it off.

@@ -87,7 +87,15 @@ class SimTraffic(object):
             self.vehicles[vid].stop()
         for pid in self.pedestrians:
             self.pedestrians[pid].stop()
-        
+
+        for vid in self.vehicles:
+            print(
+                "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
+                    int(vid),
+                    int(self.vehicles[vid].jump_back_count),
+                    float(self.vehicles[vid].max_jump_back_dist)
+                )
+            )
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
