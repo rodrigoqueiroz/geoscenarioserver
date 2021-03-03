@@ -21,7 +21,7 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
-    base_btree_location = os.path.join(ROOT_DIR, "btreesbad")
+    base_btree_location = os.path.join(ROOT_DIR, "btrees") #default btree folders location
     btree_locations = []
     if len(args.btree_locations) > 0:
         btree_locations.extend(args.btree_locations.split(":"))

@@ -48,7 +48,7 @@ class BehaviorModels(object):
 
     def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
-        print("TESTING:" + str(self.btree_locations))
+        #print("TESTING:" + str(self.btree_locations))
         if '.btree' in self.root_btree_name:
             path,file = self.find_btree(self.root_btree_name, self.btree_locations)
             if path == False: #btree file search unsuccessful
