@@ -21,8 +21,13 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
-    #TODO: add all -b tree locations here
-    btree_locations = [os.path.join(ROOT_DIR, "btrees")]
+    base_btree_location = os.path.join(ROOT_DIR, "btreesbad")
+    btree_locations = []
+    if len(args.btree_locations) > 0:
+        btree_locations.extend(args.btree_locations.split(":"))
+        btree_locations.append(base_btree_location)
+    else:
+        btree_locations = [base_btree_location]
     traffic = SimTraffic(lanelet_map, sim_config, btree_locations)
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
@@ -99,6 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-m", "--map-path", dest="map_path", default="", help="Overrides the path in which the map file can be found")
+    parser.add_argument("-b", "--btree-locations", dest="btree_locations", default="", help="Adds higher priority locations in which the different btypes of btree folders can be found")
 
 
     args = parser.parse_args()

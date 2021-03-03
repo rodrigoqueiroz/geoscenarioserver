@@ -21,7 +21,7 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = ""):
+    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = []):
         self.btree_locations = btree_locations
         self.vid = vid
         self.root_btree_name = root_btree_name
@@ -48,10 +48,12 @@ class BehaviorModels(object):
 
     def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
+        print("TESTING:" + str(self.btree_locations))
         if '.btree' in self.root_btree_name:
             path,file = self.find_btree(self.root_btree_name, self.btree_locations)
             if path == False: #btree file search unsuccessful
-                path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", self.root_btree_name)))
+                return None #no tree
+                #path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", self.root_btree_name)))
 
             file_noext = os.path.splitext(file)[0]
             interpreter = BTreeInterpreter(self.vid, bmodel=self, path=path)
@@ -91,7 +93,7 @@ class BehaviorModels(object):
 
     def tick(self, planner_state):
         if self.tree is None:
-            return None, False
+            return None, False, ""
 
         # ref_path_changed is per-tick
         self.ref_path_changed = False
