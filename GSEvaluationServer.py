@@ -89,17 +89,20 @@ def start_server(args, es, calibrate = False):
     sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", sim_start_time = float(time))
     sync_global.set_timeout(sim_config.timeout)
 
-    #GUI / Debug screen
-    dashboard = Dashboard(sim_traffic, sim_config)
-
+    
     #SIM EXECUTION START
     log.info('SIMULATION START')
     sim_traffic.start()
-    show_dashboard = SHOW_DASHBOARD and not args.no_dash
-    dashboard.start(show_dashboard)
+
+     #GUI / Debug screen
+    dashboard = Dashboard(sim_traffic, sim_config)
+    if sim_config.show_dashboard:
+        dashboard.start()
+    else:
+        log.warn("Dashboard will not start")
 
     while sync_global.tick():
-        if show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+        if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
             break
         #try:
         #Update Traffic
@@ -486,6 +489,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="y", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
     parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusivelly")
+    parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
 
     
     args = parser.parse_args()
@@ -496,8 +500,15 @@ if __name__ == "__main__":
     # Master csv to guide all experiments.
     scenarios = load_all_scenarios()
 
+    if args.eval_all:
+         for id in scenarios:
+            try:
+                start_server(args,scenarios[id], False)
+                start_server(args,scenarios[id], True)
+            except Exception as e:
+                print("ERROR. Can not run evaluation for scenario{}".format(id))
     #Run single scenario
-    if args.eval_id != "":
+    elif args.eval_id != "":
         try:
             if args.recalibrate == 'b':
                 start_server(args, scenarios[args.eval_id], False)
@@ -514,15 +525,15 @@ if __name__ == "__main__":
     elif args.eval_type != "":
         for eval_id in scenarios:
             if scenarios[eval_id].scenario_type == args.eval_type:
-                try:
-                    if args.recalibrate == 'b':
-                        start_server(args, scenarios[eval_id], False)
-                        start_server(args, scenarios[eval_id], True)
-                    elif args.recalibrate == 'n':
-                        start_server(args, scenarios[eval_id], False)
-                    else: #default
-                        start_server(args, scenarios[eval_id], True)
-                except Exception as e:
-                    print("ERROR. Can not run simulation for scenario{}".format(eval_id))
+                #try:
+                if args.recalibrate == 'b':
+                    start_server(args, scenarios[eval_id], False)
+                    start_server(args, scenarios[eval_id], True)
+                elif args.recalibrate == 'n':
+                    start_server(args, scenarios[eval_id], False)
+                else: #default
+                    start_server(args, scenarios[eval_id], True)
+                #except Exception as e:
+                #    print("ERROR. Can not run simulation for scenario{}".format(eval_id))
     
    
