@@ -38,7 +38,7 @@ class LaneConfig:
     right_bound:float = 0           #d
     _left_lane: LaneConfig = None
     _right_lane: LaneConfig = None
-    nsamples:int = 3                #number of sampling points on the lane width for lateral planning
+    nsamples:int = 1                #number of sampling points on the lane width for lateral planning
     sampling:int = SamplingMethod.UNIFORM
     sigma:float = 1                 #std dev for sampling from normal
 
@@ -175,26 +175,26 @@ class MConfig:
     #feasibility_weight defines what functions will be used
     #to remove trajectories from candidate set [binary 0-1]
     feasibility_constraints: Dict = field(default_factory=lambda:{
-        'max_lat_jerk':        1,
-        'max_long_jerk':       1,
-        'max_long_acc':        1,
-        'max_lat_acc':         1,
-        'collision':           1,
+        'max_lat_jerk':        0,
+        'max_long_jerk':       0,
+        'max_long_acc':        0,
+        'max_lat_acc':         0,
+        'collision':           0,
         'off_lane':            1,
         'direction':           1,
     })
     #cost_weight defines what cost functions will be used
     #to select trajectories from candidate set [cost > 0]
     cost_weight: Dict = field(default_factory=lambda:{
-        'time_cost':                1,
-        'effic_cost':               1,
-        'lane_offset_cost':         2,
-        'total_long_jerk_cost':     1,
-        'total_lat_jerk_cost':      1,
-        'total_long_acc_cost':      1,
-        'total_lat_acc_cost':       1,
-        'proximity_cost':           10, #10 
-        'progress_cost':            1,
+        'time_cost':                0,
+        'effic_cost':               0,
+        'lane_offset_cost':         1,
+        'total_long_jerk_cost':     0,
+        'total_lat_jerk_cost':      0,
+        'total_long_acc_cost':      0,
+        'total_lat_acc_cost':       0,
+        'proximity_cost':           0, #10 
+        'progress_cost':            0,
     })
     expected_offset_per_sec = 0.5   # [m]
     expected_long_acc_per_sec = 1   # [m/s/s]
@@ -212,7 +212,7 @@ class MConfig:
 @dataclass
 class MVelKeepConfig(MConfig):
     vel:MP = MP(14.0,10,3)              #velocity in [m/s] as MP
-    time:MP = MP(3.0,20,3)              #duration in [s] as MP
+    time:MP = MP(3.0,20,6)              #duration in [s] as MP
     max_diff:float = 6.0                 #max vel diff (current to target).
     mkey:int = Maneuver.M_VELKEEP
 
