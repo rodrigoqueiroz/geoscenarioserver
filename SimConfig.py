@@ -59,8 +59,8 @@ TRAJECTORY_SPLIT = 10       #In how many parts a trajectory is split for verific
 
 
 #Evaluation
-EVALUATION_MODE = False
-WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
+EVALUATION_MODE = True
+WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
