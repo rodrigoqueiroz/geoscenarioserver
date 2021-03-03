@@ -33,7 +33,7 @@ def start_server(args, m=MVelKeepConfig()):
     if args.gsfile:
         if '.osm' in args.gsfile:
             #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map)
+            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path)
         else:
             #Direct setup
             res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
@@ -96,6 +96,8 @@ if __name__ == "__main__":
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
+    parser.add_argument("-m", "--map-path", dest="map_path", default="", help="Overrides the path in which the map file can be found")
+
     
     args = parser.parse_args()
     start_server(args)
