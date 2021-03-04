@@ -129,7 +129,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 continue
             try:
                 myroute = vnode.tags['route']
-                root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside scenarios/btrees/
+                root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
                 root_btree_name = os.path.join(btype, root_btree_name) #access btrees from the btype's folder
                 route_nodes = parser.routes[myroute].nodes
                 lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]   #a valid lanelet route
@@ -235,7 +235,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 continue
             try:
                 p_route = pnode.tags['route']
-                #root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk_tree" # a behavior tree file (.btree) inside scenarios/btrees/
+                #root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk_tree" # a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
                 route_nodes = parser.routes[p_route].nodes
                 #lanelets_in_route = [lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes]   # a valid lanelet route
                 #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(lanelets_in_route)

@@ -35,23 +35,25 @@ class BehaviorModels(object):
         self.current_mconfig = None
         self.ref_path_changed = False
 
-    def find_btree(self, tree_name, btree_locations):
-        for btree_path in btree_locations:
-            if os.path.isfile(os.path.join(btree_path, tree_name)):
-                print ("Using a btree from" + btree_path)
-                path,file = os.path.split(os.path.abspath(os.path.join(btree_path, tree_name)))
+    def find_btree(self):
+        for btree_path in self.btree_locations:
+            if os.path.isfile(os.path.join(btree_path, self.root_btree_name)):
+                print ("Using " + os.path.join(btree_path, self.root_btree_name))
+                path,file = os.path.split(os.path.abspath(os.path.join(btree_path, self.root_btree_name)))
                 return path,file
         #Btree not found in any location
-        print ("Btree file not found in any provided location")
         return False,False
         
 
     def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
         if '.btree' in self.root_btree_name and len(self.btree_locations) > 0:
-            path,file = self.find_btree(self.root_btree_name, self.btree_locations)
+            path,file = self.find_btree()
             if path == False: #btree file search unsuccessful
                 #if you cannot find the file in any location, A message is printed and return no tree.
+                log.warn ("Btree file " + self.root_btree_name + " not found in any provided location")
+                print ("Locations: (" + str(self.btree_locations) + ")")
+
                 return None
             file_noext = os.path.splitext(file)[0]
             interpreter = BTreeInterpreter(self.vid, bmodel=self, path=path)
