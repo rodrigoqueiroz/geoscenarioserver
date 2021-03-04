@@ -21,7 +21,7 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = ""):
+    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = []):
         self.btree_locations = btree_locations
         self.vid = vid
         self.root_btree_name = root_btree_name
@@ -37,9 +37,9 @@ class BehaviorModels(object):
 
     def find_btree(self, tree_name, btree_locations):
         for btree_path in btree_locations:
-            if os.path.isfile(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)):
+            if os.path.isfile(os.path.join(btree_path, tree_name)):
                 print ("Using a btree from" + btree_path)
-                path,file = os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", btree_path, tree_name)))
+                path,file = os.path.split(os.path.abspath(os.path.join(btree_path, tree_name)))
                 return path,file
         #Btree not found in any location
         print ("Btree file not found in any provided location")
@@ -48,11 +48,11 @@ class BehaviorModels(object):
 
     def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
-        if '.btree' in self.root_btree_name:
+        if '.btree' in self.root_btree_name and len(self.btree_locations) > 0:
             path,file = self.find_btree(self.root_btree_name, self.btree_locations)
             if path == False: #btree file search unsuccessful
-                path,file =os.path.split(os.path.abspath(os.path.join(ROOT_DIR, "btrees", self.root_btree_name)))
-
+                #if you cannot find the file in any location, A message is printed and return no tree.
+                return None
             file_noext = os.path.splitext(file)[0]
             interpreter = BTreeInterpreter(self.vid, bmodel=self, path=path)
             tree = interpreter.build_tree(tree_name=file_noext)
