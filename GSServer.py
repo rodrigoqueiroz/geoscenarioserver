@@ -23,7 +23,7 @@ def start_server(args, m=MVelKeepConfig()):
     sim_config = SimConfig()
 
     base_btree_location = os.path.join(ROOT_DIR, "btrees") #default btree folders location
-    print("Default btree location set as: " + str(base_btree_location))
+    log.info ("Default btree location set as: " + str(base_btree_location))
     btree_locations = []
     if len(args.btree_locations) > 0:
         btree_locations.extend(args.btree_locations.split(":"))
