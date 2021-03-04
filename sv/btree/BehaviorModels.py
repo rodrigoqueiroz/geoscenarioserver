@@ -51,7 +51,7 @@ class BehaviorModels(object):
             path,file = self.find_btree(self.root_btree_name, self.btree_locations)
             if path == False: #btree file search unsuccessful
                 #if you cannot find the file in any location, A message is printed and return no tree.
-                print ("Btree file " + self.root_btree_name + " not found in any provided location")
+                log.warn ("Btree file " + self.root_btree_name + " not found in any provided location")
                 print ("Locations: (" + str(self.btree_locations) + ")")
 
                 return None
