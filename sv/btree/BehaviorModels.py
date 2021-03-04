@@ -38,7 +38,7 @@ class BehaviorModels(object):
     def find_btree(self):
         for btree_path in self.btree_locations:
             if os.path.isfile(os.path.join(btree_path, self.root_btree_name)):
-                print ("Using the " + self.root_btree_name + " btree from " + btree_path)
+                print ("Using " + os.path.join(btree_path, self.root_btree_name))
                 path,file = os.path.split(os.path.abspath(os.path.join(btree_path, self.root_btree_name)))
                 return path,file
         #Btree not found in any location
