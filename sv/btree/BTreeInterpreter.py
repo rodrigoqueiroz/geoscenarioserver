@@ -77,10 +77,14 @@ class BTreeInterpreter(object):
     def interpret_tree(self, tree_name):
         ''' Instantiates a tree from the name.'''
         loaded_tree = ""
+        path,file = self.bmodel.find_btree(tree_name + ".btree")
+        if path == False: #btree file search unsuccessful
+            #if you cannot find the subtree file in any location, A message is printed and return no tree.
+            raise Exception("Subtree \'{}\' was not found in any provided location {}".format(tree_name, str(self.bmodel.btree_locations)))
         try:
-            f = open(os.path.join(self.path, tree_name + '.btree'),'r')
+            f = open(os.path.join(path, tree_name + ".btree"),'r')
         except Exception:
-            raise Exception("Tree \'{}\' was not found in {}".format(tree_name, self.path))
+            raise Exception("Tree \'{}\' couldn't be opened in {}".format(tree_name, self.path))
         finally:
             loaded_tree = f.read()
             f.close()

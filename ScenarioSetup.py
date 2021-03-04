@@ -130,7 +130,6 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
             try:
                 myroute = vnode.tags['route']
                 root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
-                root_btree_name = os.path.join(btype, root_btree_name) #access btrees from the btype's folder
                 route_nodes = parser.routes[myroute].nodes
                 lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]   #a valid lanelet route
                 sim_config.lanelet_routes[vid] = lanelet_map.get_route_via(lanelets_in_route)
@@ -142,7 +141,8 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 vehicle = SDV(  vid, name, root_btree_name, start_state,
                                 lanelet_map, sim_config.lanelet_routes[vid],
                                 start_state_in_frenet=start_in_frenet,
-                                btree_locations=btree_locations
+                                btree_locations=btree_locations,
+                                btype=btype
                             )
                 if 'btconfig' in vnode.tags:
                     vehicle.btree_reconfig = vnode.tags['btconfig']
