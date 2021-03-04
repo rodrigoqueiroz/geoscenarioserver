@@ -1,0 +1,6 @@
+behaviortree st_lanechange:
+    ?
+        ->
+            condition lc( sim_time (repeat=False, tmin=3, tmax=10))
+            subtree lanechange()
+        subtree drive()
