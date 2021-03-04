@@ -49,7 +49,7 @@ class LaneletMap(object):
         tl_res = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
         for tl_re in tl_res:
             #physical lights in the re
-            for tl in tl_re.trafficLights: 
+            for tl in tl_re.trafficLights:
                 tlname = tl.attributes['name']
                 if name.casefold() == tlname.casefold():
                     #print(name+" and "+tlname)
@@ -65,14 +65,14 @@ class LaneletMap(object):
         if tl:
             for physical_ligh in tl.trafficLights: #LineString3d
                 x = physical_ligh[0].x #LineString3d node 0
-                y = physical_ligh[0].y  
+                y = physical_ligh[0].y
             line = self.lanelet_map.lineStringLayer[tl.stopLine.id]
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
             linepoints = [xs,ys]
         return x,y,linepoints
-            
-            
+
+
 
 
     @staticmethod
@@ -128,6 +128,36 @@ class LaneletMap(object):
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
             intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            if len(intersecting_lls) > 1:
+                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                    (x,y), [ll.id for ll in intersecting_lls]))
+                return intersecting_lls[1]
+        return intersecting_lls[0]
+
+    def get_occupying_lanelet_by_participant(self, x, y, participant):
+        point = BasicPoint2d(x, y)
+
+        # get all intersecting lanelets using a trivial bounding box
+        searchbox = BoundingBox2d(point, point)
+        intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
+
+        '''
+        relevent_subtypes = []
+        if participant == "pedestrian":
+            relevent_subtypes = ["crosswalk", "walkway"]
+        '''
+
+        if len(intersecting_lls) == 0:
+            raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+        elif len(intersecting_lls) > 1:
+            # filter results for lanelets containing the point
+            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            # TODO: add filter by participants here
+            '''
+            if len(relevent_subtypes) > 0:
+                intersecting_lls = list(filter(lambda ll: any(subtype in relevent_subtypes for subtype in ll.attributes["subtype"]), intersecting_lls))
+            '''
+
             if len(intersecting_lls) > 1:
                 log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                     (x,y), [ll.id for ll in intersecting_lls]))

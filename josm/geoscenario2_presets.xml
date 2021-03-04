@@ -134,7 +134,7 @@
 		<text key="name" text="* Name " />
 		<text key="yaw" text="Yaw[](deg)" />
 		<text key="model" text="Model" />
-		<combo key="btype" text="Behavior Type:" values="TP,EP,PP" default="" />
+		<combo key="btype" text="Behavior Type:" values="TP,EP,PP,SP" default="" />
 		<item_separator />
 
 		<label text="TP (trajectory-based pedestrian)" />
@@ -159,7 +159,7 @@
 		<label text="SP (simulated dynamic behavior pedestrian)" />
 		<label text="Pedestrians running BT models for dynamic behavior" />
 		<text key="btree" text="BehaviorTree (root)" />
-		<text key="route" text="Route ID" />
+		<text key="destination" text="Destination ID" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
