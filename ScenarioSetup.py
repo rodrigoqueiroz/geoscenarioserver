@@ -18,7 +18,7 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
-def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path):
+def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
     if (os.path.isabs(gsfile[0])):
@@ -129,8 +129,8 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 continue
             try:
                 myroute = vnode.tags['route']
-                btree_root_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside scenarios/btrees/
-                btree_root_name = os.path.join(btype, btree_root_name) #access btrees from the btype's folder
+                root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside scenarios/btrees/
+                root_btree_name = os.path.join(btype, root_btree_name) #access btrees from the btype's folder
                 route_nodes = parser.routes[myroute].nodes
                 lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]   #a valid lanelet route
                 sim_config.lanelet_routes[vid] = lanelet_map.get_route_via(lanelets_in_route)
@@ -139,9 +139,10 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 log.error("Route generation failed for route {}.".format(myroute))
                 raise e
             try:
-                vehicle = SDV(  vid, name, btree_root_name, start_state ,
+                vehicle = SDV(  vid, name, root_btree_name, start_state,
                                 lanelet_map, sim_config.lanelet_routes[vid],
-                                start_state_in_frenet=start_in_frenet
+                                start_state_in_frenet=start_in_frenet,
+                                btree_locations=btree_locations
                             )
                 if 'btconfig' in vnode.tags:
                     vehicle.btree_reconfig = vnode.tags['btconfig']
@@ -234,7 +235,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 continue
             try:
                 p_route = pnode.tags['route']
-                #btree_root_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk_tree" # a behavior tree file (.btree) inside scenarios/btrees/
+                #root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk_tree" # a behavior tree file (.btree) inside scenarios/btrees/
                 route_nodes = parser.routes[p_route].nodes
                 #lanelets_in_route = [lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes]   # a valid lanelet route
                 #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(lanelets_in_route)
@@ -302,10 +303,12 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
     try:
         vehicle = SDV(vid = vid,                                     #<= must ne integer
                     name = "my_sample_vehicle",                     #vehicle name
-                    btree_root_name = "drive_tree",                           #a behavior tree file (.btree) inside scenarios/btrees/
-                    start_state =  [vehicle_start.x,0.0,0.0, vehicle_start.y,0.0,0.0],          #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
+                    root_btree_name = "drive_tree",                           #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
+                    start_state = [vehicle_start.x,0.0,0.0, vehicle_start.y,0.0,0.0],          #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
                     lanelet_map = lanelet_map,
-                    lanelet_route = sim_config.lanelet_routes[vid])    #a valid lanelet route
+                    lanelet_route = sim_config.lanelet_routes[vid],
+                    btree_locations = btree_locations
+                    )    #a valid lanelet route
     except Exception as e:
         log.error("Failed to initialize vehicle {}".format(vid))
         raise e

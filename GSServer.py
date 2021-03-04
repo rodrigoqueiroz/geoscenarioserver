@@ -21,14 +21,18 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
+
     base_btree_location = os.path.join(ROOT_DIR, "btrees") #default btree folders location
+    print("Default btree location set as: " + str(base_btree_location))
     btree_locations = []
     if len(args.btree_locations) > 0:
         btree_locations.extend(args.btree_locations.split(":"))
         btree_locations.append(base_btree_location)
     else:
         btree_locations = [base_btree_location]
-    traffic = SimTraffic(lanelet_map, sim_config, btree_locations)
+
+    traffic = SimTraffic(lanelet_map, sim_config)
+    
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
         return
@@ -40,7 +44,7 @@ def start_server(args, m=MVelKeepConfig()):
     if args.gsfile:
         if '.osm' in args.gsfile:
             #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path)
+            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
         else:
             #Direct setup
             res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)

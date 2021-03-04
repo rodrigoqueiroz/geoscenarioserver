@@ -29,7 +29,7 @@ from SimTraffic import *
 
 
 class SVPlanner(object):
-    def __init__(self, sdv, sim_traffic):
+    def __init__(self, sdv, sim_traffic, btree_locations):
         #MainProcess space:
         self._process = None
         self.traffic_state_sharr = sim_traffic.traffic_state_sharr
@@ -49,9 +49,9 @@ class SVPlanner(object):
         self.btree_reconfig = sdv.btree_reconfig
         self.behavior_model = None
         self.mconfig = None
-
-    def start(self, btree_locations):
         self.btree_locations = btree_locations
+
+    def start(self):
         #Create shared arrray for Motion Plan
         c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
