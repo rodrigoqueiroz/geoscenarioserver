@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
@@ -21,9 +21,6 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
-    #TODO: add all -b tree locations here
-    btree_locations = [os.path.join(ROOT_DIR, "btrees")]
-    log.info ("Default btree location set as: " + str(btree_locations))
     traffic = SimTraffic(lanelet_map, sim_config)
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
@@ -31,16 +28,16 @@ def start_server(args, m=MVelKeepConfig()):
 
     if args.no_dash:
         sim_config.show_dashboard = False
-
+    
     # SCENARIO SETUP
     if args.gsfile:
         if '.osm' in args.gsfile:
             #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
+            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path)
         else:
             #Direct setup
             res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
-    else:
+    else: 
         res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
 
     if not res:
@@ -79,10 +76,10 @@ def start_server(args, m=MVelKeepConfig()):
         except Exception as e:
             log.error(e)
             break
-
+        
     traffic.stop_all()
     dashboard.quit()
-
+   
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario server shutdown')
@@ -101,6 +98,6 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-m", "--map-path", dest="map_path", default="", help="Overrides the path in which the map file can be found")
 
-
+    
     args = parser.parse_args()
     start_server(args)

@@ -54,9 +54,8 @@ class SDV(Vehicle):
     ''''
     Simulated Driver-Vehicle Model (dynamic behavior)
     '''
-    def __init__(self, vid, name, root_btree_name, start_state, lanelet_map:LaneletMap, lanelet_route, start_state_in_frenet=False, btree_locations=[]):
+    def __init__(self, vid, name, btree_root, start_state,  lanelet_map:LaneletMap, lanelet_route, start_state_in_frenet=False):
         #Map
-        self.btree_locations = btree_locations
         self.lanelet_map = lanelet_map
         self.lanelet_route = lanelet_route # list of lanelet ids we want this vehicle to follow
         self.global_path = None
@@ -75,7 +74,7 @@ class SDV(Vehicle):
         #Planning
         self.sv_planner = None
         #Behavior
-        self.root_btree_name = root_btree_name
+        self.btree_root = btree_root
         self.btree_reconfig = ""
         self.motion_plan = None
 
@@ -84,7 +83,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations)
+        self.sv_planner = SVPlanner(self, self.sim_traffic)
         self.sv_planner.start()
 
     def stop(self):
