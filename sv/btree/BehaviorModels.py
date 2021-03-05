@@ -21,7 +21,8 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = []):
+    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = [], btype = ""):
+        self.btype = btype
         self.btree_locations = btree_locations
         self.vid = vid
         self.root_btree_name = root_btree_name
@@ -35,28 +36,13 @@ class BehaviorModels(object):
         self.current_mconfig = None
         self.ref_path_changed = False
 
-    def find_btree(self):
-        for btree_path in self.btree_locations:
-            if os.path.isfile(os.path.join(btree_path, self.root_btree_name)):
-                log.info ("Using " + os.path.join(btree_path, self.root_btree_name))
-                path,file = os.path.split(os.path.abspath(os.path.join(btree_path, self.root_btree_name)))
-                return path,file
-        #Btree not found in any location
-        return False,False
-        
-
     def build(self,reconfig):
         #if it's defined by btree file. Use interpreter.
         if '.btree' in self.root_btree_name and len(self.btree_locations) > 0:
-            path,file = self.find_btree()
-            if path == False: #btree file search unsuccessful
-                #if you cannot find the file in any location, A message is printed and return no tree.
-                log.fatal ("Btree file " + self.root_btree_name + " not found in any provided location. Locations: (" + str(self.btree_locations) + ")")
-                exit()
-                
-            file_noext = os.path.splitext(file)[0]
-            interpreter = BTreeInterpreter(self.vid, bmodel=self, path=path)
-            tree = interpreter.build_tree(tree_name=file_noext)
+            #assume self.root_btree_name has no path, and is just name.btree
+            file_noext = os.path.splitext(self.root_btree_name)[0]
+            interpreter = BTreeInterpreter(self.vid, bmodel=self)
+            tree = interpreter.build_tree(btree_name=file_noext)
 
             '''
             args format:
@@ -92,7 +78,7 @@ class BehaviorModels(object):
 
     def tick(self, planner_state):
         if self.tree is None:
-            return None, False
+            return None, False, ""
 
         # ref_path_changed is per-tick
         self.ref_path_changed = False

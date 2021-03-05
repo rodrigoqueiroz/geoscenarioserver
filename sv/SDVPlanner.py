@@ -50,6 +50,7 @@ class SVPlanner(object):
         self.behavior_model = None
         self.mconfig = None
         self.btree_locations = btree_locations
+        self.btype = sdv.btype
 
     def start(self):
         #Create shared arrray for Motion Plan
@@ -94,7 +95,7 @@ class SVPlanner(object):
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
-        self.behavior_model = BehaviorModels(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations)
+        self.behavior_model = BehaviorModels(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         
         while sync_planner.tick():
             TickSync.clock_log("Planner: start")
