@@ -85,7 +85,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.btype)
+        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations)
         self.sv_planner.start()
 
     def stop(self):
