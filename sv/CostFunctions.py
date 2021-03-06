@@ -16,14 +16,13 @@ from sv.FrenetTrajectory import *
 
 
 def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
-    #TickSync.clock_log("FStart")
+    
     for c in mconfig.feasibility_constraints:
         if mconfig.feasibility_constraints[c] > 0:
             
             #direction
             if c == 'direction':
                 ft.direction =  direction_cost(ft, ft.start_state)
-                #TickSync.clock_log("direction")
                 if ft.direction > 0:
                     ft.unfeasibility_cause +='direction,'
                     return False
@@ -31,7 +30,6 @@ def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, v
             #collision
             elif c == 'collision':
                 ft.collision = collision_cost(ft, lane_config, vehicles, pedestrians, static_objects)
-                #TickSync.clock_log("collision")
                 if ft.collision > 0:
                     ft.unfeasibility_cause +='collision,'
                     return False
@@ -39,22 +37,18 @@ def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, v
             #off road
             elif c == 'off_lane':
                 ft.off_lane = off_lane_cost(ft, lane_config)
-                #TickSync.clock_log("offlane")
                 if ft.off_lane > 0:
                     ft.unfeasibility_cause +='off_lane,'
                     return False
-                
 
             #acc
             elif c == 'max_long_acc':
                 res, ft.max_long_acc = max_long_acc_cost(ft, mconfig.max_long_acc)
-                #TickSync.clock_log("max long acc")
                 if res > 0:
                     ft.unfeasibility_cause +='max_long_acc,'
                     return False
             elif c == 'max_lat_acc':
                 res, ft.max_lat_acc = max_lat_acc_cost(ft, mconfig.max_lat_acc)
-                #TickSync.clock_log("max lat acc")
                 if res > 0:
                     ft.unfeasibility_cause += 'max_lat_acc,'
                     return False
@@ -62,13 +56,11 @@ def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, v
             #jerk
             elif c == 'max_lat_jerk':
                 res, ft.max_lat_jerk = max_lat_jerk_cost(ft, mconfig.max_lat_jerk)
-                #TickSync.clock_log("max lat jerk")
                 if res > 0:
                     ft.unfeasibility_cause += 'max_lat_jerk,'
                     return False
             elif c == 'max_long_jerk':
                 res, ft.max_long_jerk = max_long_jerk_cost(ft, mconfig.max_long_jerk)
-                #TickSync.clock_log("max long jerk")
                 if res > 0:
                     ft.unfeasibility_cause += 'max_long_jerk,'
                     return False
@@ -87,45 +79,36 @@ def maneuver_cost(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles
             #basic cost
             if (cost == 'time_cost'):
                 if hasattr(mconfig, 'time'):
-                    ft.time_cost = k* time_cost(ft.array_format(), mconfig.time.value)
-                    #TickSync.clock_log("time cost")
+                    ft.time_cost = k* time_cost(ft, mconfig.time.value)
                     
             elif cost == 'effic_cost':
                 if hasattr(mconfig ,'vel'):
-                    ft.effic_cost = k * effic_cost(ft.array_format(), mconfig.time.value)
-                    #TickSync.clock_log("effic cost")
+                    ft.effic_cost = k * effic_cost(ft, mconfig.time.value)
                     
             #goal
-            elif cost == 'progress_cost':
-                ft.progress_cost = k * progress_cost(ft)
-                #TickSync.clock_log("progress cost")
+            #elif cost == 'progress_cost':
+            #    ft.progress_cost = k * progress_cost(ft)
                 
             elif cost == 'lane_offset_cost':
                 ft.lane_offset_cost =  k * lane_offset_cost(ft, lane_config, mconfig.expected_offset_per_sec)
-                #TickSync.clock_log("lane offset cost")
                 
             #jerk
             elif cost == 'total_lat_jerk_cost':
                 ft.total_lat_jerk_cost = k * total_lat_jerk_cost(ft, mconfig.expected_lat_jerk_per_sec)
-                #TickSync.clock_log("lat jerk cost")
                 
             elif cost == 'total_long_jerk_cost':
                 ft.total_long_jerk_cost = k *total_long_jerk_cost(ft, mconfig.expected_long_jerk_per_sec)
-                #TickSync.clock_log("long jerk cost")
                 
             #acc
             elif cost == 'total_long_acc_cost':
                 ft.total_long_acc_cost = k * total_long_acc_cost(ft, mconfig.expected_long_acc_per_sec)
-                #TickSync.clock_log("long acc cost")
                 
             elif cost == 'total_lat_acc_cost':
                 ft.total_lat_acc_cost = k * total_lat_acc_cost(ft, mconfig.expected_lat_acc_per_sec)
-                #TickSync.clock_log("lat acc cost")
                 
             #proximity
             elif cost == 'proximity_cost':
                 ft.proximity_cost = k * proximity_cost(ft, lane_config, vehicles, pedestrians, static_objects )
-                #TickSync.clock_log("prox cost")
                 
             else:
                 raise NotImplementedError("Cost function {} not implemented".format(cost))
@@ -139,38 +122,38 @@ def maneuver_cost(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles
 
 #Efficiency Cost:
 
-def effic_cost(trajectory,target_vel):
+def effic_cost(frenet_traj:FrenetTrajectory,target_vel):
     '''Penalizes low average velocity'''
-    s_coef, _, T = trajectory
-    fs = to_equation(s_coef)
-    distance = (fs(T) - fs(0))
-    avg_vel = distance / T
-    #method2:
-    #total = 0
-    #dt = float(T) / 100.0
-    #for ti in range(100):
-    #    total += vel(ti)
-    #avg_vel = float(total) / 100
+    total = 0
+    ptrajectory = frenet_traj.projected_trajectory
+    for i in range(len(ptrajectory)):
+        total += ptrajectory[i][1][1] #1=s_state, 1=s_vel
+    avg_vel = float(total) / len(ptrajectory)
     return logistic( 2*(target_vel-avg_vel) / avg_vel)
 
-def time_cost(trajectory, target_t):
+def time_cost(frenet_traj:FrenetTrajectory, target_t):
     '''Penalizes trajectories longer or shorter than target time.'''
-    _, _, T = trajectory
-    diff =  float(abs(T-target_t))
+    diff =  float(abs(frenet_traj.T-target_t))
     return logistic( diff / target_t)
 
-def progress_cost(frenet_traj):
-    '''Penalizes trajectories that end away from the target state.
-    NOTE: This may not applyto stop_at anymore!
-    '''
-    frenet_traj
-    # TODO add velocity and acc comparisons also?
+'''
+#deprecated
+#This cost is not compatible with current architecture
+def progress_cost(frenet_traj:FrenetTrajectory):
+    #Penalizes trajectories that end away from the target state.
+    
+    end_state = frenet_traj.get_state_at(frenet_traj.T)
+    target_s =  frenet_traj.target_state[0]
+    #if quartic polyn, s=0.0 means any s is accepted
+    if target_s == 0.0: 
+        target_s = end_state[0]
+    
     end_arr = np.array([
-        frenet_traj.fs(frenet_traj.T),
-        frenet_traj.fs(frenet_traj.T)
+        end_state[0],
+        end_state[3]
     ])
     target_arr = np.array([
-        frenet_traj.target_state[0],
+        target_s,
         frenet_traj.target_state[3]
     ])
     diff = end_arr - target_arr
@@ -180,25 +163,27 @@ def progress_cost(frenet_traj):
     else:
         rel_error = np.linalg.norm(diff) / np.linalg.norm(target_arr)
         cost = logistic(rel_error)
-    # print("target stop {}, actual {}, cost {}".format(
-    #     target_state[0][0],
-    #     end_arr[0],
-    #     cost
-    # ))
+    print("target {}, actual {}, diff {} cost {}".format(
+            target_arr,
+            end_arr,
+            diff,
+            cost
+        ))
     return cost
+'''
 
 #Road geometry Cost:
 
-def lane_offset_cost(frenet_traj:FrenetTrajectory,lane_config, expected_offset_per_sec):
+def lane_offset_cost(frenet_traj:FrenetTrajectory,lane_config:LaneConfig, expected_offset_per_sec):
     '''Penalizes distance from lane center during the entire trajectory'''
-    T = frenet_traj.T
-    central_d = (lane_config.left_bound - lane_config.right_bound)/2 + lane_config.right_bound
     total_offset = 0
-    dt = float(T) / 100.0
-    for i in range(100):
-        t = dt * i
-        offset = frenet_traj.fd(t) - central_d
-        total_offset += abs(offset)
+    ptrajectory = frenet_traj.projected_trajectory
+    T = frenet_traj.T
+    dt = T / len(ptrajectory)
+    for i in range(len(ptrajectory)):
+        d = ptrajectory[i][2][0] #2=d_state, 0=d
+        offset = d - lane_config.get_central_d()
+        total_offset += abs(offset)*dt
     offset_per_second = total_offset / T
     #print("total offset is per second {:.2f} ".format(offset_per_second))
     cost = logistic(offset_per_second/expected_offset_per_sec)
