@@ -18,6 +18,7 @@ from Actor import *
 from sv.Vehicle import Vehicle
 from sp.Pedestrian import *
 from TrafficLight import TrafficLight
+import datetime
 
 
 class SimTraffic(object):
@@ -100,7 +101,7 @@ class SimTraffic(object):
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
         np = len(self.pedestrians)
-
+        
         #Read Client
         if (self.sim_client_shm):
             new_client_state = False
@@ -116,7 +117,6 @@ class SimTraffic(object):
                 # print sim state and exit
                 self.log_sim_state(vstates, disabled_vehicles)
                 return -1
-
             #Update Remote Dynamic Actors
             for vid in self.vehicles:
                 #update remote agents if new state is available
@@ -131,16 +131,22 @@ class SimTraffic(object):
         #tick pedestrians:
         for pid in self.pedestrians:
             self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
-
+        
         #Update traffic light states
         for tlid in self.traffic_lights:
             self.traffic_lights[tlid].tick(tick_count, delta_time, sim_time)
-
+        
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
-
+        
         #log.info(self.debug_shdata)
         self.log_trajectories(tick_count, delta_time, sim_time)
+        
+        #Collisions at Server Side
+        if self.detect_collisions(tick_count, delta_time, sim_time):
+            self.log_sim_state(vstates, disabled_vehicles)
+            return -1
+        
         return 0
 
     #Shared Memory:
@@ -207,6 +213,22 @@ class SimTraffic(object):
         if (self.sim_client_shm):
             self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrians)
 
+
+    def detect_collisions(self,tick_count, delta_time, sim_time):
+        for id_va, va in self.vehicles.items():
+            min_x = (va.state.x - VEHICLE_RADIUS)
+            max_x = (va.state.x + VEHICLE_RADIUS)
+            min_y = (va.state.y - VEHICLE_RADIUS)
+            max_y = (va.state.y + VEHICLE_RADIUS)
+            for id_vb, vb in self.vehicles.items():
+                if id_va != id_vb:
+                    #this filter will be important when we use alternative (and more expensive) collision checking methods
+                    if  (min_x <= vb.state.x <= max_x) and (min_y <= vb.state.y <= max_y): 
+                        dist = distance_2p(va.state.x,va.state.y, vb.state.x, vb.state.y)
+                        if  dist < (2*VEHICLE_RADIUS):
+                            log.error("Collision between vehicles {} {}".format(id_va,id_vb))
+                            return True
+        return False
 
 
 

@@ -15,11 +15,8 @@ from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
-# from sv.btree.BTreeModel import * # Deprecated
-#from sv.btree.BTreeFactory import *
 from sv.btree.BehaviorModels import BehaviorModels
 from sv.SDVPlannerState import PlannerState, TrafficLightState
-# import sv.SV
 from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position, frenet_to_sim_frame, OutsideRefPathException
 import lanelet2.core
 from mapping.LaneletMap import *
@@ -42,7 +39,6 @@ class SVPlanner(object):
         self.laneletmap:LaneletMap = sim_traffic.lanelet_map
         self.sim_config = sim_traffic.sim_config
         self.sim_traffic:SimTraffic = sim_traffic
-
         #Subprocess space
         # Reference path that the planner will use for all transformations and planning
         self.reference_path = None
@@ -92,17 +88,22 @@ class SVPlanner(object):
         log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
 
         sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP")
+        sync_planning_task = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP")
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig)
         
-        expected_planner_time = PLANNING_TIME # seconds
+        # target time for planning task. Can be fixed or variable up to max planner tick time
+        task_label = "V{} plan".format(self.vid)
+        if USE_FIXED_PLANNING_TIME:
+            sync_planner.set_task(task_label,PLANNING_TIME)
+        else:
+            sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
 
         while sync_planner.tick():
-            planner_start_time = datetime.datetime.now()
+            sync_planner.start_task()
 
-            TickSync.clock_log("Planner: start")
             # Get sim state from main process
             # All objects are copies and can be changed
             header, traffic_vehicles, traffic_pedestrians,traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
@@ -113,38 +114,32 @@ class SVPlanner(object):
             else:
                 #vehicle state not available. Vehicle can be inactive.
                 continue
-            TickSync.clock_log("Planner: read traffic")
-
+            
             if self.reference_path is None:
                 self.reference_path = self.laneletmap.get_global_path_for_route(
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
 
             # Get traffic, lane config and regulatory elements in current frenet frame
-            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states,static_objects, expected_planner_time, state_time)
+            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states,static_objects, sync_planner.get_task_time(), state_time)
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
-            TickSync.clock_log("Planner: traffic state")
-
+            
             #BTree Tick - using frenet state and lane config based on old ref path
             mconfig, ref_path_changed, snapshot_tree = self.behavior_model.tick(planner_state)
-            TickSync.clock_log("Planner: behavior")
-
+            
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
             if ref_path_changed:
                 log.info("PATH CHANGED")
-
                 self.reference_path = self.laneletmap.get_global_path_for_route(
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
-
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects, expected_planner_time, state_time)
+                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects, sync_planner.get_task_time(), state_time)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
                 mconfig, _, snapshot_tree = self.behavior_model.tick(planner_state)
-            TickSync.clock_log("Planner: new ref path")
-
+            
             # new maneuver
             if self.mconfig and self.mconfig.mkey != mconfig.mkey:
                 log.info("VID {} started maneuver {}".format(self.vid, mconfig.mkey.name))
@@ -173,7 +168,7 @@ class SVPlanner(object):
                         vehicle_state.s - tvehicle.state.s - 2*VEHICLE_RADIUS,
                         vehicle_state.s_vel - tvehicle.state.s_vel
                     )
-                log.info(state_str)
+                #log.info(state_str)
             self.mconfig = mconfig
             #Maneuver Tick
             if mconfig and planner_state.lane_config:
@@ -187,16 +182,8 @@ class SVPlanner(object):
                                             planner_state.pedestrians,
                                             planner_state.static_objects)
 
-                planner_end_time = datetime.datetime.now()
-                delta_time = (planner_end_time - planner_start_time).total_seconds()
-                if delta_time < expected_planner_time:
-                    time.sleep(delta_time)
-                else:
-                    log.warn("Planning took longer than expected...")
-                    log.info("VID: %d, Plan Tick: %d, Expected: %f, Actual: %f" % (
-                        self.vid, tick_count,
-                        expected_planner_time, delta_time
-                    ))
+                
+                sync_planner.end_task() #blocks if < target
 
                 if frenet_traj is None:
                     log.warn("plan_maneuver return invalid trajectory.")
@@ -204,35 +191,18 @@ class SVPlanner(object):
                 else:
                     plan = MotionPlan()
                     plan.trajectory = frenet_traj
-                    plan.start_time = state_time + expected_planner_time
+                    plan.start_time = state_time + sync_planner.get_task_time()
                     plan.new_frenet_frame = ref_path_changed
                     plan.reversing = mconfig.mkey == Maneuver.M_REVERSE
                     plan.tick_count = tick_count
-                    log.info("+++VID: %d, Plan Tick: %d, Timestamp: %f, Start Time: %f, S Coef: (%f, %f, %f, %f, %f, %f)+++" % (
-                        self.vid, tick_count,
-                        datetime.datetime.now().timestamp(), plan.start_time,
-                        plan.trajectory.s_coef[0], plan.trajectory.s_coef[1],
-                        plan.trajectory.s_coef[2], plan.trajectory.s_coef[3],
-                        plan.trajectory.s_coef[4], plan.trajectory.s_coef[5]
-                    ))
                     self.write_motion_plan(mplan_sharr, plan)
                     if plan.trajectory.T > 0.0: #only for non zero traj
-                        #print("planner {} wrote".format(self.vid))
-                        #print(plan)
                         self.last_plan = plan
-
-                if not USE_FIXED_PLANNING_TIME:
-                    if delta_time < expected_planner_time:
-                        expected_planner_time = MIN_PLANNING_TIME if delta_time < MIN_PLANNING_TIME else delta_time
-                    else:
-                        expected_planner_time = MAX_PLANNING_TIME if delta_time > MAX_PLANNING_TIME else delta_time
-
             else:
-                traj, cand = None, None
-            TickSync.clock_log("Planner: maneuver")
-
+                frenet_traj, cand = None, None
+            
+            #Debug info (for Dahsboard and Log)
             if self.sim_config.show_dashboard:
-                #Write down debug info (for Dahsboard and Log)
                 # change ref path format for pickling (maybe always keep it like this?)
                 debug_ref_path = [(pt.x, pt.y) for pt in self.reference_path]
                 debug_shdata[int(self.vid)] = (
@@ -243,12 +213,7 @@ class SVPlanner(object):
                     [traj.array_format() for traj in cand if traj.feasible] if cand else None,
                     [traj.array_format() for traj in cand if not traj.feasible] if cand else None
                 )
-
-            TickSync.clock_log("Planner: debug")
-            #TickSync.print_clock_log()
-            
-
-        log.info('PLANNER PROCESS END')
+        log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         
 
     def get_planner_state(
@@ -267,17 +232,18 @@ class SVPlanner(object):
 
         # From compute_vehicle_state() in sv/Vehicle.py
         if self.last_plan:
-            delta_time = state_time - self.last_plan.start_time
-            time = delta_time + expected_planner_time
-
-            new_state = self.last_plan.trajectory.get_state_at(time)
+            sim_time_ahead = state_time + expected_planner_time
+            delta_time = sim_time_ahead - self.last_plan.start_time
+            if (delta_time > self.last_plan.trajectory.T): 
+                delta_time = self.last_plan.trajectory.T
+            new_state = self.last_plan.trajectory.get_state_at(delta_time)
             vehicle_state.set_S(new_state[:3])
             vehicle_state.set_D(new_state[3:])
 
             try:
                 x_vector, y_vector = frenet_to_sim_frame(self.reference_path, vehicle_state.get_S(), vehicle_state.get_D())
             except OutsideRefPathException as e:
-                pass
+                return None
 
             vehicle_state.x = x_vector[0]
             vehicle_state.x_vel = x_vector[1]
