@@ -137,8 +137,8 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
         if (dist < distance_gap) or (0 <= time_to_leader < time_gap):
             is_following = True
             leading_vid = leading_vehicle.id
-            print("{} is leading. Distance {}, time gap {}".format(
-                leading_vehicle.id, dist, time_to_leader))
+            #log.info("{} is leading. Distance {}, time gap {}".format(
+            #    leading_vehicle.id, dist, time_to_leader))
 
     return is_following, leading_vid
 

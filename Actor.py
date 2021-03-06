@@ -6,6 +6,8 @@
 # --------------------------------------------
 from dataclasses import dataclass
 from enum import IntEnum
+from util.Utils import to_equation, differentiate
+from SimConfig import *
 import numpy as np
 import glog as log
 
@@ -40,14 +42,16 @@ class Actor(object):
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
-            TODO: predict using history
+            Note: Acc can rapidly change. Using the current acc to predict future 
+            can lead to overshooting forward or backwards when vehicle is breaking
+            TODO: predict using history + kalman filter
         """
         state = [
-            self.state.s + (self.state.s_vel * t) + (self.state.s_acc * t * t),
-            self.state.s_vel + (self.state.s_acc * t),
+            self.state.s + (self.state.s_vel * t), #+ (self.state.s_acc * t * t),
+            self.state.s_vel, #+ (self.state.s_acc * t),
             self.state.s_acc,
-            self.state.d + (self.state.d_vel * t) + (self.state.d_acc * t * t),
-            self.state.d_vel + (self.state.d_acc * t),
+            self.state.d + (self.state.d_vel * t), #+ (self.state.d_acc * t * t),
+            self.state.d_vel, #+ (self.state.d_acc * t),
             self.state.d_acc
         ]
         return state
@@ -73,22 +77,37 @@ class Actor(object):
         if trajectory:
             start_time = float(trajectory[0].time) #first node
             end_time = float(trajectory[-1].time) #last node
-            traj_time = end_time - start_time
             #During trajectory
             if start_time <= sim_time <= end_time:
-                #for node in self.trajectory:
-                for i in range(len(trajectory)):
+                #Trajectory starts
+                if self.sim_state is ActorSimState.INACTIVE:
+                    log.warn("Actor ID {} is now ACTIVE".format(self.id))
+                    self.sim_state = ActorSimState.ACTIVE
+                    if self.ghost_mode:
+                        self.sim_state = ActorSimState.INVISIBLE
+                        log.warn("vid {} is now INVISIBLE".format(self.id))
+                    if EVALUATION_MODE:
+                        if -self.id in self.sim_traffic.vehicles:
+                            self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE 
+                            log.warn("vid {} is now ACTIVE".format(-self.id))
+                
+                #find closest pair of nodes
+                for i in range(len(trajectory)-1):
                     node = trajectory[i]
-                    if node.time < sim_time:
-                        continue
-                    if self.sim_state is ActorSimState.INACTIVE:
-                        log.warn("Actor ID {} is now ACTIVE".format(self.id))
-                        self.sim_state = ActorSimState.ACTIVE
-                    node.x_vel = node.y_vel = node.x_acc = node.y_acc = 0.0
-                    self.state.set_X([node.x, node.x_vel, node.x_acc])
-                    self.state.set_Y([node.y, node.y_vel, node.y_acc])
-                    break
-            #After trajectory, stay in last position get removed
+                    next = trajectory[i+1]
+                    if (node.time <= sim_time <= next.time):
+                        #print("node.time <= {} sim_time {} <= next.time {} ".format(node.time,sim_time, next.time))
+                        #interpolate
+                        pdiff = (sim_time - node.time)/(next.time - node.time) #always positive
+                        x = node.x + ((next.x - node.x) * pdiff)
+                        x_vel = node.x_vel + ((next.x_vel - node.x_vel) * pdiff)
+                        y = node.y + ((next.y - node.y) * pdiff)
+                        y_vel = node.y_vel + ((next.y_vel - node.y_vel) * pdiff)
+                        self.state.set_X([x, x_vel, 0])
+                        self.state.set_Y([y, y_vel, 0])
+                        #print("t{} x{} -> nt{} nx{}. Interp pdiff{} ix{}".format(node.time, node.x, next.time, next.x,pdiff,x))
+                        break
+            #After trajectory, stay in last position or get removed
             if sim_time > end_time:
                 if not self.keep_active:
                     self.state.set_X([-9999, 0, 0])
@@ -104,6 +123,8 @@ class Actor(object):
 class TrajNode:
     x:float = 0.0
     y:float = 0.0
+    x_vel:float = 0.0
+    y_vel:float = 0.0
     time:float = 0.0
     speed:float = 0.0
     yaw:float = 0.0
@@ -155,7 +176,7 @@ class ActorState:
         self.set_Y(arr[3:6])
         self.set_S(arr[6:9])
         self.set_D(arr[9:12])
-        self.yaw = arr[13]
+        self.yaw = arr[12]
 
     #For easy shared memory parsing
     def get_state_vector(self):
@@ -204,55 +225,4 @@ class StaticObject():
     d:float = 0.0
     model:str = ''
 
-@dataclass
-class MotionPlan:
-    # VECTORSIZE = 15
-    s_coef:tuple = tuple([0.0,0.0,0.0,0.0,0.0,0.0]) #6 coef
-    d_coef:tuple = tuple([0.0,0.0,0.0,0.0,0.0,0.0]) #6 coef
-    t:float = 0                                     #duration
-    t_start:float = 0                               #start time [s]
-    new_frenet_frame = False
-    reversing = False
-    VECTORSIZE = len(s_coef) + len(d_coef) + 1 + 1 + 1 + 1
-    #Boundaries in Frenet Frame
-    #s_start:tuple = [0.0,0.0,0.0]     #start state in s
-    #d_start:tuple = [0.0,0.0,0.0]     #start state in d
-    #s_target:tuple = [0.0,0.0,0.0]    #target state in s
-    #d_target:tuple = [0.0,0.0,0.0]    #target state in d
-    #todo: separate trajectory on its own data class
-
-    def get_trajectory(self):
-        return ([self.s_coef, self.d_coef,self.t])
-
-    def set_trajectory(self, s_coef, d_coef, t):
-        assert(len(self.s_coef) == len(s_coef))
-        assert(len(self.d_coef) == len(d_coef))
-        self.s_coef = s_coef
-        self.d_coef = d_coef
-        self.t = t
-
-    #For easy shared memory parsing
-    def set_plan_vector(self,P):
-        assert(len(P) == MotionPlan.VECTORSIZE)
-        ns = len(self.s_coef)
-        nd = len(self.d_coef)
-        self.s_coef = P[0:ns]
-        self.d_coef = P[ns:ns + nd]
-        self.t = P[ns + nd]
-        self.t_start = P[ns + nd + 1]
-        self.new_frenet_frame = P[ns + nd + 2]
-        self.reversing = P[ns + nd + 3]
-
-    def get_plan_vector(self):
-        # print(self.s_coef)
-        assert(len(self.s_coef) == 6)
-        assert(len(self.d_coef) == 6)
-        return np.concatenate([
-            self.s_coef,
-            self.d_coef,
-            np.asarray([self.t]),
-            np.asarray([self.t_start]),
-            np.asarray([self.new_frenet_frame]),
-            np.asarray([self.reversing])
-        ])
 

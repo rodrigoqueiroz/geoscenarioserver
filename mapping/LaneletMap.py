@@ -179,11 +179,20 @@ class LaneletMap(object):
         """
         ret = None
         # NOTE use laneletMap() requires a fix to python bindings
-        for ll in lanelet_route.laneletSubmap().laneletMap().laneletLayer:
-            if inside(ll, BasicPoint2d(x, y)):
-                ret = ll
-                break
+        
+        try:
+            route_submap = lanelet_route.laneletSubmap().laneletMap()
+        except Exception:
+            try:
+                route_submap = lanelet_route.laneletMap()
+            except Exception:
+                log.error("Lanelet Map can't find route submap")
+                return
 
+        for ll in route_submap.laneletLayer:
+                if inside(ll, BasicPoint2d(x, y)):
+                    ret = ll
+                    break
         return ret
 
     def get_global_path_for_route(self, lanelet_route, x=None, y=None, meters_after_end=50):
