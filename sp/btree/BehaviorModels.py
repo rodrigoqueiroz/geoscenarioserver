@@ -29,8 +29,6 @@ class BehaviorModels(object):
         self.tree = self.build(reconfig)
         #Runtime status:
         self.planner_state = None
-        #self.leading_vid = 0
-        #self.trailing_vid = 0
         #decision
         self.current_mconfig = None
         self.ref_path_changed = False
@@ -100,7 +98,6 @@ class BehaviorModels(object):
 
     def test_condition(self, condition, kwargs):
         '''Built-in condition checks
-           TODO: add logic combinations with multiple conditions
         '''
 
         if condition == "reached_goal":
@@ -122,6 +119,13 @@ class BehaviorModels(object):
                 if isinstance(re_state, TrafficLightState):
                     # check if light is green
                     return re_state.color == TrafficLightColor.Green
+
+        elif condition == "in_crosswalk_area":
+            return in_crosswalk_area(pedestrian_state)
+
+        elif condition == "past_crosswalk_halfway":
+            return past_crosswalk_halfway(pedestrian_state)
+
         return False
 
 

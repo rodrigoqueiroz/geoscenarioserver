@@ -7,11 +7,12 @@
 # ------------------------------------
 
 
-from sp.ManeuverConfig import *
-from SimConfig import *
 import numpy as np
 from Actor import *
 import glog as log
+from SimTraffic import *
+from sp.ManeuverConfig import *
+from SimConfig import *
 
 
 def has_reached_goal(pedestrian_state, goal_point, threshold=1):
@@ -28,3 +29,11 @@ def is_stopped(traffic_vehicle):
     return abs(traffic_vehicle.state.s_vel) < 0.05
 
 
+def in_crosswalk_area(pedestrian_state):
+    cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
+    ret = cur_ll.attributes["subtype"] == "crosswalk"
+    log.info(ret)
+    return ret
+
+def past_crosswalk_halfway(pedestrian_state):
+    return False
