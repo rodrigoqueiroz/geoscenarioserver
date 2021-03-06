@@ -21,7 +21,7 @@ class BCondition(behaviour.Behaviour):
         self.ts = None
 
     def reconfigure(self, condition, args):
-        ''' Some situations require that the conditions are updated. 
+        ''' Some situations require that the conditions are updated.
             This method enables the reconfiguration of the
             Condition behavior after it is instantiated.
         '''

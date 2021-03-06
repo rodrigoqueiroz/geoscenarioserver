@@ -1,0 +1,15 @@
+behaviortree crosswalk_signal:
+    ?
+        ->
+            condition c_greenlight( traffic_light_green() )
+            maneuver m_dir_dest( MVelChgConfig( direction=1 ) )
+        ?
+            ->
+                condition c_in_xwalk( in_crosswalk_area() )
+                maneuver m_speed_inc( MVelChgConfig( speed=1 ) )
+                ?
+                    ->
+                        condition c_over_half( past_crosswalk_halfway() )
+                        maneuver m_dir_dest( MVelChgConfig( direction=1 ) )
+                    maneuver m_dir_start( MVelChgConfig( direction=0 ) )
+            maneuver m_stop(  )

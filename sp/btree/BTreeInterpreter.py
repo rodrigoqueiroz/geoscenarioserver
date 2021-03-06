@@ -91,20 +91,20 @@ class BTreeInterpreter(object):
 
     def collect_nodes(self,tree):
         nodes = []
-        if not tree.root.children: return [] 
+        if not tree.root.children: return []
 
         for child in tree.root.children:
             nodes += self.collect_children(child)
 
         return nodes
-  
+
     def collect_children(self, node):
         nodes = []
         if not node.children: nodes.append(node)
-        else: 
+        else:
             for child in node.children:
                 nodes += self.collect_children(child)
-        
+
         return nodes
 
     def reconfigure_nodes(self, tree_name, tree, args=""):
@@ -118,25 +118,25 @@ class BTreeInterpreter(object):
                     id = arr[0]
                     config = arr[1]
                     args=None
-                    if config.find(",args=(") != -1: 
+                    if config.find(",args=(") != -1:
                         arr2=config.split(",args=(")
                         config=arr2[0]
                         args= arr2[1][:-1] #gets the second parameter without the last character which should be a ')'
                     reconfigured=False
-                    
+
                     for node in nodes:
                         if node.name == id:
-                            if(args is None): 
+                            if(args is None):
                                 node.reconfigure(eval(config))
-                            else: 
+                            else:
                                 #print(config + "    "+ args)
                                 node.reconfigure(config, args)
                             reconfigured=True
                             break
-                    
+
                     if not reconfigured: print(id + " node could not be found in " + tree_name)
 
-    def link_subtrees(self, tree, nodes, subtrees):        
+    def link_subtrees(self, tree, nodes, subtrees):
         for subtree in subtrees:
             parent = None
             for node in nodes:
@@ -165,7 +165,7 @@ class BTreeInterpreter(object):
         self.tree=tree
         return tree
 
-    
+
 
 class BTreeListener(BTreeDSLListener):
 
@@ -249,11 +249,11 @@ class BTreeListener(BTreeDSLListener):
 
         op = self.map(ctx.OPERATOR().getText())
 
-        if(ctx.name() == None): 
+        if(ctx.name() == None):
             name = op.lower()[:3] + "_" + self.genstr(ctx.getText())
         else:
             name = ctx.name().getText()
-        
+
         s =  name + " = composites." + op + "(\"" + name + "\")"
         self.exec_stack.append(s)
 

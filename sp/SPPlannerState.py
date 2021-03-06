@@ -25,4 +25,3 @@ class PedestrianPlannerState:
     #static_objects: List
     regulatory_elements: List
     goal_point: List[float] = None
-

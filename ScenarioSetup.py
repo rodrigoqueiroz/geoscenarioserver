@@ -234,15 +234,9 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 log.error("SP {} requires a destination .".format(pid))
                 continue
             try:
-<<<<<<< HEAD
                 p_dest = pnode.tags['destination']
                 btree_root = pnode.tags['btree'] if 'btree' in pnode.tags else "trees/pedestrian_trees/walk.btree" # a behavior tree file (.btree) inside scenarios/trees/pedestrian_trees
                 dest_node = parser.locations[p_dest]
-=======
-                p_route = pnode.tags['route']
-                #root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk_tree" # a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
-                route_nodes = parser.routes[p_route].nodes
->>>>>>> master
                 #lanelets_in_route = [lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes]   # a valid lanelet route
                 #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(lanelets_in_route)
                 sim_config.pedestrian_goal_points[pid] = (dest_node.x, dest_node.y)

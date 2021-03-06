@@ -104,7 +104,7 @@ class SP(Pedestrian):
         for lid, tl in self.sim_traffic.traffic_lights.items():
             traffic_light_states[lid] = tl.current_color.value
 
-        cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet(pedestrian_state.x, pedestrian_state.y)
+        cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
 
         # Get regulatory elements acting on this lanelet
         reg_elems = cur_ll.regulatoryElements

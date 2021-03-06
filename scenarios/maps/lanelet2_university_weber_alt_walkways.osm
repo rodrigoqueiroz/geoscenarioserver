@@ -1736,7 +1736,7 @@
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000652' visible='true'>
+  <relation id='-5000652' action='modify' visible='true'>
     <member type='way' ref='-1948779' role='left' />
     <member type='way' ref='-1948753' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1744,9 +1744,10 @@
     <tag k='name' v='-1316' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000653' visible='true'>
+  <relation id='-5000653' action='modify' visible='true'>
     <member type='way' ref='-1948780' role='left' />
     <member type='way' ref='-1948779' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1754,6 +1755,7 @@
     <tag k='name' v='-1317' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000654' action='modify' visible='true'>
@@ -1766,6 +1768,7 @@
     <tag k='name' v='-1318' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000655' action='modify' visible='true'>
@@ -1784,6 +1787,7 @@
     <tag k='name' v='-1319' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000657' action='modify' visible='true'>
@@ -1796,6 +1800,7 @@
     <tag k='name' v='-1320' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000658' action='modify' visible='true'>
@@ -1808,9 +1813,10 @@
     <tag k='name' v='-1321' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000659' visible='true'>
+  <relation id='-5000659' action='modify' visible='true'>
     <member type='relation' ref='-5000646' role='' />
     <member type='relation' ref='-5000647' role='' />
     <member type='way' ref='-1948751' role='left' />
@@ -1820,9 +1826,10 @@
     <tag k='name' v='-1322' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000660' visible='true'>
+  <relation id='-5000660' action='modify' visible='true'>
     <member type='way' ref='-1948757' role='left' />
     <member type='way' ref='-1948773' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1830,9 +1837,10 @@
     <tag k='name' v='-1323' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000661' visible='true'>
+  <relation id='-5000661' action='modify' visible='true'>
     <member type='way' ref='-1948740' role='left' />
     <member type='way' ref='-1948757' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1840,6 +1848,7 @@
     <tag k='name' v='-1324' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000662' action='modify' visible='true'>
@@ -1852,6 +1861,7 @@
     <tag k='name' v='-1325' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000663' action='modify' visible='true'>
@@ -1870,6 +1880,7 @@
     <tag k='name' v='-1326' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000665' action='modify' visible='true'>
@@ -1882,6 +1893,7 @@
     <tag k='name' v='-1327' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000666' action='modify' visible='true'>
@@ -1894,9 +1906,10 @@
     <tag k='name' v='-1328' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000667' visible='true'>
+  <relation id='-5000667' action='modify' visible='true'>
     <member type='relation' ref='-5000646' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948762' role='left' />
@@ -1906,6 +1919,7 @@
     <tag k='name' v='-1329' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000668' action='modify' visible='true'>
@@ -1917,9 +1931,10 @@
     <tag k='name' v='-1330' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000669' visible='true'>
+  <relation id='-5000669' action='modify' visible='true'>
     <member type='way' ref='-1948743' role='left' />
     <member type='way' ref='-1948744' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1927,9 +1942,10 @@
     <tag k='name' v='-1331' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000670' visible='true'>
+  <relation id='-5000670' action='modify' visible='true'>
     <member type='way' ref='-1948742' role='left' />
     <member type='way' ref='-1948743' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1937,9 +1953,10 @@
     <tag k='name' v='-1332' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000671' visible='true'>
+  <relation id='-5000671' action='modify' visible='true'>
     <member type='way' ref='-1948742' role='left' />
     <member type='way' ref='-1948748' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1947,9 +1964,10 @@
     <tag k='name' v='-1333' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000672' visible='true'>
+  <relation id='-5000672' action='modify' visible='true'>
     <member type='way' ref='-1948748' role='left' />
     <member type='way' ref='-1948775' role='right' />
     <tag k='lane_type' v='driving' />
@@ -1957,9 +1975,10 @@
     <tag k='name' v='-1334' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000673' visible='true'>
+  <relation id='-5000673' action='modify' visible='true'>
     <member type='relation' ref='-5000647' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948789' role='left' />
@@ -1969,9 +1988,10 @@
     <tag k='name' v='-1336' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000674' visible='true'>
+  <relation id='-5000674' action='modify' visible='true'>
     <member type='relation' ref='-5000647' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948776' role='left' />
@@ -1981,9 +2001,10 @@
     <tag k='name' v='-1337' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000675' visible='true'>
+  <relation id='-5000675' action='modify' visible='true'>
     <member type='relation' ref='-5000646' role='' />
     <member type='relation' ref='-5000649' role='' />
     <member type='way' ref='-1948792' role='left' />
@@ -1993,9 +2014,10 @@
     <tag k='name' v='-1338' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000676' visible='true'>
+  <relation id='-5000676' action='modify' visible='true'>
     <member type='relation' ref='-5000646' role='' />
     <member type='relation' ref='-5000649' role='' />
     <member type='way' ref='-1948774' role='left' />
@@ -2005,9 +2027,10 @@
     <tag k='name' v='-1339' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000677' visible='true'>
+  <relation id='-5000677' action='modify' visible='true'>
     <member type='way' ref='-1948777' role='left' />
     <member type='way' ref='-1948788' role='right' />
     <member type='way' ref='-1948801' role='stop_line' />
@@ -2017,6 +2040,7 @@
     <tag k='name' v='-1343' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000678' action='modify' visible='true'>
@@ -2025,7 +2049,7 @@
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
-  <relation id='-5000679' visible='true'>
+  <relation id='-5000679' action='modify' visible='true'>
     <member type='way' ref='-1948777' role='left' />
     <member type='way' ref='-1948790' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2033,9 +2057,10 @@
     <tag k='name' v='-1344' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000680' visible='true'>
+  <relation id='-5000680' action='modify' visible='true'>
     <member type='way' ref='-1948790' role='left' />
     <member type='way' ref='-1948791' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2043,9 +2068,10 @@
     <tag k='name' v='-1345' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000681' visible='true'>
+  <relation id='-5000681' action='modify' visible='true'>
     <member type='relation' ref='-5000647' role='' />
     <member type='relation' ref='-5000649' role='' />
     <member type='way' ref='-1948756' role='left' />
@@ -2055,9 +2081,10 @@
     <tag k='name' v='-1346' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000682' visible='true'>
+  <relation id='-5000682' action='modify' visible='true'>
     <member type='relation' ref='-5000646' role='' />
     <member type='relation' ref='-5000647' role='' />
     <member type='way' ref='-1948758' role='left' />
@@ -2067,9 +2094,10 @@
     <tag k='name' v='-1347' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000683' visible='true'>
+  <relation id='-5000683' action='modify' visible='true'>
     <member type='relation' ref='-5000649' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948760' role='left' />
@@ -2079,9 +2107,10 @@
     <tag k='name' v='-1348' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000684' visible='true'>
+  <relation id='-5000684' action='modify' visible='true'>
     <member type='relation' ref='-5000646' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948763' role='left' />
@@ -2091,6 +2120,7 @@
     <tag k='name' v='-1349' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000685' action='modify' visible='true'>
@@ -2104,6 +2134,7 @@
     <tag k='name' v='-1378' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000686' action='modify' visible='true'>
@@ -2117,9 +2148,10 @@
     <tag k='name' v='-1379' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000687' visible='true'>
+  <relation id='-5000687' action='modify' visible='true'>
     <member type='way' ref='-1948769' role='left' />
     <member type='way' ref='-1948778' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2127,9 +2159,10 @@
     <tag k='name' v='-1380' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000688' visible='true'>
+  <relation id='-5000688' action='modify' visible='true'>
     <member type='way' ref='-1948767' role='left' />
     <member type='way' ref='-1948768' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2137,9 +2170,10 @@
     <tag k='name' v='-1382' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000689' visible='true'>
+  <relation id='-5000689' action='modify' visible='true'>
     <member type='way' ref='-1948767' role='left' />
     <member type='way' ref='-1948766' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2147,9 +2181,10 @@
     <tag k='name' v='-1383' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000690' visible='true'>
+  <relation id='-5000690' action='modify' visible='true'>
     <member type='way' ref='-1948766' role='left' />
     <member type='way' ref='-1948785' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2157,9 +2192,10 @@
     <tag k='name' v='-1384' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000691' visible='true'>
+  <relation id='-5000691' action='modify' visible='true'>
     <member type='relation' ref='-5000647' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948782' role='left' />
@@ -2170,9 +2206,10 @@
     <tag k='name' v='-1386' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000692' visible='true'>
+  <relation id='-5000692' action='modify' visible='true'>
     <member type='relation' ref='-5000647' role='' />
     <member type='relation' ref='-5000650' role='' />
     <member type='way' ref='-1948793' role='left' />
@@ -2183,6 +2220,7 @@
     <tag k='name' v='-1387' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000693' action='modify' visible='true'>
@@ -2194,6 +2232,7 @@
     <tag k='name' v='-1388' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000694' action='modify' visible='true'>
@@ -2205,6 +2244,7 @@
     <tag k='name' v='-1389' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000695' action='modify' visible='true'>
@@ -2217,9 +2257,10 @@
     <tag k='name' v='-1390' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000696' visible='true'>
+  <relation id='-5000696' action='modify' visible='true'>
     <member type='way' ref='-1948797' role='left' />
     <member type='way' ref='-1948799' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2227,9 +2268,10 @@
     <tag k='name' v='-1391' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
-  <relation id='-5000697' visible='true'>
+  <relation id='-5000697' action='modify' visible='true'>
     <member type='way' ref='-1948799' role='left' />
     <member type='way' ref='-1948798' role='right' />
     <tag k='lane_type' v='driving' />
@@ -2237,6 +2279,7 @@
     <tag k='name' v='-1392' />
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='50' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000698' visible='true'>
@@ -2273,6 +2316,7 @@
     <member type='way' ref='-1948818' role='right' />
     <member type='way' ref='-1948819' role='left' />
     <tag k='lane_type' v='driving' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000701' action='modify' visible='true'>
@@ -2280,6 +2324,7 @@
     <member type='way' ref='-1948754' role='left' />
     <member type='way' ref='-1948819' role='right' />
     <tag k='lane_type' v='driving' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000702' action='modify' visible='true'>
@@ -2299,6 +2344,7 @@
     <member type='way' ref='-1948824' role='right' />
     <member type='way' ref='-1948772' role='left' />
     <tag k='lane_type' v='driving' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000705' action='modify' visible='true'>
@@ -2306,6 +2352,7 @@
     <member type='way' ref='-1948796' role='left' />
     <member type='way' ref='-1948772' role='right' />
     <tag k='lane_type' v='driving' />
+    <tag k='subtype' v='road' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000706' action='modify' visible='true'>

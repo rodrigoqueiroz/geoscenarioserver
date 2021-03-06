@@ -1,0 +1,10 @@
+behaviortree walk_tree:
+    ?
+        ->
+            condition c_goal ( reached_goal( threshold=1.5 ) )
+            maneuver m_stop_goal ( MStopConfig( type=2 ) )
+        ->
+            condition c_redlight ( traffic_light_red() )
+            maneuver m_stop_redlight ( MStopConfig( type=3 ) )
+        maneuver m_keepvelocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
+

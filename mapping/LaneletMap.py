@@ -33,6 +33,18 @@ class LaneletMap(object):
         traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
         self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
 
+        # Add participant attribute to all lanelets
+        for elem in self.lanelet_map.laneletLayer:
+            # ensure every lanelet has a subtype (default: road)
+            if "subtype" not in elem.attributes:
+                elem.attributes["subtype"] = "road"
+
+            if elem.attributes["subtype"] == "road":
+                elem.attributes["participant:vehicle"] = "yes"
+            elif elem.attributes["subtype"] in ["crosswalk", "walkway"]:
+                elem.attributes["participant:pedestrian"] = "yes"
+
+
     def get_right(self, lanelet):
         return self.routing_graph.right(lanelet)
 
@@ -141,11 +153,7 @@ class LaneletMap(object):
         searchbox = BoundingBox2d(point, point)
         intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
 
-        '''
-        relevent_subtypes = []
-        if participant == "pedestrian":
-            relevent_subtypes = ["crosswalk", "walkway"]
-        '''
+        participant_tag = "participant:" + participant
 
         if len(intersecting_lls) == 0:
             raise Exception("Lanelet Error: vehicle not part of any lanelet.")
@@ -153,11 +161,7 @@ class LaneletMap(object):
             # filter results for lanelets containing the point
             intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
             # TODO: add filter by participants here
-            '''
-            if len(relevent_subtypes) > 0:
-                intersecting_lls = list(filter(lambda ll: any(subtype in relevent_subtypes for subtype in ll.attributes["subtype"]), intersecting_lls))
-            '''
-
+            intersecting_lls = list(filter(lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
             if len(intersecting_lls) > 1:
                 log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                     (x,y), [ll.id for ll in intersecting_lls]))
@@ -179,7 +183,7 @@ class LaneletMap(object):
         """
         ret = None
         # NOTE use laneletMap() requires a fix to python bindings
-        
+
         try:
             route_submap = lanelet_route.laneletSubmap().laneletMap()
         except Exception:

@@ -109,7 +109,7 @@ class MConfig:
         'total_lat_jerk_cost':      1,
         'total_long_acc_cost':      1,
         'total_lat_acc_cost':       1,
-        'proximity_cost':           10, #10 
+        'proximity_cost':           10, #10
         'progress_cost':            0,
     })
     expected_offset_per_sec = 0.5   # [m]
@@ -152,5 +152,3 @@ class MStopConfig(MConfig):
 
     def __post_init__(self):
         self.max_long_acc = 12.0
-
-
