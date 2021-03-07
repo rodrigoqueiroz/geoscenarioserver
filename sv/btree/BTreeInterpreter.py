@@ -40,20 +40,19 @@ class Subtree(object):
 
 # might still need naming refactorings
 class BTreeInterpreter(object):
-    def __init__(self, vid, bmodel, path):
+    def __init__(self, vid, bmodel):
         self.vid = vid
         self.bmodel = bmodel
         self.tree = None
-        self.path = path
 
-    def text2pytree(self, tree_name, _input):
+    def text2pytree(self, btree_name, _input):
         '''
             Transformation from text to tree
             ready to be instantiated, according to pytree.
         '''
         lexer = BTreeDSLLexer(InputStream(_input))
         parser = BTreeDSLParser(CommonTokenStream(lexer))
-        listener = BTreeListener(self.vid, tree_name)
+        listener = BTreeListener(self.vid, btree_name)
         ast = parser.behaviorTree()
         ParseTreeWalker().walk(listener, ast)
         pytree = listener.getTreeStr()
@@ -74,18 +73,31 @@ class BTreeInterpreter(object):
 
         return root, nodes
 
-    def interpret_tree(self, tree_name):
+    def find_btree(self, btree_name):
+        for btree_path in self.bmodel.btree_locations:
+            if os.path.isfile(os.path.join(btree_path, self.bmodel.btype, btree_name)):
+                log.info ("Using " + os.path.join(btree_path, self.bmodel.btype, btree_name + " for VID " + str(self.vid)))
+                path,file = os.path.split(os.path.abspath(os.path.join(btree_path, self.bmodel.btype, btree_name)))
+                return path,file
+        #Btree not found in any location
+        return False,False
+
+    def interpret_tree(self, btree_name):
         ''' Instantiates a tree from the name.'''
         loaded_tree = ""
+        path,file = self.find_btree(btree_name + ".btree")
+        if path == False: #btree file search unsuccessful
+            #if you cannot find the btree file in any location, A message is printed and return no tree.
+            raise Exception("Btree \'{}\' was not found in any provided location {}".format(tree_name, str(self.bmodel.btree_locations)))
         try:
-            f = open(os.path.join(self.path, tree_name + '.btree'),'r')
+            f = open(os.path.join(path, btree_name + ".btree"),'r')
         except Exception:
-            raise Exception("Tree \'{}\' was not found in {}".format(tree_name, self.path))
+            raise Exception("Tree \'{}\' couldn't be opened in {}".format(btree_name, path))
         finally:
             loaded_tree = f.read()
             f.close()
 
-        pytree, subtrees = self.text2pytree(tree_name, loaded_tree)
+        pytree, subtrees = self.text2pytree(btree_name, loaded_tree)
         root, nodes = self.execute(pytree)
         return root, nodes, subtrees
 
@@ -107,7 +119,7 @@ class BTreeInterpreter(object):
         
         return nodes
 
-    def reconfigure_nodes(self, tree_name, tree, args=""):
+    def reconfigure_nodes(self, btree_name, tree, args=""):
         nodes = self.collect_nodes(tree)
 
         if(args != ""):
@@ -134,7 +146,7 @@ class BTreeInterpreter(object):
                             reconfigured=True
                             break
                     
-                    if not reconfigured: print(id + " node could not be found in " + tree_name)
+                    if not reconfigured: print(id + " node could not be found in " + btree_name)
 
     def link_subtrees(self, tree, nodes, subtrees):        
         for subtree in subtrees:
@@ -150,16 +162,16 @@ class BTreeInterpreter(object):
         return tree
 
     def build_subtree(self, _subtree):
-        name=_subtree.name
+        subtree_name=_subtree.name
         args=_subtree.args
-        subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(name)
+        subtree_root, subtree_nodes, subtree_subtrees = self.interpret_tree(subtree_name)
         subtree = trees.BehaviourTree(root=subtree_root)
-        if subtree_nodes: self.reconfigure_nodes(name, subtree, args)
+        if subtree_nodes: self.reconfigure_nodes(subtree_name, subtree, args)
         if subtree_subtrees: subtree = self.link_subtrees(subtree, subtree_nodes, subtree_subtrees)
         return subtree
 
-    def build_tree(self, tree_name):
-        root, nodes, subtrees = self.interpret_tree(tree_name)
+    def build_tree(self, btree_name):
+        root, nodes, subtrees = self.interpret_tree(btree_name)
         tree = trees.BehaviourTree(root=root)
         if subtrees: tree = self.link_subtrees(tree, nodes, subtrees)
         self.tree=tree
