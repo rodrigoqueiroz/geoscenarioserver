@@ -144,7 +144,6 @@ class SimTraffic(object):
         
         #Collisions at Server Side
         if self.detect_collisions(tick_count, delta_time, sim_time):
-            self.log_sim_state(vstates, disabled_vehicles)
             return -1
         
         return 0
