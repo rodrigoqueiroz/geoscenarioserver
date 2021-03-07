@@ -129,7 +129,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
     
     #==========================  Load Base Scenario
     #if not parser.load_and_validate_geoscenario(full_scenario_path):
-    if not load_geoscenario_from_file(gsfile,sim_traffic,sim_config,lanelet_map):
+    if not load_geoscenario_from_file(gsfile,sim_traffic,sim_config,lanelet_map,""):
         log.error("Error loading GeoScenario file")
         return False, 0.0
 
