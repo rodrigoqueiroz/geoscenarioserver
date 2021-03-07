@@ -29,7 +29,7 @@ from SimTraffic import *
 
 
 class SVPlanner(object):
-    def __init__(self, sdv, sim_traffic):
+    def __init__(self, sdv, sim_traffic, btree_locations):
         #MainProcess space:
         self._process = None
         self.traffic_state_sharr = sim_traffic.traffic_state_sharr
@@ -45,10 +45,12 @@ class SVPlanner(object):
         #Subprocess space
         # Reference path that the planner will use for all transformations and planning
         self.reference_path = None
-        self.btree_root = sdv.btree_root
+        self.root_btree_name = sdv.root_btree_name
         self.btree_reconfig = sdv.btree_reconfig
         self.behavior_model = None
         self.mconfig = None
+        self.btree_locations = btree_locations
+        self.btype = sdv.btype
 
     def start(self):
         #Create shared arrray for Motion Plan
@@ -93,7 +95,7 @@ class SVPlanner(object):
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
-        self.behavior_model = BehaviorModels(self.vid, self.btree_root,  self.btree_reconfig)
+        self.behavior_model = BehaviorModels(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         
         while sync_planner.tick():
             TickSync.clock_log("Planner: start")

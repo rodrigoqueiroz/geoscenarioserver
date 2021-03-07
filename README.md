@@ -41,6 +41,12 @@ optional arguments:
                         GeoScenario file
   -q VERBOSE, --quiet VERBOSE
                         don't print messages to stdout
+  -m, --map-path 
+                        Set the prefix to append to the value of the attribute `globalconfig->lanelet`
+                        e.g. --map-path $HOME/anm_unreal_test_suite/maps
+  -b, --btree-locations 
+                        Add higher priority locations to search for btrees by agent btypes
+                        e.g. --btree-locations $HOME/anm_unreal_test_suite/btrees
 ```
 
 - GeoScenario files (2.0 required) must be placed inside *scenarios/*
