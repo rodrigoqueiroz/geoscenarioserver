@@ -52,16 +52,6 @@ PLANNER_RATE = 3                     #Planner tick rate
 PLANNING_TIME = 0.150                #[s] Must be less than 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
 USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
 
-
-#Collision
-#collision and proximity cost have a great impacto on performance. 
-#For example, if the scenario does not require object avoidance, you can turn it off.
-VEH_COLLISION = True      	#If true, collision between vehicles with be considered during planning.
-PED_COLLISION = True       #If true, collision between vehicles and pedestrians on the road with be considered during planning.
-OBJ_COLLISION = True      	#If true, collision between vehicles and static objects on the road with be considered during planning.
-TRAJECTORY_SPLIT = 10       #In how many parts a trajectory is split for verification. Higher(100) = better precision, but impacts performance.
-
-
 #Evaluation
 EVALUATION_MODE = True
 WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files

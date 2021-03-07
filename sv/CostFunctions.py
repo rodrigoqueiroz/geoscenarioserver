@@ -463,24 +463,23 @@ def collision_cost(frenet_traj:FrenetTrajectory, lane_config, vehicles, pedestri
     min_objects_distance = VEHICLE_RADIUS
     ptrajectory = frenet_traj.projected_trajectory
     #check nearest
-    if VEH_COLLISION:
-        if vehicles:
-            nearest = nearest_to_vehicles_ahead(frenet_traj.start_state, ptrajectory, lane_config, vehicles)
-            if nearest < min_vehicle_distance:
-                #print("too close to vehicle")    
-                return 1
-    if PED_COLLISION:
-        if pedestrians:
-            nearest = nearest_to_pedestrians_ahead(frenet_traj.start_state, ptrajectory, lane_config, pedestrians)
-            if nearest < min_pedestrian_distance:
-                #print("too close to pedestrian")    
-                return 1
-    if OBJ_COLLISION:
-        if objects:
-            nearest = nearest_to_objects_ahead(frenet_traj.start_state, ptrajectory, lane_config, objects)
-            if nearest < min_objects_distance:
-                #print("too close to object (dist={})".format(nearest))    
-                return 1
+    if vehicles:
+        nearest = nearest_to_vehicles_ahead(frenet_traj.start_state, ptrajectory, lane_config, vehicles)
+        if nearest < min_vehicle_distance:
+            #print("too close to vehicle")    
+            return 1
+    
+    if pedestrians:
+        nearest = nearest_to_pedestrians_ahead(frenet_traj.start_state, ptrajectory, lane_config, pedestrians)
+        if nearest < min_pedestrian_distance:
+            #print("too close to pedestrian")    
+            return 1
+    
+    if objects:
+        nearest = nearest_to_objects_ahead(frenet_traj.start_state, ptrajectory, lane_config, objects)
+        if nearest < min_objects_distance:
+            #print("too close to object (dist={})".format(nearest))    
+            return 1
     return 0
 
 def proximity_cost(frenet_traj:FrenetTrajectory, lane_config, vehicles,pedestrians,objects):

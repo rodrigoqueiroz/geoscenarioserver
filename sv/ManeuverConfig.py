@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from SimConfig import *
 from util.Utils import *
 from enum import Enum, IntEnum
-import random
+
 import numpy as np
 from typing import Dict
 
@@ -34,13 +34,11 @@ class LaneConfig:
     '''
     id:int = 0
     max_velocity:float = 30         # [m/s]
-    left_bound:float = 4            #d
-    right_bound:float = 0           #d
+    left_bound:float = 2            #d
+    right_bound:float = -2          #d
     _left_lane: LaneConfig = None
     _right_lane: LaneConfig = None
-    nsamples:int = 1                #number of sampling points on the lane width for lateral planning
-    sampling:int = SamplingMethod.UNIFORM
-    sigma:float = 1                 #std dev for sampling from normal
+    
 
     def get_current_lane(self, d):
         if self.right_bound <= d <= self.left_bound:
@@ -67,104 +65,74 @@ class LaneConfig:
             if (self._left_lane.id == l_id):
                 return self._left_lane
         return None
+    
+    def get_central_d(self):
+        return (self.left_bound - self.right_bound)/2 #+ self.right_bound
 
-    def get_samples(self):
-        if (self.nsamples==1):
-            return tuple([0])
+@dataclass
+class LT:
+    '''
+    Lateral target configuration for sampling in the lane width space
+    '''
+    target:float = 0.0                  #lateral target position in meters (0.0 = center of the lane)
+    nsamples:int = 1                    #number of sampling points on the lane width for lateral planning
+    sampling:int = SamplingMethod.NORMAL
+    sigma:float = 1.0                   #std dev for sampling from normal
+    limit_lane_width:bool = True       #if True, all sampling values will be limited by lane width
+    limit_vehicle_size:bool = True      #if True, sampling values will be limited by vehicle size
+
+    def get_samples(self, lane_config:LaneConfig):
+        if (self.nsamples<=1):
+            return tuple([self.target])
+        
+        if self.limit_lane_width:     
+            up = lane_config.left_bound
+            lo = lane_config.right_bound
+        else:
+            up = lane_config._left_lane.left_bound if lane_config._left_lane else lane_config.left_bound
+            lo = lane_config._right_lane.right_bound if lane_config._right_lane else lane_config.right_bound
+        
+        vsize = VEHICLE_RADIUS if self.limit_vehicle_size else 0
+        up = up - vsize
+        lo = lo + vsize
 
         if (self.sampling==SamplingMethod.LINEAR):
-            return self.get_linear_samples()
+            return linear_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.UNIFORM):
-            return self.get_uniform_samples()
+            return uniform_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.NORMAL):
-            return self.get_normal_samples()
+            return normal_samples(self.nsamples,self.target,self.sigma,lo,up)
 
         return tuple([0])
 
-    def get_linear_samples(self):
-        lo = self.right_bound + VEHICLE_RADIUS
-        up = self.left_bound - VEHICLE_RADIUS
-        if (lo >= up):
-            return tuple([lo])
-        return np.linspace(lo,up, self.nsamples)
 
-    def get_uniform_samples(self):
-        lo = self.right_bound + VEHICLE_RADIUS
-        up = self.left_bound - VEHICLE_RADIUS
-        samples = []
-        for x in range(self.nsamples):
-            samples.append(random.uniform(lo, up))
-        return samples
-
-    def get_normal_samples(self):
-        lo = self.right_bound + VEHICLE_RADIUS
-        up = self.left_bound - VEHICLE_RADIUS
-        sd = self.sigma
-        samples = []
-        for x in range(self.nsamples):
-            #same as random.gauss(), but with bounds:
-            s = get_truncated_normal(0,sd,lo,up)
-            samples.append(s)
-        return samples
 
 
 @dataclass
 class MP:
     '''
-    Maneuver Parameter that supports sampling
+    Maneuver Parameter that supports sampling (positve only)
     '''
-    value:float = 0.0               #target value
+    value:float = 0.0               #target value (min is 0.0)
     bound_p:float = 0.0             #boundary in percentage (+/- relative to value)
     nsamples:int = 1                #number of samples
     sampling:int = SamplingMethod.UNIFORM
     sigma:float = 1                 #std dev for sampling from normal
     
-
     def get_samples(self):
-        if (self.nsamples==1):
+        if self.nsamples<=1 or self.bound_p==0.0:
             return tuple([self.value])
-        elif (self.bound_p==0.0):
-            return tuple([self.value])
-        elif (self.sampling==SamplingMethod.LINEAR):
-            return self.get_linear_samples()
+        lo = self.value - (self.value * self.bound_p / 100)
+        up = self.value + (self.value * self.bound_p / 100)
+        if lo < 0: 
+            lo = 0.0
+        
+        if (self.sampling==SamplingMethod.LINEAR):
+            return linear_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.UNIFORM):
-            return self.get_uniform_samples()
+            return uniform_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.NORMAL):
-            return self.get_normal_samples()
-
-        return tuple([self.value])
-
-    def bounds(self):
-        if (self.bound_p > 0.0):
-            lo = self.value - (self.value * self.bound_p / 100)
-            up = self.value + (self.value * self.bound_p / 100)
-            if lo < 0: lo = 0
-            return lo,up
-        else:
-            return self.value,self.value
-
-    def get_linear_samples(self):
-        lo,up = self.bounds()
-        if (lo == up):
-            return tuple([lo])
-        return np.linspace(lo,up, self.nsamples)
-
-    def get_uniform_samples(self):
-        lo,up = self.bounds()
-        samples = []
-        for x in range(self.nsamples):
-            samples.append(random.uniform(lo, up))
-        return samples
-
-    def get_normal_samples(self):
-        lo,up = self.bounds()
-        sd = self.sigma
-        samples = []
-        for x in range(self.nsamples):
-            #same as random.gauss(), but with bounds:
-            s = get_truncated_normal(0,sd,lo,up)
-            samples.append(s)
-        return samples
+            return normal_samples(self.nsamples,self.target,self.sigma,lo,up)
 
 @dataclass
 class MConfig:
@@ -175,39 +143,48 @@ class MConfig:
     #feasibility_weight defines what functions will be used
     #to remove trajectories from candidate set [binary 0-1]
     feasibility_constraints: Dict = field(default_factory=lambda:{
-        'max_lat_jerk':        0,
-        'max_long_jerk':       0,
-        'max_long_acc':        0,
-        'max_lat_acc':         0,
-        'collision':           0,
+        'max_lat_jerk':        1,
+        'max_long_jerk':       1,
+        'max_long_acc':        1,
+        'max_lat_acc':         1,
+        'collision':           1,
         'off_lane':            1,
         'direction':           1,
     })
     #cost_weight defines what cost functions will be used
     #to select trajectories from candidate set [cost > 0]
     cost_weight: Dict = field(default_factory=lambda:{
-        'time_cost':                0,
-        'effic_cost':               0,
+        'time_cost':                1,
+        'effic_cost':               1,
         'lane_offset_cost':         1,
-        'total_long_jerk_cost':     0,
-        'total_lat_jerk_cost':      0,
-        'total_long_acc_cost':      0,
-        'total_lat_acc_cost':       0,
-        'proximity_cost':           0, #10 
-        'progress_cost':            0,
+        'total_long_jerk_cost':     1,
+        'total_lat_jerk_cost':      1,
+        'total_long_acc_cost':      1,
+        'total_lat_acc_cost':       1,
+        'proximity_cost':           10, #10 
+        
     })
-    expected_offset_per_sec = 0.5   # [m]
-    expected_long_acc_per_sec = 1   # [m/s/s]
-    expected_lat_acc_per_sec = 1    # [m/s/s]
-    expected_long_jerk_per_sec = 2  # [m/s/s/s]
-    expected_lat_jerk_per_sec = 2   # [m/s/s/s]
+
+    #Cost thresholds
+    expected_offset_per_sec:float = 0.5   # [m]
+    expected_long_acc_per_sec:float = 1   # [m/s/s]
+    expected_lat_acc_per_sec:float = 1    # [m/s/s]
+    expected_long_jerk_per_sec:float = 2  # [m/s/s/s]
+    expected_lat_jerk_per_sec:float = 2   # [m/s/s/s]
 
     #Feasibility constraints
-    max_long_jerk = 10.0              # maximum longitudinal jerk [m/s/s/s]
-    max_lat_jerk = 10.0               # maximum lateral jerk [m/s/s/s]
-    max_long_acc = 12.0              # maximum longitudinal acceleration [m/s/s]
-    max_lat_acc = 4.9               # maximum lateral acceleration [m/s/s]
+    max_long_jerk:float = 10.0              # maximum longitudinal jerk [m/s/s/s]
+    max_lat_jerk:float = 10.0               # maximum lateral jerk [m/s/s/s]
+    max_long_acc:float = 12.0              # maximum longitudinal acceleration [m/s/s]
+    max_lat_acc:float = 4.9               # maximum lateral acceleration [m/s/s]
+    
+    #Lateral lane target. By default, targets center
+    lat_target:LT = LT(0.0,1)
 
+    #Precision defines how feasibility and costs are computed (and how integrals are approximated). 
+    #Higher(100) = better precision, but impacts performance. 
+    #Use with caution when multiple vehicles are used in simulation
+    cost_precision:float = 10             #from 10 to 100.
 
 @dataclass
 class MVelKeepConfig(MConfig):
@@ -225,19 +202,18 @@ class MReverseConfig(MConfig):
     def __post_init__(self):
         self.feasibility_constraints['direction'] = 0
 
-
 @dataclass
 class MStopConfig(MConfig):
-    class Type(IntEnum):
+    class StopTarget(IntEnum):
         NOW = 0         #stop with no particular position. Use decel to adjust behavior.
         S_POS = 1       #stop at a particular position in the frenet frame
         GOAL = 2        #stop at the vehicle's goal point
         STOP_LINE = 3   #stop at the stop line of a regulatory element, if any applies
 
     #target
-    type:int = Type.GOAL #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
+    type:int = StopTarget.GOAL #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
     pos:float = 0.0                 #pos in s [m]
-    distance:float = 0.0            #distance to stop_pos in [m]
+    distance:float = 0.0            #distance to target pos in [m]
     #time:MP = MP(3.0,40,6)         #[s]
     mkey:int = Maneuver.M_STOP
 
