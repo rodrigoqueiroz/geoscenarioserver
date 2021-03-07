@@ -190,7 +190,7 @@ def plan_laneswerve(vehicle_state:VehicleState, mconfig:MLaneSwerveConfig, lane_
     if not target_lane_config:
         log.warn('target lane {} not found, is it a neighbour lane?'.format(target_lid))
         return None, None
-
+    
     #generates alternative targets:
     target_state_set = []
     for t in mconfig.time.get_samples():

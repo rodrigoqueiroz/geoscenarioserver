@@ -67,7 +67,7 @@ class LaneConfig:
         return None
     
     def get_central_d(self):
-        return (self.left_bound - self.right_bound)/2 #+ self.right_bound
+        return (self.left_bound - self.right_bound)/2 + self.right_bound
 
 @dataclass
 class LT:
@@ -82,8 +82,9 @@ class LT:
     limit_vehicle_size:bool = True      #if True, sampling values will be limited by vehicle size
 
     def get_samples(self, lane_config:LaneConfig):
+        target = lane_config.get_central_d() + self.target
         if (self.nsamples<=1):
-            return tuple([self.target])
+            return tuple([target])
         
         if self.limit_lane_width:     
             up = lane_config.left_bound
@@ -101,7 +102,7 @@ class LT:
         elif (self.sampling==SamplingMethod.UNIFORM):
             return uniform_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.NORMAL):
-            return normal_samples(self.nsamples,self.target,self.sigma,lo,up)
+            return normal_samples(self.nsamples,target,self.sigma,lo,up)
 
         return tuple([0])
 
@@ -211,7 +212,7 @@ class MStopConfig(MConfig):
         STOP_LINE = 3   #stop at the stop line of a regulatory element, if any applies
 
     #target
-    type:int = StopTarget.GOAL #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
+    target:int = StopTarget.GOAL #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
     pos:float = 0.0                 #pos in s [m]
     distance:float = 0.0            #distance to target pos in [m]
     #time:MP = MP(3.0,40,6)         #[s]
