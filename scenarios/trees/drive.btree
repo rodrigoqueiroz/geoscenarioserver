@@ -9,4 +9,4 @@ behaviortree drive_tree:
         ->
             condition c_busy_lane( lane_occupied() )
             maneuver m_follow_lead ( MFollowConfig() )
-        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(14.0,10,6)) )
+        maneuver m_keepvelocity ( MVelKeepConfig( vel=MP(10.0,10,6), lat_target=LT(0.0,3) ) )
