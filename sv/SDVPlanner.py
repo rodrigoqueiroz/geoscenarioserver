@@ -185,7 +185,15 @@ class SVPlanner(object):
                                             planner_state.static_objects)
 
                 
-                sync_planner.end_task() #blocks if < target
+                if EVALUATION_MODE:
+                    if self.last_plan:
+                        sync_planner.end_task() #blocks if < target
+                        task_delta_time = sync_planner.get_task_time()
+                    else: #First plan. Does not block and return results asap.
+                        sync_planner.end_task(False) #blocks if < target
+                        task_delta_time = 0
+                else:
+                    sync_planner.end_task() #blocks if < target
 
                 if frenet_traj is None:
                     log.warn("plan_maneuver return invalid trajectory.")
@@ -193,7 +201,7 @@ class SVPlanner(object):
                 else:
                     plan = MotionPlan()
                     plan.trajectory = frenet_traj
-                    plan.start_time = state_time + sync_planner.get_task_time()
+                    plan.start_time = state_time + task_delta_time
                     plan.new_frenet_frame = ref_path_changed
                     plan.reversing = mconfig.mkey == Maneuver.M_REVERSE
                     plan.tick_count = tick_count
