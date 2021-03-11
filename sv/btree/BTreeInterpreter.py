@@ -88,7 +88,7 @@ class BTreeInterpreter(object):
         path,file = self.find_btree(btree_name + ".btree")
         if path == False: #btree file search unsuccessful
             #if you cannot find the btree file in any location, A message is printed and return no tree.
-            raise Exception("Btree \'{}\' was not found in any provided location {}".format(tree_name, str(self.bmodel.btree_locations)))
+            raise Exception("Btree \'{}\' was not found in any provided location {}".format(btree_name, str(self.bmodel.btree_locations)))
         try:
             f = open(os.path.join(path, btree_name + ".btree"),'r')
         except Exception:

@@ -103,13 +103,14 @@ class TickSync():
         self.target_t = self.next_target_t
         self.task_start_time = datetime.datetime.now()
     
-    def end_task(self):
+    def end_task(self, block = True):
         self.task_end_time = datetime.datetime.now()
         delta_time = (self.task_end_time -  self.task_start_time).total_seconds()
         diff = self.target_t - delta_time
         if diff > 0:
             #sleep for the remaining
-            time.sleep(diff) 
+            if block:
+                time.sleep(diff) 
         else:
             log.error("Task {} took longer than expected. Plan Tick: {}, Expected: {}, Actual: {}".format
                             (self.task_label, self.tick_count, self.target_t, delta_time))
@@ -132,14 +133,13 @@ class TickSync():
     
     #For Debug only:
     _last_log = None
-
     def clock_log(label):
         now = datetime.datetime.now()
         if TickSync._last_log is None:
-            log = [label,0.0]
+            newlog = [label,0.0]
         else:
             _delta = format((now - TickSync._last_log).total_seconds(),'.4f')
-            log = [label,_delta]
+            newlog = [label,_delta]
             
         TickSync._last_log = now
-        print (log)
+        log.debug(newlog)
