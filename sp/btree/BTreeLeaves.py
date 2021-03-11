@@ -87,21 +87,23 @@ class ManeuverAction(behaviour.Behaviour):
 
         status = common.Status.SUCCESS
 
-        #Maneuver specific logic for runtime configuration:
+        # Maneuver specific logic for runtime configuration:
         if self.mconfig.mkey == Maneuver.M_VELKEEP:
             pass
 
         elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
             if self.mconfig.type == MStopConfig.Type.GOAL:
-                self.mconfig.pos = self.bmodel.planner_state.goal_point[0]
-            # If stopping at a stop line, find a regulatory element with a stop line applying to this vehicle
+                self.mconfig.pos = self.bmodel.planner_state.route[-1]
+            # If stopping at a stop line, find a regulatory element with a stop line applying to this agent
             elif self.mconfig.type == MStopConfig.Type.STOP_LINE:
                 for re_state in self.bmodel.planner_state.regulatory_elements:
                     if 'stop_position' in re_state._fields:
                         self.mconfig.pos = re_state.stop_position[0]
                         break
-                    # TODO: determine whether stop pos should be behind leading vehicles instead
+
+        elif self.mconfig.mkey == Maneuver.M_UPDATEDEST:
+            pass
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)

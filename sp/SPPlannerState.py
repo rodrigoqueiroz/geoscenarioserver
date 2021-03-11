@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from collections import namedtuple
 from typing import Tuple, Dict, List
 
+from mapping.LaneletMap import *
 from Actor import PedestrianState
 
 
@@ -22,6 +23,7 @@ class PedestrianPlannerState:
     pedestrian_state: PedestrianState
     traffic_vehicles: Dict
     pedestrians: List
-    #static_objects: List
     regulatory_elements: List
-    goal_point: List[float] = None
+    route: List
+    curr_route_node: int
+    lanelet_map: LaneletMap

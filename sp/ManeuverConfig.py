@@ -17,6 +17,7 @@ from typing import Dict
 class Maneuver(Enum):
     M_VELKEEP = 1
     M_STOP = 2
+    M_UPDATEDEST = 3
 
 
 class SamplingMethod(Enum):
@@ -144,7 +145,7 @@ class MStopConfig(MConfig):
         STOP_LINE = 3   #stop at the stop line of a regulatory element, if any applies
 
     #target
-    type:int = Type.GOAL            #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
+    type:int = Type.NOW            #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
     pos:float = 0.0                 #pos in s [m]
     distance:float = 0.0            #distance to stop_pos in [m]
     #time:MP = MP(3.0,40,6)         #[s]
@@ -152,3 +153,18 @@ class MStopConfig(MConfig):
 
     def __post_init__(self):
         self.max_long_acc = 12.0
+
+
+@dataclass
+class MUpdateDestination(MConfig):
+    class Type(IntEnum):
+        NEXT = 0            # continue to next node in route
+        XWALK_ENTRY = 1     # add entry of xwalk as new and next node in route
+        XWALK_EXIT = 2      # add exit of xwalk as new and next node in route
+
+    vel:MP = MP(1.0,10,3)              #velocity in [m/s] as MP
+    time:MP = MP(3.0,20,3)              #duration in [s] as MP
+    #time_lowvel:MP = MP(6.0,10,3)      #duration in [s] as MP when starting
+    #vel_threshold:float = 7            #upper bound for lowvel in [m/s]
+    max_diff:float = 1.5               #max vel diff (current to target).
+    mkey:int = Maneuver.M_UPDATEDEST

@@ -230,16 +230,22 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                 raise e
         # Simulated pedestrian
         elif btype == 'sp':
-            if 'destination' not in pnode.tags:
-                log.error("SP {} requires a destination .".format(pid))
+            if 'destination' not in pnode.tags and 'route' not in pnode.tags:
+                log.error("SP {} requires either a destination or route.".format(pid))
                 continue
             try:
-                p_dest = pnode.tags['destination']
+                if 'route' in pnode.tags:
+                    p_route = pnode.tags['route']
+                    route_nodes = parser.routes[p_route].nodes
+                    sim_config.pedestrian_goal_points[pid] = [(node.x, node.y) for node in route_nodes]
+                    #pedestrian_lanelet_routes = [lanelet_map.get_occupying_lanelet_by_participant(node.x, node.y, "pedestrian") for node in route_nodes]   # a valid lanelet route
+                    #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(pedestrian_lanelet_routes)
+                else:
+                    p_dest = pnode.tags['destination']
+                    dest_node = parser.locations[p_dest]
+                    sim_config.pedestrian_goal_points[pid] = [(dest_node.x, dest_node.y)]
+
                 btree_root = pnode.tags['btree'] if 'btree' in pnode.tags else "trees/pedestrian_trees/walk.btree" # a behavior tree file (.btree) inside scenarios/trees/pedestrian_trees
-                dest_node = parser.locations[p_dest]
-                #lanelets_in_route = [lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes]   # a valid lanelet route
-                #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(lanelets_in_route)
-                sim_config.pedestrian_goal_points[pid] = (dest_node.x, dest_node.y)
                 pedestrian = SP(pid, name, start_state, list(sim_config.pedestrian_goal_points[pid]), btree_root)
                 sim_traffic.add_pedestrian(pedestrian)
             except Exception as e:

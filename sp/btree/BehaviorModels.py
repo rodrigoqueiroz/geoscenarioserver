@@ -5,6 +5,7 @@
 from py_trees import *
 import functools
 import glog as log
+import numpy as np
 from sp.ManeuverConfig import *
 from sp.ManeuverUtils import *
 from sp.btree.BTreeInterpreter import *
@@ -95,13 +96,17 @@ class BehaviorModels(object):
     def set_ref_path_changed(self, val):
         self.ref_path_changed = val
 
-
     def test_condition(self, condition, kwargs):
         '''Built-in condition checks
         '''
 
         if condition == "reached_goal":
-            return has_reached_goal(self.planner_state.pedestrian_state, self.planner_state.goal_point, **kwargs)
+            goal = self.planner_state.route[-1]
+            return has_reached_point(self.planner_state.pedestrian_state, goal, **kwargs)
+
+        elif condition == "reached_curr_destination":
+            curr_destination = self.planner_state.route[self.planner_state.curr_route_node]
+            return has_reached_point(self.planner_state.pedestrian_state, curr_destination, **kwargs)
 
         elif condition == "sim_time":
             tmin = kwargs['tmin'] if 'tmin' in kwargs else 0
@@ -121,10 +126,30 @@ class BehaviorModels(object):
                     return re_state.color == TrafficLightColor.Green
 
         elif condition == "in_crosswalk_area":
-            return in_crosswalk_area(pedestrian_state)
+            cur_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")
+            #log.info(cur_ll.attributes["subtype"] == "crosswalk")
+            return cur_ll.attributes["subtype"] == "crosswalk"
 
         elif condition == "past_crosswalk_halfway":
-            return past_crosswalk_halfway(pedestrian_state)
+            xwalk_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")
+
+            P = np.array([self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y])
+            right = xwalk_ll.rightBound
+            left = xwalk_ll.leftBound
+
+            # get four points of entry half of xwalk in counterclockwise direction
+            '''
+            ----------------D----------------> C
+                            |    exit half
+                            |    of walkway
+            ----------------A----------------> B
+            '''
+            B = np.array([right[1].x, right[2].y])
+            A = (np.array([right[0].x, right[0].y]) + B) / 2
+            C = np.array([left[1].x, left[2].y])
+            D = (np.array([left[0].x, left[0].y]) + C) / 2
+
+            return point_in_rectangle(P, A, B, C, D)
 
         return False
 

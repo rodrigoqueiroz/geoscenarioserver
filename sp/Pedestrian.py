@@ -78,13 +78,14 @@ class SP(Pedestrian):
     A pedestrian following a dynamic behavior model based on the Social Force Model (SFM)
     """
 
-    def __init__(self, id, name, start_state, destination, btree_root):
+    def __init__(self, id, name, start_state, destinations, btree_root):
         super().__init__(id, name, start_state)
         self.btree_root = btree_root
         self.btree_reconfig = ""
         self.mconfig = None
         self.type = Pedestrian.SP_TYPE
-        self.destination = np.asarray(destination)
+        self.curr_route_node = 0
+        self.destination = np.array(destinations[self.curr_route_node])
         #self.desired_speed = random.uniform(0.8,1.5)
         self.desired_speed = 1.5
         self.mass = random.uniform(50,80)
@@ -97,6 +98,59 @@ class SP(Pedestrian):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.update_behavior()
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
+
+
+    def update_behavior(self):
+        # Behavior Model Layer
+        self.behavior_model = BehaviorModels(self.id, self.btree_root, self.btree_reconfig)
+
+        reg_elems = self.get_reg_elem_states(self.state)
+
+        # Get planner state
+        planner_state = PedestrianPlannerState(
+                            pedestrian_state=self.state,
+                            route=self.sim_config.pedestrian_goal_points[self.id],
+                            curr_route_node=self.curr_route_node,
+                            traffic_vehicles=self.sim_traffic.vehicles,
+                            regulatory_elements=reg_elems,
+                            pedestrians=self.sim_traffic.pedestrians,
+                            lanelet_map=self.sim_traffic.lanelet_map
+                        )
+
+        #BTree Tick - using frenet state and lane config based on old ref path
+        mconfig, snapshot_tree = self.behavior_model.tick(planner_state)
+
+        # new maneuver
+        if self.mconfig and self.mconfig.mkey != mconfig.mkey:
+            log.info("PID {} started maneuver {}".format(self.id, mconfig.mkey.name))
+            # print sp state and deltas
+            state_str = (
+                "PID {}:\n"
+                "   position    sim=({:.3f},{:.3f})\n"
+                "   speed       {:.3f}\n"
+            ).format(
+                self.id,
+                self.state.x, self.state.y,
+                np.linalg.norm([self.state.x_vel, self.state.y_vel])
+            )
+            log.info(state_str)
+        self.mconfig = mconfig
+
+        # Maneuver tick
+        if mconfig:
+            #replan maneuver
+            self.curr_route_node, new_route_node, self.desired_speed = plan_maneuver(mconfig.mkey,
+                                                                        mconfig,
+                                                                        planner_state.pedestrian_state,
+                                                                        planner_state.route,
+                                                                        planner_state.curr_route_node,
+                                                                        planner_state.traffic_vehicles,
+                                                                        planner_state.pedestrians)
+
+            if new_route_node != None:
+                self.sim_config.pedestrian_goal_points[self.id].insert(self.curr_route_node, new_route_node)
+
+            self.destination = np.array(self.sim_config.pedestrian_goal_points[self.id][self.curr_route_node])
 
 
     def get_reg_elem_states(self, pedestrian_state):
@@ -125,54 +179,6 @@ class SP(Pedestrian):
         return reg_elem_states
 
 
-    def update_behavior(self):
-
-        # Behavior Model Layer
-        self.behavior_model = BehaviorModels(self.id, self.btree_root, self.btree_reconfig)
-
-        reg_elems = self.get_reg_elem_states(self.state)
-        #log.info(reg_elems)
-
-        # Get planner state
-        planner_state = PedestrianPlannerState(
-                            pedestrian_state=self.state,
-                            goal_point=self.sim_config.pedestrian_goal_points[self.id],
-                            traffic_vehicles=self.sim_traffic.vehicles,
-                            regulatory_elements=reg_elems,
-                            pedestrians=self.sim_traffic.pedestrians,
-                        )
-
-        #BTree Tick - using frenet state and lane config based on old ref path
-        mconfig, snapshot_tree = self.behavior_model.tick(planner_state)
-
-        # new maneuver
-        if self.mconfig and self.mconfig.mkey != mconfig.mkey:
-            log.info("PID {} started maneuver {}".format(self.id, mconfig.mkey.name))
-            # print sp state and deltas
-            state_str = (
-                "PID {}:\n"
-                "   position    sim=({:.3f},{:.3f})\n"
-                "   speed       {:.3f}\n"
-            ).format(
-                self.id,
-                self.state.x, self.state.y,
-                np.linalg.norm([self.state.x_vel, self.state.x_vel])
-            )
-            log.info(state_str)
-        self.mconfig = mconfig
-
-        # Maneuver tick
-        if mconfig:
-            #replan maneuver
-            new_vel = plan_maneuver(mconfig.mkey,
-                                mconfig,
-                                planner_state.pedestrian_state,
-                                planner_state.traffic_vehicles,
-                                planner_state.pedestrians)
-
-            self.desired_speed = new_vel
-
-
     def update_position_SFM(self, curr_pos, curr_vel):
         '''
         Paper with details on SFM formulas: https://royalsocietypublishing.org/doi/full/10.1098/rspb.2009.0405
@@ -180,6 +186,9 @@ class SP(Pedestrian):
         '''
         direction = np.array(normalize(self.destination - curr_pos))
         desired_vel = direction * self.desired_speed
+
+        '''if (self.desired_speed == 0.0):
+            curr_vel = 0.0'''
 
         delta_vel = desired_vel - curr_vel
 

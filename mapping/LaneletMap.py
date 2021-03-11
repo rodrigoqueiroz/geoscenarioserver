@@ -42,6 +42,7 @@ class LaneletMap(object):
             if elem.attributes["subtype"] == "road":
                 elem.attributes["participant:vehicle"] = "yes"
             elif elem.attributes["subtype"] in ["crosswalk", "walkway"]:
+                elem.attributes["one_way"] = "yes"
                 elem.attributes["participant:pedestrian"] = "yes"
 
 

@@ -50,7 +50,7 @@ COLLISION_CORNER_RADIUS = 0.2   #radius for each corner
 #Planning
 PLANNER_RATE = 5            #Planner tick rate
 #Collision
-#collision and proximity cost have a great impacto on performance. 
+#collision and proximity cost have a great impacto on performance.
 #For example, if the scenario does not require object avoidance, you can turn it off.
 VEH_COLLISION = False      	#If true, collision between vehicles with be considered during planning.
 PED_COLLISION = False       #If true, collision between vehicles and pedestrians on the road with be considered during planning.
@@ -76,6 +76,7 @@ SHM_SIZE = 2048
 @dataclass
 class SimConfig:
     lanelet_routes:Dict = field(default_factory=dict)
+    pedestrian_lanelet_routes:Dict = field(default_factory=dict)
     goal_points:Dict = field(default_factory=dict)
     pedestrian_goal_points:Dict = field(default_factory=dict)
     scenario_name:str = "Unamed scenario"

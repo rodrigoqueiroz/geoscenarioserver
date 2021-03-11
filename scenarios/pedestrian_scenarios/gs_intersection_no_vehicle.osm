@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-5238827' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
+  <node id='-5269262' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
@@ -9,31 +9,49 @@
     <tag k='timeout' v='45' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5238828' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
+  <node id='-5269263' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5238829' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
-  <node id='-5238830' action='modify' visible='true' lat='43.47794007703' lon='-80.51952403105'>
+  <node id='-5269264' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
+  <node id='-5269265' action='modify' visible='true' lat='43.47797290143' lon='-80.51951540524'>
     <tag k='btype' v='SP' />
-    <tag k='destination' v='ped_1_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
     <tag k='pid' v='1' />
+    <tag k='route' v='ped_1_route' />
   </node>
-  <node id='-5238831' action='modify' visible='true' lat='43.47794372613' lon='-80.51952771877'>
+  <node id='-5269266' action='modify' visible='true' lat='43.4780313103' lon='-80.51999509369'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_2_dest' />
   </node>
-  <node id='-5238832' action='modify' visible='true' lat='43.47783375941' lon='-80.51981957697'>
+  <node id='-5269267' action='modify' visible='true' lat='43.47783448928' lon='-80.51981991225'>
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_2' />
     <tag k='pid' v='2' />
   </node>
-  <node id='-5238833' action='modify' visible='true' lat='43.47783144791' lon='-80.51981303873'>
-    <tag k='gs' v='location' />
-    <tag k='name' v='ped_1_dest' />
-  </node>
+  <node id='-5269268' action='modify' visible='true' lat='43.47797754362' lon='-80.51952101357' />
+  <node id='-5269269' action='modify' visible='true' lat='43.47800497746' lon='-80.51953408862' />
+  <node id='-5269270' action='modify' visible='true' lat='43.47801600023' lon='-80.5195878087' />
+  <node id='-5269271' action='modify' visible='true' lat='43.47804762109' lon='-80.51959748601' />
+  <node id='-5269272' action='modify' visible='true' lat='43.47804658897' lon='-80.51963453285' />
+  <node id='-5269632' action='modify' visible='true' lat='43.47807268944' lon='-80.51964012807' />
+  <node id='-5269633' action='modify' visible='true' lat='43.47808051345' lon='-80.51968843259' />
+  <node id='-5269634' action='modify' visible='true' lat='43.47810836693' lon='-80.51969058904' />
+  <node id='-5269635' action='modify' visible='true' lat='43.4781165039' lon='-80.51974018743' />
+  <way id='-1948867' action='modify' visible='true'>
+    <nd ref='-5269268' />
+    <nd ref='-5269269' />
+    <nd ref='-5269270' />
+    <nd ref='-5269271' />
+    <nd ref='-5269272' />
+    <nd ref='-5269632' />
+    <nd ref='-5269633' />
+    <nd ref='-5269634' />
+    <nd ref='-5269635' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ped_1_route' />
+  </way>
 </osm>

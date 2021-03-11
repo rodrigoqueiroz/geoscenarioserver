@@ -1693,8 +1693,8 @@
     <nd ref='-5238823' />
   </way>
   <relation id='-5000646' action='modify' visible='true'>
-    <member type='way' ref='-1948806' role='left' />
-    <member type='way' ref='-1948807' role='right' />
+    <member type='way' ref='-1948806' role='right' />
+    <member type='way' ref='-1948807' role='left' />
     <tag k='one_way' v='no' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
@@ -1702,8 +1702,8 @@
   <relation id='-5000647' action='modify' visible='true'>
     <member type='way' ref='-1948852' role='stop_line' />
     <member type='relation' ref='-5000719' role='regulatory_element' />
-    <member type='way' ref='-1948808' role='left' />
-    <member type='way' ref='-1948843' role='right' />
+    <member type='way' ref='-1948808' role='right' />
+    <member type='way' ref='-1948843' role='left' />
     <tag k='one_way' v='no' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
@@ -1716,22 +1716,22 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000649' action='modify' visible='true'>
-    <member type='way' ref='-1948811' role='left' />
-    <member type='way' ref='-1948812' role='right' />
+    <member type='way' ref='-1948811' role='right' />
+    <member type='way' ref='-1948812' role='left' />
     <tag k='one_way' v='no' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000650' action='modify' visible='true'>
-    <member type='way' ref='-1948813' role='left' />
-    <member type='way' ref='-1948814' role='right' />
+    <member type='way' ref='-1948813' role='right' />
+    <member type='way' ref='-1948814' role='left' />
     <tag k='one_way' v='no' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000651' action='modify' visible='true'>
-    <member type='way' ref='-1948815' role='left' />
-    <member type='way' ref='-1948816' role='right' />
+    <member type='way' ref='-1948815' role='right' />
+    <member type='way' ref='-1948816' role='left' />
     <tag k='one_way' v='no' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
