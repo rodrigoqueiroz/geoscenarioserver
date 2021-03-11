@@ -15,6 +15,7 @@
   </node>
   <node id='-5269264' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
   <node id='-5269265' action='modify' visible='true' lat='43.47797290143' lon='-80.51951540524'>
+    <tag k='btree' v='walk' />
     <tag k='btype' v='SP' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
@@ -26,6 +27,7 @@
     <tag k='name' v='ped_2_dest' />
   </node>
   <node id='-5269267' action='modify' visible='true' lat='43.47783448928' lon='-80.51981991225'>
+    <tag k='btree' v='walk' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />

@@ -228,6 +228,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
+
         # Simulated pedestrian
         elif btype == 'sp':
             if 'destination' not in pnode.tags and 'route' not in pnode.tags:
@@ -245,8 +246,16 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
                     dest_node = parser.locations[p_dest]
                     sim_config.pedestrian_goal_points[pid] = [(dest_node.x, dest_node.y)]
 
-                btree_root = pnode.tags['btree'] if 'btree' in pnode.tags else "trees/pedestrian_trees/walk.btree" # a behavior tree file (.btree) inside scenarios/trees/pedestrian_trees
-                pedestrian = SP(pid, name, start_state, list(sim_config.pedestrian_goal_points[pid]), btree_root)
+                root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk.btree" # a behavior tree file (.btree) inside btrees/sp
+
+                pedestrian = SP(pid,
+                                name,
+                                start_state,
+                                list(sim_config.pedestrian_goal_points[pid]),
+                                root_btree_name,
+                                btree_locations=btree_locations,
+                                btype=btype)
+
                 sim_traffic.add_pedestrian(pedestrian)
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))

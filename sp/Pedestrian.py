@@ -75,13 +75,17 @@ class TP(Pedestrian):
 
 class SP(Pedestrian):
     """
-    A pedestrian following a dynamic behavior model based on the Social Force Model (SFM)
+    A pedestrian following a dynamic behavior model where parameters
+    of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id, name, start_state, destinations, btree_root):
+    def __init__(self, id, name, start_state, destinations, root_btree_name, btree_locations=[], btype=""):
         super().__init__(id, name, start_state)
-        self.btree_root = btree_root
+        self.btype = btype
+        self.btree_locations = btree_locations
+        self.root_btree_name = root_btree_name
         self.btree_reconfig = ""
+
         self.mconfig = None
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
@@ -102,7 +106,7 @@ class SP(Pedestrian):
 
     def update_behavior(self):
         # Behavior Model Layer
-        self.behavior_model = BehaviorModels(self.id, self.btree_root, self.btree_reconfig)
+        self.behavior_model = BehaviorModels(self.id, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         reg_elems = self.get_reg_elem_states(self.state)
 
@@ -119,6 +123,7 @@ class SP(Pedestrian):
 
         #BTree Tick - using frenet state and lane config based on old ref path
         mconfig, snapshot_tree = self.behavior_model.tick(planner_state)
+
 
         # new maneuver
         if self.mconfig and self.mconfig.mkey != mconfig.mkey:

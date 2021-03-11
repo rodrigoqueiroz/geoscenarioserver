@@ -32,7 +32,7 @@ def start_server(args, m=MVelKeepConfig()):
     log.info ("Btree search locations set (in order) as: " + str(btree_locations))
 
     traffic = SimTraffic(lanelet_map, sim_config)
-    
+
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
         return
