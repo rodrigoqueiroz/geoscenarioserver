@@ -142,8 +142,9 @@ def plan_following(vid, vehicle_state:VehicleState, mconfig:MFollowConfig, lane_
         # If leading vehicle is slower than some threshold velocity, our goal is to stop.
         if abs(leading_vehicle.state.s_vel) < 1.5:
             #log.info("lead stopped")
-            # stop some meters behind stopped vehicle
-            s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2
+            s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
+            d_target = [d_start[0],0,0]                     #keep in same lateral position
+            target_state_set.append((s_target,d_target,t))  #add target
         else:
             # match leading vehicle speed
             s_lv = leading_vehicle.future_state(t)[:3]
@@ -151,11 +152,11 @@ def plan_following(vid, vehicle_state:VehicleState, mconfig:MFollowConfig, lane_
             s_target[0] = s_lv[0] - (time_gap * s_lv[1])
             s_target[1] = s_lv[1]
             s_target[2] = s_lv[2]
-        #lateral movement
-        for di in mconfig.lat_target.get_samples(lane_config):
-            d_target = [di,0,0]
-            #add target
-            target_state_set.append((s_target,d_target,t))
+            #lateral movement
+            for di in mconfig.lat_target.get_samples(lane_config):
+                d_target = [di,0,0]
+                #add target
+                target_state_set.append((s_target,d_target,t))
     
     best, candidates = optimized_trajectory(
         vehicle_state, target_state_set, mconfig, lane_config, vehicles, pedestrians, static_objects,
@@ -366,16 +367,13 @@ def optimized_trajectory(vehicle_state:VehicleState, target_state_set,
         maneuver_cost(ft, mconfig, lane_config, vehicles, pedestrians, static_objects)
     
     if len(feasible) == 0:
-        log.error("No feasible trajectory to select")
+        #log.debug("No feasible trajectory to select from state {}".format(start_state))
         #for traj in frenet_trajectories:
-            #print(traj.unfeasibility_cause)
-            #print(traj.max_long_acc)
-        return None, None
+        #    log.debug(traj.unfeasibility_cause)
+        return None, frenet_trajectories
     
     #select best by total cost
     best_ft:FrenetTrajectory = min(feasible, key=lambda traj:traj.get_total_cost())
-    #print("  THE BEST FT IS: ")
-    #print(best_ft)
 
     #returning best, and all candidates for debug
     return best_ft, frenet_trajectories

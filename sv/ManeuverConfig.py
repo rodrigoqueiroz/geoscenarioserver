@@ -21,7 +21,7 @@ class Maneuver(Enum):
     M_STOP = 5
     M_REVERSE = 6
 
-class SamplingMethod(Enum):
+class SamplingMethod(IntEnum):
     LINEAR = 1      #linear space
     UNIFORM = 2     #random from uniform distribution
     NORMAL = 3      #random from gaussian
@@ -72,14 +72,20 @@ class LaneConfig:
 @dataclass
 class LT:
     '''
-    Lateral target configuration for sampling in the lane width space
+    Lateral target configuration for sampling in the lane width space.
+    @param target: distance [in meters] from the lane centre ( < 0 is right, > 0 is left)
+    The target value will be used exclusevely if a single sample is used (nsamples=1) 
+    or as the mean if the sampling method is NORMAL (sigma as standard deviation).
+    If nsamples > 1 and sampling is LINEAR or NORMAL, all the available lateral space is used.
+    Note that limit_lane_width is important to keep the lateral space within lane boundaries.
+    This constraint can be removed when a single target value is used or samplig with NORMAL.
     '''
-    target:float = 0.0                  #lateral target position in meters (0.0 = center of the lane)
-    nsamples:int = 1                    #number of sampling points on the lane width for lateral planning
-    sampling:int = SamplingMethod.NORMAL
-    sigma:float = 1.0                   #std dev for sampling from normal
-    limit_lane_width:bool = True       #if True, all sampling values will be limited by lane width
-    limit_vehicle_size:bool = True      #if True, sampling values will be limited by vehicle size
+    target:float = 0.0                      #lateral target position in meters (0.0 = center of the lane)
+    nsamples:int = 1                        #number of sampling points on the lane width for lateral planning
+    sampling:int = SamplingMethod.NORMAL    #sampling method
+    sigma:float = 1.0                       #std dev for sampling from normal
+    limit_lane_width:bool = True            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
+    limit_vehicle_size:bool = True          #Limit sampling values by vehicle size (within boundaries)
 
     def get_samples(self, lane_config:LaneConfig):
         target = lane_config.get_central_d() + self.target
@@ -96,17 +102,14 @@ class LT:
         vsize = VEHICLE_RADIUS if self.limit_vehicle_size else 0
         up = up - vsize
         lo = lo + vsize
-
-        if (self.sampling==SamplingMethod.LINEAR):
+        
+        if (self.sampling== SamplingMethod.LINEAR):
             return linear_samples(self.nsamples,lo,up)
-        elif (self.sampling==SamplingMethod.UNIFORM):
+        elif (self.sampling== SamplingMethod.UNIFORM):
             return uniform_samples(self.nsamples,lo,up)
-        elif (self.sampling==SamplingMethod.NORMAL):
+        elif (self.sampling== SamplingMethod.NORMAL):
             return normal_samples(self.nsamples,target,self.sigma,lo,up)
-
         return tuple([0])
-
-
 
 
 @dataclass
@@ -133,7 +136,7 @@ class MP:
         elif (self.sampling==SamplingMethod.UNIFORM):
             return uniform_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.NORMAL):
-            return normal_samples(self.nsamples,self.target,self.sigma,lo,up)
+            return normal_samples(self.nsamples,self.value,self.sigma,lo,up)
 
 @dataclass
 class MConfig:
@@ -180,7 +183,7 @@ class MConfig:
     max_lat_acc:float = 4.9               # maximum lateral acceleration [m/s/s]
     
     #Lateral lane target. By default, targets center
-    lat_target:LT = LT(0.0,1)
+    lat_target:LT = LT(0.5,3,SamplingMethod.NORMAL)
 
     #Precision defines how feasibility and costs are computed (and how integrals are approximated). 
     #Higher(100) = better precision, but impacts performance. 
@@ -191,7 +194,7 @@ class MConfig:
 class MVelKeepConfig(MConfig):
     vel:MP = MP(14.0,10,3)              #velocity in [m/s] as MP
     time:MP = MP(3.0,20,6)              #duration in [s] as MP
-    max_diff:float = 6.0                 #max vel diff (current to target).
+    max_diff:float = 8.0                 #max vel diff (current to target).
     mkey:int = Maneuver.M_VELKEEP
 
 @dataclass
@@ -219,14 +222,14 @@ class MStopConfig(MConfig):
     mkey:int = Maneuver.M_STOP
 
     def __post_init__(self):
-        self.max_long_acc = 20.0
+        self.max_long_acc = 30.0
     
 
 @dataclass
 class MFollowConfig(MConfig):
     #target
     target_vid:int = None           #target vehicle id
-    time:MP = MP(3.0,50,10)          #duration in [s] as MP
+    time:MP = MP(4.0,50,10)          #duration in [s] as MP
     time_gap:float = 3.0            #[s]
     mkey:int = Maneuver.M_FOLLOW
 
