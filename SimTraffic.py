@@ -90,13 +90,14 @@ class SimTraffic(object):
             self.pedestrians[pid].stop()
 
         for vid in self.vehicles:
-            print(
-                "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
-                    int(vid),
-                    int(self.vehicles[vid].jump_back_count),
-                    float(self.vehicles[vid].max_jump_back_dist)
+            if self.vehicles[vid].type == Vehicle.SDV_TYPE:
+                log.debug(
+                    "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
+                        int(vid),
+                        int(self.vehicles[vid].jump_back_count),
+                        float(self.vehicles[vid].max_jump_back_dist)
+                    )
                 )
-            )
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
@@ -144,7 +145,6 @@ class SimTraffic(object):
         
         #Collisions at Server Side
         if self.detect_collisions(tick_count, delta_time, sim_time):
-            self.log_sim_state(vstates, disabled_vehicles)
             return -1
         
         return 0
@@ -216,11 +216,15 @@ class SimTraffic(object):
 
     def detect_collisions(self,tick_count, delta_time, sim_time):
         for id_va, va in self.vehicles.items():
+            if va.sim_state is not ActorSimState.ACTIVE:
+                continue
             min_x = (va.state.x - VEHICLE_RADIUS)
             max_x = (va.state.x + VEHICLE_RADIUS)
             min_y = (va.state.y - VEHICLE_RADIUS)
             max_y = (va.state.y + VEHICLE_RADIUS)
             for id_vb, vb in self.vehicles.items():
+                if vb.sim_state is not ActorSimState.ACTIVE:
+                    continue
                 if id_va != id_vb:
                     #this filter will be important when we use alternative (and more expensive) collision checking methods
                     if  (min_x <= vb.state.x <= max_x) and (min_y <= vb.state.y <= max_y): 
