@@ -94,20 +94,19 @@ class SP(Pedestrian):
         self.desired_speed = 1.5
         self.mass = random.uniform(50,80)
         self.radius = 1
-        self.char_time = random.uniform(8,16) # characteristic time
+        self.char_time = random.uniform(8,16) # characteristic time for SFM
         self.bodyFactor = 120000
         self.slideFricFactor = 240000
+
+        self.behavior_model = BehaviorModels(self.id, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
+
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.update_behavior()
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
 
-
     def update_behavior(self):
-        # Behavior Model Layer
-        self.behavior_model = BehaviorModels(self.id, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-
         reg_elems = self.get_reg_elem_states(self.state)
 
         # Get planner state
@@ -121,9 +120,8 @@ class SP(Pedestrian):
                             lanelet_map=self.sim_traffic.lanelet_map
                         )
 
-        #BTree Tick - using frenet state and lane config based on old ref path
+        # BTree Tick
         mconfig, snapshot_tree = self.behavior_model.tick(planner_state)
-
 
         # new maneuver
         if self.mconfig and self.mconfig.mkey != mconfig.mkey:
@@ -144,6 +142,7 @@ class SP(Pedestrian):
         # Maneuver tick
         if mconfig:
             #replan maneuver
+
             self.curr_route_node, new_route_node, self.desired_speed = plan_maneuver(mconfig.mkey,
                                                                         mconfig,
                                                                         planner_state.pedestrian_state,
@@ -152,8 +151,10 @@ class SP(Pedestrian):
                                                                         planner_state.traffic_vehicles,
                                                                         planner_state.pedestrians)
 
+
             if new_route_node != None:
                 self.sim_config.pedestrian_goal_points[self.id].insert(self.curr_route_node, new_route_node)
+
 
             self.destination = np.array(self.sim_config.pedestrian_goal_points[self.id][self.curr_route_node])
 
@@ -164,6 +165,9 @@ class SP(Pedestrian):
             traffic_light_states[lid] = tl.current_color.value
 
         cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
+
+        if cur_ll == None:
+            cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet(pedestrian_state.x, pedestrian_state.y)
 
         # Get regulatory elements acting on this lanelet
         reg_elems = cur_ll.regulatoryElements

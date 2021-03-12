@@ -47,7 +47,7 @@ class BehaviorModels(object):
             file_noext = os.path.splitext(self.root_btree_name)[0]
             interpreter = BTreeInterpreter(self.pid, bmodel=self)
             tree = interpreter.build_tree(btree_name=file_noext)
-            
+
             '''
             args format:
                 For maneuvers always write m_id=MConfig(x=1,y=2)
@@ -135,7 +135,6 @@ class BehaviorModels(object):
 
         elif condition == "in_crosswalk_area":
             cur_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")
-            #log.info(cur_ll.attributes["subtype"] == "crosswalk")
             return cur_ll.attributes["subtype"] == "crosswalk"
 
         elif condition == "past_crosswalk_halfway":
@@ -145,16 +144,16 @@ class BehaviorModels(object):
             right = xwalk_ll.rightBound
             left = xwalk_ll.leftBound
 
-            # get four points of entry half of xwalk in counterclockwise direction
+            # get four points of exit half of xwalk in counterclockwise direction
             '''
             ----------------D----------------> C
-                            |    exit half
-                            |    of walkway
+                            |   exit half
+                            |   of crosswalk
             ----------------A----------------> B
             '''
-            B = np.array([right[1].x, right[2].y])
+            B = np.array([right[1].x, right[1].y])
             A = (np.array([right[0].x, right[0].y]) + B) / 2
-            C = np.array([left[1].x, left[2].y])
+            C = np.array([left[1].x, left[1].y])
             D = (np.array([left[0].x, left[0].y]) + C) / 2
 
             return point_in_rectangle(P, A, B, C, D)

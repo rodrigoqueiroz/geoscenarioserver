@@ -157,16 +157,21 @@ class LaneletMap(object):
         participant_tag = "participant:" + participant
 
         if len(intersecting_lls) == 0:
-            raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+            raise Exception("Lanelet Error: agent not part of any lanelet.")
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
             intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
-            # TODO: add filter by participants here
+            # filter results for lanelets with allowed participants matching participant_tag
             intersecting_lls = list(filter(lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
             if len(intersecting_lls) > 1:
                 log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                     (x,y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
+
+        # case if agent is in lanelet where they are not an allowed participant
+        if len(intersecting_lls) == 0:
+            return None
+
         return intersecting_lls[0]
 
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
