@@ -9,7 +9,7 @@
     <tag k='version' v='2.0' />
   </node>
   <node id='-5005017' action='modify' visible='true' lat='49.00725781895' lon='8.4570859424'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />

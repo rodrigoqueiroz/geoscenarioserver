@@ -18,7 +18,7 @@
     <tag k='agentspeed' v='5' />
   </node>
   <node id='-5005205' action='modify' visible='true' lat='49.00788980558' lon='8.45800940545'>
-    <tag k='btree' v='trees/st_reverse.btree' />
+    <tag k='btree' v='st_reverse.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='reversing_vehicle' />

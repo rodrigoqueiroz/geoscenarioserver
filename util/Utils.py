@@ -5,6 +5,7 @@
 # UTILS
 # --------------------------------------------
 from math import sqrt, exp, trunc, sin, cos, hypot
+import random
 from matplotlib import pyplot as plt
 import uuid
 import numpy as np
@@ -84,3 +85,26 @@ def distance_point_line(x1,y1,x2,y2, xp, yp):
     p3=np.array([xp,yp])
     d=np.cross(p2-p1,p3-p1)/np.linalg.norm(p2-p1)
     return abs(d)
+
+def linear_samples(nsamples,lo,up):
+    if (lo >= up):
+        return tuple([lo])
+    return np.linspace(lo,up, nsamples)
+
+def uniform_samples(nsamples,lo,up):
+    samples = []
+    for x in range(nsamples):
+        samples.append(random.uniform(lo, up))
+    return samples
+
+def normal_samples(nsamples, mean, sd, lo = None,up = None):
+    samples = []
+    for x in range(nsamples):
+        if lo is None and up is None:
+            s = random.gauss(mean,sd)
+        else:
+            #same as random.gauss(), but with bounds:
+            s = get_truncated_normal(mean,sd,lo,up) 
+        samples.append(s)
+    return samples
+    

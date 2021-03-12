@@ -19,7 +19,7 @@
   <node id='-5145822' action='modify' visible='true' lat='43.47196635823' lon='-80.54020786767' />
   <node id='-5145824' action='modify' visible='true' lat='43.47254328162' lon='-80.54094230983' />
   <node id='-5145847' action='modify' visible='true' lat='43.47199816899' lon='-80.54025113851'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />

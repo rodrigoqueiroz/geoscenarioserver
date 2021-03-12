@@ -74,8 +74,8 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
 
     #=========  Ego (External Vehicle)
     if parser.egostart is not None:
-        ego_vehicle = RV(99, 'Ego', [0.0,0.0,0.0, 0.0,0.0,0.0])
-        sim_traffic.vehicle(ego_vehicle)
+        ego_vehicle = EV(99, 'Ego', [0.0,0.0,0.0, 0.0,0.0,0.0])
+        sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
     for vid, vnode in parser.vehicles.items():
