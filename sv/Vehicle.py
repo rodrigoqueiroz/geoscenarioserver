@@ -5,6 +5,7 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
+from os import stat_result
 from matplotlib import pyplot as plt
 import math
 import sys
@@ -20,6 +21,7 @@ from mapping.LaneletMap import LaneletMap
 from shm.SimSharedMemory import *
 from util.Utils import kalman
 
+import datetime
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(Actor):
@@ -79,7 +81,11 @@ class SDV(Vehicle):
         self.root_btree_name = root_btree_name
         self.btree_reconfig = ""
         self.motion_plan = None
-
+        self.next_motion_plan = None
+        
+        #debug:
+        self.jump_back_count = 0
+        self.max_jump_back_dist = 0
 
     def start_planner(self):
         """For SDV models controlled by SVPlanner.
@@ -94,7 +100,6 @@ class SDV(Vehicle):
 
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
-
         #Read planner
         if self.sv_planner:
             plan = self.sv_planner.get_plan()
@@ -102,34 +107,63 @@ class SDV(Vehicle):
                 if plan.trajectory.T != 0:
                     self.set_new_motion_plan(plan, sim_time)
                     if plan.new_frenet_frame:
-                        # NOTE: vehicle state being used here is from the pervious frame (that planner should have gotten)
+                        # NOTE: vehicle state being used here is from the previous frame (that planner should have gotten)
                         self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.state.x, self.state.y)
                 else:
                     self.set_new_motion_plan(plan, sim_time)
             #Compute new state
-            self.compute_vehicle_state(delta_time)
+            self.compute_vehicle_state(delta_time, sim_time)
 
-    def compute_vehicle_state(self, delta_time):
+    def compute_vehicle_state(self, delta_time, sim_time):
         """
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
         """
+        
+        #Check if vehicle can switch to new plan
+        if (self.next_motion_plan):
+            time = sim_time - self.next_motion_plan.start_time
+            #if ahead of current im time
+            if time < 0:
+                log.warning("Next v{} plan at {:2f}s is ahead of sim_time {:2f}s (diff{:2f}s) and will be delayed".format(
+                    self.id,self.next_motion_plan.start_time,sim_time, time))
+            else:
+                self.motion_plan = self.next_motion_plan
+                self.next_motion_plan = None
+        
+        #Follow current plan
         if (self.motion_plan):
-            self.motion_plan.trajectory.consumed_time += delta_time
-            time = self.motion_plan.trajectory.consumed_time
-
+            time = sim_time - self.motion_plan.start_time
+            
             #exceed total traj time
-            #if this happens, the planner is stuck and can't generate new trajectories.
-            #note: add an emergency break as a backup plan
+            #If this happens and the vehicle is not stopped, the planner is stuck and can't generate new trajectories.
+            #note: add an emergency break /fallback as a backup plan
             if (time > self.motion_plan.trajectory.T): 
-                #log.error("Vehicle {} can not exceed trajectory time".format(self.id))
+                if self.state.s_vel > 0.1:
+                    log.error("Vehicle {} finished last trajectory without stopping".format(self.id))
                 return
 
-            # update frenet state
+            # new state
+            self.motion_plan.trajectory.consumed_time = time
             new_state = self.motion_plan.trajectory.get_state_at(time) 
+
+            #check consistency during transition from previous to new states
+            # <1cm is within acceptable difference (rounding and error in frame conversion)
+            s_delta = new_state[0] - self.state.s
+            if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
+                log.error("Vehicle {} moved backwards by {}m".format(self.id, s_delta))
+                log.info("SimTime {} Delta {} Plan: StartTime{} TimeIn {}".format(
+                        sim_time, delta_time, self.motion_plan.start_time,time))
+                log.info(self.state.get_frenet_state_vector())
+                log.info(new_state)
+                #log.info(self.motion_plan.trajectory)
+                self.jump_back_count += 1
+                self.max_jump_back_dist = max(self.max_jump_back_dist, s_delta)
+
+            # update frenet state
             self.state.set_S(new_state[:3])
             self.state.set_D(new_state[3:])
-
+            
             # Compute sim state using the global path this vehicle is following
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.state.x, self.state.y, self.lanelet_route)
             try:
@@ -137,8 +171,9 @@ class SDV(Vehicle):
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
                 log.error("Outside of path. Vehicle reached goal?")
+                return
                 #raise e
-
+            
             # update sim state
             self.state.x = x_vector[0]
             self.state.x_vel = x_vector[1]
@@ -150,45 +185,43 @@ class SDV(Vehicle):
             if self.motion_plan.reversing:
                 heading *= -1
             self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
-            
 
-    def get_frenet_state(self):
-        if self.s_eq is None:
-            return None
-        time = self.trajectory_time
-        return [self.s_eq(time), self.s_vel_eq(time), self.s_acc_eq(time), self.d_eq(time), self.d_vel_eq(time), self.d_acc_eq(time)]
+            #DEBUG:
+            #Note: use this log to evaluate if the "jump back" issue returns
+            #log.info("===VID: %d, Plan Tick: %d, Timestamp: %f, Delta Time: %f, Diff: %f, Start Time: %f, S Coef: (%f, %f, %f, %f, %f, %f)===" % (
+            #    self.id, self.motion_plan.tick_count,
+            #    datetime.datetime.now().timestamp(), delta_time,
+            #    diff, self.motion_plan.start_time,
+            #    self.motion_plan.trajectory.s_coef[0], self.motion_plan.trajectory.s_coef[1],
+            #    self.motion_plan.trajectory.s_coef[2], self.motion_plan.trajectory.s_coef[3],
+            #    self.motion_plan.trajectory.s_coef[4], self.motion_plan.trajectory.s_coef[5]
+            #))
+            #if old_s > self.state.s and not self.motion_plan.reversing:
+            #    self.jump_back_count += 1
+                #new_pos = np.array([self.state.x, self.state.y])
+                #delta_pos = new_pos - old_pos
+                #dist = math.sqrt(delta_pos[0]*delta_pos[0] + delta_pos[1]*delta_pos[1])
+                #dist = old_s - self.state.s
+                #self.max_jump_back_dist = max(self.max_jump_back_dist, dist)
 
-    def get_global_path(self):
-        """ The ref path the SV is following
-        """
-        pass
+                #log.info("???VID: %d, Plan Tick: %d, Old: %f, Start: %f, New: %f, Diff: %f???" % (
+                #    self.id, self.motion_plan.tick_count,
+                #    old_s, self.motion_plan.trajectory.get_state_at(0)[0],
+                #    self.state.s, diff
+                #))
+
+   
 
     def set_new_motion_plan(self, plan:MotionPlan, sim_time):
         """
-        Set a new Motion Plan with a trajectory to start following immediately.
+        Set a new Motion Plan with a trajectory to start following at start_time.
         """
-        
         if (plan.trajectory.T == 0):
-            self.motion_plan = None
-            return
+            self.next_motion_plan = None
+        else:
+            self.next_motion_plan = plan
         
-        plan.trajectory.consumed_time = 0
-        #Correct trajectory progress based
-        #on diff planning time and now
-        diff = sim_time - plan.start_time
-        if (diff > 0):
-            plan.trajectory.consumed_time += diff
-            #print("NEW PLAN: SIM_TIME {} PLAN_TIME {} DIFF {} CONSUMED {}".format(sim_time,plan.start_time,diff, plan.trajectory.consumed_time))
         
-        #print("NEW PLAN: SIM_TIME {} PLAN_TIME {} s {} traj s_start{} traj s_consum {}".format(
-        #    sim_time,
-        #    plan.start_time,
-        #    self.state.s,
-        #    plan.trajectory.fs(0),
-        #    plan.trajectory.fs(plan.trajectory.consumed_time))
-        #    )
-
-        self.motion_plan = plan
         
 
 

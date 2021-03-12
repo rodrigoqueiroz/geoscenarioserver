@@ -29,6 +29,8 @@ class LaneletMap(object):
         self.lanelet_map, errors = lanelet2.io.loadRobust(filename, projector)
         assert not errors, log.error(errors)
 
+        self.projector = projector
+
         # generate routing table
         traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
         self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)

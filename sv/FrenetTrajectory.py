@@ -6,7 +6,6 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
-from SimConfig import TRAJECTORY_SPLIT
 from dataclasses import dataclass
 from util.Utils import *
 
@@ -56,7 +55,7 @@ class FrenetTrajectory:
     def array_format(self):
         return [np.array(self.s_coef), np.array(self.d_coef), self.T]
     
-    def set_trajectory(self,s_coef, d_coef, duration):
+    def set_trajectory(self,s_coef, d_coef, duration, projection_precision = None):
         '''
         Set a new trajectory, computes all derivatives, 
         and stores functions for easy access 
@@ -81,24 +80,29 @@ class FrenetTrajectory:
         self.fd_vel = to_equation(d_vel_coef)
         self.fd_acc = to_equation(d_acc_coef)
         self.fd_jerk = to_equation(d_jerk_coef)
-        #project
-        self.projected_trajectory = self.project(TRAJECTORY_SPLIT)
-        
+        #projects
+        if projection_precision is not None:
+            self.projected_trajectory = self.project(projection_precision)
+        else:
+            self.projected_trajectory = None
 
     def get_state_at(self, time):
         '''
-        Returns a predicted state for a given time in the trajectory
+        Returns a predicted frenet state for a given time in the trajectory
         '''
+        #limit max time
+        if time > self.T: 
+            time = self.T
         return [self.fs(time), self.fs_vel(time), self.fs_acc(time),
                 self.fd(time), self.fd_vel(time), self.fd_acc(time)]
 
-    def project(self,split = 100):
+    def project(self,precision = 10):
         '''Projects trajectory from start to goal and split in equally distributed parts.
-            Higher split returns more measures, but impacts performance.
+            Higher precision returns more measures, but impacts performance.
         '''
         projected = []
-        dt = float(self.T) / split
-        for i in range(split):
+        dt = float(self.T) / precision
+        for i in range(precision):
             #t = float(i) / split * self.T
             t = dt * i
             state_s = [self.fs(t), self.fs_vel(t), self.fs_acc(t), self.fs_jerk(t)]
@@ -124,10 +128,11 @@ class MotionPlan:
     start_time:float = 0            #sim start time [s]
     new_frenet_frame = False        #if a new frenet frame was generated
     reversing = False               #if the plan is reversed
+    tick_count = None
     
     #For easy shared memory parsing
     def get_vector_length(self):
-        return len(self.trajectory.s_coef) + len(self.trajectory.d_coef) + 4
+        return len(self.trajectory.s_coef) + len(self.trajectory.d_coef) + 5
 
     def set_plan_vector(self,P):
         assert(len(P) == self.get_vector_length())
@@ -139,6 +144,7 @@ class MotionPlan:
         self.start_time = P[ns + nd + 1]
         self.new_frenet_frame = P[ns + nd + 2]
         self.reversing = P[ns + nd + 3]
+        self.tick_count = P[ns + nd + 4]
         self.trajectory.set_trajectory(s_coef,d_coef,t)
 
     def get_plan_vector(self):
@@ -150,5 +156,6 @@ class MotionPlan:
             np.asarray([self.trajectory.T]),
             np.asarray([self.start_time]),
             np.asarray([self.new_frenet_frame]),
-            np.asarray([self.reversing])
+            np.asarray([self.reversing]),
+            np.asarray([self.tick_count])
         ])

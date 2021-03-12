@@ -4,7 +4,7 @@
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
-    <tag k='name' v='Straight Road Drive and Follow Scenario' />
+    <tag k='name' v='Lateral planning demo' />
     <tag k='timeout' v='30' />
     <tag k='version' v='2.0' />
   </node>
@@ -14,9 +14,9 @@
     <tag k='gs' v='origin' />
   </node>
   <node id='-5149179' action='modify' visible='true' lat='49.00729972481' lon='8.45710179305' />
-  <node id='-5149180' action='modify' visible='true' lat='49.00818215891' lon='8.45824935668' />
+  <node id='-5149180' action='modify' visible='true' lat='49.00846935451' lon='8.45859938496' />
   <node id='-5149181' action='modify' visible='true' lat='49.00726589979' lon='8.45704525575'>
-    <tag k='btree' v='st_drivefast.btree' />
+    <tag k='btree' v='st_lateral_demo.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
@@ -25,7 +25,7 @@
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-5149184' action='modify' visible='true' lat='49.0081535901' lon='8.45830837123'>
+  <node id='-5149184' action='modify' visible='true' lat='49.00819094899' lon='8.45826090977'>
     <tag k='area' v='no' />
     <tag k='gs' v='staticobject' />
     <tag k='name' v='myobject' />

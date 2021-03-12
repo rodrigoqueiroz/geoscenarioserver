@@ -17,7 +17,7 @@
   <node id='-5145404' action='modify' visible='true' lat='43.47790730383' lon='-80.52029198388' />
   <node id='-5145405' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
   <node id='-5145406' action='modify' visible='true' lat='43.47823992752' lon='-80.51933527822'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='red_light_runner' />
@@ -32,7 +32,7 @@
     <tag k='type' v='default' />
   </node>
   <node id='-5145409' action='modify' visible='true' lat='43.47820088433' lon='-80.51945731312'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='red_light_runner' />

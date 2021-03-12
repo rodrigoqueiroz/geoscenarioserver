@@ -69,11 +69,11 @@ def evaluate_scenario(es:EvalScenario):
     es.fd = get_frechet(traj_s,traj_e) 
     es.fd_nc = get_frechet(traj_s_nc,traj_e_nc)
     es.ed, es.ed_vector = get_euclideandistance(traj_s,traj_e) 
-    es.ed_nc, _ = 1, None #get_euclideandistance(traj_s_nc,traj_e_nc) 
+    es.ed_nc, _ = get_euclideandistance(traj_s_nc,traj_e_nc) 
     
     traj_plot_combined(es, traj_s, traj_s_nc, traj_e)
     speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
-    save_ed_plot(es)
+    ed_plot(es)
     
     #not calibrated
     #traj_s_nc = load_trajectory_log( 'trajlog/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id) ) #synthetic
@@ -90,8 +90,7 @@ def evaluate_scenario(es:EvalScenario):
     #print("Experiment {} Frechet distance = {} (nc) {} (rc) Euclidean distance = {} (nc) {} (rc)".format(
     #    es.scenario_id, es.fd_nc,es.fd_rc,es.ed_nc,es.ed_rc))
     
-    data = update_results_table(es)
-    generate_boxplots(data)
+    
     
 def load_all_scenarios():
     scenarios = {}
@@ -278,33 +277,13 @@ def get_frechet(traj_p,traj_q, trim = 1.0, samples = None):
 def get_euclideandistance(P,Q = None):
     score = 0
     d_vector = []
-    de_vector = []
-    ds_vector = []
-    x_dif = []
-
+    
     n = len(P)
     for i in range(n):
-        if Q is not None:
-            d = distance_2p( P[i]['x'], P[i]['y'], Q[i]['x'],Q[i]['y']) 
-            ds = distance_2p( P[i]['x'], P[i]['y'], 0,0) 
-            de = distance_2p( 0, 0, Q[i]['x'],Q[i]['y'])
-            d_vector.append([ P[i]['time'] , d ]) 
-            ds_vector.append([ P[i]['time'] , ds ]) 
-            de_vector.append([ P[i]['time'] , de ]) 
-            #print("x {} y {} | x {} y {} | d {}".format(P[i]['x'],P[i]['y'], Q[i]['x'],Q[i]['y'],d))
-        else:
-            d = distance_2p( P[i]['x'], P[i]['y'], 0,0) 
+        d = distance_2p( P[i]['x'], P[i]['y'], Q[i]['x'],Q[i]['y']) 
+        d_vector.append([ P[i]['time'] , d ])
         score += d
     score = score/n
-
-    
-    plt.cla()
-    plt.plot(  [node[0] for node in d_vector] , [node[1] for node in d_vector],'k-',label="ed")
-    plt.plot(  [node[0] for node in ds_vector] , [node[1] for node in ds_vector],'b-',label="ed s")
-    plt.plot(  [node[0] for node in de_vector] , [node[1] for node in de_vector],'r-',label="ed e")
-    #plt.xlim(9,10)
-    plt.show()    
-
     return score, d_vector
 
 def distance_2p(x1,y1,x2,y2):
@@ -316,50 +295,70 @@ def distance_2p(x1,y1,x2,y2):
 
 def traj_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e):
     plt.cla()
-    plt.plot(   [node['x'] for node in traj_e],    
+    fig=plt.figure()
+    ax=fig.add_subplot(111)
+    ax.plot(   [node['x'] for node in traj_e],    
                 [node['y'] for node in traj_e], 
                 'r-', label="emp")
 
-    plt.plot(   [node['x'] for node in traj_s_nc],    
+    ax.plot(   [node['x'] for node in traj_s_nc],    
                 [node['y'] for node in traj_s_nc], 
                 'b--',label="synth Ed={} m Fd={} m (A)".format(format(es.ed_nc, '.2f'),format(es.fd_nc, '.2f')))
 
-    plt.plot(   [node['x'] for node in traj_s],    
+    ax.plot(   [node['x'] for node in traj_s],    
                 [node['y'] for node in traj_s], 
                 'b-',label="synth Ed={} m Fd={} m (B)".format(format(es.ed, '.2f'),format(es.fd, '.2f')))
     
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+    ax.legend(loc="upper center",bbox_to_anchor=(0.5, -0.05))
     plt.suptitle('Experiment {} ({}) \nTrajectory'.format(es.scenario_id, es.scenario_type))
-    plt.legend(loc="upper left")
+    plt.ylabel('y (m)')
+    plt.xlabel('x (m)')
+    
     plt.axis('equal')
     filename = 'plots/{}/{}_trajectory'.format(es.scenario_type, es.scenario_id)
     plt.savefig(filename+'.png')
+    plt.close(fig)
     
 
-def speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l):
+def speed_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e, traj_l, ymin=0, ymax=20):
     plt.cla()
+    fig=plt.figure()
+    ax=fig.add_subplot(111)
+
     if traj_l:
-        plt.plot(   [node['time'] for node in traj_l],    
+        ax.plot(   [node['time'] for node in traj_l],    
                     [node['speed'] for node in traj_l], 
                     'k--',label="lead")
-    plt.plot(   [node['time'] for node in traj_e],    
+    ax.plot(   [node['time'] for node in traj_e],    
                 [node['speed'] for node in traj_e], 
                 'r-',label="emp")
-    plt.plot(   [node['time'] for node in traj_s_nc],    
+    ax.plot(   [node['time'] for node in traj_s_nc],    
                 [node['speed'] for node in traj_s_nc], 
                 'b--',label="synth A")
-    plt.plot(   [node['time'] for node in traj_s],    
+    ax.plot(   [node['time'] for node in traj_s],    
                 [node['speed'] for node in traj_s], 
                 'b-',label="synth B")
     plt.ylabel('speed/n(m/s)')
     plt.xlabel('time (s)')
-    #plt.ylim(0,20)
-    #plt.xlim(0,50)
+    
+    xmin = min([node['time'] for node in traj_e])
+    xmax = max([node['time'] for node in traj_e])
+    
+    ax.set_xbound(lower=xmin, upper=xmax)
+    ax.set_ybound(lower=ymin, upper=ymax)
+    #plt.xlim(xmin,xmax)
+    #plt.ylim(0,30)
+    #plt.yticks(range(0, 30))
+    #plt.axis.set_aspect('auto')
     plt.suptitle('Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id, es.scenario_type))
     plt.legend(loc="upper left")
     filename = 'plots/{}/{}_speed'.format(es.scenario_type, es.scenario_id)
     plt.savefig(filename+'.png')
+    plt.close(fig)
 
-def save_ed_plot(es):
+def ed_plot(es):
     filename = 'plots/{}/{}_edvector'.format(es.scenario_type, es.scenario_id)
     title = 'Experiment {} ({}) \n ED {} m'.format(es.scenario_id, es.scenario_type, format(es.ed, '.2f'))
     plt.cla()
@@ -402,45 +401,48 @@ def update_results_table(es):
     return lines
 
 def generate_boxplots(lines):
-    data_nc = []
-    data_rc = []
-    #split by type:
-    data_nc_follow = []
-    data_rc_follow = []
-    data_nc_free = []
-    data_rc_free = []
-    data_nc_glstart = []
-    data_rc_glstart = []
-    data_nc_rlstop = []
-    data_rc_rlstop = []
+    i_ed_nc = 2
+    i_ed = 3
+    i_fd = 5
+    i_fd_nc = 6
+    datasize = len(lines)-1
+    #all scenarios
+    data_fd_nc =    [ float(lines[i][i_fd_nc]) for i in range(len(lines)) if lines[i][0] != 'sid' ]
+    data_fd =       [ float(lines[i][i_fd]) for i in range(len(lines)) if lines[i][0] != 'sid' ]
+    data_ed_nc =    [ float(lines[i][i_ed_nc]) for i in range(len(lines)) if lines[i][0] != 'sid' ]
+    data_ed =       [ float(lines[i][i_ed]) for i in range(len(lines)) if lines[i][0] != 'sid' ]
     
-    for l in lines:
-        if l[0] == 'sid': #skip header
-            continue
-        if l[1] == 'free':
-            data_nc_free.append(float(l[2]))
-            data_rc_free.append(float(l[3]))
-        if l[1] == 'follow':
-            data_nc_follow.append(float(l[2]))
-            data_rc_follow.append(float(l[3]))
-        if l[1] == 'glstart':
-            data_nc_glstart.append(float(l[2]))
-            data_rc_glstart.append(float(l[3]))
-        if l[1] == 'rlstop':
-            data_nc_rlstop.append(float(l[2]))
-            data_rc_rlstop.append(float(l[3]))
-        data_nc.append(float(l[2]))
-        data_rc.append(float(l[3]))
+    data_ed_type = [
+            [ float(lines[i][i_ed_nc]) for i in range(len(lines)) if lines[i][1] == 'free' ],
+            [ float(lines[i][i_ed])    for i in range(len(lines)) if lines[i][1] == 'free' ],
+            [ float(lines[i][i_ed_nc]) for i in range(len(lines)) if lines[i][1] == 'follow' ],
+            [ float(lines[i][i_ed])    for i in range(len(lines)) if lines[i][1] == 'follow' ],
+            [ float(lines[i][i_ed_nc]) for i in range(len(lines)) if lines[i][1] == 'glstart' ],
+            [ float(lines[i][i_ed])    for i in range(len(lines)) if lines[i][1] == 'glstart' ],
+            [ float(lines[i][i_ed_nc]) for i in range(len(lines)) if lines[i][1] == 'rlstop' ],
+            [ float(lines[i][i_ed])    for i in range(len(lines)) if lines[i][1] == 'rlstop' ]
+    ]
+    
+    data_fd_type = [
+            [ float(lines[i][i_fd_nc]) for i in range(len(lines)) if lines[i][1] == 'free' ],
+            [ float(lines[i][i_fd])    for i in range(len(lines)) if lines[i][1] == 'free' ],
+            [ float(lines[i][i_fd_nc]) for i in range(len(lines)) if lines[i][1] == 'follow' ],
+            [ float(lines[i][i_fd])    for i in range(len(lines)) if lines[i][1] == 'follow' ],
+            [ float(lines[i][i_fd_nc]) for i in range(len(lines)) if lines[i][1] == 'glstart' ],
+            [ float(lines[i][i_fd])    for i in range(len(lines)) if lines[i][1] == 'glstart' ],
+            [ float(lines[i][i_fd_nc]) for i in range(len(lines)) if lines[i][1] == 'rlstop' ],
+            [ float(lines[i][i_fd])    for i in range(len(lines)) if lines[i][1] == 'rlstop' ]
+    ]
     
     #boxplot
-    title = "Frechet distance. {} scenarios".format(len(data_rc))
-    data = [data_nc, data_rc]
-    filename = 'boxplot_combined.png'    
     #plt.cla()
+    title = "Euclidean distance (ED) and Fréchet distance (FD) distribution.\n{} scenarios".format(datasize)
+    data = [data_ed_nc, data_ed, data_fd_nc, data_fd]
+    filename = 'boxplot_combined.png'    
     fig = plt.figure() 
     ax = fig.add_subplot(111)
     bp = ax.boxplot(data) 
-    ax.set_xticklabels(['all', 'all rc']) 
+    ax.set_xticklabels(['ED (a)', 'ED (b)','FD (a)', 'FD (b)' ]) 
     ax.get_xaxis().tick_bottom() 
     ax.get_yaxis().tick_left() 
     plt.title(title) 
@@ -448,18 +450,35 @@ def generate_boxplots(lines):
     plt.close(fig)
     
 
-    #boxplot combined
-    title = "Frechet distance. {} scenarios".format(len(data_rc))
-    data = [data_nc_follow,data_rc_follow, 
-            data_nc_free,data_rc_free,
-            data_nc_glstart,data_rc_glstart,
-            data_nc_rlstop,data_rc_rlstop]
-    filename = 'boxplot_scenarios.png'    
+    #boxplot combined ED
+    title = "Euclidean distance (ED) distribution per scenario type"
+    filename = 'boxplot_type_ed.png'    
     #plt.cla()
     fig = plt.figure() 
     ax = fig.add_subplot(111)
-    bp = ax.boxplot(data) 
-    ax.set_xticklabels(['follow', 'follow rc','free','free rc','glstart','glstart rc','rlstop', 'rlstop rc']) 
+    bp = ax.boxplot(data_ed_type) 
+    ax.set_xticklabels(['follow (a)', 'follow (b)',
+                        'free (a)','free (b)',
+                        'glstart (a)','glstart (b)',
+                        'rlstop (a)', 'rlstop (b)']) 
+    ax.get_xaxis().tick_bottom() 
+    ax.get_yaxis().tick_left() 
+    plt.title(title) 
+    plt.savefig(filename)
+    plt.close(fig)
+    #plt.show()
+
+    #boxplot combined FD
+    title = "Fréchet distance (FD) distribution per scenario type"
+    filename = 'boxplot_type_fd.png'    
+    #plt.cla()
+    fig = plt.figure() 
+    ax = fig.add_subplot(111)
+    bp = ax.boxplot(data_fd_type) 
+    ax.set_xticklabels(['follow (a)', 'follow (b)',
+                        'free (a)','free (b)',
+                        'glstart (a)','glstart (b)',
+                        'rlstop (a)', 'rlstop (b)']) 
     ax.get_xaxis().tick_bottom() 
     ax.get_yaxis().tick_left() 
     plt.title(title) 
@@ -502,25 +521,40 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--scenario", dest="eval_id", default="", help="Scenario Id for evaluation")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-tf", "--traj_file", dest="traj_file", default="", help="Single Trajectory analysis")
+    parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
     args = parser.parse_args()
     
     scenarios = load_all_scenarios()
 
-    if args.eval_id != "":
-        try:
-            evaluate_scenario(scenarios[args.eval_id])
-        except Exception as e:
-            print("ERROR. Can not run evaluation for scenario{}".format(args.eval_id))
-            raise e
-
+    #All scenarios
+    if args.eval_all:
+        for id in scenarios:
+            try:
+                evaluate_scenario(scenarios[id])
+                results = update_results_table(scenarios[id])
+            except Exception as e:
+                print("ERROR. Can not run evaluation for scenario{}".format(id))
+        generate_boxplots(results)
+    #All scenarios from type
     elif args.eval_type != "":
         for id in scenarios:
             if scenarios[id].scenario_type == args.eval_type:
                 try:
                     evaluate_scenario(scenarios[id])
+                    results = update_results_table(scenarios[args.eval_id])
                 except Exception as e:
                     print("ERROR. Can not run evaluation for scenario{}".format(id))
-    
+        generate_boxplots(results)
+    #One scenario
+    elif args.eval_id != "":
+        try:
+            evaluate_scenario(scenarios[args.eval_id])
+            results = update_results_table(scenarios[args.eval_id])
+            generate_boxplots(results)
+        except Exception as e:
+            print("ERROR. Can not run evaluation for scenario{}".format(args.eval_id))
+            raise e
+
     #evaluate single trajectory
     elif args.traj_file != "":
         evaluate_trajectory(args.traj_file)
