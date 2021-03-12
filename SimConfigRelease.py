@@ -50,7 +50,7 @@ COLLISION_CORNER_RADIUS = 0.2   #radius for each corner
 #Planning
 PLANNER_RATE = 5            #Planner tick rate
 #Collision
-#collision and proximity cost have a great impacto on performance. 
+#collision and proximity cost have a great impacto on performance.
 #For example, if the scenario does not require object avoidance, you can turn it off.
 VEH_COLLISION = False      	#If true, collision between vehicles with be considered during planning.
 PED_COLLISION = False       #If true, collision between vehicles and pedestrians on the road with be considered during planning.
@@ -66,7 +66,7 @@ WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved 
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
-CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
+CLIENT_SHM = True          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943
