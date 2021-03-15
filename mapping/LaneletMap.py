@@ -35,6 +35,19 @@ class LaneletMap(object):
         traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
         self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
 
+        # Add participant attribute to all lanelets
+        for elem in self.lanelet_map.laneletLayer:
+            # ensure every lanelet has a subtype (default: road)
+            if "subtype" not in elem.attributes:
+                elem.attributes["subtype"] = "road"
+
+            if elem.attributes["subtype"] == "road":
+                elem.attributes["participant:vehicle"] = "yes"
+            elif elem.attributes["subtype"] in ["crosswalk", "walkway"]:
+                elem.attributes["one_way"] = "yes"
+                elem.attributes["participant:pedestrian"] = "yes"
+
+
     def get_right(self, lanelet):
         return self.routing_graph.right(lanelet)
 
@@ -51,7 +64,7 @@ class LaneletMap(object):
         tl_res = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
         for tl_re in tl_res:
             #physical lights in the re
-            for tl in tl_re.trafficLights: 
+            for tl in tl_re.trafficLights:
                 tlname = tl.attributes['name']
                 if name.casefold() == tlname.casefold():
                     #print(name+" and "+tlname)
@@ -67,14 +80,14 @@ class LaneletMap(object):
         if tl:
             for physical_ligh in tl.trafficLights: #LineString3d
                 x = physical_ligh[0].x #LineString3d node 0
-                y = physical_ligh[0].y  
+                y = physical_ligh[0].y
             line = self.lanelet_map.lineStringLayer[tl.stopLine.id]
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
             linepoints = [xs,ys]
         return x,y,linepoints
-            
-            
+
+
 
 
     @staticmethod
@@ -136,6 +149,33 @@ class LaneletMap(object):
                 return intersecting_lls[1]
         return intersecting_lls[0]
 
+    def get_occupying_lanelet_by_participant(self, x, y, participant):
+        point = BasicPoint2d(x, y)
+
+        # get all intersecting lanelets using a trivial bounding box
+        searchbox = BoundingBox2d(point, point)
+        intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
+
+        participant_tag = "participant:" + participant
+
+        if len(intersecting_lls) == 0:
+            raise Exception("Lanelet Error: agent not part of any lanelet.")
+        elif len(intersecting_lls) > 1:
+            # filter results for lanelets containing the point
+            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            # filter results for lanelets with allowed participants matching participant_tag
+            intersecting_lls = list(filter(lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
+            if len(intersecting_lls) > 1:
+                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                    (x,y), [ll.id for ll in intersecting_lls]))
+                return intersecting_lls[1]
+
+        # case if agent is in lanelet where they are not an allowed participant
+        if len(intersecting_lls) == 0:
+            return None
+
+        return intersecting_lls[0]
+
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
         """ Returns the lanelet closest to (x,y) that lies along ref_path.
             Does not check if (x,y) lies inside the lanelet.
@@ -151,7 +191,7 @@ class LaneletMap(object):
         """
         ret = None
         # NOTE use laneletMap() requires a fix to python bindings
-        
+
         try:
             route_submap = lanelet_route.laneletSubmap().laneletMap()
         except Exception:

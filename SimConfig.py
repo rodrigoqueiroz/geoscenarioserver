@@ -70,6 +70,7 @@ SHM_SIZE = 2048
 @dataclass
 class SimConfig:
     lanelet_routes:Dict = field(default_factory=dict)
+    pedestrian_lanelet_routes:Dict = field(default_factory=dict)
     goal_points:Dict = field(default_factory=dict)
     pedestrian_goal_points:Dict = field(default_factory=dict)
     scenario_name:str = "Unamed scenario"

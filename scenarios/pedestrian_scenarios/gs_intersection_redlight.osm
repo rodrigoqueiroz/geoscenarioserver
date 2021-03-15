@@ -1,84 +1,64 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-5145331' action='modify' visible='true' lat='43.47822413504' lon='-80.5193980465' />
-  <node id='-5145332' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
+  <node id='-5269675' action='modify' visible='true' lat='43.47822413504' lon='-80.5193980465' />
+  <node id='-5269676' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='maps/lanelet2_university_weber_alt.osm' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='red to green light scenario' />
-    <tag k='timeout' v='20' />
+    <tag k='timeout' v='40' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5145333' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
+  <node id='-5269677' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5145334' action='modify' visible='true' lat='43.47790730383' lon='-80.52029198388' />
-  <node id='-5145338' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
-  <node id='-5145340' action='modify' visible='true' lat='43.47823992752' lon='-80.51933527822'>
-    <tag k='btree' v='pedestrian_trees/drive.btree' />
+  <node id='-5269678' action='modify' visible='true' lat='43.47790730383' lon='-80.52029198388' />
+  <node id='-5269679' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
+  <node id='-5269680' action='modify' visible='true' lat='43.47823992752' lon='-80.51933527822'>
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='red_light_runner' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-5145341' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
+  <node id='-5269681' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
     <tag k='duration' v='2,0.5,10,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_e_w' />
     <tag k='states' v='G,Y,R,G' />
     <tag k='type' v='default' />
   </node>
-  <node id='-5150238' action='modify' visible='true' lat='43.47793959045' lon='-80.51952000774'>
+  <node id='-5269682' action='modify' visible='true' lat='43.477947619' lon='-80.51952973075'>
+    <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_1_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
     <tag k='pid' v='1' />
-    <tag k='route' v='ped_east_west_route' />
   </node>
-  <node id='-5192101' action='modify' visible='true' lat='43.47793715732' lon='-80.51952235435' />
-  <node id='-5192102' action='modify' visible='true' lat='43.47783375917' lon='-80.5198220912' />
-  <node id='-5196984' action='modify' visible='true' lat='43.47783375941' lon='-80.51982829415'>
+  <node id='-5269683' action='modify' visible='true' lat='43.47783351612' lon='-80.51981689476'>
+    <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_2' />
     <tag k='pid' v='2' />
-    <tag k='route' v='ped_west_east_route' />
   </node>
-  <node id='-5197003' action='modify' visible='true' lat='43.47782512237' lon='-80.51980197463' />
-  <node id='-5197004' action='modify' visible='true' lat='43.47794920016' lon='-80.51952973041' />
-  <node id='-5201890' action='modify' visible='true' lat='43.47793618416' lon='-80.51951833103'>
-    <tag k='btype' v='SP' />
-    <tag k='gs' v='pedestrian' />
-    <tag k='name' v='pedestrian_3' />
-    <tag k='pid' v='3' />
-    <tag k='route' v='ped_east_west_route' />
+  <node id='-5269686' action='modify' visible='true' lat='43.47782548731' lon='-80.51980633322'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_1_dest' />
   </node>
-  <node id='-5201951' action='modify' visible='true' lat='43.47783010982' lon='-80.51982494105'>
-    <tag k='btype' v='SP' />
-    <tag k='gs' v='pedestrian' />
-    <tag k='name' v='pedestrian_4' />
-    <tag k='pid' v='4' />
-    <tag k='route' v='ped_west_east_route' />
+  <node id='-5269687' action='modify' visible='true' lat='43.47793594087' lon='-80.5195257071'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_2_dest' />
   </node>
-  <way id='-1947925' action='modify' visible='true'>
-    <nd ref='-5145331' />
-    <nd ref='-5145334' />
+  <way id='-1948869' action='modify' visible='true'>
+    <nd ref='-5269675' />
+    <nd ref='-5269678' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
-  </way>
-  <way id='-1947997' action='modify' visible='true'>
-    <nd ref='-5192101' />
-    <nd ref='-5192102' />
-    <tag k='gs' v='route' />
-    <tag k='name' v='ped_east_west_route' />
-  </way>
-  <way id='-1948000' action='modify' visible='true'>
-    <nd ref='-5197003' />
-    <nd ref='-5197004' />
-    <tag k='gs' v='route' />
-    <tag k='name' v='ped_west_east_route' />
   </way>
 </osm>

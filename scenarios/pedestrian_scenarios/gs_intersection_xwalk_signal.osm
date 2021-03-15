@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5279796' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='crossing light scenario' />
+    <tag k='timeout' v='50' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5279797' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5279798' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
+  <node id='-5279799' action='modify' visible='true' lat='43.47797803019' lon='-80.51951531387'>
+    <tag k='btree' v='crossing_light.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_1' />
+    <tag k='pid' v='1' />
+    <tag k='route' v='ped_1_route' />
+  </node>
+  <node id='-5279800' action='modify' visible='true' lat='43.47813178865' lon='-80.5197238553'>
+    <tag k='duration' v='8,15' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_s_n_east' />
+    <tag k='states' v='R,G' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5279801' action='modify' visible='true' lat='43.47798192258' lon='-80.51952235434' />
+  <node id='-5279802' action='modify' visible='true' lat='43.47812911248' lon='-80.51973994855' />
+  <way id='-1948880' action='modify' visible='true'>
+    <nd ref='-5279801' />
+    <nd ref='-5279802' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ped_1_route' />
+  </way>
+</osm>
