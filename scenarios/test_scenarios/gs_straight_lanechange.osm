@@ -11,7 +11,7 @@
   <node id='-5145119' action='modify' visible='true' lat='49.00746149318' lon='8.45736544534' />
   <node id='-5145120' action='modify' visible='true' lat='49.00840056832' lon='8.45856982859' />
   <node id='-5145121' action='modify' visible='true' lat='49.00741293364' lon='8.45729409396'>
-    <tag k='btree' v='trees/st_lanechange.btree' />
+    <tag k='btree' v='st_lanechange.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />

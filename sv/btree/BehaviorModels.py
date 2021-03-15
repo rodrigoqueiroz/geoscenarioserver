@@ -60,13 +60,14 @@ class BehaviorModels(object):
 
             if reconfig !="":
                 log.info("Behavior model will be reconfigured {}".format(reconfig))
-                #interpreter.reconfigure_nodes(tree_name=self.root_btree_name_name,tree=tree, args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)")
-                interpreter.reconfigure_nodes(tree_name=self.root_btree_name_name,tree=tree, args=reconfig)
+                interpreter.reconfigure_nodes(btree_name=self.root_btree_name,tree=tree, args=reconfig)
 
-        else: #btree file not given properly. TODO: add build_tree_from_code
-            interpreter = BTreeInterpreter(self.vid, bmodel=self)
-            tree = interpreter.build_tree_from_code(tree_name=self.root_btree_name)
-            pass 
+        else: 
+            #btree file not given properly. 
+            #interpreter = BTreeInterpreter(self.vid, bmodel=self)
+            #TODO: add build_tree_from_code
+            #tree = interpreter.build_tree_from_code(tree_name=self.root_btree_name)
+            return None
 
         self.snapshot_visitor = visitors.SnapshotVisitor()
         tree.visitors.append(self.snapshot_visitor)
@@ -164,7 +165,7 @@ class BehaviorModels(object):
                     # check if light is red and we're close enough
                     threshold = kwargs['distance'] if 'distance' in kwargs else 40
                     return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
-                        and re_state.color == TrafficLightColor.Red
+                        and (re_state.color == TrafficLightColor.Red or re_state.color == TrafficLightColor.Yellow)
 
         elif condition == "traffic_light_green":
             for re_state in self.planner_state.regulatory_elements:

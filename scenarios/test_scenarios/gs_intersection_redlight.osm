@@ -17,7 +17,7 @@
   <node id='-5145334' action='modify' visible='true' lat='43.47790730383' lon='-80.52029198388' />
   <node id='-5145338' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
   <node id='-5145340' action='modify' visible='true' lat='43.47823992752' lon='-80.51933527822'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='red_light_runner' />

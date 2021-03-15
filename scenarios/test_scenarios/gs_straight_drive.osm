@@ -9,7 +9,7 @@
     <tag k='version' v='2.0' />
   </node>
   <node id='-2610801' action='modify' visible='true' lat='49.0072437435' lon='8.45708393074'>
-    <tag k='btree' v='trees/st_driveslow.btree' />
+    <tag k='btree' v='st_driveslow.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
@@ -28,7 +28,7 @@
   <node id='-2637032' action='modify' visible='true' lat='49.00729972481' lon='8.45710179305' />
   <node id='-2637033' action='modify' visible='true' lat='49.00818215891' lon='8.45824935668' />
   <node id='-2637043' action='modify' visible='true' lat='49.00726589979' lon='8.45704525575'>
-    <tag k='btree' v='trees/st_drivefast.btree' />
+    <tag k='btree' v='st_drivefast.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />

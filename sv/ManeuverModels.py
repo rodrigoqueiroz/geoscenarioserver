@@ -63,7 +63,7 @@ def plan_velocity_keeping(vehicle_state:VehicleState, mconfig:MVelKeepConfig, la
         for vel in target_vel.get_samples():
             s_target = [0,vel,0] #pos not relevant
             #lateral movement
-            for di in lane_config.get_samples():
+            for di in mconfig.lat_target.get_samples(lane_config):
                 d_target = [di,0,0]
                 #add target
                 target_state_set.append((s_target,d_target,t))
@@ -91,7 +91,7 @@ def plan_reversing(vehicle_state:VehicleState, mconfig:MReverseConfig, lane_conf
         for vel in mconfig.vel.get_samples():
             s_target = [0,-vel,0] #pos not relevant
             #lateral movement
-            for di in lane_config.get_samples():
+            for di in mconfig.lat_target.get_samples(lane_config):
                 d_target = [di,0,0]
                 #add target
                 target_state_set.append((s_target,d_target,t))
@@ -142,8 +142,9 @@ def plan_following(vid, vehicle_state:VehicleState, mconfig:MFollowConfig, lane_
         # If leading vehicle is slower than some threshold velocity, our goal is to stop.
         if abs(leading_vehicle.state.s_vel) < 1.5:
             #log.info("lead stopped")
-            # stop some meters behind stopped vehicle
-            s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2
+            s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
+            d_target = [d_start[0],0,0]                     #keep in same lateral position
+            target_state_set.append((s_target,d_target,t))  #add target
         else:
             # match leading vehicle speed
             s_lv = leading_vehicle.future_state(t)[:3]
@@ -151,11 +152,11 @@ def plan_following(vid, vehicle_state:VehicleState, mconfig:MFollowConfig, lane_
             s_target[0] = s_lv[0] - (time_gap * s_lv[1])
             s_target[1] = s_lv[1]
             s_target[2] = s_lv[2]
-        #lateral movement
-        for di in lane_config.get_samples():
-            d_target = [di,0,0]
-            #add target
-            target_state_set.append((s_target,d_target,t))
+            #lateral movement
+            for di in mconfig.lat_target.get_samples(lane_config):
+                d_target = [di,0,0]
+                #add target
+                target_state_set.append((s_target,d_target,t))
     
     best, candidates = optimized_trajectory(
         vehicle_state, target_state_set, mconfig, lane_config, vehicles, pedestrians, static_objects,
@@ -190,7 +191,7 @@ def plan_laneswerve(vehicle_state:VehicleState, mconfig:MLaneSwerveConfig, lane_
     if not target_lane_config:
         log.warn('target lane {} not found, is it a neighbour lane?'.format(target_lid))
         return None, None
-
+    
     #generates alternative targets:
     target_state_set = []
     for t in mconfig.time.get_samples():
@@ -198,7 +199,8 @@ def plan_laneswerve(vehicle_state:VehicleState, mconfig:MLaneSwerveConfig, lane_
         vel = s_start[1]
         s_target = [0,vel,0] #pos not relevant, no acc expected at the end
         #lateral movement
-        for di in target_lane_config.get_samples():
+        #for di in target_lane_config.get_samples():
+        for di in mconfig.lat_target.get_samples(target_lane_config):
             d_target = [di,0,0] #no lateral movement expected at the end
             target_state_set.append((s_target,d_target,t))
 
@@ -249,7 +251,8 @@ def plan_cutin(vehicle_state:VehicleState, mconfig:MCutInConfig, lane_config:Lan
             for s_vel in s_samples[1]:
                 for s_acc in s_samples[2]:
                     s_target = np.array([s, s_vel, s_acc])
-                    for di in target_lane_config.get_samples():
+                    #for di in target_lane_config.get_samples():
+                    for di in mconfig.lat_target.get_samples(target_lane_config):
                         # no lateral movement expected at the end
                         d_target = [di, 0, 0]
                         target_state_set.append((s_target, d_target, t))
@@ -318,7 +321,7 @@ def plan_stop(vid, vehicle_state:VehicleState, mconfig:MStopConfig, lane_config:
         #longitudinal movement: goal is to reach vel and acc 0
         s_target = [target_pos, 0, 0]
         #lateral movement
-        for di in lane_config.get_samples():
+        for di in mconfig.lat_target.get_samples(lane_config):
             d_target = [di, 0, 0]
             #add target
             target_state_set.append((s_target, d_target, t))
@@ -333,7 +336,7 @@ def plan_stop(vid, vehicle_state:VehicleState, mconfig:MStopConfig, lane_config:
 #===TRAJECTORY OPTIMIZATION ===
 
 def optimized_trajectory(vehicle_state:VehicleState, target_state_set, 
-                        mconfig, lane_config:LaneConfig, 
+                        mconfig:MConfig, lane_config:LaneConfig, 
                         vehicles, pedestrians, static_objects, s_solver):
     """
     Generates and select the best trajectory for the maneuver.
@@ -341,13 +344,10 @@ def optimized_trajectory(vehicle_state:VehicleState, target_state_set,
     """
     start_state = vehicle_state.get_S() + vehicle_state.get_D()
     
-    TickSync.clock_log("Opt Traj Start")
     #find trajectories
     trajectories = []
     traj_solver = lambda x: find_trajectory(x, s_solver)
     trajectories = list(map(traj_solver, zip(itertools.repeat(start_state), target_state_set)))
-    TickSync.clock_log("PolynFit")
-
     
     #evaluate feasibility
     #New: holding a data object for trajectories to hold and share partial costs across multiple cost functions 
@@ -355,35 +355,27 @@ def optimized_trajectory(vehicle_state:VehicleState, target_state_set,
     feasible = []
     for traj, target_state in zip(trajectories, target_state_set):
         ft = FrenetTrajectory()
-        ft.set_trajectory(traj[0],traj[1],target_state[2] )
+        ft.set_trajectory(traj[0],traj[1],target_state[2],mconfig.cost_precision)
         ft.start_state = start_state
         ft.target_state = np.concatenate([target_state[0],target_state[1]])
         frenet_trajectories.append(ft)
         if maneuver_feasibility(ft, mconfig, lane_config, vehicles, pedestrians, static_objects):
             ft.feasible = True
             feasible.append(ft)
-    TickSync.clock_log("Feas")
-    
     
     for ft in feasible:
         maneuver_cost(ft, mconfig, lane_config, vehicles, pedestrians, static_objects)
-    TickSync.clock_log("Cost")
-
-    if len(feasible) == 0:
-        log.error("No feasible trajectory to select")
-        #for traj in frenet_trajectories:
-            #print(traj.unfeasibility_cause)
-            #print(traj.max_long_acc)
-        return None, None
     
+    if len(feasible) == 0:
+        #log.debug("No feasible trajectory to select from state {}".format(start_state))
+        #for traj in frenet_trajectories:
+        #    log.debug(traj.unfeasibility_cause)
+        return None, frenet_trajectories
     
     #select best by total cost
     best_ft:FrenetTrajectory = min(feasible, key=lambda traj:traj.get_total_cost())
-    #print("  THE BEST FT IS: ")
-    #print(best_ft)
-    
 
-    #returning best, and candidates for debug
+    #returning best, and all candidates for debug
     return best_ft, frenet_trajectories
 
 
