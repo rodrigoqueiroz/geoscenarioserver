@@ -160,6 +160,7 @@
 		<label text="Pedestrians running BT models for dynamic behavior" />
 		<text key="btree" text="BehaviorTree (root)" />
 		<text key="destination" text="Destination ID" />
+		<text key="route" text="Route ID" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
