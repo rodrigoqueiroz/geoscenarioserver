@@ -184,12 +184,12 @@ class SVPlanner(object):
                                             planner_state.pedestrians,
                                             planner_state.static_objects)
 
-                if self.last_plan:
-                    sync_planner.end_task() #blocks if < target
-                    task_delta_time = sync_planner.get_task_time()
-                else: #First plan. Does not block and return results asap.
+                if EVALUATION_MODE and not self.last_plan:
                     sync_planner.end_task(False) #blocks if < target
                     task_delta_time = 0
+                else:
+                    sync_planner.end_task() #blocks if < target
+                    task_delta_time = sync_planner.get_task_time()
 
                 if frenet_traj is None:
                     log.warn("plan_maneuver return invalid trajectory.")
