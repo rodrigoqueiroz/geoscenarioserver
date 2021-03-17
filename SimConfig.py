@@ -67,6 +67,10 @@ CS_SHM_KEY = 333943
 CS_SEM_KEY = 933433
 SHM_SIZE = 2048
 
+# osm file merging config
+# list of gs tags that must be unique per scenario
+UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
+
 @dataclass
 class SimConfig:
     lanelet_routes:Dict = field(default_factory=dict)

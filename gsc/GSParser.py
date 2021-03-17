@@ -7,6 +7,7 @@ import xml.etree.ElementTree
 import re
 import gsc.Utils as Utils
 from gsc.Report import Report
+from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
@@ -71,9 +72,58 @@ class GSParser(object):
                 way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
             self.ways.append(way)
 
-    def load_and_validate_geoscenario(self, filepath):
+    def merge_and_load_geoscenario_from_file(self, base_filepath, merged_filepath):
+        xml_root_base = xml.etree.ElementTree.parse(base_filepath).getroot()
+        xml_root_merged = xml.etree.ElementTree.parse(merged_filepath).getroot()
+
+        # load base scenario nodes and ways
+        for osm_node in xml_root_base.findall('node'):
+            node = Node()
+            node.id = int(osm_node.get('id'))
+            node.lat = float(osm_node.get('lat'))
+            node.lon = float(osm_node.get('lon'))
+            self.parse_tags(osm_node, node)
+            self.nodes[node.id] = node
+        for osm_node in xml_root_base.findall('way'):
+            way = Way()
+            way.id = int(osm_node.get('id'))
+            self.parse_tags(osm_node, way)
+            for osm_nd in osm_node.findall('nd'):
+                way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
+            self.ways.append(way)
+
+        # add nodes of second scenario
+        for osm_node in xml_root_merged.findall('node'):
+            node = Node()
+            node.id = int(osm_node.get('id'))
+            node.lat = float(osm_node.get('lat'))
+            node.lon = float(osm_node.get('lon'))
+            self.parse_tags(osm_node, node)
+            # only add gs tags if the value is not in the list of
+            # unique tags per scenario (e.g. origin, globalconfig)
+            if ('gs' in node.tags):
+                if (node.tags['gs'] not in UNIQUE_GS_TAGS_PER_SCENARIO):
+                    self.nodes[node.id] = node
+            else:
+                self.nodes[node.id] = node
+
+        # add ways of second scenario
+        # there are currently no way tags that must be unique per scenario
+        for osm_node in xml_root_merged.findall('way'):
+            way = Way()
+            way.id = int(osm_node.get('id'))
+            self.parse_tags(osm_node, way)
+            for osm_nd in osm_node.findall('nd'):
+                way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
+            self.ways.append(way)
+
+
+    def load_and_validate_geoscenario(self, filepath, merged_filepath):
         #Load XML
-        self.load_geoscenario_file(filepath)
+        if (merged_filepath == ""):
+            self.load_geoscenario_file(filepath)
+        else:
+            self.merge_and_load_geoscenario_from_file(filepath, merged_filepath)
         self.isValid = True
         self.report.file = filepath
         self.filename = filepath
@@ -164,7 +214,7 @@ class GSParser(object):
         optional = {"group","duration","interval"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.tlights[n.tags['name']] = n
 
         # ensure no. states match no. durations
@@ -298,7 +348,7 @@ class GSParser(object):
        #todo: check nd attributes, and  if nodes exist
        return None
 
-    
+
     def check_uniquename(self,n):
         name = n.tags['name']
 
@@ -336,5 +386,3 @@ class GSParser(object):
             print (x,':', self.vehicles[x])
             for y in self.vehicles[x].tags:
                 print (y, ':', self.vehicles[x].tags[y])
-
-

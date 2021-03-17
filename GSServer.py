@@ -43,8 +43,12 @@ def start_server(args, m=MVelKeepConfig()):
     # SCENARIO SETUP
     if args.gsfile:
         if '.osm' in args.gsfile:
-            #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfile, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
+            # check for second scenario to merge to base scenario
+            if args.merged_gsfile:
+                res = load_geoscenario_from_file(args.gsfile, args.merged_gsfile, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
+            else:
+                #GeoScenario XML files (GSParser)
+                res = load_geoscenario_from_file(args.gsfile, "", traffic, sim_config, lanelet_map, args.map_path, btree_locations)
         else:
             #Direct setup
             res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
@@ -104,6 +108,7 @@ def verify_map_file(map_file, lanelet_map:LaneletMap):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file. If no file is provided, the GSServer will load a scenario from code")
+    parser.add_argument("-M", "--merge-scenario", dest="merged_gsfile", metavar="FILE", default="", help="GeoScenario file to be merged into file given with -s flag.")
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
