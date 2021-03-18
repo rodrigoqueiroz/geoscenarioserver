@@ -92,7 +92,7 @@ class SP(Pedestrian):
         self.destination = np.array(destinations[self.curr_route_node])
         self.desired_speed = 1.5 # random.uniform(0.8,1.5)
         self.mass = random.uniform(50,80)
-        self.radius = 1
+        self.radius = 0.5
         self.char_time = random.uniform(8,16) # characteristic time for SFM
         self.bodyFactor = 120000
         self.slideFricFactor = 240000
@@ -233,27 +233,24 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A, B, phi, omega):
         '''
         Calculates repulsive forces between pedestrians
         '''
-        other_pos = np.array([other_ped.state.x, other_ped.state.y])
-        other_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
+        other_ped_pos = np.array([other_ped.state.x, other_ped.state.y])
+        other_ped_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
 
-        eij = normalize(other_pos - curr_pos)
-        Dij = lambda_w * (curr_vel - other_vel) + eij
-        tij = normalize(Dij)
-        nij = np.array([-tij[1], tij[0]])
+        rij = self.radius + other_ped.radius
+        dij = np.linalg.norm(other_ped_pos - curr_pos)
+        nij = normalize(curr_pos - other_ped_pos)
+        tij = np.array([-nij[1], nij[0]])
+        delta_vij = (other_ped_vel - curr_vel)*tij
 
-        dij = np.linalg.norm(curr_pos - other_pos)
-        dot_product = max(min(np.dot(tij, eij), 1.0), -1.0) # stay within [-1,1] domain
-        theta = np.arccos(dot_product)
+        # add following effect
 
-        B = gamma * np.linalg.norm(Dij)
+        # add evasive effect
 
-        theta += B*epsilon
-
-        fij = A*np.exp(rij-dij/B) * phi*(np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
+        fij = (A*np.exp(rij-dij/B) * phi*max(0, rij-dij))*nij + omega*max(0, rij-dij)*delta_vij*tij
 
         return fij
 
