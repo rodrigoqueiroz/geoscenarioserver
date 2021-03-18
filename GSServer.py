@@ -41,17 +41,17 @@ def start_server(args, m=MVelKeepConfig()):
         sim_config.show_dashboard = False
 
     # SCENARIO SETUP
-    if args.gsfile:
-        if '.osm' in args.gsfile:
-            # check for second scenario to merge to base scenario
-            if args.merged_gsfile:
-                res = load_geoscenario_from_file(args.gsfile, args.merged_gsfile, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
-            else:
-                #GeoScenario XML files (GSParser)
-                res = load_geoscenario_from_file(args.gsfile, "", traffic, sim_config, lanelet_map, args.map_path, btree_locations)
+    if args.gsfiles:
+        if all(['.osm' in file for file in args.gsfiles]):
+            #GeoScenario XML files (GSParser)
+            res = load_geoscenario_from_file(args.gsfiles, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
+        elif any(['.osm' in file for file in args.gsfiles]):
+            log.error("Passed scenarios must either all be loaded from files or all be loaded from code.")
+        elif len(args.gsfiles) > 1:
+            log.error("Can only load multiple scenarios from files.")
         else:
             #Direct setup
-            res = load_geoscenario_from_code(args.gsfile, traffic, sim_config, lanelet_map)
+            res = load_geoscenario_from_code(args.gsfiles[0], traffic, sim_config, lanelet_map)
     else:
         res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
 
@@ -107,14 +107,12 @@ def verify_map_file(map_file, lanelet_map:LaneletMap):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file. If no file is provided, the GSServer will load a scenario from code")
-    parser.add_argument("-M", "--merge-scenario", dest="merged_gsfile", metavar="FILE", default="", help="GeoScenario file to be merged into file given with -s flag.")
+    parser.add_argument("-s", "--scenario", dest="gsfiles", nargs='*', metavar="FILE", default="", help="GeoScenario file. If no file is provided, the GSServer will load a scenario from code")
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-m", "--map-path", dest="map_path", default="", help="Set the prefix to append to the value of the attribute `globalconfig->lanelet`")
     parser.add_argument("-b", "--btree-locations", dest="btree_locations", default="", help="Add higher priority locations to search for btrees by agent btypes")
-
 
     args = parser.parse_args()
     start_server(args)

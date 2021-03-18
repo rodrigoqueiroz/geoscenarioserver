@@ -18,35 +18,24 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
-def load_geoscenario_from_file(gsfile, merged_gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
+def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
-    if (os.path.isabs(gsfile[0])):
-        # absolute path
-        full_scenario_path = gsfile
-    else:
-        # relative to ROOT_DIR
-        full_scenario_path = os.path.join(ROOT_DIR, gsfile)
-
-    load_gs_file_msg = "Loading GeoScenario file: {}".format(full_scenario_path)
-
-    if (merged_gsfile != ""):
-        if (os.path.isabs(merged_gsfile[0])):
+    full_scenario_paths = []
+    for gsfile in gsfiles:
+        if (os.path.isabs(gsfile[0])):
             # absolute path
-            full_merged_scenario_path = merged_gsfile
+            full_scenario_paths.append(gsfile)
         else:
             # relative to ROOT_DIR
-            full_merged_scenario_path = os.path.join(ROOT_DIR, merged_gsfile)
-        load_gs_file_msg += " merged with {}".format(full_merged_scenario_path)
-    else:
-        full_merged_scenario_path = ""
+            full_scenario_paths.append(os.path.join(ROOT_DIR, gsfile))
 
-    log.info(load_gs_file_msg)
+    log.info("Loading GeoScenario file(s): {}".format(", ".join(full_scenario_paths)))
 
     #========= Parse GeoScenario File
     parser = GSParser()
-    if not parser.load_and_validate_geoscenario(full_scenario_path, full_merged_scenario_path):
-        log.error("Error loading GeoScenario file")
+    if not parser.load_and_validate_geoscenario(full_scenario_paths):
+        log.error("Error loading GeoScenario file(s)")
         return False
     if parser.globalconfig.tags['version'] < 2.0:
         log.error("GSServer requires GeoScenario 2.0 or newer")
