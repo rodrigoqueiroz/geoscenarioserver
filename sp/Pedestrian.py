@@ -90,8 +90,7 @@ class SP(Pedestrian):
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
         self.destination = np.array(destinations[self.curr_route_node])
-        #self.desired_speed = random.uniform(0.8,1.5)
-        self.desired_speed = 1.5
+        self.desired_speed = 1.5 # random.uniform(0.8,1.5)
         self.mass = random.uniform(50,80)
         self.radius = 1
         self.char_time = random.uniform(8,16) # characteristic time for SFM
@@ -214,7 +213,7 @@ class SP(Pedestrian):
         walls = []
 
         # attracting force towards destination
-        f_adapt = (delta_vel * self.mass) / self.char_time
+        f_adapt = delta_vel / self.char_time
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
@@ -234,7 +233,7 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A=4.5, gamma=0.35, n=2.0, n_prime=3.0, lambda_w=2.0, epsilon=0.005):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped):
         '''
         Calculates repulsive forces between pedestrians
         '''
@@ -254,9 +253,33 @@ class SP(Pedestrian):
 
         theta += B*epsilon
 
-        fij = -A*np.exp(-dij/B) * (np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
+        fij = A*np.exp(rij-dij/B) * phi*(np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
 
         return fij
+
+    # def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A=4.5, gamma=0.35, n=2.0, n_prime=3.0, lambda_w=2.0, epsilon=0.005):
+    #     '''
+    #     Calculates repulsive forces between pedestrians
+    #     '''
+    #     other_pos = np.array([other_ped.state.x, other_ped.state.y])
+    #     other_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
+    #
+    #     eij = normalize(other_pos - curr_pos)
+    #     Dij = lambda_w * (curr_vel - other_vel) + eij
+    #     tij = normalize(Dij)
+    #     nij = np.array([-tij[1], tij[0]])
+    #
+    #     dij = np.linalg.norm(curr_pos - other_pos)
+    #     dot_product = max(min(np.dot(tij, eij), 1.0), -1.0) # stay within [-1,1] domain
+    #     theta = np.arccos(dot_product)
+    #
+    #     B = gamma * np.linalg.norm(Dij)
+    #
+    #     theta += B*epsilon
+    #
+    #     fij = -A*np.exp(-dij/B) * (np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
+    #
+    #     return fij
 
     def wall_interaction(self):
         wij = np.zeros(2)
