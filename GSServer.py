@@ -47,8 +47,10 @@ def start_server(args, m=MVelKeepConfig()):
             res = load_geoscenario_from_file(args.gsfiles, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
         elif any(['.osm' in file for file in args.gsfiles]):
             log.error("Passed scenarios must either all be loaded from files or all be loaded from code.")
+            return
         elif len(args.gsfiles) > 1:
             log.error("Can only load multiple scenarios from files.")
+            return
         else:
             #Direct setup
             res = load_geoscenario_from_code(args.gsfiles[0], traffic, sim_config, lanelet_map)
