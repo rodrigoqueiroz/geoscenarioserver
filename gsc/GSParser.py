@@ -63,7 +63,7 @@ class GSParser(object):
                 node.id = int(osm_node.get('id'))
                 node.lat = float(osm_node.get('lat'))
                 node.lon = float(osm_node.get('lon'))
-                self.parse_tags(osm_node, node)
+                self.parse_tags(osm_node, node, file_num)
                 if file_num == 0 or 'gs' not in node.tags:
                     self.nodes[node.id] = node
                 else:
@@ -76,7 +76,7 @@ class GSParser(object):
             for osm_node in xml_root.findall('way'):
                 way = Way()
                 way.id = int(osm_node.get('id'))
-                self.parse_tags(osm_node, way)
+                self.parse_tags(osm_node, way, file_num)
                 for osm_nd in osm_node.findall('nd'):
                     way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
                 self.ways.append(way)
@@ -115,10 +115,16 @@ class GSParser(object):
         #Return result
         return self.isValid
 
-    def parse_tags(self, osm_node, node):
+    def parse_tags(self, osm_node, node, file_num):
         for osm_tag in osm_node.findall('tag'):
+            k = osm_tag.get('k')
             v = osm_tag.get('v')
-            node.tags[osm_tag.get('k')] = float(v) if Utils.is_number(v) else v
+
+            # append file number to agent id to ensure uniqueness
+            if k in ['vid', 'pid']:
+                v = int(str(file_num + 1) + str(v))
+
+            node.tags[k] = float(v) if Utils.is_number(v) else v
 
     def project_nodes(self, projector, altitude):
         assert len(self.nodes) > 0
