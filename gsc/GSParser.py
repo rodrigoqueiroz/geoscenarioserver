@@ -133,7 +133,8 @@ class GSParser(object):
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
-        self.pedestrians[n.tags["pid"]] = n
+        pid = int(n.tags["pid"])
+        self.vehicles[pid] = n
 
     def check_vehicle(self, n):
         mandatory = {"gs","vid","name"}
