@@ -93,7 +93,6 @@ class SP(Pedestrian):
         self.desired_speed = 1.5 # random.uniform(0.8,1.5)
         self.mass = random.uniform(50,80)
         self.radius = 0.5
-        self.char_time = random.uniform(8,16) # characteristic time for SFM
         self.bodyFactor = 120000
         self.slideFricFactor = 240000
 
@@ -194,9 +193,7 @@ class SP(Pedestrian):
         '''
         direction = np.array(normalize(self.destination - curr_pos))
         desired_vel = direction * self.desired_speed
-
-        '''if (self.desired_speed == 0.0):
-            curr_vel = 0.0'''
+        accl_time = 0.5 # acceleration time
 
         delta_vel = desired_vel - curr_vel
 
@@ -209,15 +206,15 @@ class SP(Pedestrian):
         f_other_ped = np.zeros(2)
         f_walls = np.zeros(2)
 
-        # placeholder until I can read border data from traffic
+        # placeholder until we decide to use borders in scenario
         walls = []
 
         # attracting force towards destination
-        f_adapt = delta_vel / self.char_time
+        f_adapt = (delta_vel * self.mass) / accl_time
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
-            f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped)
+            f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
 
         # repulsive forces from walls (borders)
         for wall in walls:
@@ -233,7 +230,7 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A, B, phi, omega):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, direction, A=2000, B=0.08, phi=120000, omega=240000):
         '''
         Calculates repulsive forces between pedestrians
         '''
@@ -247,8 +244,30 @@ class SP(Pedestrian):
         delta_vij = (other_ped_vel - curr_vel)*tij
 
         # add following effect
+        C = 12
+        D = 0.35
+        E = 500
+        F = 0.82
 
-        # add evasive effect
+        # angle btw ped's destination and other ped's velocity vector
+        theta = np.arccos(max(min(np.dot(direction, normalize(other_ped_vel)), 1.0), -1.0)) # stay within [-1,1] domain for arccos
+
+        same_dest = 0
+        if theta < np.radians(5):
+            same_dest = 1
+
+        follow_left = np.array([-curr_vel[1], curr_vel[0]])
+        follow_right = np.array([curr_vel[1], -curr_vel[0]])
+
+        if float(np.cross(curr_vel, other_ped_vel)) > 0:
+            follow_l_r = follow_left
+        else:
+            follow_l_r = follow_right
+
+        follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
+
+        # TODO: add evasive effect
+
 
         fij = (A*np.exp(rij-dij/B) * phi*max(0, rij-dij))*nij + omega*max(0, rij-dij)*delta_vij*tij
 
