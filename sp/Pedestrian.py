@@ -90,7 +90,7 @@ class SP(Pedestrian):
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
         self.destination = np.array(destinations[self.curr_route_node])
-        self.desired_speed = 1.5 # random.uniform(0.8,1.5)
+        self.desired_speed = random.uniform(0.8,1.5)
         self.mass = random.uniform(50,80)
         self.radius = 0.5
         self.bodyFactor = 120000
@@ -152,7 +152,6 @@ class SP(Pedestrian):
 
             if new_route_node != None:
                 self.sim_config.pedestrian_goal_points[self.id].insert(self.curr_route_node, new_route_node)
-
 
             self.destination = np.array(self.sim_config.pedestrian_goal_points[self.id][self.curr_route_node])
 
@@ -230,7 +229,7 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, direction, A=2000, B=0.08, phi=120000, omega=240000):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, direction, phi=120000, omega=240000):
         '''
         Calculates repulsive forces between pedestrians
         '''
@@ -244,32 +243,48 @@ class SP(Pedestrian):
         delta_vij = (other_ped_vel - curr_vel)*tij
 
         # add following effect
+        A = 1632
+        B = 0.08
         C = 12
         D = 0.35
         E = 500
         F = 0.82
 
         # angle btw ped's destination and other ped's velocity vector
-        theta = np.arccos(max(min(np.dot(direction, normalize(other_ped_vel)), 1.0), -1.0)) # stay within [-1,1] domain for arccos
+        dot_product = max(min(np.dot(direction, normalize(other_ped_vel)), 1.0), -1.0) # stay within [-1,1] domain for arccos
+        theta = np.arccos(dot_product)
 
+        # pedestrians have same perceived destination if their
+        # velocity vectors have an angle less than 2 deg between them
         same_dest = 0
-        if theta < np.radians(5):
+        if theta < np.radians(2):
             same_dest = 1
 
-        follow_left = np.array([-curr_vel[1], curr_vel[0]])
-        follow_right = np.array([curr_vel[1], -curr_vel[0]])
+        left_unit = normalize(np.array([-curr_vel[1], curr_vel[0]]))
+        right_unit = normalize(np.array([curr_vel[1], -curr_vel[0]]))
 
         if float(np.cross(curr_vel, other_ped_vel)) > 0:
-            follow_l_r = follow_left
+            follow_l_r = left_unit
         else:
-            follow_l_r = follow_right
+            follow_l_r = right_unit
 
         follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
+        if (all(follow_effect) != 0):
+            log.info("follow")
 
-        # TODO: add evasive effect
+        # add evasive effect
+        vj_unit = normalize(other_ped_vel)
+        vi_unit = normalize(curr_vel)
+        ref = vj_unit - 2 * np.dot(vj_unit, vi_unit) * vi_unit
 
+        if float(np.cross(curr_vel, other_ped_vel)) > 0:
+            evade_l_r = right_unit
+        else:
+            evade_l_r = left_unit
 
-        fij = (A*np.exp(rij-dij/B) * phi*max(0, rij-dij))*nij + omega*max(0, rij-dij)*delta_vij*tij
+        evasive_effect = (C*np.exp((rij-dij)/D)*ref + E*np.exp((rij-dij)/F)*evade_l_r)*(1-same_dest)
+
+        fij = (A*np.exp(rij-dij/B) * phi*max(0, rij-dij))*nij + omega*max(0, rij-dij)*delta_vij*tij + follow_effect + evasive_effect
 
         return fij
 
