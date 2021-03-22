@@ -37,8 +37,8 @@ bash scripts/install_dependencies.bash
 ```
 optional arguments:
   -h, --help            show this help message and exit
-  -s FILE, --scenario FILE
-                        GeoScenario file
+  -s [FILE [FILE ...]], --scenario [FILE [FILE ...]]
+                        GeoScenario file. If no file is provided, the GSServer will load a scenario from code
   -q VERBOSE, --quiet VERBOSE
                         don't print messages to stdout
   -m, --map-path 
@@ -53,6 +53,21 @@ optional arguments:
 - If a file is not given, you must provide a manual problem startup from code.
 - LaneletMap files must be placed inside *scenarios/maps* (a map file is mandatory).
 - Co-Simulator (Unreal or other) is optional.
+
+## Loading multiple scenario files
+
+- The `--scenario` option can take more than one `.osm` file as its arguments
+- With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
+- The `globalconfig` and `origin` are used from the first `.osm` file that is specified
+- Since multiple scenarios can define vehicles and pedestrians with the same `vid`s and `pid`s, the position of the file when passed to `--scenario` is prepended to each `vid` and `pid` from that scenario
+- Example:
+```
+python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
+```
+- The vehicle in `gs_straight_obstacles.osm` has a `vid` of `1`, and the vehicle in `gs_straight_pedestrian.osm` also has a `vid` of `1`
+- When running the example above, the vehicle from `gs_straight_obstacles.osm` (the first file specified) will have a `vid` of `11`, and the vehicle from `gs_straight_pedestrian.osm` (the second scenario specified) will have a `vid` of `21`
+- Notice that the pedstrian from `gs_straight_pedestrian.osm`, which is defined with a `pid` of `1`, has a `pid` of `21` when the example above is run
+
 
 ## Configuration:
 
