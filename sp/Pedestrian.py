@@ -90,11 +90,9 @@ class SP(Pedestrian):
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
         self.destination = np.array(destinations[self.curr_route_node])
-        self.desired_speed = random.uniform(0.8,1.5)
+        self.desired_speed = random.uniform(0.6, 1.2)
         self.mass = random.uniform(50,80)
-        self.radius = 0.5
-        self.bodyFactor = 120000
-        self.slideFricFactor = 240000
+        self.radius = random.uniform(0.25, 0.35)
 
         self.behavior_model = BehaviorModels(self.id, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
@@ -187,7 +185,8 @@ class SP(Pedestrian):
 
     def update_position_SFM(self, curr_pos, curr_vel):
         '''
-        Paper with details on SFM formulas: https://royalsocietypublishing.org/doi/full/10.1098/rspb.2009.0405
+        Paper with details on SFM formulas:
+        https://link.springer.com/content/pdf/10.1007/s12205-016-0741-9.pdf (access through University of Waterloo)
         This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
         '''
         direction = np.array(normalize(self.destination - curr_pos))
@@ -202,14 +201,14 @@ class SP(Pedestrian):
 
         dt = 1 / TRAFFIC_RATE
 
-        f_other_ped = np.zeros(2)
-        f_walls = np.zeros(2)
-
         # placeholder until we decide to use borders in scenario
         walls = []
 
         # attracting force towards destination
         f_adapt = (delta_vel * self.mass) / accl_time
+
+        f_other_ped = np.zeros(2)
+        f_walls = np.zeros(2)
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
@@ -223,7 +222,7 @@ class SP(Pedestrian):
         f_sum = f_adapt + f_other_ped + f_walls
 
         curr_acc = f_sum / self.mass
-        curr_vel += curr_acc*dt
+        curr_vel += curr_acc * dt
         curr_pos += curr_vel * dt
 
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
@@ -233,6 +232,13 @@ class SP(Pedestrian):
         '''
         Calculates repulsive forces between pedestrians
         '''
+        A = 1500 # 1500~2000
+        B = 0.08
+        C = 12 # 0~500
+        D = 0.35 # 0~1
+        E = 400 # 0~500
+        F = 0.82 # 0~1
+
         other_ped_pos = np.array([other_ped.state.x, other_ped.state.y])
         other_ped_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
 
@@ -243,12 +249,9 @@ class SP(Pedestrian):
         delta_vij = (other_ped_vel - curr_vel)*tij
 
         # add following effect
-        A = 1632
-        B = 0.08
-        C = 12
-        D = 0.35
-        E = 500
-        F = 0.82
+        '''
+        Alternative method to determine if ped's have same destination by
+        calculating angle between current destination and other peds velocity
 
         # angle btw ped's destination and other ped's velocity vector
         dot_product = max(min(np.dot(direction, normalize(other_ped_vel)), 1.0), -1.0) # stay within [-1,1] domain for arccos
@@ -258,6 +261,11 @@ class SP(Pedestrian):
         # velocity vectors have an angle less than 2 deg between them
         same_dest = 0
         if theta < np.radians(2):
+            same_dest = 1
+        '''
+
+        same_dest = 0
+        if np.linalg.norm(self.destination - other_ped.destination) < 0.5:
             same_dest = 1
 
         left_unit = normalize(np.array([-curr_vel[1], curr_vel[0]]))
@@ -269,8 +277,7 @@ class SP(Pedestrian):
             follow_l_r = right_unit
 
         follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
-        if (all(follow_effect) != 0):
-            log.info("follow")
+        # follow_effect needs to be calibrated properly before being added
 
         # add evasive effect
         vj_unit = normalize(other_ped_vel)
@@ -284,33 +291,16 @@ class SP(Pedestrian):
 
         evasive_effect = (C*np.exp((rij-dij)/D)*ref + E*np.exp((rij-dij)/F)*evade_l_r)*(1-same_dest)
 
-        fij = (A*np.exp(rij-dij/B) * phi*max(0, rij-dij))*nij + omega*max(0, rij-dij)*delta_vij*tij + follow_effect + evasive_effect
+        # body compression factor (phi*max(0, rij-dij)*nij)
+        # will be taken into account in high density scenarios
+        body_factor_weight = 1 # phi*max(0, rij-dij)
+        friction_factor_weight = omega*max(0, rij-dij)
+
+
+        fij = (A*np.exp((rij-dij)/B) * body_factor_weight)*nij + friction_factor_weight*delta_vij*tij + evasive_effect
 
         return fij
 
-    # def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, A=4.5, gamma=0.35, n=2.0, n_prime=3.0, lambda_w=2.0, epsilon=0.005):
-    #     '''
-    #     Calculates repulsive forces between pedestrians
-    #     '''
-    #     other_pos = np.array([other_ped.state.x, other_ped.state.y])
-    #     other_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
-    #
-    #     eij = normalize(other_pos - curr_pos)
-    #     Dij = lambda_w * (curr_vel - other_vel) + eij
-    #     tij = normalize(Dij)
-    #     nij = np.array([-tij[1], tij[0]])
-    #
-    #     dij = np.linalg.norm(curr_pos - other_pos)
-    #     dot_product = max(min(np.dot(tij, eij), 1.0), -1.0) # stay within [-1,1] domain
-    #     theta = np.arccos(dot_product)
-    #
-    #     B = gamma * np.linalg.norm(Dij)
-    #
-    #     theta += B*epsilon
-    #
-    #     fij = -A*np.exp(-dij/B) * (np.exp(-(n_prime*B*theta)**2)*tij + np.exp(-(n*B*theta)**2)*nij)
-    #
-    #     return fij
 
     def wall_interaction(self):
         wij = np.zeros(2)
