@@ -54,7 +54,7 @@ USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. 
 
 #Evaluation
 EVALUATION_MODE = True
-WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files
+WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
