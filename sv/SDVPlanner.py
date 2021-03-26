@@ -128,6 +128,7 @@ class SVPlanner(object):
                 continue
             
             #BTree Tick - using frenet state and lane config based on old ref path
+            print(vehicle_state)
             mconfig, ref_path_changed, snapshot_tree = self.behavior_model.tick(planner_state)
             
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
@@ -136,7 +137,7 @@ class SVPlanner(object):
                 self.reference_path = self.laneletmap.get_global_path_for_route(
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects, sync_planner.get_task_time(), state_time)
+                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects, 0, state_time)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -237,7 +238,7 @@ class SVPlanner(object):
         """
 
         # From compute_vehicle_state() in sv/Vehicle.py
-        if self.last_plan:
+        if self.last_plan and expected_planner_time>0:
             sim_time_ahead = state_time + expected_planner_time
             delta_time = sim_time_ahead - self.last_plan.start_time
             if (delta_time > self.last_plan.trajectory.T): 
@@ -258,10 +259,11 @@ class SVPlanner(object):
             vehicle_state.y_vel = y_vector[1]
             vehicle_state.y_acc = y_vector[2]
         else:
-            # update vehicle frenet state since refernce path may have changed
+            # update vehicle frenet state since reference path may have changed
             s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
             vehicle_state.set_S(s_vector)
             vehicle_state.set_D(d_vector)
+            delta_time = 0.0
 
         # update lane config based on current (possibly outdated) reference frame
         lane_config, reg_elems = self.read_map(vehicle_state, self.reference_path, traffic_light_states)
