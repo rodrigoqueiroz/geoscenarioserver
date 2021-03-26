@@ -183,7 +183,7 @@ class MConfig:
     max_lat_acc:float = 4.9               # maximum lateral acceleration [m/s/s]
     
     #Lateral lane target. By default, targets center
-    lat_target:LT = LT(0.5,3,SamplingMethod.NORMAL)
+    lat_target:LT = LT(0.0,1)
 
     #Precision defines how feasibility and costs are computed (and how integrals are approximated). 
     #Higher(100) = better precision, but impacts performance. 
