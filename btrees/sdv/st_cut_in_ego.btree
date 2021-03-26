@@ -1,0 +1,11 @@
+behaviortree LaneChange:
+    ?
+        ->
+            condition c_trigger( sim_time (repeat=True, tmin=4))
+            ?
+                ->
+                    condition c_gap(reached_gap(repeat=False, target_lane_id=-1, meters=5))
+                    maneuver m_cutin(MCutInConfig(target_lid=-1, delta_s=(0, 0, 0)))
+                subtree drive(m_keepvelocity=MVelKeepConfig(vel=MP(14.0,10,6)))
+        subtree drive(m_keepvelocity=MVelKeepConfig(vel=MP(16.0,10,6)))
+        
