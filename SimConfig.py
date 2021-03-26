@@ -60,7 +60,7 @@ WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved 
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
-CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
+CLIENT_SHM = True          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943

@@ -128,7 +128,6 @@ class SVPlanner(object):
                 continue
             
             #BTree Tick - using frenet state and lane config based on old ref path
-            print(vehicle_state)
             mconfig, ref_path_changed, snapshot_tree = self.behavior_model.tick(planner_state)
             
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles

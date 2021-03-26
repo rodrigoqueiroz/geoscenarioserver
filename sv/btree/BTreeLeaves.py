@@ -115,8 +115,10 @@ class ManeuverAction(behaviour.Behaviour):
                     self.bmodel.planner_state.lane_config.get_neighbour(self.mconfig.target_lid),
                     self.bmodel.planner_state.traffic_vehicles
                 )
-                # TODO check for None
-                self.mconfig.target_vid = target_vehicle.id
+                if target_vehicle is not None:
+                    self.mconfig.target_vid = target_vehicle.id
+                else:
+                    status = common.Status.FAILURE
 
         elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
@@ -128,11 +130,11 @@ class ManeuverAction(behaviour.Behaviour):
                     if 'stop_position' in re_state._fields:
                         self.mconfig.pos = re_state.stop_position[0]
                         break
-                    # TODO: determine whether stop pos should be behind leading vehicles instead
+                    
 
         # Handle completion of lane swerve/cutin maneuver
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
-            if not self.maneuver_completed:
+            if not self.maneuver_completed and status is not common.Status.FAILURE:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(
                         self.bmodel.planner_state.vehicle_state,
                         self.bmodel.planner_state.lane_config,
