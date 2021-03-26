@@ -1,0 +1,12 @@
+behaviortree eval_main:
+    ?
+        ->
+            condition c_redlight ( traffic_light_red(threshold=20 ) )
+            maneuver m_stop_redlight ( MStopConfig( target=3 , distance = 0.0) )
+        ->
+            condition c_green_light ( traffic_light_green(threshold=20 ) )
+            ?
+                condition c_wait ( wait( time=0.01) )
+                subtree eval_drive()
+        subtree eval_drive()
+
