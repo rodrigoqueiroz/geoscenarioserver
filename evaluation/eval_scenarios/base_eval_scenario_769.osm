@@ -3,7 +3,7 @@
   <node id='-5000000' visible='true' lat='43.4784550044' lon='-80.51972915596'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='maps/lanelet2_university_weber_alt.osm' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='name' v='Evaluation Scenario' />
     <tag k='timeout' v='180' />
     <tag k='version' v='2.0' />

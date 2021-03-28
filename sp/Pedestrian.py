@@ -62,6 +62,7 @@ class TP(Pedestrian):
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
+        self.destination = np.array([trajectory[-1].x, trajectory[-1].y])
         if not keep_active:
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
@@ -211,7 +212,7 @@ class SP(Pedestrian):
         f_walls = np.zeros(2)
 
         # repulsive forces from other pedestrians
-        for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
+        for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if abs(pid) != abs(self.id) and not ped.ghost_mode}:
             f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
 
         # repulsive forces from walls (borders)

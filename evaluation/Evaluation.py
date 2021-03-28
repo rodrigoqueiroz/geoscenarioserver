@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
+#slarter@uwaterloo.ca
 # ---------------------------------------------
 # GeoScenario Server for Evaluation only
 # Controls the problem setup and traffic simulation loop
@@ -23,6 +24,7 @@ from TrafficLight import TrafficLight, TrafficLightColor
 from dash.Dashboard import *
 from gsc.GSParser import GSParser
 from sv.Vehicle import Vehicle
+from sp.Pedestrian import Pedestrian
 from Actor import TrajNode
 from sv.ManeuverConfig import *
 from sv.SDVPlanner import LaneConfig
@@ -39,16 +41,16 @@ from ScenarioSetup import *
 class EvalScenario:
     scenario_id:str = ''
     track_id:int = 0
-    vehicle_type:str = ''                           #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
+    agent_type:str = ''                           #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
     scenario_type:str = ''                          #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
-    const_vehicles:list = field(default_factory=list)    #vehicles/pedestrians that must be in the scene (e.g: following, or yielding)
+    const_agents:list = field(default_factory=list)    #vehicles/pedestrians that must be in the scene (e.g: following, or yielding)
     start_time:float = 0.0                          #scenario start time
     end_time:float = 0.0                            #scenario end time
     direction:str = ''                              #n_s, s_n, e_w, w_e
 
 @dataclass
 class SDVConfig:
-    btree_root:str = "eval_main"
+    btree_root:str = "eval_main.btree"
     btree_reconfig:str = ""
     start_state:list = field(default_factory=list) #[0.0,0.0,0.0, 0.0,0.0,0.0]  #cartesian [xpos,xvel,xacc, upos, yvel, yacc]
     route_nodes:list = field(default_factory=list)
@@ -60,6 +62,19 @@ class SDVConfig:
     rlstop_dist:float = 0.0
     d_target:float = 0.0
     off_lane:int = 1
+
+@dataclass
+class SPConfig:
+    btree_root:str = "eval_walk.btree"
+    btree_reconfig:str = ""
+    start_state:list = field(default_factory=list) #[0.0,0.0,0.0, 0.0,0.0,0.0]  #cartesian [xpos,xvel,xacc, upos, yvel, yacc]
+    route_nodes:list = field(default_factory=list)
+    # vk_target_vel:float = 14.0
+    # vk_time:float = 3.0
+    # vk_time_low:float = 6.0
+    # follow_timegap:float = 3.0
+    # glstart_delay:float = 0.0
+    # rlstop_dist:float = 0.0
 
 
 @dataclass
@@ -77,14 +92,14 @@ class TrajStats:
     stop_time:float = 0.0
     end_time:float  = 0.0
     end_speed:float = 0.0
-    
-    
+
+
 def start_server(args, es, calibrate = False):
     log.info('GeoScenario Evaluation Server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
     sim_traffic = SimTraffic(lanelet_map, sim_config)
-    
+
     #Scenario SETUP
     res, time = setup_evaluation_scenario(args.gsfile, sim_traffic, sim_config, lanelet_map, es, calibrate)
     if not res:
@@ -93,7 +108,7 @@ def start_server(args, es, calibrate = False):
     sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", sim_start_time = float(time))
     sync_global.set_timeout(sim_config.timeout)
 
-    
+
     #SIM EXECUTION START
     log.info('SIMULATION START')
     sim_traffic.start()
@@ -120,17 +135,17 @@ def start_server(args, es, calibrate = False):
         #except Exception as e:
         #    log.error(e)
         #    break
-        
+
     sim_traffic.stop_all()
     dashboard.quit()
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario Evaluation Server SHUTDOWN')
 
-   
+
 def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, es, calibrate_behavior):
     print("===== Setup scenario {} for evaluation. Recalibrate? {}".format(es.scenario_id,calibrate_behavior))
-    
+
     #==========================  Load Base Scenario
     #if not parser.load_and_validate_geoscenario(full_scenario_path):
     base_btree_location = os.path.join(ROOT_DIR, "evaluation/eval_scenarios/") #default btree folders location
@@ -148,7 +163,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
     trajectories = {}
     trajectories[es.track_id]  = query_track(es.track_id, c, lanelet_map.projector)
     #load tracks for dependencies (vehicles, pedestrians)
-    for cvid in es.const_vehicles:
+    for cvid in es.const_agents:
         trajectories[cvid] = query_track(cvid, c, lanelet_map.projector)
 
     #========================== Estimate scenario configuration
@@ -156,36 +171,71 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     #========================== Populate Simulation
     #Add Vehicles to Simulation
-    for vid in trajectories:
-        trajectory = trajectories[vid]
-        
-        name = ('veh_'+ format(vid, '03d'))
-        vehicle = TV(vid, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory, False)
-        sim_traffic.add_vehicle(vehicle)
+    for id in trajectories:
+        trajectory = trajectories[id]
 
-        if vid == es.track_id:
-            #set reference trajectory vehicle to run in ghost mode (not visible in traffic)
-            sim_traffic.vehicles[vid].ghost_mode = True
-            
-            #create dynamic vehicle in same trajectory with -vid
-            evid = -vid
-            try:
-                lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in config.route_nodes ]
-                sim_config.lanelet_routes[evid] = lanelet_map.get_route_via(lanelets_in_route)
-                
-            except Exception as e:
-                log.error("Route generation failed for route {}. Can't use this vehicle for evaluation".format(evid))
-                return False, 0.0
-            sim_config.goal_points[evid] = (config.route_nodes[-1].x, config.route_nodes[-1].y)
+        if es.agent_type == "Pedestrian":
+            name = ('ped_'+ format(id, '03d'))
+            pedestrian = TP(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory, False)
+            sim_traffic.add_pedestrian(pedestrian)
 
-            vehicle = SDV(evid, '-'+name, config.btree_root, config.start_state , 
-                                lanelet_map, sim_config.lanelet_routes[evid],False,btree_locations)
-            #vehicle = Vehicle(evid, '-'+name, config.start_state)
-            vehicle.btree_reconfig = config.btree_reconfig
+            if id == es.track_id:
+                #set reference trajectory pedestrian to run in ghost mode (not visible in traffic)
+                sim_traffic.pedestrians[id].ghost_mode = True
+
+                #create dynamic pedestrian in same trajectory with -id
+                epid = -id
+                try:
+                    # lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in config.route_nodes ]
+                    # sim_config.lanelet_routes[eid] = lanelet_map.get_route_via(lanelets_in_route)
+                    # print(sim_config.lanelet_routes[eid])
+
+                    #sim_config.pedestrian_goal_points[eid] = [(node.x, node.y) for node in config.route_nodes] # route
+                    sim_config.pedestrian_goal_points[epid] = [(config.route_nodes[-1].x, config.route_nodes[-1].y)] # destination
+
+                    pedestrian = SP(epid,
+                                    '-'+name,
+                                    config.start_state,
+                                    list(sim_config.pedestrian_goal_points[epid]),
+                                    config.btree_root,
+                                    btree_locations=btree_locations,
+                                    btype="sp")
+
+                    pedestrian.btree_reconfig = config.btree_reconfig
+                    sim_traffic.add_pedestrian(pedestrian)
+                    #start as inactive until the original trajectory starts
+                    sim_traffic.pedestrians[epid].sim_state = ActorSimState.INACTIVE
+                except Exception as e:
+                    log.error("Route generation failed for route {}. Can't use this pedestrian for evaluation".format(epid))
+                    return False, 0.0
+        else:
+            name = ('veh_'+ format(id, '03d'))
+            vehicle = TV(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory, False)
             sim_traffic.add_vehicle(vehicle)
-            #start as inactive until the original trajectory starts
-            sim_traffic.vehicles[evid].sim_state = ActorSimState.INACTIVE
-    
+
+            if id == es.track_id:
+                #set reference trajectory vehicle to run in ghost mode (not visible in traffic)
+                sim_traffic.vehicles[id].ghost_mode = True
+
+                #create dynamic vehicle in same trajectory with -id
+                evid = -id
+                try:
+                    lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in config.route_nodes ]
+                    sim_config.lanelet_routes[evid] = lanelet_map.get_route_via(lanelets_in_route)
+
+                except Exception as e:
+                    log.error("Route generation failed for route {}. Can't use this vehicle for evaluation".format(evid))
+                    return False, 0.0
+                sim_config.goal_points[evid] = (config.route_nodes[-1].x, config.route_nodes[-1].y)
+
+                vehicle = SDV(evid, '-'+name, config.btree_root, config.start_state ,
+                                    lanelet_map, sim_config.lanelet_routes[evid],False,btree_locations)
+                #vehicle = Vehicle(evid, '-'+name, config.start_state)
+                vehicle.btree_reconfig = config.btree_reconfig
+                sim_traffic.add_vehicle(vehicle)
+                #start as inactive until the original trajectory starts
+                sim_traffic.vehicles[evid].sim_state = ActorSimState.INACTIVE
+
     if calibrate_behavior:
         sim_config.scenario_name = "{}_rc".format(es.scenario_id)
         sim_traffic.log_file = sim_config.scenario_name
@@ -200,7 +250,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
 def load_all_scenarios():
     scenarios = {}
-    with open('evaluation/scenarios.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios.csv', mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
@@ -214,15 +264,15 @@ def load_all_scenarios():
             es = EvalScenario()
             es.scenario_id = row[0]
             es.track_id = int(row[2])
-            es.vehicle_type = row[3]
+            es.agent_type = row[3]
             es.direction = row[4]
             es.scenario_type = row[5]
             #constraints
             if (row[6] != ''):
                 if (',' in row[6]):
-                    es.const_vehicles = [int(cvid) for cvid in row[6].split(',')]
+                    es.const_agents = [int(cid) for cid in row[6].split(',')]
                 else:
-                    es.const_vehicles.append(int(row[6]))
+                    es.const_agents.append(int(row[6]))
             #start time
             if (row[7] != ''):
                 es.start_time = float(row[7])
@@ -230,20 +280,20 @@ def load_all_scenarios():
                     es.end_time = float(row[8])
             scenarios[es.scenario_id] = es
     return scenarios
-        
-def query_track(vid, c, projector):
+
+def query_track(id, c, projector):
     #track
     track = []
-    query = "SELECT  * \
-                FROM TRAJECTORIES_0769 \
-                LEFT JOIN TRAJECTORIES_0769_EXT \
-                ON TRAJECTORIES_0769.TRACK_ID == TRAJECTORIES_0769_EXT.TRACK_ID AND TRAJECTORIES_0769.TIME == TRAJECTORIES_0769_EXT.TIME\
-                WHERE TRAJECTORIES_0769.TRACK_ID == '{}'\
-                ORDER BY TRAJECTORIES_0769.TIME".format(vid)
+    query = "SELECT T.TRACK_ID, T.X, T.Y, T.SPEED, T.TAN_ACC, T.LAT_ACC, T.TIME, T.ANGLE, TK.TYPE \
+            FROM TRAJECTORIES_0769 T \
+            LEFT JOIN TRAJECTORIES_0769_EXT T_EXT ON T.TRACK_ID = T_EXT.TRACK_ID AND T.TIME = T_EXT.TIME \
+            LEFT JOIN TRACKS TK ON T.TRACK_ID = TK.TRACK_ID \
+            WHERE T.TRACK_ID = '{}' \
+            ORDER BY T.TIME".format(id)
     res = c.execute(query)
     for row in res:
         track.append(row)
-    
+
     trajectory = []
     for step in track:
         time = float(step[6])
@@ -258,34 +308,38 @@ def query_track(vid, c, projector):
         node.x_vel, node.y_vel = speed_to_vel(node.speed, node.yaw)
         #node.tan_acc = float(step[4])
         #node.lat_acc = float(step[5])
-        
+
         trajectory.append(node)
     return trajectory
 
 def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, trajectories, calibrate_behavior):
     ''''
-    Configure dynamic vehicle behavior to match empirical vehicle 
+    Configure dynamic vehicle behavior to match empirical vehicle
     using the original track to extract stats
     '''
     trajectory = trajectories[es.track_id]
     trajectory.sort(key=lambda x: x.time)       #Sorting nodes using time (if not sorted during query)
     if (es.start_time > trajectory[0].time):    #if trajectory starts before scenario, clip nodes
-        trajectory = [node for node in trajectory if node.time>= es.start_time]
+        trajectory = [node for node in trajectory if node.time >= es.start_time]
     #Traj Stats
-    ts = generate_traj_stats(trajectory) 
+    ts = generate_traj_stats(trajectory)
     #scenario starts only when vehicle enters the scene
-    if (es.start_time < ts.start_time):         
+    if (es.start_time < ts.start_time):
         es.start_time = ts.start_time
     es.end_time = ts.end_time
     #Config
-    config = SDVConfig()
+    if es.agent_type == "Pedestrian":
+        config = SPConfig()
+        config.btree_root = 'eval_walk.btree'
+    else:
+        config = SDVConfig()
+        config.btree_root = 'eval_main.btree'
     #Standard
     config.route_nodes = [ trajectory[0], trajectory[-1]]
     config.start_state = [ trajectory[0].x, ts.start_vel_x,0.0, trajectory[0].y, ts.start_vel_y,0.0 ]
-    config.btree_root = "eval_main.btree"
     config.btree_reconfig = ""
 
-    print("Both start at  x_sdv {} x_tv{}".format(config.start_state[0],trajectory[0].x))
+    print("Both start at x_sdv {} x_tv {}".format(config.start_state[0],trajectory[0].x))
 
     #scenario specific
     if es.scenario_type == 'free':
@@ -298,7 +352,7 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
 
     elif es.scenario_type == 'follow' or  es.scenario_type == 'free_follow':
         config.btree_root = "eval_drive.btree"
-        lead_id = es.const_vehicles[0] #assuming one lead vehicle for the entire scenario
+        lead_id = es.const_agents[0] #assuming one lead vehicle for the entire scenario
         lead_ts = generate_traj_stats(trajectories[lead_id])
         es.end_time = lead_ts.end_time #scenario ends when lead vehicle exists
         if calibrate_behavior:
@@ -314,7 +368,7 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
             #config.btree_reconfig = "m_follow_lead=MFollowConfig( time_gap={},lat_target=LT({}),feasibility_constraints['off_lane'] = {} )".format(
             config.btree_reconfig = "m_follow_lead=MFollowConfig( time_gap={},lat_target=LT({},3) )".format(
                 config.follow_timegap,
-                config.d_target) 
+                config.d_target)
                 #config.off_lane)
             config.btree_reconfig+= ";m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({},3) )".format(
                 config.vk_target_vel,
@@ -330,7 +384,7 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
             config.rlstop_dist = find_stop_distance(lanelet_map, trajectory)
             config.btree_reconfig = "m_stop_redlight=MStopConfig( target=3 , distance={}, lat_target=LT({}) )".format(config.rlstop_dist, config.d_target)
             config.btree_reconfig += ";m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({}) )".format(config.vk_target_vel,config.d_target)
-            
+
 
     elif es.scenario_type == 'glstart':
         if calibrate_behavior:
@@ -343,16 +397,16 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
                 config.glstart_delay = 0
             else:
                 config.glstart_delay = delay
-            config.start_state = [ trajectory[0].x, 0.0, 0.0, trajectory[0].y, 0.0, 0.0 ] 
+            config.start_state = [ trajectory[0].x, 0.0, 0.0, trajectory[0].y, 0.0, 0.0 ]
             config.btree_reconfig = "c_wait=wait,args=(time={})".format(config.glstart_delay)
             config.btree_reconfig += ";m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({}) )".format(config.vk_target_vel,config.d_target)
             #to consider:
             # the final speed on the riginal track may not be accurate. getting an average on the last quartil can help
             # the limiting factor on the acceleration could be increased to allow steeper startup
-           
-            
-    
-    #Summary: 
+
+
+
+    #Summary:
     print("======= Experiment Summary ===")
     print(es)
     print(ts)
@@ -376,13 +430,16 @@ def generate_traj_stats(trajectory):
         if node.speed <= 0.01:
             ts.stop_time = node.time
             break
-    
+
     #average for higher speeds (stopping times)
     nodes_driving = []
     for node in trajectory:
         if node.speed > 4:
             nodes_driving.append(node)
-    ts.avg_driving_speed = sum([ node.speed for node in nodes_driving]) / len(nodes_driving)
+    if len(nodes_driving) > 0:
+        ts.avg_driving_speed = sum([ node.speed for node in nodes_driving]) / len(nodes_driving)
+    else:
+        ts.avg_driving_speed = 0.0
 
     #average speed by the end of track
     start = int(3 * len(trajectory)/4)
@@ -413,7 +470,7 @@ def find_stop_distance(laneletmap:LaneletMap, trajectory): #, traffic_light_stat
         if node.speed <= 0.01:
             stop_node = node
             break
-    
+
     #Find distance to stop line
     cur_ll = laneletmap.get_occupying_lanelet(stop_node.x,stop_node.y)
     #regulatory elements acting on this lanelet
@@ -422,7 +479,7 @@ def find_stop_distance(laneletmap:LaneletMap, trajectory): #, traffic_light_stat
     for re in reg_elems:
         if isinstance(re, lanelet2.core.TrafficLight):
             stop_linestring = re.parameters['ref_line']
-            stop_distance = distance_point_line(stop_linestring[0][0].x,stop_linestring[0][0].y, 
+            stop_distance = distance_point_line(stop_linestring[0][0].x,stop_linestring[0][0].y,
                                 stop_linestring[0][-1].x, stop_linestring[0][-1].y,
                                 stop_node.x, stop_node.y)
             if stop_distance > VEHICLE_RADIUS:
@@ -431,7 +488,7 @@ def find_stop_distance(laneletmap:LaneletMap, trajectory): #, traffic_light_stat
             #    stop_distance
 
     if stop_distance is None:
-        print ("Can't find stop distance")        
+        print ("Can't find stop distance")
         return 0.0
 
     return stop_distance
@@ -448,10 +505,10 @@ def find_follow_gap(laneletmap:LaneletMap, t, tlead,  ts:TrajStats):
     n_samples = 100
     min_time = ts.start_time
     max_time = ts.end_time
-    
+
     t_norm = {}
     tlead_norm = {}
-    
+
     #run a sim over the trajectory time to capture both vehicles at the same time
     for stime in np.linspace(min_time,max_time, n_samples,dtype = float, endpoint=False):
         #find closest node to stime
@@ -469,13 +526,13 @@ def find_follow_gap(laneletmap:LaneletMap, t, tlead,  ts:TrajStats):
                 if stime >= tlead[i].time:
                     node_lead = tlead[i]
         if not node_lead:
-            continue     
+            continue
 
         time = format(stime,'.2f')
         t_norm[time] = node
         tlead_norm[time] = node_lead
-        
-    
+
+
     all_tgs = []
     for time,node in t_norm.items():
         diff = distance_2p(tlead_norm[time].x,tlead_norm[time].y,node.x,node.y)
@@ -492,7 +549,7 @@ def find_follow_gap(laneletmap:LaneletMap, t, tlead,  ts:TrajStats):
     maxgap = format(max(all_tgs), '.2f')
     print("Follow gap: min{} avg{} max{}".format(mingap, avggap, maxgap))
     return mingap, avggap, maxgap
-    
+
 def find_gl_delay(laneletmap:LaneletMap, trajectory, traffic_lights):
     delay = 0.0
     #Find traffic light
@@ -503,7 +560,7 @@ def find_gl_delay(laneletmap:LaneletMap, trajectory, traffic_lights):
     reg_elem_stats = {}
     for re in reg_elems:
         if isinstance(re, lanelet2.core.TrafficLight):
-            for re_tl in re.trafficLights: 
+            for re_tl in re.trafficLights:
                 tlname = re_tl.attributes['name']
                 for id, tl in traffic_lights.items():
                     if tl.name == tlname:
@@ -520,10 +577,10 @@ def find_gl_delay(laneletmap:LaneletMap, trajectory, traffic_lights):
             if state == TrafficLightColor.Green:
                 delay = float(format(gl_time,'.3f'))
                 break
-    
+
     print("Delay after green light is {}".format(delay))
     return delay
-  
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
@@ -534,9 +591,9 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusivelly")
     parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
 
-    
+
     args = parser.parse_args()
-    
+
     CLIENT_SHM = False
     WRITE_TRAJECTORIES = True
 
@@ -584,5 +641,3 @@ if __name__ == "__main__":
                     start_server(args, scenarios[eval_id], True)
                 #except Exception as e:
                 #    print("ERROR. Can not run simulation for scenario{}".format(eval_id))
-    
-   

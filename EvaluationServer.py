@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 from evaluation.Evaluation import *
 import glog as log
 
-  
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
@@ -18,16 +18,16 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--eval", dest="eval_id", default="", help="Evaluation scenario ID")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="y", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
-    parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusivelly")
+    parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusively")
     parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
 
-    
+
     args = parser.parse_args()
-    
+
     CLIENT_SHM = False
     WRITE_TRAJECTORIES = False
 
-    
+
     # Master csv to guide all experiments.
     scenarios = load_all_scenarios()
 
@@ -72,5 +72,3 @@ if __name__ == "__main__":
                     start_server(args, scenarios[eval_id], True)
                 #except Exception as e:
                 #    print("ERROR. Can not run simulation for scenario{}".format(eval_id))
-    
-   

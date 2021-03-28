@@ -42,7 +42,7 @@ class Actor(object):
     def future_state(self, t):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
-            Note: Acc can rapidly change. Using the current acc to predict future 
+            Note: Acc can rapidly change. Using the current acc to predict future
             can lead to overshooting forward or backwards when vehicle is breaking
             TODO: predict using history + kalman filter
         """
@@ -64,7 +64,7 @@ class Actor(object):
         #keep current position while forcing vel and acc to 0.0
         self.state.x_vel = self.state.x_acc = self.state.y_vel  = self.state.y_acc = 0.0
         self.state.s_vel = self.state.s_acc = self.state.d_vel  = self.state.d_acc = 0.0
-        pass    
+        pass
 
     def remove(self):
         self.sim_state = ActorSimState.INACTIVE
@@ -88,9 +88,12 @@ class Actor(object):
                         log.warn("vid {} is now INVISIBLE".format(self.id))
                     if EVALUATION_MODE:
                         if -self.id in self.sim_traffic.vehicles:
-                            self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE 
+                            self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE
                             log.warn("vid {} is now ACTIVE".format(-self.id))
-                
+                        elif -self.id in self.sim_traffic.pedestrians:
+                            self.sim_traffic.pedestrians[-self.id].sim_state = ActorSimState.ACTIVE
+                            log.warn("pid {} is now ACTIVE".format(-self.id))
+
                 #find closest pair of nodes
                 for i in range(len(trajectory)-1):
                     node = trajectory[i]
@@ -149,7 +152,7 @@ class ActorState:
     z:float = 0.0
     z_vel:float = 0.0
     z_acc:float = 0.0
-  
+
     #frenet state
     s:float = 0.0
     s_vel:float = 0.0
@@ -157,18 +160,18 @@ class ActorState:
     d:float = 0.0
     d_vel:float = 0.0
     d_acc:float = 0.0
-    
+
     #the direction the actor is facing
     yaw:float = 0.0
 
-    
+
     #For easy shared memory parsing
     def get_cart_state_vector(self):
         return [self.x, self.x_vel, self.x_acc,
                 self.y,  self.y_vel, self.y_acc]
 
     def get_frenet_state_vector(self):
-        return [self.s, self.s_vel, self.s_acc, 
+        return [self.s, self.s_vel, self.s_acc,
                 self.d, self.d_vel, self.d_acc]
 
     def set_state_vector(self, arr):
@@ -224,5 +227,3 @@ class StaticObject():
     s:float = 0.0
     d:float = 0.0
     model:str = ''
-
-
