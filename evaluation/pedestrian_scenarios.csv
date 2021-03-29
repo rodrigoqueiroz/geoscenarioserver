@@ -2,7 +2,7 @@ scenario_id,selected,track_id,type,direction,scenario_type,constraint_agents,sta
 1,x,16,Pedestrian,,,,,
 2,x,17,Pedestrian,,,,,
 3,x,18,Pedestrian,,,,,
-4,s,19,Pedestrian,w_e,crossed bottom crosswalk,"27,63,114,169,172,180,203,205,259,260,277",0,59.526133
+4,s,19,Pedestrian,w_e,crossed bottom crosswalk,"27,63,114,169,172,180,203,205,259,260,277,9",0,59.526133
 5,x,22,Pedestrian,,,,,
 6,s,27,Pedestrian,"e_w, s_n",crossed bottom and left crosswalk,"19,63,114,169,172,180,203,205,259,260,277",9.5095,103.436667
 7,x,45,Pedestrian,,,,,

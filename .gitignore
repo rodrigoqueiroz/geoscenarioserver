@@ -7,3 +7,4 @@ scenarios/logs/*
 .vscode/
 *.DS_Store
 test_btree_parser
+evaluation/*.db
