@@ -26,13 +26,13 @@ class SimTraffic(object):
     def __init__(self, laneletmap, sim_config):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
-        
+
         #Dyn agents
         self.vehicles = {}  #dictionary for direct access using vid
         self.static_objects = {}
         self.pedestrians = {}
         self.traffic_lights = {}    #geoscenario TrafficLights by corresponding lanelet2 TrafficLight id
-        
+
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
@@ -67,7 +67,7 @@ class SimTraffic(object):
 
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
-        
+
 
     def start(self):
         nv = len(self.vehicles)
@@ -102,13 +102,13 @@ class SimTraffic(object):
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)
         np = len(self.pedestrians)
-        
+
         #Read Client
         if (self.sim_client_shm):
             new_client_state = False
             header, vstates, pstates, disabled_vehicles, disabled_pedestrians = self.sim_client_shm.read_client_state(nv, np)
             if header is not None:
-                client_tick_count, client_delta_time, n_vehicles = header
+                client_tick_count, client_delta_time, n_vehicles, n_pedestrians = header
                 if self.sim_client_tick_count < client_tick_count:
                     self.sim_client_tick_count = client_tick_count
                     new_client_state = True
@@ -124,29 +124,29 @@ class SimTraffic(object):
                 if self.vehicles[vid].type is Vehicle.EV_TYPE and vid in vstates:
                     if new_client_state:
                         self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
-        
+
         #tick vehicles (all types)
         for vid in self.vehicles:
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
-        
+
         #tick pedestrians:
         for pid in self.pedestrians:
             self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
-        
+
         #Update traffic light states
         for tlid in self.traffic_lights:
             self.traffic_lights[tlid].tick(tick_count, delta_time, sim_time)
-        
+
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
-        
+
         #log.info(self.debug_shdata)
         self.log_trajectories(tick_count, delta_time, sim_time)
-        
+
         #Collisions at Server Side
         if self.detect_collisions(tick_count, delta_time, sim_time):
             return -1
-        
+
         return 0
 
     #Shared Memory:
@@ -165,21 +165,21 @@ class SimTraffic(object):
 
         #Internal Debug Shared Data
         self.debug_shdata = Manager().dict()
-  
+
     def write_traffic_state(self, tick_count, delta_time, sim_time):
         if not self.traffic_state_sharr:
             return
 
         nv = len(self.vehicles)
         np = len(self.pedestrians)
-        
+
         r = 1 + nv + np #1 for header
         c = int(len(self.traffic_state_sharr) / r)
 
         #header
         header_vector = [tick_count, delta_time, sim_time, nv, np]
         self.traffic_state_sharr[0:5] = header_vector
-        
+
         #vehicles
         ri = 1 #row index, start at 1 for header
         for vid, vehicle in sorted(self.vehicles.items()):
@@ -189,8 +189,8 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i+1 ] = vehicle.type
             self.traffic_state_sharr[ i+2 ] = vehicle.sim_state
             self.traffic_state_sharr[ i+3 : i+3+len(sv) ] = sv
-            ri += 1 
-        
+            ri += 1
+
         # pedestrians
         for pid, pedestrian in sorted(self.pedestrians.items()):
             sv = pedestrian.state.get_state_vector()
@@ -200,7 +200,7 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i+2 ] = pedestrian.sim_state
             self.traffic_state_sharr[ i+3 : i+3+len(sv) ] = sv
             ri += 1
-        
+
         # traffic light state
         # Arrays should be automatically thread-safe
         traffic_light_states = []
@@ -227,7 +227,7 @@ class SimTraffic(object):
                     continue
                 if id_va != id_vb:
                     #this filter will be important when we use alternative (and more expensive) collision checking methods
-                    if  (min_x <= vb.state.x <= max_x) and (min_y <= vb.state.y <= max_y): 
+                    if  (min_x <= vb.state.x <= max_x) and (min_y <= vb.state.y <= max_y):
                         dist = distance_2p(va.state.x,va.state.y, vb.state.x, vb.state.y)
                         if  dist < (2*VEHICLE_RADIUS):
                             log.error("Collision between vehicles {} {}".format(id_va,id_vb))
@@ -263,7 +263,7 @@ class SimTraffic(object):
                 if vehicle.sim_state == ActorSimState.ACTIVE or vehicle.sim_state == ActorSimState.INVISIBLE:
                     sv = vehicle.state.get_state_vector()
                     line = [vid, vehicle.type,int(vehicle.sim_state), tick_count, sim_time, delta_time] + sv
-                    
+
                     if vid not in self.vehicles_log:
                         self.vehicles_log[vid] = []
                     self.vehicles_log[vid].append(line)
@@ -288,17 +288,17 @@ class SimTraffic(object):
     def read_traffic_state(self, traffic_state_sharr, actives_only = True):
         '''
         Read traffic state using sharred arrays
-        Each process reading the state must store it's own 
-        reference to the shared array. 
+        Each process reading the state must store it's own
+        reference to the shared array.
         This reference must be passed during the process creation.
         '''
-        
+
         #header
         header = traffic_state_sharr[0:5]
         nv = int(header[3])
         np = int(header[4])
         c = 30
-        
+
         #vehicles
         vehicles = {}
         start = 1
@@ -309,7 +309,7 @@ class SimTraffic(object):
             v_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
             if actives_only:
-                if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE: 
+                if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                     continue
             vehicle = Vehicle(vid)
             vehicle.type = v_type
@@ -318,7 +318,7 @@ class SimTraffic(object):
             state_vector = traffic_state_sharr[ i+3 : i+16 ]
             vehicle.state.set_state_vector(state_vector)
             vehicles[vid] = vehicle
-        
+
         pedestrians = {}
         start = end
         end = start + np
@@ -328,7 +328,7 @@ class SimTraffic(object):
             p_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
             if actives_only:
-                if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE: 
+                if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                         continue
             pedestrian = Pedestrian(pid)
             pedestrian.type = p_type
@@ -337,18 +337,14 @@ class SimTraffic(object):
             state_vector = traffic_state_sharr[ i+3 : i+16 ]
             pedestrian.state.set_state_vector(state_vector)
             pedestrians[pid] = pedestrian
-        
+
         # should be automatically thread-safe
         tl_states = copy(self.traffic_light_sharr[:]) #List[(id, color)]
         traffic_light_states = {}
         for i in range(0,len(tl_states),2):
             traffic_light_states[tl_states[i]] = tl_states[i+1]
-        
+
         # should be automatically thread-safe
         static_objects = copy(self.static_objects)
-        
+
         return header, vehicles, pedestrians, traffic_light_states, static_objects
-
-
-
-
