@@ -68,7 +68,7 @@ class SimSharedMemory(object):
 
     def read_client_state(self, nvehicles, npedestrians):
         # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
-        header = None
+        header = [ 0, 0.0, 0, 0 ]
         vstates = {}
         pstates = {}
         disabled_vehicles = []
@@ -96,7 +96,6 @@ class SimSharedMemory(object):
         data_arr = data_str.split('\n')
 
         if len(data_arr) == 0 or int.from_bytes(data, byteorder='big') == 0:
-            # log.info("Garbage memory")
             # memory is garbage
             return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
@@ -105,15 +104,16 @@ class SimSharedMemory(object):
             header = [int(header_str[0]), float(header_str[1]), int(header_str[2]), int(header_str[3])]
             nclient_vehicles = header[2]
             nclient_pedestrians = header[3]
+        except Exception as e:
+            log.error("Header parsing exception")
+            log.error("data_arr[0]: %s ", data_arr[0])
+            log.error(e)
+            pass
 
-            # size = 4
-            # if (len(data_arr) < size):
-            #     #memory is garbage
-            #     return
-
+        try:
             # the client must see the same number of vehicles as server
             if nclient_vehicles == nvehicles:
-                for ri in range(1, nvehicles + 1):
+                for ri in range(1, nvehicles):
                     vid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
                     vs = VehicleState()
                     vid = int(vid)
@@ -125,16 +125,20 @@ class SimSharedMemory(object):
                     vstates[vid] = vs
                     if not int(is_active):
                         disabled_vehicles.append(vid)
-
             else:
                 log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
                     nclient_vehicles,
                     nvehicles
                 ))
                 log.warn(data_str)
+        except Exception as e:
+            log.error("VehicleState parsing exception")
+            log.error(e)
+            pass
 
+        try:
             if nclient_pedestrians == npedestrians:
-                for ri in range(nvehicles + 1, nvehicles + npedestrians + 1):
+                for ri in range(nvehicles + 1, nvehicles + 1 + npedestrians):
                     pid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
                     ps = PedestrianState()
                     pid = int(pid)
@@ -152,13 +156,11 @@ class SimSharedMemory(object):
                     npedestrians
                 ))
                 log.warn(data_str)
-
-        except Exception:
-            # garbage memory
+        except Exception as e:
+            log.error("PedestrianState parsing exception")
+            log.error(e)
             pass
 
-        # log.info("VSTATES")
-        # log.info(vstates)
         return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
     def __del__(self):
