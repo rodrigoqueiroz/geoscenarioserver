@@ -321,7 +321,8 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 	}
 
 	std::stringstream oss;
-	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << '\n';
+	// output the correct number of pedestrians
+	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << " " << 0 /* pedestrians.Num() */ << '\n';
 	for (auto& Elem : vehicles)
 	{
 		GSVehicle &gsv = Elem.Value;
