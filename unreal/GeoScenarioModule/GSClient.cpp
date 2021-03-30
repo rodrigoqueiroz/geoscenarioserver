@@ -26,8 +26,8 @@ void AGSClient::BeginPlay()
 	server_framestat = FrameStat();
 	// Setup shared memory
 	isConnected = false;
-	ss_shmInfo = ShmInfo(SHM_KEY, SEM_KEY);	
-	cs_shmInfo = ShmInfo(CS_SHM_KEY, CS_SEM_KEY);	
+	ss_shmInfo = ShmInfo(SHM_KEY, SEM_KEY);
+	cs_shmInfo = ShmInfo(CS_SHM_KEY, CS_SEM_KEY);
 	GetWorldTimerManager().SetTimer(ConnectionTimerHandler, this, &AGSClient::AttemptConnection, 1.0f, true);
 }
 
@@ -45,7 +45,7 @@ void AGSClient::Tick(float DeltaTime)
 
 	// log for experiments
 	std::stringstream oss;
-	
+
 	for (auto& Elem : vehicles)
 	{
 		GSVehicle &gsv = Elem.Value;
@@ -61,7 +61,7 @@ void AGSClient::Tick(float DeltaTime)
 		}
 	}
 
-	UE_LOG(GeoScenarioModule, Log, TEXT("%s | %s"), *FString(oss.str().c_str()), *FDateTime::Now().ToString());
+	// UE_LOG(GeoScenarioModule, Log, TEXT("%s | %s"), *FString(oss.str().c_str()), *FDateTime::Now().ToString());
 }
 
 void AGSClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -94,7 +94,7 @@ void AGSClient::AttemptConnection()
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
-	
+
 	//Client State SHM
 	// get semaphore instance
     if ((cs_shmInfo.sem_id = semget(cs_shmInfo.sem_key, 1, 0666)) < 0) {
@@ -105,7 +105,7 @@ void AGSClient::AttemptConnection()
 	// get shared mem instance
     if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, SHM_SIZE, 0666)) < 0) {
         UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS memory ID"));
-		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
+				UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
         return;
     }
 	// attach memory to this process's address space
@@ -141,7 +141,7 @@ void AGSClient::ReadServerState(float deltaTime)
 	//std::stringstream ss;
 	//ss << iss.rdbuf();
 	// SS SHM RELEASE
-	if (semop(ss_shmInfo.sem_id, &(ss_shmInfo.v), 1) < 0) { 
+	if (semop(ss_shmInfo.sem_id, &(ss_shmInfo.v), 1) < 0) {
 		UE_LOG(GeoScenarioModule, Error, TEXT("Cannot v SS semaphore"));
 		UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
 		// isConnected = false;
@@ -151,7 +151,7 @@ void AGSClient::ReadServerState(float deltaTime)
 	float server_delta_time;
 	int server_tick_count, nvehicles, vid;
 	iss >> server_tick_count >> server_delta_time >> nvehicles;
-	
+
 	// parse vehicles
 	int vehicles_read = 0;
 	while (vehicles_read < nvehicles)
@@ -184,14 +184,14 @@ void AGSClient::ReadServerState(float deltaTime)
 
 		if (v_type == 1)
 		{
-			if (server_framestat.tick_count == server_tick_count) 
+			if (server_framestat.tick_count == server_tick_count)
 			{
 				//same tick, no new state
 				//Predict new state based on Unreal tick time
 				gsvptr->vehicle_state.x  = gsvptr->vehicle_state.x + (gsvptr->vehicle_state.x_vel * deltaTime);
 				gsvptr->vehicle_state.y  = gsvptr->vehicle_state.y + (gsvptr->vehicle_state.y_vel * deltaTime);
 			}
-			else 
+			else
 			{
 				gsvptr->vehicle_state.x = x;
 				gsvptr->vehicle_state.y = y;
@@ -217,7 +217,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
-		if (gsv.v_type == 0) continue;
+		if (gsv.v_type != 2) continue;
 
 		// Update the vehicle's vehicle_state based on its actor's location.
 		// Actual movement of the vehicle is updated in another class.
@@ -241,7 +241,7 @@ void AGSClient::CreateVehicle(int vid, int v_type)
 	gsv.vid = vid;
 	gsv.v_type = v_type;
 	gsv.vehicle_state =  VehicleState();
-	if (v_type == 1) // SDV
+	if (v_type == 1 || v_type == 3) // SDV or TV
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
@@ -261,7 +261,7 @@ void AGSClient::CreateVehicle(int vid, int v_type)
 		FName BboxTag = FName(*PubBbox);
 		gsv.actor->Tags.Add(BboxTag);
 	}
-	else // EV, TV
+	else if (v_type == 2) // EV
 	{
 		//Find actor with tag
 		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle"));
@@ -285,8 +285,8 @@ AActor* AGSClient::FindVehicleActor(int vid)
 	static const FName GSTAG(TEXT("gsvehicle")); //faster than FString
 	for(TActorIterator<AActor> Itr(GetWorld()); Itr; ++Itr)
 	{
-		if (Itr->ActorHasTag(GSTAG)) 
-		{ 
+		if (Itr->ActorHasTag(GSTAG))
+		{
 			for (FName tag: Itr->Tags)
 			{
 				FString str = tag.ToString();
@@ -302,7 +302,7 @@ AActor* AGSClient::FindVehicleActor(int vid)
 						{
 							UE_LOG(GeoScenarioModule, Log, TEXT("GeoScenario vehicle actor FOUND. Id %d"),tagvid);
 							return *Itr;
-						} 
+						}
 					}
 				}
 			}
@@ -315,7 +315,10 @@ AActor* AGSClient::FindVehicleActor(int vid)
 
 void AGSClient::WriteClientState(int tickCount, float deltaTime)
 {
-	if (!isConnected || cs_shmInfo.shm_id < 0) { return; }
+	if (!isConnected || cs_shmInfo.shm_id < 0) {
+		UE_LOG(GeoScenarioModule, Log, TEXT("Returning from WriteClientState"));
+		return;
+	}
 
 	std::stringstream oss;
 	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << '\n';
@@ -340,6 +343,8 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Vehicle state to CS ShM. Actor is null."));
 		}
 	}
+
+	UE_LOG(GeoScenarioModule, Log, TEXT("WriteClientState: %s | %s"), *FString(oss.str().c_str()), *FDateTime::Now().ToString());
 
 	// CS SHM ACQUIRE
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.p), 1) < 0) {
