@@ -104,8 +104,8 @@ void AGSClient::AttemptConnection()
     }
 	// get shared mem instance
     if ((cs_shmInfo.shm_id = shmget(cs_shmInfo.shm_key, SHM_SIZE, 0666)) < 0) {
-        UE_LOG(GeoScenarioModule, Error, TEXT("Error getting CS memory ID"));
-				UE_LOG(GeoScenarioModule, Error, TEXT("%s"), *FString(strerror(errno)));
+        UE_LOG(GeoScenarioModule, Error,
+               TEXT("Error getting CS memory ID: %s "), *FString(strerror(errno)));
         return;
     }
 	// attach memory to this process's address space
@@ -315,10 +315,7 @@ AActor* AGSClient::FindVehicleActor(int vid)
 
 void AGSClient::WriteClientState(int tickCount, float deltaTime)
 {
-	if (!isConnected || cs_shmInfo.shm_id < 0) {
-		UE_LOG(GeoScenarioModule, Log, TEXT("Returning from WriteClientState"));
-		return;
-	}
+	if (!isConnected || cs_shmInfo.shm_id < 0) { return; }
 
 	std::stringstream oss;
 	// output the correct number of pedestrians
@@ -345,7 +342,10 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 		}
 	}
 
-	UE_LOG(GeoScenarioModule, Log, TEXT("WriteClientState: %s | %s"), *FString(oss.str().c_str()), *FDateTime::Now().ToString());
+  // UE_LOG(GeoScenarioModule, Log,
+  //        TEXT("WriteClientState: %s | %s"),
+  //             *FString(oss.str().c_str()),
+  //             *FDateTime::Now().ToString());
 
 	// CS SHM ACQUIRE
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.p), 1) < 0) {
