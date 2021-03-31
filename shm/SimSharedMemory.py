@@ -68,7 +68,7 @@ class SimSharedMemory(object):
 
     def read_client_state(self, nvehicles, npedestrians):
         # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
-        header = [ 0, 0.0, 0, 0 ]
+        header = None
         vstates = {}
         pstates = {}
         disabled_vehicles = []
