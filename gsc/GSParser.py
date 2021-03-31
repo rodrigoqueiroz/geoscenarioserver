@@ -7,7 +7,7 @@ import xml.etree.ElementTree
 import re
 import gsc.Utils as Utils
 from gsc.Report import Report
-from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO, VEHICLE_BTYPES, PEDESTRIAN_BTYPES
+from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
@@ -85,18 +85,18 @@ class GSParser(object):
                 self.ways.append(way)
 
         # assign auto-generated ids
-        agent_nodes = [node for node in self.nodes.values() if 'btype' in node.tags]
-        nvehicles = len([node for node in agent_nodes if node.tags['btype'].lower() in VEHICLE_BTYPES])
-        npedestrians = len([node for node in agent_nodes if node.tags['btype'].lower() in PEDESTRIAN_BTYPES])
+        gs_nodes = [node for node in self.nodes.values() if 'gs' in node.tags]
+        nvehicles = len([node for node in gs_nodes if node.tags['gs'] == 'vehicle'])
+        npedestrians = len([node for node in gs_nodes if node.tags['gs'] == 'pedestrian'])
 
-        for node in agent_nodes:
+        for node in gs_nodes:
             # check if node does not have a pid or vid
             if not any([k in ['vid', 'pid'] for k in node.tags]):
-                if node.tags['btype'].lower() in VEHICLE_BTYPES:
+                if node.tags['gs'] == 'vehicle':
                     auto_id = next(i for i in range(1, nvehicles + 1) if i not in agent_ids['vehicles'])
                     node.tags['vid'] = auto_id
                     agent_ids['vehicles'].append(auto_id)
-                elif node.tags['btype'].lower() in PEDESTRIAN_BTYPES:
+                elif node.tags['gs'] == 'pedestrian':
                     auto_id = next(i for i in range(1, npedestrians + 1) if i not in agent_ids['pedestrians'])
                     node.tags['pid'] = auto_id
                     agent_ids['pedestrians'].append(auto_id)

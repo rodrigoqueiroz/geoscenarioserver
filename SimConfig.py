@@ -70,8 +70,6 @@ SHM_SIZE = 2048
 # osm file merging config
 # list of gs tags that must be unique per scenario
 UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
-VEHICLE_BTYPES = ['sdv', 'ev', 'tv']
-PEDESTRIAN_BTYPES = ['tp', 'pp', 'ep', 'sp']
 
 @dataclass
 class SimConfig:
