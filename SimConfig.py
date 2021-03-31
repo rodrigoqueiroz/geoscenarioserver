@@ -54,7 +54,7 @@ USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. 
 
 #Evaluation
 EVALUATION_MODE = True
-WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files
+WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
@@ -70,6 +70,8 @@ SHM_SIZE = 2048
 # osm file merging config
 # list of gs tags that must be unique per scenario
 UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
+VEHICLE_BTYPES = ['sdv', 'ev', 'tv']
+PEDESTRIAN_BTYPES = ['tp', 'pp', 'ep', 'sp']
 
 @dataclass
 class SimConfig:

@@ -19,7 +19,6 @@
     <tag k='btype' v='SP' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
-    <tag k='pid' v='1' />
     <tag k='route' v='ped_1_route' />
   </node>
   <node id='-5279768' action='modify' visible='true' lat='43.4780313103' lon='-80.51999509369'>
@@ -32,7 +31,6 @@
     <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_2' />
-    <tag k='pid' v='2' />
   </node>
   <node id='-5279770' action='modify' visible='true' lat='43.47797754362' lon='-80.51952101357' />
   <node id='-5279771' action='modify' visible='true' lat='43.47805996081' lon='-80.51961589599' />

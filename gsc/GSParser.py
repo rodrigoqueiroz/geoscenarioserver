@@ -7,7 +7,7 @@ import xml.etree.ElementTree
 import re
 import gsc.Utils as Utils
 from gsc.Report import Report
-from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
+from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO, VEHICLE_BTYPES, PEDESTRIAN_BTYPES
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
@@ -56,6 +56,9 @@ class GSParser(object):
         self.report = Report()
 
     def load_geoscenario_file(self, filepaths):
+        #for file_num,filepath in enumerate(filepaths):
+        agent_ids = {'pedestrians': [], 'vehicles': []}
+
         for file_num,filepath in enumerate(filepaths):
             xml_root = xml.etree.ElementTree.parse(filepath).getroot()
             for osm_node in xml_root.findall('node'):
@@ -63,7 +66,7 @@ class GSParser(object):
                 node.id = int(osm_node.get('id'))
                 node.lat = float(osm_node.get('lat'))
                 node.lon = float(osm_node.get('lon'))
-                self.parse_tags(osm_node, node, file_num)
+                self.parse_tags(osm_node, node, agent_ids)
                 if file_num == 0 or 'gs' not in node.tags:
                     self.nodes[node.id] = node
                 else:
@@ -76,10 +79,30 @@ class GSParser(object):
             for osm_node in xml_root.findall('way'):
                 way = Way()
                 way.id = int(osm_node.get('id'))
-                self.parse_tags(osm_node, way, file_num)
+                self.parse_tags(osm_node, way, agent_ids)
                 for osm_nd in osm_node.findall('nd'):
                     way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
                 self.ways.append(way)
+
+        # assign auto-generated ids
+        for node in self.nodes.values():
+            # check if node has a btype and does not have a pid or vid
+            if 'btype' in node.tags and not any([k in ['vid', 'pid'] for k in node.tags]):
+                if node.tags['btype'].lower() in VEHICLE_BTYPES:
+                    if len(agent_ids['vehicles']) == 0:
+                        auto_id = 1
+                    else:
+                        auto_id = agent_ids['vehicles'][-1] + 1
+                    node.tags['vid'] = auto_id
+                    agent_ids['vehicles'].append(auto_id)
+                elif node.tags['btype'].lower() in PEDESTRIAN_BTYPES:
+                    if len(agent_ids['pedestrians']) == 0:
+                        auto_id = 1
+                    else:
+                        auto_id = agent_ids['pedestrians'][-1] + 1
+                    node.tags['pid'] = auto_id
+                    agent_ids['pedestrians'].append(auto_id)
+
 
     def load_and_validate_geoscenario(self, filepaths):
         #Load XML
@@ -115,16 +138,18 @@ class GSParser(object):
         #Return result
         return self.isValid
 
-    def parse_tags(self, osm_node, node, file_num):
+    def parse_tags(self, osm_node, node, agent_ids):
         for osm_tag in osm_node.findall('tag'):
             k = osm_tag.get('k')
             v = osm_tag.get('v')
 
-            # append file number to agent id to ensure uniqueness
-            if k in ['vid', 'pid']:
-                v = int(str(file_num + 1) + str(v))
-
             node.tags[k] = float(v) if Utils.is_number(v) else v
+
+        # if node has a pid or vid, add it to appropriate array in agent_ids
+        if 'vid' in node.tags:
+            agent_ids['vehicles'].append(node.tags['vid'])
+        elif 'pid' in node.tags:
+            agent_ids['pedestrians'].append(node.tags['pid'])
 
     def project_nodes(self, projector, altitude):
         assert len(self.nodes) > 0
