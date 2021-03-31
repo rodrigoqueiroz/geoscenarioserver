@@ -13,12 +13,12 @@ class SimSharedMemory(object):
         self.cs_shm_key = cs_shm_key
         self.cs_sem_key = cs_sem_key
         try:
-            # create a semaphore and SHM for for Serve State
+            # create a semaphore and SHM for server state (SS)
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
             log.info("ShM SS semaphore created")
             self.ss_shm = sysv_ipc.SharedMemory(self.ss_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
             log.info("ShM SS memory created")
-            # create a semaphore and SHM for for Client State
+            # create a semaphore and SHM for client state (CS)
             self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
             log.info("ShM CS semaphore created")
             self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
@@ -29,26 +29,26 @@ class SimSharedMemory(object):
             self.is_connected = False
 
     def write_server_state(self, tick_count, delta_time, vehicles, pedestrians):
-        """ Writes to shared memory pose data for each Vehicle.
+        """ Writes to shared memory pose data for each agent.
             @param vehicles:      dictionary of type <int, Vehicle>
             @param pedestrians:      dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count delta_time n_vehicles n_pedestrians
-                vid v_type x y z vx vy yaw  steering_angle
+                vid v_type x y z vx vy yaw steering_angle
                 pid p_type x y z vx vy yaw
                 ...
         """
         if not self.is_connected:
             return
 
-        # write tick count and deltatime
+        # write tick count, deltatime, numbers of vehicles and pedestrians
         write_str = "{} {} {} {}\n".format(tick_count, delta_time, len(vehicles), len(pedestrians))
         # write vehicle states
         for svid in vehicles:
             vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
                 vid, v_type, position[0], position[1], position[2],
-                yaw, velocity[0], velocity[1], steering_angle)
+                velocity[0], velocity[1], yaw, steering_angle)
 
         for spid in pedestrians:
             pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
@@ -67,6 +67,15 @@ class SimSharedMemory(object):
         # log.info("Shared Memory write\n{}".format(write_str))
 
     def read_client_state(self, nvehicles, npedestrians):
+        """ Reads from shared memory pose data for each agent.
+            @param nvehicles:         number of vehicles
+            @param npedestrians:      number of pedestrians
+            Shared memory format:
+                tick_count delta_time n_vehicles n_pedestrians
+                vid x y z x_vel y_vel is_active
+                pid x y z x_vel y_vel is_active
+                ...
+        """
         # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
         header = None
         vstates = {}
@@ -88,7 +97,7 @@ class SimSharedMemory(object):
             self.is_connected = False
             return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
         except sysv_ipc.BusyError:
-            log.warn("client state semaphore locked...")
+            log.error("Cannot acquire client state semaphore...")
             return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
         # Parse client data

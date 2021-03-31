@@ -162,8 +162,8 @@ void AGSClient::ReadServerState(float deltaTime)
 		if (vid==0) {continue;} //garbage at the end of string
 
 		int v_type;
-		float x, y, z, yaw, x_vel, y_vel, steer;
-		iss >> v_type >> x >> y >> z >> yaw >> x_vel >> y_vel >> steer;
+		float x, y, z, x_vel, y_vel, yaw, steer;
+		iss >> v_type >> x >> y >> z >> x_vel >> y_vel >> yaw >> steer;
 		// Unreal's y axis is inverted from GS server's.
 		y *= -1;
 		y_vel *= -1;
@@ -196,9 +196,9 @@ void AGSClient::ReadServerState(float deltaTime)
 				gsvptr->vehicle_state.x = x;
 				gsvptr->vehicle_state.y = y;
 				gsvptr->vehicle_state.z = z;
-				gsvptr->vehicle_state.yaw = yaw;
 				gsvptr->vehicle_state.x_vel = x_vel;
 				gsvptr->vehicle_state.y_vel = y_vel;
+				gsvptr->vehicle_state.yaw = yaw;
 				gsvptr->vehicle_state.steer = steer;
 			}
 			FVector loc = FVector(gsvptr->vehicle_state.x, gsvptr->vehicle_state.y, gsvptr->actor->GetActorLocation()[2]);
@@ -231,6 +231,9 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 		gsv.vehicle_state.x = loc[0];
 		gsv.vehicle_state.y = loc[1];
 		gsv.vehicle_state.z = loc[2];
+		// update yaw
+		FRotator rot = gsv.actor->GetActorRotation();
+		gsv.vehicle_state.yaw = rot.Yaw;
 	}
 }
 
@@ -333,7 +336,7 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			int active = sv != nullptr ? (int)(sv->GetActive()) : 1;
 			oss << Elem.Key << " "
 				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
-				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " "
+				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " " /* TODO: gsv.vehicle_state.yaw << " " */
 				<< /*active*/ 1 << '\n';
 		}
 		else
@@ -341,7 +344,7 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Vehicle state to CS ShM. Actor is null."));
 		}
 	}
-
+	/* repeat the loop for pedestrians */
   UE_LOG(GeoScenarioModule, Log,
          TEXT("WriteClientState: %s | %s"),
               *FString(oss.str().c_str()),
