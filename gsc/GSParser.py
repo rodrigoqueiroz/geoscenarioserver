@@ -85,21 +85,19 @@ class GSParser(object):
                 self.ways.append(way)
 
         # assign auto-generated ids
-        for node in self.nodes.values():
-            # check if node has a btype and does not have a pid or vid
-            if 'btype' in node.tags and not any([k in ['vid', 'pid'] for k in node.tags]):
+        agent_nodes = [node for node in self.nodes.values() if 'btype' in node.tags]
+        nvehicles = len([node for node in agent_nodes if node.tags['btype'].lower() in VEHICLE_BTYPES])
+        npedestrians = len([node for node in agent_nodes if node.tags['btype'].lower() in PEDESTRIAN_BTYPES])
+
+        for node in agent_nodes:
+            # check if node does not have a pid or vid
+            if not any([k in ['vid', 'pid'] for k in node.tags]):
                 if node.tags['btype'].lower() in VEHICLE_BTYPES:
-                    if len(agent_ids['vehicles']) == 0:
-                        auto_id = 1
-                    else:
-                        auto_id = agent_ids['vehicles'][-1] + 1
+                    auto_id = next(i for i in range(1, nvehicles + 1) if i not in agent_ids['vehicles'])
                     node.tags['vid'] = auto_id
                     agent_ids['vehicles'].append(auto_id)
                 elif node.tags['btype'].lower() in PEDESTRIAN_BTYPES:
-                    if len(agent_ids['pedestrians']) == 0:
-                        auto_id = 1
-                    else:
-                        auto_id = agent_ids['pedestrians'][-1] + 1
+                    auto_id = next(i for i in range(1, npedestrians + 1) if i not in agent_ids['pedestrians'])
                     node.tags['pid'] = auto_id
                     agent_ids['pedestrians'].append(auto_id)
 
