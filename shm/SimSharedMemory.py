@@ -113,7 +113,7 @@ class SimSharedMemory(object):
         try:
             # the client must see the same number of vehicles as server
             if nclient_vehicles == nvehicles:
-                for ri in range(1, nvehicles):
+                for ri in range(1, nvehicles + 1):
                     vid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
                     vs = VehicleState()
                     vid = int(vid)
