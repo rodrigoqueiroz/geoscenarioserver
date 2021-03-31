@@ -174,8 +174,8 @@ void AGSClient::ReadServerState(float deltaTime)
 		GSVehicle* gsvptr = vehicles.Find(vid);
 		if (!gsvptr)
 		{
-			UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
-			UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
+			// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
+			// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
 			CreateVehicle(vid, v_type);
 			//debug
@@ -342,10 +342,10 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 		}
 	}
 
-  // UE_LOG(GeoScenarioModule, Log,
-  //        TEXT("WriteClientState: %s | %s"),
-  //             *FString(oss.str().c_str()),
-  //             *FDateTime::Now().ToString());
+  UE_LOG(GeoScenarioModule, Log,
+         TEXT("WriteClientState: %s | %s"),
+              *FString(oss.str().c_str()),
+              *FDateTime::Now().ToString());
 
 	// CS SHM ACQUIRE
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.p), 1) < 0) {
