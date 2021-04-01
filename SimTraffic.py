@@ -19,6 +19,7 @@ from sv.Vehicle import Vehicle
 from sp.Pedestrian import *
 from TrafficLight import TrafficLight
 import datetime
+import time
 
 
 class SimTraffic(object):
@@ -36,6 +37,7 @@ class SimTraffic(object):
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
+        self.cosimulation = False
 
         #Internal ShM
         self.traffic_state_sharr = None
@@ -50,6 +52,10 @@ class SimTraffic(object):
         self.vehicles[v.id] = v
         v.sim_traffic = self
         v.sim_config = self.sim_config
+
+        #If shared memory is active and there is at least one EV
+        if v.type == Vehicle.EV_TYPE and CLIENT_SHM:
+            self.cosimulation = True
 
     def add_traffic_light(self, tl):
         #check if Traffic Light exists in the map
@@ -74,6 +80,15 @@ class SimTraffic(object):
         #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
         self.write_traffic_state(0.0,0.0,0.0)
+
+        #If cosimulation, hold start waiting for first client state
+        if self.cosimulation == True:
+            log.warn("GSServer is running in Cosimulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
+            while(True):
+                header, vstates, _, _, _ = self.sim_client_shm.read_client_state(nv, np)
+                if len(vstates)>0:
+                    break;
+                time.sleep(0.5)
 
         #Start SDV Planners
         for vid,vehicle in self.vehicles.items():
