@@ -154,12 +154,11 @@ void AGSClient::ReadServerState(float deltaTime)
 
 	// parse vehicles
 	int vehicles_read = 0;
-	while (vehicles_read <= nvehicles)
+	while (vehicles_read < nvehicles)
 	{
 		iss >> vid;
-		vehicles_read++;
-
 		if (vid==0) {continue;} //garbage at the end of string
+		vehicles_read++;
 
 		int v_type;
 		float x, y, z, x_vel, y_vel, yaw, steer;
