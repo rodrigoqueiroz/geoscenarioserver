@@ -76,10 +76,9 @@ class SimTraffic(object):
 
 
     def start(self):
-        
         #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
-        self.write_traffic_state(0.0 , 0.0, 0.0)
+        self.write_traffic_state(0 , 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
         if self.cosimulation == True and WAIT_FOR_CLIENT:
@@ -91,7 +90,7 @@ class SimTraffic(object):
                 time.sleep(0.5)
 
         #Start SDV Planners
-        for vid,vehicle in self.vehicles.items():
+        for vid, vehicle in self.vehicles.items():
             if vehicle.type == Vehicle.SDV_TYPE:
                 vehicle.start_planner()
 
