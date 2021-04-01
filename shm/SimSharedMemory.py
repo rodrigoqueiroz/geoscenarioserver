@@ -42,7 +42,7 @@ class SimSharedMemory(object):
             return
 
         # write tick count, deltatime, numbers of vehicles and pedestrians
-        write_str = "{} {} {} {}\n".format(tick_count, delta_time, len(vehicles), len(pedestrians))
+        write_str = "{} {} {} {}\n".format(int(tick_count), delta_time, len(vehicles), len(pedestrians))
         # write vehicle states
         for svid in vehicles:
             vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()

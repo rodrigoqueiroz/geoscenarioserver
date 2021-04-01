@@ -76,16 +76,16 @@ class SimTraffic(object):
 
 
     def start(self):
-        nv = len(self.vehicles)
+        
         #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
-        self.write_traffic_state(0.0,0.0,0.0)
+        self.write_traffic_state(0.0 , 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
-        if self.cosimulation == True:
+        if self.cosimulation == True and WAIT_FOR_CLIENT:
             log.warn("GSServer is running in Cosimulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
             while(True):
-                header, vstates, _, _, _ = self.sim_client_shm.read_client_state(nv, np)
+                header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:
                     break;
                 time.sleep(0.5)
@@ -93,8 +93,6 @@ class SimTraffic(object):
         #Start SDV Planners
         for vid,vehicle in self.vehicles.items():
             if vehicle.type == Vehicle.SDV_TYPE:
-                #vehicle.start_planner(
-                #    nv, self.sim_config, self.traffic_state_sharr, self.traffic_pedestrian_sharr, self.traffic_light_sharr, self.debug_shdata)
                 vehicle.start_planner()
 
     def stop_all(self):
