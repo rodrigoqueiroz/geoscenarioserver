@@ -53,7 +53,7 @@ class EvalScenario:
 class SPConfig:
     btree_root:str = "eval_walk.btree"
     btree_reconfig:str = ""
-    start_state:list = field(default_factory=list) #[0.0,0.0,0.0, 0.0,0.0,0.0]  #cartesian [xpos,xvel,xacc, upos, yvel, yacc]
+    start_state:list = field(default_factory=list) #[0.0,0.0,0.0, 0.0,0.0,0.0]  #cartesian [xpos,xvel,xacc, ypos, yvel, yacc]
     route_nodes:list = field(default_factory=list)
     # vk_target_vel:float = 14.0
     # vk_time:float = 3.0
@@ -292,7 +292,8 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     config = SPConfig()
     config.btree_root = 'eval_walk.btree'
     #Standard
-    config.route_nodes = [ trajectory[0], trajectory[-1]]
+    #config.route_nodes = [ trajectory[0], trajectory[-1]]
+    config.route_nodes = trajectory[::10] # every 10 nodes in trajectory
     config.start_state = [ trajectory[0].x, ts.start_vel_x,0.0, trajectory[0].y, ts.start_vel_y,0.0 ]
     config.btree_reconfig = ""
 

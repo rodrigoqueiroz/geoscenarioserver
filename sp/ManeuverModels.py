@@ -31,16 +31,8 @@ def plan_velocity_keeping(pedestrian_state:PedestrianState, route, curr_route_no
     No target point, but needs to adapt to a desired velocity
     """
     ped_speed = np.linalg.norm([pedestrian_state.x_vel, pedestrian_state.y_vel])
-
-    #cap target vel to maximum difference
-    #this will smooth the trajectory when starting
-    if (mconfig.vel.value - ped_speed) > mconfig.max_diff:
-        target_speed = copy(mconfig.vel)
-        target_speed.value = ped_speed + mconfig.max_diff
-    else:
-        target_speed =  mconfig.vel.value
-
-    return curr_route_node, None, target_speed
+    
+    return curr_route_node, None, ped_speed
 
 
 def plan_stop(pedestrian_state:PedestrianState, route, curr_route_node, mconfig:MStopConfig, vehicles=None, pedestrians=None):
