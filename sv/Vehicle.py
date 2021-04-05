@@ -27,8 +27,8 @@ import datetime
 class Vehicle(Actor):
     #vehicle types
     N_TYPE = 0      #neutral
-    SDV_TYPE = 1    
-    EV_TYPE = 2         
+    SDV_TYPE = 1
+    EV_TYPE = 2
     TV_TYPE = 3
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
@@ -41,7 +41,7 @@ class Vehicle(Actor):
         # only be done for external vehicles (which don't have a frenet state)
         if self.type is not Vehicle.EV_TYPE:
             log.warn("Cannot update sim state for gs vehicles directly.")
-            
+
     def get_full_state_for_client(self):
         x = round((self.state.x * CLIENT_METER_UNIT))
         y = round((self.state.y * CLIENT_METER_UNIT))
@@ -82,7 +82,7 @@ class SDV(Vehicle):
         self.btree_reconfig = ""
         self.motion_plan = None
         self.next_motion_plan = None
-        
+
         #debug:
         self.jump_back_count = 0
         self.max_jump_back_dist = 0
@@ -119,7 +119,7 @@ class SDV(Vehicle):
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
         """
-        
+
         #Check if vehicle can switch to new plan
         if (self.next_motion_plan):
             time = sim_time - self.next_motion_plan.start_time
@@ -130,22 +130,22 @@ class SDV(Vehicle):
             else:
                 self.motion_plan = self.next_motion_plan
                 self.next_motion_plan = None
-        
+
         #Follow current plan
         if (self.motion_plan):
             time = sim_time - self.motion_plan.start_time
-            
+
             #exceed total traj time
             #If this happens and the vehicle is not stopped, the planner is stuck and can't generate new trajectories.
             #note: add an emergency break /fallback as a backup plan
-            if (time > self.motion_plan.trajectory.T): 
+            if (time > self.motion_plan.trajectory.T):
                 if self.state.s_vel > 0.1:
                     log.error("Vehicle {} finished last trajectory without stopping".format(self.id))
                 return
 
             # new state
             self.motion_plan.trajectory.consumed_time = time
-            new_state = self.motion_plan.trajectory.get_state_at(time) 
+            new_state = self.motion_plan.trajectory.get_state_at(time)
 
             #check consistency during transition from previous to new states
             # <1cm is within acceptable difference (rounding and error in frame conversion)
@@ -163,7 +163,7 @@ class SDV(Vehicle):
             # update frenet state
             self.state.set_S(new_state[:3])
             self.state.set_D(new_state[3:])
-            
+
             # Compute sim state using the global path this vehicle is following
             # self.global_path = self.lanelet_map.get_global_path_for_route(self.state.x, self.state.y, self.lanelet_route)
             try:
@@ -173,7 +173,7 @@ class SDV(Vehicle):
                 log.error("Outside of path. Vehicle reached goal?")
                 return
                 #raise e
-            
+
             # update sim state
             self.state.x = x_vector[0]
             self.state.x_vel = x_vector[1]
@@ -210,7 +210,7 @@ class SDV(Vehicle):
                 #    self.state.s, diff
                 #))
 
-   
+
 
     def set_new_motion_plan(self, plan:MotionPlan, sim_time):
         """
@@ -220,9 +220,9 @@ class SDV(Vehicle):
             self.next_motion_plan = None
         else:
             self.next_motion_plan = plan
-        
-        
-        
+
+
+
 
 
 class EV(Vehicle):
@@ -230,9 +230,9 @@ class EV(Vehicle):
     An external vehicle (remote simulation)
     """
     def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(vid = vid, name=name, start_state=start_state)
+        super().__init__(vid, name, start_state)
         self.type = Vehicle.EV_TYPE
-        self.P = np.identity(2) * 0.5 # some large error        
+        self.P = np.identity(2) * 0.5 # some large error
         # experiment w these values
         self.POS_VAR = 0.01 ** 2
         self.VEL_VAR = 0.1 ** 2
@@ -299,15 +299,10 @@ class TV(Vehicle):
         self.keep_active = keep_active
         if not keep_active:
             #starts as inactive until trajectory begins
-            self.sim_state = ActorSimState.INACTIVE 
+            self.sim_state = ActorSimState.INACTIVE
             self.state.set_X([9999, 0, 0])
             self.state.set_Y([9999,0,0])
-        
+
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         self.follow_trajectory(sim_time, self.trajectory)
-            
-                    
-
-
-     
