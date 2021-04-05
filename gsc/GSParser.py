@@ -8,6 +8,7 @@ import re
 import gsc.Utils as Utils
 from gsc.Report import Report
 from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
+import glog as log
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
@@ -66,7 +67,8 @@ class GSParser(object):
                 node.id = int(osm_node.get('id'))
                 node.lat = float(osm_node.get('lat'))
                 node.lon = float(osm_node.get('lon'))
-                self.parse_tags(osm_node, node, agent_ids)
+                if not self.parse_tags(osm_node, node, agent_ids):
+                    return False
                 if file_num == 0 or 'gs' not in node.tags:
                     self.nodes[node.id] = node
                 else:
@@ -89,22 +91,24 @@ class GSParser(object):
         nvehicles = len([node for node in gs_nodes if node.tags['gs'] == 'vehicle'])
         npedestrians = len([node for node in gs_nodes if node.tags['gs'] == 'pedestrian'])
 
+        vehicle_auto_ids = iter([i for i in range(1, nvehicles + 1) if i not in agent_ids['vehicle']])
+        ped_auto_ids = iter([i for i in range(1, npedestrians + 1) if i not in agent_ids['pedestrian']])
+
         for node in gs_nodes:
             # check if node does not have a pid or vid
             if not any([k in ['vid', 'pid'] for k in node.tags]):
                 if node.tags['gs'] == 'vehicle':
-                    auto_id = next(i for i in range(1, nvehicles + 1) if i not in agent_ids[node.tags['gs']])
-                    node.tags['vid'] = auto_id
-                    agent_ids[node.tags['gs']].append(auto_id)
+                    node.tags['vid'] = next(vehicle_auto_ids)
                 elif node.tags['gs'] == 'pedestrian':
-                    auto_id = next(i for i in range(1, npedestrians + 1) if i not in agent_ids[node.tags['gs']])
-                    node.tags['pid'] = auto_id
-                    agent_ids[node.tags['gs']].append(auto_id)
+                    node.tags['pid'] = next(ped_auto_ids)
+
+        return True
 
 
     def load_and_validate_geoscenario(self, filepaths):
         #Load XML
-        self.load_geoscenario_file(filepaths)
+        if not self.load_geoscenario_file(filepaths):
+            return False
         self.isValid = True
         self.report.file = filepaths[0]
         self.filename = filepaths[0]
@@ -144,10 +148,17 @@ class GSParser(object):
             node.tags[k] = float(v) if Utils.is_number(v) else v
 
         # if node has a pid or vid, add it to appropriate array in agent_ids
-        if 'vid' in node.tags:
-            agent_ids['vehicle'].append(node.tags['vid'])
-        elif 'pid' in node.tags:
-            agent_ids['pedestrian'].append(node.tags['pid'])
+        if any([k in ['vid', 'pid'] for k in node.tags]):
+            id_type = 'vid' if 'vid' in node.tags else 'pid'
+            assigned_id = int(node.tags[id_type])
+
+            if assigned_id in agent_ids[node.tags['gs']]:
+                log.error("Conflicting {}'s of {} in loaded scenario files".format(id_type, assigned_id))
+                return False
+
+            agent_ids[node.tags['gs']].append(assigned_id)
+
+        return True
 
     def project_nodes(self, projector, altitude):
         assert len(self.nodes) > 0
