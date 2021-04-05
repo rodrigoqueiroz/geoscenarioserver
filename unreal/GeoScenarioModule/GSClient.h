@@ -25,9 +25,9 @@ struct VehicleState
     float x = 0;
     float y = 0;
     float z = 0;
-    float yaw = 0;
     float x_vel = 0;
     float y_vel = 0;
+    float yaw = 0;
     float steer = 0;
 };
 
@@ -41,16 +41,16 @@ struct GSVehicle
 
 struct FrameStat
 {
-	float sim_time = 0;
-    int tick_count = 0;
-    float delta_time = 0;
+  float sim_time = 0;
+  int tick_count = 0;
+  float delta_time = 0;
 };
 
 UCLASS()
 class GEOSCENARIOMODULE_API AGSClient : public AActor
 {
 	GENERATED_BODY()
-	
+
 protected:
 	ShmInfo ss_shmInfo;
 	ShmInfo cs_shmInfo;
@@ -67,7 +67,7 @@ protected:
 	void UpdateRemoteVehicleStates(float deltaTime);
 	void WriteClientState(int tickCount, float deltaTime);
 
-public:	
+public:
 	AGSClient();
 	virtual void Tick(float DeltaTime) override;
 	void AttemptConnection();
