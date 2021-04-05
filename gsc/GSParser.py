@@ -153,7 +153,8 @@ class GSParser(object):
             assigned_id = int(node.tags[id_type])
 
             if assigned_id in agent_ids[node.tags['gs']]:
-                log.error("Conflicting {}'s of {} in loaded scenario files".format(id_type, assigned_id))
+                log.error("Conflicting {}={} in the loaded scenario files.".format(id_type, assigned_id))
+                log.error("Please assign a different {} for one of the agents.".format(id_type))
                 return False
 
             agent_ids[node.tags['gs']].append(assigned_id)
