@@ -44,23 +44,22 @@ void AGSClient::Tick(float DeltaTime)
 	WriteClientState(framestat.tick_count, framestat.delta_time);
 
 	// log for experiments
-	std::stringstream oss;
-
-	for (auto& Elem : vehicles)
-	{
-		GSVehicle &gsv = Elem.Value;
-		//Write out Client Vehicle states
-		//todo: include full state
-		if (gsv.actor != nullptr)
-		{
-			FVector loc = gsv.actor->GetActorLocation();
-			loc[2] = 0.0f;
-			oss << Elem.Key << " "
-				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
-				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << '\n';
-		}
-	}
-
+	// std::stringstream oss;
+	//
+	// for (auto& Elem : vehicles)
+	// {
+	// 	GSVehicle &gsv = Elem.Value;
+	// 	//Write out Client Vehicle states
+	// 	//todo: include full state
+	// 	if (gsv.actor != nullptr)
+	// 	{
+	// 		FVector loc = gsv.actor->GetActorLocation();
+	// 		loc[2] = 0.0f;
+	// 		oss << Elem.Key << " "
+	// 			<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
+	// 			<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << '\n';
+	// 	}
+	// }
 	// UE_LOG(GeoScenarioModule, Log, TEXT("%s | %s"), *FString(oss.str().c_str()), *FDateTime::Now().ToString());
 }
 
@@ -117,7 +116,7 @@ void AGSClient::AttemptConnection()
     }
 	//Connected :)
 	isConnected = true;
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "====>>>>> Connected to GeoScenario Server");
+  //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "====>>>>> Connected to GeoScenario Server");
 	UE_LOG(GeoScenarioModule, Warning, TEXT("====>>>>> Connected to GeoScenario Server"));
 	//clear timer
 	GetWorldTimerManager().ClearTimer(ConnectionTimerHandler);
@@ -344,10 +343,10 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 		}
 	}
 	/* repeat the loop for pedestrians */
-  UE_LOG(GeoScenarioModule, Log,
-         TEXT("WriteClientState: %s | %s"),
-              *FString(oss.str().c_str()),
-              *FDateTime::Now().ToString());
+  // UE_LOG(GeoScenarioModule, Log,
+  //        TEXT("WriteClientState: %s | %s"),
+  //             *FString(oss.str().c_str()),
+  //             *FDateTime::Now().ToString());
 
 	// CS SHM ACQUIRE
 	if (semop(cs_shmInfo.sem_id, &(cs_shmInfo.p), 1) < 0) {
