@@ -20,8 +20,8 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
 DASH_RATE = 30              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1               	#vehicle from the first specified scenario to center the main plot around, if not defined by this scenario.
-                            #Make sure there exists a vehicle in the first specified scenario with this id
+PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by the scenario.
+                            #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
 MPLOT_SIZE = 100			#map plot: road length in meters (shorter=better performance)
