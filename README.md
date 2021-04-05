@@ -57,17 +57,18 @@ optional arguments:
 ## Loading multiple scenario files
 
 - The `--scenario` option can take more than one `.osm` file as its arguments
-- With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
-- The `globalconfig` and `origin` are used from the first `.osm` file that is specified
-- Since multiple scenarios can define vehicles and pedestrians with the same `vid`s and `pid`s, the position of the file when passed to `--scenario` is prepended to each `vid` and `pid` from that scenario
-- Example:
+- For example,
 ```
 python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
 ```
-- The vehicle in `gs_straight_obstacles.osm` has a `vid` of `1`, and the vehicle in `gs_straight_pedestrian.osm` also has a `vid` of `1`
-- When running the example above, the vehicle from `gs_straight_obstacles.osm` (the first file specified) will have a `vid` of `11`, and the vehicle from `gs_straight_pedestrian.osm` (the second scenario specified) will have a `vid` of `21`
-- Notice that the pedstrian from `gs_straight_pedestrian.osm`, which is defined with a `pid` of `1`, has a `pid` of `21` when the example above is run
-
+- With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
+- The `globalconfig` and `origin` are used from the first `.osm` file that is specified (which is `gs_straight_obstacles.osm` in the example)
+- Multiple scenarios can define vehicles and pedestrians with the same `vid`s and `pid`s
+- If these scenarios are passed to the `--scenario` option, then an error will be reported
+- All `vid` and `pid` conflicts must be resolved before running `GSServer.py`
+- Scenarios can contain vehicles with no `vid` and pedestrians with no `pid`
+- These vehicles and pedestrians will be auto-assigned `vid`s and `pid`s
+- Auto-assigned `vid`s and `pids` will start from 1 and won't conflict with the other `vid`s and `pid`s
 
 ## Configuration:
 
