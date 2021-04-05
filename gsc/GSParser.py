@@ -57,7 +57,7 @@ class GSParser(object):
 
     def load_geoscenario_file(self, filepaths):
         #for file_num,filepath in enumerate(filepaths):
-        agent_ids = {'pedestrians': [], 'vehicles': []}
+        agent_ids = {'pedestrian': [], 'vehicle': []}
 
         for file_num,filepath in enumerate(filepaths):
             xml_root = xml.etree.ElementTree.parse(filepath).getroot()
@@ -93,13 +93,13 @@ class GSParser(object):
             # check if node does not have a pid or vid
             if not any([k in ['vid', 'pid'] for k in node.tags]):
                 if node.tags['gs'] == 'vehicle':
-                    auto_id = next(i for i in range(1, nvehicles + 1) if i not in agent_ids['vehicles'])
+                    auto_id = next(i for i in range(1, nvehicles + 1) if i not in agent_ids[node.tags['gs']])
                     node.tags['vid'] = auto_id
-                    agent_ids['vehicles'].append(auto_id)
+                    agent_ids[node.tags['gs']].append(auto_id)
                 elif node.tags['gs'] == 'pedestrian':
-                    auto_id = next(i for i in range(1, npedestrians + 1) if i not in agent_ids['pedestrians'])
+                    auto_id = next(i for i in range(1, npedestrians + 1) if i not in agent_ids[node.tags['gs']])
                     node.tags['pid'] = auto_id
-                    agent_ids['pedestrians'].append(auto_id)
+                    agent_ids[node.tags['gs']].append(auto_id)
 
 
     def load_and_validate_geoscenario(self, filepaths):
@@ -145,9 +145,9 @@ class GSParser(object):
 
         # if node has a pid or vid, add it to appropriate array in agent_ids
         if 'vid' in node.tags:
-            agent_ids['vehicles'].append(node.tags['vid'])
+            agent_ids['vehicle'].append(node.tags['vid'])
         elif 'pid' in node.tags:
-            agent_ids['pedestrians'].append(node.tags['pid'])
+            agent_ids['pedestrian'].append(node.tags['pid'])
 
     def project_nodes(self, projector, altitude):
         assert len(self.nodes) > 0
