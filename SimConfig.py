@@ -53,14 +53,15 @@ PLANNING_TIME = 0.150                #[s] Must be less than 1/PLANNTER_RATE (we 
 USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
 
 #Evaluation
-EVALUATION_MODE = True
+EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
-CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
+WAIT_FOR_CLIENT = True     #Hold Simulation start until a valid state is sent from client
+CLIENT_SHM = True          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943

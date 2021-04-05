@@ -57,6 +57,8 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
                 vehicle_state.s_vel - tvehicle.state.s_vel
             )
         log.info(state_str)
+        log.warn("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
+        return True
 
     # return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lid=target_lane_config.id))
     # Returning false for the experiments
@@ -171,6 +173,9 @@ def get_leading_vehicle(vehicle_state, lane_config, traffic_vehicles):
     log.check_notnone(lane_config)
 
     cur_lane = lane_config.get_current_lane(vehicle_state.d)
+    #if cur_lane is None:
+        #print(vehicle_state.d)
+        #print(lane_config)
     log.check_notnone(cur_lane)
 
     vehicles_ahead = list(filter(
