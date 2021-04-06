@@ -203,35 +203,35 @@ class SDVRoute(object):
         #     plt.axis([-50, 40, -50, 40])
         #     plt.show()
 
-    def _update_should_lane_change(self, s, path, s_start):
+    def _update_should_lane_change(self, s, path, start_s):
         start, end, direction = self._current_sdv_path.get_lane_change_info()
 
         if (start is not None) and (end is not None):
             try:
-                start_s = sim_to_frenet_position(
-                    path, start.x, start.y, s_start
+                s_start = sim_to_frenet_position(
+                    path, start.x, start.y, start_s
                 )[0]
             except OutsideRefPathException:
-                start_s = None
+                s_start = None
 
             try:
-                end_s = sim_to_frenet_position(
-                    path, end.x, end.y, s_start
+                s_end = sim_to_frenet_position(
+                    path, end.x, end.y, start_s
                 )[0]
             except OutsideRefPathException:
-                end_s = None
+                s_end = None
 
-            if (start_s is None) and (end_s is not None):
-                # start_s is None because it lies before path
-                self._should_lane_change = (s <= end_s)
-            elif (start_s is not None) and (end_s is None):
-                # end_s is None because it lies after path
-                self._should_lane_change = (s >= start_s)
-            elif (start_s is not None) and (end_s is not None):
-                # both start_s and end_s lie on path
-                self._should_lane_change = (s >= start_s) and (s <= end_s)
-            # NOTE: start_s and end_s will both be None in the case where path is
-            #       the reference path; end_s is gauranteed to lie on the global path
+            if (s_start is None) and (s_end is not None):
+                # s_start is None because it lies before path
+                self._should_lane_change = (s <= s_end)
+            elif (s_start is not None) and (s_end is None):
+                # s_end is None because it lies after path
+                self._should_lane_change = (s >= s_start)
+            elif (s_start is not None) and (s_end is not None):
+                # both s_start and s_end lie on path
+                self._should_lane_change = (s >= s_start) and (s <= s_end)
+            # NOTE: s_start and s_end will both be None in the case where path is
+            #       the reference path; s_end is gauranteed to lie on the global path
         else:
             # NOTE: start and end will either both be None, or both be a point
             self._should_lane_change = False
