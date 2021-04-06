@@ -20,7 +20,7 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
 DASH_RATE = 30              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by scenario.
+PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by the scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
@@ -53,19 +53,24 @@ PLANNING_TIME = 0.150                #[s] Must be less than 1/PLANNTER_RATE (we 
 USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
 
 #Evaluation
-EVALUATION_MODE = True
+EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
-CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
+WAIT_FOR_CLIENT = True     #Hold Simulation start until a valid state is sent from client
+CLIENT_SHM = True          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943
 CS_SEM_KEY = 933433
 SHM_SIZE = 2048
+
+# osm file merging config
+# list of gs tags that must be unique per scenario
+UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
 
 @dataclass
 class SimConfig:

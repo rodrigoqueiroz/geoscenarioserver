@@ -19,6 +19,7 @@ from sv.Vehicle import Vehicle
 from sp.Pedestrian import *
 from TrafficLight import TrafficLight
 import datetime
+import time
 
 
 class SimTraffic(object):
@@ -36,6 +37,7 @@ class SimTraffic(object):
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
+        self.cosimulation = False
 
         #Internal ShM
         self.traffic_state_sharr = None
@@ -51,6 +53,10 @@ class SimTraffic(object):
         self.vehicles[v.id] = v
         v.sim_traffic = self
         v.sim_config = self.sim_config
+
+        #If shared memory is active and there is at least one EV
+        if v.type == Vehicle.EV_TYPE and CLIENT_SHM:
+            self.cosimulation = True
 
     def add_traffic_light(self, tl):
         #check if Traffic Light exists in the map
@@ -71,16 +77,22 @@ class SimTraffic(object):
 
 
     def start(self):
-        nv = len(self.vehicles)
         #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
-        self.write_traffic_state(0.0,0.0,0.0)
+        self.write_traffic_state(0 , 0.0, 0.0)
+
+        #If cosimulation, hold start waiting for first client state
+        if self.cosimulation == True and WAIT_FOR_CLIENT:
+            log.warn("GSServer is running in Cosimulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
+            while(True):
+                header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
+                if len(vstates)>0:
+                    break;
+                time.sleep(0.5)
 
         #Start SDV Planners
-        for vid,vehicle in self.vehicles.items():
+        for vid, vehicle in self.vehicles.items():
             if vehicle.type == Vehicle.SDV_TYPE:
-                #vehicle.start_planner(
-                #    nv, self.sim_config, self.traffic_state_sharr, self.traffic_pedestrian_sharr, self.traffic_light_sharr, self.debug_shdata)
                 vehicle.start_planner()
 
     def stop_all(self):
@@ -109,7 +121,7 @@ class SimTraffic(object):
             new_client_state = False
             header, vstates, pstates, disabled_vehicles, disabled_pedestrians = self.sim_client_shm.read_client_state(nv, np)
             if header is not None:
-                client_tick_count, client_delta_time, n_vehicles = header
+                client_tick_count, client_delta_time, n_vehicles, n_pedestrians = header
                 if self.sim_client_tick_count < client_tick_count:
                     self.sim_client_tick_count = client_tick_count
                     new_client_state = True
