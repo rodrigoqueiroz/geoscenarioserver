@@ -122,7 +122,8 @@ class SVPlanner(object):
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
 
             # Get traffic, lane config and regulatory elements in current frenet frame
-            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states,static_objects, sync_planner.get_task_time(), state_time)
+            self.project_dynamic_objects(vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, sync_planner.get_task_time())
+            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
@@ -136,7 +137,7 @@ class SVPlanner(object):
                 self.reference_path = self.laneletmap.get_global_path_for_route(
                     self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects, 0, state_time)
+                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -221,23 +222,15 @@ class SVPlanner(object):
                 )
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         
-
-    def get_planner_state(
+    def project_dynamic_objects(
             self,
-            planner_tick:TickSync,
             vehicle_state:VehicleState,
             traffic_vehicles:dict,
             traffic_pedestrians:dict,
-            traffic_light_states:dict,
-            static_objects:dict,
-            expected_planner_time,
-            state_time):
-        """ Transforms vehicle_state and all traffic vehicles to the current frenet frame, and generates other
-            frame-dependent planning data like current lane config and goal.
-        """
+            state_time,
+            expected_planner_time):
 
-        # From compute_vehicle_state() in sv/Vehicle.py
-        if self.last_plan and expected_planner_time>0:
+        if self.last_plan and expected_planner_time > 0:
             sim_time_ahead = state_time + expected_planner_time
             delta_time = sim_time_ahead - self.last_plan.start_time
             if (delta_time > self.last_plan.trajectory.T): 
@@ -257,12 +250,41 @@ class SVPlanner(object):
             vehicle_state.y = y_vector[0]
             vehicle_state.y_vel = y_vector[1]
             vehicle_state.y_acc = y_vector[2]
-        else:
-            # update vehicle frenet state since reference path may have changed
-            s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
-            vehicle_state.set_S(s_vector)
-            vehicle_state.set_D(d_vector)
-            delta_time = 0.0
+
+            # transform other vehicles and pedestrians to frenet frame based on this vehicle
+            for vid, vehicle in traffic_vehicles.items():
+                state = vehicle.future_state(delta_time)
+                vehicle.state.s = state[0]
+                vehicle.state.s_vel = state[1]
+                vehicle.state.s_acc = state[2]
+                vehicle.state.d = state[3]
+                vehicle.state.d_vel = state[4]
+                vehicle.state.d_acc = state[5]
+
+            for pid, pedestrian in traffic_pedestrians.items():
+                state = pedestrian.future_state(delta_time)
+                pedestrian.state.s = state[0]
+                pedestrian.state.s_vel = state[1]
+                pedestrian.state.s_acc = state[2]
+                pedestrian.state.d = state[3]
+                pedestrian.state.d_vel = state[4]
+                pedestrian.state.d_acc = state[5]
+
+    def get_planner_state(
+            self,
+            planner_tick:TickSync,
+            vehicle_state:VehicleState,
+            traffic_vehicles:dict,
+            traffic_pedestrians:dict,
+            traffic_light_states:dict,
+            static_objects:dict):
+        """ Transforms vehicle_state and all traffic vehicles to the current frenet frame, and generates other
+            frame-dependent planning data like current lane config and goal.
+        """
+
+        s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
+        vehicle_state.set_S(s_vector)
+        vehicle_state.set_D(d_vector)
 
         # update lane config based on current (possibly outdated) reference frame
         lane_config, reg_elems = self.read_map(vehicle_state, self.reference_path, traffic_light_states)
@@ -277,21 +299,12 @@ class SVPlanner(object):
                 self.reference_path, vehicle.state.get_X(), vehicle.state.get_Y())
             vehicle.state.set_S(s_vector)
             vehicle.state.set_D(d_vector)
-            if self.last_plan:
-                state = vehicle.future_state(delta_time)
-                vehicle.state.s = state[0]
-                vehicle.state.s_vel = state[1]
-                vehicle.state.s_acc = state[2]
-                vehicle.state.d = state[3]
-                vehicle.state.d_vel = state[4]
-                vehicle.state.d_acc = state[5]
         
         for pid, pedestrian in traffic_pedestrians.items():
             s_vector, d_vector = sim_to_frenet_frame(
                 self.reference_path, pedestrian.state.get_X(), pedestrian.state.get_Y())
             pedestrian.state.set_S(s_vector)
             pedestrian.state.set_D(d_vector)
-            # TODO: get future_state()
         
         for soid, so in static_objects.items():
             so.s, so.d = sim_to_frenet_position(self.reference_path, so.x, so.y)
