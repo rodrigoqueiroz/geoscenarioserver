@@ -20,7 +20,7 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
 DASH_RATE = 30              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by scenario.
+PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by the scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
@@ -67,6 +67,10 @@ SEM_KEY = 346565
 CS_SHM_KEY = 333943
 CS_SEM_KEY = 933433
 SHM_SIZE = 2048
+
+# osm file merging config
+# list of gs tags that must be unique per scenario
+UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
 
 @dataclass
 class SimConfig:

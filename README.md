@@ -37,8 +37,8 @@ bash scripts/install_dependencies.bash
 ```
 optional arguments:
   -h, --help            show this help message and exit
-  -s FILE, --scenario FILE
-                        GeoScenario file
+  -s [FILE [FILE ...]], --scenario [FILE [FILE ...]]
+                        GeoScenario file. If no file is provided, the GSServer will load a scenario from code
   -q VERBOSE, --quiet VERBOSE
                         don't print messages to stdout
   -m, --map-path 
@@ -53,6 +53,22 @@ optional arguments:
 - If a file is not given, you must provide a manual problem startup from code.
 - LaneletMap files must be placed inside *scenarios/maps* (a map file is mandatory).
 - Co-Simulator (Unreal or other) is optional.
+
+## Loading multiple scenario files
+
+- The `--scenario` option can take more than one `.osm` file as its arguments
+- For example,
+```
+python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
+```
+- With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
+- The `globalconfig` and `origin` are used from the first `.osm` file that is specified (which is `gs_straight_obstacles.osm` in the example)
+- Multiple scenarios can define vehicles and pedestrians with the same `vid`s and `pid`s
+- If these scenarios are passed to the `--scenario` option, then an error will be reported
+- All `vid` and `pid` conflicts must be resolved before running `GSServer.py`
+- Scenarios can contain vehicles with no `vid` and pedestrians with no `pid`
+- These vehicles and pedestrians will be auto-assigned `vid`s and `pid`s
+- Auto-assigned `vid`s and `pids` will start from 1 and won't conflict with the other `vid`s and `pid`s
 
 ## Configuration:
 
