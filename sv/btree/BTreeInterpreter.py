@@ -161,7 +161,19 @@ class BTreeInterpreter(object):
     def build_tree(self, tree_name):
         root, nodes, subtrees = self.interpret_tree(tree_name)
         tree = trees.BehaviourTree(root=root)
-        if subtrees: tree = self.link_subtrees(tree, nodes, subtrees)
+        roottree_nodes = len(self.collect_nodes(tree))
+        reuse = 0
+        expanded_nodes = 0
+        if subtrees: 
+            tree = self.link_subtrees(tree, nodes, subtrees)
+            expanded_nodes = len(self.collect_nodes(tree))
+            reuse = ((expanded_nodes-roottree_nodes)/expanded_nodes)*100
+
+        print("[vehicle " + str(self.vid) + "]")
+        print(" root tree nodes = " + str(roottree_nodes))
+        print(" tree with subtrees nodes = " + str(expanded_nodes))
+        print(" reuse = " + str(reuse) + "%")
+
         self.tree=tree
         return tree
 
