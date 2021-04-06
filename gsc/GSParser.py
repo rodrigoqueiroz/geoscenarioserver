@@ -7,6 +7,8 @@ import xml.etree.ElementTree
 import re
 import gsc.Utils as Utils
 from gsc.Report import Report
+from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
+import glog as log
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
@@ -54,29 +56,62 @@ class GSParser(object):
 
         self.report = Report()
 
-    def load_geoscenario_file(self, filepath):
-        xml_root = xml.etree.ElementTree.parse(filepath).getroot()
-        for osm_node in xml_root.findall('node'):
-            node = Node()
-            node.id = int(osm_node.get('id'))
-            node.lat = float(osm_node.get('lat'))
-            node.lon = float(osm_node.get('lon'))
-            self.parse_tags(osm_node, node)
-            self.nodes[node.id] = node
-        for osm_node in xml_root.findall('way'):
-            way = Way()
-            way.id = int(osm_node.get('id'))
-            self.parse_tags(osm_node, way)
-            for osm_nd in osm_node.findall('nd'):
-                way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
-            self.ways.append(way)
+    def load_geoscenario_file(self, filepaths):
+        #for file_num,filepath in enumerate(filepaths):
+        agent_ids = {'pedestrian': [], 'vehicle': []}
 
-    def load_and_validate_geoscenario(self, filepath):
+        for file_num,filepath in enumerate(filepaths):
+            xml_root = xml.etree.ElementTree.parse(filepath).getroot()
+            for osm_node in xml_root.findall('node'):
+                node = Node()
+                node.id = int(osm_node.get('id'))
+                node.lat = float(osm_node.get('lat'))
+                node.lon = float(osm_node.get('lon'))
+                if not self.parse_tags(osm_node, node, agent_ids):
+                    return False
+                if file_num == 0 or 'gs' not in node.tags:
+                    self.nodes[node.id] = node
+                else:
+                    # only add gs tags if the value is not in the list of
+                    # unique tags per scenario (e.g. origin, globalconfig)
+                    if (node.tags['gs'] not in UNIQUE_GS_TAGS_PER_SCENARIO):
+                        self.nodes[node.id] = node
+
+            # there are currently no way tags that must be unique per scenario
+            for osm_node in xml_root.findall('way'):
+                way = Way()
+                way.id = int(osm_node.get('id'))
+                self.parse_tags(osm_node, way, agent_ids)
+                for osm_nd in osm_node.findall('nd'):
+                    way.nodes.append(self.nodes[ int(osm_nd.get('ref')) ])
+                self.ways.append(way)
+
+        # assign auto-generated ids
+        gs_nodes = [node for node in self.nodes.values() if 'gs' in node.tags]
+        nvehicles = len([node for node in gs_nodes if node.tags['gs'] == 'vehicle'])
+        npedestrians = len([node for node in gs_nodes if node.tags['gs'] == 'pedestrian'])
+
+        vehicle_auto_ids = iter([i for i in range(1, nvehicles + 1) if i not in agent_ids['vehicle']])
+        ped_auto_ids = iter([i for i in range(1, npedestrians + 1) if i not in agent_ids['pedestrian']])
+
+        for node in gs_nodes:
+            # check if node does not have a pid or vid
+            if not any([k in ['vid', 'pid'] for k in node.tags]):
+                if node.tags['gs'] == 'vehicle':
+                    node.tags['vid'] = next(vehicle_auto_ids)
+                elif node.tags['gs'] == 'pedestrian':
+                    node.tags['pid'] = next(ped_auto_ids)
+
+        return True
+
+
+    def load_and_validate_geoscenario(self, filepaths):
         #Load XML
-        self.load_geoscenario_file(filepath)
+        if not self.load_geoscenario_file(filepaths):
+            return False
         self.isValid = True
-        self.report.file = filepath
-        self.filename = filepath
+        self.report.file = filepaths[0]
+        self.filename = filepaths[0]
         #Process Nodes
         for nid, node in self.nodes.items():
             if "gs" in node.tags:
@@ -105,10 +140,26 @@ class GSParser(object):
         #Return result
         return self.isValid
 
-    def parse_tags(self, osm_node, node):
+    def parse_tags(self, osm_node, node, agent_ids):
         for osm_tag in osm_node.findall('tag'):
+            k = osm_tag.get('k')
             v = osm_tag.get('v')
-            node.tags[osm_tag.get('k')] = float(v) if Utils.is_number(v) else v
+
+            node.tags[k] = float(v) if Utils.is_number(v) else v
+
+        # if node has a pid or vid, add it to appropriate array in agent_ids
+        if any([k in ['vid', 'pid'] for k in node.tags]):
+            id_type = 'vid' if 'vid' in node.tags else 'pid'
+            assigned_id = int(node.tags[id_type])
+
+            if assigned_id in agent_ids[node.tags['gs']]:
+                log.error("Conflicting {}={} in the loaded scenario files.".format(id_type, assigned_id))
+                log.error("Please assign a different {} for one of the agents.".format(id_type))
+                return False
+
+            agent_ids[node.tags['gs']].append(assigned_id)
+
+        return True
 
     def project_nodes(self, projector, altitude):
         assert len(self.nodes) > 0
@@ -165,7 +216,7 @@ class GSParser(object):
         optional = {"group","duration","interval"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
-        
+
         self.tlights[n.tags['name']] = n
 
         # ensure no. states match no. durations
@@ -299,7 +350,7 @@ class GSParser(object):
        #todo: check nd attributes, and  if nodes exist
        return None
 
-    
+
     def check_uniquename(self,n):
         name = n.tags['name']
 
@@ -337,5 +388,3 @@ class GSParser(object):
             print (x,':', self.vehicles[x])
             for y in self.vehicles[x].tags:
                 print (y, ':', self.vehicles[x].tags[y])
-
-

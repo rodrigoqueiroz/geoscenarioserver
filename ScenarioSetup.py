@@ -18,20 +18,24 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
-def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
+def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
-    if (os.path.isabs(gsfile[0])):
-        # absolute path
-        full_scenario_path = gsfile
-    else:
-        # relative to ROOT_DIR
-        full_scenario_path = os.path.join(ROOT_DIR, gsfile)
-    log.info("Loading GeoScenario file: {}".format(full_scenario_path))
+    full_scenario_paths = []
+    for gsfile in gsfiles:
+        if (os.path.isabs(gsfile[0])):
+            # absolute path
+            full_scenario_paths.append(gsfile)
+        else:
+            # relative to ROOT_DIR
+            full_scenario_paths.append(os.path.join(ROOT_DIR, gsfile))
+
+    log.info("Loading GeoScenario file(s): {}".format(", ".join(full_scenario_paths)))
+
     #========= Parse GeoScenario File
     parser = GSParser()
-    if not parser.load_and_validate_geoscenario(full_scenario_path):
-        log.error("Error loading GeoScenario file")
+    if not parser.load_and_validate_geoscenario(full_scenario_paths):
+        log.error("Error loading GeoScenario file(s)")
         return False
     if parser.globalconfig.tags['version'] < 2.0:
         log.error("GSServer requires GeoScenario 2.0 or newer")
@@ -41,7 +45,7 @@ def load_geoscenario_from_file(gsfile, sim_traffic:SimTraffic, sim_config:SimCon
     sim_config.scenario_name = parser.globalconfig.tags['name']
     sim_config.timeout = parser.globalconfig.tags['timeout']
     if 'plotvid' in parser.globalconfig.tags:
-        sim_config.plot_vid = parser.globalconfig.tags['plotvid']
+        sim_config.plot_vid = int(parser.globalconfig.tags['plotvid'])
 
     #========= Map
     if map_path == "":
