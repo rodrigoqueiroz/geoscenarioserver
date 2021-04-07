@@ -44,6 +44,9 @@ class SDVRoute(object):
     def get_reference_path(self):
         return self._current_sdv_path.get_ref_path()
 
+    def get_reference_path_origin(self):
+        return self._current_sdv_path.get_ref_path_origin()
+
     def get_reference_path_s_start(self):
         return self._current_sdv_path.get_ref_path_s_start()
 
@@ -73,7 +76,7 @@ class SDVRoute(object):
 
         if plan_lane_change:
             self._update_should_lane_change(
-                0, self.get_reference_path(), self.get_reference_path_start_s()
+                0, self.get_reference_path(), self.get_reference_path_s_start()
             )
 
     def _set_sdv_paths(self):
@@ -258,6 +261,7 @@ class SDVPath(object):
 
         # The reference path
         self._ref_path = None
+        self._ref_path_origin:float = 0.0
         self._ref_path_s_start:float = 0.0
         self._ref_path_s_end:float = 0.0
 
@@ -275,12 +279,16 @@ class SDVPath(object):
     def get_ref_path(self):
         return self._ref_path
 
+    def get_ref_path_origin(self):
+        return self._ref_path_origin
+
     def get_ref_path_s_start(self):
         return self._ref_path_s_start
 
     def update_ref_path(self, ref_path_origin:float, ref_path_s_start:float=-100.0, ref_path_s_end:float=100.0):
         # NOTE: ref_path_origin is the position (s) of the origin of the reference
         #       path along the global path
+        self._ref_path_origin = ref_path_origin
 
         global_path_start_index, global_path_end_index = self._get_global_path_start_and_end_indices(
             ref_path_origin + ref_path_s_start,
