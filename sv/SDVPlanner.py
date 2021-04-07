@@ -251,9 +251,8 @@ class SVPlanner(object):
             vehicle_state.y_vel = y_vector[1]
             vehicle_state.y_acc = y_vector[2]
 
-            # transform other vehicles and pedestrians to frenet frame based on this vehicle
             for vid, vehicle in traffic_vehicles.items():
-                state = vehicle.future_state(delta_time)
+                state = vehicle.future_state(expected_planner_time)
                 vehicle.state.s = state[0]
                 vehicle.state.s_vel = state[1]
                 vehicle.state.s_acc = state[2]
@@ -262,7 +261,7 @@ class SVPlanner(object):
                 vehicle.state.d_acc = state[5]
 
             for pid, pedestrian in traffic_pedestrians.items():
-                state = pedestrian.future_state(delta_time)
+                state = pedestrian.future_state(expected_planner_time)
                 pedestrian.state.s = state[0]
                 pedestrian.state.s_vel = state[1]
                 pedestrian.state.s_acc = state[2]
