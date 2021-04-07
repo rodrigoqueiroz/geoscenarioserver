@@ -33,6 +33,7 @@ class SimTraffic(object):
         self.static_objects = {}
         self.pedestrians = {}
         self.traffic_lights = {}    #geoscenario TrafficLights by corresponding lanelet2 TrafficLight id
+        self.crosswalk_entry_pts = {}
 
         #External Sim (Unreal) ShM
         self.sim_client_shm = None
@@ -93,6 +94,11 @@ class SimTraffic(object):
         for vid, vehicle in self.vehicles.items():
             if vehicle.type == Vehicle.SDV_TYPE:
                 vehicle.start_planner()
+
+        #Start SP Planners
+        for pid, pedestrian in self.pedestrians.items():
+            if pedestrian.type == Pedestrian.SP_TYPE:
+                pedestrian.start_planner()
 
     def stop_all(self):
         self.write_log_trajectories()

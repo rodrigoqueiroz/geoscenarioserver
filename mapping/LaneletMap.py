@@ -87,7 +87,25 @@ class LaneletMap(object):
             linepoints = [xs,ys]
         return x,y,linepoints
 
+    def get_crosswalks_entry_pts(self):
+        all_xwalks = {}
+        xwalk_id = 1
 
+        for elem in self.lanelet_map.laneletLayer:
+            if elem.attributes["subtype"] == "crosswalk":
+                entrance_pt_left = np.array([elem.leftBound[0].x, elem.leftBound[0].y])
+                entrance_pt_right = np.array([elem.rightBound[0].x, elem.rightBound[0].y])
+                exit_pt_left = np.array([elem.leftBound[1].x, elem.leftBound[1].y])
+                exit_pt_right = np.array([elem.rightBound[1].x, elem.rightBound[1].y])
+
+                entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
+                exit_pt = (exit_pt_left + exit_pt_right) / 2
+
+                all_xwalks[xwalk_id] = [entrance_pt, exit_pt]
+
+                xwalk_id += 1
+
+        return all_xwalks
 
 
     @staticmethod

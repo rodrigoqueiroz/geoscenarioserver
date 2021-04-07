@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+#rqueiroz@uwaterloo.ca
+#d43sharm@uwaterloo.ca
+#slarter@uwaterloo.ca
+# --------------------------------------------
+# GEOSCENARIO SIMULATION PEDESTRIAN PLANNER
+# --------------------------------------------
+
+import datetime
+import numpy as np
+from multiprocessing import shared_memory, Process, Lock, Array, Manager
+from typing import Dict, List
+import glog as log
+from copy import copy
+from TickSync import TickSync
+from mapping.LaneletMap import LaneletMap
+from sp.ManeuverConfig import *
+from sp.ManeuverModels import plan_maneuver
+from sp.btree.BehaviorModels import BehaviorModels
+from sp.SPPlannerState import PedestrianPlannerState, TrafficLightState
+import lanelet2.core
+from mapping.LaneletMap import *
+from Actor import *
+from SimTraffic import *
+
+import time
+
+class SPPlanner(object):
+    def __init__(self, sp, sim_traffic, btree_locations):
+        self.pid = int(sp.id)
+        self.laneletmap:LaneletMap = sim_traffic.lanelet_map
+        self.sim_config = sim_traffic.sim_config
+        self.sim_traffic:SimTraffic = sim_traffic
+        #Subprocess space
+        # Reference path that the planner will use for all transformations and planning
+
+        self.root_btree_name = sp.root_btree_name
+        self.btree_reconfig = sp.btree_reconfig
+        self.behavior_model = None
+        self.mconfig = None
+        self.btree_locations = btree_locations
+        self.btype = sp.btype
+
+        self.curr_route_node = sp.curr_route_node
+        self.desired_speed = sp.desired_speed
+
+
+    def start(self):
+        log.info('PLANNER PROCESS START for Pedestrian {}'.format(self.pid))
+        #Behavior Layer
+        #Note: If an alternative behavior module is to be used, it must be replaced here.
+        self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
+
+    def run_planner(self):
+        pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
+
+        reg_elems = self.get_reg_elem_states(pedestrian_state)
+
+        # Get planner state
+        planner_state = PedestrianPlannerState(
+                            pedestrian_state=pedestrian_state,
+                            route=self.sim_config.pedestrian_goal_points[self.pid],
+                            curr_route_node=self.curr_route_node,
+                            traffic_vehicles=self.sim_traffic.vehicles,
+                            regulatory_elements=reg_elems,
+                            pedestrians=self.sim_traffic.pedestrians,
+                            lanelet_map=self.sim_traffic.lanelet_map
+                        )
+
+        # BTree Tick
+        mconfig, snapshot_tree = self.behavior_model.tick(planner_state)
+
+        # new maneuver
+        if self.mconfig and self.mconfig.mkey != mconfig.mkey:
+            log.info("PID {} started maneuver {}".format(self.pid, mconfig.mkey.name))
+            # print sp state and deltas
+            state_str = (
+                "PID {}:\n"
+                "   position    sim=({:.3f},{:.3f})\n"
+                "   speed       {:.3f}\n"
+            ).format(
+                self.pid,
+                pedestrian_state.x, pedestrian_state.y,
+                np.linalg.norm([pedestrian_state.x_vel, pedestrian_state.y_vel])
+            )
+            log.info(state_str)
+        self.mconfig = mconfig
+
+        # Maneuver tick
+        if mconfig:
+            #replan maneuver
+            self.curr_route_node, new_route_node, speed_chg = plan_maneuver(mconfig.mkey,
+                                                                            mconfig,
+                                                                            planner_state.pedestrian_state,
+                                                                            planner_state.route,
+                                                                            planner_state.curr_route_node,
+                                                                            planner_state.traffic_vehicles,
+                                                                            planner_state.pedestrians)
+            if new_route_node != None:
+                self.sim_config.pedestrian_goal_points[self.id].insert(self.curr_route_node, new_route_node)
+
+            if speed_chg != None:
+                self.desired_speed = speed_chg
+
+
+
+    def get_reg_elem_states(self, pedestrian_state):
+        traffic_light_states = {}
+        for lid, tl in self.sim_traffic.traffic_lights.items():
+            traffic_light_states[lid] = tl.current_color.value
+
+        cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
+
+        if cur_ll == None:
+            cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet(pedestrian_state.x, pedestrian_state.y)
+
+        # Get regulatory elements acting on this lanelet
+        reg_elems = cur_ll.regulatoryElements
+        reg_elem_states = []
+
+        for re in reg_elems:
+            if isinstance(re, lanelet2.core.TrafficLight):
+                # lanelet2 traffic lights must have a corresponding state from the main process
+                if re.id not in traffic_light_states:
+                    continue
+
+                stop_linestring = re.parameters['ref_line']
+
+                # stop at middle of stop line
+                stop_pos = (np.asarray([stop_linestring[0][0].x, stop_linestring[0][0].y]) + np.asarray([stop_linestring[0][-1].x, stop_linestring[0][-1].y])) / 2
+                reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
+
+        return reg_elem_states

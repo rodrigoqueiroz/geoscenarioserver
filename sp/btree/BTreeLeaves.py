@@ -102,7 +102,7 @@ class ManeuverAction(behaviour.Behaviour):
                         self.mconfig.pos = re_state.stop_position[0]
                         break
 
-        elif self.mconfig.mkey == Maneuver.M_UPDATEDEST:
+        elif self.mconfig.mkey == Maneuver.M_UPDATEWAYPOINT:
             pass
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:

@@ -112,9 +112,9 @@ class BehaviorModels(object):
             goal = self.planner_state.route[-1]
             return has_reached_point(self.planner_state.pedestrian_state, goal, **kwargs)
 
-        elif condition == "reached_curr_destination":
-            curr_destination = self.planner_state.route[self.planner_state.curr_route_node]
-            return has_reached_point(self.planner_state.pedestrian_state, curr_destination, **kwargs)
+        elif condition == "reached_next_waypoint":
+            waypoint = self.planner_state.route[self.planner_state.curr_route_node]
+            return has_reached_point(self.planner_state.pedestrian_state, waypoint, **kwargs)
 
         elif condition == "sim_time":
             tmin = kwargs['tmin'] if 'tmin' in kwargs else 0
