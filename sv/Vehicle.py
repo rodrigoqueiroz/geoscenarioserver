@@ -148,7 +148,7 @@ class SDV(Vehicle):
             new_state = self.motion_plan.trajectory.get_state_at(time)
 
             #check consistency during transition from previous to new states
-            # <1cm is within acceptable difference (rounding and error in frame conversion)
+            # <=1mm is within acceptable difference (rounding and error in frame conversion)
             s_delta = new_state[0] - self.state.s
             if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
                 log.error("Vehicle {} moved backwards by {}m".format(self.id, s_delta))
