@@ -44,8 +44,8 @@ class SDVRoute(object):
     def get_reference_path(self):
         return self._current_sdv_path.get_ref_path()
 
-    def get_reference_path_start_s(self):
-        return self._current_sdv_path.get_ref_path_start_s()
+    def get_reference_path_s_start(self):
+        return self._current_sdv_path.get_ref_path_s_start()
 
     def update_global_path(self, x, y):
         if (x is None) or (y is None):
@@ -203,35 +203,35 @@ class SDVRoute(object):
         #     plt.axis([-50, 40, -50, 40])
         #     plt.show()
 
-    def _update_should_lane_change(self, s, path, start_s):
+    def _update_should_lane_change(self, s, path, s_start):
         start, end, direction = self._current_sdv_path.get_lane_change_info()
 
         if (start is not None) and (end is not None):
             try:
-                s_start = sim_to_frenet_position(
-                    path, start.x, start.y, start_s
+                start_s = sim_to_frenet_position(
+                    path, start.x, start.y, s_start
                 )[0]
             except OutsideRefPathException:
-                s_start = None
+                start_s = None
 
             try:
-                s_end = sim_to_frenet_position(
-                    path, end.x, end.y, start_s
+                end_s = sim_to_frenet_position(
+                    path, end.x, end.y, s_start
                 )[0]
             except OutsideRefPathException:
-                s_end = None
+                end_s = None
 
-            if (s_start is None) and (s_end is not None):
-                # s_start is None because it lies before path
-                self._should_lane_change = (s <= s_end)
-            elif (s_start is not None) and (s_end is None):
-                # s_end is None because it lies after path
-                self._should_lane_change = (s >= s_start)
-            elif (s_start is not None) and (s_end is not None):
-                # both s_start and s_end lie on path
-                self._should_lane_change = (s >= s_start) and (s <= s_end)
-            # NOTE: s_start and s_end will both be None in the case where path is
-            #       the reference path; s_end is gauranteed to lie on the global path
+            if (start_s is None) and (end_s is not None):
+                # start_s is None because it lies before path
+                self._should_lane_change = (s <= end_s)
+            elif (start_s is not None) and (end_s is None):
+                # end_s is None because it lies after path
+                self._should_lane_change = (s >= start_s)
+            elif (start_s is not None) and (end_s is not None):
+                # both start_s and end_s lie on path
+                self._should_lane_change = (s >= start_s) and (s <= end_s)
+            # NOTE: start_s and end_s will both be None in the case where path is
+            #       the reference path; end_s is gauranteed to lie on the global path
         else:
             # NOTE: start and end will either both be None, or both be a point
             self._should_lane_change = False
@@ -258,8 +258,8 @@ class SDVPath(object):
 
         # The reference path
         self._ref_path = None
-        self._ref_path_start_s:float = 0.0
-        self._ref_path_end_s:float = 0.0
+        self._ref_path_s_start:float = 0.0
+        self._ref_path_s_end:float = 0.0
 
     def get_global_path(self):
         # NOTE: global_path needs to be stored as a list because ConstLineString3d
@@ -275,22 +275,22 @@ class SDVPath(object):
     def get_ref_path(self):
         return self._ref_path
 
-    def get_ref_path_start_s(self):
-        return self._ref_path_start_s
+    def get_ref_path_s_start(self):
+        return self._ref_path_s_start
 
-    def update_ref_path(self, ref_path_origin:float, ref_path_start_s:float=-100.0, ref_path_end_s:float=100.0):
+    def update_ref_path(self, ref_path_origin:float, ref_path_s_start:float=-100.0, ref_path_s_end:float=100.0):
         # NOTE: ref_path_origin is the position (s) of the origin of the reference
         #       path along the global path
 
         global_path_start_index, global_path_end_index = self._get_global_path_start_and_end_indices(
-            ref_path_origin + ref_path_start_s,
-            ref_path_origin + ref_path_end_s
+            ref_path_origin + ref_path_s_start,
+            ref_path_origin + ref_path_s_end
         )
 
-        # NOTE: _ref_path_start_s and _ref_path_end_s will be as close as possible
-        #       to ref_path_start_s and ref_path_end_s respectively
-        self._ref_path_start_s = self._path_index_to_s(global_path_start_index) - ref_path_origin
-        self._ref_path_end_s = self._path_index_to_s(global_path_end_index) - ref_path_origin
+        # NOTE: _ref_path_s_start and _ref_path_s_end will be as close as possible
+        #       to ref_path_s_start and ref_path_s_end respectively
+        self._ref_path_s_start = self._path_index_to_s(global_path_start_index) - ref_path_origin
+        self._ref_path_s_end = self._path_index_to_s(global_path_end_index) - ref_path_origin
 
         if self._lane_is_loop:
             global_path_start_index = global_path_start_index % self._global_path_len
@@ -302,8 +302,8 @@ class SDVPath(object):
             global_path_end_index = min(self._global_path_len - 1, global_path_end_index)
 
             # In case the range changed
-            self._ref_path_start_s = self._path_index_to_s(global_path_start_index) - ref_path_origin
-            self._ref_path_end_s = self._path_index_to_s(global_path_end_index) - ref_path_origin
+            self._ref_path_s_start = self._path_index_to_s(global_path_start_index) - ref_path_origin
+            self._ref_path_s_end = self._path_index_to_s(global_path_end_index) - ref_path_origin
 
         # NOTE: assumes global_path_start_index never equals global_path_end_index
         if self._lane_is_loop and (global_path_start_index < global_path_end_index):
