@@ -151,14 +151,14 @@ class SDV(Vehicle):
             # <=1mm is within acceptable difference (rounding and error in frame conversion)
             s_delta = new_state[0] - self.state.s
             if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
-                log.error("Vehicle {} moved backwards by {}m".format(self.id, s_delta))
-                log.info("SimTime {} Delta {} Plan: StartTime{} TimeIn {}".format(
-                        sim_time, delta_time, self.motion_plan.start_time,time))
+                log.error("Vehicle {} moved backwards by {}m".format(self.id, abs(s_delta)))
+                log.info("SimTime {} Delta {} Plan: StartTime {} TimeIn {}".format(
+                        sim_time, delta_time, self.motion_plan.start_time, time))
                 log.info(self.state.get_frenet_state_vector())
                 log.info(new_state)
                 #log.info(self.motion_plan.trajectory)
                 self.jump_back_count += 1
-                self.max_jump_back_dist = max(self.max_jump_back_dist, s_delta)
+                self.max_jump_back_dist = max(self.max_jump_back_dist, abs(s_delta))
 
             # update frenet state
             self.state.set_S(new_state[:3])
