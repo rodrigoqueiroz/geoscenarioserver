@@ -41,8 +41,10 @@ class SPPlanner(object):
         self.btree_locations = btree_locations
         self.btype = sp.btype
 
+        self.route = None
         self.curr_route_node = sp.curr_route_node
         self.desired_speed = sp.desired_speed
+        self.replan_route = True
 
 
     def start(self):
@@ -51,10 +53,78 @@ class SPPlanner(object):
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
+
     def run_planner(self):
         pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
 
         reg_elems = self.get_reg_elem_states(pedestrian_state)
+
+        if self.replan_route:
+            ped_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+            destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1])
+            dist_to_dest = np.linalg.norm(destination - ped_pos)
+
+            self.route = []
+            xwalks_in_plan = []
+            closest_xwalk = -1
+            closest_entry_dist = np.linalg.norm(list(self.sim_traffic.crosswalk_entry_pts.values())[0] - ped_pos)
+
+            # -------------find initial closest entry point -------------
+            xwalks_not_in_plan = {xwalk_id: entry_pts for (xwalk_id, entry_pts) in self.sim_traffic.crosswalk_entry_pts.items() if xwalk_id not in xwalks_in_plan}
+            for xwalk_id,entry_pts in xwalks_not_in_plan.items():
+                # determine entrance and exit by distance to pedestrian
+                entrance = entry_pts[0]
+                exit = entry_pts[1]
+                if np.linalg.norm(exit - ped_pos) < np.linalg.norm(entrance - ped_pos):
+                    entrance = entry_pts[1]
+                    exit = entry_pts[0]
+
+                dist_to_entrance = np.linalg.norm(ped_pos - entrance)
+                dist_from_exit_to_dest = np.linalg.norm(destination - exit)
+
+                # pick the closest entrance with an exit that is closer to dest than ped_pos is
+                if dist_to_entrance < closest_entry_dist and dist_from_exit_to_dest < dist_to_dest:
+                    closest_entry_dist = dist_to_entrance
+                    closest_xwalk = xwalk_id
+
+            if closest_xwalk != -1:
+                xwalks_in_plan.append(closest_xwalk)
+                self.route.append(entrance)
+                self.route.append(exit)
+                dist_to_dest = np.linalg.norm(destination - exit)
+
+            # -------------find rest of points in route -------------
+            while closest_xwalk != -1:
+                closest_xwalk = -1
+
+                xwalks_not_in_plan = {xwalk_id: entry_pts for (xwalk_id, entry_pts) in self.sim_traffic.crosswalk_entry_pts.items() if xwalk_id not in xwalks_in_plan}
+                closest_entry_dist = np.linalg.norm(list(xwalks_not_in_plan.values())[0] - self.route[-1])
+
+                for xwalk_id,entry_pts in xwalks_not_in_plan.items():
+                    # determine entrance and exit by distance to pedestrian
+                    entrance = entry_pts[0]
+                    exit = entry_pts[1]
+                    if np.linalg.norm(exit - self.route[-1]) < np.linalg.norm(entrance - self.route[-1]):
+                        entrance = entry_pts[1]
+                        exit = entry_pts[0]
+
+                    dist_to_entrance = np.linalg.norm(self.route[-1] - entrance)
+                    dist_from_exit_to_dest = np.linalg.norm(destination - exit)
+
+                    # pick the closest entrance with an exit that is closer to dest than ped_pos is
+                    if dist_to_entrance < closest_entry_dist and dist_from_exit_to_dest < dist_to_dest:
+                        closest_entry_dist = dist_to_entrance
+                        closest_xwalk = xwalk_id
+
+                if closest_xwalk != -1:
+                    xwalks_in_plan.append(closest_xwalk)
+                    self.route.append(entrance)
+                    self.route.append(exit)
+                    dist_to_dest = np.linalg.norm(destination - exit)
+
+            self.route.append(destination)
+            self.replan_route = False
+
 
         # Get planner state
         planner_state = PedestrianPlannerState(

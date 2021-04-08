@@ -91,7 +91,8 @@ class SP(Pedestrian):
 
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
-        self.waypoint = np.array(route[self.curr_route_node])
+        #self.route = route
+        #self.waypoint = np.array(route[self.curr_route_node])
         self.desired_speed = random.uniform(0.6, 1.2)
         self.mass = random.uniform(50,80)
         self.radius = random.uniform(0.25, 0.35)
@@ -109,9 +110,10 @@ class SP(Pedestrian):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
         self.sp_planner.run_planner()
+        self.route = self.sp_planner.route
         self.curr_route_node = self.sp_planner.curr_route_node
         self.desired_speed = self.sp_planner.desired_speed
-        self.waypoint = np.array(self.sim_config.pedestrian_goal_points[self.id][self.curr_route_node])
+        self.waypoint = np.array(self.route[self.curr_route_node])
 
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
 
