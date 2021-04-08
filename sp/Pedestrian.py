@@ -91,8 +91,8 @@ class SP(Pedestrian):
 
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
-        #self.route = route
-        #self.waypoint = np.array(route[self.curr_route_node])
+        self.route = []
+        self.waypoint = None # np.array(route[self.curr_route_node])
         self.desired_speed = random.uniform(0.6, 1.2)
         self.mass = random.uniform(50,80)
         self.radius = random.uniform(0.25, 0.35)

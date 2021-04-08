@@ -5,7 +5,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
-    <tag k='name' v='red to green light scenario' />
+    <tag k='name' v='single pedestrian scenario' />
     <tag k='timeout' v='45' />
     <tag k='version' v='2.0' />
   </node>
@@ -21,7 +21,7 @@
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
   </node>
-  <node id='-5305074' action='modify' visible='true' lat='43.47813130207' lon='-80.51974464242'>
+  <node id='-5305074' action='modify' visible='true' lat='43.47809626848' lon='-80.52012015168'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>
