@@ -93,24 +93,25 @@ class SP(Pedestrian):
         self.curr_route_node = 0
         self.route = []
         self.waypoint = None # np.array(route[self.curr_route_node])
-        self.desired_speed = random.uniform(0.6, 1.2)
+        self.desired_speed = 1.75 # random.uniform(0.6, 1.2)
         self.mass = random.uniform(50,80)
         self.radius = random.uniform(0.25, 0.35)
 
 
     def start_planner(self):
-        """For SP models controlled by SPPlanner.
+        """ For SP models controlled by SPPlanner.
             If a planner is started, the pedestrian can't be a remote.
         """
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
+        self.route = self.sp_planner.route
+        self.waypoint = np.array(self.route[self.curr_route_node])
 
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
         self.sp_planner.run_planner()
-        self.route = self.sp_planner.route
         self.curr_route_node = self.sp_planner.curr_route_node
         self.desired_speed = self.sp_planner.desired_speed
         self.waypoint = np.array(self.route[self.curr_route_node])

@@ -43,8 +43,8 @@ class LaneletMap(object):
 
             if elem.attributes["subtype"] == "road":
                 elem.attributes["participant:vehicle"] = "yes"
-            elif elem.attributes["subtype"] in ["crosswalk", "walkway"]:
-                elem.attributes["one_way"] = "yes"
+            elif elem.attributes["subtype"] in ["crosswalk", "walkway", "traffic_island"]:
+                elem.attributes["one_way"] = "no"
                 elem.attributes["participant:pedestrian"] = "yes"
 
 
@@ -177,7 +177,11 @@ class LaneletMap(object):
         participant_tag = "participant:" + participant
 
         if len(intersecting_lls) == 0:
-            raise Exception("Lanelet Error: agent not part of any lanelet.")
+            if participant == "vehicle":
+                raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+            else:
+                # non-vehicle agents can be a part of non-lanelet spaces
+                return None
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
             intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
@@ -193,6 +197,28 @@ class LaneletMap(object):
             return None
 
         return intersecting_lls[0]
+
+    def get_occupying_area(self, x, y):
+        point = BasicPoint2d(x, y)
+
+        # get all intersecting areas using a trivial bounding box
+        searchbox = BoundingBox2d(point, point)
+        intersecting_areas = self.lanelet_map.areaLayer.search(searchbox)
+
+        if len(intersecting_areas) == 0:
+            return None
+        elif len(intersecting_areas) > 1:
+            # filter results for areas containing the point
+            intersecting_areas = list(filter(lambda area: inside(area, point), intersecting_lls))
+            if len(intersecting_areas) > 1:
+                log.warn("Point {} part of more than one area ({}), cannot automatically resolve.".format(
+                    (x,y), [area.id for area in intersecting_areas]))
+                return intersecting_areas[1]
+
+        if len(intersecting_areas) == 0:
+            return None
+
+        return intersecting_areas[0]
 
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
         """ Returns the lanelet closest to (x,y) that lies along ref_path.

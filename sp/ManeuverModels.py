@@ -31,18 +31,18 @@ def plan_velocity_keeping(pedestrian_state:PedestrianState, route, curr_route_no
     No target point, but needs to adapt to a desired velocity
     """
 
-    return curr_route_node, None, None
+    return curr_route_node, None
 
 
 def plan_stop(pedestrian_state:PedestrianState, route, curr_route_node, mconfig:MStopConfig, vehicles=None, pedestrians=None):
     """
     STOP MANEUVER
     """
-    return curr_route_node, None, 0.0
+    return curr_route_node, 0.0
 
 
 def plan_update_waypoint(pedestrian_state:PedestrianState, route, curr_route_node, mconfig:MUpdateWaypoint, vehicles=None, pedestrians=None):
     """
     UPDATE INTERMEDIATE WAYPOINT
     """
-    return curr_route_node + 1, None, None
+    return curr_route_node + 1, None
