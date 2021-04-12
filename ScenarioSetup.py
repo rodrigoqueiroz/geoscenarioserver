@@ -82,7 +82,9 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
+    log.warn("vehicles:")
     for vid, vnode in parser.vehicles.items():
+        log.warn("found a vehicle {}".format(vid))
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
@@ -201,7 +203,9 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #=========
 
     #========= Pedestrians
+    log.warn("pedestrians here:")
     for pid, pnode in parser.pedestrians.items():
+        log.warn("found a pedestrian")
         pid = int(pid)
         name = pnode.tags['name']
         start_state = [pnode.x,0.0,0.0, pnode.y,0.0,0.0]                    #start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
@@ -261,11 +265,13 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 btype=btype)
 
                 sim_traffic.add_pedestrian(pedestrian)
+                log.warn("Added pedestrian in spot 1")
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
         else:
             pedestrian = Pedestrian(pid, name, start_state)
+            log.warn("Added pedestrian in spot 2")
             sim_traffic.add_pedestrian(pedestrian)
 
     #========= Static Objects

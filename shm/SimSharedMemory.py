@@ -144,7 +144,11 @@ class SimSharedMemory(object):
             log.error("VehicleState parsing exception")
             log.error(e)
             pass
-
+        
+        log.warn("Client state error: No. client pedestrians ({}) and server pedestrians ({}).".format(
+            nclient_pedestrians,
+            npedestrians
+        ))
         try:
             if nclient_pedestrians == npedestrians:
                 for ri in range(nvehicles + 1, nvehicles + 1 + npedestrians):

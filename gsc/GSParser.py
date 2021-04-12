@@ -184,6 +184,9 @@ class GSParser(object):
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
+        #testing
+        log.info("node {}".format(n.tags))
+
         pid = int(n.tags["pid"])
         self.vehicles[pid] = n
 

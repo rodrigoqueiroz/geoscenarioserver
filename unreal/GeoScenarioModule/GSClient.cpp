@@ -320,7 +320,9 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 
 	std::stringstream oss;
 	// output the correct number of pedestrians
-	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << " " << 0 /* pedestrians.Num() */ << '\n';
+	
+	//vehicle loop
+	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << " " << pedestrians.Num() << '\n';
 	for (auto& Elem : vehicles)
 	{
 		GSVehicle &gsv = Elem.Value;
@@ -340,6 +342,29 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 		else
 		{
 			UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Vehicle state to CS ShM. Actor is null."));
+		}
+	}
+
+	//pedestrian loop
+	for (auto& Elem : pedestrians)
+	{
+		GSPedestrian &gsp = Elem.Value;
+		//Write out Client Pedestrian states
+		//todo: include full state
+		if (gsp.actor != nullptr)
+		{
+			FVector loc = gsp.actor->GetActorLocation();
+			loc[2] = 0.0f;
+			ASimPedestrian *sp = Cast<ASimPedestrian>(gsp.actor);
+			int active = sp != nullptr ? (int)(sp->GetActive()) : 1;
+			oss << Elem.Key << " "
+				<< gsp.pedestrian_state.x << " " << gsp.pedestrian_state.y << " " << gsp.pedestrian_state.z << " "
+				<< gsp.pedestrian_state.x_vel << " " << gsp.predestrian_state.y_vel << " " /* TODO: gsp.pedestrian_state.yaw << " " */
+				<< /*active*/ 1 << '\n';
+		}
+		else
+		{
+			UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Pedestrian state to CS ShM. Actor is null."));
 		}
 	}
 	/* repeat the loop for pedestrians */
