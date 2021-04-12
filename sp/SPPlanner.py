@@ -43,7 +43,7 @@ class SPPlanner(object):
 
         self.route = []
         self.curr_route_node = sp.curr_route_node
-        self.desired_speed = sp.desired_speed
+        self.current_desired_speed = sp.current_desired_speed
         self.replan_route = True
 
 
@@ -105,10 +105,13 @@ class SPPlanner(object):
         pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
 
         reg_elems = self.get_reg_elem_states(pedestrian_state)
+        pedestrian_speed = {'default_desired': self.sim_traffic.pedestrians[self.pid].default_desired_speed,
+                            'current_desired': self.sim_traffic.pedestrians[self.pid].current_desired_speed}
 
         # Get planner state
         planner_state = PedestrianPlannerState(
                             pedestrian_state=pedestrian_state,
+                            pedestrian_speed=pedestrian_speed,
                             route=self.route,
                             curr_route_node=self.curr_route_node,
                             traffic_vehicles=self.sim_traffic.vehicles,
@@ -142,13 +145,14 @@ class SPPlanner(object):
             self.curr_route_node, speed_chg = plan_maneuver(mconfig.mkey,
                                                             mconfig,
                                                             planner_state.pedestrian_state,
+                                                            planner_state.pedestrian_speed,
                                                             planner_state.route,
                                                             planner_state.curr_route_node,
                                                             planner_state.traffic_vehicles,
                                                             planner_state.pedestrians)
 
-            if speed_chg:
-                self.desired_speed = speed_chg
+            if speed_chg != None:
+                self.current_desired_speed = speed_chg
 
 
 

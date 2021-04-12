@@ -93,7 +93,8 @@ class SP(Pedestrian):
         self.curr_route_node = 0
         self.route = []
         self.waypoint = None # np.array(route[self.curr_route_node])
-        self.desired_speed = 1.75 # random.uniform(0.6, 1.2)
+        self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
+        self.current_desired_speed = self.default_desired_speed
         self.mass = random.uniform(50,80)
         self.radius = random.uniform(0.25, 0.35)
 
@@ -113,7 +114,7 @@ class SP(Pedestrian):
 
         self.sp_planner.run_planner()
         self.curr_route_node = self.sp_planner.curr_route_node
-        self.desired_speed = self.sp_planner.desired_speed
+        self.current_desired_speed = self.sp_planner.current_desired_speed
         self.waypoint = np.array(self.route[self.curr_route_node])
 
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
@@ -126,7 +127,7 @@ class SP(Pedestrian):
         This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
         '''
         direction = np.array(normalize(self.waypoint - curr_pos))
-        desired_vel = direction * self.desired_speed
+        desired_vel = direction * self.current_desired_speed
         accl_time = 0.5 # acceleration time
 
         delta_vel = desired_vel - curr_vel

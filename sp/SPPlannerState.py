@@ -21,6 +21,7 @@ TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
 class PedestrianPlannerState:
     #sim_time: float
     pedestrian_state: PedestrianState
+    pedestrian_speed: Dict
     traffic_vehicles: Dict
     pedestrians: List
     regulatory_elements: List

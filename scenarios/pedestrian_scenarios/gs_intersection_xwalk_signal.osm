@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='crossing light scenario' />
-    <tag k='timeout' v='50' />
+    <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5321455' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
@@ -22,13 +22,13 @@
     <tag k='name' v='pedestrian_1' />
   </node>
   <node id='-5321458' action='modify' visible='true' lat='43.47813178865' lon='-80.5197238553'>
-    <tag k='duration' v='8,15' />
+    <tag k='duration' v='5,20' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='ped_tl_s_n_east' />
     <tag k='states' v='R,G' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5321460' action='modify' visible='true' lat='43.47813446483' lon='-80.51974799518'>
+  <node id='-5321460' action='modify' visible='true' lat='43.4781308155' lon='-80.51974330131'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>

@@ -116,6 +116,9 @@ class BehaviorModels(object):
             waypoint = self.planner_state.route[self.planner_state.curr_route_node]
             return has_reached_point(self.planner_state.pedestrian_state, waypoint, **kwargs)
 
+        elif condition == "at_desired_speed":
+            return self.planner_state.pedestrian_speed['current_desired'] == self.planner_state.pedestrian_speed['default_desired']
+
         elif condition == "sim_time":
             tmin = kwargs['tmin'] if 'tmin' in kwargs else 0
             tmax = kwargs['tmax'] if 'tmax' in kwargs else float('inf')
@@ -135,6 +138,8 @@ class BehaviorModels(object):
 
         elif condition == "in_crosswalk_area":
             cur_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")
+            if cur_ll == None:
+                return False
             return cur_ll.attributes["subtype"] == "crosswalk"
 
         elif condition == "past_crosswalk_halfway":
