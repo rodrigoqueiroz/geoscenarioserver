@@ -7,7 +7,7 @@
     <tag k='mutate' v='no' />
     <tag k='name' v='Campus ring road stress test' />
     <tag k='plotvid' v='1' />
-    <tag k='timeout' v='300' />
+    <tag k='timeout' v='200' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5145818' action='modify' visible='true' lat='43.47107113614' lon='-80.54268926448'>

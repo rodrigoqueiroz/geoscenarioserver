@@ -7,7 +7,7 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='red to green light scenario' />
-    <tag k='timeout' v='20' />
+    <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5145333' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
