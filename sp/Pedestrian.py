@@ -10,6 +10,7 @@ import glog as log
 from SimConfig import *
 from util.Utils import *
 from Actor import *
+from sp.SPPlanner import *
 from sp.SPPlannerState import *
 from shm.SimSharedMemory import *
 from util.Utils import kalman
@@ -79,108 +80,44 @@ class SP(Pedestrian):
     of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id, name, start_state, destinations, root_btree_name, btree_locations=[], btype=""):
+    def __init__(self, id, name, start_state, route, root_btree_name, btree_locations=[], btype=""):
         super().__init__(id, name, start_state)
         self.btype = btype
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
         self.btree_reconfig = ""
 
-        self.mconfig = None
+        self.sp_planner = None
+
         self.type = Pedestrian.SP_TYPE
         self.curr_route_node = 0
-        self.destination = np.array(destinations[self.curr_route_node])
-        self.desired_speed = random.uniform(0.6, 1.2)
+        self.route = []
+        self.waypoint = None # np.array(route[self.curr_route_node])
+        self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
+        self.current_desired_speed = self.default_desired_speed
         self.mass = random.uniform(50,80)
         self.radius = random.uniform(0.25, 0.35)
 
-        self.behavior_model = BehaviorModels(self.id, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
+
+    def start_planner(self):
+        """ For SP models controlled by SPPlanner.
+            If a planner is started, the pedestrian can't be a remote.
+        """
+        self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
+        self.sp_planner.start()
+        self.route = self.sp_planner.route
+        self.waypoint = np.array(self.route[self.curr_route_node])
 
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
-        self.update_behavior()
+
+        self.sp_planner.run_planner()
+        self.curr_route_node = self.sp_planner.curr_route_node
+        self.current_desired_speed = self.sp_planner.current_desired_speed
+        self.waypoint = np.array(self.route[self.curr_route_node])
+
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
-
-    def update_behavior(self):
-        reg_elems = self.get_reg_elem_states(self.state)
-
-        # Get planner state
-        planner_state = PedestrianPlannerState(
-                            pedestrian_state=self.state,
-                            route=self.sim_config.pedestrian_goal_points[self.id],
-                            curr_route_node=self.curr_route_node,
-                            traffic_vehicles=self.sim_traffic.vehicles,
-                            regulatory_elements=reg_elems,
-                            pedestrians=self.sim_traffic.pedestrians,
-                            lanelet_map=self.sim_traffic.lanelet_map
-                        )
-
-        # BTree Tick
-        mconfig, snapshot_tree = self.behavior_model.tick(planner_state)
-
-        # new maneuver
-        if self.mconfig and self.mconfig.mkey != mconfig.mkey:
-            log.info("PID {} started maneuver {}".format(self.id, mconfig.mkey.name))
-            # print sp state and deltas
-            state_str = (
-                "PID {}:\n"
-                "   position    sim=({:.3f},{:.3f})\n"
-                "   speed       {:.3f}\n"
-            ).format(
-                self.id,
-                self.state.x, self.state.y,
-                np.linalg.norm([self.state.x_vel, self.state.y_vel])
-            )
-            log.info(state_str)
-        self.mconfig = mconfig
-
-        # Maneuver tick
-        if mconfig:
-            #replan maneuver
-
-            self.curr_route_node, new_route_node, self.desired_speed = plan_maneuver(mconfig.mkey,
-                                                                        mconfig,
-                                                                        planner_state.pedestrian_state,
-                                                                        planner_state.route,
-                                                                        planner_state.curr_route_node,
-                                                                        planner_state.traffic_vehicles,
-                                                                        planner_state.pedestrians)
-
-
-            if new_route_node != None:
-                self.sim_config.pedestrian_goal_points[self.id].insert(self.curr_route_node, new_route_node)
-
-            self.destination = np.array(self.sim_config.pedestrian_goal_points[self.id][self.curr_route_node])
-
-
-    def get_reg_elem_states(self, pedestrian_state):
-        traffic_light_states = {}
-        for lid, tl in self.sim_traffic.traffic_lights.items():
-            traffic_light_states[lid] = tl.current_color.value
-
-        cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
-
-        if cur_ll == None:
-            cur_ll = self.sim_traffic.lanelet_map.get_occupying_lanelet(pedestrian_state.x, pedestrian_state.y)
-
-        # Get regulatory elements acting on this lanelet
-        reg_elems = cur_ll.regulatoryElements
-        reg_elem_states = []
-
-        for re in reg_elems:
-            if isinstance(re, lanelet2.core.TrafficLight):
-                # lanelet2 traffic lights must have a corresponding state from the main process
-                if re.id not in traffic_light_states:
-                    continue
-
-                stop_linestring = re.parameters['ref_line']
-
-                # stop at middle of stop line
-                stop_pos = (np.asarray([stop_linestring[0][0].x, stop_linestring[0][0].y]) + np.asarray([stop_linestring[0][-1].x, stop_linestring[0][-1].y])) / 2
-                reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
-
-        return reg_elem_states
 
 
     def update_position_SFM(self, curr_pos, curr_vel):
@@ -189,8 +126,8 @@ class SP(Pedestrian):
         https://link.springer.com/content/pdf/10.1007/s12205-016-0741-9.pdf (access through University of Waterloo)
         This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
         '''
-        direction = np.array(normalize(self.destination - curr_pos))
-        desired_vel = direction * self.desired_speed
+        direction = np.array(normalize(self.waypoint - curr_pos))
+        desired_vel = direction * self.current_desired_speed
         accl_time = 0.5 # acceleration time
 
         delta_vel = desired_vel - curr_vel
@@ -265,7 +202,7 @@ class SP(Pedestrian):
         '''
 
         same_dest = 0
-        if np.linalg.norm(self.destination - other_ped.destination) < 0.5:
+        if np.linalg.norm(self.waypoint - other_ped.waypoint) < 0.5:
             same_dest = 1
 
         left_unit = normalize(np.array([-curr_vel[1], curr_vel[0]]))

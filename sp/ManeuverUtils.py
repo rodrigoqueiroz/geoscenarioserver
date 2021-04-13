@@ -15,15 +15,6 @@ from sp.ManeuverConfig import *
 from SimConfig import *
 
 
-def has_reached_goal(pedestrian_state, goal_point, threshold=1):
-    """ Checks if the pedestrian has reached goal point in the cartesian frame
-        @param goal_point: Array [x,y] goal position
-        @param threshold: Max acceptable distance to goal
-    """
-    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-
-    return np.linalg.norm(np.asarray(goal_point) - pedestrian_pos) < threshold
-
 def has_reached_point(pedestrian_state, point, threshold=1):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
