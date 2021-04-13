@@ -84,6 +84,7 @@ class SDV(Vehicle):
         self.next_motion_plan = None
 
         #debug:
+        self.jump_back_check = True
         self.jump_back_count = 0
         self.max_jump_back_dist = 0
 
@@ -103,14 +104,12 @@ class SDV(Vehicle):
         #Read planner
         if self.sv_planner:
             plan = self.sv_planner.get_plan()
-            if plan:
-                if plan.trajectory.T != 0:
-                    self.set_new_motion_plan(plan, sim_time)
-                    if plan.new_frenet_frame:
-                        # NOTE: vehicle state being used here is from the previous frame (that planner should have gotten)
-                        self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.state.x, self.state.y)
-                else:
-                    self.set_new_motion_plan(plan, sim_time)
+            if plan is not None:
+                self.set_new_motion_plan(plan, sim_time)
+                if plan.new_frenet_frame:
+                    # NOTE: vehicle state being used here is from the previous frame (that planner should have gotten)
+                    self.jump_back_check = False
+                    self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.state.x, self.state.y)
             #Compute new state
             self.compute_vehicle_state(delta_time, sim_time)
 
@@ -149,16 +148,19 @@ class SDV(Vehicle):
 
             #check consistency during transition from previous to new states
             # <=1mm is within acceptable difference (rounding and error in frame conversion)
-            s_delta = new_state[0] - self.state.s
-            if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
-                log.error("Vehicle {} moved backwards by {}m".format(self.id, abs(s_delta)))
-                log.info("SimTime {} Delta {} Plan: StartTime {} TimeIn {}".format(
-                        sim_time, delta_time, self.motion_plan.start_time, time))
-                log.info(self.state.get_frenet_state_vector())
-                log.info(new_state)
-                #log.info(self.motion_plan.trajectory)
-                self.jump_back_count += 1
-                self.max_jump_back_dist = max(self.max_jump_back_dist, abs(s_delta))
+            if self.jump_back_check:
+                s_delta = new_state[0] - self.state.s
+                if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
+                    log.error("Vehicle {} moved backwards by {}m".format(self.id, abs(s_delta)))
+                    log.info("SimTime {} Delta {} Plan: StartTime {} TimeIn {}".format(
+                            sim_time, delta_time, self.motion_plan.start_time, time))
+                    log.info(self.state.get_frenet_state_vector())
+                    log.info(new_state)
+                    #log.info(self.motion_plan.trajectory)
+                    self.jump_back_count += 1
+                    self.max_jump_back_dist = max(self.max_jump_back_dist, abs(s_delta))
+            else:
+                self.jump_back_check = True
 
             # update frenet state
             self.state.set_S(new_state[:3])

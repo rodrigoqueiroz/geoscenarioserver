@@ -77,10 +77,14 @@ class SVPlanner(object):
         self._mplan_sharr.acquire() #<=========LOCK
         plan.set_plan_vector(copy(self._mplan_sharr[:]))
         self._mplan_sharr.release() #<=========RELEASE
-        #if empty
-        if (plan.trajectory.T == 0): 
+        if (plan.trajectory.T == 0):
+            # Empty plan
             return None
-        #Valid:
+        elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
+            # Same plan
+            return None
+        # New plan
+        self.last_plan = plan
         return plan
         
 
