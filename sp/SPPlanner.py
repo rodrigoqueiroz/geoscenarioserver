@@ -94,6 +94,10 @@ class SPPlanner(object):
                 xwalks_in_plan.append(closest_xwalk)
                 self.route.append(entrance)
                 self.route.append(exit)
+
+                # do not continue planning if the last crosswalk was just added to the route
+                if len(list(xwalks_not_in_plan.values())) == 1:
+                    found_closest_exit = True
             else:
                 found_closest_exit = True
 
@@ -155,23 +159,36 @@ class SPPlanner(object):
                 self.current_desired_speed = speed_chg
 
 
+    def get_space_occupied_by_pedestrian(self, pedestrian_state):
+        # check if ped on lanelet
+        ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
+        if ll != None:
+            return ll
+
+        # check if ped on area
+        area = self.sim_traffic.lanelet_map.get_occupying_area(pedestrian_state.x, pedestrian_state.y)
+        if area != None:
+            return area
+
+        # otherwise, ped is off the map
+        return None
+
 
     def get_reg_elem_states(self, pedestrian_state):
+        reg_elem_states = []
+
         traffic_light_states = {}
         for lid, tl in self.sim_traffic.traffic_lights.items():
             traffic_light_states[lid] = tl.current_color.value
 
-        curr_ll_or_area = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
+        curr_ll_or_area = self.get_space_occupied_by_pedestrian(pedestrian_state)
 
         if not curr_ll_or_area:
-            curr_ll_or_area = self.sim_traffic.lanelet_map.get_occupying_area(pedestrian_state.x, pedestrian_state.y)
-
-        if not curr_ll_or_area:
-            curr_ll_or_area = self.sim_traffic.lanelet_map.get_occupying_lanelet(pedestrian_state.x, pedestrian_state.y)
+            return reg_elem_states
 
         # Get regulatory elements acting on this lanelet
         reg_elems = curr_ll_or_area.regulatoryElements
-        reg_elem_states = []
+
 
         for re in reg_elems:
             if isinstance(re, lanelet2.core.TrafficLight):
