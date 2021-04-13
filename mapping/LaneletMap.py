@@ -180,21 +180,33 @@ class LaneletMap(object):
             if participant == "vehicle":
                 raise Exception("Lanelet Error: vehicle not part of any lanelet.")
             else:
-                # non-vehicle agents can be a part of non-lanelet spaces
+                # case: non-vehicle agent is not on any lanelet
                 return None
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
             intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
             # filter results for lanelets with allowed participants matching participant_tag
-            intersecting_lls = list(filter(lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
+            participant_lls = list(filter(lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
+
+            # case: agent is on one lanelet where they are the allowed participant
+            if len(participant_lls) == 1:
+                return participant_lls[0]
+
+            # case: agent is on more than one lanelet where they are the allowed participant
+            if len(participant_lls) > 1:
+                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                    (x,y), [ll.id for ll in participant_lls]))
+                return participant_lls[1]
+
+            # case: agent is on more than one lanelet where they are NOT the allowed participant
             if len(intersecting_lls) > 1:
                 log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                     (x,y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
 
-        # case if agent is in lanelet where they are not an allowed participant
-        if len(intersecting_lls) == 0:
-            return None
+            # case: if agent is not on any lanelet (but bounding box intersected multiple lanelets)
+            if len(intersecting_lls) == 0:
+                return None
 
         return intersecting_lls[0]
 
@@ -207,7 +219,8 @@ class LaneletMap(object):
 
         if len(intersecting_areas) == 0:
             return None
-        elif len(intersecting_areas) > 1:
+
+        if len(intersecting_areas) > 1:
             # filter results for areas containing the point
             intersecting_areas = list(filter(lambda area: inside(area, point), intersecting_lls))
             if len(intersecting_areas) > 1:
