@@ -1,8 +1,11 @@
 behaviortree crosswalk_signal:
     ?
         ->
-            condition c_curr_dest ( reached_curr_destination( threshold=1.5 ) )
-            maneuver m_dest_next ( MUpdateDestination( vel=MP(1.0,30,6) ) )
+            condition c_goal ( reached_goal( threshold=1 ) )
+            maneuver m_stop_goal ( MStopConfig( type=2 ) )        
+        ->
+            condition c_curr_waypt ( reached_next_waypoint( threshold=1 ) )
+            maneuver m_waypt_next ( MUpdateWaypoint( vel=MP(1.0,30,6) ) )
         ->
             condition c_greenlight ( traffic_light_green() )
             maneuver m_keep_velocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
