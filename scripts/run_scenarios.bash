@@ -53,7 +53,7 @@ kill_python38()
 }
 
 for scenario in $scenarios; do
-    echo "CTRL + C to the script."
+    echo "CTRL + C to exit the script."
     read -p "ENTER to run ${scenario#$REPO_DIR/}:"
 
     trap kill_python38 SIGINT
