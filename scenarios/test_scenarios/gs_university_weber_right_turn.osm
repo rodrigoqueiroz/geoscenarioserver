@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2716470' action='modify' visible='true' lat='43.47772143856' lon='-80.52046477248' />
+  <node id='-2716471' action='modify' visible='true' lat='43.47758176413' lon='-80.51952961634' />
+  <node id='-2716472' action='modify' visible='true' lat='43.47771813802' lon='-80.52046585544'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='lane_changer' />
+    <tag k='route' v='right_turn' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-2716480' action='modify' visible='true' lat='43.47783962918' lon='-80.51986611111'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-2716484' action='modify' visible='true' lat='43.47783522847' lon='-80.51989296856'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_modified.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='university_weber_right_turn' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <way id='-103239' action='modify' visible='true'>
+    <nd ref='-2716470' />
+    <nd ref='-2716471' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='right_turn' />
+  </way>
+</osm>
