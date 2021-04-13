@@ -94,6 +94,10 @@ class SPPlanner(object):
                 xwalks_in_plan.append(closest_xwalk)
                 self.route.append(entrance)
                 self.route.append(exit)
+
+                # do not continue planning if the last crosswalk was just added to the route
+                if len(list(xwalks_not_in_plan.values())) == 1:
+                    found_closest_exit = True
             else:
                 found_closest_exit = True
 
