@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='single pedestrian scenario' />
-    <tag k='timeout' v='45' />
+    <tag k='timeout' v='30' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5321301' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
@@ -14,14 +14,14 @@
     <tag k='name' v='origin' />
   </node>
   <node id='-5321302' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
-  <node id='-5321303' action='modify' visible='true' lat='43.47797922695' lon='-80.51951674634'>
+  <node id='-5321303' action='modify' visible='true' lat='43.47795197853' lon='-80.51945371443'>
     <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
   </node>
-  <node id='-5321304' action='modify' visible='true' lat='43.47809724164' lon='-80.52012082223'>
+  <node id='-5321304' action='modify' visible='true' lat='43.47778777735' lon='-80.51988344673'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>
