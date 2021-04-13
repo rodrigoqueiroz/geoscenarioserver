@@ -1,6 +1,8 @@
-from math import floor, ceil
+from math import floor
+from typing import List
 
-from lanelet2.core import ConstLineString3d, LaneletSequence, Point3d
+from lanelet2.core import ConstLineString3d, Lanelet, Point3d
+from lanelet2.routing import Route
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy.interpolate import splprep, splev
@@ -13,17 +15,17 @@ from util.Utils import distance_2p
 class SDVRoute(object):
     lanelet_map = None
 
-    def __init__(self, lanelet_route, lanelet_map:LaneletMap, start_x=None, start_y=None):
+    def __init__(self, lanelet_route:Route, lanelet_map:LaneletMap, start_x:float=None, start_y:float=None):
         # NOTE: start_x and start_y should only be None in the case where x and 
         #       y aren't known; e.g., when starting with frenet state
 
         if SDVRoute.lanelet_map is None:
             SDVRoute.lanelet_map = lanelet_map
 
-        self._lanelet_route = lanelet_route
+        self._lanelet_route:Route = lanelet_route
 
-        self._sdv_paths = None
-        self._current_sdv_path = None
+        self._sdv_paths:List[SDVPath] = None
+        self._current_sdv_path:SDVPath = None
         self._set_sdv_paths()
 
         # This is True if the vehicle should lane change to stay on its route
@@ -70,6 +72,8 @@ class SDVRoute(object):
             y = curr_ll.centerline[0].y
         s = sim_to_frenet_position(self.get_global_path(), x, y, 0)[0]
         self._update_should_lane_change(s, self.get_global_path(), 0)
+
+        self.update_reference_path(s)
 
     def update_reference_path(self, ref_path_origin:float, plan_lane_change=False):
         self._current_sdv_path.update_ref_path(ref_path_origin)
@@ -240,35 +244,42 @@ class SDVRoute(object):
             self._should_lane_change = False
 
 class SDVPath(object):
-    def __init__(self, full_lane, lane_is_loop:bool, lane_change_start:Point3d, lane_change_end:Point3d, lane_change_direction:int):
-        # These mark the start and end of a section on the path where a lane change
-        # would be necessary to stay on the route
+    def __init__(self, lane:List[Lanelet], lane_is_loop:bool, lane_change_start:Point3d, lane_change_end:Point3d, lane_change_direction:int):
+        # These can be used to mark a section of the global path as a "lane change zone"
         self._lane_change_start:Point3d = lane_change_start
         self._lane_change_end:Point3d = lane_change_end
+        # NOTE: the values are the same as the ones used in LaneConfig.id; -1 for
+        #       right, 1 for left, and 0 for no lane change
         self._lane_change_direction:int = lane_change_direction
 
-        # Points per meter along the global and reference paths
-        self._path_density:float = SimConfig.POINTS_PER_METER
-
         # The lanelets that make the global path
-        self._lane = full_lane
+        self._lane:List[Lanelet] = lane
         self._lane_is_loop:bool = lane_is_loop
 
         # The global path
-        self._global_path = None
-        self._global_path_len:int = 0
+        # NOTE: _global_path needs to be stored as a List of Point3d because ConstLineString3d
+        #       does not support slicing
+        self._global_path:List[Point3d] = None
+        self._global_path_i_len:int = 0
+        self._global_path_s_len:float = 0.0
         self._set_global_path()
 
         # The reference path
-        self._ref_path = None
-        self._ref_path_origin:float = 0.0
-        self._ref_path_s_start:float = 0.0
-        self._ref_path_s_end:float = 0.0
+        self._ref_path:ConstLineString3d = None
+        # NOTE: it is assumed that this value is <= 0
+        self._ref_path_s_start:float = -100.0
+        # NOTE: it is assumed that this value is > 0
+        self._ref_path_s_end:float = 100.0
+
+        # Positions of of reference path points relative to the global path
+        self._global_path_s_origin:float = 0.0
+        self._global_path_i_start:int = 0
+        self._global_path_s_start:float = 0.0
+        self._global_path_i_end:int = 0
+        self._global_path_s_end:float = 0.0
 
     def get_global_path(self):
-        # NOTE: global_path needs to be stored as a list because ConstLineString3d
-        #       does not support slicing
-        return None if (self._global_path is None) else ConstLineString3d(0, self._global_path)
+        return ConstLineString3d(0, self._global_path)
 
     def get_lane(self):
         return self._lane
@@ -280,72 +291,146 @@ class SDVPath(object):
         return self._ref_path
 
     def get_ref_path_origin(self):
-        return self._ref_path_origin
+        return self._global_path_s_origin
 
     def get_ref_path_s_start(self):
-        return self._ref_path_s_start
+        ref_path_s_start = self._global_path_s_start - self._global_path_s_origin
 
-    def update_ref_path(self, ref_path_origin:float, ref_path_s_start:float=-100.0, ref_path_s_end:float=100.0):
-        # NOTE: ref_path_origin is the position (s) of the origin of the reference
-        #       path along the global path
-        self._ref_path_origin = ref_path_origin
+        if self._lane_is_loop and ref_path_s_start > 0:
+            ref_path_s_start -= self._global_path_s_len
 
-        global_path_start_index, global_path_end_index = self._get_global_path_start_and_end_indices(
-            ref_path_origin + ref_path_s_start,
-            ref_path_origin + ref_path_s_end
-        )
+        return ref_path_s_start
 
-        # NOTE: _ref_path_s_start and _ref_path_s_end will be as close as possible
-        #       to ref_path_s_start and ref_path_s_end respectively
-        self._ref_path_s_start = self._path_index_to_s(global_path_start_index) - ref_path_origin
-        self._ref_path_s_end = self._path_index_to_s(global_path_end_index) - ref_path_origin
+    def update_ref_path(self, ref_path_origin:float):
+        assert 0 <= ref_path_origin <= self._global_path_s_len
+
+        self._global_path_s_origin = ref_path_origin
+
+        global_path_s_start = self._global_path_s_origin + self._ref_path_s_start
+        global_path_s_end = self._global_path_s_origin + self._ref_path_s_end
+        if self._lane_is_loop:
+            global_path_s_start %= self._global_path_s_len
+            global_path_s_end %= self._global_path_s_len
+        else:
+            global_path_s_start = max(0.0, global_path_s_start)
+            global_path_s_end = min(global_path_s_end, self._global_path_s_len)
+
+        delta_s_start = global_path_s_start - self._global_path_s_start
+        delta_s_end = global_path_s_end - self._global_path_s_end
 
         if self._lane_is_loop:
-            global_path_start_index = global_path_start_index % self._global_path_len
-            global_path_end_index = global_path_end_index % self._global_path_len
-        else:
-            # If the path is not a loop, then global_path_start_index cannot be
-            # before index 0 and global_path_end_index cannot be after the last index
-            global_path_start_index = max(0, global_path_start_index)
-            global_path_end_index = min(self._global_path_len - 1, global_path_end_index)
+            if abs(delta_s_start + self._global_path_s_len) < abs(delta_s_start):
+                # s_start changed from the end of the global path to the start
+                delta_s_start += self._global_path_s_len
+                self._global_path_i_start = 0
+                self._global_path_s_start = 0
+            elif abs(delta_s_start - self._global_path_s_len) < abs(delta_s_start):
+                # s_start changed from the start of the global path to the end
+                delta_s_start -= self._global_path_s_len
+                self._global_path_i_start = self._global_path_i_len - 1
+                self._global_path_s_start = self._global_path_s_len
 
-            # In case the range changed
-            self._ref_path_s_start = self._path_index_to_s(global_path_start_index) - ref_path_origin
-            self._ref_path_s_end = self._path_index_to_s(global_path_end_index) - ref_path_origin
+            if abs(delta_s_end + self._global_path_s_len) < abs(delta_s_end):
+                # s_end changed from the end of the global path to the start
+                delta_s_end += self._global_path_s_len
+                self._global_path_i_end = 0
+                self._global_path_s_end = 0
+            elif abs(delta_s_end - self._global_path_s_len) < abs(delta_s_end):
+                # s_end changed from the start of the global path to the end
+                delta_s_end -= self._global_path_s_len
+                self._global_path_i_end = self._global_path_i_len - 1
+                self._global_path_s_end = self._global_path_s_len
 
-        # NOTE: assumes global_path_start_index never equals global_path_end_index
-        if self._lane_is_loop and (global_path_start_index < global_path_end_index):
+        s = self._global_path_s_start
+        if delta_s_start > 0.0:
+            for i in range(self._global_path_i_start, self._global_path_i_len - 1):
+                ds = distance_2p(
+                    self._global_path[i].x, self._global_path[i].y,
+                    self._global_path[i + 1].x, self._global_path[i + 1].y
+                )
+
+                if s <= global_path_s_start < s + ds:
+                    self._global_path_i_start = i
+                    self._global_path_s_start = s
+                    break
+                elif global_path_s_start == s + ds:
+                    self._global_path_i_start = i + 1
+                    self._global_path_s_start = s + ds
+                    break
+
+                s += ds
+        elif delta_s_start < 0.0:
+            for i in reversed(range(1, self._global_path_i_start + 1)):
+                ds = distance_2p(
+                    self._global_path[i].x, self._global_path[i].y,
+                    self._global_path[i - 1].x, self._global_path[i - 1].y
+                )
+
+                if s - ds <= global_path_s_start < s:
+                    self._global_path_i_start = i - 1
+                    self._global_path_s_start = s - ds
+                    break
+                elif global_path_s_start == s:
+                    self._global_path_i_start = i
+                    self._global_path_s_start = s
+                    break
+
+                s -= ds
+
+        s = self._global_path_s_end
+        if delta_s_end > 0.0:
+            for i in range(self._global_path_i_end, self._global_path_i_len - 1):
+                ds = distance_2p(
+                    self._global_path[i].x, self._global_path[i].y,
+                    self._global_path[i + 1].x, self._global_path[i + 1].y
+                )
+
+                if s < global_path_s_end <= s + ds:
+                    self._global_path_i_end = i + 1
+                    self._global_path_s_end = s + ds
+                    break
+                elif global_path_s_end == s:
+                    self._global_path_i_end = i
+                    self._global_path_s_end = s
+                    break
+
+                s += ds
+        elif delta_s_end < 0.0:
+            for i in reversed(range(1, self._global_path_i_end + 1)):
+                ds = distance_2p(
+                    self._global_path[i].x, self._global_path[i].y,
+                    self._global_path[i - 1].x, self._global_path[i - 1].y
+                )
+
+                if s - ds < global_path_s_end <= s:
+                    self._global_path_i_end = i
+                    self._global_path_s_end = s
+                    break
+                elif global_path_s_end == s - ds:
+                    self._global_path_i_end = i - 1
+                    self._global_path_s_end = s - ds
+                    break
+
+                s -= ds
+
+        # NOTE: assumes _global_path_i_start never equals _global_path_i_end
+        if self._lane_is_loop and (self._global_path_i_start < self._global_path_i_end):
             # The slice lies between the ends of the global path
             self._ref_path = ConstLineString3d(
-                0, self._global_path[ global_path_start_index : global_path_end_index ]
+                0, self._global_path[ self._global_path_i_start : self._global_path_i_end ]
             )
-        elif self._lane_is_loop and (global_path_start_index > global_path_end_index):
+        elif self._lane_is_loop and (self._global_path_i_start > self._global_path_i_end):
             # The slice wraps around the ends of the global path
             self._ref_path = ConstLineString3d(
-                0, self._global_path[ global_path_start_index : ] +
-                self._global_path[ : global_path_end_index ]
+                0, self._global_path[ self._global_path_i_start : ] +
+                self._global_path[ : self._global_path_i_end ]
             )
         elif not self._lane_is_loop:
-            # NOTE: it is assumed global_path_start_index < global_path_end_index
+            # NOTE: it is assumed _global_path_i_start < _global_path_i_end
             #       in this case
             self._ref_path = ConstLineString3d(
-                0, self._global_path[ global_path_start_index : global_path_end_index ]
+                0, self._global_path[ self._global_path_i_start : self._global_path_i_end ]
             )
-
-    def _get_global_path_start_and_end_indices(self, global_path_start_s:float, global_path_end_s:float):
-        # NOTE: the range global_path_start_index to global_path_end_index will
-        #       contain global_path_start_s and global_path_end_s
-        global_path_start_index = floor(self._s_to_path_index(global_path_start_s))
-        global_path_end_index = ceil(self._s_to_path_index(global_path_end_s))
-
-        return global_path_start_index, global_path_end_index
-
-    def _path_index_to_s(self, path_index:int):
-        return float(path_index) / self._path_density
-
-    def _s_to_path_index(self, s:float):
-        # NOTE: the path index won't necessarily be an integer
-        return s * self._path_density
 
     def _set_global_path(self):
         centerline_length = 0.0
@@ -371,25 +456,14 @@ class SDVPath(object):
         # a higher s means less closeness, and more smoothness, of fit
         tck, u = splprep([centerline_x, centerline_y], s=3, per=self._lane_is_loop)
 
-        num_points = floor(self._path_density * centerline_length)
+        num_points = floor(SimConfig.POINTS_PER_METER * centerline_length)
         # generate evenly spaced points along the spline
         spline = splev(np.linspace(0, 1, num=num_points), tck)
 
-        if self._lane_is_loop:
-            # if the last point is not removed then the distance between it and
-            # the first point would be 0 instead of 1/_path_density
-            spline[0] = spline[0][:-1]
-            spline[1] = spline[1][:-1]
-            num_points -= 1
-
-        avg_meters_per_point = 0.0
+        self._global_path_s_len = 0.0
         self._global_path = [ Point3d(0, spline[0][0], spline[1][0], 0.0) ]
         for x, y in zip(spline[0][1:], spline[1][1:]):
-            avg_meters_per_point += distance_2p(x, y, self._global_path[-1].x, self._global_path[-1].y)
+            self._global_path_s_len += distance_2p(x, y, self._global_path[-1].x, self._global_path[-1].y)
             self._global_path.append(Point3d(0, x, y, 0.0))
-        avg_meters_per_point /= (num_points - 1)
 
-        # update _path_density since num_points was floored, and splprep isn't exact
-        self._path_density = 1.0 / avg_meters_per_point
-
-        self._global_path_len = len(self._global_path)
+        self._global_path_i_len = len(self._global_path)
