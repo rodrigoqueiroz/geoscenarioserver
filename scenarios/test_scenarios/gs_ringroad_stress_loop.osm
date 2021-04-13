@@ -18,7 +18,7 @@
     <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Campus ring road stress test' />
-    <tag k='timeout' v='180' />
+    <tag k='timeout' v='210' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5149173' action='modify' visible='true' lat='43.4681668322' lon='-80.5436763174'>

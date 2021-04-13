@@ -5,7 +5,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
     <tag k='name' v='Straight Road following and avoiding obstacles' />
-    <tag k='timeout' v='20' />
+    <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5145205' action='modify' visible='true' lat='49.00725430009' lon='8.45708929516'>

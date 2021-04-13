@@ -17,7 +17,7 @@ from typing import Dict
 class Maneuver(Enum):
     M_VELKEEP = 1
     M_STOP = 2
-    M_UPDATEDEST = 3
+    M_UPDATEWAYPOINT = 3
 
 
 class SamplingMethod(Enum):
@@ -156,7 +156,7 @@ class MStopConfig(MConfig):
 
 
 @dataclass
-class MUpdateDestination(MConfig):
+class MUpdateWaypoint(MConfig):
     class Type(IntEnum):
         NEXT = 0            # continue to next node in route
         XWALK_ENTRY = 1     # add entry of xwalk as new and next node in route
@@ -167,4 +167,4 @@ class MUpdateDestination(MConfig):
     #time_lowvel:MP = MP(6.0,10,3)      #duration in [s] as MP when starting
     #vel_threshold:float = 7            #upper bound for lowvel in [m/s]
     max_diff:float = 1.5               #max vel diff (current to target).
-    mkey:int = Maneuver.M_UPDATEDEST
+    mkey:int = Maneuver.M_UPDATEWAYPOINT
