@@ -249,7 +249,7 @@ class SDVPath(object):
         self._lane_change_start:Point3d = lane_change_start
         self._lane_change_end:Point3d = lane_change_end
         # NOTE: the values are the same as the ones used in LaneConfig.id; -1 for
-        #       right, 1 for left, and 0 for no lane change
+        #       right, 1 for left, and None for no lane change
         self._lane_change_direction:int = lane_change_direction
 
         # The lanelets that make the global path

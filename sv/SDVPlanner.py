@@ -302,8 +302,10 @@ class SVPlanner(object):
         vehicle_state.set_D(d_vector)
 
         # the next plan's ref_path_origin is vehicle_state.s
-        self.sdv_route.update_reference_path(vehicle_state.s, plan_lane_change=False)
+        self.sdv_route.update_reference_path(vehicle_state.s, plan_lane_change=True)
         vehicle_state.s = 0.0
+
+        lane_swerve_target = self.sdv_route.get_lane_change_direction(vehicle_state.s)
 
         # update lane config based on current (possibly outdated) reference frame
         lane_config, reg_elems = self.read_map(vehicle_state, traffic_light_states)
@@ -361,7 +363,8 @@ class SVPlanner(object):
             traffic_vehicles=traffic_vehicles,
             regulatory_elements=reg_elems,
             pedestrians=traffic_pedestrians,
-            static_objects=static_objects
+            static_objects=static_objects,
+            lane_swerve_target=lane_swerve_target
         )
 
     def read_map(self, vehicle_state, traffic_light_states):

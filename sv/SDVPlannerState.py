@@ -27,3 +27,4 @@ class PlannerState:
     regulatory_elements: List
     goal_point: Tuple[float,float] = None
     goal_point_frenet: Tuple[float,float] = None
+    lane_swerve_target: int = None

@@ -174,6 +174,14 @@ class BehaviorModels(object):
                     threshold = kwargs['distance'] if 'distance' in kwargs else 40
                     return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
                         and re_state.color == TrafficLightColor.Green
+
+        elif condition == "should_lane_change":
+            return self.planner_state.lane_swerve_target is not None
+
+        elif condition == "min_long_vel":
+            vel = kwargs['vel']
+            return self.planner_state.vehicle_state.s_vel >= vel
+
         return False
 
 
