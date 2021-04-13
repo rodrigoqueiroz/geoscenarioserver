@@ -108,10 +108,18 @@ def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=20, reve
     """ Checks if the vehicle has reached or passed the goal point in the frenet frame.
         @param frenet_goal_point:  Arraylike (s,d) goal position in the vehicle's frenet frame
     """
-    goal_s = 0 if reverse else frenet_goal_point[0]
-    direction = -1 if reverse else 1
+    if frenet_goal_point is None:
+        return False
+
+    # TODO: remove reverse from goal condition; all vehicles' goals will be the
+    #       last point in their route
+    # goal_s = 0 if reverse else frenet_goal_point[0]
+    # direction = -1 if reverse else 1
+    goal_s = frenet_goal_point[0]
+
     # A distance to goal with the same sign as direction means we've reached and passed it
-    return direction * (goal_s - vehicle_state.s) < threshold
+    # return direction * (goal_s - vehicle_state.s) < threshold
+    return 0 <= goal_s - vehicle_state.s < threshold
 
 def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5, distance_gap=30):
     """ Determines whether there is a vehicle in front of a given vehicle in the same lane and within a specified

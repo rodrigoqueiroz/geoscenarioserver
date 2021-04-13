@@ -351,10 +351,11 @@ class Dashboard(object):
         
 
         #main vehicle
-        x,y = goal_point_frenet[0],goal_point_frenet[1]
-        #plt.plot(x, 'go',markersize=6, zorder=10)
-        plt.axvline(x, color="k", linestyle='-', zorder=0)
-        plt.gca().text(x+1, y+1, "goal", style='italic', zorder=10)
+        if goal_point_frenet is not None:
+            x,y = goal_point_frenet[0],goal_point_frenet[1]
+            #plt.plot(x, 'go',markersize=6, zorder=10)
+            plt.axvline(x, color="k", linestyle='-', zorder=0)
+            plt.gca().text(x+1, y+1, "goal", style='italic', zorder=10)
         if cand:
             for t in cand:
                 Dashboard.plot_trajectory(t[0], t[1], t[2], 'grey')

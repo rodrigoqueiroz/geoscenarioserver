@@ -59,6 +59,42 @@ class LaneletMap(object):
         following = self.routing_graph.following(lanelet)
         return following[0] if following else None
 
+    def get_previous(self, lanelet):
+        # returns first previous lanelet
+        previous = self.routing_graph.previous(lanelet)
+        return previous[0] if previous else None
+
+    def get_right_by_route(self, lanelet_route, lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        right = []
+
+        right_relations = lanelet_route.rightRelations(lanelet)
+        if right_relations:
+            for relation in right_relations:
+                if relation.relationType == RelationType.Right:
+                    right.append(relation.lanelet)
+
+        return right
+
+    def get_left_by_route(self, lanelet_route, lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        left = []
+
+        left_relations = lanelet_route.leftRelations(lanelet)
+        if left_relations:
+            for relation in left_relations:
+                if relation.relationType == RelationType.Left:
+                    left.append(relation.lanelet)
+
+        return left
+
+    def get_next_by_route(self, lanelet_route, lanelet):
+        following_relations = lanelet_route.followingRelations(lanelet)
+
+        return following_relations[0].lanelet if following_relations else None
+
     def get_traffic_light_by_name(self, name):
         #filter regulatory elemments for TL only
         tl_res = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
@@ -250,50 +286,6 @@ class LaneletMap(object):
                     ret = ll
                     break
         return ret
-
-    def get_global_path_for_route(self, lanelet_route, x=None, y=None, meters_after_end=50):
-        """ This looks 100m ahead of the beginning of the current lanelet. Change?
-            x, y only used to determine the starting lanelet, allowed to be a little outdated.
-            Ideally we don't want to request for this very often - only when we generate a new trajectory.
-
-            @param lanelet_route:       Route object from lanelet2
-            @param meters_after_end:    distance beyond the end of lanelet_route to extend the global path by
-
-            @return:    list of lanelet2.core.Point3d
-        """
-
-        # if a position is not given, take the first lanelet in the shortest path
-        # otherwise find the lanelet we are in in the shortest path
-        cur_ll = lanelet_route.shortestPath()[0] if x is None or y is None \
-            else self.get_occupying_lanelet_by_route(lanelet_route, x, y)
-        assert cur_ll, "Cannot get current lane from x={}, y={}".format(x, y)
-
-        cur_lane = lanelet_route.fullLane(cur_ll)
-        assert cur_lane
-
-        path = []
-        # append centerline of each lanelet in the lane
-        for ll in cur_lane:
-            for p in ll.centerline:
-                path.append(Point3d(0, p.x, p.y, 0.0))
-
-        # add a padding at the end of the path
-        path_length = 0
-        next_ll = self.get_next(cur_lane[-1])
-        while next_ll is not None and path_length < meters_after_end:
-            for p, q in pairwise(next_ll.centerline):
-                # for first iteration, also append p
-                if path_length == 0:
-                    path.append(Point3d(0, p.x, p.y, 0.0))
-
-                path.append(Point3d(0, q.x, q.y, 0.0))
-                path_length += distance(p, q)
-
-                if path_length >= meters_after_end: break
-            next_ll = self.get_next(next_ll)
-
-        path_ls = ConstLineString3d(0, path)
-        return path_ls
 
     def get_points(self,  x_min=0, y_min=0, x_max=0, y_max=0):
         data = []

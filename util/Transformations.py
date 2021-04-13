@@ -12,6 +12,7 @@ from lanelet2.geometry import toArcCoordinates
 from typing import List
 from scipy import interpolate
 
+from util.Utils import distance_2p
 
 class OutsideRefPathException(Exception):
     def __init__(self, message):
@@ -27,101 +28,86 @@ def vector_interp(a, b, t):
     return a + t * (b - a)
 
 
-def frenet_to_sim_position(ref_path:ConstLineString3d, s:float, d:float):
+def frenet_to_sim_position(ref_path:ConstLineString3d, s:float, d:float, s_start:float):
     sim_position = None
-    arclen = 0
+    arclen = s_start
 
+    if s >= s_start:
+        for i in range(len(ref_path) - 1):
+            p = ref_path[i]
+            q = ref_path[i + 1]
 
-    #x_points = [ ref_path[i].x for i in range(len(ref_path) ]
-    #y_points = [ ref_path[i].y for i in range(len(ref_path) ]
+            pq = np.array([q.x - p.x, q.y - p.y])
+            dist = np.linalg.norm(pq)
 
-    #tck = interpolate.splrep(x_points, y_points)
-    #x = s
-    #interpolate.splev(x, tck)
-    #print(len(ref_path))
+            if arclen <= s <= arclen + dist: # if s lies between p and q
+                unit_tangent = normalize(pq)
+                # rotate tangent counter-clockwise for unit normal
+                unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
 
-    for i in range(len(ref_path) - 1):
-        p = ref_path[i]
-        q = ref_path[i + 1]
+                # we are still travelling along pq, but facing in the direction of an interpolated tangent
+                point_on_ref_path = np.array([p.x, p.y]) + unit_tangent * (s - arclen)
+                sim_position = point_on_ref_path + unit_normal * d
+                break
 
-        pq = np.array([q.x - p.x, q.y - p.y])
-        dist = np.linalg.norm(pq)
-
-        if s < 0 or arclen <= s <= arclen + dist: # if s lies between p and q
-            unit_tangent = normalize(pq)
-            # rotate tangent counter-clockwise for unit normal
-            unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
-
-            # we are still travelling along pq, but facing in the direction of an interpolated tangent
-            point_on_ref_path = np.array([p.x, p.y]) + unit_tangent * (s - arclen)
-            sim_position = point_on_ref_path + unit_normal * d
-            break
-        arclen += dist
+            arclen += dist
 
     if sim_position is None:
         raise OutsideRefPathException("s {} d {} is outside the reference path.".format(s, d))
     return sim_position
 
 
-def sim_to_frenet_position(ref_path:ConstLineString3d, x:float, y:float):
-    ret = None
+def sim_to_frenet_position(ref_path:ConstLineString3d, x:float, y:float, s_start:float, max_dist_from_path:float=5.0):
+    # TODO: find a better way of checking if the point is on ref_path
+    point_is_on_path = False
+    for point in ref_path:
+        if distance_2p(point.x, point.y, x, y) <= max_dist_from_path:
+            point_is_on_path = True
+            break
+
+    if not point_is_on_path:
+        raise OutsideRefPathException("x {} y {} is outside the reference path.".format(x, y))
 
     path_ls = ConstLineString2d(ref_path)
     # toArcCoordinates does not interpolate beyond or before ref_path
     # arc_coords.distance used as d may be discontinuous moving across points
     arc_coords = toArcCoordinates(path_ls, BasicPoint2d(x, y))
 
-    # in case s is behind the ref path, arc_coords.length would be 0
-    if arc_coords.length == 0:
-        # use first two points to interpolate behind ref path
-        p = ref_path[0]
-        q = ref_path[1]
-        pq = np.array([q.x - p.x, q.y - p.y])
-        unit_normal = normalize(np.array([-1 * pq[1], pq[0]]))
-        p_sim_pos = np.array([x - p.x, y - p.y])
-
-        projection = (np.dot(pq, p_sim_pos) / np.dot(pq, pq)) * pq
-        projection_normal = p_sim_pos - projection
-        ret = (
-            copysign(np.linalg.norm(projection), np.dot(projection, pq)),
-            copysign(np.linalg.norm(projection_normal), np.dot(projection_normal, unit_normal)))
-    else:
-        ret = (arc_coords.length, arc_coords.distance)
-
-    return ret
+    return (arc_coords.length + s_start, arc_coords.distance)
 
 
-def path_frame_at_arclength(ref_path:ConstLineString3d, s:float):
+def path_frame_at_arclength(ref_path:ConstLineString3d, s:float, s_start:float):
     """ Returns the unit tangent, unit normal, and kappa (curvature) at arclength s along
         the reference path.
     """
     ret = None
-    arclen = 0
+    arclen = s_start
 
-    for i in range(len(ref_path) - 1):
-        p = ref_path[i]
-        q = ref_path[i + 1]
+    if s >= s_start:
+        for i in range(len(ref_path) - 1):
+            p = ref_path[i]
+            q = ref_path[i + 1]
 
-        pq = np.array([q.x - p.x, q.y - p.y])
-        dist = np.linalg.norm(pq)
+            pq = np.array([q.x - p.x, q.y - p.y])
+            dist = np.linalg.norm(pq)
 
-        if s < 0 or arclen <= s <= arclen + dist: # if s lies between p and q
-            # interpolate tangent between p and q
-            tangent_p = tangent_of_path_at(ref_path, i)
-            tangent_q = tangent_of_path_at(ref_path, i+1)
-            percent_delta_s = (s - arclen) / dist
-            unit_tangent = normalize(vector_interp(tangent_p, tangent_q, percent_delta_s))
-            # rotate tangent counter-clockwise for unit normal
-            unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
-            # should be parallel to unit normal, pointing inwards
-            # curvature is negative if pointing away from unit normal
-            kappa_vector = (tangent_q - tangent_p) / dist
-            kappa = copysign(np.linalg.norm(kappa_vector), np.dot(kappa_vector, unit_normal))
+            if arclen <= s <= arclen + dist: # if s lies between p and q
+                # interpolate tangent between p and q
+                tangent_p = tangent_of_path_at(ref_path, i)
+                tangent_q = tangent_of_path_at(ref_path, i+1)
+                percent_delta_s = (s - arclen) / dist
+                unit_tangent = normalize(vector_interp(tangent_p, tangent_q, percent_delta_s))
+                # rotate tangent counter-clockwise for unit normal
+                unit_normal = np.array([-1 * unit_tangent[1], unit_tangent[0]])
+                # should be parallel to unit normal, pointing inwards
+                # curvature is negative if pointing away from unit normal
+                kappa_vector = (tangent_q - tangent_p) / dist
+                kappa = copysign(np.linalg.norm(kappa_vector), np.dot(kappa_vector, unit_normal))
 
-            ret = (unit_tangent, unit_normal, kappa)
-            break
+                ret = (unit_tangent, unit_normal, kappa)
+                break
 
-        arclen += dist
+            arclen += dist
 
     if ret is None:
         raise OutsideRefPathException("s {} is outside the reference path.".format(s))
@@ -141,7 +127,7 @@ def tangent_of_path_at(path:ConstLineString3d, i:int):
     return normalize(op + pq)
 
 
-def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List, y_vector:List):
+def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List, y_vector:List, s_start:float):
     """ Transforms position and speed from cartesian to frenet frame based of ref_path
 
         @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?
@@ -152,9 +138,9 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List, y_vector:List
     acc = np.array([x_acc, y_acc])
 
     # position
-    s, d = sim_to_frenet_position(ref_path, x, y)
+    s, d = sim_to_frenet_position(ref_path, x, y, s_start)
 
-    unit_tangent, unit_normal, kappa = path_frame_at_arclength(ref_path, s)
+    unit_tangent, unit_normal, kappa = path_frame_at_arclength(ref_path, s, s_start)
 
     s_vel = np.dot(velocity, unit_tangent)
     d_vel = np.dot(velocity, unit_normal)
@@ -165,15 +151,15 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List, y_vector:List
     return [s, s_vel, s_acc], [d, d_vel, d_acc]
 
 
-def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector):
+def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector, s_start:float):
     """ Transforms position and speed from frenet frame based on ref_path to cartesian.
         @param ref_path:    iterable of lanelet2.core.Point3d. Change to something general?
     """
     s, s_vel, s_acc = s_vector
     d, d_vel, d_acc = d_vector
 
-    position = frenet_to_sim_position(ref_path, s, d)
-    unit_tangent, unit_normal, kappa = path_frame_at_arclength(ref_path, s)
+    position = frenet_to_sim_position(ref_path, s, d, s_start)
+    unit_tangent, unit_normal, kappa = path_frame_at_arclength(ref_path, s, s_start)
 
     # position = point_on_ref_path + unit_normal*d
     vel = s_vel * unit_tangent + d_vel * unit_normal
