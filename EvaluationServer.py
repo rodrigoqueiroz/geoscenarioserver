@@ -14,7 +14,7 @@ import glog as log
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
-    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("-s", "--scenario", dest="gsfile", nargs='*', metavar="FILE", default="", help="GeoScenario file")
     parser.add_argument("-e", "--eval", dest="eval_id", default="", help="Evaluation scenario ID")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="y", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
@@ -43,7 +43,7 @@ if __name__ == "__main__":
                     start_server(args,scenarios[id], True)
 
             except Exception as e:
-                print("ERROR. Can not run evaluation for scenario{}".format(id))
+                print("ERROR. Can not run evaluation for scenario {}".format(id))
     #Run single scenario
     elif args.eval_id != "":
         try:
@@ -56,7 +56,7 @@ if __name__ == "__main__":
                 start_server(args, scenarios[args.eval_id], True)
 
         except Exception as e:
-            print("ERROR. Can not run simulation for scenario{}".format(args.eval_id))
+            print("ERROR. Can not run simulation for scenario {}".format(args.eval_id))
             raise e
     #Run all scenarios from type
     elif args.eval_type != "":

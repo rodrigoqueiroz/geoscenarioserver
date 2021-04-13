@@ -63,7 +63,7 @@ class TP(Pedestrian):
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
-        self.destination = np.array([trajectory[-1].x, trajectory[-1].y])
+        self.waypoint = np.array([trajectory[-1].x, trajectory[-1].y])
         if not keep_active:
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
