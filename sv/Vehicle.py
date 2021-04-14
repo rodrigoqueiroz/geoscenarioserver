@@ -134,6 +134,7 @@ class SDV(Vehicle):
             if time < 0:
                 log.warning("Next v{} plan at {:2f}s is ahead of sim_time {:2f}s (diff{:2f}s) and will be delayed".format(
                     self.id,self.next_motion_plan.start_time,sim_time, time))
+                return
             else:
                 self.motion_plan = self.next_motion_plan
                 self.next_motion_plan = None
