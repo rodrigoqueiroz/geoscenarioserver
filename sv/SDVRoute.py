@@ -28,18 +28,18 @@ class SDVRoute(object):
         self._current_sdv_path:SDVPath = None
         self._set_sdv_paths()
 
-        # This is True if the vehicle should lane change to stay on its route
-        self._should_lane_change:bool = False
+        # This is True if the vehicle should lane swerve to stay on its route
+        self._should_lane_swerve:bool = False
 
         self.update_global_path(start_x, start_y)
 
     def get_global_path(self):
         return self._current_sdv_path.get_global_path()
 
-    def get_lane_change_direction(self, s):
-        start, end, direction = self._current_sdv_path.get_lane_change_info()
+    def get_lane_swerve_direction(self, s):
+        start, end, direction = self._current_sdv_path.get_lane_swerve_info()
 
-        if self._should_lane_change:
+        if self._should_lane_swerve:
             return direction
         return None
 
@@ -71,15 +71,15 @@ class SDVRoute(object):
             x = curr_ll.centerline[0].x
             y = curr_ll.centerline[0].y
         s = sim_to_frenet_position(self.get_global_path(), x, y, 0)[0]
-        self._update_should_lane_change(s, self.get_global_path(), 0)
+        self._update_should_lane_swerve(s, self.get_global_path(), 0)
 
         self.update_reference_path(s)
 
-    def update_reference_path(self, ref_path_origin:float, plan_lane_change=False):
+    def update_reference_path(self, ref_path_origin:float, plan_lane_swerve=False):
         self._current_sdv_path.update_ref_path(ref_path_origin)
 
-        if plan_lane_change:
-            self._update_should_lane_change(
+        if plan_lane_swerve:
+            self._update_should_lane_swerve(
                 0, self.get_reference_path(), self.get_reference_path_s_start()
             )
 
@@ -133,50 +133,50 @@ class SDVRoute(object):
             remaining_lls = self._lanelet_route.remainingShortestPath(route_lane[0])
             if len(remaining_lls) == 0:
                 # None of route_lane is on the shortest path
-                lane_change_start = route_lane[0].centerline[0]
-                lane_change_end = route_lane[-1].centerline[-1]
-                lane_change_direction = None
+                lane_swerve_start = route_lane[0].centerline[0]
+                lane_swerve_end = route_lane[-1].centerline[-1]
+                lane_swerve_direction = None
 
                 right_lls = SDVRoute.lanelet_map.get_right_by_route(self._lanelet_route, route_lane[0])
                 for ll in right_lls:
                     if len(self._lanelet_route.remainingShortestPath(ll)) > 0:
-                        lane_change_direction = -1
+                        lane_swerve_direction = -1
                         break
 
-                if lane_change_direction is None:
+                if lane_swerve_direction is None:
                     left_lls = SDVRoute.lanelet_map.get_left_by_route(self._lanelet_route, route_lane[0])
                     for ll in left_lls:
                         if len(self._lanelet_route.remainingShortestPath(ll)) > 0:
-                            lane_change_direction = 1
+                            lane_swerve_direction = 1
                             break
 
-                assert lane_change_direction
+                assert lane_swerve_direction
             elif all(ll in route_lane for ll in remaining_lls):
                 # The route lane is the shortest path
-                lane_change_start = None
-                lane_change_end = None
-                lane_change_direction = None
+                lane_swerve_start = None
+                lane_swerve_end = None
+                lane_swerve_direction = None
             else:
                 # The route lane is on the shortest path
-                lane_change_start = None
-                lane_change_end = route_lane[-1].centerline[-1]
-                lane_change_direction = None
+                lane_swerve_start = None
+                lane_swerve_end = route_lane[-1].centerline[-1]
+                lane_swerve_direction = None
 
                 right_lls = SDVRoute.lanelet_map.get_right_by_route(self._lanelet_route, route_lane[-1])
                 left_lls = SDVRoute.lanelet_map.get_left_by_route(self._lanelet_route, route_lane[-1])
                 if right_lls and (right_lls[0] in remaining_lls):
-                    lane_change_direction = -1
-                    lane_change_start = right_lls[0].centerline[0]
+                    lane_swerve_direction = -1
+                    lane_swerve_start = right_lls[0].centerline[0]
                 elif left_lls and (left_lls[0] in remaining_lls):
-                    lane_change_start = left_lls[0].centerline[0]
-                    lane_change_direction = 1
+                    lane_swerve_start = left_lls[0].centerline[0]
+                    lane_swerve_direction = 1
                 
-                assert lane_change_start, lane_change_direction
+                assert lane_swerve_start, lane_swerve_direction
 
             self._sdv_paths.append(
                 SDVPath(
                     full_lane, lane_is_loop,
-                    lane_change_start, lane_change_end, lane_change_direction
+                    lane_swerve_start, lane_swerve_end, lane_swerve_direction
                 )
             )
 
@@ -210,8 +210,8 @@ class SDVRoute(object):
         #     plt.axis([-50, 40, -50, 40])
         #     plt.show()
 
-    def _update_should_lane_change(self, s, path, s_start):
-        start, end, direction = self._current_sdv_path.get_lane_change_info()
+    def _update_should_lane_swerve(self, s, path, s_start):
+        start, end, direction = self._current_sdv_path.get_lane_swerve_info()
 
         if (start is not None) and (end is not None):
             try:
@@ -230,27 +230,27 @@ class SDVRoute(object):
 
             if (start_s is None) and (end_s is not None):
                 # start_s is None because it lies before path
-                self._should_lane_change = (s <= end_s)
+                self._should_lane_swerve = (s <= end_s)
             elif (start_s is not None) and (end_s is None):
                 # end_s is None because it lies after path
-                self._should_lane_change = (s >= start_s)
+                self._should_lane_swerve = (s >= start_s)
             elif (start_s is not None) and (end_s is not None):
                 # both start_s and end_s lie on path
-                self._should_lane_change = (s >= start_s) and (s <= end_s)
+                self._should_lane_swerve = (s >= start_s) and (s <= end_s)
             # NOTE: start_s and end_s will both be None in the case where path is
             #       the reference path; end_s is gauranteed to lie on the global path
         else:
             # NOTE: start and end will either both be None, or both be a point
-            self._should_lane_change = False
+            self._should_lane_swerve = False
 
 class SDVPath(object):
-    def __init__(self, lane:List[Lanelet], lane_is_loop:bool, lane_change_start:Point3d, lane_change_end:Point3d, lane_change_direction:int):
-        # These can be used to mark a section of the global path as a "lane change zone"
-        self._lane_change_start:Point3d = lane_change_start
-        self._lane_change_end:Point3d = lane_change_end
+    def __init__(self, lane:List[Lanelet], lane_is_loop:bool, lane_swerve_start:Point3d, lane_swerve_end:Point3d, lane_swerve_direction:int):
+        # These can be used to mark a section of the global path as a "lane swerve zone"
+        self._lane_swerve_start:Point3d = lane_swerve_start
+        self._lane_swerve_end:Point3d = lane_swerve_end
         # NOTE: the values are the same as the ones used in LaneConfig.id; -1 for
-        #       right, 1 for left, and None for no lane change
-        self._lane_change_direction:int = lane_change_direction
+        #       right, 1 for left, and None for no lane swerve
+        self._lane_swerve_direction:int = lane_swerve_direction
 
         # The lanelets that make the global path
         self._lane:List[Lanelet] = lane
@@ -284,8 +284,8 @@ class SDVPath(object):
     def get_lane(self):
         return self._lane
 
-    def get_lane_change_info(self):
-        return self._lane_change_start, self._lane_change_end, self._lane_change_direction
+    def get_lane_swerve_info(self):
+        return self._lane_swerve_start, self._lane_swerve_end, self._lane_swerve_direction
 
     def get_ref_path(self):
         return self._ref_path

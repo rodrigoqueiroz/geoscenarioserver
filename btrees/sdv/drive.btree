@@ -4,9 +4,9 @@ behaviortree drive_tree:
             condition c_goal ( reached_goal( threshold=35 ) )
             maneuver m_stop_goal ( MStopConfig(target=2) )
         ->
-            condition c_lane_change_min_vel ( min_long_vel( vel=1.0 ) )
-            condition c_lane_change ( should_lane_change() )
-            maneuver m_lane_change ( MLaneSwerveConfig() )
+            condition c_lane_swerve_min_vel ( min_long_vel( vel=1.0 ) )
+            condition c_lane_swerve ( should_lane_swerve() )
+            maneuver m_lane_swerve ( MLaneSwerveConfig() )
         ->
             condition c_redlight ( traffic_light_red( threshold=40 ) )
             maneuver m_stop_redlight ( MStopConfig( target=3 ) )

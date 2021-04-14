@@ -175,7 +175,7 @@ class BehaviorModels(object):
                     return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
                         and re_state.color == TrafficLightColor.Green
 
-        elif condition == "should_lane_change":
+        elif condition == "should_lane_swerve":
             return self.planner_state.lane_swerve_target is not None
 
         elif condition == "min_long_vel":
