@@ -11,6 +11,7 @@ import uuid
 import numpy as np
 from scipy.stats import truncnorm
 from itertools import tee
+from util.Transformations import normalize
 
 
 #Iterates an iter by pairs
@@ -70,7 +71,7 @@ def kalman(x, z, P, F, H, Q, R):
     return x_new, P_new
 
 def speed_to_vel(speed, angle):
-    x_vel = speed*cos(angle) 
+    x_vel = speed*cos(angle)
     y_vel = speed*sin(angle)
     return x_vel, y_vel
 
@@ -104,7 +105,26 @@ def normal_samples(nsamples, mean, sd, lo = None,up = None):
             s = random.gauss(mean,sd)
         else:
             #same as random.gauss(), but with bounds:
-            s = get_truncated_normal(mean,sd,lo,up) 
+            s = get_truncated_normal(mean,sd,lo,up)
         samples.append(s)
     return samples
-    
+
+def distance_point_to_wall(pt, wall):
+    p0 = wall[0]
+    p1 = wall[1]
+    wall_vec = p1-p0
+    pt_p0 = pt-p0
+
+    t = np.dot(wall_vec, pt_p0) / np.dot(wall_vec, wall_vec)
+    cross = p0 + t*wall_vec
+
+    if t <= 0.0:
+        dist = np.linalg.norm(pt_p0)
+    elif t >= 1.0:
+        dist = np.linalg.norm(pt-p1)
+    else:
+        dist = np.linalg.norm(cross-pt)
+
+    niW = normalize(cross-pt)
+
+    return dist, niW

@@ -43,6 +43,7 @@ class SPPlanner(object):
 
         self.route = []
         self.curr_route_node = sp.curr_route_node
+        self.current_lanelet = sp.current_lanelet
         self.current_desired_speed = sp.current_desired_speed
         self.replan_route = True
 
@@ -107,6 +108,8 @@ class SPPlanner(object):
 
     def run_planner(self):
         pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
+
+        self.current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_state)
 
         reg_elems = self.get_reg_elem_states(pedestrian_state)
         pedestrian_speed = {'default_desired': self.sim_traffic.pedestrians[self.pid].default_desired_speed,
@@ -177,17 +180,15 @@ class SPPlanner(object):
     def get_reg_elem_states(self, pedestrian_state):
         reg_elem_states = []
 
+        if not self.current_lanelet:
+            return reg_elem_states
+
         traffic_light_states = {}
         for lid, tl in self.sim_traffic.traffic_lights.items():
             traffic_light_states[lid] = tl.current_color.value
 
-        curr_ll_or_area = self.get_space_occupied_by_pedestrian(pedestrian_state)
-
-        if not curr_ll_or_area:
-            return reg_elem_states
-
         # Get regulatory elements acting on this lanelet
-        reg_elems = curr_ll_or_area.regulatoryElements
+        reg_elems = self.current_lanelet.regulatoryElements
 
 
         for re in reg_elems:

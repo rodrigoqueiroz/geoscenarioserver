@@ -13,7 +13,7 @@ from Actor import *
 from sp.SPPlanner import *
 from sp.SPPlannerState import *
 from shm.SimSharedMemory import *
-from util.Utils import kalman
+from util.Utils import kalman, distance_point_to_wall
 from util.Transformations import normalize
 from SimTraffic import *
 from sp.btree.BehaviorModels import BehaviorModels
@@ -93,10 +93,10 @@ class SP(Pedestrian):
         self.curr_route_node = 0
         self.route = []
         self.waypoint = None # np.array(route[self.curr_route_node])
+        self.current_lanelet = None
         self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
         self.current_desired_speed = self.default_desired_speed
         self.mass = random.uniform(50,80)
-        self.radius = random.uniform(0.25, 0.35)
 
 
     def start_planner(self):
@@ -106,6 +106,7 @@ class SP(Pedestrian):
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
         self.route = self.sp_planner.route
+        self.current_lanelet = self.sp_planner.current_lanelet
         self.waypoint = np.array(self.route[self.curr_route_node])
 
 
@@ -114,6 +115,7 @@ class SP(Pedestrian):
 
         self.sp_planner.run_planner()
         self.curr_route_node = self.sp_planner.curr_route_node
+        self.current_lanelet = self.sp_planner.current_lanelet
         self.current_desired_speed = self.sp_planner.current_desired_speed
         self.waypoint = np.array(self.route[self.curr_route_node])
 
@@ -138,8 +140,30 @@ class SP(Pedestrian):
 
         dt = 1 / TRAFFIC_RATE
 
-        # placeholder until we decide to use borders in scenario
+        # get borders of current lanelet/area
         walls = []
+
+        if self.current_lanelet and 'subtype' in self.current_lanelet.attributes:
+            if self.current_lanelet.attributes['subtype'] in ['walkway', 'crosswalk']:
+                right = self.current_lanelet.rightBound
+                left = self.current_lanelet.leftBound
+
+                for i in range(len(right) - 1):
+                    p0 = np.array([right[i].x, right[i].y])
+                    p1 = np.array([right[i+1].x, right[i+1].y])
+                    walls.append([p0, p1])
+
+                for i in range(len(left) - 1):
+                    p0 = np.array([left[i].x, left[i].y])
+                    p1 = np.array([left[i+1].x, left[i+1].y])
+                    walls.append([p0, p1])
+            elif self.current_lanelet.attributes['subtype'] == 'traffic_island':
+                outer = self.current_lanelet.outerBound[0]
+
+                for i in range(len(outer) - 1):
+                    p0 = np.array([outer[i].x, outer[i].y])
+                    p1 = np.array([outer[i+1].x, outer[i+1].y])
+                    walls.append([p0, p1])
 
         # attracting force towards destination
         f_adapt = (delta_vel * self.mass) / accl_time
@@ -153,7 +177,7 @@ class SP(Pedestrian):
 
         # repulsive forces from walls (borders)
         for wall in walls:
-            f_walls += self.wall_interaction()
+            f_walls += self.wall_interaction(curr_pos, curr_vel, wall)
 
 
         f_sum = f_adapt + f_other_ped + f_walls
@@ -239,7 +263,14 @@ class SP(Pedestrian):
         return fij
 
 
-    def wall_interaction(self):
-        wij = np.zeros(2)
+    def wall_interaction(self, curr_pos, vi, wall, phi=12000, omega=24000):
+        A = 1500 # 1500~2000
+        B = 0.08
 
-        return wij
+        ri = self.radius
+        diW, niW = distance_point_to_wall(curr_pos, wall)
+        tiW = np.array([-niW[1], niW[0]])
+
+        fiW = (A*np.exp((ri-diW)/B) + phi*max(0,ri-diW))*niW - omega*max(0,ri-diW)*np.dot(vi,tiW)*tiW
+
+        return fiW
