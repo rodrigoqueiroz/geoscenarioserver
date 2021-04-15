@@ -107,7 +107,10 @@ class BehaviorModels(object):
         '''
 
         if condition == "reached_goal":
-            return has_reached_goal_frenet(self.planner_state.vehicle_state, self.planner_state.goal_point_frenet, **kwargs)
+            return has_reached_goal_frenet(
+                self.planner_state.vehicle_state, self.planner_state.goal_point_frenet,
+                self.planner_state.route_complete, **kwargs
+            )
 
         elif condition == "lane_occupied":
             lane_occupied, lv_id = is_in_following_range(
