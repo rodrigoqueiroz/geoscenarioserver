@@ -36,9 +36,9 @@ class SDVRoute(object):
             start_x = curr_ll.centerline[0].x
             start_y = curr_ll.centerline[0].y
         self.update_global_path(start_x, start_y)
-        s = sim_to_frenet_position(self.get_global_path(), start_x, start_y, 0)[0]
-        self._update_should_lane_swerve(s, self.get_global_path(), 0)
-        self.update_reference_path(s)
+        start_s = sim_to_frenet_position(self.get_global_path(), start_x, start_y, 0)[0]
+        self._update_should_lane_swerve(start_s, self.get_global_path(), 0)
+        self.update_reference_path(start_s)
 
     def get_global_path(self):
         return self._current_sdv_path.get_global_path()
