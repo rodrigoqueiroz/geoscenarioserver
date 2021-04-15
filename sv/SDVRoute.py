@@ -31,12 +31,19 @@ class SDVRoute(object):
         # This is True if the vehicle should lane swerve to stay on its route
         self._should_lane_swerve:bool = False
 
+        if (start_x is None) or (start_y is None):
+            curr_ll = self._lanelet_route.shortestPath()[0]
+            start_x = curr_ll.centerline[0].x
+            start_y = curr_ll.centerline[0].y
         self.update_global_path(start_x, start_y)
+        s = sim_to_frenet_position(self.get_global_path(), start_x, start_y, 0)[0]
+        self._update_should_lane_swerve(s, self.get_global_path(), 0)
+        self.update_reference_path(s)
 
     def get_global_path(self):
         return self._current_sdv_path.get_global_path()
 
-    def get_lane_swerve_direction(self, s):
+    def get_lane_swerve_direction(self, s:float):
         start, end, direction = self._current_sdv_path.get_lane_swerve_info()
 
         if self._should_lane_swerve:
@@ -52,13 +59,10 @@ class SDVRoute(object):
     def get_reference_path_s_start(self):
         return self._current_sdv_path.get_ref_path_s_start()
 
-    def update_global_path(self, x, y):
-        if (x is None) or (y is None):
-            curr_ll = self._lanelet_route.shortestPath()[0]
-        else:
-            curr_ll = SDVRoute.lanelet_map.get_occupying_lanelet_by_route(
-                self._lanelet_route, x, y
-            )
+    def update_global_path(self, x:float, y:float):
+        curr_ll = SDVRoute.lanelet_map.get_occupying_lanelet_by_route(
+            self._lanelet_route, x, y
+        )
         assert curr_ll
 
         for sdv_path in self._sdv_paths:
@@ -67,15 +71,7 @@ class SDVRoute(object):
                 self._current_sdv_path = sdv_path
                 break
 
-        if (x is None) or (y is None):
-            x = curr_ll.centerline[0].x
-            y = curr_ll.centerline[0].y
-        s = sim_to_frenet_position(self.get_global_path(), x, y, 0)[0]
-        self._update_should_lane_swerve(s, self.get_global_path(), 0)
-
-        self.update_reference_path(s)
-
-    def update_reference_path(self, ref_path_origin:float, plan_lane_swerve=False):
+    def update_reference_path(self, ref_path_origin:float, plan_lane_swerve:bool=False):
         self._current_sdv_path.update_ref_path(ref_path_origin)
 
         if plan_lane_swerve:
@@ -210,7 +206,7 @@ class SDVRoute(object):
         #     plt.axis([-50, 40, -50, 40])
         #     plt.show()
 
-    def _update_should_lane_swerve(self, s, path, s_start):
+    def _update_should_lane_swerve(self, s:float, path:ConstLineString3d, s_start:float):
         start, end, direction = self._current_sdv_path.get_lane_swerve_info()
 
         if (start is not None) and (end is not None):
