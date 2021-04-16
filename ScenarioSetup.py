@@ -88,11 +88,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     for vid, vnode in parser.vehicles.items():
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
+        start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
+        start_in_frenet = False
         yaw = 0.0
         if 'yaw' in vnode.tags:
             yaw = float(vnode.tags['yaw'])
-        start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0,yaw]
-        start_in_frenet = False
 
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
 
@@ -112,7 +112,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 x_acc = float(gs_sc[1].strip())
                 y_vel = float(gs_sc[2].strip())
                 y_acc = float(gs_sc[3].strip())
-                start_state = [x,x_vel,x_acc,y,y_vel,y_acc,yaw]     #vehicle start state in cartesian frame
+                start_state = [x,x_vel,x_acc,y,y_vel,y_acc]     #vehicle start state in cartesian frame
                 print(start_state)
 
             if 'start_frenet' in vnode.tags:
@@ -130,7 +130,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 d = float(gs_sf[3])
                 d_vel = float(gs_sf[4].strip())
                 d_acc = float(gs_sf[5].strip())
-                start_state = [s,s_vel,s_acc,d,d_vel,d_acc,yaw]     #vehicle start state in frenet frame
+                start_state = [s,s_vel,s_acc,d,d_vel,d_acc]     #vehicle start state in frenet frame
                 print(start_state)
 
             #route
@@ -148,7 +148,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("Route generation failed for route {}.".format(myroute))
                 raise e
             try:
-                vehicle = SDV(  vid, name, root_btree_name, start_state,
+                vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, sim_config.lanelet_routes[vid],
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
@@ -182,6 +182,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 vehicle = TV(vid = vid,                                     #<= must ne integer
                             name = name,                                    #vehicle name
                             start_state =  start_state,                     #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
+                            yaw = yaw,
                             trajectory = trajectory)                        #a valid trajectory with at least x,y,time per node
                 sim_traffic.add_vehicle(vehicle)
             except Exception as e:
@@ -190,19 +191,19 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
         # Path Vehicle (PV)
         elif btype == 'pv':
-            vehicle = Vehicle(vid, name, start_state)
+            vehicle = Vehicle(vid, name, start_state, yaw=yaw)
             sim_traffic.add_vehicle(vehicle)
             log.warning("Path-based vehicles are still not supported in GeoScenario Server {}".format(vid))
             continue
 
         # External Vehicle (EV)
         elif btype == 'ev':
-            vehicle = EV(vid, name, start_state) #<Locaton
+            vehicle = EV(vid, name, start_state, yaw) #<Locaton
             sim_traffic.add_vehicle(vehicle)
 
         # Neutral Vehicle
         else:
-            vehicle = Vehicle(vid, name, start_state)
+            vehicle = Vehicle(vid, name, start_state, yaw=yaw)
             sim_traffic.add_vehicle(vehicle)
         #=========
 
@@ -211,6 +212,9 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         pid = int(pid)
         name = pnode.tags['name']
         start_state = [pnode.x,0.0,0.0, pnode.y,0.0,0.0]                    #start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
+        yaw = 0.0
+        if 'yaw' in pnode.tags:
+            yaw = float(pnode.tags['yaw'])
         btype = pnode.tags['btype'].lower() if 'btype' in pnode.tags else ''
 
 
@@ -233,7 +237,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     nd.yaw = float(node.tags['yaw']) if 'yaw' in node.tags else None
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
-                pedestrian = TP(pid, name, start_state,trajectory)
+                pedestrian = TP(pid, name, start_state, yaw, trajectory)
                 sim_traffic.add_pedestrian(pedestrian)
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
@@ -261,6 +265,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 pedestrian = SP(pid,
                                 name,
                                 start_state,
+                                yaw,
                                 list(sim_config.pedestrian_goal_points[pid]),
                                 root_btree_name,
                                 btree_locations=btree_locations,
@@ -271,7 +276,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
         else:
-            pedestrian = Pedestrian(pid, name, start_state)
+            pedestrian = Pedestrian(pid, name, start_state, yaw)
             sim_traffic.add_pedestrian(pedestrian)
 
     #========= Static Objects
