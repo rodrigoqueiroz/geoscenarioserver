@@ -34,8 +34,8 @@ class Vehicle(Actor):
     EV_TYPE = 2
     TV_TYPE = 3
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id,name, start_state,frenet_state, VehicleState())
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
         self.type = Vehicle.N_TYPE
         self.radius = VEHICLE_RADIUS
 
@@ -61,7 +61,7 @@ class SDV(Vehicle):
     '''
     def __init__(
             self, vid:int, name:str, root_btree_name:str,
-            start_state:List[float], lanelet_map:LaneletMap, lanelet_route:Route,
+            start_state:List[float], yaw:float, lanelet_map:LaneletMap, lanelet_route:Route,
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
         self.btype = btype
         self.btree_locations = btree_locations
@@ -75,7 +75,7 @@ class SDV(Vehicle):
             )
             self.sdv_route.update_reference_path(start_state[0])
             start_state[0] = 0.0
-            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state)
+            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw)
         else:
             self.sdv_route = SDVRoute(lanelet_route, lanelet_map, start_state[0], start_state[3])
             s_vector, d_vector = sim_to_frenet_frame(
@@ -83,7 +83,7 @@ class SDV(Vehicle):
             )
             self.sdv_route.update_reference_path(s_vector[0])
             s_vector[0] = 0.0
-            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector))
+            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw)
 
         self.type = Vehicle.SDV_TYPE
 
@@ -253,8 +253,8 @@ class EV(Vehicle):
     """
     An external vehicle (remote simulation)
     """
-    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(vid, name, start_state)
+    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+        super().__init__(vid, name, start_state, yaw=yaw)
         self.type = Vehicle.EV_TYPE
         self.P = np.identity(2) * 0.5 # some large error
         # experiment w these values
@@ -316,8 +316,8 @@ class TV(Vehicle):
     A trajectory following vehicle.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
-    def __init__(self, vid, name, start_state, trajectory, keep_active = True):
-        super().__init__(vid, name, start_state)
+    def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True):
+        super().__init__(vid, name, start_state, yaw=yaw)
         self.type = Vehicle.TV_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
