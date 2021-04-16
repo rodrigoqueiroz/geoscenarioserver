@@ -8,6 +8,7 @@
     <tag k='name' v='outer_loop_driver' />
     <tag k='route' v='outer_double_loop' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='330' />
   </node>
   <node id='-138115' action='modify' visible='true' lat='43.51042288592' lon='-80.53396151706'>
     <tag k='altitude' v='300' />
@@ -40,6 +41,7 @@
     <tag k='name' v='inner_loop_driver' />
     <tag k='route' v='inner_double_loop' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='330' />
   </node>
   <node id='-1145837' action='modify' visible='true' lat='43.51132113674' lon='-80.5344028702' />
   <node id='-1145838' action='modify' visible='true' lat='43.51028250227' lon='-80.5337319336' />

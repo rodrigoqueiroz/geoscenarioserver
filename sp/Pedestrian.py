@@ -32,8 +32,8 @@ class Pedestrian(Actor):
 
     PEDESTRIAN_RADIUS = 0.2
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id, name, start_state)
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+        super().__init__(id, name, start_state, yaw=yaw)
         self.type = Pedestrian.N_TYPE
         self.radius = Pedestrian.PEDESTRIAN_RADIUS
 
@@ -58,8 +58,8 @@ class TP(Pedestrian):
     A trajectory following pedestrian.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
-    def __init__(self, id, name, start_state, trajectory, keep_active = True):
-        super().__init__(id, name, start_state)
+    def __init__(self, id, name, start_state, yaw, trajectory, keep_active = True):
+        super().__init__(id, name, start_state, yaw)
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -80,8 +80,8 @@ class SP(Pedestrian):
     of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id, name, start_state, route, root_btree_name, btree_locations=[], btype=""):
-        super().__init__(id, name, start_state)
+    def __init__(self, id, name, start_state, yaw, route, root_btree_name, btree_locations=[], btype=""):
+        super().__init__(id, name, start_state, yaw)
         self.btype = btype
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
