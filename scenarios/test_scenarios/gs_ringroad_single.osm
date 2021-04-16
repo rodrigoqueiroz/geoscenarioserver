@@ -27,6 +27,7 @@
     <tag k='name' v='campus_vehicle2' />
     <tag k='route' v='inner_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='45' />
   </node>
   <node id='-5149167' action='modify' visible='true' lat='43.47089789545' lon='-80.53897172481' />
   <way id='-1948234' action='modify' visible='true'>

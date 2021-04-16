@@ -31,8 +31,8 @@ class Vehicle(Actor):
     EV_TYPE = 2
     TV_TYPE = 3
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id,name, start_state,frenet_state, VehicleState())
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
         self.type = Vehicle.N_TYPE
         self.radius = VEHICLE_RADIUS
 
@@ -56,7 +56,7 @@ class SDV(Vehicle):
     ''''
     Simulated Driver-Vehicle Model (dynamic behavior)
     '''
-    def __init__(self, vid, name, root_btree_name, start_state, lanelet_map:LaneletMap, lanelet_route, start_state_in_frenet=False, btree_locations=[], btype=""):
+    def __init__(self, vid, name, root_btree_name, start_state, yaw, lanelet_map:LaneletMap, lanelet_route, start_state_in_frenet=False, btree_locations=[], btype=""):
         #Map
         self.btype = btype
         self.btree_locations = btree_locations
@@ -67,13 +67,13 @@ class SDV(Vehicle):
             # assume frenet start_state is relative to the first lane of the route
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
             # compute sim state
-            x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:])
-            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state)
+            x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:6])
+            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw)
         else:
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, x=start_state[0], y=start_state[3])
             # Compute frenet state corresponding to start_state
-            s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
-            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector))
+            s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:6])
+            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw)
         self.type = Vehicle.SDV_TYPE
         #Planning
         self.sv_planner = None
@@ -229,8 +229,8 @@ class EV(Vehicle):
     """
     An external vehicle (remote simulation)
     """
-    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(vid, name, start_state)
+    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+        super().__init__(vid, name, start_state, yaw=yaw)
         self.type = Vehicle.EV_TYPE
         self.P = np.identity(2) * 0.5 # some large error
         # experiment w these values
@@ -292,8 +292,8 @@ class TV(Vehicle):
     A trajectory following vehicle.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
-    def __init__(self, vid, name, start_state, trajectory, keep_active = True):
-        super().__init__(vid, name, start_state)
+    def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True):
+        super().__init__(vid, name, start_state, yaw=yaw)
         self.type = Vehicle.TV_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
