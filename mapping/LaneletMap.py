@@ -11,7 +11,7 @@ from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, C
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
-from lanelet2.routing import RelationType
+from lanelet2.routing import RelationType, Route
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -59,12 +59,12 @@ class LaneletMap(object):
         following = self.routing_graph.following(lanelet)
         return following[0] if following else None
 
-    def get_previous(self, lanelet):
+    def get_previous(self, lanelet:Lanelet):
         # returns first previous lanelet
         previous = self.routing_graph.previous(lanelet)
         return previous[0] if previous else None
 
-    def get_right_by_route(self, lanelet_route, lanelet):
+    def get_right_by_route(self, lanelet_route:Route, lanelet:Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
         right = []
@@ -77,7 +77,7 @@ class LaneletMap(object):
 
         return right
 
-    def get_left_by_route(self, lanelet_route, lanelet):
+    def get_left_by_route(self, lanelet_route:Route, lanelet:Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
         left = []
@@ -90,7 +90,7 @@ class LaneletMap(object):
 
         return left
 
-    def get_next_by_route(self, lanelet_route, lanelet):
+    def get_next_by_route(self, lanelet_route:Route, lanelet:Lanelet):
         following_relations = lanelet_route.followingRelations(lanelet)
 
         return following_relations[0].lanelet if following_relations else None

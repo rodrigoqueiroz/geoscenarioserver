@@ -127,7 +127,7 @@ def tangent_of_path_at(path:ConstLineString3d, i:int):
     return normalize(op + pq)
 
 
-def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List, y_vector:List, s_start:float):
+def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List[float], y_vector:List[float], s_start:float):
     """ Transforms position and speed from cartesian to frenet frame based of ref_path
 
         @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?
@@ -151,7 +151,7 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List, y_vector:List
     return [s, s_vel, s_acc], [d, d_vel, d_acc]
 
 
-def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector, d_vector, s_start:float):
+def frenet_to_sim_frame(ref_path:ConstLineString3d, s_vector:List[float], d_vector:List[float], s_start:float):
     """ Transforms position and speed from frenet frame based on ref_path to cartesian.
         @param ref_path:    iterable of lanelet2.core.Point3d. Change to something general?
     """

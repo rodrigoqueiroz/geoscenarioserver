@@ -21,6 +21,8 @@ from Actor import *
 from mapping.LaneletMap import LaneletMap
 from shm.SimSharedMemory import *
 from util.Utils import kalman
+from typing import List
+from lanelet2.routing import Route
 
 import datetime
 
@@ -57,7 +59,10 @@ class SDV(Vehicle):
     ''''
     Simulated Driver-Vehicle Model (dynamic behavior)
     '''
-    def __init__(self, vid, name, root_btree_name, start_state, lanelet_map:LaneletMap, lanelet_route, start_state_in_frenet=False, btree_locations=[], btype=""):
+    def __init__(
+            self, vid:int, name:str, root_btree_name:str,
+            start_state:List[float], lanelet_map:LaneletMap, lanelet_route:Route,
+            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
         self.btype = btype
         self.btree_locations = btree_locations
 
@@ -107,7 +112,7 @@ class SDV(Vehicle):
         if self.sv_planner:
             self.sv_planner.stop()
 
-    def tick(self, tick_count, delta_time, sim_time):
+    def tick(self, tick_count:int, delta_time:float, sim_time:float):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
@@ -121,7 +126,7 @@ class SDV(Vehicle):
             #Compute new state
             self.compute_vehicle_state(delta_time, sim_time)
 
-    def compute_vehicle_state(self, delta_time, sim_time):
+    def compute_vehicle_state(self, delta_time:float, sim_time:float):
         """
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
@@ -231,7 +236,7 @@ class SDV(Vehicle):
 
 
 
-    def set_new_motion_plan(self, plan:MotionPlan, sim_time):
+    def set_new_motion_plan(self, plan:MotionPlan, sim_time:float):
         """
         Set a new Motion Plan with a trajectory to start following at start_time.
         """

@@ -236,8 +236,8 @@ class SVPlanner(object):
             vehicle_state:VehicleState,
             traffic_vehicles:dict,
             traffic_pedestrians:dict,
-            state_time,
-            expected_planner_time):
+            state_time:float,
+            expected_planner_time:float):
 
         if self.last_plan and expected_planner_time > 0:
             sim_time_ahead = state_time + expected_planner_time
@@ -367,7 +367,7 @@ class SVPlanner(object):
             lane_swerve_target=lane_swerve_target
         )
 
-    def read_map(self, vehicle_state, traffic_light_states):
+    def read_map(self, vehicle_state:VehicleState, traffic_light_states:dict):
         """ Builds a lane config centered around the closest lanelet to vehicle_state lying
             on the reference_path.
         """
