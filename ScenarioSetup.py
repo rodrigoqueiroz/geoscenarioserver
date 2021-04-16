@@ -90,9 +90,14 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         name = vnode.tags['name']   #vehicle name
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
-        yaw = 0.0
+        yaw = 90.0
         if 'yaw' in vnode.tags:
-            yaw = float(vnode.tags['yaw'])
+            yaw = (float(vnode.tags['yaw']) + 90.0) % 360.0
+            # Place yaw in the range [-180.0, 180.0)
+            if yaw < -180.0:
+                yaw += 360.0
+            elif yaw >= 180.0:
+                yaw -= 360.0
 
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
 
@@ -212,9 +217,15 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         pid = int(pid)
         name = pnode.tags['name']
         start_state = [pnode.x,0.0,0.0, pnode.y,0.0,0.0]                    #start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
-        yaw = 0.0
+        yaw = 90.0
         if 'yaw' in pnode.tags:
-            yaw = float(pnode.tags['yaw'])
+            yaw = (float(pnode.tags['yaw']) + 90.0) % 360.0
+            # Place yaw in the range [-180.0, 180.0)
+            if yaw < -180.0:
+                yaw += 360.0
+            elif yaw >= 180.0:
+                yaw -= 360.0
+
         btype = pnode.tags['btype'].lower() if 'btype' in pnode.tags else ''
 
 

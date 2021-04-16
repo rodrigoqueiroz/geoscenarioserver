@@ -16,7 +16,7 @@
     <tag k='name' v='v1' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
-    <tag k='yaw' v='40' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-5005018' action='modify' visible='true' lat='49.00758115529' lon='8.45777709595'>
     <tag k='altitude' v='329' />
