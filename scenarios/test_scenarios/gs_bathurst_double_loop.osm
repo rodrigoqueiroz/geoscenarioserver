@@ -41,15 +41,15 @@
     <tag k='route' v='inner_double_loop' />
     <tag k='vid' v='1' />
   </node>
-  <node id='-1145807' action='modify' visible='true' lat='43.51132648144' lon='-80.53438666234' />
-  <node id='-1145808' action='modify' visible='true' lat='43.51031376937' lon='-80.53371137218' />
-  <node id='-1145809' action='modify' visible='true' lat='43.5092822043' lon='-80.53651778846' />
-  <node id='-1145810' action='modify' visible='true' lat='43.510320214' lon='-80.53720127984' />
-  <node id='-1145811' action='modify' visible='true' lat='43.51131458478' lon='-80.53442903881' />
-  <node id='-1145813' action='modify' visible='true' lat='43.51030484673' lon='-80.53375101468' />
-  <node id='-1145814' action='modify' visible='true' lat='43.50929757084' lon='-80.53649933351' />
-  <node id='-1145815' action='modify' visible='true' lat='43.51032269202' lon='-80.53717667347' />
-  <node id='-1145816' action='modify' visible='true' lat='43.51128422263' lon='-80.53449943722' />
+  <node id='-1145837' action='modify' visible='true' lat='43.51132113674' lon='-80.5344028702' />
+  <node id='-1145838' action='modify' visible='true' lat='43.51028250227' lon='-80.5337319336' />
+  <node id='-1145839' action='modify' visible='true' lat='43.50931157629' lon='-80.53643843692' />
+  <node id='-1145840' action='modify' visible='true' lat='43.5103422598' lon='-80.53713840821' />
+  <node id='-1145841' action='modify' visible='true' lat='43.51131203098' lon='-80.53441856463' />
+  <node id='-1145842' action='modify' visible='true' lat='43.51027474751' lon='-80.53376204659' />
+  <node id='-1145845' action='modify' visible='true' lat='43.50932865015' lon='-80.53641489529' />
+  <node id='-1145846' action='modify' visible='true' lat='43.51034382445' lon='-80.53712389028' />
+  <node id='-1145847' action='modify' visible='true' lat='43.51128528281' lon='-80.53451979366' />
   <way id='-1145630' action='modify' visible='true'>
     <nd ref='-1145782' />
     <nd ref='-1145783' />
@@ -63,16 +63,16 @@
     <tag k='gs' v='route' />
     <tag k='name' v='outer_double_loop' />
   </way>
-  <way id='-1145640' action='modify' visible='true'>
-    <nd ref='-1145807' />
-    <nd ref='-1145808' />
-    <nd ref='-1145809' />
-    <nd ref='-1145810' />
-    <nd ref='-1145811' />
-    <nd ref='-1145813' />
-    <nd ref='-1145814' />
-    <nd ref='-1145815' />
-    <nd ref='-1145816' />
+  <way id='-1145652' action='modify' visible='true'>
+    <nd ref='-1145837' />
+    <nd ref='-1145838' />
+    <nd ref='-1145839' />
+    <nd ref='-1145840' />
+    <nd ref='-1145841' />
+    <nd ref='-1145842' />
+    <nd ref='-1145845' />
+    <nd ref='-1145846' />
+    <nd ref='-1145847' />
     <tag k='gs' v='route' />
     <tag k='name' v='inner_double_loop' />
   </way>
