@@ -62,7 +62,7 @@ class SDV(Vehicle):
     '''
     def __init__(
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
-            lanelet_map:LaneletMap, lanelet_route:Route, route_nodes:List[Node]
+            lanelet_map:LaneletMap, lanelet_route:Route, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
         self.btype = btype
         self.btree_locations = btree_locations
