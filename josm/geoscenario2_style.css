@@ -59,7 +59,7 @@ node[gs=pedestrian] {
 
 node[gs=vehicle] {
     icon-image: "vehicle_black.png";   
-    icon-rotation: degree_to_radians(tag("yaw"));
+    icon-rotation: degree_to_radians(tag("yaw") - 90);
     icon-width: 64;
     text: eval(concat( "V: ", tag("vid"), " ", tag("name"), " bt:", tag("btree"), " (", tag("speed"), " km/h)" ," )" ));
     text-offset-x: -50;

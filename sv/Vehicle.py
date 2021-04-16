@@ -67,13 +67,14 @@ class SDV(Vehicle):
             # assume frenet start_state is relative to the first lane of the route
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
             # compute sim state
-            x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:])
+            x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:6])
             Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state)
         else:
             self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, x=start_state[0], y=start_state[3])
             # Compute frenet state corresponding to start_state
-            s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:])
+            s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:6])
             Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector))
+        self.state.yaw = start_state[6]
         self.type = Vehicle.SDV_TYPE
         #Planning
         self.sv_planner = None

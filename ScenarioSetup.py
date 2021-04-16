@@ -88,7 +88,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     for vid, vnode in parser.vehicles.items():
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
-        start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
+        yaw = 0.0
+        if 'yaw' in vnode.tags:
+            yaw = float(vnode.tags['yaw'])
+        start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0,yaw]
         start_in_frenet = False
 
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
@@ -109,7 +112,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 x_acc = float(gs_sc[1].strip())
                 y_vel = float(gs_sc[2].strip())
                 y_acc = float(gs_sc[3].strip())
-                start_state = [x,x_vel,x_acc,y,y_vel,y_acc]     #vehicle start state in cartesian frame
+                start_state = [x,x_vel,x_acc,y,y_vel,y_acc,yaw]     #vehicle start state in cartesian frame
                 print(start_state)
 
             if 'start_frenet' in vnode.tags:
@@ -127,7 +130,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 d = float(gs_sf[3])
                 d_vel = float(gs_sf[4].strip())
                 d_acc = float(gs_sf[5].strip())
-                start_state = [s,s_vel,s_acc,d,d_vel,d_acc]     #vehicle start state in frenet frame
+                start_state = [s,s_vel,s_acc,d,d_vel,d_acc,yaw]     #vehicle start state in frenet frame
                 print(start_state)
 
             #route
