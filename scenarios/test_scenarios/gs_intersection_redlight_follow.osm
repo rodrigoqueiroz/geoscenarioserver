@@ -23,6 +23,7 @@
     <tag k='name' v='red_light_runner' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='-115' />
   </node>
   <node id='-5145407' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
     <tag k='duration' v='2,0.5,10,10' />
@@ -38,6 +39,7 @@
     <tag k='name' v='red_light_runner' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='-115' />
   </node>
   <way id='-1947938' action='modify' visible='true'>
     <nd ref='-5145401' />

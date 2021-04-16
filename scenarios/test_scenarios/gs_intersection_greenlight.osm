@@ -26,6 +26,7 @@
     <tag k='name' v='ego_placeholder' />
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='-30' />
   </node>
   <node id='-5145306' action='modify' visible='true' lat='43.4781426121' lon='-80.51962227458'>
     <tag k='btree' v='drive.btree' />
@@ -34,6 +35,7 @@
     <tag k='name' v='red_light_runner' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='-115' />
   </node>
   <node id='-5145307' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
     <tag k='duration' v='3,10,1,7' />

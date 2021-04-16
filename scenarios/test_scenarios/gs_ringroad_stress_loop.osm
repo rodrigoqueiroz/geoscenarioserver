@@ -8,6 +8,7 @@
     <tag k='name' v='campus_vehicle' />
     <tag k='route' v='north_route' />
     <tag k='vid' v='4' />
+    <tag k='yaw' v='-40' />
   </node>
   <node id='-5149169' action='modify' visible='true' lat='43.47267422578' lon='-80.54100610251' />
   <node id='-5149170' action='modify' visible='true' lat='43.47304614132' lon='-80.54139631311' />
@@ -38,6 +39,7 @@
     <tag k='name' v='campus_vehicle2' />
     <tag k='route' v='north_route' />
     <tag k='vid' v='3' />
+    <tag k='yaw' v='-40' />
   </node>
   <node id='-5149181' action='modify' visible='true' lat='43.47263710533' lon='-80.54097466238'>
     <tag k='btree' v='drive.btree' />
@@ -47,6 +49,7 @@
     <tag k='name' v='campus_vehicle3' />
     <tag k='route' v='north_route' />
     <tag k='vid' v='5' />
+    <tag k='yaw' v='-40' />
   </node>
   <node id='-5149182' action='modify' visible='true' lat='43.47261822476' lon='-80.54102992653' />
   <node id='-5149183' action='modify' visible='true' lat='43.47213393678' lon='-80.54042682186' />
@@ -62,6 +65,7 @@
     <tag k='name' v='campus_vehicle3' />
     <tag k='route' v='inner_route' />
     <tag k='vid' v='10' />
+    <tag k='yaw' v='140' />
   </node>
   <node id='-5149189' action='modify' visible='true' lat='43.47278406542' lon='-80.54119259253'>
     <tag k='btree' v='drive.btree' />
@@ -71,6 +75,7 @@
     <tag k='name' v='campus_vehicle3' />
     <tag k='route' v='inner_route' />
     <tag k='vid' v='9' />
+    <tag k='yaw' v='140' />
   </node>
   <node id='-5149190' action='modify' visible='true' lat='43.47297384717' lon='-80.54141253367'>
     <tag k='btree' v='drive.btree' />
@@ -80,6 +85,7 @@
     <tag k='name' v='campus_vehicle3' />
     <tag k='route' v='inner_route' />
     <tag k='vid' v='8' />
+    <tag k='yaw' v='140' />
   </node>
   <node id='-5149191' action='modify' visible='true' lat='43.47303175432' lon='-80.54146383025'>
     <tag k='btree' v='drive.btree' />
@@ -89,6 +95,7 @@
     <tag k='name' v='campus_vehicle3' />
     <tag k='route' v='inner_route' />
     <tag k='vid' v='7' />
+    <tag k='yaw' v='140' />
   </node>
   <node id='-5149192' action='modify' visible='true' lat='43.47308625558' lon='-80.54151211001'>
     <tag k='btree' v='drive.btree' />
@@ -98,6 +105,7 @@
     <tag k='name' v='campus_vehicle3' />
     <tag k='route' v='inner_route' />
     <tag k='vid' v='6' />
+    <tag k='yaw' v='140' />
   </node>
   <node id='-5149193' action='modify' visible='true' lat='43.47220498363' lon='-80.54044727303'>
     <tag k='btree' v='drive.btree' />
@@ -107,6 +115,7 @@
     <tag k='name' v='campus_vehicle2' />
     <tag k='route' v='north_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='-40' />
   </node>
   <node id='-5149194' action='modify' visible='true' lat='43.47211982463' lon='-80.54033361509'>
     <tag k='btree' v='drive.btree' />
@@ -116,6 +125,7 @@
     <tag k='name' v='campus_vehicle2' />
     <tag k='route' v='north_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='-40' />
   </node>
   <node id='-5149195' action='modify' visible='true' lat='43.47224013878' lon='-80.54050308508' />
   <way id='-1948473' action='modify' visible='true'>

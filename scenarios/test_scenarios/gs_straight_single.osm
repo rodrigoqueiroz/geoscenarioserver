@@ -21,9 +21,9 @@
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='orientation' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='40' />
   </node>
   <node id='-5149184' action='modify' visible='true' lat='49.0081535901' lon='8.45830837123'>
     <tag k='area' v='no' />
