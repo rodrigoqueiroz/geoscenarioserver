@@ -124,7 +124,7 @@ def distance_point_to_wall(pt, wall):
         dist = np.linalg.norm(pt-p1)
     else:
         dist = np.linalg.norm(cross-pt)
-
-    niW = normalize(cross-pt)
+    
+    niW = normalize(pt-cross)
 
     return dist, niW
