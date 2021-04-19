@@ -110,6 +110,10 @@ def normal_samples(nsamples, mean, sd, lo = None,up = None):
     return samples
 
 def distance_point_to_wall(pt, wall):
+    '''
+    get shortest distance from pt to vector (wall)
+    and unit vector perpendicular to wall
+    '''
     p0 = wall[0]
     p1 = wall[1]
     wall_vec = p1-p0
@@ -124,7 +128,7 @@ def distance_point_to_wall(pt, wall):
         dist = np.linalg.norm(pt-p1)
     else:
         dist = np.linalg.norm(cross-pt)
-    
-    niW = normalize(pt-cross)
 
-    return dist, niW
+    norm = normalize(pt-cross)
+
+    return dist, norm

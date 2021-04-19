@@ -31,8 +31,6 @@ class SPPlanner(object):
         self.laneletmap:LaneletMap = sim_traffic.lanelet_map
         self.sim_config = sim_traffic.sim_config
         self.sim_traffic:SimTraffic = sim_traffic
-        #Subprocess space
-        # Reference path that the planner will use for all transformations and planning
 
         self.root_btree_name = sp.root_btree_name
         self.btree_reconfig = sp.btree_reconfig
@@ -42,9 +40,6 @@ class SPPlanner(object):
         self.btype = sp.btype
 
         self.route = []
-        self.curr_route_node = sp.curr_route_node
-        self.current_lanelet = sp.current_lanelet
-        self.current_desired_speed = sp.current_desired_speed
         self.replan_route = True
 
 
@@ -106,21 +101,21 @@ class SPPlanner(object):
         self.route = self.route[1:] # remove current ped position from route
 
 
-    def run_planner(self):
+    def run_planner(self, curr_route_node, curr_desired_speed):
         pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
 
-        self.current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_state)
+        current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_state)
 
-        reg_elems = self.get_reg_elem_states(pedestrian_state)
+        reg_elems = self.get_reg_elem_states(pedestrian_state, current_lanelet)
         pedestrian_speed = {'default_desired': self.sim_traffic.pedestrians[self.pid].default_desired_speed,
-                            'current_desired': self.sim_traffic.pedestrians[self.pid].current_desired_speed}
+                            'current_desired': self.sim_traffic.pedestrians[self.pid].curr_desired_speed}
 
         # Get planner state
         planner_state = PedestrianPlannerState(
                             pedestrian_state=pedestrian_state,
                             pedestrian_speed=pedestrian_speed,
                             route=self.route,
-                            curr_route_node=self.curr_route_node,
+                            curr_route_node=curr_route_node,
                             traffic_vehicles=self.sim_traffic.vehicles,
                             regulatory_elements=reg_elems,
                             pedestrians=self.sim_traffic.pedestrians,
@@ -149,7 +144,7 @@ class SPPlanner(object):
         # Maneuver tick
         if mconfig:
             #replan maneuver
-            self.curr_route_node, speed_chg = plan_maneuver(mconfig.mkey,
+            curr_route_node, speed_chg = plan_maneuver(mconfig.mkey,
                                                             mconfig,
                                                             planner_state.pedestrian_state,
                                                             planner_state.pedestrian_speed,
@@ -159,7 +154,9 @@ class SPPlanner(object):
                                                             planner_state.pedestrians)
 
             if speed_chg != None:
-                self.current_desired_speed = speed_chg
+                curr_desired_speed = speed_chg
+
+        return curr_route_node, curr_desired_speed, current_lanelet
 
 
     def get_space_occupied_by_pedestrian(self, pedestrian_state):
@@ -177,10 +174,10 @@ class SPPlanner(object):
         return None
 
 
-    def get_reg_elem_states(self, pedestrian_state):
+    def get_reg_elem_states(self, pedestrian_state, current_lanelet):
         reg_elem_states = []
 
-        if not self.current_lanelet:
+        if not current_lanelet:
             return reg_elem_states
 
         traffic_light_states = {}
@@ -188,7 +185,7 @@ class SPPlanner(object):
             traffic_light_states[lid] = tl.current_color.value
 
         # Get regulatory elements acting on this lanelet
-        reg_elems = self.current_lanelet.regulatoryElements
+        reg_elems = current_lanelet.regulatoryElements
 
 
         for re in reg_elems:

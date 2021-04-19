@@ -95,7 +95,7 @@ class SP(Pedestrian):
         self.waypoint = None # np.array(route[self.curr_route_node])
         self.current_lanelet = None
         self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
-        self.current_desired_speed = self.default_desired_speed
+        self.curr_desired_speed = self.default_desired_speed
         self.mass = random.uniform(50,80)
 
 
@@ -106,17 +106,14 @@ class SP(Pedestrian):
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
         self.route = self.sp_planner.route
-        self.current_lanelet = self.sp_planner.current_lanelet
         self.waypoint = np.array(self.route[self.curr_route_node])
 
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
-        self.sp_planner.run_planner()
-        self.curr_route_node = self.sp_planner.curr_route_node
-        self.current_lanelet = self.sp_planner.current_lanelet
-        self.current_desired_speed = self.sp_planner.current_desired_speed
+        self.curr_route_node, self.curr_desired_speed, self.current_lanelet = self.sp_planner.run_planner(self.curr_route_node, self.curr_desired_speed)
+
         self.waypoint = np.array(self.route[self.curr_route_node])
 
         self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
@@ -129,7 +126,7 @@ class SP(Pedestrian):
         This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
         '''
         direction = np.array(normalize(self.waypoint - curr_pos))
-        desired_vel = direction * self.current_desired_speed
+        desired_vel = direction * self.curr_desired_speed
         accl_time = 0.5 # acceleration time
 
         delta_vel = desired_vel - curr_vel
@@ -175,9 +172,11 @@ class SP(Pedestrian):
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
             f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
 
+        '''
         # repulsive forces from walls (borders)
         for wall in walls:
             f_walls += self.wall_interaction(curr_pos, curr_vel, wall)
+        '''
 
 
         f_sum = f_adapt + f_other_ped + f_walls
