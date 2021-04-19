@@ -273,15 +273,14 @@ void AGSClient::CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot)
 		rot = gsv.actor->GetActorRotation();
 	}
 
-
-	gsv.vehicle_state.x = loc.X;
-	gsv.vehicle_state.y = loc.Y;
-	gsv.vehicle_state.z = loc.Z;
-	gsv.vehicle_state.yaw = rot.Yaw;
-
 	//check if success
 	if (gsv.actor != nullptr)
 	{
+		gsv.vehicle_state.x = loc.X;
+		gsv.vehicle_state.y = loc.Y;
+		gsv.vehicle_state.z = loc.Z;
+		gsv.vehicle_state.yaw = rot.Yaw;
+
 		vehicles.Add(vid, gsv);
 	}
 	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d v_type=%d"), vid, v_type);}
