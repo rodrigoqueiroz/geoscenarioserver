@@ -102,8 +102,8 @@ void ASimVehicle::OnOverlap(AActor *self, AActor *other)
 {
     // UE_LOG(LogTemp, Error, TEXT("OVERLAP"));
 
-    // Temporary check to exclude collisions with non-vehicles
-    if (other->GetClass()->IsChildOf(ASimVehicle::StaticClass())) {
+    static const FName GSTAG(TEXT("gsvehicle"));
+    if (other->ActorHasTag(GSTAG)) {
         UE_LOG(GeoScenarioModule, Warning,
                 TEXT("GS vehicle %s collided with %s"),
                 *self->GetName(),
