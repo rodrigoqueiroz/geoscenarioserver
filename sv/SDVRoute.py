@@ -97,29 +97,31 @@ class SDVRoute(object):
 
             prev_lane = []
             if not lane_is_loop:
-                prev_ll = SDVRoute.lanelet_map.get_previous(route_lane[0])
-                while (prev_ll is not None):
-                    if prev_ll.id == route_lane[-1].id:
+                prev_lls = SDVRoute.lanelet_map.get_previous(route_lane[0])
+                while (prev_lls is not None):
+                    if any(prev_ll.id == route_lane[-1].id for prev_ll in prev_lls):
                         lane_is_loop = True
                         break
 
+                    prev_ll = prev_lls[0]
                     prev_lane.append(prev_ll)
-                    prev_ll = SDVRoute.lanelet_map.get_previous(prev_ll)
+                    prev_lls = SDVRoute.lanelet_map.get_previous(prev_ll)
 
                 prev_lane.reverse()
 
             next_lane = []
             if not lane_is_loop:
-                next_ll = SDVRoute.lanelet_map.get_next(route_lane[-1])
-                while (next_ll is not None):
-                    if next_ll.id == route_lane[0].id:
+                next_lls = SDVRoute.lanelet_map.get_next(route_lane[-1])
+                while (next_lls is not None):
+                    if any(next_ll.id == route_lane[0].id for next_ll in next_lls):
                         lane_is_loop = True
                         break
-                    
-                    next_lane.append(next_ll)
-                    next_ll = SDVRoute.lanelet_map.get_next(next_ll)
 
-            # full_lane = prev_lane + route_lane + next_lane
+                    next_ll = next_lls[0]
+                    next_lane.append(next_ll)
+                    next_lls = SDVRoute.lanelet_map.get_next(next_ll)
+
+            # NOTE: full_lane = prev_lane + route_lane + next_lane
             full_lane = prev_lane
             for ll in route_lane:
                 full_lane.append(ll)
@@ -145,8 +147,6 @@ class SDVRoute(object):
                         if len(self._lanelet_route.remainingShortestPath(ll)) > 0:
                             lane_swerve_direction = 1
                             break
-
-                assert lane_swerve_direction
             elif all(ll in route_lane for ll in remaining_lls):
                 # The route lane is the shortest path
                 lane_swerve_start = None
@@ -166,8 +166,6 @@ class SDVRoute(object):
                 elif left_lls and (left_lls[0] in remaining_lls):
                     lane_swerve_start = left_lls[0].centerline[0]
                     lane_swerve_direction = 1
-                
-                assert lane_swerve_start, lane_swerve_direction
 
             self._sdv_paths.append(
                 SDVPath(

@@ -57,12 +57,12 @@ class LaneletMap(object):
     def get_next(self, lanelet):
         # returns first following lanelet
         following = self.routing_graph.following(lanelet)
-        return following[0] if following else None
+        return following if len(following) > 0 else None
 
     def get_previous(self, lanelet:Lanelet):
         # returns first previous lanelet
         previous = self.routing_graph.previous(lanelet)
-        return previous[0] if previous else None
+        return previous if len(previous) > 0 else None
 
     def get_right_by_route(self, lanelet_route:Route, lanelet:Lanelet):
         # NOTE: lanelet must be on lanelet_route
