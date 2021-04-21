@@ -55,14 +55,10 @@ class LaneletMap(object):
         return self.routing_graph.left(lanelet)
 
     def get_next(self, lanelet):
-        # returns first following lanelet
-        following = self.routing_graph.following(lanelet)
-        return following if len(following) > 0 else None
+        return self.routing_graph.following(lanelet)
 
     def get_previous(self, lanelet:Lanelet):
-        # returns first previous lanelet
-        previous = self.routing_graph.previous(lanelet)
-        return previous if len(previous) > 0 else None
+        return self.routing_graph.previous(lanelet)
 
     def get_right_by_route(self, lanelet_route:Route, lanelet:Lanelet):
         # NOTE: lanelet must be on lanelet_route
@@ -70,10 +66,9 @@ class LaneletMap(object):
         right = []
 
         right_relations = lanelet_route.rightRelations(lanelet)
-        if right_relations:
-            for relation in right_relations:
-                if relation.relationType == RelationType.Right:
-                    right.append(relation.lanelet)
+        for relation in right_relations:
+            if relation.relationType == RelationType.Right:
+                right.append(relation.lanelet)
 
         return right
 
@@ -83,17 +78,33 @@ class LaneletMap(object):
         left = []
 
         left_relations = lanelet_route.leftRelations(lanelet)
-        if left_relations:
-            for relation in left_relations:
-                if relation.relationType == RelationType.Left:
-                    left.append(relation.lanelet)
+        for relation in left_relations:
+            if relation.relationType == RelationType.Left:
+                left.append(relation.lanelet)
 
         return left
 
     def get_next_by_route(self, lanelet_route:Route, lanelet:Lanelet):
-        following_relations = lanelet_route.followingRelations(lanelet)
+        # NOTE: lanelet must be on lanelet_route
 
-        return following_relations[0].lanelet if following_relations else None
+        following = []
+
+        following_relations = lanelet_route.followingRelations(lanelet)
+        for relation in following_relations:
+            following.append(relation.lanelet)
+
+        return following
+
+    def get_previous_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        previous = []
+
+        previous_relations = lanelet_route.previousRelations(lanelet)
+        for relation in previous_relations:
+            previous.append(relation.lanelet)
+
+        return previous
 
     def get_traffic_light_by_name(self, name):
         #filter regulatory elemments for TL only

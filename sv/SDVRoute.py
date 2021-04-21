@@ -90,15 +90,13 @@ class SDVRoute(object):
 
             route_lane = self._lanelet_route.fullLane(route_ll)
 
-            next_ll_in_route = SDVRoute.lanelet_map.get_next_by_route(self._lanelet_route, route_lane[-1])
-            lane_is_loop = (
-                (next_ll_in_route is not None) and (next_ll_in_route.id == route_lane[0].id)
-            )
+            next_lls = SDVRoute.lanelet_map.get_next_by_route(self._lanelet_route, route_lane[-1])
+            lane_is_loop = any(next_ll.id == route_lane[0].id for next_ll in next_lls)
 
             prev_lane = []
             if not lane_is_loop:
                 prev_lls = SDVRoute.lanelet_map.get_previous(route_lane[0])
-                while (prev_lls is not None):
+                while len(prev_lls) > 0:
                     if any(prev_ll.id == route_lane[-1].id for prev_ll in prev_lls):
                         lane_is_loop = True
                         break
@@ -112,7 +110,7 @@ class SDVRoute(object):
             next_lane = []
             if not lane_is_loop:
                 next_lls = SDVRoute.lanelet_map.get_next(route_lane[-1])
-                while (next_lls is not None):
+                while len(next_lls) > 0:
                     if any(next_ll.id == route_lane[0].id for next_ll in next_lls):
                         lane_is_loop = True
                         break
