@@ -168,6 +168,8 @@ void AGSClient::ReadServerState(float deltaTime)
 		yaw -= 90;
 	    // GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
 
+		FVector loc = {x, y, z};
+		FRotator rot = {0.0f, yaw, 0.0f};
 
 		GSVehicle* gsvptr = vehicles.Find(vid);
 		if (!gsvptr)
@@ -175,7 +177,8 @@ void AGSClient::ReadServerState(float deltaTime)
 			// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
 			// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
-			CreateVehicle(vid, v_type);
+			CreateVehicle(vid, v_type, loc, rot);
+
 			//debug
 			continue;
 		}
@@ -191,17 +194,16 @@ void AGSClient::ReadServerState(float deltaTime)
 			}
 			else
 			{
-				gsvptr->vehicle_state.x = x;
-				gsvptr->vehicle_state.y = y;
-				gsvptr->vehicle_state.z = z;
+				gsvptr->vehicle_state.x = loc.X;
+				gsvptr->vehicle_state.y = loc.Y;
+				gsvptr->vehicle_state.z = loc.Z;
 				gsvptr->vehicle_state.x_vel = x_vel;
 				gsvptr->vehicle_state.y_vel = y_vel;
-				gsvptr->vehicle_state.yaw = yaw;
+				gsvptr->vehicle_state.yaw = rot.Yaw;
 				gsvptr->vehicle_state.steer = steer;
 			}
-			FVector loc = FVector(gsvptr->vehicle_state.x, gsvptr->vehicle_state.y, gsvptr->actor->GetActorLocation()[2]);
 			gsvptr->actor->SetActorLocation(loc);
-			gsvptr->actor->SetActorRotation(FRotator(0.0f, yaw, 0.0f));
+			gsvptr->actor->SetActorRotation(rot);
 		}
 	}
 	//Update Server Tick
@@ -235,7 +237,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	}
 }
 
-void AGSClient::CreateVehicle(int vid, int v_type)
+void AGSClient::CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot)
 {
 	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d v_type=%d"), vid, v_type);
 	GSVehicle gsv = GSVehicle();
@@ -246,8 +248,8 @@ void AGSClient::CreateVehicle(int vid, int v_type)
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
-		FVector location = {0.0, 0.0, 0.0};
-		ASimVehicle *sv = (ASimVehicle*)GetWorld()->SpawnActor(ASimVehicle::StaticClass(), &location);
+
+		ASimVehicle *sv = (ASimVehicle*)GetWorld()->SpawnActor(ASimVehicle::StaticClass(), &loc, &rot);
 		//sv->manager = this;
 		//sv->id = vid;
 		gsv.actor = (AActor*) sv;
@@ -267,14 +269,18 @@ void AGSClient::CreateVehicle(int vid, int v_type)
 		//Find actor with tag
 		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Vehicle"));
 		gsv.actor = FindVehicleActor(vid);
-		FVector loc = gsv.actor->GetActorLocation();
-		gsv.vehicle_state.x = loc[0];
-		gsv.vehicle_state.y = loc[1];
-		gsv.vehicle_state.z = loc[2];
+		loc = gsv.actor->GetActorLocation();
+		rot = gsv.actor->GetActorRotation();
 	}
+
 	//check if success
 	if (gsv.actor != nullptr)
 	{
+		gsv.vehicle_state.x = loc.X;
+		gsv.vehicle_state.y = loc.Y;
+		gsv.vehicle_state.z = loc.Z;
+		gsv.vehicle_state.yaw = rot.Yaw;
+
 		vehicles.Add(vid, gsv);
 	}
 	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d v_type=%d"), vid, v_type);}
@@ -335,7 +341,7 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			oss << Elem.Key << " "
 				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
 				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " " /* TODO: gsv.vehicle_state.yaw << " " */
-				<< /*active*/ 1 << '\n';
+				<< active << '\n';
 		}
 		else
 		{
