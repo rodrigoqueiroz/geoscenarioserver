@@ -106,6 +106,39 @@ class LaneletMap(object):
 
         return previous
 
+    def route_full_lane(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: this is a wrapper for lanelet_route.fullLane(lanelet)
+        # Currently, if lanelet is on lanelet_route.shortestPath(), then there are
+        # cases where lanelet_route.fullLane(lanelet) is not the full lane that
+        # is in the shortest path (i.e., the shortest path contains more of the lane)
+        # E.g., when the shortest path passes through one of the cul-de-sacs in
+        # scenarios/maps/experimental_maps/lanelet2_bathurst.osm, then
+        # lanelet_route.fullLane(lanelet) will end before the cul-de-sac, but the
+        # lane containing lanelet in the shortest path will include the cul-de-sac
+
+        full_lane = []
+
+        shortest_path = lanelet_route.shortestPath()
+        lanelet_on_path = False
+        next_lls = []
+        for ll in shortest_path:
+            if any(next_ll.id == ll.id for next_ll in next_lls):
+                full_lane.append(ll)
+            elif lanelet_on_path:
+                break
+            else:
+                full_lane = [ll]
+
+            if ll.id == lanelet.id:
+                lanelet_on_path = True
+
+            next_lls = self.get_next_by_route(lanelet_route, ll)
+
+        if not lanelet_on_path:
+            full_lane = lanelet_route.fullLane(lanelet)
+
+        return full_lane
+
     def get_traffic_light_by_name(self, name):
         #filter regulatory elemments for TL only
         tl_res = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
