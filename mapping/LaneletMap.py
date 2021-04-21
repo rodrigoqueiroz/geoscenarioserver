@@ -122,7 +122,13 @@ class LaneletMap(object):
         lanelet_on_path = False
         next_lls = []
         for ll in shortest_path:
-            if any(next_ll.id == ll.id for next_ll in next_lls):
+            append = False
+            for next_ll in next_lls:
+                if (next_ll.id == ll.id) and (ll.id != full_lane[0].id):
+                    append = True
+                    break
+
+            if append:
                 full_lane.append(ll)
             elif lanelet_on_path:
                 break
