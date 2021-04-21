@@ -109,11 +109,11 @@ class BehaviorModels(object):
         '''
 
         if condition == "reached_goal":
-            goal = self.planner_state.route[-1]
+            goal = self.planner_state.destination
             return has_reached_point(self.planner_state.pedestrian_state, goal, **kwargs)
 
         elif condition == "reached_next_waypoint":
-            waypoint = self.planner_state.route[self.planner_state.curr_route_node]
+            waypoint = self.planner_state.waypoint
             return has_reached_point(self.planner_state.pedestrian_state, waypoint, **kwargs)
 
         elif condition == "at_desired_speed":

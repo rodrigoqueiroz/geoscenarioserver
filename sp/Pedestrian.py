@@ -90,12 +90,12 @@ class SP(Pedestrian):
         self.sp_planner = None
 
         self.type = Pedestrian.SP_TYPE
-        self.curr_route_node = 0
         self.route = []
-        self.waypoint = None # np.array(route[self.curr_route_node])
+        self.waypoint = None
         self.current_lanelet = None
         self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
         self.curr_desired_speed = self.default_desired_speed
+        self.direction = None
         self.mass = random.uniform(50,80)
 
 
@@ -105,18 +105,20 @@ class SP(Pedestrian):
         """
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
-        self.route = self.sp_planner.route
-        self.waypoint = np.array(self.route[self.curr_route_node])
+        self.route = iter(self.sp_planner.route)
+        self.waypoint = next(self.route)
 
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
-        self.curr_route_node, self.curr_desired_speed, self.current_lanelet = self.sp_planner.run_planner(self.curr_route_node, self.curr_desired_speed)
+        curr_pos = np.array([self.state.x, self.state.y])
+        curr_vel = np.array([self.state.x_vel, self.state.y_vel])
 
-        self.waypoint = np.array(self.route[self.curr_route_node])
+        self.waypoint, self.curr_desired_speed, self.current_lanelet = self.sp_planner.run_planner(self.waypoint, self.curr_desired_speed, self.route)
+        self.direction = np.array(normalize(self.waypoint - curr_pos))
 
-        self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
+        self.update_position_SFM(curr_pos, curr_vel)
 
 
     def update_position_SFM(self, curr_pos, curr_vel):
@@ -125,8 +127,7 @@ class SP(Pedestrian):
         https://link.springer.com/content/pdf/10.1007/s12205-016-0741-9.pdf (access through University of Waterloo)
         This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
         '''
-        direction = np.array(normalize(self.waypoint - curr_pos))
-        desired_vel = direction * self.curr_desired_speed
+        desired_vel = self.direction * self.curr_desired_speed
         accl_time = 0.5 # acceleration time
 
         delta_vel = desired_vel - curr_vel
@@ -177,8 +178,7 @@ class SP(Pedestrian):
         for wall in walls:
             f_walls += self.wall_interaction(curr_pos, curr_vel, wall)
         '''
-
-
+        
         f_sum = f_adapt + f_other_ped + f_walls
 
         curr_acc = f_sum / self.mass

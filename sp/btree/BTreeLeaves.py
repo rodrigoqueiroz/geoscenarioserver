@@ -94,7 +94,7 @@ class ManeuverAction(behaviour.Behaviour):
         elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
             if self.mconfig.type == MStopConfig.Type.GOAL:
-                self.mconfig.pos = self.bmodel.planner_state.route[-1]
+                self.mconfig.pos = self.bmodel.planner_state.destination
             # If stopping at a stop line, find a regulatory element with a stop line applying to this agent
             elif self.mconfig.type == MStopConfig.Type.STOP_LINE:
                 for re_state in self.bmodel.planner_state.regulatory_elements:

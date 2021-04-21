@@ -101,21 +101,21 @@ class SPPlanner(object):
         self.route = self.route[1:] # remove current ped position from route
 
 
-    def run_planner(self, curr_route_node, curr_desired_speed):
+    def run_planner(self, curr_waypoint, curr_desired_speed, route):
         pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
 
         current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_state)
 
         reg_elems = self.get_reg_elem_states(pedestrian_state, current_lanelet)
         pedestrian_speed = {'default_desired': self.sim_traffic.pedestrians[self.pid].default_desired_speed,
-                            'current_desired': self.sim_traffic.pedestrians[self.pid].curr_desired_speed}
+                            'current_desired': curr_desired_speed}
 
         # Get planner state
         planner_state = PedestrianPlannerState(
                             pedestrian_state=pedestrian_state,
                             pedestrian_speed=pedestrian_speed,
-                            route=self.route,
-                            curr_route_node=curr_route_node,
+                            waypoint = curr_waypoint,
+                            destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
                             regulatory_elements=reg_elems,
                             pedestrians=self.sim_traffic.pedestrians,
@@ -144,20 +144,17 @@ class SPPlanner(object):
         # Maneuver tick
         if mconfig:
             #replan maneuver
-            curr_route_node, speed_chg = plan_maneuver(mconfig.mkey,
-                                                            mconfig,
-                                                            planner_state.pedestrian_state,
-                                                            planner_state.pedestrian_speed,
-                                                            planner_state.route,
-                                                            planner_state.curr_route_node,
-                                                            current_lanelet,
-                                                            planner_state.traffic_vehicles,
-                                                            planner_state.pedestrians)
+            curr_waypoint, curr_desired_speed = plan_maneuver(mconfig.mkey,
+                                                                mconfig,
+                                                                planner_state.pedestrian_state,
+                                                                planner_state.pedestrian_speed,
+                                                                planner_state.waypoint,
+                                                                route,
+                                                                current_lanelet,
+                                                                planner_state.traffic_vehicles,
+                                                                planner_state.pedestrians)
 
-            if speed_chg != None:
-                curr_desired_speed = speed_chg
-
-        return curr_route_node, curr_desired_speed, current_lanelet
+        return curr_waypoint, curr_desired_speed, current_lanelet
 
 
     def get_space_occupied_by_pedestrian(self, pedestrian_state):

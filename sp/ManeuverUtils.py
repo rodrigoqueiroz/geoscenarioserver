@@ -13,6 +13,7 @@ import glog as log
 from SimTraffic import *
 from sp.ManeuverConfig import *
 from SimConfig import *
+from util.Transformations import normalize
 
 
 def has_reached_point(pedestrian_state, point, threshold=1):
@@ -24,7 +25,7 @@ def has_reached_point(pedestrian_state, point, threshold=1):
 
     return np.linalg.norm(np.asarray(point) - pedestrian_pos) < threshold
 
-def direction_to_center_of_lane(pedestrian_state, current_lane, next_waypoint):
+def center_pt_of_current_lane(pedestrian_state, current_lane, curr_waypoint):
         pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
 
         '''
@@ -35,57 +36,67 @@ def direction_to_center_of_lane(pedestrian_state, current_lane, next_waypoint):
         '''
 
         # 1)
-        lane_entrance = (np.array(current_lane.leftBound[0][0]) + np.array(current_lane.rightBound[0][0])) / 2
-        lane_exit = (np.array(current_lane.leftBound[-1][1]) + np.array(current_lane.rightBound[-1][1])) / 2
-        if np.linalg.norm(next_waypoint - lane_exit) < np.linalg.norm(next_waypoint - lane_entrance):
+        entrance_pt_left = np.array([current_lane.leftBound[0].x, current_lane.leftBound[0].y])
+        entrance_pt_right = np.array([current_lane.rightBound[0].x, current_lane.rightBound[0].y])
+        exit_pt_left = np.array([current_lane.leftBound[-1].x, current_lane.leftBound[-1].y])
+        exit_pt_right = np.array([current_lane.rightBound[-1].x, current_lane.rightBound[-1].y])
+
+        lane_entrance = (entrance_pt_left + entrance_pt_right) / 2
+        lane_exit = (exit_pt_left + exit_pt_right) / 2
+
+        if np.linalg.norm(curr_waypoint - lane_exit) < np.linalg.norm(curr_waypoint - lane_entrance):
             left_bound = current_lane.leftBound
             right_bound = current_lane.rightBound
         else:
-            lane_entrance = (np.array(current_lane.leftBound[-1][1]) + np.array(current_lane.rightBound[-1][1])) / 2
-            lane_exit = (np.array(current_lane.leftBound[0][0]) + np.array(current_lane.rightBound[0][0])) / 2
-            left_bound = reverse([way.invert() for way in current_lane.rightBound])
-            right_bound = reverse([way.invert() for way in current_lane.leftBound])
+            temp = lane_entrance
+            lane_entrance = lane_exit
+            lane_exit = temp
+
+            left_bound = np.array(list(reversed(current_lane.rightBound)))
+            right_bound = np.array(list(reversed(current_lane.leftBound)))
 
         # 2)
-        closest_left_way = None
-        closest_right_way = None
+        closest_left_way = []
+        closest_right_way = []
 
-        for way in left_bound:
-            way_vec = np.array(way[1]) - np.array(way[0])
-            pos_to_way_start = pedestrian_pos - np.array(way[0])
+        for node_idx in range(len(left_bound)-1):
+            way_start = np.array([left_bound[node_idx].x, left_bound[node_idx].y])
+            way_end = np.array([left_bound[node_idx+1].x, left_bound[node_idx+1].y])
+            way_vec = way_end - way_start
+            pos_to_way_start = pedestrian_pos - way_start
 
             t = np.dot(way_vec, pos_to_way_start) / np.dot(way_vec, way_vec)
 
             # ped can "drop a 90" to way if 0<=t<=1
             if t >= 0 and t <= 1:
-                closest_left_way = way
+                closest_left_way = way_vec
 
-        for way in right_bound:
-            way_vec = np.array(way[1]) - np.array(way[0])
-            pos_to_way_start = pedestrian_pos - np.array(way[0])
+        for node_idx in range(len(right_bound)-1):
+            way_start = np.array([right_bound[node_idx].x, right_bound[node_idx].y])
+            way_end = np.array([right_bound[node_idx+1].x, right_bound[node_idx+1].y])
+            way_vec = way_end - way_start
+            pos_to_way_start = pedestrian_pos - way_start
 
             t = np.dot(way_vec, pos_to_way_start) / np.dot(way_vec, way_vec)
 
             if t >= 0 and t <= 1:
-                closest_right_way = way
+                closest_right_way = way_vec
 
-        if closest_left_way == None:
+        if len(closest_left_way) == 0:
             if np.linalg.norm(pedestrian_pos - lane_entrance) < np.linalg.norm(pedestrian_pos - lane_exit):
-                closest_left_way = left_bound[0]
+                closest_left_way = np.array([left_bound[0].x, left_bound[0].y])
             else:
-                closest_left_way = left_bound[-1]
+                closest_left_way = np.array([left_bound[-1].x, left_bound[-1].y])
 
-        if closest_right_way == None:
+        if len(closest_right_way) == 0:
             if np.linalg.norm(pedestrian_pos - lane_entrance) < np.linalg.norm(pedestrian_pos - lane_exit):
-                closest_right_way = right_bound[0]
+                closest_right_way = np.array([right_bound[0].x, right_bound[0].y])
             else:
-                closest_right_way = right_bound[-1]
+                closest_right_way = np.array([right_bound[-1].x, right_bound[-1].y])
 
         # 3)
-        target_pt = (np.array(closest_left_way) + np.array(closest_right_way)) / 2
-        direction = target_pt - pedestrian_pos
-
-        return direction
+        center_pt = (closest_left_way + closest_right_way) / 2
+        return center_pt
 
 def point_in_rectangle(P, A, B, C, D):
     ''' Checks if the point pt is in the rectangle defined by
