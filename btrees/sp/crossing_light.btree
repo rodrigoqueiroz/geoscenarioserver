@@ -15,6 +15,6 @@ behaviortree crosswalk_signal:
                 ?
                     ->
                         condition c_over_half ( past_crosswalk_halfway() )
-                        maneuver m_keep_velocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
+                        maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
                     maneuver m_stop_now ( MStopConfig( type=0 ) )
             maneuver m_stop_now ( MStopConfig( type=0 ) )

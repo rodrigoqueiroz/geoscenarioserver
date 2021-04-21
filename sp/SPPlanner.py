@@ -150,6 +150,7 @@ class SPPlanner(object):
                                                             planner_state.pedestrian_speed,
                                                             planner_state.route,
                                                             planner_state.curr_route_node,
+                                                            current_lanelet,
                                                             planner_state.traffic_vehicles,
                                                             planner_state.pedestrians)
 

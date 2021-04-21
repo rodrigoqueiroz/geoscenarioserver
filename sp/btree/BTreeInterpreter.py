@@ -3,7 +3,7 @@
 #dinizr@chalmers.se
 
 from py_trees import *
-from sp.ManeuverConfig import MVelKeepConfig
+from sp.ManeuverConfig import MKeepInLaneConfig
 from sp.ManeuverUtils import *
 from sp.btree.BTreeLeaves import *
 

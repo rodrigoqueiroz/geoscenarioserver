@@ -6,5 +6,5 @@ behaviortree walk_tree:
         ->
             condition c_curr_waypt ( reached_next_waypoint( threshold=1 ) )
             maneuver m_waypt_next ( MUpdateWaypoint( vel=MP(1.0,30,6) ) )
-        maneuver m_keep_velocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
+        maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
 

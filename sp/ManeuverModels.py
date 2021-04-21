@@ -15,33 +15,33 @@ from typing import Callable
 from sp.ManeuverUtils import *
 
 
-def plan_maneuver(man_key, mconfig, pedestrian_state, pedestrian_speed, route, curr_route_node, vehicles, pedestrians):
+def plan_maneuver(man_key, mconfig, pedestrian_state, pedestrian_speed, route, curr_route_node, current_lanelet, vehicles, pedestrians):
     #Micro maneuver layer
-    if (man_key == Maneuver.M_VELKEEP):
-        return plan_velocity_keeping(pedestrian_state, pedestrian_speed, route, curr_route_node, mconfig, vehicles, pedestrians)
+    if (man_key == Maneuver.M_KEEPINLANE):
+        return plan_keep_in_lane(pedestrian_state, pedestrian_speed, route, curr_route_node, current_lanelet, mconfig, vehicles, pedestrians)
     elif (man_key == Maneuver.M_STOP):
-        return plan_stop(pedestrian_state, pedestrian_speed, route, curr_route_node, mconfig, vehicles, pedestrians)
+        return plan_stop(pedestrian_state, pedestrian_speed, route, curr_route_node, current_lanelet, mconfig, vehicles, pedestrians)
     elif (man_key == Maneuver.M_UPDATEWAYPOINT):
-        return plan_update_waypoint(pedestrian_state, pedestrian_speed, route, curr_route_node, mconfig, vehicles, pedestrians)
+        return plan_update_waypoint(pedestrian_state, pedestrian_speed, route, curr_route_node, current_lanelet, mconfig, vehicles, pedestrians)
 
 
-def plan_velocity_keeping(pedestrian_state:PedestrianState, pedestrian_speed, route, curr_route_node, mconfig:MVelKeepConfig, vehicles=None,  pedestrians=None):
+def plan_keep_in_lane(pedestrian_state:PedestrianState, pedestrian_speed, route, curr_route_node, current_lanelet, mconfig:MKeepInLaneConfig, vehicles=None,  pedestrians=None):
     """
-    VELOCITY KEEPING
+    KEEP IN LANE
     No target point, but needs to adapt to a desired velocity
     """
-
+    #TODO: return new direction
     return curr_route_node, pedestrian_speed['default_desired']
 
 
-def plan_stop(pedestrian_state:PedestrianState, pedestrian_speed, route, curr_route_node, mconfig:MStopConfig, vehicles=None, pedestrians=None):
+def plan_stop(pedestrian_state:PedestrianState, pedestrian_speed, route, curr_route_node, current_lanelet, mconfig:MStopConfig, vehicles=None, pedestrians=None):
     """
     STOP MANEUVER
     """
     return curr_route_node, 0.0
 
 
-def plan_update_waypoint(pedestrian_state:PedestrianState, pedestrian_speed, route, curr_route_node, mconfig:MUpdateWaypoint, vehicles=None, pedestrians=None):
+def plan_update_waypoint(pedestrian_state:PedestrianState, pedestrian_speed, route, curr_route_node, current_lanelet, mconfig:MUpdateWaypoint, vehicles=None, pedestrians=None):
     """
     UPDATE INTERMEDIATE WAYPOINT
     """

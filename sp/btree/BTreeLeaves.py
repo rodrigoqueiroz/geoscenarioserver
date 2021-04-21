@@ -78,7 +78,7 @@ class ManeuverAction(behaviour.Behaviour):
 
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
-            If the maneuver is indefinite (e.g. velocity keeping), it returns SUCCESS.
+            If the maneuver is indefinite (e.g. keep in lane), it returns SUCCESS.
             If the maneuver has an end (e.g. lane swerve) it returns RUNNING and SUCCESS when finished.
             If the maneuver cannot be performed it returns FAILURE.
         """
@@ -88,7 +88,7 @@ class ManeuverAction(behaviour.Behaviour):
         status = common.Status.SUCCESS
 
         # Maneuver specific logic for runtime configuration:
-        if self.mconfig.mkey == Maneuver.M_VELKEEP:
+        if self.mconfig.mkey == Maneuver.M_KEEPINLANE:
             pass
 
         elif self.mconfig.mkey == Maneuver.M_STOP:
