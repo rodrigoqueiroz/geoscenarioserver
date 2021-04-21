@@ -119,7 +119,7 @@ class SDVRoute(object):
             if any(ll.id == route_ll.id for ll in visited_route_lls):
                 continue
 
-            route_lane = self._lanelet_route.fullLane(route_ll)
+            route_lane = SDVRoute.lanelet_map.route_full_lane(self._lanelet_route, route_ll)
 
             next_lls = SDVRoute.lanelet_map.get_next_by_route(self._lanelet_route, route_lane[-1])
             lane_is_loop = any(next_ll.id == route_lane[0].id for next_ll in next_lls)
@@ -203,6 +203,7 @@ class SDVRoute(object):
                 )
             )
 
+        # NOTE: uncomment to see a plot of the map, route, and global paths
         # for sdv_path in self._sdv_paths:
         #     map_lines = SDVRoute.lanelet_map.get_lines()
         #     for line in map_lines:
