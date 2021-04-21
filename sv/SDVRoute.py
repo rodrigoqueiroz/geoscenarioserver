@@ -203,36 +203,38 @@ class SDVRoute(object):
                 )
             )
 
-        # NOTE: uncomment to see a plot of the map, route, and global paths
-        # for sdv_path in self._sdv_paths:
-        #     map_lines = SDVRoute.lanelet_map.get_lines()
-        #     for line in map_lines:
-        #         plt.plot(line[0], line[1], '-', color='black')
+        if SimConfig.PLOT_VEHICLE_ROUTES:
+            for sdv_path in self._sdv_paths:
+                plt.figure()
+                map_lines = SDVRoute.lanelet_map.get_lines()
+                for line in map_lines:
+                    plt.plot(line[0], line[1], '-', color='black')
 
-        #     for ll in route_lls:
-        #         l_lanelet_x = []
-        #         l_lanelet_y = []
-        #         for point in ll.leftBound:
-        #             l_lanelet_x.append(point.x)
-        #             l_lanelet_y.append(point.y)
+                for ll in route_lls:
+                    l_lanelet_x = []
+                    l_lanelet_y = []
+                    for point in ll.leftBound:
+                        l_lanelet_x.append(point.x)
+                        l_lanelet_y.append(point.y)
 
-        #         r_lanelet_x = []
-        #         r_lanelet_y = []
-        #         for point in ll.rightBound:
-        #             r_lanelet_x.append(point.x)
-        #             r_lanelet_y.append(point.y)
-        #         plt.plot(l_lanelet_x, l_lanelet_y, '-', color='red')
-        #         plt.plot(r_lanelet_x, r_lanelet_y, '-', color='red')
+                    r_lanelet_x = []
+                    r_lanelet_y = []
+                    for point in ll.rightBound:
+                        r_lanelet_x.append(point.x)
+                        r_lanelet_y.append(point.y)
+                    plt.plot(l_lanelet_x, l_lanelet_y, '-', color='red')
+                    plt.plot(r_lanelet_x, r_lanelet_y, '-', color='red')
 
-        #     global_path_x = []
-        #     global_path_y = []
-        #     for point in sdv_path.get_global_path():
-        #         global_path_x.append(point.x)
-        #         global_path_y.append(point.y)
-        #     plt.plot(global_path_x, global_path_y, '.', color='blue')
+                global_path_x = []
+                global_path_y = []
+                for point in sdv_path.get_global_path():
+                    global_path_x.append(point.x)
+                    global_path_y.append(point.y)
+                plt.plot(global_path_x, global_path_y, '.', color='blue')
 
-        #     plt.axis([-50, 40, -50, 40])
-        #     plt.show()
+                plt.axis([-50, 40, -50, 40])
+
+            plt.show()
 
     def _update_should_lane_swerve(self, s:float, path:ConstLineString3d, s_start:float):
         start, end, direction = self._current_sdv_path.get_lane_swerve_info()

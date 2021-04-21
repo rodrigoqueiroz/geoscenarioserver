@@ -54,6 +54,13 @@ USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. 
 POINTS_PER_METER = 1.0               #The number of points per meter to be used along the vehicle's reference path
                                      #Note that the value that is used may be slightly different
 
+#Debugging
+PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths
+                               #Each figure will contain the map (black), the route (red), and the global path (blue)
+                               #Figures are opened for each vehicle in the scenario
+                               #This should only be set when you want to see these figures
+                               #The program will crash after showing figures for all vehicles (an XIO error)
+
 #Evaluation
 EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
