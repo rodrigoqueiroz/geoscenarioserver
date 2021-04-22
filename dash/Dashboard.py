@@ -91,7 +91,7 @@ class Dashboard(object):
 
             #vehicles table
             self.update_table(vehicles)
-
+            #pedestrians at the bottom of vehicles table
             self.update_pedestrian_table(pedestrians)
 
             #find valid vehicle to focus plots and btree (if available)
@@ -99,22 +99,21 @@ class Dashboard(object):
             if self.center_id in vehicles:
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
-            if vid:
-                #vehicles with planner: cartesian, frenet chart and behavior tree
-                if vid in debug_shdata:
-                    #read vehicle planning data from debug_shdata
-                    planner_state, btree_snapshot, ref_path, traj, cand, unf, = debug_shdata[vid]
-                    if SHOW_CPLOT: #cartesian plot with lanelet map
-                        self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-                    if SHOW_FFPLOT: #frenet frame plot
-                        self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf)
-                    if VEH_TRAJ_CHART: #vehicle traj plot
-                        self.plot_vehicle_sd(traj, cand)
-                    #behavior tree
-                    self.tree_msg.configure(text="==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid,btree_snapshot) )
-                else:
-                    #vehicles without planner:
-                    self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                    #vehicles with planner: cartesian, frenet chart and behavior tree
+                    if vid in debug_shdata:
+                        #read vehicle planning data from debug_shdata
+                        planner_state, btree_snapshot, ref_path, traj, cand, unf, = debug_shdata[vid]
+                        if SHOW_CPLOT: #cartesian plot with lanelet map
+                            self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                        if SHOW_FFPLOT: #frenet frame plot
+                            self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf)
+                        if VEH_TRAJ_CHART: #vehicle traj plot
+                            self.plot_vehicle_sd(traj, cand)
+                        #behavior tree
+                        self.tree_msg.configure(text="==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid,btree_snapshot) )
+                    else:
+                        #vehicles without planner:
+                        self.plot_cartesian_chart(vid, vehicles, pedestrians)
             elif self.center_id in pedestrians:
                 if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     pid = int(self.center_id)
@@ -153,7 +152,7 @@ class Dashboard(object):
 
     def update_pedestrian_table(self, pedestrians):
         if len(pedestrians) > 0:
-            self.tab.insert('', 'end', int(0), values=("pid:"))
+            self.tab.insert('', 'end', int(0), values=("Pedestrians"))
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
             sim_state = pedestrians[pid].sim_state
@@ -664,7 +663,7 @@ class Dashboard(object):
         self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
         self.map_canvas.get_tk_widget().pack()
         
-        # table
+        # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
         tab['columns'] = (
             'id', 'sim_st',
