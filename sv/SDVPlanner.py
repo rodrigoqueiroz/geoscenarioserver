@@ -223,13 +223,18 @@ class SVPlanner(object):
             if self.sim_config.show_dashboard:
                 # change ref path format for pickling (maybe always keep it like this?)
                 debug_ref_path = [(pt.x, pt.y) for pt in self.sdv_route.get_reference_path()]
+                traj_s_shift = 0.0
+                if (self.last_plan is not None) and (frenet_traj is None):
+                    # shift the trajectories to the old frenet frame they are positioned in
+                    traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
                 debug_shdata[int(self.vid)] = (
                     planner_state,
                     snapshot_tree,
                     debug_ref_path,
                     (mplan_sharr[:6], mplan_sharr[6:12], mplan_sharr[12]),
                     [traj.array_format() for traj in cand if traj.feasible] if cand else None,
-                    [traj.array_format() for traj in cand if not traj.feasible] if cand else None
+                    [traj.array_format() for traj in cand if not traj.feasible] if cand else None,
+                    traj_s_shift
                 )
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         
