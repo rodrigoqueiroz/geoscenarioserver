@@ -20,6 +20,7 @@ import glog as log
 from SimTraffic import *
 from SimConfig import *
 from util.Utils import *
+import sv.SDVPlannerState
 from sv.Vehicle import *
 from Actor import *
 from TrafficLight import *
@@ -342,7 +343,7 @@ class Dashboard(object):
 
         #re
         for re in regulatory_elements:
-            if isinstance(re, TrafficLightState):
+            if isinstance(re, sv.SDVPlannerState.TrafficLightState):
                 colorcode,_ = self.get_color_by_type('trafficlight',re.color)
                 x, y = re.stop_position
                 plt.axvline(x, color= colorcode, linestyle='-', zorder=0)
