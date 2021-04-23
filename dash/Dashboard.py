@@ -134,8 +134,8 @@ class Dashboard(object):
         focus = self.tab.focus()
         if (focus):
             if (type(focus) == str):
-                self.center_id = int(focus[1:-1]) #remove first letter
-            else :
+                self.center_id = int(focus[1:]) #remove first letter
+            else:
                 self.center_id = int(focus)
             #log.info("Changed focus to {}".format(self.center_id))
 
