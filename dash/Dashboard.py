@@ -133,7 +133,10 @@ class Dashboard(object):
     def change_tab_focus(self, event):
         focus = self.tab.focus()
         if (focus):
-            self.center_id = int(focus)
+            if (type(focus) == str):
+                self.center_id = int(focus[1:-1]) #remove first letter
+            else :
+                self.center_id = int(focus)
             #log.info("Changed focus to {}".format(self.center_id))
 
     def update_table(self, vehicles):
@@ -146,20 +149,20 @@ class Dashboard(object):
             sv = vehicle.state.get_state_vector()
             truncate_vector(sv,2)
             sv = [vid] + [sim_state] + sv
-            self.tab.insert('', 'end', int(vid), values=(sv))
+            self.tab.insert('', 'end', 'v' + str(vid), values=(sv))
         if self.tab.exists(self.center_id):
             self.tab.selection_set(self.center_id)
 
     def update_pedestrian_table(self, pedestrians):
         if len(pedestrians) > 0:
-            self.tab.insert('', 'end', int(0), values=("Pedestrians"))
+            self.tab.insert('', 'end', str(-1), values=("Pedestrians"))
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
             truncate_vector(sp,2)
             sp = [pid] + [sim_state] + sp
-            self.tab.insert('', 'end', int(pid), values=(sp))
+            self.tab.insert('','end', 'p' + str(pid), values=(sp))
         
 
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
