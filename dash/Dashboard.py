@@ -36,6 +36,7 @@ class Dashboard(object):
         self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
+        self.center_pedestrian = False
         
         
 
@@ -96,7 +97,16 @@ class Dashboard(object):
 
             #find valid vehicle to focus plots and btree (if available)
             vid = None
-            if self.center_id in vehicles:
+
+            
+            if (type(self.center_id) == str):
+                if self.center_id[0] == 'p':
+                    self.center_pedestrian = True
+                else:
+                    self.center_pedestrian = False
+                self.center_id = int(self.center_id[1:]) #remove first letter
+            
+            if self.center_pedestrian == False and self.center_id in vehicles:
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
                     #vehicles with planner: cartesian, frenet chart and behavior tree
@@ -114,7 +124,7 @@ class Dashboard(object):
                     else:
                         #vehicles without planner:
                         self.plot_cartesian_chart(vid, vehicles, pedestrians)
-            elif self.center_id in pedestrians:
+            elif self.center_pedestrian and self.center_id in pedestrians:
                 if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     pid = int(self.center_id)
                     if SHOW_CPLOT: #cartesian plot with lanelet map
@@ -133,10 +143,7 @@ class Dashboard(object):
     def change_tab_focus(self, event):
         focus = self.tab.focus()
         if (focus):
-            if (type(focus) == str):
-                self.center_id = int(focus[1:]) #remove first letter
-            else:
-                self.center_id = int(focus)
+            self.center_id = focus #sets center_id to an int or string
             #log.info("Changed focus to {}".format(self.center_id))
 
     def update_table(self, vehicles):
