@@ -144,7 +144,7 @@ class SPPlanner(object):
         # Maneuver tick
         if mconfig:
             #replan maneuver
-            curr_waypoint, curr_desired_speed = plan_maneuver(mconfig.mkey,
+            direction, curr_waypoint, curr_desired_speed = plan_maneuver(mconfig.mkey,
                                                                 mconfig,
                                                                 planner_state.pedestrian_state,
                                                                 planner_state.pedestrian_speed,
@@ -154,7 +154,7 @@ class SPPlanner(object):
                                                                 planner_state.traffic_vehicles,
                                                                 planner_state.pedestrians)
 
-        return curr_waypoint, curr_desired_speed, current_lanelet
+        return direction, curr_waypoint, curr_desired_speed, current_lanelet
 
 
     def get_space_occupied_by_pedestrian(self, pedestrian_state):

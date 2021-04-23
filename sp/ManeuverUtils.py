@@ -25,78 +25,54 @@ def has_reached_point(pedestrian_state, point, threshold=1):
 
     return np.linalg.norm(np.asarray(point) - pedestrian_pos) < threshold
 
-def center_pt_of_current_lane(pedestrian_state, current_lane, curr_waypoint):
+def dir_to_follow_lane_border(pedestrian_state, current_lane, curr_waypoint):
         pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
 
-        '''
-        1) determine which direction ped is walking in (which lane endpoint are they walking towards)
-        2) starting from the other end, determine what is the last way on each border the ped can "drop a 90" to
-            a) if they can't drop a 90 to any way, take either first or last node depending on which end point they are closer to
-        3) direction points to the midpoint between the two end points of the selected ways on each border
-        '''
-
-        # 1)
+        # find entrance and exit points of the current lanelet
         entrance_pt_left = np.array([current_lane.leftBound[0].x, current_lane.leftBound[0].y])
         entrance_pt_right = np.array([current_lane.rightBound[0].x, current_lane.rightBound[0].y])
         exit_pt_left = np.array([current_lane.leftBound[-1].x, current_lane.leftBound[-1].y])
         exit_pt_right = np.array([current_lane.rightBound[-1].x, current_lane.rightBound[-1].y])
 
-        lane_entrance = (entrance_pt_left + entrance_pt_right) / 2
-        lane_exit = (exit_pt_left + exit_pt_right) / 2
+        entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
+        exit_pt = (exit_pt_left + exit_pt_right) / 2
 
-        if np.linalg.norm(curr_waypoint - lane_exit) < np.linalg.norm(curr_waypoint - lane_entrance):
-            left_bound = current_lane.leftBound
-            right_bound = current_lane.rightBound
+        left_border = [np.array([pt.x, pt.y]) for pt in current_lane.leftBound]
+        right_border = [np.array([pt.x, pt.y]) for pt in current_lane.rightBound]
+
+        # determine which direction ped is heading in lanelet and flip order of border nodes if necessary
+        if np.linalg.norm(entrance_pt - curr_waypoint) < np.linalg.norm(exit_pt - curr_waypoint):
+            temp = entrance_pt
+            entrance_pt = exit_pt
+            exit_pt = temp
+
+            left_border = [np.array([pt.x, pt.y]) for pt in list(reversed(current_lane.rightBound))]
+            right_border = [np.array([pt.x, pt.y]) for pt in list(reversed(current_lane.leftBound))]
+
+        pos_to_exit = exit_pt - pedestrian_pos
+        pos_to_waypt = curr_waypoint - pedestrian_pos
+
+        # determine which border (left or right) ped should follow from angle to their waypoint
+        angle = np.arctan2(np.linalg.det(np.array([pos_to_exit, pos_to_waypt])), np.dot(pos_to_exit, pos_to_waypt))
+
+        if angle > 0:
+            # follow left border
+            follow_border = left_border
         else:
-            temp = lane_entrance
-            lane_entrance = lane_exit
-            lane_exit = temp
+            # follow right border
+            follow_border = right_border
 
-            left_bound = np.array(list(reversed(current_lane.rightBound)))
-            right_bound = np.array(list(reversed(current_lane.leftBound)))
+        # find first border segment the ped has not yet passed and return a parallel direction
+        for idx in range(len(follow_border)-1):
+            border_seg = follow_border[idx+1] - follow_border[idx]
+            pos_to_border_start = pedestrian_pos - follow_border[idx]
+            t = np.dot(border_seg, pos_to_border_start) / np.dot(border_seg, border_seg)
 
-        # 2)
-        closest_left_way = []
-        closest_right_way = []
+            if t < 1:
+                return normalize(border_seg)
 
-        for node_idx in range(len(left_bound)-1):
-            way_start = np.array([left_bound[node_idx].x, left_bound[node_idx].y])
-            way_end = np.array([left_bound[node_idx+1].x, left_bound[node_idx+1].y])
-            way_vec = way_end - way_start
-            pos_to_way_start = pedestrian_pos - way_start
-
-            t = np.dot(way_vec, pos_to_way_start) / np.dot(way_vec, way_vec)
-
-            # ped can "drop a 90" to way if 0<=t<=1
-            if t >= 0 and t <= 1:
-                closest_left_way = way_vec
-
-        for node_idx in range(len(right_bound)-1):
-            way_start = np.array([right_bound[node_idx].x, right_bound[node_idx].y])
-            way_end = np.array([right_bound[node_idx+1].x, right_bound[node_idx+1].y])
-            way_vec = way_end - way_start
-            pos_to_way_start = pedestrian_pos - way_start
-
-            t = np.dot(way_vec, pos_to_way_start) / np.dot(way_vec, way_vec)
-
-            if t >= 0 and t <= 1:
-                closest_right_way = way_vec
-
-        if len(closest_left_way) == 0:
-            if np.linalg.norm(pedestrian_pos - lane_entrance) < np.linalg.norm(pedestrian_pos - lane_exit):
-                closest_left_way = np.array([left_bound[0].x, left_bound[0].y])
-            else:
-                closest_left_way = np.array([left_bound[-1].x, left_bound[-1].y])
-
-        if len(closest_right_way) == 0:
-            if np.linalg.norm(pedestrian_pos - lane_entrance) < np.linalg.norm(pedestrian_pos - lane_exit):
-                closest_right_way = np.array([right_bound[0].x, right_bound[0].y])
-            else:
-                closest_right_way = np.array([right_bound[-1].x, right_bound[-1].y])
-
-        # 3)
-        center_pt = (closest_left_way + closest_right_way) / 2
-        return center_pt
+        # return direction parallel to last border segment if ped has passed all segments
+        return normalize(follow_border[-1] - follow_border[-2])
 
 def point_in_rectangle(P, A, B, C, D):
     ''' Checks if the point pt is in the rectangle defined by

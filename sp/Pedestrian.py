@@ -115,8 +115,7 @@ class SP(Pedestrian):
         curr_pos = np.array([self.state.x, self.state.y])
         curr_vel = np.array([self.state.x_vel, self.state.y_vel])
 
-        self.waypoint, self.curr_desired_speed, self.current_lanelet = self.sp_planner.run_planner(self.waypoint, self.curr_desired_speed, self.route)
-        self.direction = np.array(normalize(self.waypoint - curr_pos))
+        self.direction, self.waypoint, self.curr_desired_speed, self.current_lanelet = self.sp_planner.run_planner(self.waypoint, self.curr_desired_speed, self.route)
 
         self.update_position_SFM(curr_pos, curr_vel)
 
@@ -173,12 +172,12 @@ class SP(Pedestrian):
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
             f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
 
-        '''
+        
         # repulsive forces from walls (borders)
         for wall in walls:
             f_walls += self.wall_interaction(curr_pos, curr_vel, wall)
-        '''
-        
+
+
         f_sum = f_adapt + f_other_ped + f_walls
 
         curr_acc = f_sum / self.mass

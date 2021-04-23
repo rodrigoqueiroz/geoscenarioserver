@@ -13,6 +13,7 @@ from SimConfig import *
 from Actor import *
 from typing import Callable
 from sp.ManeuverUtils import *
+from util.Transformations import normalize
 
 
 def plan_maneuver(man_key, mconfig, pedestrian_state, pedestrian_speed, curr_waypoint, route, current_lanelet, vehicles, pedestrians):
@@ -30,21 +31,26 @@ def plan_keep_in_lane(pedestrian_state:PedestrianState, pedestrian_speed, curr_w
     KEEP IN LANE
     No target point, but needs to adapt to a desired velocity
     """
-    #waypoint = center_pt_of_current_lane(pedestrian_state, current_lanelet, curr_waypoint)
+    direction = dir_to_follow_lane_border(pedestrian_state, current_lanelet, curr_waypoint)
 
-    #return curr_route_node, pedestrian_speed['default_desired'], direction
-    return curr_waypoint, pedestrian_speed['default_desired']
+    return direction, curr_waypoint, pedestrian_speed['default_desired']
 
 
 def plan_stop(pedestrian_state:PedestrianState, pedestrian_speed, curr_waypoint, route, current_lanelet, mconfig:MStopConfig, vehicles=None, pedestrians=None):
     """
     STOP MANEUVER
     """
-    return curr_waypoint, 0.0
+    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+    direction = normalize(curr_waypoint-pedestrian_pos)
+
+    return direction, curr_waypoint, 0.0
 
 
 def plan_update_waypoint(pedestrian_state:PedestrianState, pedestrian_speed, curr_waypoint, route, current_lanelet, mconfig:MUpdateWaypoint, vehicles=None, pedestrians=None):
     """
     UPDATE INTERMEDIATE WAYPOINT
     """
-    return next(route), pedestrian_speed['default_desired']
+    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+    direction = normalize(curr_waypoint-pedestrian_pos)
+    
+    return direction, next(route), pedestrian_speed['default_desired']
