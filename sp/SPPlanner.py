@@ -32,6 +32,7 @@ class SPPlanner(object):
         self.sim_config = sim_traffic.sim_config
         self.sim_traffic:SimTraffic = sim_traffic
 
+        self.sp = sp
         self.root_btree_name = sp.root_btree_name
         self.btree_reconfig = sp.btree_reconfig
         self.behavior_model = None
@@ -39,8 +40,7 @@ class SPPlanner(object):
         self.btree_locations = btree_locations
         self.btype = sp.btype
 
-        self.route = []
-        self.replan_route = True
+        self.lanelet_of_curr_waypoint = None
 
 
     def start(self):
@@ -49,6 +49,7 @@ class SPPlanner(object):
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         self.plan_route()
+        self.lanelet_of_curr_waypoint = self.get_space_occupied_by_pedestrian(self.sp.waypoint)
 
 
     def plan_route(self):
@@ -58,25 +59,25 @@ class SPPlanner(object):
         destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1])
         dist_to_dest = np.linalg.norm(destination - ped_pos)
 
-        self.route = [ped_pos]
+        route = [ped_pos]
         xwalks_in_plan = []
         found_closest_exit = False
 
         while not found_closest_exit:
             closest_xwalk = -1
             xwalks_not_in_plan = {xwalk_id: entry_pts for (xwalk_id, entry_pts) in self.sim_traffic.crosswalk_entry_pts.items() if xwalk_id not in xwalks_in_plan}
-            closest_entry_dist = np.linalg.norm(list(xwalks_not_in_plan.values())[0] - self.route[-1])
-            dist_to_dest = np.linalg.norm(destination - self.route[-1])
+            closest_entry_dist = np.linalg.norm(list(xwalks_not_in_plan.values())[0] - route[-1])
+            dist_to_dest = np.linalg.norm(destination - route[-1])
 
             for xwalk_id,entry_pts in xwalks_not_in_plan.items():
                 # determine entrance and exit by distance to pedestrian
                 new_entrance = entry_pts[0]
                 new_exit = entry_pts[1]
-                if np.linalg.norm(new_exit - self.route[-1]) < np.linalg.norm(new_entrance - self.route[-1]):
+                if np.linalg.norm(new_exit - route[-1]) < np.linalg.norm(new_entrance - route[-1]):
                     new_entrance = entry_pts[1]
                     new_exit = entry_pts[0]
 
-                dist_to_entrance = np.linalg.norm(self.route[-1] - new_entrance)
+                dist_to_entrance = np.linalg.norm(route[-1] - new_entrance)
                 dist_from_exit_to_dest = np.linalg.norm(destination - new_exit)
 
                 # pick the closest entrance with an exit that is closer to dest than the current last route node
@@ -88,8 +89,8 @@ class SPPlanner(object):
 
             if closest_xwalk != -1:
                 xwalks_in_plan.append(closest_xwalk)
-                self.route.append(entrance)
-                self.route.append(exit)
+                route.append(entrance)
+                route.append(exit)
 
                 # do not continue planning if the last crosswalk was just added to the route
                 if len(list(xwalks_not_in_plan.values())) == 1:
@@ -97,24 +98,28 @@ class SPPlanner(object):
             else:
                 found_closest_exit = True
 
-        self.route.append(destination)
-        self.route = self.route[1:] # remove current ped position from route
+        route.append(destination)
+        route = route[1:] # remove current ped position from route
+
+        self.sp.route = iter(route)
+        self.sp.waypoint = next(self.sp.route) # get first waypoint
 
 
-    def run_planner(self, curr_waypoint, curr_desired_speed, route):
-        pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
+    def run_planner(self):
+        pedestrian_state = self.sp.state
+        pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
 
-        current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_state)
+        self.sp.current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_pos)
 
-        reg_elems = self.get_reg_elem_states(pedestrian_state, current_lanelet)
-        pedestrian_speed = {'default_desired': self.sim_traffic.pedestrians[self.pid].default_desired_speed,
-                            'current_desired': curr_desired_speed}
+        reg_elems = self.get_reg_elem_states(pedestrian_state, self.sp.current_lanelet)
+        pedestrian_speed = {'default_desired': self.sp.default_desired_speed,
+                            'current_desired': self.sp.curr_desired_speed}
 
         # Get planner state
         planner_state = PedestrianPlannerState(
                             pedestrian_state=pedestrian_state,
                             pedestrian_speed=pedestrian_speed,
-                            waypoint = curr_waypoint,
+                            waypoint = self.sp.waypoint,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
                             regulatory_elements=reg_elems,
@@ -128,6 +133,7 @@ class SPPlanner(object):
         # new maneuver
         if self.mconfig and self.mconfig.mkey != mconfig.mkey:
             log.info("PID {} started maneuver {}".format(self.pid, mconfig.mkey.name))
+            self.sp.maneuver_sequence.append(mconfig.mkey.name)
             # print sp state and deltas
             state_str = (
                 "PID {}:\n"
@@ -144,27 +150,31 @@ class SPPlanner(object):
         # Maneuver tick
         if mconfig:
             #replan maneuver
-            direction, curr_waypoint, curr_desired_speed = plan_maneuver(mconfig.mkey,
-                                                                mconfig,
-                                                                planner_state.pedestrian_state,
-                                                                planner_state.pedestrian_speed,
-                                                                planner_state.waypoint,
-                                                                route,
-                                                                current_lanelet,
-                                                                planner_state.traffic_vehicles,
-                                                                planner_state.pedestrians)
+            self.sp.direction, self.sp.waypoint, self.sp.curr_desired_speed = plan_maneuver(mconfig.mkey,
+                                                                                            mconfig,
+                                                                                            self.sp,
+                                                                                            planner_state.pedestrian_state,
+                                                                                            planner_state.pedestrian_speed,
+                                                                                            self.lanelet_of_curr_waypoint,
+                                                                                            planner_state.traffic_vehicles,
+                                                                                            planner_state.pedestrians)
 
-        return direction, curr_waypoint, curr_desired_speed, current_lanelet
+    def stop(self):
+        # write manuever sequences to csv file
+        with open('sp/maneuver_sequences/pid_{}.csv'.format(self.pid), 'w', newline='') as maneuvers_file:
+            maneuver_writer = csv.writer(maneuvers_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            maneuver_writer.writerow(["pid", "maneuver sequence"])
+            maneuver_writer.writerow([self.pid] + self.sp.maneuver_sequence)
 
 
-    def get_space_occupied_by_pedestrian(self, pedestrian_state):
+    def get_space_occupied_by_pedestrian(self, position):
         # check if ped on lanelet
-        ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(pedestrian_state.x, pedestrian_state.y, "pedestrian")
+        ll = self.sim_traffic.lanelet_map.get_occupying_lanelet_by_participant(position[0], position[1], "pedestrian")
         if ll != None:
             return ll
 
         # check if ped on area
-        area = self.sim_traffic.lanelet_map.get_occupying_area(pedestrian_state.x, pedestrian_state.y)
+        area = self.sim_traffic.lanelet_map.get_occupying_area(position[0], position[1])
         if area != None:
             return area
 

@@ -109,18 +109,18 @@ def normal_samples(nsamples, mean, sd, lo = None,up = None):
         samples.append(s)
     return samples
 
-def distance_point_to_wall(pt, wall):
+def distance_point_to_border(pt, border):
     '''
-    get shortest distance from pt to vector (wall)
-    and unit vector perpendicular to wall
+    get shortest distance from pt to vector (border)
+    and unit vector perpendicular to border
     '''
-    p0 = wall[0]
-    p1 = wall[1]
-    wall_vec = p1-p0
+    p0 = border[0]
+    p1 = border[1]
+    border_vec = p1-p0
     pt_p0 = pt-p0
 
-    t = np.dot(wall_vec, pt_p0) / np.dot(wall_vec, wall_vec)
-    cross = p0 + t*wall_vec
+    t = np.dot(border_vec, pt_p0) / np.dot(border_vec, border_vec)
+    cross = p0 + t*border_vec
 
     if t <= 0.0:
         dist = np.linalg.norm(pt_p0)

@@ -13,7 +13,7 @@ from Actor import *
 from sp.SPPlanner import *
 from sp.SPPlannerState import *
 from shm.SimSharedMemory import *
-from util.Utils import kalman, distance_point_to_wall
+from util.Utils import kalman, distance_point_to_border
 from util.Transformations import normalize
 from SimTraffic import *
 from sp.btree.BehaviorModels import BehaviorModels
@@ -96,7 +96,10 @@ class SP(Pedestrian):
         self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
         self.curr_desired_speed = self.default_desired_speed
         self.direction = None
+        self.border_forces = False
         self.mass = random.uniform(50,80)
+
+        self.maneuver_sequence = []
 
 
     def start_planner(self):
@@ -105,9 +108,10 @@ class SP(Pedestrian):
         """
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
-        self.route = iter(self.sp_planner.route)
-        self.waypoint = next(self.route)
 
+    def stop(self):
+        if self.sp_planner:
+            self.sp_planner.stop()
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
@@ -115,8 +119,7 @@ class SP(Pedestrian):
         curr_pos = np.array([self.state.x, self.state.y])
         curr_vel = np.array([self.state.x_vel, self.state.y_vel])
 
-        self.direction, self.waypoint, self.curr_desired_speed, self.current_lanelet = self.sp_planner.run_planner(self.waypoint, self.curr_desired_speed, self.route)
-
+        self.sp_planner.run_planner()
         self.update_position_SFM(curr_pos, curr_vel)
 
 
@@ -124,7 +127,7 @@ class SP(Pedestrian):
         '''
         Paper with details on SFM formulas:
         https://link.springer.com/content/pdf/10.1007/s12205-016-0741-9.pdf (access through University of Waterloo)
-        This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
+        This paper explains the calculations and parameters in other_pedestrian_interaction() and border_interaction()
         '''
         desired_vel = self.direction * self.curr_desired_speed
         accl_time = 0.5 # acceleration time
@@ -138,47 +141,49 @@ class SP(Pedestrian):
         dt = 1 / TRAFFIC_RATE
 
         # get borders of current lanelet/area
-        walls = []
+        borders = []
 
-        if self.current_lanelet and 'subtype' in self.current_lanelet.attributes:
-            if self.current_lanelet.attributes['subtype'] in ['walkway', 'crosswalk']:
-                right = self.current_lanelet.rightBound
-                left = self.current_lanelet.leftBound
+        # only find borders of current lane if border_forces is True (dependent on current maneuver)
+        if self.border_forces:
+            if self.current_lanelet and 'subtype' in self.current_lanelet.attributes:
+                if self.current_lanelet.attributes['subtype'] in ['walkway', 'crosswalk']:
+                    right = self.current_lanelet.rightBound
+                    left = self.current_lanelet.leftBound
 
-                for i in range(len(right) - 1):
-                    p0 = np.array([right[i].x, right[i].y])
-                    p1 = np.array([right[i+1].x, right[i+1].y])
-                    walls.append([p0, p1])
+                    for i in range(len(right) - 1):
+                        p0 = np.array([right[i].x, right[i].y])
+                        p1 = np.array([right[i+1].x, right[i+1].y])
+                        borders.append([p0, p1])
 
-                for i in range(len(left) - 1):
-                    p0 = np.array([left[i].x, left[i].y])
-                    p1 = np.array([left[i+1].x, left[i+1].y])
-                    walls.append([p0, p1])
-            elif self.current_lanelet.attributes['subtype'] == 'traffic_island':
-                outer = self.current_lanelet.outerBound[0]
+                    for i in range(len(left) - 1):
+                        p0 = np.array([left[i].x, left[i].y])
+                        p1 = np.array([left[i+1].x, left[i+1].y])
+                        borders.append([p0, p1])
+                elif self.current_lanelet.attributes['subtype'] == 'traffic_island':
+                    outer = self.current_lanelet.outerBound[0]
 
-                for i in range(len(outer) - 1):
-                    p0 = np.array([outer[i].x, outer[i].y])
-                    p1 = np.array([outer[i+1].x, outer[i+1].y])
-                    walls.append([p0, p1])
+                    for i in range(len(outer) - 1):
+                        p0 = np.array([outer[i].x, outer[i].y])
+                        p1 = np.array([outer[i+1].x, outer[i+1].y])
+                        borders.append([p0, p1])
 
         # attracting force towards destination
         f_adapt = (delta_vel * self.mass) / accl_time
 
         f_other_ped = np.zeros(2)
-        f_walls = np.zeros(2)
+        f_borders = np.zeros(2)
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
             f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
 
-        
-        # repulsive forces from walls (borders)
-        for wall in walls:
-            f_walls += self.wall_interaction(curr_pos, curr_vel, wall)
+
+        # repulsive forces from borders
+        for border in borders:
+            f_borders += self.border_interaction(curr_pos, curr_vel, border)
 
 
-        f_sum = f_adapt + f_other_ped + f_walls
+        f_sum = f_adapt + f_other_ped + f_borders
 
         curr_acc = f_sum / self.mass
         curr_vel += curr_acc * dt
@@ -261,12 +266,12 @@ class SP(Pedestrian):
         return fij
 
 
-    def wall_interaction(self, curr_pos, vi, wall, phi=12000, omega=24000):
+    def border_interaction(self, curr_pos, vi, border, phi=12000, omega=24000):
         A = 1500 # 1500~2000
         B = 0.08
 
         ri = self.radius
-        diW, niW = distance_point_to_wall(curr_pos, wall)
+        diW, niW = distance_point_to_border(curr_pos, border)
         tiW = np.array([-niW[1], niW[0]])
 
         fiW = (A*np.exp((ri-diW)/B) + phi*max(0,ri-diW))*niW - omega*max(0,ri-diW)*np.dot(vi,tiW)*tiW

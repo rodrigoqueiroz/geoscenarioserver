@@ -13,7 +13,7 @@
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5331998' action='modify' visible='true' lat='43.4778008171' lon='-80.51942082086'>
+  <node id='-5331998' action='modify' visible='true' lat='43.47785651335' lon='-80.51946991613'>
     <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
