@@ -37,15 +37,15 @@ class Dashboard(object):
         self.center_vid = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
-        
-        
+
+
 
     def start(self):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
         """
-        
+
         if not self.sim_traffic:
             log.error("Dashboard requires a traffic to start")
             return
@@ -53,7 +53,7 @@ class Dashboard(object):
         if not (self.sim_traffic.traffic_state_sharr):
             log.error("Dashboard can not start before traffic")
             return
-        
+
         self.nvehicles = len(self.sim_traffic.vehicles)
         self.lanelet_map = self.sim_traffic.lanelet_map
         self._process = Process(target=self.run_dash_process,
@@ -69,7 +69,7 @@ class Dashboard(object):
         while sync_dash.tick():
             if not self.window:
                 return
-            
+
             #clear
             self.clear_vehicle_charts()
             self.tree_msg.configure(text= "")
@@ -80,9 +80,9 @@ class Dashboard(object):
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
-            config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time) 
-            
-            
+            config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time)
+
+
 
             #config/stats
             self.scenario_config_lb['text'] = config_txt
@@ -124,7 +124,7 @@ class Dashboard(object):
 
     def quit(self):
         self._process.terminate()
-        
+
 
     def change_tab_focus(self, event):
         focus = self.tab.focus()
@@ -161,7 +161,7 @@ class Dashboard(object):
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
-        
+
         #layout
         plt.xlim(x_min,x_max)
         plt.ylim(y_min,y_max)
@@ -194,7 +194,7 @@ class Dashboard(object):
             #505050
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
-      
+
         #layout
         plt.xlim(x_min,x_max)
         plt.ylim(y_min,y_max)
@@ -208,13 +208,13 @@ class Dashboard(object):
         #fig.tight_layout(pad=0.1)
 
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
-        
+
         #road lines:
         #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
         data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
         for line in data:
             plt.plot(line[0], line[1], color = '#cccccc',zorder=0)
-        
+
         #pedestrian marking
         #regulatory elements:
         #lights
@@ -224,18 +224,24 @@ class Dashboard(object):
                 x,y,line = self.lanelet_map.get_traffic_light_pos(lid)
                 #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
                 colorcode,_ = self.get_color_by_type('trafficlight',state)
-                plt.plot(x, y, 'ks', markersize=8, zorder=4) #black square
                 tl_type = self.sim_traffic.traffic_lights[lid].type
+                square_size = 8
+                if tl_type == TrafficLightType.pedestrian:
+                    square_size = 4
+                plt.plot(x, y, 'ks', markersize=square_size, zorder=4) #black square
                 if tl_type == TrafficLightType.default:
                     plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
                 elif tl_type == TrafficLightType.left:
                     plt.plot(x, y, colorcode+'<', markersize=6, zorder=5)
                 elif tl_type == TrafficLightType.right:
                     plt.plot(x, y, colorcode+'>', markersize=6, zorder=5)
+                elif tl_type == TrafficLightType.pedestrian:
+                    plt.plot(x, y, colorcode+'o', markersize=2, zorder=5)
 
-                label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
-                plt.gca().text(x+1, y, label, style='italic')
-                plt.plot(line[0], line[1], color = colorcode, zorder=5)
+                if tl_type != TrafficLightType.pedestrian:
+                    label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
+                    plt.gca().text(x+1, y, label, style='italic')
+                    plt.plot(line[0], line[1], color = colorcode, zorder=5)
         #signs
 
     def plot_static_objects(self,static_objects,x_min,x_max,y_min,y_max):
@@ -279,6 +285,13 @@ class Dashboard(object):
                 colorcode,alpha = self.get_color_by_type('pedestrian',pedestrian.type, pedestrian.sim_state)
                 x = pedestrian.state.x
                 y = pedestrian.state.y
+
+                # show pedestrians' goals on map
+                x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
+                y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
+                plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
+                plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
+
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
                     circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
@@ -293,7 +306,7 @@ class Dashboard(object):
         gca = plt.gca()
 
         vehicle_state = planner_state.vehicle_state
-        vehicles = planner_state.traffic_vehicles 
+        vehicles = planner_state.traffic_vehicles
         pedestrians = planner_state.pedestrians
         lane_config = planner_state.lane_config
         static_objects = planner_state.static_objects
@@ -330,7 +343,7 @@ class Dashboard(object):
             plt.gca().add_artist(circle1)
             label = "p{}".format(pid)
             plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
-        
+
         #objects
         for oid, obj in static_objects.items():
             x = obj.s
@@ -349,7 +362,7 @@ class Dashboard(object):
                 plt.axvline(x, color= colorcode, linestyle='-', zorder=0)
             else:
                 print(re)
-        
+
 
         #main vehicle
         x,y = goal_point_frenet[0],goal_point_frenet[1]
@@ -364,8 +377,8 @@ class Dashboard(object):
                 Dashboard.plot_trajectory(t[0], t[1], t[2],'red')
         if traj:
             Dashboard.plot_trajectory(traj[0], traj[1], traj[2], 'blue')
-        
-        
+
+
 
         vs = vehicle_state
         vid = center_vid
@@ -391,7 +404,7 @@ class Dashboard(object):
         #fig.patch.set_facecolor('lightgray')
         #fig.tight_layout(pad=0.05)
 
-    
+
     def get_color_by_type(self,actor,a_type,sim_state = None):
         #color
         colorcode = 'k' #black
@@ -416,8 +429,8 @@ class Dashboard(object):
                 colorcode = 'g'
             if a_type == TrafficLightColor.Yellow:
                 colorcode = 'y'
-        #alpha      
-        alpha = 1.0          
+        #alpha
+        alpha = 1.0
         if sim_state:
             if sim_state== ActorSimState.ACTIVE:
                 alpha = 1.0
@@ -427,7 +440,7 @@ class Dashboard(object):
                 alpha = 0.5
 
         return colorcode, alpha
-    
+
     def clear_vehicle_charts(self):
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
@@ -435,7 +448,7 @@ class Dashboard(object):
         plt.cla()
         fig = plt.figure(Dashboard.TRAJ_FIG_ID)
         plt.cla()
-        
+
 
     @staticmethod
     def plot_trajectory(s_coef, d_coef, T,tcolor='grey'):
@@ -572,7 +585,7 @@ class Dashboard(object):
 
         tab_frame = tk.Frame(global_frame, width = 1000, height = 300, bg = "blue")
         tab_frame.grid(row=0, column=2, sticky="nsew")
-        
+
         #vehicle sub containers
         cart_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
         fren_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
@@ -585,7 +598,7 @@ class Dashboard(object):
             if visible:
                 cframe.grid(row=0, column=c, sticky="nsew")
                 c += 1
-        
+
         # Content:
         window.title = 'GeoScenario Server'
         str_title = ' GeoScenario Server '
@@ -593,7 +606,7 @@ class Dashboard(object):
         img_gs = pimg = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/gs.png").resize((40, 40)))
         img_veh = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle.png").resize((100, 47)))
         img_ego = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle_ego.png").resize((80, 30)))
-        
+
         # Widgets
         # title
         lb = tk.Label(title_frame, text=str_title, bg = "black", fg="white",font=('OpenSans', 30))
@@ -613,13 +626,13 @@ class Dashboard(object):
         #self.scenario_stats_lb = scenario_stats_lb
 
         # global container:
-        
+
         # map
         fig_map = plt.figure(Dashboard.MAP_FIG_ID)
         #fig_map.set_size_inches(6,6,forward=True)
         self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
         self.map_canvas.get_tk_widget().pack()
-        
+
         # table
         tab = ttk.Treeview(tab_frame, show=['headings'])
         tab['columns'] = (
@@ -637,7 +650,7 @@ class Dashboard(object):
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
         self.tab = tab
-        
+
 
         # vehicle container:
 
@@ -658,7 +671,7 @@ class Dashboard(object):
         fig_traj.set_size_inches(4,4,forward=True)
         self.traj_canvas = FigureCanvasTkAgg(fig_traj, traj_frame)
         self.traj_canvas.get_tk_widget().pack()
-        
+
         tree_msg= tk.Message(bt_frame,text='', anchor='s',
                                     width=300,
                                     bg='white',foreground='black')
@@ -675,4 +688,3 @@ class Dashboard(object):
         matplotlib.rc('figure', titlesize=8)
 
         return window
-

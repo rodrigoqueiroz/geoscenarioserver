@@ -8,7 +8,7 @@ behaviortree crosswalk_signal:
             maneuver m_waypt_next ( MUpdateWaypoint( vel=MP(1.0,30,6) ) )
         ->
             condition c_greenlight ( traffic_light_green() )
-            maneuver m_keep_velocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
+            maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
         ?
             ->
                 condition c_in_xwalk ( in_crosswalk_area() )
