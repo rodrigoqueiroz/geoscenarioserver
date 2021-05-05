@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 #dinizr@chalmers.se
 #rqueiroz@uwaterloo.ca
+#slarter@uwaterloo.ca
 
 from py_trees import *
 import random
 from TickSync import TickSync
 from sp.ManeuverConfig import *
-import sp.ManeuverUtils
+from sp.ManeuverUtils import *
 
 #alternative:
 class BCondition(behaviour.Behaviour):
@@ -102,8 +103,19 @@ class ManeuverAction(behaviour.Behaviour):
                         self.mconfig.pos = re_state.stop_position[0]
                         break
 
-        elif self.mconfig.mkey == Maneuver.M_UPDATEWAYPOINT:
-            pass
+        elif self.mconfig.mkey == Maneuver.M_ENTERCROSSWALK:
+            # RUNNING while pedestrian has not yet entered crosswalk
+            if not in_crosswalk_area(self.bmodel.planner_state):
+                status = common.Status.RUNNING
+            else:
+                self.maneuver_completed = True
+
+        elif self.mconfig.mkey == Maneuver.M_EXITCROSSWALK:
+            # RUNNING while pedestrian has not yet exited crosswalk
+            if in_crosswalk_area(self.bmodel.planner_state):
+                status = common.Status.RUNNING
+            else:
+                self.maneuver_completed = True
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)

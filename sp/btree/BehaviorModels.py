@@ -112,9 +112,17 @@ class BehaviorModels(object):
             goal = self.planner_state.destination
             return has_reached_point(self.planner_state.pedestrian_state, goal, **kwargs)
 
-        elif condition == "reached_next_waypoint":
+        elif condition == "reached_curr_waypoint":
             waypoint = self.planner_state.waypoint
             return has_reached_point(self.planner_state.pedestrian_state, waypoint, **kwargs)
+
+        elif condition == "reached_crosswalk_entrance":
+            entrance = self.planner_state.target_crosswalk_pts[0]
+            return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
+
+        elif condition == "reached_crosswalk_exit":
+            entrance = self.planner_state.target_crosswalk_pts[1]
+            return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
 
         elif condition == "at_desired_speed":
             return self.planner_state.pedestrian_speed['current_desired'] == self.planner_state.pedestrian_speed['default_desired']
@@ -137,10 +145,7 @@ class BehaviorModels(object):
                     return re_state.color == TrafficLightColor.Green
 
         elif condition == "in_crosswalk_area":
-            cur_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")
-            if cur_ll == None:
-                return False
-            return cur_ll.attributes["subtype"] == "crosswalk"
+            return in_crosswalk_area(self.planner_state)
 
         elif condition == "past_crosswalk_halfway":
             xwalk_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")

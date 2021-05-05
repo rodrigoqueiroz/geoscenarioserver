@@ -28,7 +28,7 @@ import time
 class SPPlanner(object):
     def __init__(self, sp, sim_traffic, btree_locations):
         self.pid = int(sp.id)
-        self.laneletmap:LaneletMap = sim_traffic.lanelet_map
+        self.lanelet_map:LaneletMap = sim_traffic.lanelet_map
         self.sim_config = sim_traffic.sim_config
         self.sim_traffic:SimTraffic = sim_traffic
 
@@ -48,64 +48,78 @@ class SPPlanner(object):
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-        self.plan_route()
+        self.plan_local_route()
         self.lanelet_of_curr_waypoint = self.get_space_occupied_by_pedestrian(self.sp.waypoint)
 
 
-    def plan_route(self):
-        pedestrian_state = self.sim_traffic.pedestrians[self.pid].state
+    def plan_local_route(self):
+        pedestrian_state = self.sp.state
+        pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
 
-        ped_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-        destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1])
-        dist_to_dest = np.linalg.norm(destination - ped_pos)
+        occupied_spaces = self.lanelet_map.get_spaces_occupied_by_pedestrian(pedestrian_pos)
 
-        route = [ped_pos]
-        xwalks_in_plan = []
-        found_closest_exit = False
+        # find which crosswalks are accessible from current lanelet or area
+        paths_to_accessible_crosswalks = []
 
-        while not found_closest_exit:
-            closest_xwalk = -1
-            xwalks_not_in_plan = {xwalk_id: entry_pts for (xwalk_id, entry_pts) in self.sim_traffic.crosswalk_entry_pts.items() if xwalk_id not in xwalks_in_plan}
-            closest_entry_dist = np.linalg.norm(list(xwalks_not_in_plan.values())[0] - route[-1])
-            dist_to_dest = np.linalg.norm(destination - route[-1])
+        for xwalk in self.sim_traffic.crosswalks:
+            for ll in occupied_spaces['lanelets']:
+                route_to_xwalk = self.lanelet_map.routing_graph_pedestrians.getRoute(ll, xwalk)
+                if route_to_xwalk:
+                    path_to_xwalk = self.lanelet_map.get_pedestrian_shortest_path(ll.id, xwalk.id)
+                    num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_xwalk)])
+                    # ensure there is only one crosswalk in path to target crosswalk
+                    if num_xwalks_in_path == 1:
+                        paths_to_accessible_crosswalks.append(path_to_xwalk)
 
-            for xwalk_id,entry_pts in xwalks_not_in_plan.items():
-                # determine entrance and exit by distance to pedestrian
-                new_entrance = entry_pts[0]
-                new_exit = entry_pts[1]
-                if np.linalg.norm(new_exit - route[-1]) < np.linalg.norm(new_entrance - route[-1]):
-                    new_entrance = entry_pts[1]
-                    new_exit = entry_pts[0]
+            for area in occupied_spaces['areas']:
+                # check if the current area shares a node with the target crosswalk
+                if self.lanelet_map.area_and_lanelet_share_node(area, xwalk):
+                    # determine entrance and exit points
+                    entrance_pt_left = np.array([xwalk.leftBound[0].x, xwalk.leftBound[0].y])
+                    entrance_pt_right = np.array([xwalk.rightBound[0].x, xwalk.rightBound[0].y])
+                    exit_pt_left = np.array([xwalk.leftBound[-1].x, xwalk.leftBound[-1].y])
+                    exit_pt_right = np.array([xwalk.rightBound[-1].x, xwalk.rightBound[-1].y])
 
-                dist_to_entrance = np.linalg.norm(route[-1] - new_entrance)
-                dist_from_exit_to_dest = np.linalg.norm(destination - new_exit)
+                    entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
+                    exit_pt = (exit_pt_left + exit_pt_right) / 2
 
-                # pick the closest entrance with an exit that is closer to dest than the current last route node
-                if dist_to_entrance < closest_entry_dist and dist_from_exit_to_dest < dist_to_dest:
-                    entrance = new_entrance
-                    exit = new_exit
-                    closest_entry_dist = dist_to_entrance
-                    closest_xwalk = xwalk_id
+                    if np.linalg.norm(exit_pt - pedestrian_pos) < np.linalg.norm(entrance_pt - pedestrian_pos):
+                        # invert crosswalk way
+                        xwalk = xwalk.invert()
 
-            if closest_xwalk != -1:
-                xwalks_in_plan.append(closest_xwalk)
-                route.append(entrance)
-                route.append(exit)
+                    paths_to_accessible_crosswalks.append([area, xwalk])
 
-                # do not continue planning if the last crosswalk was just added to the route
-                if len(list(xwalks_not_in_plan.values())) == 1:
-                    found_closest_exit = True
-            else:
-                found_closest_exit = True
+        # choose the path with the crosswalk that bring peds closest to destination
+        chosen_path = None
+        target_entry_pt = self.sp.destination
+        target_exit_pt = self.sp.destination
+        distance_to_dest = np.linalg.norm(self.sp.destination - pedestrian_pos)
 
-        route.append(destination)
-        route = route[1:] # remove current ped position from route
+        for path in paths_to_accessible_crosswalks:
+            xwalk = path[-1]
 
-        self.sp.route = iter(route)
-        self.sp.waypoint = next(self.sp.route) # get first waypoint
+            entrance_pt_left = np.array([xwalk.leftBound[0].x, xwalk.leftBound[0].y])
+            entrance_pt_right = np.array([xwalk.rightBound[0].x, xwalk.rightBound[0].y])
+            exit_pt_left = np.array([xwalk.leftBound[-1].x, xwalk.leftBound[-1].y])
+            exit_pt_right = np.array([xwalk.rightBound[-1].x, xwalk.rightBound[-1].y])
+
+            entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
+            exit_pt = (exit_pt_left + exit_pt_right) / 2
+
+            # if this crosswalk brings ped closer to destination
+            exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
+            entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
+            if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
+                distance_to_dest = exit_to_dest_dist
+                chosen_path = path
+                target_entry_pt = entrance_pt
+                target_exit_pt = exit_pt
+
+        self.sp.waypoint = target_entry_pt
+        self.sp.target_crosswalk_pts = [target_entry_pt, target_exit_pt]
 
 
-    def run_planner(self):
+    def run_planner(self, sim_time):
         pedestrian_state = self.sp.state
         pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
 
@@ -119,6 +133,7 @@ class SPPlanner(object):
         planner_state = PedestrianPlannerState(
                             pedestrian_state=pedestrian_state,
                             pedestrian_speed=pedestrian_speed,
+                            target_crosswalk_pts = self.sp.target_crosswalk_pts,
                             waypoint = self.sp.waypoint,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
@@ -133,7 +148,7 @@ class SPPlanner(object):
         # new maneuver
         if self.mconfig and self.mconfig.mkey != mconfig.mkey:
             log.info("PID {} started maneuver {}".format(self.pid, mconfig.mkey.name))
-            self.sp.maneuver_sequence.append(mconfig.mkey.name)
+            self.sp.maneuver_sequence.append([sim_time, mconfig.mkey.name])
             # print sp state and deltas
             state_str = (
                 "PID {}:\n"
@@ -160,11 +175,14 @@ class SPPlanner(object):
                                                                                             planner_state.pedestrians)
 
     def stop(self):
+        pass
         # write manuever sequences to csv file
-        with open('sp/maneuver_sequences/pid_{}.csv'.format(self.pid), 'w', newline='') as maneuvers_file:
-            maneuver_writer = csv.writer(maneuvers_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            maneuver_writer.writerow(["pid", "maneuver sequence"])
-            maneuver_writer.writerow([self.pid] + self.sp.maneuver_sequence)
+        # with open('sp/maneuver_sequences/pid_{}.csv'.format(self.pid), 'w', newline='') as maneuvers_file:
+        #     maneuver_writer = csv.writer(maneuvers_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        #     maneuver_writer.writerow(["sim time", "maneuver"])
+        #
+        #     for maneuver_row in self.sp.maneuver_sequence:
+        #         maneuver_writer.writerow(maneuver_row)
 
 
     def get_space_occupied_by_pedestrian(self, position):

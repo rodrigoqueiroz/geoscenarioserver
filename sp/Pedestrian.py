@@ -80,7 +80,7 @@ class SP(Pedestrian):
     of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id, name, start_state, yaw, route, root_btree_name, btree_locations=[], btype=""):
+    def __init__(self, id, name, start_state, yaw, goal_points, root_btree_name, btree_locations=[], btype=""):
         super().__init__(id, name, start_state, yaw)
         self.btype = btype
         self.btree_locations = btree_locations
@@ -90,8 +90,11 @@ class SP(Pedestrian):
         self.sp_planner = None
 
         self.type = Pedestrian.SP_TYPE
-        self.route = []
+
+        self.target_crosswalk_pts = []
         self.waypoint = None
+        self.destination = goal_points[-1]
+
         self.current_lanelet = None
         self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
         self.curr_desired_speed = self.default_desired_speed
@@ -119,7 +122,7 @@ class SP(Pedestrian):
         curr_pos = np.array([self.state.x, self.state.y])
         curr_vel = np.array([self.state.x_vel, self.state.y_vel])
 
-        self.sp_planner.run_planner()
+        self.sp_planner.run_planner(sim_time)
         self.update_position_SFM(curr_pos, curr_vel)
 
 
