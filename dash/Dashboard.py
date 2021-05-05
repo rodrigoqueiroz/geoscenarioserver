@@ -32,11 +32,12 @@ class Dashboard(object):
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
 
-    def __init__(self, sim_traffic, sim_config):
+    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig):
         self.sim_traffic:SimTraffic = sim_traffic
-        self.center_vid = int(sim_config.plot_vid)
+        self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
+        self.center_pedestrian = False
 
 
 
@@ -54,7 +55,6 @@ class Dashboard(object):
             log.error("Dashboard can not start before traffic")
             return
 
-        self.nvehicles = len(self.sim_traffic.vehicles)
         self.lanelet_map = self.sim_traffic.lanelet_map
         self._process = Process(target=self.run_dash_process,
                                 args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata),
@@ -75,14 +75,12 @@ class Dashboard(object):
             self.tree_msg.configure(text= "")
 
             #get new data
-            header, vehicles, pedestrians, traffic_lights,static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
+            header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
             config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time)
-
-
 
             #config/stats
             self.scenario_config_lb['text'] = config_txt
@@ -93,28 +91,43 @@ class Dashboard(object):
 
             #vehicles table
             self.update_table(vehicles)
+            #pedestrians at the bottom of vehicles table
+            self.update_pedestrian_table(pedestrians)
 
             #find valid vehicle to focus plots and btree (if available)
             vid = None
-            if self.center_vid in vehicles:
-                if vehicles[self.center_vid].sim_state is not ActorSimState.INACTIVE:
-                    vid = int(self.center_vid)
-            if vid:
-                #vehicles with planner: cartesian, frenet chart and behavior tree
-                if vid in debug_shdata:
-                    #read vehicle planning data from debug_shdata
-                    planner_state, btree_snapshot, ref_path, traj, cand, unf,  = debug_shdata[vid]
-                    if SHOW_CPLOT: #cartesian plot with lanelet map
-                        self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-                    if SHOW_FFPLOT: #frenet frame plot
-                        self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf)
-                    if VEH_TRAJ_CHART: #vehicle traj plot
-                        self.plot_vehicle_sd(traj, cand)
-                    #behavior tree
-                    self.tree_msg.configure(text="==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid,btree_snapshot) )
+
+
+            if (type(self.center_id) == str):
+                if self.center_id[0] == 'p':
+                    self.center_pedestrian = True
                 else:
-                    #vehicles without planner:
-                    self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                    self.center_pedestrian = False
+                self.center_id = int(self.center_id[1:]) #remove first letter
+
+            if self.center_pedestrian == False and self.center_id in vehicles:
+                if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
+                    vid = int(self.center_id)
+                    #vehicles with planner: cartesian, frenet chart and behavior tree
+                    if vid in debug_shdata:
+                        #read vehicle planning data from debug_shdata
+                        planner_state, btree_snapshot, ref_path, traj, cand, unf, = debug_shdata[vid]
+                        if SHOW_CPLOT: #cartesian plot with lanelet map
+                            self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                        if SHOW_FFPLOT: #frenet frame plot
+                            self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf)
+                        if VEH_TRAJ_CHART: #vehicle traj plot
+                            self.plot_vehicle_sd(traj, cand)
+                        #behavior tree
+                        self.tree_msg.configure(text="==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))
+                    else:
+                        #vehicles without planner:
+                        self.plot_cartesian_chart(vid, vehicles, pedestrians)
+            elif self.center_pedestrian and self.center_id in pedestrians:
+                if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
+                    pid = int(self.center_id)
+                    if SHOW_CPLOT: #cartesian plot with lanelet map
+                        self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, traffic_lights, static_objects)
 
             self.cart_canvas.draw()
             self.fren_canvas.draw()
@@ -125,12 +138,11 @@ class Dashboard(object):
     def quit(self):
         self._process.terminate()
 
-
     def change_tab_focus(self, event):
         focus = self.tab.focus()
         if (focus):
-            self.center_vid = int(focus)
-            #log.info("Changed focus to {}".format(self.center_vid))
+            self.center_id = focus #sets center_id to an int or string
+            #log.info("Changed focus to {}".format(self.center_id))
 
     def update_table(self, vehicles):
         current_set = self.tab.get_children()
@@ -138,13 +150,25 @@ class Dashboard(object):
             self.tab.delete(*current_set)
         for vid in vehicles:
             vehicle = vehicles[vid]
-            sim_state =vehicles[vid].sim_state
+            sim_state = vehicles[vid].sim_state
             sv = vehicle.state.get_state_vector()
             truncate_vector(sv,2)
-            sv = [vid] + [sim_state] + sv
-            self.tab.insert('', 'end', int(vid), values=(sv))
-        if self.tab.exists(self.center_vid):
-            self.tab.selection_set(self.center_vid)
+            sv = ['v'+ str(vid)] + [sim_state] + sv
+            self.tab.insert('', 'end', 'v' + str(vid), values=(sv))
+        if self.tab.exists(self.center_id):
+            self.tab.selection_set(self.center_id)
+
+    def update_pedestrian_table(self, pedestrians):
+        if len(pedestrians) == 0:
+            return
+        for pid in pedestrians:
+            pedestrian = pedestrians[pid]
+            sim_state = pedestrians[pid].sim_state
+            sp = pedestrian.state.get_state_vector()
+            truncate_vector(sp,2)
+            sp = ['p' + str(pid)] + [sim_state] + sp
+            self.tab.insert('','end', 'p' + str(pid), values=(sp))
+
 
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
         #-Global Map cartesian plot
@@ -173,17 +197,44 @@ class Dashboard(object):
         #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
         fig.tight_layout(pad=0.0)
 
+    def plot_pedestrian_cartesian_chart(self, center_id, vehicles, pedestrians, traffic_lights = None, static_objects = None):
+        #-Pedestrian focus cartesian plot
+        fig = plt.figure(Dashboard.CART_FIG_ID)
+        plt.cla()
 
-    def plot_cartesian_chart(self, center_vid, vehicles, pedestrians, reference_path = None, traffic_lights = None, static_objects = None):
+        #boundaries
+        x_min = pedestrians[center_id].state.x - (CPLOT_SIZE/2)
+        x_max = pedestrians[center_id].state.x + (CPLOT_SIZE/2)
+        y_min = pedestrians[center_id].state.y - (CPLOT_SIZE/2)
+        y_max = pedestrians[center_id].state.y + (CPLOT_SIZE/2)
+
+
+        self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
+        self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
+
+        self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
+        self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
+
+        #layout
+        plt.xlim(x_min,x_max)
+        plt.ylim(y_min,y_max)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.gca().xaxis.set_visible(True)
+        plt.gca().yaxis.set_visible(True)
+        plt.margins(0,0)
+
+    def plot_cartesian_chart(self, center_id, vehicles, pedestrians, reference_path = None, traffic_lights = None, static_objects = None):
         #-Vehicle focus cartesian plot
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
         #boundaries
-        x_min = vehicles[center_vid].state.x - (CPLOT_SIZE/2)
-        x_max = vehicles[center_vid].state.x + (CPLOT_SIZE/2)
-        y_min = vehicles[center_vid].state.y - (CPLOT_SIZE/2)
-        y_max = vehicles[center_vid].state.y + (CPLOT_SIZE/2)
+        x_min = vehicles[center_id].state.x - (CPLOT_SIZE/2)
+        x_max = vehicles[center_id].state.x + (CPLOT_SIZE/2)
+        y_min = vehicles[center_id].state.y - (CPLOT_SIZE/2)
+        y_max = vehicles[center_id].state.y + (CPLOT_SIZE/2)
 
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
@@ -299,7 +350,7 @@ class Dashboard(object):
                     label = "p{}".format(pid)
                     plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
-    def plot_frenet_chart(self, center_vid, planner_state, debug_ref_path, traj, cand, unf):
+    def plot_frenet_chart(self, center_id, planner_state, debug_ref_path, traj, cand, unf):
         #Frenet Frame plot
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
@@ -316,7 +367,7 @@ class Dashboard(object):
         #road
         plt.axhline(lane_config.left_bound, color="k", linestyle='-', zorder=0)
         plt.axhline(lane_config.right_bound, color="k", linestyle='-', zorder=0)
-        plt.title("Frenet Frame. Vehicle {}:".format(center_vid))
+        plt.title("Frenet Frame. Vehicle {}:".format(center_id))
         plt.xlabel('S')
         plt.ylabel('D')
 
@@ -381,12 +432,12 @@ class Dashboard(object):
 
 
         vs = vehicle_state
-        vid = center_vid
+        vid = center_id
 
         plt.plot( vs.s, vs.d, ".",zorder=20)
         circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False, zorder=20)
         gca.add_artist(circle1)
-        #label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_vid, float(vs.s), float(vs.s_vel), float(vs.s_acc))
+        #label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_id, float(vs.s), float(vs.s_vel), float(vs.s_acc))
         label = "v{}".format(int(vid))
         gca.text(vs.s, vs.d+1.5, label,zorder=20)
 
@@ -633,7 +684,7 @@ class Dashboard(object):
         self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
         self.map_canvas.get_tk_widget().pack()
 
-        # table
+        # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
         tab['columns'] = (
             'id', 'sim_st',
