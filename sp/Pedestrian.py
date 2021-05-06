@@ -91,8 +91,9 @@ class SP(Pedestrian):
 
         self.type = Pedestrian.SP_TYPE
 
-        self.target_crosswalk_pts = []
-        self.waypoint = None
+        self.path = None
+        self.waypoints = []
+        self.current_waypoint = None
         self.destination = goal_points[-1]
 
         self.current_lanelet = None
@@ -232,7 +233,7 @@ class SP(Pedestrian):
         '''
 
         same_dest = 0
-        if np.linalg.norm(self.waypoint - other_ped.waypoint) < 0.5:
+        if np.linalg.norm(self.current_waypoint - other_ped.current_waypoint) < 0.5:
             same_dest = 1
 
         left_unit = normalize(np.array([-curr_vel[1], curr_vel[0]]))

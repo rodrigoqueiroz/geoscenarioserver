@@ -121,8 +121,8 @@ class BehaviorModels(object):
             return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
 
         elif condition == "reached_crosswalk_exit":
-            entrance = self.planner_state.target_crosswalk_pts[1]
-            return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
+            exit = self.planner_state.target_crosswalk_pts[1]
+            return has_reached_point(self.planner_state.pedestrian_state, exit, **kwargs)
 
         elif condition == "at_desired_speed":
             return self.planner_state.pedestrian_speed['current_desired'] == self.planner_state.pedestrian_speed['default_desired']

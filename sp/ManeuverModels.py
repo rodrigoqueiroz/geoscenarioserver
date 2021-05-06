@@ -35,16 +35,16 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
     KEEP IN LANE
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    direction = normalize(sp.waypoint - pedestrian_pos)
+    direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     #
     # if sp.current_lanelet and sp.current_lanelet.attributes["type"] == "lanelet":
-    #     if sp.current_lanelet != lanelet_of_curr_waypoint and np.linalg.norm(pedestrian_pos - sp.waypoint) > 2:
-    #         direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.waypoint)
+    #     if sp.current_lanelet != lanelet_of_curr_waypoint and np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2:
+    #         direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint)
 
     sp.border_forces = False
 
-    return direction, sp.waypoint, pedestrian_speed['default_desired']
+    return direction, sp.current_waypoint, pedestrian_speed['default_desired']
 
 
 def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, lanelet_of_curr_waypoint, vehicles=None, pedestrians=None):
@@ -52,11 +52,11 @@ def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestr
     STOP MANEUVER
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    direction = normalize(sp.waypoint - pedestrian_pos)
+    direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     sp.border_forces = False
 
-    return direction, sp.waypoint, 0.0
+    return direction, sp.current_waypoint, 0.0
 
 
 def plan_update_waypoint(mconfig:MUpdateWaypointConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, lanelet_of_curr_waypoint, vehicles=None, pedestrians=None):
@@ -64,7 +64,7 @@ def plan_update_waypoint(mconfig:MUpdateWaypointConfig, sp, pedestrian_state:Ped
     UPDATE INTERMEDIATE WAYPOINT
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    direction = normalize(sp.waypoint - pedestrian_pos)
+    direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     sp.border_forces = False
 
@@ -75,7 +75,7 @@ def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:Ped
     ENTER CROSSWALK
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    waypoint = sp.target_crosswalk_pts[1]
+    waypoint = next(sp.waypoints)
 
     direction = normalize(waypoint - pedestrian_pos)
 
@@ -88,9 +88,9 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
     EXIT CROSSWALK
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    sp.sp_planner.plan_local_route()
-    direction = normalize(sp.waypoint - pedestrian_pos)
+    sp.sp_planner.plan_local_path()
+    direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     sp.border_forces = False
 
-    return direction, sp.waypoint, pedestrian_speed['default_desired']
+    return direction, sp.current_waypoint, pedestrian_speed['default_desired']

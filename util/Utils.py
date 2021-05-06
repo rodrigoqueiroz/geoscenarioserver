@@ -110,9 +110,8 @@ def normal_samples(nsamples, mean, sd, lo = None,up = None):
     return samples
 
 def distance_point_to_border(pt, border):
-    '''
-    get shortest distance from pt to vector (border)
-    and unit vector perpendicular to border
+    ''' get shortest distance from pt to vector (border)
+        and unit vector perpendicular to border
     '''
     p0 = border[0]
     p1 = border[1]
@@ -132,3 +131,17 @@ def distance_point_to_border(pt, border):
     norm = normalize(pt-cross)
 
     return dist, norm
+
+def get_lanelet_entry_exit_points(lanelet):
+    ''' given a directed lanelet, return the points
+        midway between the endpoints at each end 
+    '''
+    entrance_pt_left = np.array([lanelet.leftBound[0].x, lanelet.leftBound[0].y])
+    entrance_pt_right = np.array([lanelet.rightBound[0].x, lanelet.rightBound[0].y])
+    exit_pt_left = np.array([lanelet.leftBound[-1].x, lanelet.leftBound[-1].y])
+    exit_pt_right = np.array([lanelet.rightBound[-1].x, lanelet.rightBound[-1].y])
+
+    entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
+    exit_pt = (exit_pt_left + exit_pt_right) / 2
+
+    return entrance_pt, exit_pt

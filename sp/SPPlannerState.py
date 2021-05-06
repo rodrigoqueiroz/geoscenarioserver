@@ -22,8 +22,9 @@ class PedestrianPlannerState:
     #sim_time: float
     pedestrian_state: PedestrianState
     pedestrian_speed: Dict
-    target_crosswalk_pts: List
+    path: List
     waypoint: List
+    target_crosswalk_pts: List
     destination: List
     traffic_vehicles: Dict
     pedestrians: List
