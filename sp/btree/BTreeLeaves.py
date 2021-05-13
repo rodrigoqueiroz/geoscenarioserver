@@ -107,15 +107,11 @@ class ManeuverAction(behaviour.Behaviour):
             # RUNNING while pedestrian has not yet entered crosswalk
             if not in_crosswalk_area(self.bmodel.planner_state):
                 status = common.Status.RUNNING
-            else:
-                self.maneuver_completed = True
 
         elif self.mconfig.mkey == Maneuver.M_EXITCROSSWALK:
             # RUNNING while pedestrian has not yet exited crosswalk
             if in_crosswalk_area(self.bmodel.planner_state):
                 status = common.Status.RUNNING
-            else:
-                self.maneuver_completed = True
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)

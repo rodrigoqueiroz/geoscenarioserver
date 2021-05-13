@@ -14,6 +14,7 @@ from SimTraffic import *
 from sp.ManeuverConfig import *
 from SimConfig import *
 from util.Transformations import normalize
+from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation
 
 
 def has_reached_point(pedestrian_state, point, threshold=1):
@@ -25,54 +26,60 @@ def has_reached_point(pedestrian_state, point, threshold=1):
 
     return np.linalg.norm(np.asarray(point) - pedestrian_pos) < threshold
 
-def dir_to_follow_lane_border(pedestrian_state, current_lane, curr_waypoint):
+
+def dir_to_follow_lane_border(pedestrian_state, current_lane, curr_waypoint, inverted_path):
+    ''' find unit vector of desired direction to follow left or right border
+    '''
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+    dist_from_border = 0.75
+
+    if inverted_path:
+        current_lane = current_lane.invert()
 
     # find entrance and exit points of the current lanelet
-    entrance_pt_left = np.array([current_lane.leftBound[0].x, current_lane.leftBound[0].y])
-    entrance_pt_right = np.array([current_lane.rightBound[0].x, current_lane.rightBound[0].y])
-    exit_pt_left = np.array([current_lane.leftBound[-1].x, current_lane.leftBound[-1].y])
-    exit_pt_right = np.array([current_lane.rightBound[-1].x, current_lane.rightBound[-1].y])
+    entrance_pt, exit_pt = get_lanelet_entry_exit_points(current_lane)
 
-    entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
-    exit_pt = (exit_pt_left + exit_pt_right) / 2
+    # determine which border (left or right) ped should follow from orientation of waypoint
+    waypt_orientation = orientation(pedestrian_pos, exit_pt, curr_waypoint)
 
-    left_border = [np.array([pt.x, pt.y]) for pt in current_lane.leftBound]
-    right_border = [np.array([pt.x, pt.y]) for pt in current_lane.rightBound]
+    left_end_pt = np.array([current_lane.leftBound[-1].x, current_lane.leftBound[-1].y])
+    right_end_pt = np.array([current_lane.rightBound[-1].x, current_lane.rightBound[-1].y])
 
-    # determine which direction ped is heading in lanelet and flip order of border nodes if necessary
-    if np.linalg.norm(entrance_pt - curr_waypoint) < np.linalg.norm(exit_pt - curr_waypoint):
-        temp = entrance_pt
-        entrance_pt = exit_pt
-        exit_pt = temp
-
-        left_border = [np.array([pt.x, pt.y]) for pt in list(reversed(current_lane.rightBound))]
-        right_border = [np.array([pt.x, pt.y]) for pt in list(reversed(current_lane.leftBound))]
-
-    pos_to_exit = exit_pt - pedestrian_pos
-    pos_to_waypt = curr_waypoint - pedestrian_pos
-
-    # determine which border (left or right) ped should follow from angle to their waypoint
-    angle = np.arctan2(np.linalg.det(np.array([pos_to_exit, pos_to_waypt])), np.dot(pos_to_exit, pos_to_waypt))
-
-    if angle > 0:
-        # follow left border
-        follow_border = left_border
+    if waypt_orientation == 2:
+        # waypoint on left side of line between position and lanelet exit
+        follow_border = current_lane.leftBound
+        # extra node is necessary to ensure ped can actually exit the lanelet
+        extra_node = left_end_pt + (normalize(right_end_pt - left_end_pt)*dist_from_border)
     else:
-        # follow right border
-        follow_border = right_border
+        follow_border = current_lane.rightBound
+        extra_node = right_end_pt + (normalize(left_end_pt - right_end_pt)*dist_from_border)
 
-    # find first border segment the ped has not yet passed and return a parallel direction
-    for idx in range(len(follow_border)-1):
-        border_seg = follow_border[idx+1] - follow_border[idx]
-        pos_to_border_start = pedestrian_pos - follow_border[idx]
-        t = np.dot(border_seg, pos_to_border_start) / np.dot(border_seg, border_seg)
+    # check if extra node is in line of sight
+    if has_line_of_sight_to_point(pedestrian_pos, extra_node, current_lane):
+        return normalize(extra_node - pedestrian_pos)
 
-        if t < 1:
-            return normalize(border_seg)
+    # traverse follow_border segments in reverse order to find furthest target point with direct line of sight
+    for node_idx in range(len(follow_border)-1, 0, -1):
+        seg_start_pt = np.array([follow_border[node_idx-1].x, follow_border[node_idx-1].y])
+        seg_end_pt = np.array([follow_border[node_idx].x, follow_border[node_idx].y])
 
-    # return direction parallel to last border segment if ped has passed all segments
-    return normalize(follow_border[-1] - follow_border[-2])
+        seg_vec = seg_end_pt - seg_start_pt
+
+        if waypt_orientation == 2:
+            # target point to right of left border
+            seg_norm = normalize(np.array([seg_vec[1], -seg_vec[0]]))
+        else:
+            # target point to left of right border
+            seg_norm = normalize(np.array([-seg_vec[1], seg_vec[0]]))
+
+        # get point 0.5m in from end of segment
+        target_pt = seg_end_pt + (seg_norm*dist_from_border)
+
+        if has_line_of_sight_to_point(pedestrian_pos, target_pt, current_lane):
+            return normalize(target_pt - pedestrian_pos)
+
+    return normalize(curr_waypoint - pedestrian_pos)
+
 
 def in_crosswalk_area(planner_state):
     cur_ll = planner_state.lanelet_map.get_occupying_lanelet_by_participant(planner_state.pedestrian_state.x, planner_state.pedestrian_state.y, "pedestrian")
@@ -80,6 +87,35 @@ def in_crosswalk_area(planner_state):
         return False
     return cur_ll.attributes["subtype"] == "crosswalk"
 
+
+def has_line_of_sight_to_point(position, point, lanelet):
+    ''' return True if there is a line of sight
+        from stop_position to point in lanelet
+    '''
+
+    sight_line = [point, position]
+
+    # check if left bound of lanelet obstructs line of sight to point
+    for node_idx in range(len(lanelet.leftBound) - 1):
+        p1 = [lanelet.leftBound[node_idx].x, lanelet.leftBound[node_idx].y]
+        p2 = [lanelet.leftBound[node_idx + 1].x, lanelet.leftBound[node_idx + 1].y]
+
+        seg = [p1, p2]
+
+        if line_segments_intersect(seg, sight_line):
+            return False
+
+    # check if right bound of lanelet obstructs line of sight to point
+    for node_idx in range(len(lanelet.rightBound) - 1):
+        p1 = [lanelet.rightBound[node_idx].x, lanelet.rightBound[node_idx].y]
+        p2 = [lanelet.rightBound[node_idx + 1].x, lanelet.rightBound[node_idx + 1].y]
+
+        seg = [p1, p2]
+
+        if line_segments_intersect(seg, sight_line):
+            return False
+
+    return True
 
 def point_in_rectangle(P, A, B, C, D):
     ''' Checks if the point pt is in the rectangle defined by

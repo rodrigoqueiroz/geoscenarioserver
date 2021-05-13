@@ -134,7 +134,7 @@ def distance_point_to_border(pt, border):
 
 def get_lanelet_entry_exit_points(lanelet):
     ''' given a directed lanelet, return the points
-        midway between the endpoints at each end 
+        midway between the endpoints at each end
     '''
     entrance_pt_left = np.array([lanelet.leftBound[0].x, lanelet.leftBound[0].y])
     entrance_pt_right = np.array([lanelet.rightBound[0].x, lanelet.rightBound[0].y])
@@ -145,3 +145,63 @@ def get_lanelet_entry_exit_points(lanelet):
     exit_pt = (exit_pt_left + exit_pt_right) / 2
 
     return entrance_pt, exit_pt
+
+
+    ''' return True if line segments L1=(p1,q1) and L2=(p2,q2) intersect
+    '''
+def line_segments_intersect(L1, L2):
+    # find orientations
+    o1 = orientation(L1[0], L1[1], L2[0])
+    o2 = orientation(L1[0], L1[1], L2[1])
+    o3 = orientation(L2[0], L2[1], L1[0])
+    o4 = orientation(L2[0], L2[1], L1[1])
+
+    # general case
+    if ((o1 != o2) and (o3 != o4)):
+        return True
+
+    # special cases
+
+    # p2 colinear to and lies on L1
+    if (o1 == 0 and colinear_point_on_line_segment(L2[0], L1)):
+        return True
+
+    # q2 colinear to and lies on L1
+    if (o2 == 0 and colinear_point_on_line_segment(L2[1], L1)):
+        return True
+
+    # p1 colinear to and lies on L2
+    if (o3 == 0 and colinear_point_on_line_segment(L1[0], L2)):
+        return True
+
+    # q1 colinear to and lies on L2
+    if (o4 == 0 and colinear_point_on_line_segment(L1[1], L2)):
+        return True
+
+    # line segments to not intersect
+    return False
+
+
+def orientation(p1, p2, p3):
+    ''' return the orientation of the ordered triplet of points (p1, p2, p3)
+    '''
+    val = (float(p2[1] - p1[1]) * (p3[0] - p2[0])) - (float(p2[0] - p1[0]) * (p3[1] - p2[1]))
+
+    if val > 0:
+        # clockwise
+        return 1
+    elif val < 0:
+        # counterclockwise
+        return 2
+    else:
+        # colinear
+        return 0
+
+def colinear_point_on_line_segment(pt, L):
+    ''' given point pt colinear to line L, return True if pt is on L
+    '''
+    if ((pt[0] <= max(L[0][0], L[1][0])) and (pt[0] >= min(L[0][0], L[1][0])) and
+            (pt[1] <= max(L[0][1], L[1][1])) and (pt[1] >= min(L[0][1], L[1][1]))):
+        return True
+
+    return False

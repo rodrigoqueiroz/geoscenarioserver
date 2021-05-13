@@ -42,6 +42,8 @@ class SPPlanner(object):
         self.btype = sp.btype
 
         self.lanelet_of_curr_waypoint = None
+        self.inverted_path = False
+        self.previous_maneuver = None
 
 
     def start(self):
@@ -49,84 +51,110 @@ class SPPlanner(object):
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-        self.plan_local_path()
+        pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
+        self.plan_local_path(pedestrian_pos)
         self.lanelet_of_curr_waypoint = self.get_space_occupied_by_pedestrian(self.sp.current_waypoint)
 
 
-    def plan_local_path(self):
-        pedestrian_state = self.sp.state
-        pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-
-        occupied_spaces = self.lanelet_map.get_spaces_occupied_by_pedestrian(pedestrian_pos)
+    def plan_local_path(self, planning_position):
+        occupied_spaces = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(planning_position)
 
         # find which crosswalks are accessible from current lanelet or area
         paths_to_accessible_crosswalks = []
 
         for xwalk in self.sim_traffic.crosswalks:
             for ll in occupied_spaces['lanelets']:
-                route_to_xwalk = self.lanelet_map.routing_graph_pedestrians.getRoute(ll, xwalk)
-                if route_to_xwalk:
+                route_ll_to_xwalk = self.lanelet_map.routing_graph_pedestrians.getRoute(ll, xwalk)
+                if route_ll_to_xwalk:
                     path_to_xwalk = self.lanelet_map.get_pedestrian_shortest_path(ll.id, xwalk.id)
+                    # ensure there is only one crosswalk in path to target crosswalk (excluding current lanelet)
                     num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_xwalk)])
-                    # ensure there is only one crosswalk in path to target crosswalk
                     if num_xwalks_in_path == 1:
                         paths_to_accessible_crosswalks.append(path_to_xwalk)
+                else:
+                    # check if there is a route from xwalk to lanelet (this case is necessary due to restrictions on the lanelet map)
+                    route_xwalk_to_ll = self.lanelet_map.routing_graph_pedestrians.getRoute(xwalk, ll)
+                    if route_xwalk_to_ll:
+                        path_to_ll = self.lanelet_map.get_pedestrian_shortest_path(xwalk.id, ll.id)
+                        # ensure there is only one crosswalk in path to target crosswalk (excluding current lanelet)
+                        num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_ll)])
+                        if num_xwalks_in_path == 1:
+                            paths_to_accessible_crosswalks.append(path_to_ll)
+
 
             for area in occupied_spaces['areas']:
-                # check if the current area shares a node with the target crosswalk
+                # crosswalk is accessible from area if they share a node
                 if self.lanelet_map.area_and_lanelet_share_node(area, xwalk):
                     # determine entrance and exit points
                     entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
 
-                    if np.linalg.norm(exit_pt - pedestrian_pos) < np.linalg.norm(entrance_pt - pedestrian_pos):
+                    if np.linalg.norm(exit_pt - planning_position) < np.linalg.norm(entrance_pt - planning_position):
                         # invert crosswalk way so that entrance is closer to ped than exit
                         xwalk = xwalk.invert()
 
                     paths_to_accessible_crosswalks.append([area, xwalk])
 
-        # choose the path with the crosswalk that bring peds closest to destination
+        # choose the path with the crosswalk that bring ped closest to destination
         chosen_path = None
-        target_entry_pt = self.sp.destination
-        target_exit_pt = self.sp.destination
-        distance_to_dest = np.linalg.norm(self.sp.destination - pedestrian_pos)
+        distance_to_dest = np.linalg.norm(self.sp.destination - planning_position)
 
-        for path in paths_to_accessible_crosswalks:
-            xwalk = path[-1]
+        if len(paths_to_accessible_crosswalks) > 0:
+            target_id = -1
+            target_entry_pt = [None, None]
+            target_exit_pt = [None, None]
 
-            entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
+            for path in paths_to_accessible_crosswalks:
+                inverted_path = path[0].attributes['subtype'] == "crosswalk"
 
-            # if this crosswalk brings ped closer to destination
-            exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
-            entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
-            if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
-                distance_to_dest = exit_to_dest_dist
-                chosen_path = path
-                target_entry_pt = entrance_pt
-                target_exit_pt = exit_pt
+                if inverted_path:
+                    xwalk = path[0]
+                else:
+                    xwalk = path[-1]
 
-        # get waypoints along path
-        waypoints = []
+                entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
 
-        for seg_id, path_seg in enumerate(chosen_path):
-            if seg_id == 0:
-                continue
+                if inverted_path:
+                    temp = entrance_pt
+                    entrance_pt = exit_pt
+                    exit_pt = temp
 
-            entry_waypt, exit_waypt = get_lanelet_entry_exit_points(path_seg)
-            if seg_id == 1:
-                waypoints.append(entry_waypt)
-            waypoints.append(exit_waypt)
+                # update selected path if this crosswalk brings ped closer to destination
+                exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
+                entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
+                if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
+                    distance_to_dest = exit_to_dest_dist
+                    chosen_path = path
+                    target_id = xwalk.id
+                    target_entry_pt = entrance_pt
+                    target_exit_pt = exit_pt
+                    self.inverted_path = inverted_path
+
+            # set entry and exit points if there is a useful crosswalk
+            if all([pt != None for pt in target_entry_pt]):
+                waypoints = [target_entry_pt, target_exit_pt]
+            else:
+                waypoints = [self.sp.destination]
+        else:
+            # there are no accessible crosswalks
+            waypoints = [self.sp.destination]
 
         self.sp.path = chosen_path
         self.sp.waypoints = iter(waypoints)
         self.sp.current_waypoint = next(self.sp.waypoints)
-        self.sp.target_crosswalk_pts = [target_entry_pt, target_exit_pt]
+        self.sp.target_crosswalk = {'id': target_id, 'entry': target_entry_pt, 'exit': target_exit_pt}
 
 
     def run_planner(self, sim_time):
         pedestrian_state = self.sp.state
         pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
 
-        self.sp.current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_pos)
+        # get current lanelet/area
+        if self.sp.path:
+            for ll_or_area in self.sp.path:
+                if self.lanelet_map.inside_lanelet_or_area(pedestrian_pos, ll_or_area):
+                    self.sp.current_lanelet = ll_or_area
+        else:
+            self.sp.current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_pos)
 
         reg_elems = self.get_reg_elem_states(pedestrian_state, self.sp.current_lanelet)
         pedestrian_speed = {'default_desired': self.sp.default_desired_speed,
@@ -138,12 +166,13 @@ class SPPlanner(object):
                             pedestrian_speed=pedestrian_speed,
                             path = self.sp.path,
                             waypoint = self.sp.current_waypoint,
-                            target_crosswalk_pts = self.sp.target_crosswalk_pts,
+                            target_crosswalk = self.sp.target_crosswalk,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
                             regulatory_elements=reg_elems,
                             pedestrians=self.sim_traffic.pedestrians,
-                            lanelet_map=self.sim_traffic.lanelet_map
+                            lanelet_map=self.sim_traffic.lanelet_map,
+                            previous_maneuver = self.previous_maneuver
                         )
 
         # BTree Tick
@@ -174,9 +203,12 @@ class SPPlanner(object):
                                                                                             self.sp,
                                                                                             planner_state.pedestrian_state,
                                                                                             planner_state.pedestrian_speed,
+                                                                                            planner_state.target_crosswalk,
                                                                                             self.lanelet_of_curr_waypoint,
                                                                                             planner_state.traffic_vehicles,
-                                                                                            planner_state.pedestrians)
+                                                                                            planner_state.pedestrians,
+                                                                                            planner_state.previous_maneuver)
+            self.previous_maneuver = mconfig.mkey
 
     def stop(self):
         pass

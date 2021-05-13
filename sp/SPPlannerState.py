@@ -24,9 +24,10 @@ class PedestrianPlannerState:
     pedestrian_speed: Dict
     path: List
     waypoint: List
-    target_crosswalk_pts: List
+    target_crosswalk: List
     destination: List
     traffic_vehicles: Dict
     pedestrians: List
     regulatory_elements: List
     lanelet_map: LaneletMap
+    previous_maneuver: int

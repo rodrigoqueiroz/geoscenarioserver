@@ -97,7 +97,7 @@ class SP(Pedestrian):
         self.destination = goal_points[-1]
 
         self.current_lanelet = None
-        self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
+        self.default_desired_speed = 2 # random.uniform(0.6, 1.2)
         self.curr_desired_speed = self.default_desired_speed
         self.direction = None
         self.border_forces = False
@@ -179,7 +179,7 @@ class SP(Pedestrian):
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
-            f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
+            f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped)
 
 
         # repulsive forces from borders
@@ -196,7 +196,7 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, direction, phi=120000, omega=240000):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, phi=120000, omega=240000):
         '''
         Calculates repulsive forces between pedestrians
         '''

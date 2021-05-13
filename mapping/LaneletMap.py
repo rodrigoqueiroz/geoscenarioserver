@@ -194,14 +194,14 @@ class LaneletMap(object):
 
             # case: agent is on more than one lanelet where they are the allowed participant
             if len(participant_lls) > 1:
-                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                    (x,y), [ll.id for ll in participant_lls]))
+                # log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #     (x,y), [ll.id for ll in participant_lls]))
                 return participant_lls[1]
 
             # case: agent is on more than one lanelet where they are NOT the allowed participant
             if len(intersecting_lls) > 1:
-                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                    (x,y), [ll.id for ll in intersecting_lls]))
+                # log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #     (x,y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
 
             # case: if agent is not on any lanelet (but bounding box intersected multiple lanelets)
@@ -211,7 +211,7 @@ class LaneletMap(object):
         return intersecting_lls[0]
 
 
-    def get_spaces_occupied_by_pedestrian(self, position):
+    def get_spaces_list_occupied_by_pedestrian(self, position):
         spaces_list = {'lanelets': [], 'areas': []}
 
         point = BasicPoint2d(position[0], position[1])
@@ -260,6 +260,12 @@ class LaneletMap(object):
             return None
 
         return intersecting_areas[0]
+
+    def inside_lanelet_or_area(self, position, lanelet_or_area):
+        point = BasicPoint2d(position[0], position[1])
+        if lanelet_or_area.attributes['type'] == 'multipolygon':
+            return distance(point, lanelet_or_area) <= 0.0
+        return inside(lanelet_or_area, point)
 
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
         """ Returns the lanelet closest to (x,y) that lies along ref_path.
