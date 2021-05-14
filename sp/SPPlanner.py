@@ -41,7 +41,6 @@ class SPPlanner(object):
         self.btree_locations = btree_locations
         self.btype = sp.btype
 
-        self.lanelet_of_curr_waypoint = None
         self.inverted_path = False
         self.previous_maneuver = None
 
@@ -53,8 +52,6 @@ class SPPlanner(object):
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
         self.plan_local_path(pedestrian_pos)
-        self.lanelet_of_curr_waypoint = self.get_space_occupied_by_pedestrian(self.sp.current_waypoint)
-
 
     def plan_local_path(self, planning_position):
         occupied_spaces = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(planning_position)
@@ -95,13 +92,13 @@ class SPPlanner(object):
                     paths_to_accessible_crosswalks.append([area, xwalk])
 
         # choose the path with the crosswalk that bring ped closest to destination
-        chosen_path = None
+        chosen_path = []
         distance_to_dest = np.linalg.norm(self.sp.destination - planning_position)
 
         if len(paths_to_accessible_crosswalks) > 0:
             target_id = -1
-            target_entry_pt = [None, None]
-            target_exit_pt = [None, None]
+            target_entry_pt = []
+            target_exit_pt = []
 
             for path in paths_to_accessible_crosswalks:
                 inverted_path = path[0].attributes['subtype'] == "crosswalk"
@@ -130,13 +127,86 @@ class SPPlanner(object):
                     self.inverted_path = inverted_path
 
             # set entry and exit points if there is a useful crosswalk
-            if all([pt != None for pt in target_entry_pt]):
+            if len(target_entry_pt) > 0:
                 waypoints = [target_entry_pt, target_exit_pt]
             else:
                 waypoints = [self.sp.destination]
         else:
             # there are no accessible crosswalks
             waypoints = [self.sp.destination]
+
+        if len(chosen_path) == 0:
+            # no accessible crosswalk bring ped closer to destination
+            invert_ll = False
+            invert_candidate = False
+            spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
+
+            selected_ll = occupied_spaces['lanelets'][0]
+            selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
+            if np.linalg.norm(self.sp.destination - selected_entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                selected_exit_pt = selected_entrance_pt
+                invert_candidate = True
+
+            for ll in occupied_spaces['lanelets'][1:]:
+                entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
+
+                if np.linalg.norm(self.sp.destination - exit_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                    selected_exit_pt = exit_pt
+                    selected_ll = ll
+
+                if np.linalg.norm(self.sp.destination - entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                    selected_exit_pt = entrance_pt
+                    selected_ll = ll
+                    invert_candidate = True
+
+            invert_ll = invert_candidate
+
+            if invert_ll:
+                selected_ll = selected_ll.invert()
+
+            chosen_path.append(selected_ll)
+
+            previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
+            following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+            spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
+            next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
+
+            # build path of connected previous/following lanelets
+            while len(next_lls_containing_dest) == 0:
+                invert_ll = False
+
+                candidate_ll = None
+                closest_dist_to_dest = np.linalg.norm(self.sp.destination - selected_exit_pt)
+
+                for prev_or_follow_ll in (previous_lls + following_lls):
+                    invert_candidate = False
+                    entrance_pt, exit_pt = get_lanelet_entry_exit_points(prev_or_follow_ll)
+                    if np.linalg.norm(exit_pt - selected_exit_pt) < 0.005:
+                        exit_pt = entrance_pt
+                        invert_candidate = True
+
+                    dist_exit_to_dest = np.linalg.norm(self.sp.destination - exit_pt)
+                    if dist_exit_to_dest < closest_dist_to_dest:
+                        candidate_ll = prev_or_follow_ll
+                        candidate_exit_pt = exit_pt
+                        closest_dist_to_dest = dist_exit_to_dest
+                        invert_ll = invert_candidate
+
+                if not candidate_ll:
+                    break
+
+                selected_ll = candidate_ll
+                selected_exit_pt = candidate_exit_pt
+                if invert_ll:
+                    selected_ll = selected_ll.invert()
+                chosen_path.append(selected_ll)
+
+                previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
+                following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+                spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
+                next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
+
+            chosen_path.append(next_lls_containing_dest[0])
 
         self.sp.path = chosen_path
         self.sp.waypoints = iter(waypoints)
@@ -204,7 +274,6 @@ class SPPlanner(object):
                                                                                             planner_state.pedestrian_state,
                                                                                             planner_state.pedestrian_speed,
                                                                                             planner_state.target_crosswalk,
-                                                                                            self.lanelet_of_curr_waypoint,
                                                                                             planner_state.traffic_vehicles,
                                                                                             planner_state.pedestrians,
                                                                                             planner_state.previous_maneuver)

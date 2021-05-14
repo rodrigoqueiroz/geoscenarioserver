@@ -16,7 +16,7 @@ from sp.ManeuverUtils import *
 from util.Transformations import normalize
 
 
-def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, lanelet_of_curr_waypoint, vehicles, pedestrians, previous_maneuver):
+def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, vehicles, pedestrians, previous_maneuver):
     #Micro maneuver layer
     if (man_key == Maneuver.M_KEEPINLANE):
         return plan_keep_in_lane(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
@@ -41,7 +41,6 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
         if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2:
             direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint, sp.sp_planner.inverted_path)
 
-    sp.border_forces = False
 
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']
 
@@ -53,7 +52,6 @@ def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestr
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     direction = normalize(sp.current_waypoint - pedestrian_pos)
 
-    sp.border_forces = False
 
     return direction, sp.current_waypoint, 0.0
 
@@ -65,8 +63,6 @@ def plan_update_waypoint(mconfig:MUpdateWaypointConfig, sp, pedestrian_state:Ped
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     direction = normalize(sp.current_waypoint - pedestrian_pos)
 
-    sp.border_forces = False
-
     return direction, next(sp.route), pedestrian_speed['default_desired']
 
 def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):
@@ -77,8 +73,6 @@ def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:Ped
     waypoint = target_crosswalk['exit']
 
     direction = normalize(waypoint - pedestrian_pos)
-
-    sp.border_forces = False
 
     return direction, waypoint, pedestrian_speed['default_desired']
 
@@ -107,7 +101,5 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
 
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     direction = normalize(sp.current_waypoint - pedestrian_pos)
-
-    sp.border_forces = False
 
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']

@@ -94,13 +94,12 @@ class SP(Pedestrian):
         self.path = None
         self.waypoints = []
         self.current_waypoint = None
-        self.destination = goal_points[-1]
+        self.destination = np.array(goal_points[-1])
 
         self.current_lanelet = None
         self.default_desired_speed = 2 # random.uniform(0.6, 1.2)
         self.curr_desired_speed = self.default_desired_speed
         self.direction = None
-        self.border_forces = False
         self.mass = random.uniform(50,80)
 
         self.maneuver_sequence = []
@@ -126,7 +125,6 @@ class SP(Pedestrian):
         self.sp_planner.run_planner(sim_time)
         self.update_position_SFM(curr_pos, curr_vel)
 
-
     def update_position_SFM(self, curr_pos, curr_vel):
         '''
         Paper with details on SFM formulas:
@@ -144,32 +142,8 @@ class SP(Pedestrian):
 
         dt = 1 / TRAFFIC_RATE
 
-        # get borders of current lanelet/area
+        # get borders of current lanelet/area - currently unnecessary and not implemented
         borders = []
-
-        # only find borders of current lane if border_forces is True (dependent on current maneuver)
-        if self.border_forces:
-            if self.current_lanelet and 'subtype' in self.current_lanelet.attributes:
-                if self.current_lanelet.attributes['subtype'] in ['walkway', 'crosswalk']:
-                    right = self.current_lanelet.rightBound
-                    left = self.current_lanelet.leftBound
-
-                    for i in range(len(right) - 1):
-                        p0 = np.array([right[i].x, right[i].y])
-                        p1 = np.array([right[i+1].x, right[i+1].y])
-                        borders.append([p0, p1])
-
-                    for i in range(len(left) - 1):
-                        p0 = np.array([left[i].x, left[i].y])
-                        p1 = np.array([left[i+1].x, left[i+1].y])
-                        borders.append([p0, p1])
-                elif self.current_lanelet.attributes['subtype'] == 'traffic_island':
-                    outer = self.current_lanelet.outerBound[0]
-
-                    for i in range(len(outer) - 1):
-                        p0 = np.array([outer[i].x, outer[i].y])
-                        p1 = np.array([outer[i+1].x, outer[i+1].y])
-                        borders.append([p0, p1])
 
         # attracting force towards destination
         f_adapt = (delta_vel * self.mass) / accl_time
@@ -244,8 +218,8 @@ class SP(Pedestrian):
         else:
             follow_l_r = right_unit
 
-        follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
         # follow_effect needs to be calibrated properly before being added
+        follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
 
         # add evasive effect
         vj_unit = normalize(other_ped_vel)
