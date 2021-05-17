@@ -143,6 +143,7 @@ class SPPlanner(object):
 
             selected_ll = occupied_spaces['lanelets'][0]
             selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
+
             if np.linalg.norm(self.sp.destination - selected_entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
                 selected_exit_pt = selected_entrance_pt
                 invert_candidate = True
@@ -153,6 +154,7 @@ class SPPlanner(object):
                 if np.linalg.norm(self.sp.destination - exit_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
                     selected_exit_pt = exit_pt
                     selected_ll = ll
+                    invert_candidate = False
 
                 if np.linalg.norm(self.sp.destination - entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
                     selected_exit_pt = entrance_pt
@@ -168,6 +170,7 @@ class SPPlanner(object):
 
             previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
             following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+
             spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
             next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
 
