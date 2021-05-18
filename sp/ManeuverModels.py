@@ -41,7 +41,6 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
         if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2:
             direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint, sp.sp_planner.inverted_path)
 
-
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']
 
 
@@ -51,7 +50,6 @@ def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestr
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     direction = normalize(sp.current_waypoint - pedestrian_pos)
-
 
     return direction, sp.current_waypoint, 0.0
 

@@ -205,3 +205,9 @@ def colinear_point_on_line_segment(pt, L):
         return True
 
     return False
+
+def angle_btwn_vectors(a, b):
+    ''' return the angle in radians between vectors a and b
+        (0 <= angle <= pi)
+    '''
+    return np.arccos(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
