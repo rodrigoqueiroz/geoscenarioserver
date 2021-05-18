@@ -22,8 +22,6 @@ def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, targ
         return plan_keep_in_lane(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
     elif (man_key == Maneuver.M_STOP):
         return plan_stop(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
-    elif (man_key == Maneuver.M_UPDATEWAYPOINT):
-        return plan_update_waypoint(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
     elif (man_key == Maneuver.M_ENTERCROSSWALK):
         return plan_enter_crosswalk(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, previous_maneuver)
     elif (man_key == Maneuver.M_EXITCROSSWALK):
@@ -53,15 +51,6 @@ def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestr
 
     return direction, sp.current_waypoint, 0.0
 
-
-def plan_update_waypoint(mconfig:MUpdateWaypointConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
-    """
-    UPDATE INTERMEDIATE WAYPOINT
-    """
-    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    direction = normalize(sp.current_waypoint - pedestrian_pos)
-
-    return direction, next(sp.route), pedestrian_speed['default_desired']
 
 def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):
     """

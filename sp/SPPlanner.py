@@ -102,6 +102,7 @@ class SPPlanner(object):
             target_exit_pt = []
 
             for path in paths_to_accessible_crosswalks:
+                # inverted_path is True if there was a valid route found from a crosswalk to the planning position
                 inverted_path = path[0].attributes['subtype'] == "crosswalk"
 
                 if inverted_path:
@@ -111,7 +112,6 @@ class SPPlanner(object):
 
                 entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
 
-                # inverted_path is True if there was a valid route found from a crosswalk to the planning position
                 if inverted_path:
                     temp = entrance_pt
                     entrance_pt = exit_pt
@@ -137,18 +137,18 @@ class SPPlanner(object):
             # there are no accessible crosswalks
             waypoints = [self.sp.destination]
 
-        ''' If no path chosen, construct path from sequence of consecutive lanelets '''
+        ''' If no path containing a crosswalk chosen, construct path from sequence of consecutive lanelets '''
         if len(chosen_path) == 0:
             invert_ll = False
             invert_candidate = False
             spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
             spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
 
+            # list of lanelets containing both the destination and planning position
             curr_lls_containing_dest = [ll for ll in occupied_spaces['lanelets'] if ll.id in spaces_of_dest_ids]
 
             if len(curr_lls_containing_dest) > 0:
                 # current lanelet contains the ped's destination
-
                 selected_ll = curr_lls_containing_dest[0]
 
                 # invert the lanelet if direction towards destination is heading to the lanelet entrance
@@ -161,6 +161,12 @@ class SPPlanner(object):
 
                 chosen_path.append(selected_ll)
             else:
+                ''' construct sequence of lanelets from planning position to destination by
+                    considering all previous and following lanelets at each step and selecting
+                    one that brings ped closest to destination
+                '''
+
+                # current lanelet does not contain the ped's destination
                 selected_ll = occupied_spaces['lanelets'][0]
                 selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
 
@@ -193,7 +199,7 @@ class SPPlanner(object):
 
                 next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
 
-                # build path of connected previous/following lanelets
+                # build path of connected previous/following lanelets until lanelet containing destination is next
                 while len(next_lls_containing_dest) == 0:
                     invert_ll = False
 
