@@ -62,7 +62,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	AActor* FindVehicleActor(int vid);
-	void CreateVehicle(int vid, int v_type);
+	void CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot);
 	void ReadServerState(float deltaTime);
 	void UpdateRemoteVehicleStates(float deltaTime);
 	void WriteClientState(int tickCount, float deltaTime);

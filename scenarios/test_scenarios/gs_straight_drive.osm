@@ -14,9 +14,9 @@
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v2' />
-    <tag k='orientation' v='325' />
     <tag k='route' v='central_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-2610802' action='modify' visible='true' lat='49.00769375801' lon='8.45755581371'>
     <tag k='altitude' v='329' />
@@ -33,9 +33,9 @@
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='orientation' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='310' />
   </node>
   <way id='-1947482' action='modify' visible='true'>
     <nd ref='-2610804' />

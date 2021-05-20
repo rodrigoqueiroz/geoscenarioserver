@@ -13,7 +13,7 @@ from Actor import *
 from sp.SPPlanner import *
 from sp.SPPlannerState import *
 from shm.SimSharedMemory import *
-from util.Utils import kalman
+from util.Utils import kalman, distance_point_to_border
 from util.Transformations import normalize
 from SimTraffic import *
 from sp.btree.BehaviorModels import BehaviorModels
@@ -32,8 +32,8 @@ class Pedestrian(Actor):
 
     PEDESTRIAN_RADIUS = 0.2
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0]):
-        super().__init__(id, name, start_state)
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+        super().__init__(id, name, start_state, yaw=yaw)
         self.type = Pedestrian.N_TYPE
         self.radius = Pedestrian.PEDESTRIAN_RADIUS
 
@@ -58,8 +58,8 @@ class TP(Pedestrian):
     A trajectory following pedestrian.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
-    def __init__(self, id, name, start_state, trajectory, keep_active = True):
-        super().__init__(id, name, start_state)
+    def __init__(self, id, name, start_state, yaw, trajectory, keep_active = True):
+        super().__init__(id, name, start_state, yaw)
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -81,8 +81,8 @@ class SP(Pedestrian):
     of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id, name, start_state, route, root_btree_name, btree_locations=[], btype=""):
-        super().__init__(id, name, start_state)
+    def __init__(self, id, name, start_state, yaw, goal_points, root_btree_name, btree_locations=[], btype=""):
+        super().__init__(id, name, start_state, yaw)
         self.btype = btype
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
@@ -91,13 +91,19 @@ class SP(Pedestrian):
         self.sp_planner = None
 
         self.type = Pedestrian.SP_TYPE
-        self.curr_route_node = 0
-        self.route = []
-        self.waypoint = None # np.array(route[self.curr_route_node])
-        self.default_desired_speed = 1.75 # random.uniform(0.6, 1.2)
-        self.current_desired_speed = self.default_desired_speed
+
+        self.path = None
+        self.waypoints = []
+        self.current_waypoint = None
+        self.destination = np.array(goal_points[-1])
+
+        self.current_lanelet = None
+        self.default_desired_speed = 2 # random.uniform(0.6, 1.2)
+        self.curr_desired_speed = self.default_desired_speed
+        self.direction = None
         self.mass = random.uniform(50,80)
-        self.radius = random.uniform(0.25, 0.35)
+
+        self.maneuver_sequence = []
 
 
     def start_planner(self):
@@ -106,29 +112,27 @@ class SP(Pedestrian):
         """
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
-        self.route = self.sp_planner.route
-        self.waypoint = np.array(self.route[self.curr_route_node])
 
+    def stop(self):
+        if self.sp_planner:
+            self.sp_planner.stop()
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
-        self.sp_planner.run_planner()
-        self.curr_route_node = self.sp_planner.curr_route_node
-        self.current_desired_speed = self.sp_planner.current_desired_speed
-        self.waypoint = np.array(self.route[self.curr_route_node])
+        curr_pos = np.array([self.state.x, self.state.y])
+        curr_vel = np.array([self.state.x_vel, self.state.y_vel])
 
-        self.update_position_SFM(np.array([self.state.x, self.state.y]), np.array([self.state.x_vel, self.state.y_vel]))
-
+        self.sp_planner.run_planner(sim_time)
+        self.update_position_SFM(curr_pos, curr_vel)
 
     def update_position_SFM(self, curr_pos, curr_vel):
         '''
         Paper with details on SFM formulas:
         https://link.springer.com/content/pdf/10.1007/s12205-016-0741-9.pdf (access through University of Waterloo)
-        This paper explains the calculations and parameters in other_pedestrian_interaction() and wall_interaction()
+        This paper explains the calculations and parameters in other_pedestrian_interaction() and border_interaction()
         '''
-        direction = np.array(normalize(self.waypoint - curr_pos))
-        desired_vel = direction * self.current_desired_speed
+        desired_vel = self.direction * self.curr_desired_speed
         accl_time = 0.5 # acceleration time
 
         delta_vel = desired_vel - curr_vel
@@ -139,25 +143,25 @@ class SP(Pedestrian):
 
         dt = 1 / TRAFFIC_RATE
 
-        # placeholder until we decide to use borders in scenario
-        walls = []
+        # get borders of current lanelet/area - currently unnecessary and not implemented
+        borders = []
 
         # attracting force towards destination
         f_adapt = (delta_vel * self.mass) / accl_time
 
         f_other_ped = np.zeros(2)
-        f_walls = np.zeros(2)
+        f_borders = np.zeros(2)
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if abs(pid) != abs(self.id) and not ped.ghost_mode}:
             f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped, direction)
 
-        # repulsive forces from walls (borders)
-        for wall in walls:
-            f_walls += self.wall_interaction()
+        # repulsive forces from borders
+        for border in borders:
+            f_borders += self.border_interaction(curr_pos, curr_vel, border)
 
 
-        f_sum = f_adapt + f_other_ped + f_walls
+        f_sum = f_adapt + f_other_ped + f_borders
 
         curr_acc = f_sum / self.mass
         curr_vel += curr_acc * dt
@@ -166,7 +170,7 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, direction, phi=120000, omega=240000):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, phi=120000, omega=240000):
         '''
         Calculates repulsive forces between pedestrians
         '''
@@ -203,7 +207,7 @@ class SP(Pedestrian):
         '''
 
         same_dest = 0
-        if np.linalg.norm(self.waypoint - other_ped.waypoint) < 0.5:
+        if np.linalg.norm(self.current_waypoint - other_ped.current_waypoint) < 0.5:
             same_dest = 1
 
         left_unit = normalize(np.array([-curr_vel[1], curr_vel[0]]))
@@ -214,8 +218,8 @@ class SP(Pedestrian):
         else:
             follow_l_r = right_unit
 
-        follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
         # follow_effect needs to be calibrated properly before being added
+        follow_effect = (C*np.exp((rij-dij)/D)*other_ped_vel + E*np.exp((rij-dij)/F)*follow_l_r)*same_dest
 
         # add evasive effect
         vj_unit = normalize(other_ped_vel)
@@ -240,7 +244,14 @@ class SP(Pedestrian):
         return fij
 
 
-    def wall_interaction(self):
-        wij = np.zeros(2)
+    def border_interaction(self, curr_pos, vi, border, phi=12000, omega=24000):
+        A = 1500 # 1500~2000
+        B = 0.08
 
-        return wij
+        ri = self.radius
+        diW, niW = distance_point_to_border(curr_pos, border)
+        tiW = np.array([-niW[1], niW[0]])
+
+        fiW = (A*np.exp((ri-diW)/B) + phi*max(0,ri-diW))*niW - omega*max(0,ri-diW)*np.dot(vi,tiW)*tiW
+
+        return fiW

@@ -33,7 +33,7 @@ class SimTraffic(object):
         self.static_objects = {}
         self.pedestrians = {}
         self.traffic_lights = {}    #geoscenario TrafficLights by corresponding lanelet2 TrafficLight id
-        self.crosswalk_entry_pts = {}
+        self.crosswalks = {}
 
         #External Sim (Unreal) ShM
         self.sim_client_shm = None

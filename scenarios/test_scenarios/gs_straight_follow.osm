@@ -13,9 +13,9 @@
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
-    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-5005165' action='modify' visible='true' lat='49.00782334739' lon='8.45758985977'>
     <tag k='gs' v='origin' />
@@ -26,9 +26,9 @@
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />
-    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-5005167' action='modify' visible='true' lat='49.00749865154' lon='8.45743320175' />
   <node id='-5005168' action='modify' visible='true' lat='49.00842350452' lon='8.45862057094' />

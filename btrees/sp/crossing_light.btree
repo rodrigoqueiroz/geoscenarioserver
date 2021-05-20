@@ -4,17 +4,21 @@ behaviortree crosswalk_signal:
             condition c_goal ( reached_goal( threshold=1 ) )
             maneuver m_stop_goal ( MStopConfig( type=2 ) )        
         ->
-            condition c_curr_waypt ( reached_next_waypoint( threshold=1 ) )
-            maneuver m_waypt_next ( MUpdateWaypoint( vel=MP(1.0,30,6) ) )
+            condition c_reached_entrance ( reached_crosswalk_entrance() )
+            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+        ->
+            condition c_reached_exit ( reached_crosswalk_exit() )
+            maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
         ->
             condition c_greenlight ( traffic_light_green() )
-            maneuver m_keep_velocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
+            maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
         ?
             ->
                 condition c_in_xwalk ( in_crosswalk_area() )
                 ?
                     ->
                         condition c_over_half ( past_crosswalk_halfway() )
-                        maneuver m_keep_velocity ( MVelKeepConfig( vel=MP(1.0,30,6) ) )
+                        maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
                     maneuver m_stop_now ( MStopConfig( type=0 ) )
             maneuver m_stop_now ( MStopConfig( type=0 ) )
+
