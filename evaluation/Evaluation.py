@@ -163,7 +163,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
         if agent_type == "Pedestrian":
             name = ('ped_'+ format(id, '03d'))
-            pedestrian = TP(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory, False)
+            pedestrian = TP(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], 0.0, trajectory, False)
             sim_traffic.add_pedestrian(pedestrian)
 
             if id == es.track_id:
@@ -179,6 +179,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
                     pedestrian = SP(epid,
                                     '-'+name,
                                     config.start_state,
+                                    0.0,
                                     list(sim_config.pedestrian_goal_points[epid]),
                                     config.btree_root,
                                     btree_locations=btree_locations,
@@ -193,7 +194,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
                     return False, 0.0
         else:
             name = ('veh_'+ format(id, '03d'))
-            vehicle = TV(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], trajectory, False)
+            vehicle = TV(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], 0.0, trajectory, False)
             sim_traffic.add_vehicle(vehicle)
 
     if calibrate_behavior:
