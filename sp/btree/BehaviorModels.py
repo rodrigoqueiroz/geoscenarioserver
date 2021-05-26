@@ -136,17 +136,14 @@ class BehaviorModels(object):
             tmax = kwargs['tmax'] if 'tmax' in kwargs else float('inf')
             return tmin < self.planner_state.sim_time < tmax
 
-        elif condition == "traffic_light_red":
+        elif condition == "pedestrian_light_red":
             for re_state in self.planner_state.regulatory_elements:
                 if isinstance(re_state, TrafficLightState):
                     # check if light is red
                     return re_state.color == TrafficLightColor.Red
 
-        elif condition == "traffic_light_green":
-            for re_state in self.planner_state.regulatory_elements:
-                if isinstance(re_state, TrafficLightState):
-                    # check if light is green
-                    return re_state.color == TrafficLightColor.Green
+        elif condition == "pedestrian_light_green":
+            return self.planner_state.crossing_light_color == TrafficLightColor.Green
 
         elif condition == "in_crosswalk_area":
             return in_crosswalk_area(self.planner_state)

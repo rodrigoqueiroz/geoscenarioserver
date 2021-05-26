@@ -17,7 +17,7 @@ from util.Transformations import normalize
 from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation
 
 
-def has_reached_point(pedestrian_state, point, threshold=1):
+def has_reached_point(pedestrian_state, point, threshold=1.5):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
         @param threshold: Max acceptable distance to point

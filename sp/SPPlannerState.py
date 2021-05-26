@@ -12,6 +12,7 @@ from typing import Tuple, Dict, List
 
 from mapping.LaneletMap import *
 from Actor import PedestrianState
+from TrafficLight import TrafficLightColor
 
 
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
@@ -25,6 +26,7 @@ class PedestrianPlannerState:
     path: List
     waypoint: List
     target_crosswalk: List
+    crossing_light_color: TrafficLightColor
     destination: List
     traffic_vehicles: Dict
     pedestrians: List

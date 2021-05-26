@@ -251,10 +251,21 @@ class SPPlanner(object):
             for ll_or_area in self.sp.path:
                 if self.lanelet_map.inside_lanelet_or_area(pedestrian_pos, ll_or_area):
                     self.sp.current_lanelet = ll_or_area
+                    break
         else:
             self.sp.current_lanelet = self.get_space_occupied_by_pedestrian(pedestrian_pos)
 
-        reg_elems = self.get_reg_elem_states(pedestrian_state, self.sp.current_lanelet)
+        reg_elems = self.get_reg_elem_states(self.sp.current_lanelet)
+
+        crossing_light_color = None
+        if self.sp.target_crosswalk['id'] != -1:
+            if self.inverted_path:
+                crosswalk = self.sp.path[0]
+            else:
+                crosswalk = self.sp.path[-1]
+
+            crossing_light_color = self.get_crossing_light_color(crosswalk)
+
         pedestrian_speed = {'default_desired': self.sp.default_desired_speed,
                             'current_desired': self.sp.curr_desired_speed}
 
@@ -265,6 +276,7 @@ class SPPlanner(object):
                             path = self.sp.path,
                             waypoint = self.sp.current_waypoint,
                             target_crosswalk = self.sp.target_crosswalk,
+                            crossing_light_color = crossing_light_color,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
                             regulatory_elements=reg_elems,
@@ -333,7 +345,7 @@ class SPPlanner(object):
         return None
 
 
-    def get_reg_elem_states(self, pedestrian_state, current_lanelet):
+    def get_reg_elem_states(self, current_lanelet):
         reg_elem_states = []
 
         if not current_lanelet:
@@ -360,3 +372,25 @@ class SPPlanner(object):
                 reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
 
         return reg_elem_states
+
+
+    def get_crossing_light_color(self, crosswalk):
+        if not crosswalk:
+            return None
+
+        traffic_light_states = {}
+        for lid, tl in self.sim_traffic.traffic_lights.items():
+            traffic_light_states[lid] = tl.current_color.value
+
+        # Get regulatory elements acting on this lanelet
+        reg_elems = crosswalk.regulatoryElements
+
+        for re in reg_elems:
+            if isinstance(re, lanelet2.core.TrafficLight):
+                # lanelet2 traffic lights must have a corresponding state from the main process
+                if re.id not in traffic_light_states:
+                    continue
+
+                return traffic_light_states[re.id]
+
+        return None
