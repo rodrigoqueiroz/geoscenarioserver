@@ -338,10 +338,10 @@ class Dashboard(object):
                 y = pedestrian.state.y
 
                 # show pedestrians' goals on map
-                x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
-                y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
-                plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
-                plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
+                # x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
+                # y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
+                # plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
+                # plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
 
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
