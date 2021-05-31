@@ -275,18 +275,24 @@ class Dashboard(object):
                 x,y,line = self.lanelet_map.get_traffic_light_pos(lid)
                 #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
                 colorcode,_ = self.get_color_by_type('trafficlight',state)
-                plt.plot(x, y, 'ks', markersize=8, zorder=4) #black square
                 tl_type = self.sim_traffic.traffic_lights[lid].type
+                square_size = 8
+                if tl_type == TrafficLightType.pedestrian:
+                    square_size = 4
+                plt.plot(x, y, 'ks', markersize=square_size, zorder=4) #black square
                 if tl_type == TrafficLightType.default:
                     plt.plot(x, y, colorcode+'o', markersize=6, zorder=5)
                 elif tl_type == TrafficLightType.left:
                     plt.plot(x, y, colorcode+'<', markersize=6, zorder=5)
                 elif tl_type == TrafficLightType.right:
                     plt.plot(x, y, colorcode+'>', markersize=6, zorder=5)
+                elif tl_type == TrafficLightType.pedestrian:
+                    plt.plot(x, y, colorcode+'o', markersize=2, zorder=5)
 
-                label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
-                plt.gca().text(x+1, y, label, style='italic')
-                plt.plot(line[0], line[1], color = colorcode, zorder=5)
+                if tl_type != TrafficLightType.pedestrian:
+                    label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
+                    plt.gca().text(x+1, y, label, style='italic')
+                    plt.plot(line[0], line[1], color = colorcode, zorder=5)
         #signs
 
     def plot_static_objects(self,static_objects,x_min,x_max,y_min,y_max):
@@ -330,6 +336,13 @@ class Dashboard(object):
                 colorcode,alpha = self.get_color_by_type('pedestrian',pedestrian.type, pedestrian.sim_state)
                 x = pedestrian.state.x
                 y = pedestrian.state.y
+
+                # show pedestrians' goals on map
+                x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
+                y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
+                plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
+                plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
+
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
                     circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
