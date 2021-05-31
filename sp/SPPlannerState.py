@@ -25,7 +25,8 @@ class PedestrianPlannerState:
     pedestrian_speed: Dict
     path: List
     waypoint: List
-    target_crosswalk: List
+    current_lanelet: Lanelet
+    target_crosswalk: Dict
     crossing_light_color: TrafficLightColor
     destination: List
     traffic_vehicles: Dict

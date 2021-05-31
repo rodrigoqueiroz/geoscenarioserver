@@ -20,6 +20,8 @@ class Maneuver(Enum):
     M_ENTERCROSSWALK = 3
     M_EXITCROSSWALK = 4
     M_WAITATCROSSWALK = 5
+    M_RETURNTOENTRANCE = 6
+    M_INCREASEWALKINGSPEED = 7
 
 
 class SamplingMethod(Enum):
@@ -163,6 +165,17 @@ class MEnterCrosswalkConfig(MConfig):
 class MExitCrosswalkConfig(MConfig):
     mkey:int = Maneuver.M_EXITCROSSWALK
 
+
 @dataclass
 class MWaitAtCrosswalkConfig(MConfig):
     mkey:int = Maneuver.M_WAITATCROSSWALK
+
+
+@dataclass
+class MReturnToEntranceConfig(MConfig):
+    mkey:int = Maneuver.M_RETURNTOENTRANCE
+
+
+@dataclass
+class MIncreaseWalkingSpeedConfig(MConfig):
+    mkey:int = Maneuver.M_INCREASEWALKINGSPEED

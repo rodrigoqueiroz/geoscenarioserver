@@ -137,10 +137,7 @@ class BehaviorModels(object):
             return tmin < self.planner_state.sim_time < tmax
 
         elif condition == "pedestrian_light_red":
-            for re_state in self.planner_state.regulatory_elements:
-                if isinstance(re_state, TrafficLightState):
-                    # check if light is red
-                    return re_state.color == TrafficLightColor.Red
+            return self.planner_state.crossing_light_color == TrafficLightColor.Red
 
         elif condition == "pedestrian_light_green":
             return self.planner_state.crossing_light_color == TrafficLightColor.Green
@@ -149,25 +146,7 @@ class BehaviorModels(object):
             return in_crosswalk_area(self.planner_state)
 
         elif condition == "past_crosswalk_halfway":
-            xwalk_ll = self.planner_state.lanelet_map.get_occupying_lanelet_by_participant(self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y, "pedestrian")
-
-            P = np.array([self.planner_state.pedestrian_state.x, self.planner_state.pedestrian_state.y])
-            right = xwalk_ll.rightBound
-            left = xwalk_ll.leftBound
-
-            # get four points of exit half of xwalk in counterclockwise direction
-            '''
-            ----------------D----------------> C
-                            |   exit half
-                            |   of crosswalk
-            ----------------A----------------> B
-            '''
-            B = np.array([right[1].x, right[1].y])
-            A = (np.array([right[0].x, right[0].y]) + B) / 2
-            C = np.array([left[1].x, left[1].y])
-            D = (np.array([left[0].x, left[0].y]) + C) / 2
-
-            return point_in_rectangle(P, A, B, C, D)
+            return past_crosswalk_halfway(self.planner_state)
 
         return False
 

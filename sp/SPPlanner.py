@@ -276,6 +276,7 @@ class SPPlanner(object):
                             path = self.sp.path,
                             waypoint = self.sp.current_waypoint,
                             target_crosswalk = self.sp.target_crosswalk,
+                            current_lanelet = self.sp.current_lanelet,
                             crossing_light_color = crossing_light_color,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
