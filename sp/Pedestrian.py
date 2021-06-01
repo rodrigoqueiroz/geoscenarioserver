@@ -98,7 +98,7 @@ class SP(Pedestrian):
         self.destination = np.array(goal_points[-1])
 
         self.current_lanelet = None
-        self.default_desired_speed = 2 # random.uniform(0.6, 1.2)
+        self.default_desired_speed = 1.5 # random.uniform(0.6, 1.2)
         self.curr_desired_speed = self.default_desired_speed
         self.direction = None
         self.mass = random.uniform(50,80)
