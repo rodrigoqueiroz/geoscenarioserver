@@ -14,10 +14,10 @@ from SimTraffic import *
 from sp.ManeuverConfig import *
 from SimConfig import *
 from util.Transformations import normalize
-from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation
+from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation, point_in_rectangle
 
 
-def has_reached_point(pedestrian_state, point, threshold=1):
+def has_reached_point(pedestrian_state, point, threshold=1.5):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
         @param threshold: Max acceptable distance to point
@@ -82,10 +82,29 @@ def dir_to_follow_lane_border(pedestrian_state, current_lane, curr_waypoint, inv
 
 
 def in_crosswalk_area(planner_state):
-    cur_ll = planner_state.lanelet_map.get_occupying_lanelet_by_participant(planner_state.pedestrian_state.x, planner_state.pedestrian_state.y, "pedestrian")
-    if cur_ll == None:
+    if not planner_state.current_lanelet:
         return False
-    return cur_ll.attributes["subtype"] == "crosswalk"
+    return planner_state.current_lanelet.attributes['subtype'] == 'crosswalk'
+
+def past_crosswalk_halfway(planner_state):
+    P = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
+    crosswalk = planner_state.current_lanelet
+    right = crosswalk.rightBound
+    left = crosswalk.leftBound
+
+    # get four points of exit half of xwalk in counterclockwise direction
+    '''
+    ----------------D----------------> C
+                    |   exit half
+                    |   of crosswalk
+    ----------------A----------------> B
+    '''
+    B = np.array([right[-1].x, right[-1].y])
+    A = (np.array([right[0].x, right[0].y]) + B) / 2
+    C = np.array([left[-1].x, left[-1].y])
+    D = (np.array([left[0].x, left[0].y]) + C) / 2
+
+    return point_in_rectangle(P, A, B, C, D)
 
 
 def has_line_of_sight_to_point(position, point, lanelet):
@@ -116,25 +135,3 @@ def has_line_of_sight_to_point(position, point, lanelet):
             return False
 
     return True
-
-def point_in_rectangle(P, A, B, C, D):
-    ''' Checks if the point pt is in the rectangle defined by
-        points A, B, C, D in a counterclockwise orientation
-    '''
-    left_of_AB = (B[0]-A[0])*(P[1]-A[1]) - (B[1]-A[1])*(P[0]-A[0]) > 0
-    left_of_BC = (C[0]-B[0])*(P[1]-B[1]) - (C[1]-B[1])*(P[0]-B[0]) > 0
-    left_of_CD = (D[0]-C[0])*(P[1]-C[1]) - (D[1]-C[1])*(P[0]-C[0]) > 0
-    left_of_DA = (A[0]-D[0])*(P[1]-D[1]) - (A[1]-D[1])*(P[0]-D[0]) > 0
-
-    '''
-    Could not directly return (left_of_AB and left_of_BC and left_of_CD and left_of_DA)
-    for some reason so I had to split into two different bools (first_two and last_two).
-
-    (left_of_AB and left_of_BC and left_of_CD and left_of_DA) apparently evaluates
-    to an empty list instead of True or False
-    '''
-    first_two = left_of_AB and left_of_BC
-    last_two = left_of_CD and left_of_DA
-    inside_rect = first_two and last_two
-
-    return inside_rect
