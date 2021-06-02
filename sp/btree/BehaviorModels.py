@@ -148,6 +148,9 @@ class BehaviorModels(object):
         elif condition == "past_crosswalk_halfway":
             return past_crosswalk_halfway(self.planner_state)
 
+        elif condition == "approaching_crosswalk":
+            return approaching_crosswalk(self.planner_state)
+
         return False
 
 

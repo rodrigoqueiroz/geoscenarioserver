@@ -51,9 +51,9 @@ class SPPlanner(object):
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
-        self.plan_local_path(pedestrian_pos)
+        self.plan_local_path(pedestrian_pos, False)
 
-    def plan_local_path(self, planning_position):
+    def plan_local_path(self, planning_position, consider_light_states):
         # get list of lanelets and spaces containing the planning position
         occupied_spaces = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(planning_position)
 

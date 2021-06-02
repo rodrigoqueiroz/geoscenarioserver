@@ -135,3 +135,10 @@ def has_line_of_sight_to_point(position, point, lanelet):
             return False
 
     return True
+
+def approaching_crosswalk(planner_state):
+    threshold_dist = 3
+    pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
+    crosswalk_entry = planner_state.target_crosswalk["entry"]
+    dist_to_crosswalk_entrance = np.linalg.norm(crosswalk_entry - pedestrian_pos)
+    return dist_to_crosswalk_entrance < threshold_dist
