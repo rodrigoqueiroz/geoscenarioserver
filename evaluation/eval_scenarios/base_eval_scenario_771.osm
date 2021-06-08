@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5337880' action='modify' visible='true' lat='43.4784550044' lon='-80.51972915596'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
+    <tag k='name' v='Evaluation Scenario' />
+    <tag k='timeout' v='250' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5337881' visible='true' lat='43.47800032687' lon='-80.51977346677'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5337882' action='modify' visible='true' lat='43.47787555287' lon='-80.51973063472'>
+    <tag k='duration' v='12,31,4,48,48,7,55,38,4,3' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_n_s' />
+    <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='default' />
+  </node>
+  <node id='-5337883' action='modify' visible='true' lat='43.47817410046' lon='-80.51981690272'>
+    <tag k='duration' v='12,31,4,64,32,7,45,48,4,3' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_s_n' />
+    <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='default' />
+  </node>
+  <node id='-5337884' action='modify' visible='true' lat='43.4780236632' lon='-80.52000984684'>
+    <tag k='duration' v='58,30,4,66,30,4,58' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_e_w' />
+    <tag k='states' v='R,G,Y,R,G,Y,R' />
+    <tag k='type' v='default' />
+  </node>
+  <node id='-5337885' action='modify' visible='true' lat='43.47804143402' lon='-80.51956279257'>
+    <tag k='duration' v='58,30,4,66,30,4,58' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_w_e' />
+    <tag k='states' v='R,G,Y,R,G,Y,R' />
+    <tag k='type' v='default' />
+  </node>
+  <node id='-5337886' action='modify' visible='true' lat='43.47815027932' lon='-80.51988579467'>
+    <tag k='duration' v='43,4,64,32,7,45,48,4,3' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_s_w' />
+    <tag k='states' v='G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='left' />
+  </node>
+  <node id='-5337887' action='modify' visible='true' lat='43.4779792153' lon='-80.51997809765'>
+    <tag k='duration' v='50,38,4,58,38,4,58' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_e_s' />
+    <tag k='states' v='R,G,Y,R,G,Y,R' />
+    <tag k='type' v='left' />
+  </node>
+  <node id='-5337888' action='modify' visible='true' lat='43.47808799738' lon='-80.51961489156'>
+    <tag k='duration' v='50,38,4,58,38,4,58' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_w_n' />
+    <tag k='states' v='R,G,Y,R,G,Y,R' />
+    <tag k='type' v='left' />
+  </node>
+  <node id='-5337889' action='modify' visible='true' lat='43.47790373225' lon='-80.51964416263'>
+    <tag k='duration' v='43,4,48,48,7,55,38,4,3' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_n_e' />
+    <tag k='states' v='G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='left' />
+  </node>
+</osm>
