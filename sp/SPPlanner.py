@@ -19,6 +19,7 @@ from sp.ManeuverModels import plan_maneuver
 from sp.btree.BehaviorModels import BehaviorModels
 from sp.SPPlannerState import PedestrianPlannerState, TrafficLightState
 from util.Utils import get_lanelet_entry_exit_points, angle_btwn_vectors
+from TrafficLight import TrafficLightColor
 import lanelet2.core
 from mapping.LaneletMap import *
 from Actor import *
@@ -43,6 +44,7 @@ class SPPlanner(object):
 
         self.inverted_path = False
         self.previous_maneuver = None
+        self.selected_target_crosswalk = False
 
 
     def start(self):
@@ -101,35 +103,95 @@ class SPPlanner(object):
             target_entry_pt = []
             target_exit_pt = []
 
-            for path in paths_to_accessible_crosswalks:
-                # inverted_path is True if there was a valid route found from a crosswalk to the planning position
-                inverted_path = path[0].attributes['subtype'] == "crosswalk"
+            if consider_light_states:
+                green_light_selected = False
+                distance_to_dest_via_green = distance_to_dest
 
-                if inverted_path:
-                    xwalk = path[0]
-                else:
-                    xwalk = path[-1]
+                for path in paths_to_accessible_crosswalks:
+                    # inverted_path is True if there was a valid route found from a crosswalk to the planning position
+                    inverted_path = path[0].attributes['subtype'] == "crosswalk"
 
-                entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
+                    if inverted_path:
+                        xwalk = path[0]
+                    else:
+                        xwalk = path[-1]
 
-                if inverted_path:
-                    temp = entrance_pt
-                    entrance_pt = exit_pt
-                    exit_pt = temp
+                    entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
 
-                # update selected path if this crosswalk brings ped closer to destination
-                exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
-                entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
-                if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
-                    distance_to_dest = exit_to_dest_dist
-                    chosen_path = path
-                    target_id = xwalk.id
-                    target_entry_pt = entrance_pt
-                    target_exit_pt = exit_pt
-                    self.inverted_path = inverted_path
+                    if inverted_path:
+                        temp = entrance_pt
+                        entrance_pt = exit_pt
+                        exit_pt = temp
+
+                    crossing_light_color = self.get_crossing_light_color(xwalk)
+
+                    ''' choose between accessible crosswalks based on light state and if it brings ped closer to destination '''
+                    if crossing_light_color == TrafficLightColor.Green:
+                        exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
+                        entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
+                        if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest_via_green):
+                            green_light_selected = True
+                            distance_to_dest = exit_to_dest_dist
+                            distance_to_dest_via_green = exit_to_dest_dist
+                            chosen_path = path
+                            target_id = xwalk.id
+                            target_entry_pt = entrance_pt
+                            target_exit_pt = exit_pt
+                            self.inverted_path = inverted_path
+                    elif crossing_light_color == TrafficLightColor.Red:
+                        if not green_light_selected:
+                            exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
+                            entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
+                            if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
+                                distance_to_dest = exit_to_dest_dist
+                                chosen_path = path
+                                target_id = xwalk.id
+                                target_entry_pt = entrance_pt
+                                target_exit_pt = exit_pt
+                                self.inverted_path = inverted_path
+                    elif not crossing_light_color:
+                        # treat unsignalized crosswalks as green light
+                        exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
+                        entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
+                        if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
+                            distance_to_dest = exit_to_dest_dist
+                            chosen_path = path
+                            target_id = xwalk.id
+                            target_entry_pt = entrance_pt
+                            target_exit_pt = exit_pt
+                            self.inverted_path = inverted_path
+
+                self.selected_target_crosswalk = (target_id != -1)
+            else:
+                for path in paths_to_accessible_crosswalks:
+                    # inverted_path is True if there was a valid route found from a crosswalk to the planning position
+                    inverted_path = path[0].attributes['subtype'] == "crosswalk"
+
+                    if inverted_path:
+                        xwalk = path[0]
+                    else:
+                        xwalk = path[-1]
+
+                    entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
+
+                    if inverted_path:
+                        temp = entrance_pt
+                        entrance_pt = exit_pt
+                        exit_pt = temp
+
+                    # update selected path if this crosswalk brings ped closer to destination
+                    exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
+                    entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
+                    if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
+                        distance_to_dest = exit_to_dest_dist
+                        chosen_path = path
+                        target_id = xwalk.id
+                        target_entry_pt = entrance_pt
+                        target_exit_pt = exit_pt
+                        self.inverted_path = inverted_path
 
             # set entry and exit points if there is a useful crosswalk
-            if len(target_entry_pt) > 0:
+            if target_id != -1:
                 waypoints = [target_entry_pt, target_exit_pt]
             else:
                 waypoints = [self.sp.destination]
@@ -276,6 +338,7 @@ class SPPlanner(object):
                             path = self.sp.path,
                             waypoint = self.sp.current_waypoint,
                             target_crosswalk = self.sp.target_crosswalk,
+                            selected_target_crosswalk = self.selected_target_crosswalk,
                             current_lanelet = self.sp.current_lanelet,
                             crossing_light_color = crossing_light_color,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),

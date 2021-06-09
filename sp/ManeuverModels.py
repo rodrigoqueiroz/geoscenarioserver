@@ -95,6 +95,8 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
 
         sp.sp_planner.plan_local_path(mid, False)
 
+        sp.sp_planner.selected_target_crosswalk = False
+
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     direction = normalize(sp.current_waypoint - pedestrian_pos)
 

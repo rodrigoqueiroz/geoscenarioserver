@@ -7,9 +7,13 @@ behaviortree crosswalk_signal:
             condition c_reached_entrance ( reached_crosswalk_entrance() )
             ?
                 ->
-                    condition c_ped_greenlight ( pedestrian_light_green() )
-                    maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
-                maneuver m_wait_at_crosswalk ( MWaitAtCrosswalkConfig() )
+                    condition c_crosswalk_has_light ( crosswalk_has_light() )
+                    ?
+                        ->
+                            condition c_ped_greenlight ( pedestrian_light_green() )
+                            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+                        maneuver m_wait_at_crosswalk ( MWaitAtCrosswalkConfig() )
+                maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
         ->
             condition c_reached_exit ( reached_crosswalk_exit() )
             maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )

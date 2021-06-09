@@ -142,6 +142,9 @@ class BehaviorModels(object):
         elif condition == "pedestrian_light_green":
             return self.planner_state.crossing_light_color == TrafficLightColor.Green
 
+        elif condition == "crosswalk_has_light":
+            return self.planner_state.crossing_light_color != None
+
         elif condition == "in_crosswalk_area":
             return in_crosswalk_area(self.planner_state)
 
@@ -149,7 +152,7 @@ class BehaviorModels(object):
             return past_crosswalk_halfway(self.planner_state)
 
         elif condition == "approaching_crosswalk":
-            return approaching_crosswalk(self.planner_state)
+            return not self.planner_state.selected_target_crosswalk and approaching_crosswalk(self.planner_state)
 
         return False
 

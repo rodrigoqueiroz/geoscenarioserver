@@ -27,6 +27,7 @@ class PedestrianPlannerState:
     waypoint: List
     current_lanelet: Lanelet
     target_crosswalk: Dict
+    selected_target_crosswalk: bool
     crossing_light_color: TrafficLightColor
     destination: List
     traffic_vehicles: Dict
