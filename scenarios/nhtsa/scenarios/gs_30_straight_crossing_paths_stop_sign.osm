@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-1976748' action='modify' visible='true' lat='43.47838427301' lon='-80.51894927626' />
+  <node id='-1976749' action='modify' visible='true' lat='43.47822695195' lon='-80.51937820687' />
+  <node id='-1976750' action='modify' visible='true' lat='43.47987156384' lon='-80.52248869752'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='nhtsa/maps/lanelet2_university_weber_alt.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Running red light scenario' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-1976751' action='modify' visible='true' lat='43.47982885633' lon='-80.52249023191'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-1976752' action='modify' visible='true' lat='43.4779836917' lon='-80.52006818186' />
+  <node id='-1976753' action='modify' visible='true' lat='43.47769088382' lon='-80.51942391304' />
+  <node id='-1976754' action='modify' visible='true' lat='43.47782242828' lon='-80.51953756132' />
+  <node id='-1976755' action='modify' visible='true' lat='43.4784324437' lon='-80.52009363662' />
+  <node id='-1976756' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
+  <node id='-1976758' action='modify' visible='true' lat='43.47830931276' lon='-80.51914479172'>
+    <tag k='btree' v='nhtsa/behavior/blind2redlight_scenario_tree.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='red_light_runner' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-1976772' action='modify' visible='true' lat='43.47767101328' lon='-80.51939899385'>
+    <tag k='btree' v='nhtsa/behavior/drive_scenario_tree.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-2716513' action='modify' visible='true' lat='43.47802474174' lon='-80.51997900076'>
+    <tag k='duration' v='15' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_e_w' />
+    <tag k='states' v='red' />
+  </node>
+  <node id='-2716519' action='modify' visible='true' lat='43.47815611777' lon='-80.51983684368'>
+    <tag k='duration' v='15' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_s_n' />
+    <tag k='states' v='green' />
+  </node>
+  <way id='-1947847' action='modify' visible='true'>
+    <nd ref='-1976748' />
+    <nd ref='-1976749' />
+    <nd ref='-1976752' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1947848' action='modify' visible='true'>
+    <nd ref='-1976753' />
+    <nd ref='-1976754' />
+    <nd ref='-1976755' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>
