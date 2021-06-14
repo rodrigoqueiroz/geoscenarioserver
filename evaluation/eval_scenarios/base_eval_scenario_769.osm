@@ -5,7 +5,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='name' v='Evaluation Scenario' />
-    <tag k='timeout' v='290' />
+    <tag k='timeout' v='284' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5337724' visible='true' lat='43.47800032687' lon='-80.51977346677'>

@@ -68,4 +68,32 @@
     <tag k='states' v='G,Y,R,G,Y,R,G,Y,R,G' />
     <tag k='type' v='left' />
   </node>
+  <node id='-5338336' action='modify' visible='true' lat='43.47813717154' lon='-80.51971627003'>
+    <tag k='duration' v='18,70,7,23,64,7,29,70' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_n_s_east' />
+    <tag k='states' v='Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5338337' action='modify' visible='true' lat='43.47807862499' lon='-80.52000798322'>
+    <tag k='duration' v='35,7,23,70,7,23,70,7,23,23' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_e_w_north' />
+    <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5338338' action='modify' visible='true' lat='43.47792424854' lon='-80.51952484585'>
+    <tag k='duration' v='35,7,23,70,7,23,70,7,23,23' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_e_w_south' />
+    <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5338339' action='modify' visible='true' lat='43.47784238234' lon='-80.51984934696'>
+    <tag k='duration' v='18,70,7,23,64,7,29,70' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_n_s_west' />
+    <tag k='states' v='Y,R,G,Y,R,G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
 </osm>
