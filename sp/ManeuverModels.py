@@ -140,7 +140,6 @@ def plan_select_crosswalk_by_light(mconfig:MStopConfig, sp, pedestrian_state:Ped
     """
     SELECT CROSSWALK BY LIGHT MANEUVER
     """
-    # TODO: only run this maneuver once per crosswalk approach
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     sp.sp_planner.plan_local_path(pedestrian_pos, True)
     direction = normalize(sp.current_waypoint - pedestrian_pos)
