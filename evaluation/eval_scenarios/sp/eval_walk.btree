@@ -19,4 +19,3 @@ behaviortree walk_tree:
                 condition c_ped_redlight ( pedestrian_light_red() )
                 maneuver m_increase_speed ( MIncreaseWalkingSpeedConfig() )
         maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
-

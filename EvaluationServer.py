@@ -15,6 +15,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-s", "--scenario", dest="gsfile", nargs='*', metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("-v", "--video-id", dest="video_id", default="769", help="Video file id")
     parser.add_argument("-e", "--eval", dest="eval_id", default="", help="Evaluation scenario ID")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="y", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
@@ -29,7 +30,7 @@ if __name__ == "__main__":
 
 
     # Master csv to guide all experiments.
-    scenarios = load_all_scenarios()
+    scenarios = load_all_scenarios(args.video_id)
 
     if args.eval_all:
          for id in scenarios:

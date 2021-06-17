@@ -87,7 +87,7 @@ def start_server(args, es, calibrate = False):
     sim_traffic = SimTraffic(lanelet_map, sim_config)
 
     #Scenario SETUP
-    res, time = setup_evaluation_scenario(args.gsfile, sim_traffic, sim_config, lanelet_map, es, calibrate)
+    res, time = setup_evaluation_scenario(args.gsfile, args.video_id, sim_traffic, sim_config, lanelet_map, es, calibrate)
     if not res:
         return
 
@@ -129,7 +129,7 @@ def start_server(args, es, calibrate = False):
     log.info('GeoScenario Evaluation Server SHUTDOWN')
 
 
-def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, es, calibrate_behavior):
+def setup_evaluation_scenario(gsfile, video_id, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, es, calibrate_behavior):
     print("===== Setup scenario {} for evaluation. Recalibrate? {}".format(es.scenario_id,calibrate_behavior))
 
     #==========================  Load Base Scenario
@@ -143,14 +143,14 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     #========================== Load Tracks
     # Database to retrieve trajectory info
-    connection = sqlite3.connect('evaluation/uni_weber_769.db')
+    connection = sqlite3.connect('evaluation/db_files/uni_weber_' + video_id + '.db')
     c = connection.cursor()
 
     trajectories = {}
-    trajectories[es.track_id]  = query_track(es.track_id, c, lanelet_map.projector)
+    trajectories[es.track_id]  = query_track(es.track_id, video_id, c, lanelet_map.projector)
     #load tracks for dependencies (vehicles, pedestrians)
     for cid in es.const_agents:
-        trajectories[cid] = query_track(cid, c, lanelet_map.projector)
+        trajectories[cid] = query_track(cid, video_id, c, lanelet_map.projector)
 
     #========================== Estimate scenario configuration
     config = generate_config(es, lanelet_map, sim_traffic.traffic_lights, trajectories, calibrate_behavior)
@@ -209,9 +209,9 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     return True, es.start_time
 
-def load_all_scenarios():
+def load_all_scenarios(video_id):
     scenarios = {}
-    with open('evaluation/pedestrian_scenarios.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios/pedestrian_scenarios_' + video_id + '.csv', mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
@@ -242,9 +242,9 @@ def load_all_scenarios():
             scenarios[es.scenario_id] = es
     return scenarios
 
-def query_track(id, c, projector):
+def query_track(id, video_id, c, projector):
     query = "SELECT T.TRACK_ID, T.X, T.Y, T.SPEED, T.TAN_ACC, T.LAT_ACC, T.TIME, T.ANGLE, TK.TYPE \
-            FROM TRAJECTORIES_0769 T \
+            FROM TRAJECTORIES_0" + video_id + " T \
             LEFT JOIN TRACKS TK ON T.TRACK_ID = TK.TRACK_ID \
             WHERE T.TRACK_ID = '{}' \
             ORDER BY T.TIME".format(id)
