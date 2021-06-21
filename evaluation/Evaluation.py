@@ -244,10 +244,10 @@ def load_all_scenarios(video_id):
 
 def query_track(id, video_id, c, projector):
     query = "SELECT T.TRACK_ID, T.X, T.Y, T.SPEED, T.TAN_ACC, T.LAT_ACC, T.TIME, T.ANGLE, TK.TYPE \
-            FROM TRAJECTORIES_0" + video_id + " T \
+            FROM TRAJECTORIES_0{} T \
             LEFT JOIN TRACKS TK ON T.TRACK_ID = TK.TRACK_ID \
             WHERE T.TRACK_ID = '{}' \
-            ORDER BY T.TIME".format(id)
+            ORDER BY T.TIME".format(video_id, id)
     c.execute(query)
     res = c.fetchall()
 
@@ -540,6 +540,7 @@ def find_gl_delay(laneletmap:LaneletMap, trajectory, traffic_lights):
     print("Delay after green light is {}".format(delay))
     return delay
 
+'''
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
@@ -600,3 +601,4 @@ if __name__ == "__main__":
                     start_server(args, scenarios[eval_id], True)
                 #except Exception as e:
                 #    print("ERROR. Can not run simulation for scenario{}".format(eval_id))
+'''

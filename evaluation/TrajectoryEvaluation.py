@@ -68,44 +68,22 @@ def evaluate_scenario(es:EvalScenario):
     print("Evaluate scenario {}".format(es.scenario_id))
 
     traj_l = None
-    if es.scenario_type == 'follow':
-        lead_id = es.const_vehicles[0] #assuming single lead
-        traj_l = load_trajectory_log( 'traj_log/{}_rc_{}.csv'.format(es.scenario_id, lead_id) )    #lead
-    traj_e = load_trajectory_log( 'traj_log/{}_rc_{}.csv'.format(es.scenario_id, es.track_id) )   #empirical
-    traj_s = load_trajectory_log( 'traj_log/{}_rc_{}.csv'.format(es.scenario_id, -es.track_id) )  #synthetic
-    traj_s_nc = load_trajectory_log( 'traj_log/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id) ) #synthetic nc
-    traj_e_nc = load_trajectory_log( 'traj_log/{}_nc_{}.csv'.format(es.scenario_id, es.track_id) )  #empirical nc
+    traj_s = load_trajectory_log( 'traj_log/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id) ) #synthetic nc
+    traj_e = load_trajectory_log( 'traj_log/{}_nc_{}.csv'.format(es.scenario_id, es.track_id) )  #empirical nc
 
-    es.time = float(traj_e_nc[-1]['time']) - float(traj_e_nc[0]['time'])
+    es.time = float(traj_e[-1]['time']) - float(traj_e[0]['time'])
 
-    #nc
-    es.ed_nc_vector, _, _, es.ed_nc = get_euclideandistance(traj_s_nc,traj_e_nc) #Frechet distance
-    ed_nc_array = [  x[1]  for x in es.ed_nc_vector]
-    es.ed_nc_mean = np.mean(ed_nc_array)
-    es.ed_nc_median = np.median(ed_nc_array)
-    es.ed_nc_max = np.max(ed_nc_array)
-
-    #rc
-    es.ed_vector,  es.d0_vector_s, es.d0_vector_e,es.ed  = get_euclideandistance(traj_s,traj_e)
-    ed_array = [  x[1]  for x in es.ed_vector]
+    es.ed_vector, es.d0_vector_s, es.d0_vector_e, es.ed = get_euclideandistance(traj_s, traj_e)
+    ed_array = [x[1] for x in es.ed_vector]
     es.ed_mean = np.mean(ed_array)
-    es.ed_max = np.max(ed_array)
     es.ed_median = np.median(ed_array)
-
-    es.ed_change = (es.ed - es.ed_nc)
-
+    es.ed_max = np.max(ed_array)
 
     #Frechet distance
-    #es.fd = get_frechet(traj_s,traj_e)
-    #es.fd_nc = get_frechet(traj_s_nc,traj_e_nc)
+    #es.fd = get_frechet(traj_s, traj_e)
 
-
-    #es.ed_nc, _, _, _ = get_euclideandistance(traj_s_nc,traj_e_nc)
-
-
-
-    traj_plot_combined(es, traj_s, traj_s_nc, traj_e)
-    speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
+    # traj_plot_combined(es, traj_s, traj_s_nc, traj_e)
+    # speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
     ed_plot(es)
 
     #not calibrated
@@ -125,11 +103,9 @@ def evaluate_scenario(es:EvalScenario):
     #print("Experiment {} Frechet distance = {} (nc) {} (rc) Euclidean distance = {} (nc) {} (rc)".format(
     #    es.scenario_id, es.fd_nc,es.fd_rc,es.ed_nc,es.ed_rc))
 
-
-
-def load_all_scenarios():
+def load_all_scenarios(video_id):
     scenarios = {}
-    with open('evaluation/pedestrian_scenarios.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('pedestrian_scenarios/pedestrian_scenarios_{}.csv'.format(video_id), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
@@ -143,15 +119,15 @@ def load_all_scenarios():
             es = EvalScenario()
             es.scenario_id = row[0]
             es.track_id = int(row[2])
-            es.vehicle_type = row[3]
+            es.agent_type = row[3]
             es.direction = row[4]
             es.scenario_type = row[5]
             #constraints
             if (row[6] != ''):
                 if (',' in row[6]):
-                    es.const_vehicles = [int(cvid) for cvid in row[6].split(',')]
+                    es.const_agents = [int(cid) for cid in row[6].split(',')]
                 else:
-                    es.const_vehicles.append(int(row[6]))
+                    es.const_agents.append(int(row[6]))
             #start time
             if (row[7] != ''):
                 es.start_time = float(row[7])
@@ -159,7 +135,6 @@ def load_all_scenarios():
                     es.end_time = float(row[8])
             scenarios[es.scenario_id] = es
     return scenarios
-
 
 def load_scenario_db(scenario_id):
     es = None
@@ -200,23 +175,22 @@ def load_scenario_db(scenario_id):
     return es
 
 def load_trajectory_log(filename):
-     #'id', 'type','sim_state', 'tick_count', 'sim_time', 'delta_time',
-     #'x', 'x_vel', 'x_acc', 'y',  'y_vel', 'y_acc', 's', 's_vel', 's_acc','d', 'd_vel', 'd_acc', 'angle'
+     #'id', 'agent_type', 'type', 'sim_state', 'tick_count', 'sim_time', 'delta_time',
+     #'x', 'x_vel', 'x_acc', 'y', 'y_vel', 'y_acc', 's', 's_vel', 's_acc', 'd', 'd_vel', 'd_acc', 'yaw'
 
     trajectory = []
     with open(filename, mode='r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
+        next(csv_reader, None)  # skip the header
         for row in csv_reader:
-            if row[0] == 'id':
-                continue
             node = {}
-            node['time'] = float(row[4])
-            node['x'] = float(row[6])
-            node['xvel'] = float(row[7])
-            node['y'] = float(row[9])
-            node['yvel'] = float(row[10])
+            node['time'] = float(row[5])
+            node['x'] = float(row[7])
+            node['xvel'] = float(row[8])
+            node['y'] = float(row[10])
+            node['yvel'] = float(row[11])
             node['speed'] = sqrt(node['xvel']**2 + node['yvel'] **2)
-            node['s'] = float(row[12])
+            node['s'] = float(row[13])
             trajectory.append(node)
         return trajectory
 
@@ -311,7 +285,7 @@ def get_frechet(traj_p,traj_q, trim = 1.0, samples = 300):
     score = frdist(Plist,Qlist)
     return score
 
-def get_euclideandistance(P,Q = None):
+def get_euclideandistance(P, Q = None):
     d_vector = []
     d0_vector_e = []
     d0_vector_s = []
@@ -319,22 +293,22 @@ def get_euclideandistance(P,Q = None):
     n = len(P)
     dt = 0
     total = 0
+
     for i in range(n):
-        d = distance_2p( P[i]['x'], P[i]['y'], Q[i]['x'],Q[i]['y'])
-        d_vector.append([ P[i]['time'] , d ])
-        d0_vector_s.append([ P[i]['time'], distance_2p( P[i]['x'], P[i]['y'], 0, 0 ) ])
-        d0_vector_e.append([ Q[i]['time'], distance_2p( Q[i]['x'], Q[i]['y'], 0, 0 ) ])
-        if i<(n-1):
+        d = distance_2p(P[i]['x'], P[i]['y'], Q[i]['x'], Q[i]['y'])
+        d_vector.append([P[i]['time'], d])
+        d0_vector_s.append([P[i]['time'], distance_2p(P[i]['x'], P[i]['y'], 0, 0)])
+        d0_vector_e.append([Q[i]['time'], distance_2p(Q[i]['x'], Q[i]['y'], 0, 0)])
+        if i < (n-1):
             dt = P[i+1]['time'] - P[i]['time']
-            total+= d*dt
+            total += d*dt
     score = total / (P[-1]['time'] - P[0]['time'])
     return d_vector, d0_vector_s, d0_vector_e, score
 
-def distance_2p(x1,y1,x2,y2):
-    #dist = hypot(x2 - x1, y2 - y1)
-    dist = sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
-    return dist
 
+def distance_2p(x1, y1, x2, y2):
+    dist = sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return dist
 
 
 def traj_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e):
@@ -403,11 +377,12 @@ def speed_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e, traj_l, ymin
     plt.savefig(filename+'.png')
     plt.close(fig)
 
+
 def ed_plot(es):
     filename = 'plots/{}/{}_edvector'.format(es.scenario_type, es.scenario_id)
     title = 'Experiment {} ({}) \n ED {} m'.format(es.scenario_id, es.scenario_type, format(es.ed_mean, '.2f'))
     plt.cla()
-    plt.plot(  [node[0] for node in es.ed_vector] , [node[1] for node in es.ed_vector],'k-',label="ed")
+    plt.plot([node[0] for node in es.ed_vector], [node[1] for node in es.ed_vector], 'k-', label="ed")
     plt.suptitle(title)
     plt.legend(loc="upper left")
     plt.savefig(filename+'.png')
@@ -416,13 +391,11 @@ def ed_plot(es):
     filename = 'plots/{}/{}_edvector_0'.format(es.scenario_type, es.scenario_id)
     title = 'Experiment {} ({}) \n ED to 0'.format(es.scenario_id, es.scenario_type)
     plt.cla()
-    plt.plot(  [node[0] for node in es.d0_vector_s] , [node[1] for node in es.d0_vector_s],'b',label="ed_0_s")
-    plt.plot(  [node[0] for node in es.d0_vector_e] , [node[1] for node in es.d0_vector_e],'r-',label="ed_0_e")
+    plt.plot([node[0] for node in es.d0_vector_s], [node[1] for node in es.d0_vector_s], 'b', label="ed_0_s")
+    plt.plot([node[0] for node in es.d0_vector_e], [node[1] for node in es.d0_vector_e], 'r-', label="ed_0_e")
     plt.suptitle(title)
     #plt.legend(loc="upper left")
     plt.savefig(filename+'.png')
-
-    #plt.show()
 
 def update_results_table(es:EvalScenario):
     print("Update results for scenario {}".format(es.scenario_id))
@@ -606,12 +579,13 @@ def save_speed_plot(P, Q, L, es, config_str):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-s", "--scenario", dest="eval_id", default="", help="Scenario Id for evaluation")
+    parser.add_argument("-v", "--video-id", dest="video_id", default="769", help="Video file id (default: 769)")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-tf", "--traj_file", dest="traj_file", default="", help="Single Trajectory analysis")
     parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
     args = parser.parse_args()
 
-    scenarios = load_all_scenarios()
+    scenarios = load_all_scenarios(args.video_id)
 
     #All scenarios
     if args.eval_all:
@@ -638,8 +612,8 @@ if __name__ == "__main__":
     elif args.eval_id != "":
         try:
             evaluate_scenario(scenarios[args.eval_id])
-            results = update_results_table(scenarios[args.eval_id])
-            generate_boxplots(results)
+            #results = update_results_table(scenarios[args.eval_id])
+            #generate_boxplots(results)
         except Exception as e:
             print("ERROR. Can not run evaluation for scenario {}".format(args.eval_id))
             raise e

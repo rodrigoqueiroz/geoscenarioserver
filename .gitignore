@@ -1,10 +1,10 @@
 catkin_ws
 .venv
-scenarios/plots/*
-scenarios/logs/*
 *__pycache__/
 **/build/
 .vscode/
 *.DS_Store
 test_btree_parser
+evaluation/plots/*
+evaluation/traj_log/*
 evaluation/db_files/*

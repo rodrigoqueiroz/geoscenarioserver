@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     CLIENT_SHM = False
-    WRITE_TRAJECTORIES = False
+    WRITE_TRAJECTORIES = True
 
 
     # Master csv to guide all experiments.
