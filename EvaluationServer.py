@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--video-id", dest="video_id", default="769", help="Video file id")
     parser.add_argument("-e", "--eval", dest="eval_id", default="", help="Evaluation scenario ID")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
-    parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="y", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
+    parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="n", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
     parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusively")
     parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
 

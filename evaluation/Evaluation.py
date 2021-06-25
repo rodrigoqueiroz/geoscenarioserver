@@ -55,12 +55,6 @@ class SPConfig:
     btree_reconfig:str = ""
     start_state:list = field(default_factory=list) #[0.0,0.0,0.0, 0.0,0.0,0.0]  #cartesian [xpos,xvel,xacc, ypos, yvel, yacc]
     route_nodes:list = field(default_factory=list)
-    # vk_target_vel:float = 14.0
-    # vk_time:float = 3.0
-    # vk_time_low:float = 6.0
-    # follow_timegap:float = 3.0
-    # glstart_delay:float = 0.0
-    # rlstop_dist:float = 0.0
 
 
 @dataclass
@@ -143,11 +137,11 @@ def setup_evaluation_scenario(gsfile, video_id, sim_traffic:SimTraffic, sim_conf
 
     #========================== Load Tracks
     # Database to retrieve trajectory info
-    connection = sqlite3.connect('evaluation/db_files/uni_weber_' + video_id + '.db')
+    connection = sqlite3.connect('evaluation/db_files/uni_weber_{}.db'.format(video_id))
     c = connection.cursor()
 
     trajectories = {}
-    trajectories[es.track_id]  = query_track(es.track_id, video_id, c, lanelet_map.projector)
+    trajectories[es.track_id] = query_track(es.track_id, video_id, c, lanelet_map.projector)
     #load tracks for dependencies (vehicles, pedestrians)
     for cid in es.const_agents:
         trajectories[cid] = query_track(cid, video_id, c, lanelet_map.projector)
@@ -230,15 +224,15 @@ def load_all_scenarios(video_id):
             es.scenario_type = row[5]
             #constraints
             if (row[6] != ''):
-                if (',' in row[6]):
-                    es.const_agents = [int(cid) for cid in row[6].split(',')]
+                if (';' in row[6]):
+                    es.const_agents = [int(cid) for cid in row[6].split(';')]
                 else:
                     es.const_agents.append(int(row[6]))
             #start time
             if (row[7] != ''):
                 es.start_time = float(row[7])
             if (row[8] != ''):
-                    es.end_time = float(row[8])
+                es.end_time = float(row[8])
             scenarios[es.scenario_id] = es
     return scenarios
 
@@ -283,6 +277,20 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
         trajectory = [node for node in trajectory if node.time >= es.start_time]
     if (trajectory[-1].time > es.end_time):    #if trajectory ends before scenario, clip nodes
         trajectory = [node for node in trajectory if node.time <= es.end_time]
+
+    # clip start and end nodes that are outside of any lanelet in map
+    idx = 0
+    while (len(lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))['lanelets']) == 0):
+        idx += 1
+
+    trajectory = trajectory[idx:]
+
+    idx = len(trajectory) - 1
+    while (len(lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))['lanelets']) == 0):
+        idx -= 1
+
+    trajectory = trajectory[:idx+1]
+
     #Traj Stats
     ts = generate_traj_stats(trajectory)
     #scenario starts only when vehicle enters the scene
@@ -299,71 +307,6 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     config.btree_reconfig = ""
 
     print("Both start at x_sp {} x_tp {}".format(config.start_state[0],trajectory[0].x))
-
-    #scenario specific
-    if es.scenario_type == 'free':
-        config.btree_root = "eval_drive.btree"
-        if calibrate_behavior:
-            config.vk_target_vel = format(ts.avg_speed_exit, '.2f')
-            config.d_target = find_lateral_pos(lanelet_map,trajectory)
-            config.vk_time = 3.0
-            config.btree_reconfig+= "m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({}) )".format(config.vk_target_vel,config.d_target)
-
-    elif es.scenario_type == 'follow' or  es.scenario_type == 'free_follow':
-        config.btree_root = "eval_drive.btree"
-        lead_id = es.const_agents[0] #assuming one lead vehicle for the entire scenario
-        lead_ts = generate_traj_stats(trajectories[lead_id])
-        es.end_time = lead_ts.end_time #scenario ends when lead vehicle exists
-        if calibrate_behavior:
-            config.d_target = find_lateral_pos(lanelet_map,trajectory)
-            if abs(config.d_target) > 1.0:
-                config.off_lane = 0
-            else:
-                config.off_lane = 1
-            config.vk_time = 3.0
-            config.vk_target_vel = format(ts.avg_walking_speed, '.2f')
-            mingap, avggap, maxgap = find_follow_gap(lanelet_map,trajectory, trajectories[lead_id],ts)
-            config.follow_timegap = avggap  #3.0
-            #config.btree_reconfig = "m_follow_lead=MFollowConfig( time_gap={},lat_target=LT({}),feasibility_constraints['off_lane'] = {} )".format(
-            config.btree_reconfig = "m_follow_lead=MFollowConfig( time_gap={},lat_target=LT({},3) )".format(
-                config.follow_timegap,
-                config.d_target)
-                #config.off_lane)
-            config.btree_reconfig+= ";m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({},3) )".format(
-                config.vk_target_vel,
-                config.d_target)
-                #config.off_lane)
-
-    elif es.scenario_type == 'rlstop':
-        es.end_time = ts.stop_time
-        if calibrate_behavior:
-            config.d_target = find_lateral_pos(lanelet_map,trajectory)
-            config.vk_target_vel = ts.start_speed
-            config.vk_time = 3.0
-            config.rlstop_dist = find_stop_distance(lanelet_map, trajectory)
-            config.btree_reconfig = "m_stop_redlight=MStopConfig( target=3 , distance={}, lat_target=LT({}) )".format(config.rlstop_dist, config.d_target)
-            config.btree_reconfig += ";m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({}) )".format(config.vk_target_vel,config.d_target)
-
-
-    elif es.scenario_type == 'glstart':
-        if calibrate_behavior:
-            config.d_target = find_lateral_pos(lanelet_map,trajectory)
-            #config.vk_target_vel = ts.avg_speed
-            config.vk_target_vel = format(ts.avg_speed_exit, '.2f')
-            config.vk_time = 3.0
-            delay = find_gl_delay(lanelet_map, trajectory, traffic_lights)
-            if delay < 0.33:
-                config.glstart_delay = 0
-            else:
-                config.glstart_delay = delay
-            config.start_state = [ trajectory[0].x, 0.0, 0.0, trajectory[0].y, 0.0, 0.0 ]
-            config.btree_reconfig = "c_wait=wait,args=(time={})".format(config.glstart_delay)
-            config.btree_reconfig += ";m_vkeeping=MVelKeepConfig( vel=MP({},10,3), lat_target=LT({}) )".format(config.vk_target_vel,config.d_target)
-            #to consider:
-            # the final speed on the riginal track may not be accurate. getting an average on the last quartil can help
-            # the limiting factor on the acceleration could be increased to allow steeper startup
-
-
 
     #Summary:
     print("======= Experiment Summary =======")

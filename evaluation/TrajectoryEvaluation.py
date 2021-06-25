@@ -67,23 +67,23 @@ def evaluate_trajectory(traj_file):
 def evaluate_scenario(es:EvalScenario):
     print("Evaluate scenario {}".format(es.scenario_id))
 
-    traj_l = None
-    traj_s = load_trajectory_log( 'traj_log/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id) ) #synthetic nc
-    traj_e = load_trajectory_log( 'traj_log/{}_nc_{}.csv'.format(es.scenario_id, es.track_id) )  #empirical nc
+    traj_s = load_trajectory_log('traj_log/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id)) #synthetic nc
+    traj_e = load_trajectory_log('traj_log/{}_nc_{}.csv'.format(es.scenario_id, es.track_id))  #empirical nc
 
     es.time = float(traj_e[-1]['time']) - float(traj_e[0]['time'])
 
+    # Euclidean distance
     es.ed_vector, es.d0_vector_s, es.d0_vector_e, es.ed = get_euclideandistance(traj_s, traj_e)
     ed_array = [x[1] for x in es.ed_vector]
     es.ed_mean = np.mean(ed_array)
     es.ed_median = np.median(ed_array)
     es.ed_max = np.max(ed_array)
 
-    #Frechet distance
+    # Frechet distance
     #es.fd = get_frechet(traj_s, traj_e)
 
-    # traj_plot_combined(es, traj_s, traj_s_nc, traj_e)
-    # speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
+    traj_plot_combined(es, traj_s, traj_e)
+    #speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
     ed_plot(es)
 
     #not calibrated
@@ -124,8 +124,8 @@ def load_all_scenarios(video_id):
             es.scenario_type = row[5]
             #constraints
             if (row[6] != ''):
-                if (',' in row[6]):
-                    es.const_agents = [int(cid) for cid in row[6].split(',')]
+                if (';' in row[6]):
+                    es.const_agents = [int(cid) for cid in row[6].split(';')]
                 else:
                     es.const_agents.append(int(row[6]))
             #start time
@@ -259,7 +259,7 @@ def get_samples(traj_p, traj_q, traj_l = None, trim = 1.0, samples = None):
             L =  [ node for node in traj_l[:size]]
     return P, Q, L
 
-def get_frechet(traj_p,traj_q, trim = 1.0, samples = 300):
+def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
     L = None
     #trim ending of trajectory in %
     #print("trim trajectory in {} of {}".format(trim, len(traj_p)))
@@ -311,17 +311,13 @@ def distance_2p(x1, y1, x2, y2):
     return dist
 
 
-def traj_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e):
+def traj_plot_combined(es:EvalScenario, traj_s, traj_e):
     plt.cla()
     fig=plt.figure()
     ax=fig.add_subplot(111)
     ax.plot(   [node['x'] for node in traj_e],
                 [node['y'] for node in traj_e],
                 'r-', label="Empirical vehicle")
-
-    ax.plot(   [node['x'] for node in traj_s_nc],
-                [node['y'] for node in traj_s_nc],
-                'b--',label="SDV (a) ed={} m ed={} m".format(format(es.ed_nc_mean, '.2f'),format(es.ed_nc_max, '.2f')))
 
     ax.plot(   [node['x'] for node in traj_s],
                 [node['y'] for node in traj_s],
@@ -394,7 +390,7 @@ def ed_plot(es):
     plt.plot([node[0] for node in es.d0_vector_s], [node[1] for node in es.d0_vector_s], 'b', label="ed_0_s")
     plt.plot([node[0] for node in es.d0_vector_e], [node[1] for node in es.d0_vector_e], 'r-', label="ed_0_e")
     plt.suptitle(title)
-    #plt.legend(loc="upper left")
+    plt.legend(loc="upper left")
     plt.savefig(filename+'.png')
 
 def update_results_table(es:EvalScenario):

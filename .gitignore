@@ -5,6 +5,3 @@ catkin_ws
 .vscode/
 *.DS_Store
 test_btree_parser
-evaluation/plots/*
-evaluation/traj_log/*
-evaluation/db_files/*
