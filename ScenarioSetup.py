@@ -77,7 +77,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_traffic_light(tl)
 
     #========= crosswalks
-    sim_traffic.crosswalk_entry_pts = lanelet_map.get_crosswalks_entry_pts()
+    sim_traffic.crosswalks = lanelet_map.get_crosswalks()
 
     #=========  Ego (External Vehicle)
     if parser.egostart is not None:

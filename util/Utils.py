@@ -13,6 +13,10 @@ from scipy.stats import truncnorm
 from itertools import tee
 
 
+def normalize(v):
+    norm = np.linalg.norm(v)
+    return v / norm if norm > 0 else v
+
 #Iterates an iter by pairs
 def pairwise(iterable):
     i, j = tee(iterable, 2)
@@ -70,7 +74,7 @@ def kalman(x, z, P, F, H, Q, R):
     return x_new, P_new
 
 def speed_to_vel(speed, angle):
-    x_vel = speed*cos(angle) 
+    x_vel = speed*cos(angle)
     y_vel = speed*sin(angle)
     return x_vel, y_vel
 
@@ -104,7 +108,109 @@ def normal_samples(nsamples, mean, sd, lo = None,up = None):
             s = random.gauss(mean,sd)
         else:
             #same as random.gauss(), but with bounds:
-            s = get_truncated_normal(mean,sd,lo,up) 
+            s = get_truncated_normal(mean,sd,lo,up)
         samples.append(s)
     return samples
-    
+
+def distance_point_to_border(pt, border):
+    ''' get shortest distance from pt to vector (border)
+        and unit vector perpendicular to border
+    '''
+    p0 = border[0]
+    p1 = border[1]
+    border_vec = p1-p0
+    pt_p0 = pt-p0
+
+    t = np.dot(border_vec, pt_p0) / np.dot(border_vec, border_vec)
+    cross = p0 + t*border_vec
+
+    if t <= 0.0:
+        dist = np.linalg.norm(pt_p0)
+    elif t >= 1.0:
+        dist = np.linalg.norm(pt-p1)
+    else:
+        dist = np.linalg.norm(cross-pt)
+
+    norm = normalize(pt-cross)
+
+    return dist, norm
+
+def get_lanelet_entry_exit_points(lanelet):
+    ''' given a directed lanelet, return the points
+        midway between the endpoints at each end
+    '''
+    entrance_pt_left = np.array([lanelet.leftBound[0].x, lanelet.leftBound[0].y])
+    entrance_pt_right = np.array([lanelet.rightBound[0].x, lanelet.rightBound[0].y])
+    exit_pt_left = np.array([lanelet.leftBound[-1].x, lanelet.leftBound[-1].y])
+    exit_pt_right = np.array([lanelet.rightBound[-1].x, lanelet.rightBound[-1].y])
+
+    entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
+    exit_pt = (exit_pt_left + exit_pt_right) / 2
+
+    return entrance_pt, exit_pt
+
+
+    ''' return True if line segments L1=(p1,q1) and L2=(p2,q2) intersect
+    '''
+def line_segments_intersect(L1, L2):
+    # find orientations
+    o1 = orientation(L1[0], L1[1], L2[0])
+    o2 = orientation(L1[0], L1[1], L2[1])
+    o3 = orientation(L2[0], L2[1], L1[0])
+    o4 = orientation(L2[0], L2[1], L1[1])
+
+    # general case
+    if ((o1 != o2) and (o3 != o4)):
+        return True
+
+    # special cases
+
+    # p2 colinear to and lies on L1
+    if (o1 == 0 and colinear_point_on_line_segment(L2[0], L1)):
+        return True
+
+    # q2 colinear to and lies on L1
+    if (o2 == 0 and colinear_point_on_line_segment(L2[1], L1)):
+        return True
+
+    # p1 colinear to and lies on L2
+    if (o3 == 0 and colinear_point_on_line_segment(L1[0], L2)):
+        return True
+
+    # q1 colinear to and lies on L2
+    if (o4 == 0 and colinear_point_on_line_segment(L1[1], L2)):
+        return True
+
+    # line segments to not intersect
+    return False
+
+
+def orientation(p1, p2, p3):
+    ''' return the orientation of the ordered triplet of points (p1, p2, p3)
+    '''
+    val = (float(p2[1] - p1[1]) * (p3[0] - p2[0])) - (float(p2[0] - p1[0]) * (p3[1] - p2[1]))
+
+    if val > 0:
+        # clockwise
+        return 1
+    elif val < 0:
+        # counterclockwise
+        return 2
+    else:
+        # colinear
+        return 0
+
+def colinear_point_on_line_segment(pt, L):
+    ''' given point pt colinear to line L, return True if pt is on L
+    '''
+    if ((pt[0] <= max(L[0][0], L[1][0])) and (pt[0] >= min(L[0][0], L[1][0])) and
+            (pt[1] <= max(L[0][1], L[1][1])) and (pt[1] >= min(L[0][1], L[1][1]))):
+        return True
+
+    return False
+
+def angle_btwn_vectors(a, b):
+    ''' return the angle in radians between vectors a and b
+        (0 <= angle <= pi)
+    '''
+    return np.arccos(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
