@@ -383,7 +383,7 @@ class LaneletMap(object):
                     ret = ll
                     break
         return ret
-
+    
     def area_and_lanelet_share_node(self, area, lanelet):
         """ Return True if either left or right bounds of the lanelet share a node with the area
         """
@@ -392,7 +392,7 @@ class LaneletMap(object):
 
         return share_area_node_with_left or share_area_node_with_right
 
-
+    #deprecated?
     def get_global_path_for_route(self, lanelet_route, x=None, y=None, meters_after_end=50):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
             x, y only used to determine the starting lanelet, allowed to be a little outdated.

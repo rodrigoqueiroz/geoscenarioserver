@@ -28,7 +28,7 @@ from SimTraffic import *
 import time
 
 class SVPlanner(object):
-    def __init__(self, sdv, sim_traffic, btree_locations):
+    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes):
         #MainProcess space:
         self._process = None
         self.traffic_state_sharr = sim_traffic.traffic_state_sharr
@@ -51,6 +51,7 @@ class SVPlanner(object):
         self.btree_locations = btree_locations
         self.btype = sdv.btype
         self.sdv_route = None
+        self.route_nodes = route_nodes
 
     def start(self):
         #Create shared arrray for Motion Plan
@@ -125,7 +126,8 @@ class SVPlanner(object):
             
             if self.sdv_route is None:
                 self.sdv_route = SDVRoute(
-                    self.sim_config.lanelet_routes[self.vid], self.laneletmap, vehicle_state.x, vehicle_state.y
+                    self.sim_config.lanelet_routes[self.vid], self.laneletmap,
+                    vehicle_state.x, vehicle_state.y, self.route_nodes
                 )
 
             # Get traffic, lane config and regulatory elements in current frenet frame
@@ -307,8 +309,12 @@ class SVPlanner(object):
         vehicle_state.set_D(d_vector)
 
         # the next plan's ref_path_origin is vehicle_state.s
-        self.sdv_route.update_reference_path(vehicle_state.s, plan_lane_swerve=True)
+        self.sdv_route.update_reference_path(
+            vehicle_state.s, plan_lane_swerve=True, update_route_progress=True
+        )
         vehicle_state.s = 0.0
+
+        route_complete = self.sdv_route.route_complete()
 
         lane_swerve_target = self.sdv_route.get_lane_swerve_direction(vehicle_state.s)
 
@@ -365,6 +371,7 @@ class SVPlanner(object):
             vehicle_state=vehicle_state,
             lane_config=lane_config,
             goal_point_frenet=goal_point_frenet,
+            route_complete=route_complete,
             traffic_vehicles=traffic_vehicles,
             regulatory_elements=reg_elems,
             pedestrians=traffic_pedestrians,

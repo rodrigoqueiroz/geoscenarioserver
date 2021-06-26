@@ -23,6 +23,7 @@ from shm.SimSharedMemory import *
 from util.Utils import kalman
 from typing import List
 from lanelet2.routing import Route
+from gsc.GSParser import Node
 
 import datetime
 
@@ -60,11 +61,12 @@ class SDV(Vehicle):
     Simulated Driver-Vehicle Model (dynamic behavior)
     '''
     def __init__(
-            self, vid:int, name:str, root_btree_name:str,
-            start_state:List[float], yaw:float, lanelet_map:LaneletMap, lanelet_route:Route,
+            self, vid:int, name:str, root_btree_name:str, start_state:List[float],
+            yaw:float, lanelet_map:LaneletMap, lanelet_route:Route, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
         self.btype = btype
         self.btree_locations = btree_locations
+        self.route_nodes = route_nodes
 
         if start_state_in_frenet:
             # assume frenet start_state is relative to the starting global path
@@ -105,7 +107,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations)
+        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes)
         self.sv_planner.start()
 
     def stop(self):

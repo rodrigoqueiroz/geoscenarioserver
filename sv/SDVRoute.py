@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from scipy.interpolate import splprep, splev
 
+from gsc.GSParser import Node
 from mapping.LaneletMap import LaneletMap
 import SimConfig
 from util.Transformations import OutsideRefPathException, sim_to_frenet_position
@@ -15,7 +16,7 @@ from util.Utils import distance_2p
 class SDVRoute(object):
     lanelet_map = None
 
-    def __init__(self, lanelet_route:Route, lanelet_map:LaneletMap, start_x:float=None, start_y:float=None):
+    def __init__(self, lanelet_route:Route, lanelet_map:LaneletMap, start_x:float=None, start_y:float=None, route_nodes:List[Node]=None):
         # NOTE: start_x and start_y should only be None in the case where x and 
         #       y aren't known; e.g., when starting with frenet state
 
@@ -40,6 +41,9 @@ class SDVRoute(object):
         self._update_should_lane_swerve(start_s, self.get_global_path(), 0)
         self.update_reference_path(start_s)
 
+        self._route_nodes:List[Node] = route_nodes
+        self._update_route_progress(True)
+
     def get_global_path(self):
         return self._current_sdv_path.get_global_path()
 
@@ -59,6 +63,11 @@ class SDVRoute(object):
     def get_reference_path_s_start(self):
         return self._current_sdv_path.get_ref_path_s_start()
 
+    def route_complete(self):
+        if self._route_nodes is not None:
+            return len(self._route_nodes) == 0
+        return True
+
     def update_global_path(self, x:float, y:float):
         curr_ll = SDVRoute.lanelet_map.get_occupying_lanelet_by_route(
             self._lanelet_route, x, y
@@ -71,13 +80,35 @@ class SDVRoute(object):
                 self._current_sdv_path = sdv_path
                 break
 
-    def update_reference_path(self, ref_path_origin:float, plan_lane_swerve:bool=False):
+    def update_reference_path(self, ref_path_origin:float, plan_lane_swerve:bool=False, update_route_progress:bool=False):
         self._current_sdv_path.update_ref_path(ref_path_origin)
+
+        if update_route_progress:
+            self._update_route_progress()
 
         if plan_lane_swerve:
             self._update_should_lane_swerve(
                 0, self.get_reference_path(), self.get_reference_path_s_start()
             )
+
+    def _update_route_progress(self, search_until_found=False):
+        if not self.route_complete():
+            copy_start = 0
+            for i, node in enumerate(self._route_nodes.copy()):
+                try:
+                    sim_to_frenet_position(
+                        self.get_reference_path(), node.x,
+                        node.y, self.get_reference_path_s_start()
+                    )
+                    search_until_found = False
+                except OutsideRefPathException:
+                    if not search_until_found:
+                        break
+
+                # If node is on the reference path, then it is visited
+                copy_start = i + 1
+
+            self._route_nodes = self._route_nodes[copy_start:]
 
     def _set_sdv_paths(self):
         self._sdv_paths = []
