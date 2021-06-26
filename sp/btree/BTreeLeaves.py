@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 #dinizr@chalmers.se
 #rqueiroz@uwaterloo.ca
+#slarter@uwaterloo.ca
 
 from py_trees import *
 import random
 from TickSync import TickSync
 from sp.ManeuverConfig import *
-import sp.ManeuverUtils
+from sp.ManeuverUtils import *
 
 #alternative:
 class BCondition(behaviour.Behaviour):
@@ -78,7 +79,7 @@ class ManeuverAction(behaviour.Behaviour):
 
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
-            If the maneuver is indefinite (e.g. velocity keeping), it returns SUCCESS.
+            If the maneuver is indefinite (e.g. keep in lane), it returns SUCCESS.
             If the maneuver has an end (e.g. lane swerve) it returns RUNNING and SUCCESS when finished.
             If the maneuver cannot be performed it returns FAILURE.
         """
@@ -88,13 +89,13 @@ class ManeuverAction(behaviour.Behaviour):
         status = common.Status.SUCCESS
 
         # Maneuver specific logic for runtime configuration:
-        if self.mconfig.mkey == Maneuver.M_VELKEEP:
+        if self.mconfig.mkey == Maneuver.M_KEEPINLANE:
             pass
 
         elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
             if self.mconfig.type == MStopConfig.Type.GOAL:
-                self.mconfig.pos = self.bmodel.planner_state.route[-1]
+                self.mconfig.pos = self.bmodel.planner_state.destination
             # If stopping at a stop line, find a regulatory element with a stop line applying to this agent
             elif self.mconfig.type == MStopConfig.Type.STOP_LINE:
                 for re_state in self.bmodel.planner_state.regulatory_elements:
@@ -102,8 +103,15 @@ class ManeuverAction(behaviour.Behaviour):
                         self.mconfig.pos = re_state.stop_position[0]
                         break
 
-        elif self.mconfig.mkey == Maneuver.M_UPDATEWAYPOINT:
-            pass
+        elif self.mconfig.mkey == Maneuver.M_ENTERCROSSWALK:
+            # RUNNING while pedestrian has not yet entered crosswalk
+            if not in_crosswalk_area(self.bmodel.planner_state):
+                status = common.Status.RUNNING
+
+        elif self.mconfig.mkey == Maneuver.M_EXITCROSSWALK:
+            # RUNNING while pedestrian has not yet exited crosswalk
+            if in_crosswalk_area(self.bmodel.planner_state):
+                status = common.Status.RUNNING
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)

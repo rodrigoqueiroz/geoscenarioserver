@@ -35,6 +35,10 @@ class LaneletMap(object):
         traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
         self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
 
+        # generate routing table specifically for pedestrians
+        traffic_rules_pedestrians = lanelet2.traffic_rules.create(Locations.Germany, Participants.Pedestrian)
+        self.routing_graph_pedestrians = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules_pedestrians)
+
         # Add participant attribute to all lanelets
         for elem in self.lanelet_map.laneletLayer:
             # ensure every lanelet has a subtype (default: road)
@@ -173,26 +177,8 @@ class LaneletMap(object):
             linepoints = [xs,ys]
         return x,y,linepoints
 
-    def get_crosswalks_entry_pts(self):
-        all_xwalks = {}
-        xwalk_id = 1
-
-        for elem in self.lanelet_map.laneletLayer:
-            if elem.attributes["subtype"] == "crosswalk":
-                entrance_pt_left = np.array([elem.leftBound[0].x, elem.leftBound[0].y])
-                entrance_pt_right = np.array([elem.rightBound[0].x, elem.rightBound[0].y])
-                exit_pt_left = np.array([elem.leftBound[1].x, elem.leftBound[1].y])
-                exit_pt_right = np.array([elem.rightBound[1].x, elem.rightBound[1].y])
-
-                entrance_pt = (entrance_pt_left + entrance_pt_right) / 2
-                exit_pt = (exit_pt_left + exit_pt_right) / 2
-
-                all_xwalks[xwalk_id] = [entrance_pt, exit_pt]
-
-                xwalk_id += 1
-
-        return all_xwalks
-
+    def get_crosswalks(self):
+        return [ll for ll in self.lanelet_map.laneletLayer if ll.attributes["subtype"] == "crosswalk"]
 
     @staticmethod
     def get_left_in_route(route, lanelet):
@@ -218,6 +204,14 @@ class LaneletMap(object):
         assert route
         return route
 
+    def get_pedestrian_route(self, from_lanelet_id:int, to_lanelet_id:int):
+        from_ll = self.lanelet_map.laneletLayer[from_lanelet_id]
+        to_ll = self.lanelet_map.laneletLayer[to_lanelet_id]
+        # Route object automatically constructs a sub-laneletmap
+        route = self.routing_graph_pedestrians.getRoute(from_ll, to_ll)
+        assert route
+        return route
+
     def get_route_via(self, lanelets:List[Lanelet]):
         assert len(lanelets) >= 2
 
@@ -231,6 +225,12 @@ class LaneletMap(object):
 
     def get_shortest_path(self, from_lanelet_id:int, to_lanelet_id:int):
         route = self.get_route(from_lanelet_id, to_lanelet_id)
+        shortest_path = route.shortestPath()
+        assert(shortest_path)
+        return shortest_path
+
+    def get_pedestrian_shortest_path(self, from_lanelet_id:int, to_lanelet_id:int):
+        route = self.get_pedestrian_route(from_lanelet_id, to_lanelet_id)
         shortest_path = route.shortestPath()
         assert(shortest_path)
         return shortest_path
@@ -280,14 +280,14 @@ class LaneletMap(object):
 
             # case: agent is on more than one lanelet where they are the allowed participant
             if len(participant_lls) > 1:
-                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                    (x,y), [ll.id for ll in participant_lls]))
+                # log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #     (x,y), [ll.id for ll in participant_lls]))
                 return participant_lls[1]
 
             # case: agent is on more than one lanelet where they are NOT the allowed participant
             if len(intersecting_lls) > 1:
-                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                    (x,y), [ll.id for ll in intersecting_lls]))
+                # log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #     (x,y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
 
             # case: if agent is not on any lanelet (but bounding box intersected multiple lanelets)
@@ -295,6 +295,34 @@ class LaneletMap(object):
                 return None
 
         return intersecting_lls[0]
+
+
+    def get_spaces_list_occupied_by_pedestrian(self, position):
+        spaces_list = {'lanelets': [], 'areas': []}
+
+        point = BasicPoint2d(position[0], position[1])
+
+        # get all intersecting lanelets using a trivial bounding box
+        searchbox = BoundingBox2d(point, point)
+        intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
+        intersecting_areas = self.lanelet_map.areaLayer.search(searchbox)
+
+        # filter lanelets
+        if len(intersecting_lls) > 0:
+            # filter results for lanelets containing the point
+            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            # filter results for lanelets with allowed participants matching participant_tag
+            pedestrian_lls = list(filter(lambda ll: 'participant:pedestrian' in ll.attributes and ll.attributes['participant:pedestrian'] == "yes", intersecting_lls))
+            spaces_list['lanelets'] = pedestrian_lls
+
+        # filter areas
+        if len(intersecting_areas) > 0:
+            # filter results for lanelets containing the point
+            intersecting_areas = list(filter(lambda area: distance(point, area) <= 0.0, intersecting_areas))
+            # note: pedestrians are allowed in all areas so there is no need to filter by participant
+            spaces_list['areas'] = intersecting_areas
+
+        return spaces_list
 
     def get_occupying_area(self, x, y):
         point = BasicPoint2d(x, y)
@@ -318,6 +346,12 @@ class LaneletMap(object):
             return None
 
         return intersecting_areas[0]
+
+    def inside_lanelet_or_area(self, position, lanelet_or_area):
+        point = BasicPoint2d(position[0], position[1])
+        if lanelet_or_area.attributes['type'] == 'multipolygon':
+            return distance(point, lanelet_or_area) <= 0.0
+        return inside(lanelet_or_area, point)
 
     def get_occupying_lanelet_in_reference_path(self, ref_path, lanelet_route, x, y):
         """ Returns the lanelet closest to (x,y) that lies along ref_path.
@@ -349,6 +383,59 @@ class LaneletMap(object):
                     ret = ll
                     break
         return ret
+
+    def area_and_lanelet_share_node(self, area, lanelet):
+        """ Return True if either left or right bounds of the lanelet share a node with the area
+        """
+        share_area_node_with_left = any([node in area.outerBound[0] for node in lanelet.leftBound])
+        share_area_node_with_right = any([node in area.outerBound[0] for node in lanelet.rightBound])
+
+        return share_area_node_with_left or share_area_node_with_right
+
+
+    def get_global_path_for_route(self, lanelet_route, x=None, y=None, meters_after_end=50):
+        """ This looks 100m ahead of the beginning of the current lanelet. Change?
+            x, y only used to determine the starting lanelet, allowed to be a little outdated.
+            Ideally we don't want to request for this very often - only when we generate a new trajectory.
+
+            @param lanelet_route:       Route object from lanelet2
+            @param meters_after_end:    distance beyond the end of lanelet_route to extend the global path by
+
+            @return:    list of lanelet2.core.Point3d
+        """
+
+        # if a position is not given, take the first lanelet in the shortest path
+        # otherwise find the lanelet we are in in the shortest path
+        cur_ll = lanelet_route.shortestPath()[0] if x is None or y is None \
+            else self.get_occupying_lanelet_by_route(lanelet_route, x, y)
+        assert cur_ll, "Cannot get current lane from x={}, y={}".format(x, y)
+
+        cur_lane = lanelet_route.fullLane(cur_ll)
+        assert cur_lane
+
+        path = []
+        # append centerline of each lanelet in the lane
+        for ll in cur_lane:
+            for p in ll.centerline:
+                path.append(Point3d(0, p.x, p.y, 0.0))
+
+        # add a padding at the end of the path
+        path_length = 0
+        next_ll = self.get_next(cur_lane[-1])
+        while next_ll is not None and path_length < meters_after_end:
+            for p, q in pairwise(next_ll.centerline):
+                # for first iteration, also append p
+                if path_length == 0:
+                    path.append(Point3d(0, p.x, p.y, 0.0))
+
+                path.append(Point3d(0, q.x, q.y, 0.0))
+                path_length += distance(p, q)
+
+                if path_length >= meters_after_end: break
+            next_ll = self.get_next(next_ll)
+
+        path_ls = ConstLineString3d(0, path)
+        return path_ls
 
     def get_points(self,  x_min=0, y_min=0, x_max=0, y_max=0):
         data = []

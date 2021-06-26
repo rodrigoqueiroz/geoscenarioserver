@@ -15,9 +15,10 @@ from typing import Dict
 
 
 class Maneuver(Enum):
-    M_VELKEEP = 1
+    M_KEEPINLANE = 1
     M_STOP = 2
-    M_UPDATEWAYPOINT = 3
+    M_ENTERCROSSWALK = 3
+    M_EXITCROSSWALK = 4
 
 
 class SamplingMethod(Enum):
@@ -127,13 +128,13 @@ class MConfig:
 
 
 @dataclass
-class MVelKeepConfig(MConfig):
+class MKeepInLaneConfig(MConfig):
     vel:MP = MP(1.0,10,3)              #velocity in [m/s] as MP
     time:MP = MP(3.0,20,3)              #duration in [s] as MP
     #time_lowvel:MP = MP(6.0,10,3)      #duration in [s] as MP when starting
     #vel_threshold:float = 7            #upper bound for lowvel in [m/s]
     max_diff:float = 1.5               #max vel diff (current to target).
-    mkey:int = Maneuver.M_VELKEEP
+    mkey:int = Maneuver.M_KEEPINLANE
 
 
 @dataclass
@@ -151,20 +152,12 @@ class MStopConfig(MConfig):
     #time:MP = MP(3.0,40,6)         #[s]
     mkey:int = Maneuver.M_STOP
 
-    def __post_init__(self):
-        self.max_long_acc = 12.0
+
+@dataclass
+class MEnterCrosswalkConfig(MConfig):
+    mkey:int = Maneuver.M_ENTERCROSSWALK
 
 
 @dataclass
-class MUpdateWaypoint(MConfig):
-    class Type(IntEnum):
-        NEXT = 0            # continue to next node in route
-        XWALK_ENTRY = 1     # add entry of xwalk as new and next node in route
-        XWALK_EXIT = 2      # add exit of xwalk as new and next node in route
-
-    vel:MP = MP(1.0,10,3)              #velocity in [m/s] as MP
-    time:MP = MP(3.0,20,3)              #duration in [s] as MP
-    #time_lowvel:MP = MP(6.0,10,3)      #duration in [s] as MP when starting
-    #vel_threshold:float = 7            #upper bound for lowvel in [m/s]
-    max_diff:float = 1.5               #max vel diff (current to target).
-    mkey:int = Maneuver.M_UPDATEWAYPOINT
+class MExitCrosswalkConfig(MConfig):
+    mkey:int = Maneuver.M_EXITCROSSWALK
