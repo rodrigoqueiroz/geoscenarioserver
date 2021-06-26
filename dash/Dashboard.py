@@ -111,11 +111,11 @@ class Dashboard(object):
                     #vehicles with planner: cartesian, frenet chart and behavior tree
                     if vid in debug_shdata:
                         #read vehicle planning data from debug_shdata
-                        planner_state, btree_snapshot, ref_path, traj, cand, unf, = debug_shdata[vid]
+                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
                         if SHOW_CPLOT: #cartesian plot with lanelet map
                             self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
                         if SHOW_FFPLOT: #frenet frame plot
-                            self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf)
+                            self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
                         if VEH_TRAJ_CHART: #vehicle traj plot
                             self.plot_vehicle_sd(traj, cand)
                         #behavior tree
@@ -350,7 +350,7 @@ class Dashboard(object):
                     label = "p{}".format(pid)
                     plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
-    def plot_frenet_chart(self, center_id, planner_state, debug_ref_path, traj, cand, unf):
+    def plot_frenet_chart(self, center_id, planner_state, debug_ref_path, traj, cand, unf, traj_s_shift):
         #Frenet Frame plot
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
@@ -416,18 +416,19 @@ class Dashboard(object):
 
 
         #main vehicle
-        x,y = goal_point_frenet[0],goal_point_frenet[1]
-        #plt.plot(x, 'go',markersize=6, zorder=10)
-        plt.axvline(x, color="k", linestyle='-', zorder=0)
-        plt.gca().text(x+1, y+1, "goal", style='italic', zorder=10)
+        if goal_point_frenet is not None:
+            x,y = goal_point_frenet[0],goal_point_frenet[1]
+            #plt.plot(x, 'go',markersize=6, zorder=10)
+            plt.axvline(x, color="k", linestyle='-', zorder=0)
+            plt.gca().text(x+1, y+1, "goal", style='italic', zorder=10)
         if cand:
             for t in cand:
-                Dashboard.plot_trajectory(t[0], t[1], t[2], 'grey')
+                Dashboard.plot_trajectory(t[0], t[1], t[2], traj_s_shift, 'grey')
         if unf:
             for t in unf:
-                Dashboard.plot_trajectory(t[0], t[1], t[2],'red')
+                Dashboard.plot_trajectory(t[0], t[1], t[2], traj_s_shift, 'red')
         if traj:
-            Dashboard.plot_trajectory(traj[0], traj[1], traj[2], 'blue')
+            Dashboard.plot_trajectory(traj[0], traj[1], traj[2], traj_s_shift, 'blue')
 
 
 
@@ -502,14 +503,14 @@ class Dashboard(object):
 
 
     @staticmethod
-    def plot_trajectory(s_coef, d_coef, T,tcolor='grey'):
+    def plot_trajectory(s_coef, d_coef, T, traj_s_shift, tcolor='grey'):
         s_eq = to_equation(s_coef)
         d_eq = to_equation(d_coef)
         X = []
         Y = []
         t = 0
         while t <= T+0.01:
-            X.append(s_eq(t))
+            X.append(s_eq(t) + traj_s_shift)
             Y.append(d_eq(t))
             t += 0.25
         #plot trajectory curve

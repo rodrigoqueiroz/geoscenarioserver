@@ -16,10 +16,13 @@ from SimConfig import *
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
 from util.Utils import *
 from sv.SDVPlanner import *
+from sv.SDVRoute import SDVRoute
 from Actor import *
 from mapping.LaneletMap import LaneletMap
 from shm.SimSharedMemory import *
 from util.Utils import kalman
+from typing import List
+from lanelet2.routing import Route
 
 import datetime
 
@@ -56,27 +59,37 @@ class SDV(Vehicle):
     ''''
     Simulated Driver-Vehicle Model (dynamic behavior)
     '''
-    def __init__(self, vid, name, root_btree_name, start_state, yaw, lanelet_map:LaneletMap, lanelet_route, start_state_in_frenet=False, btree_locations=[], btype=""):
-        #Map
+    def __init__(
+            self, vid:int, name:str, root_btree_name:str,
+            start_state:List[float], yaw:float, lanelet_map:LaneletMap, lanelet_route:Route,
+            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
         self.btype = btype
         self.btree_locations = btree_locations
-        self.lanelet_map = lanelet_map
-        self.lanelet_route = lanelet_route # list of lanelet ids we want this vehicle to follow
-        self.global_path = None
+
         if start_state_in_frenet:
-            # assume frenet start_state is relative to the first lane of the route
-            self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route)
-            # compute sim state
-            x_vector, y_vector = frenet_to_sim_frame(self.global_path, start_state[0:3], start_state[3:6])
+            # assume frenet start_state is relative to the starting global path
+            self.sdv_route = SDVRoute(lanelet_route, lanelet_map)
+            x_vector, y_vector = frenet_to_sim_frame(
+                self.sdv_route.get_global_path(), start_state[0:3],
+                start_state[3:], 0
+            )
+            self.sdv_route.update_reference_path(start_state[0])
+            start_state[0] = 0.0
             Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw)
         else:
-            self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, x=start_state[0], y=start_state[3])
-            # Compute frenet state corresponding to start_state
-            s_vector, d_vector = sim_to_frenet_frame(self.global_path, start_state[0:3], start_state[3:6])
+            self.sdv_route = SDVRoute(lanelet_route, lanelet_map, start_state[0], start_state[3])
+            s_vector, d_vector = sim_to_frenet_frame(
+                self.sdv_route.get_global_path(), start_state[0:3], start_state[3:], 0
+            )
+            self.sdv_route.update_reference_path(s_vector[0])
+            s_vector[0] = 0.0
             Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw)
+
         self.type = Vehicle.SDV_TYPE
+
         #Planning
         self.sv_planner = None
+
         #Behavior
         self.root_btree_name = root_btree_name
         self.btree_reconfig = ""
@@ -84,6 +97,7 @@ class SDV(Vehicle):
         self.next_motion_plan = None
 
         #debug:
+        self.jump_back_check = True
         self.jump_back_count = 0
         self.max_jump_back_dist = 0
 
@@ -98,23 +112,21 @@ class SDV(Vehicle):
         if self.sv_planner:
             self.sv_planner.stop()
 
-    def tick(self, tick_count, delta_time, sim_time):
+    def tick(self, tick_count:int, delta_time:float, sim_time:float):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
             plan = self.sv_planner.get_plan()
-            if plan:
-                if plan.trajectory.T != 0:
-                    self.set_new_motion_plan(plan, sim_time)
-                    if plan.new_frenet_frame:
-                        # NOTE: vehicle state being used here is from the previous frame (that planner should have gotten)
-                        self.global_path = self.lanelet_map.get_global_path_for_route(self.lanelet_route, self.state.x, self.state.y)
-                else:
-                    self.set_new_motion_plan(plan, sim_time)
+            if plan is not None:
+                self.set_new_motion_plan(plan, sim_time)
+                if plan.new_frenet_frame:
+                    # NOTE: vehicle state being used here is from the previous frame (that planner should have gotten)
+                    self.jump_back_check = False
+                    self.sdv_route.update_global_path(self.state.x, self.state.y)
             #Compute new state
             self.compute_vehicle_state(delta_time, sim_time)
 
-    def compute_vehicle_state(self, delta_time, sim_time):
+    def compute_vehicle_state(self, delta_time:float, sim_time:float):
         """
         Consume trajectory based on a given time and update pose
         Optimized with pre computed derivatives and equations
@@ -127,6 +139,7 @@ class SDV(Vehicle):
             if time < 0:
                 log.warning("Next v{} plan at {:2f}s is ahead of sim_time {:2f}s (diff{:2f}s) and will be delayed".format(
                     self.id,self.next_motion_plan.start_time,sim_time, time))
+                return
             else:
                 self.motion_plan = self.next_motion_plan
                 self.next_motion_plan = None
@@ -148,26 +161,37 @@ class SDV(Vehicle):
             new_state = self.motion_plan.trajectory.get_state_at(time)
 
             #check consistency during transition from previous to new states
-            # <1cm is within acceptable difference (rounding and error in frame conversion)
-            s_delta = new_state[0] - self.state.s
-            if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
-                log.error("Vehicle {} moved backwards by {}m".format(self.id, s_delta))
-                log.info("SimTime {} Delta {} Plan: StartTime{} TimeIn {}".format(
-                        sim_time, delta_time, self.motion_plan.start_time,time))
-                log.info(self.state.get_frenet_state_vector())
-                log.info(new_state)
-                #log.info(self.motion_plan.trajectory)
-                self.jump_back_count += 1
-                self.max_jump_back_dist = max(self.max_jump_back_dist, s_delta)
+            # <=1mm is within acceptable difference (rounding and error in frame conversion)
+            if self.jump_back_check:
+                delta_origin = self.motion_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
+                s_delta = new_state[0] + delta_origin - self.state.s
+                if s_delta < 0 and abs(s_delta) > 0.001 and not self.motion_plan.reversing:
+                    # NOTE: if the global path is a loop, then jump back will be reported
+                    #       when the vehicle goes from the end of the loop back to the
+                    #       start since delta_origin will be large and negative
+                    log.error("Vehicle {} moved backwards by {}m".format(self.id, abs(s_delta)))
+                    log.info("SimTime {} Delta {} Plan: StartTime {} TimeIn {}".format(
+                            sim_time, delta_time, self.motion_plan.start_time, time))
+                    log.info(self.state.get_frenet_state_vector())
+                    log.info(new_state)
+                    #log.info(self.motion_plan.trajectory)
+                    self.jump_back_count += 1
+                    self.max_jump_back_dist = max(self.max_jump_back_dist, abs(s_delta))
+            else:
+                self.jump_back_check = True
 
             # update frenet state
             self.state.set_S(new_state[:3])
             self.state.set_D(new_state[3:])
 
+            self.sdv_route.update_reference_path(self.motion_plan.ref_path_origin)
+
             # Compute sim state using the global path this vehicle is following
-            # self.global_path = self.lanelet_map.get_global_path_for_route(self.state.x, self.state.y, self.lanelet_route)
             try:
-                x_vector, y_vector = frenet_to_sim_frame(self.global_path, self.state.get_S(), self.state.get_D())
+                x_vector, y_vector = frenet_to_sim_frame(
+                    self.sdv_route.get_reference_path(), self.state.get_S(),
+                    self.state.get_D(), self.sdv_route.get_reference_path_s_start()
+                )
             except OutsideRefPathException as e:
                 # assume we've reached the goal and exit?
                 log.error("Outside of path. Vehicle reached goal?")
@@ -212,7 +236,7 @@ class SDV(Vehicle):
 
 
 
-    def set_new_motion_plan(self, plan:MotionPlan, sim_time):
+    def set_new_motion_plan(self, plan:MotionPlan, sim_time:float):
         """
         Set a new Motion Plan with a trajectory to start following at start_time.
         """

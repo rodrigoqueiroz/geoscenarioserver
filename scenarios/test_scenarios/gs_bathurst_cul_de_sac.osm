@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-133084' action='modify' visible='true' lat='43.5101706399' lon='-80.5377494511'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='cul_de_sac_driver' />
+    <tag k='route' v='cul_de_sac' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='160' />
+  </node>
+  <node id='-133105' action='modify' visible='true' lat='43.50984896879' lon='-80.53828513943'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-133109' action='modify' visible='true' lat='43.50998138248' lon='-80.538409771'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/experimental_maps/lanelet2_bathurst.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='gs_bathurst_cul_de_sac' />
+    <tag k='timeout' v='25' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-1292257' action='modify' visible='true' lat='43.5101518887' lon='-80.53779663213' />
+  <node id='-1292258' action='modify' visible='true' lat='43.50977594686' lon='-80.53883596673' />
+  <node id='-1292259' action='modify' visible='true' lat='43.51009795167' lon='-80.53775744594' />
+  <way id='-1148313' action='modify' visible='true'>
+    <nd ref='-1292257' />
+    <nd ref='-1292258' />
+    <nd ref='-1292259' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='cul_de_sac' />
+  </way>
+</osm>
