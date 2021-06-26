@@ -11,18 +11,11 @@ from lanelet2.core import BasicPoint2d, ConstLineString2d, ConstLineString3d
 from lanelet2.geometry import toArcCoordinates
 from typing import List
 from scipy import interpolate
-
-from util.Utils import distance_2p
+from util.Utils import distance_2p, normalize
 
 class OutsideRefPathException(Exception):
     def __init__(self, message):
         Exception(message)
-
-
-def normalize(v):
-    norm = np.linalg.norm(v)
-    return v / norm if norm > 0 else v
-
 
 def vector_interp(a, b, t):
     return a + t * (b - a)
