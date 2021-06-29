@@ -17,7 +17,8 @@ from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
 from sv.btree.BehaviorModels import BehaviorModels
 from sv.SDVPlannerState import PlannerState, TrafficLightState
-from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position, frenet_to_sim_frame, OutsideRefPathException
+from sv.SDVRoute import SDVRoute
+from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position, frenet_to_sim_frame, frenet_to_sim_position, OutsideRefPathException
 import lanelet2.core
 from mapping.LaneletMap import *
 from Actor import *
@@ -27,21 +28,21 @@ from SimTraffic import *
 import time
 
 class SVPlanner(object):
-    def __init__(self, sdv, sim_traffic, btree_locations):
+    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes):
         #MainProcess space:
         self._process = None
         self.traffic_state_sharr = sim_traffic.traffic_state_sharr
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
         self._debug_shdata = sim_traffic.debug_shdata
         self._mplan_sharr = None
+
         #Shared space
         self.vid = int(sdv.id)
         self.laneletmap:LaneletMap = sim_traffic.lanelet_map
         self.sim_config = sim_traffic.sim_config
         self.sim_traffic:SimTraffic = sim_traffic
+
         #Subprocess space
-        # Reference path that the planner will use for all transformations and planning
-        self.reference_path = None
         self.root_btree_name = sdv.root_btree_name
         self.btree_reconfig = sdv.btree_reconfig
         self.behavior_model = None
@@ -49,6 +50,8 @@ class SVPlanner(object):
         self.last_plan = None
         self.btree_locations = btree_locations
         self.btype = sdv.btype
+        self.sdv_route = None
+        self.route_nodes = route_nodes
 
     def start(self):
         #Create shared arrray for Motion Plan
@@ -77,10 +80,14 @@ class SVPlanner(object):
         self._mplan_sharr.acquire() #<=========LOCK
         plan.set_plan_vector(copy(self._mplan_sharr[:]))
         self._mplan_sharr.release() #<=========RELEASE
-        #if empty
-        if (plan.trajectory.T == 0): 
+        if (plan.trajectory.T == 0):
+            # Empty plan
             return None
-        #Valid:
+        elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
+            # Same plan
+            return None
+        # New plan
+        self.last_plan = plan
         return plan
         
 
@@ -117,12 +124,15 @@ class SVPlanner(object):
                 #vehicle state not available. Vehicle can be inactive.
                 continue
             
-            if self.reference_path is None:
-                self.reference_path = self.laneletmap.get_global_path_for_route(
-                    self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+            if self.sdv_route is None:
+                self.sdv_route = SDVRoute(
+                    self.sim_config.lanelet_routes[self.vid], self.laneletmap,
+                    vehicle_state.x, vehicle_state.y, self.route_nodes
+                )
 
             # Get traffic, lane config and regulatory elements in current frenet frame
-            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states,static_objects, sync_planner.get_task_time(), state_time)
+            self.project_dynamic_objects(vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, sync_planner.get_task_time())
+            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
@@ -133,10 +143,11 @@ class SVPlanner(object):
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
             if ref_path_changed:
                 log.info("PATH CHANGED")
-                self.reference_path = self.laneletmap.get_global_path_for_route(
-                    self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+
+                self.sdv_route.update_global_path(vehicle_state.x, vehicle_state.y)
+
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects, 0, state_time)
+                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -201,6 +212,7 @@ class SVPlanner(object):
                     plan.new_frenet_frame = ref_path_changed
                     plan.reversing = mconfig.mkey == Maneuver.M_REVERSE
                     plan.tick_count = tick_count
+                    plan.ref_path_origin = self.sdv_route.get_reference_path_origin()
                     self.write_motion_plan(mplan_sharr, plan)
                     if plan.trajectory.T > 0.0: #only for non zero traj
                         self.last_plan = plan
@@ -210,34 +222,31 @@ class SVPlanner(object):
             #Debug info (for Dahsboard and Log)
             if self.sim_config.show_dashboard:
                 # change ref path format for pickling (maybe always keep it like this?)
-                debug_ref_path = [(pt.x, pt.y) for pt in self.reference_path]
+                debug_ref_path = [(pt.x, pt.y) for pt in self.sdv_route.get_reference_path()]
+                traj_s_shift = 0.0
+                if (self.last_plan is not None) and (frenet_traj is None):
+                    # shift the trajectories to the old frenet frame they are positioned in
+                    traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
                 debug_shdata[int(self.vid)] = (
                     planner_state,
                     snapshot_tree,
                     debug_ref_path,
                     (mplan_sharr[:6], mplan_sharr[6:12], mplan_sharr[12]),
                     [traj.array_format() for traj in cand if traj.feasible] if cand else None,
-                    [traj.array_format() for traj in cand if not traj.feasible] if cand else None
+                    [traj.array_format() for traj in cand if not traj.feasible] if cand else None,
+                    traj_s_shift
                 )
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         
-
-    def get_planner_state(
+    def project_dynamic_objects(
             self,
-            planner_tick:TickSync,
             vehicle_state:VehicleState,
             traffic_vehicles:dict,
             traffic_pedestrians:dict,
-            traffic_light_states:dict,
-            static_objects:dict,
-            expected_planner_time,
-            state_time):
-        """ Transforms vehicle_state and all traffic vehicles to the current frenet frame, and generates other
-            frame-dependent planning data like current lane config and goal.
-        """
+            state_time:float,
+            expected_planner_time:float):
 
-        # From compute_vehicle_state() in sv/Vehicle.py
-        if self.last_plan and expected_planner_time>0:
+        if self.last_plan and expected_planner_time > 0:
             sim_time_ahead = state_time + expected_planner_time
             delta_time = sim_time_ahead - self.last_plan.start_time
             if (delta_time > self.last_plan.trajectory.T): 
@@ -246,10 +255,15 @@ class SVPlanner(object):
             vehicle_state.set_S(new_state[:3])
             vehicle_state.set_D(new_state[3:])
 
+            self.sdv_route.update_reference_path(self.last_plan.ref_path_origin)
+
             try:
-                x_vector, y_vector = frenet_to_sim_frame(self.reference_path, vehicle_state.get_S(), vehicle_state.get_D())
-            except OutsideRefPathException as e:
-                return None
+                x_vector, y_vector = frenet_to_sim_frame(
+                    self.sdv_route.get_reference_path(), vehicle_state.get_S(),
+                    vehicle_state.get_D(), self.sdv_route.get_reference_path_s_start()
+                )
+            except OutsideRefPathException:
+                return
 
             vehicle_state.x = x_vector[0]
             vehicle_state.x_vel = x_vector[1]
@@ -257,65 +271,122 @@ class SVPlanner(object):
             vehicle_state.y = y_vector[0]
             vehicle_state.y_vel = y_vector[1]
             vehicle_state.y_acc = y_vector[2]
-        else:
-            # update vehicle frenet state since reference path may have changed
-            s_vector, d_vector = sim_to_frenet_frame(self.reference_path, vehicle_state.get_X(), vehicle_state.get_Y())
-            vehicle_state.set_S(s_vector)
-            vehicle_state.set_D(d_vector)
-            delta_time = 0.0
 
-        # update lane config based on current (possibly outdated) reference frame
-        lane_config, reg_elems = self.read_map(vehicle_state, self.reference_path, traffic_light_states)
-        if not lane_config:
-            # No map data for current position
-            log.warn("no lane config")
-            return None
-
-        # transform other vehicles and pedestrians to frenet frame based on this vehicle
-        for vid, vehicle in traffic_vehicles.items():
-            s_vector, d_vector = sim_to_frenet_frame(
-                self.reference_path, vehicle.state.get_X(), vehicle.state.get_Y())
-            vehicle.state.set_S(s_vector)
-            vehicle.state.set_D(d_vector)
-            if self.last_plan:
-                state = vehicle.future_state(delta_time)
+            for vid, vehicle in traffic_vehicles.items():
+                state = vehicle.future_state(expected_planner_time)
                 vehicle.state.s = state[0]
                 vehicle.state.s_vel = state[1]
                 vehicle.state.s_acc = state[2]
                 vehicle.state.d = state[3]
                 vehicle.state.d_vel = state[4]
                 vehicle.state.d_acc = state[5]
+
+            for pid, pedestrian in traffic_pedestrians.items():
+                state = pedestrian.future_state(expected_planner_time)
+                pedestrian.state.s = state[0]
+                pedestrian.state.s_vel = state[1]
+                pedestrian.state.s_acc = state[2]
+                pedestrian.state.d = state[3]
+                pedestrian.state.d_vel = state[4]
+                pedestrian.state.d_acc = state[5]
+
+    def get_planner_state(
+            self,
+            planner_tick:TickSync,
+            vehicle_state:VehicleState,
+            traffic_vehicles:dict,
+            traffic_pedestrians:dict,
+            traffic_light_states:dict,
+            static_objects:dict):
+        """ Transforms vehicle_state and all traffic vehicles to the current frenet frame, and generates other
+            frame-dependent planning data like current lane config and goal.
+        """
+
+        s_vector, d_vector = sim_to_frenet_frame(
+            self.sdv_route.get_global_path(), vehicle_state.get_X(), vehicle_state.get_Y(), 0
+        )
+        vehicle_state.set_S(s_vector)
+        vehicle_state.set_D(d_vector)
+
+        # the next plan's ref_path_origin is vehicle_state.s
+        self.sdv_route.update_reference_path(
+            vehicle_state.s, plan_lane_swerve=True, update_route_progress=True
+        )
+        vehicle_state.s = 0.0
+
+        route_complete = self.sdv_route.route_complete()
+
+        lane_swerve_target = self.sdv_route.get_lane_swerve_direction(vehicle_state.s)
+
+        # update lane config based on current (possibly outdated) reference frame
+        lane_config, reg_elems = self.read_map(vehicle_state, traffic_light_states)
+        if not lane_config:
+            # No map data for current position
+            log.warn("no lane config")
+            return None
+
+        # transform other vehicles and pedestrians to frenet frame based on this vehicle
+        for vid, vehicle in list(traffic_vehicles.items()):
+            try:
+                s_vector, d_vector = sim_to_frenet_frame(
+                    self.sdv_route.get_reference_path(), vehicle.state.get_X(),
+                    vehicle.state.get_Y(), self.sdv_route.get_reference_path_s_start()
+                )
+                vehicle.state.set_S(s_vector)
+                vehicle.state.set_D(d_vector)
+            except OutsideRefPathException:
+                del traffic_vehicles[vid]
         
-        for pid, pedestrian in traffic_pedestrians.items():
-            s_vector, d_vector = sim_to_frenet_frame(
-                self.reference_path, pedestrian.state.get_X(), pedestrian.state.get_Y())
-            pedestrian.state.set_S(s_vector)
-            pedestrian.state.set_D(d_vector)
-            # TODO: get future_state()
+        for pid, pedestrian in list(traffic_pedestrians.items()):
+            try:
+                s_vector, d_vector = sim_to_frenet_frame(
+                        self.sdv_route.get_reference_path(), pedestrian.state.get_X(),
+                        pedestrian.state.get_Y(), self.sdv_route.get_reference_path_s_start()
+                    )
+                pedestrian.state.set_S(s_vector)
+                pedestrian.state.set_D(d_vector)
+            except OutsideRefPathException:
+                del traffic_pedestrians[pid]
         
-        for soid, so in static_objects.items():
-            so.s, so.d = sim_to_frenet_position(self.reference_path, so.x, so.y)
+        for soid, so in list(static_objects.items()):
+            try:
+                so.s, so.d = sim_to_frenet_position(
+                    self.sdv_route.get_reference_path(), so.x,
+                    so.y, self.sdv_route.get_reference_path_s_start()
+                )
+            except OutsideRefPathException:
+                del static_objects[soid]
 
         # transform goal to frenet
-        goal_point_frenet = sim_to_frenet_position(self.reference_path, *self.sim_config.goal_points[self.vid])
+        try:
+            goal_point_frenet = sim_to_frenet_position(
+                self.sdv_route.get_reference_path(),
+                *self.sim_config.goal_points[self.vid], self.sdv_route.get_reference_path_s_start()
+            )
+        except OutsideRefPathException:
+            goal_point_frenet = None
 
         return PlannerState(
             sim_time=planner_tick.sim_time,
             vehicle_state=vehicle_state,
             lane_config=lane_config,
             goal_point_frenet=goal_point_frenet,
+            route_complete=route_complete,
             traffic_vehicles=traffic_vehicles,
             regulatory_elements=reg_elems,
             pedestrians=traffic_pedestrians,
-            static_objects=static_objects
+            static_objects=static_objects,
+            lane_swerve_target=lane_swerve_target
         )
 
-    def read_map(self, vehicle_state, reference_path, traffic_light_states):
+    def read_map(self, vehicle_state:VehicleState, traffic_light_states:dict):
         """ Builds a lane config centered around the closest lanelet to vehicle_state lying
             on the reference_path.
         """
         cur_ll = self.laneletmap.get_occupying_lanelet_in_reference_path(
-            reference_path, self.sim_config.lanelet_routes[self.vid], vehicle_state.x, vehicle_state.y)
+            self.sdv_route.get_reference_path(),
+            self.sim_config.lanelet_routes[self.vid],vehicle_state.x, vehicle_state.y
+        )
         if not cur_ll:
             # as last resort, search the whole map
             cur_ll = self.laneletmap.get_occupying_lanelet(vehicle_state.x, vehicle_state.y)
@@ -347,12 +418,25 @@ class SVPlanner(object):
                     continue
 
                 stop_linestring = re.parameters['ref_line']
-                # choose the closest point on the stop line as the stop position
-                stop_pos = min(
-                    sim_to_frenet_position(self.reference_path, stop_linestring[0][0].x, stop_linestring[0][0].y),
-                    sim_to_frenet_position(self.reference_path, stop_linestring[0][-1].x, stop_linestring[0][-1].y),
-                    key=lambda p: p[0])
-                reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
+
+                try:
+                    # choose the closest point on the stop line as the stop position
+                    stop_pos = min(
+                            sim_to_frenet_position(
+                                self.sdv_route.get_reference_path(), stop_linestring[0][0].x,
+                                stop_linestring[0][0].y, self.sdv_route.get_reference_path_s_start(),
+                                max_dist_from_path=10.0
+                            ),
+                            sim_to_frenet_position(
+                                self.sdv_route.get_reference_path(), stop_linestring[0][-1].x,
+                                stop_linestring[0][-1].y, self.sdv_route.get_reference_path_s_start(),
+                                max_dist_from_path=10.0
+                            ),
+                            key=lambda p: p[0]
+                    )
+                    reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
+                except OutsideRefPathException:
+                    pass
 
         return middle_lane_config, reg_elem_states
 
