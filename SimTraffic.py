@@ -276,7 +276,7 @@ class SimTraffic(object):
         log.info(state_str)
 
 
-    def log_trajectories(self,tick_count,delta_time,sim_time):
+    def log_trajectories(self, tick_count, delta_time, sim_time):
         if WRITE_TRAJECTORIES:
             for vid, vehicle in sorted(self.vehicles.items()):
                 if vehicle.sim_state == ActorSimState.ACTIVE or vehicle.sim_state == ActorSimState.INVISIBLE:
@@ -289,12 +289,13 @@ class SimTraffic(object):
 
             for pid, pedestrian in sorted(self.pedestrians.items()):
                 if pedestrian.sim_state == ActorSimState.ACTIVE or pedestrian.sim_state == ActorSimState.INVISIBLE:
-                    sp = pedestrian.state.get_state_vector()
-                    line = [pid, "pedestrian", pedestrian.type, int(pedestrian.sim_state), tick_count, sim_time, delta_time] + sp
+                    if pid < 0 or -pid in self.pedestrians:
+                        sp = pedestrian.state.get_state_vector()
+                        line = [pid, "pedestrian", pedestrian.type, int(pedestrian.sim_state), tick_count, sim_time, delta_time] + sp
 
-                    if pid not in self.pedestrians_log:
-                        self.pedestrians_log[pid] = []
-                    self.pedestrians_log[pid].append(line)
+                        if pid not in self.pedestrians_log:
+                            self.pedestrians_log[pid] = []
+                        self.pedestrians_log[pid].append(line)
 
     def write_log_trajectories(self):
         if WRITE_TRAJECTORIES:

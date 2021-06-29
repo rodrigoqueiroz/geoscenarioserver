@@ -80,7 +80,7 @@ def evaluate_scenario(es:EvalScenario):
     es.ed_max = np.max(ed_array)
 
     # Frechet distance
-    #es.fd = get_frechet(traj_s, traj_e)
+    es.fd = get_frechet(traj_s, traj_e)
 
     traj_plot_combined(es, traj_s, traj_e)
     #speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
@@ -272,17 +272,17 @@ def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
         #todo: sample time. using index only works if both are collected with in same simulation with same number of points collected
         #indexes = sorted(random.sample(range(len(traj_p)), sample_size))
         max_index = len(P)-1
-        indexes = np.linspace(0, max_index, sample_size,dtype = int, endpoint=False)
-        SP = [ P[i]  for i in indexes]
-        SQ = [ Q[i]  for i in indexes]
+        indexes = np.linspace(0, max_index, sample_size, dtype=int, endpoint=False)
+        SP = [P[i] for i in indexes]
+        SQ = [Q[i] for i in indexes]
     else:
         size = min([len(P),len(Q)]) #max size
-        SP = [ node for node in P[:size]]
-        SQ = [ node for node in Q[:size]]
+        SP = [node for node in P[:size]]
+        SQ = [node for node in Q[:size]]
 
-    Plist = [ [ node['x'], node['y']] for node in SP]
-    Qlist = [ [ node['x'], node['y']] for node in SQ]
-    score = frdist(Plist,Qlist)
+    Plist = [[node['x'], node['y']] for node in SP]
+    Qlist = [[node['x'], node['y']] for node in SQ]
+    score = frdist(Plist, Qlist)
     return score
 
 def get_euclideandistance(P, Q = None):
@@ -588,11 +588,11 @@ if __name__ == "__main__":
         for id in scenarios:
             try:
                 evaluate_scenario(scenarios[id])
-                results = update_results_table(scenarios[id])
+                #results = update_results_table(scenarios[id])
             except Exception as e:
                 print("ERROR. Can not run evaluation for scenario {}".format(id))
                 print(e)
-        generate_boxplots(results)
+        #generate_boxplots(results)
     #All scenarios from type
     elif args.eval_type != "":
         for id in scenarios:
