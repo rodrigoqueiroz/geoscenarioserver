@@ -14,7 +14,7 @@
     <tag k='name' v='origin' />
   </node>
   <node id='-5337349' action='modify' visible='true' lat='43.47777518152' lon='-80.51973522868'>
-    <tag k='btree' v='crossing_light.btree' />
+    <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
     <tag k='gs' v='pedestrian' />
