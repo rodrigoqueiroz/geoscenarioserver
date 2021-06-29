@@ -11,8 +11,11 @@ import uuid
 import numpy as np
 from scipy.stats import truncnorm
 from itertools import tee
-from util.Transformations import normalize
 
+
+def normalize(v):
+    norm = np.linalg.norm(v)
+    return v / norm if norm > 0 else v
 
 #Iterates an iter by pairs
 def pairwise(iterable):

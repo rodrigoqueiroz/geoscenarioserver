@@ -110,7 +110,7 @@ class SimTraffic(object):
 
         for vid in self.vehicles:
             if self.vehicles[vid].type == Vehicle.SDV_TYPE:
-                log.debug(
+                log.info(
                     "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
                         int(vid),
                         int(self.vehicles[vid].jump_back_count),

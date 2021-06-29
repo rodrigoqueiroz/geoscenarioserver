@@ -129,10 +129,11 @@ class MotionPlan:
     new_frenet_frame = False        #if a new frenet frame was generated
     reversing = False               #if the plan is reversed
     tick_count = None
+    ref_path_origin:float = None
     
     #For easy shared memory parsing
     def get_vector_length(self):
-        return len(self.trajectory.s_coef) + len(self.trajectory.d_coef) + 5
+        return len(self.trajectory.s_coef) + len(self.trajectory.d_coef) + 6
 
     def set_plan_vector(self,P):
         assert(len(P) == self.get_vector_length())
@@ -145,6 +146,7 @@ class MotionPlan:
         self.new_frenet_frame = P[ns + nd + 2]
         self.reversing = P[ns + nd + 3]
         self.tick_count = P[ns + nd + 4]
+        self.ref_path_origin = P[ns + nd + 5]
         self.trajectory.set_trajectory(s_coef,d_coef,t)
 
     def get_plan_vector(self):
@@ -157,5 +159,6 @@ class MotionPlan:
             np.asarray([self.start_time]),
             np.asarray([self.new_frenet_frame]),
             np.asarray([self.reversing]),
-            np.asarray([self.tick_count])
+            np.asarray([self.tick_count]),
+            np.asarray([self.ref_path_origin])
         ])

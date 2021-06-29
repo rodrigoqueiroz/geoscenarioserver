@@ -155,6 +155,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             try:
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, sim_config.lanelet_routes[vid],
+                                route_nodes,
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
                                 btype=btype

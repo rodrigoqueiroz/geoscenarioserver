@@ -11,7 +11,7 @@ from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, C
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
-from lanelet2.routing import RelationType
+from lanelet2.routing import RelationType, Route
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -59,9 +59,95 @@ class LaneletMap(object):
         return self.routing_graph.left(lanelet)
 
     def get_next(self, lanelet):
-        # returns first following lanelet
-        following = self.routing_graph.following(lanelet)
-        return following[0] if following else None
+        return self.routing_graph.following(lanelet)
+
+    def get_previous(self, lanelet:Lanelet):
+        return self.routing_graph.previous(lanelet)
+
+    def get_right_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        right = []
+
+        right_relations = lanelet_route.rightRelations(lanelet)
+        for relation in right_relations:
+            if relation.relationType == RelationType.Right:
+                right.append(relation.lanelet)
+
+        return right
+
+    def get_left_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        left = []
+
+        left_relations = lanelet_route.leftRelations(lanelet)
+        for relation in left_relations:
+            if relation.relationType == RelationType.Left:
+                left.append(relation.lanelet)
+
+        return left
+
+    def get_next_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        following = []
+
+        following_relations = lanelet_route.followingRelations(lanelet)
+        for relation in following_relations:
+            following.append(relation.lanelet)
+
+        return following
+
+    def get_previous_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: lanelet must be on lanelet_route
+
+        previous = []
+
+        previous_relations = lanelet_route.previousRelations(lanelet)
+        for relation in previous_relations:
+            previous.append(relation.lanelet)
+
+        return previous
+
+    def route_full_lane(self, lanelet_route:Route, lanelet:Lanelet):
+        # NOTE: this is a wrapper for lanelet_route.fullLane(lanelet)
+        # Currently, if lanelet is on lanelet_route.shortestPath(), then there are
+        # cases where lanelet_route.fullLane(lanelet) is not the full lane that
+        # is in the shortest path (i.e., the shortest path contains more of the lane)
+        # E.g., when the shortest path passes through one of the cul-de-sacs in
+        # scenarios/maps/experimental_maps/lanelet2_bathurst.osm, then
+        # lanelet_route.fullLane(lanelet) will end before the cul-de-sac, but the
+        # lane containing lanelet in the shortest path will include the cul-de-sac
+
+        full_lane = []
+
+        shortest_path = lanelet_route.shortestPath()
+        lanelet_on_path = False
+        next_lls = []
+        for ll in shortest_path:
+            append = False
+            for next_ll in next_lls:
+                if (next_ll.id == ll.id) and (ll.id != full_lane[0].id):
+                    append = True
+                    break
+
+            if append:
+                full_lane.append(ll)
+            elif lanelet_on_path:
+                break
+            else:
+                full_lane = [ll]
+
+            if ll.id == lanelet.id:
+                lanelet_on_path = True
+
+            next_lls = self.get_next_by_route(lanelet_route, ll)
+
+        if not lanelet_on_path:
+            full_lane = lanelet_route.fullLane(lanelet)
+
+        return full_lane
 
     def get_traffic_light_by_name(self, name):
         #filter regulatory elemments for TL only
@@ -297,7 +383,7 @@ class LaneletMap(object):
                     ret = ll
                     break
         return ret
-
+    
     def area_and_lanelet_share_node(self, area, lanelet):
         """ Return True if either left or right bounds of the lanelet share a node with the area
         """
@@ -306,7 +392,7 @@ class LaneletMap(object):
 
         return share_area_node_with_left or share_area_node_with_right
 
-
+    #deprecated?
     def get_global_path_for_route(self, lanelet_route, x=None, y=None, meters_after_end=50):
         """ This looks 100m ahead of the beginning of the current lanelet. Change?
             x, y only used to determine the starting lanelet, allowed to be a little outdated.

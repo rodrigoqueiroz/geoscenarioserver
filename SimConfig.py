@@ -51,6 +51,15 @@ COLLISION_CORNER_RADIUS = 0.2   #radius for each corner
 PLANNER_RATE = 3                     #Planner tick rate
 PLANNING_TIME = 0.150                #[s] Must be less than 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
 USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
+POINTS_PER_METER = 1.0               #The number of points per meter to be used along the vehicle's reference path
+                                     #Note that the value that is used may be slightly different
+
+#Debugging
+PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths
+                               #Each figure will contain the map (black), the route (red), and the global path (blue)
+                               #Figures are opened for each vehicle in the scenario
+                               #This should only be set when you want to see these figures
+                               #The program will crash after showing figures for all vehicles (an XIO error)
 
 #Evaluation
 EVALUATION_MODE = False

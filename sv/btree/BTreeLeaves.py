@@ -68,6 +68,7 @@ class ManeuverAction(behaviour.Behaviour):
         self.name = name
         self.bmodel = bmodel
         self.mconfig = mconfig
+        self.mconfig_cpy = self.mconfig
         self.kwargs = kwargs
         # self.status = common.Status.SUCCESS
         # Some maneuvers can "finish" (eg. lane change and cutin) while some are indefinite
@@ -80,6 +81,7 @@ class ManeuverAction(behaviour.Behaviour):
             Maneuver behavior after it is instantiated.
         '''
         self.mconfig = new_mconfig
+        self.mconfig_cpy = self.mconfig
 
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
@@ -120,6 +122,10 @@ class ManeuverAction(behaviour.Behaviour):
                 else:
                     status = common.Status.FAILURE
 
+        elif self.mconfig.mkey == Maneuver.M_LANESWERVE:
+            if self.mconfig.target_lid is None:
+                self.mconfig.target_lid = self.bmodel.planner_state.lane_swerve_target
+
         elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
             if self.mconfig.target == MStopConfig.StopTarget.GOAL:
@@ -148,5 +154,9 @@ class ManeuverAction(behaviour.Behaviour):
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)
+
+        elif self.maneuver_completed:
+            self.mconfig = self.mconfig_cpy
+            self.maneuver_completed = False
 
         return status

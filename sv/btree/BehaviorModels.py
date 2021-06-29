@@ -107,7 +107,10 @@ class BehaviorModels(object):
         '''
 
         if condition == "reached_goal":
-            return has_reached_goal_frenet(self.planner_state.vehicle_state, self.planner_state.goal_point_frenet, **kwargs)
+            return has_reached_goal_frenet(
+                self.planner_state.vehicle_state, self.planner_state.goal_point_frenet,
+                self.planner_state.route_complete, **kwargs
+            )
 
         elif condition == "lane_occupied":
             lane_occupied, lv_id = is_in_following_range(
@@ -174,6 +177,14 @@ class BehaviorModels(object):
                     threshold = kwargs['distance'] if 'distance' in kwargs else 40
                     return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold \
                         and re_state.color == TrafficLightColor.Green
+
+        elif condition == "should_lane_swerve":
+            return self.planner_state.lane_swerve_target is not None
+
+        elif condition == "min_long_vel":
+            vel = kwargs['vel']
+            return self.planner_state.vehicle_state.s_vel >= vel
+
         return False
 
 
