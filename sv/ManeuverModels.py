@@ -142,7 +142,8 @@ def plan_following(vid, vehicle_state:VehicleState, mconfig:MFollowConfig, lane_
         # If leading vehicle is slower than some threshold velocity, our goal is to stop.
         if abs(leading_vehicle.state.s_vel) < 1.5:
             #log.info("lead stopped")
-            s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
+            #s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
+            s_target[0] = leading_vehicle.state.s - VEHICLE_LENGTH - mconfig.stop_distance  #some meters behind stopped vehicle
             d_target = [d_start[0],0,0]                     #keep in same lateral position
             target_state_set.append((s_target,d_target,t))  #add target
         else:
@@ -236,7 +237,8 @@ def plan_cutin(vehicle_state:VehicleState, mconfig:MCutInConfig, lane_config:Lan
         state_relative_to = vehicles[target_id].future_state(t)
         # log.info("cuttee future state at t={}: {:.3f} {:.3f} {:.3f}".format(t, state_relative_to[0], state_relative_to[1], state_relative_to[2]))
         goal_state_relative = np.array(state_relative_to) + np.array(delta)
-        goal_state_relative[0] += 2 * VEHICLE_RADIUS
+        #goal_state_relative[0] += 2 * VEHICLE_RADIUS
+        goal_state_relative[0] += VEHICLE_LENGTH
         # log.info("with delta: {:.3f} {:.3f} {:.3f}".format(goal_state_relative[0], goal_state_relative[1], goal_state_relative[2]))
 
         # sample in s
@@ -286,12 +288,14 @@ def plan_stop(vid, vehicle_state:VehicleState, mconfig:MStopConfig, lane_config:
         return ft, None
 
     #adjust target pos to vehicle length
-    target_pos = mconfig.pos - VEHICLE_RADIUS -  mconfig.distance
+    #target_pos = mconfig.pos - VEHICLE_RADIUS -  mconfig.distance
+    target_pos = mconfig.pos - VEHICLE_LENGTH/2 - mconfig.distance 
     
     #adjust target pos to possible dynamic elements:
     lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
     if lv:
-        max_pos = lv.state.s - VEHICLE_RADIUS*3
+        #max_pos = lv.state.s - VEHICLE_RADIUS*3
+        max_pos = lv.state.s - VEHICLE_LENGTH - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
         if target_pos > max_pos:
             #log.warn('Vehicle {} stop target {} adjusted to lead pos {}. New target {}'.format(vid,target_pos, lv.state.s, max_pos))
             target_pos = max_pos

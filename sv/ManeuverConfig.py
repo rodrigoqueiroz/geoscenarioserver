@@ -229,8 +229,9 @@ class MStopConfig(MConfig):
 class MFollowConfig(MConfig):
     #target
     target_vid:int = None           #target vehicle id
-    time:MP = MP(4.0,50,10)          #duration in [s] as MP
+    time:MP = MP(4.0,50,10)         #duration in [s] as MP
     time_gap:float = 3.0            #[s]
+    stop_distance:float = 3.0       #target distance when lead vehicle stops
     mkey:int = Maneuver.M_FOLLOW
 
 @dataclass
