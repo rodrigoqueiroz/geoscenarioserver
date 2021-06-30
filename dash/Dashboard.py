@@ -306,6 +306,7 @@ class Dashboard(object):
                     plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
     def plot_vehicles(self,vehicles,x_min,x_max,y_min,y_max, show_arrow = False):
+        ax = plt.gca()
         if vehicles:
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
@@ -314,11 +315,25 @@ class Dashboard(object):
                 x = vehicle.state.x
                 y = vehicle.state.y
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
+                    #centre
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
-                    circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
-                    plt.gca().add_artist(circle1)
+                    if SHOW_VEHICLE_SHAPE:
+                        #rectangle origin
+                        rect_x = x -(VEHICLE_LENGTH/2)
+                        rect_y = y -(VEHICLE_WIDTH/2)
+                        t = matplotlib.transforms.Affine2D().rotate_deg_around(x,y,vehicle.state.yaw) + ax.transData #transform rotation around centre
+                        rect = matplotlib.patches.Rectangle( (rect_x,rect_y),VEHICLE_LENGTH, VEHICLE_WIDTH, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
+                        rect.set_transform(t)
+                        ax.add_patch(rect)
+                    if (SHOW_VEHICLE_RADIUS):
+                        #radius circle
+                        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                        ax.add_artist(circle1)
+                    #label
                     label = "v{}".format(vid)
-                    plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
+                    label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
+                    ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
+                    #arrow
                     if (show_arrow):
                         vx = vehicle.state.x_vel
                         vy = vehicle.state.y_vel
@@ -326,6 +341,7 @@ class Dashboard(object):
                             vx = -vx
                             vy = -vy
                         plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
+                    
 
 
     def plot_pedestrians(self,pedestrians,x_min,x_max,y_min,y_max):
