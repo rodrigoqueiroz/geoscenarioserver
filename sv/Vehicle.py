@@ -52,16 +52,9 @@ class Vehicle(Actor):
         z = 0.0
         position = [x, y, z]
         velocity = [self.state.x_vel, self.state.y_vel]
-        
-        #Unreal yaw (TODO: move translation to client)
-        heading = np.array([self.state.y_vel,self.state.x_vel])
-        if self.motion_plan:
-            if self.motion_plan.reversing:
-                heading *= -1 
-        yaw_unreal = math.degrees(math.atan2(heading[1], heading[0]))
 
         #remote = 1 if self.is_remote else 0
-        return self.id, self.type, position, velocity, yaw_unreal, self.state.steer
+        return self.id, self.type, position, velocity, self.state.yaw_unreal, self.state.steer
 
 
 class SDV(Vehicle):
@@ -215,10 +208,17 @@ class SDV(Vehicle):
             self.state.y = y_vector[0]
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
-            heading = np.array([x_vector[1], y_vector[1]]) #GSServer transformation
+            #GSServer transformation
+            heading = np.array([x_vector[1], y_vector[1]]) 
             if self.motion_plan.reversing:
                 heading *= -1
             self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
+            #Unreal yaw (TODO: move translation to client)
+            heading = np.array([self.state.y_vel,self.state.x_vel])
+            if self.motion_plan:
+                if self.motion_plan.reversing:
+                    heading *= -1 
+            self.state.yaw_unreal = math.degrees(math.atan2(heading[1], heading[0]))
             
             
             #DEBUG:
