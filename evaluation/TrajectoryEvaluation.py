@@ -14,33 +14,23 @@ TIMESTR = time.strftime("%m%d_%H%M")
 class EvalScenario:
     scenario_id:str = ''
     track_id:int = 0
-    vehicle_type:str = ''                           #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
-    scenario_type:str = ''                          #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
-    const_vehicles:list = field(default_factory=list)    #vehicles/pedestrians that must be in the scene (e.g: following, or yielding)
-    start_time:float = 0.0                          #scenario start time
-    direction:str = ''                              #(straight) n_s, s_n, e_w, w_e (left turns) s_w, w_n (right turn) s_e, w_s, (not supported) e_n, n_w
+    agent_type:str = ''                                 #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
+    scenario_type:str = ''                              #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
+    const_agents:list = field(default_factory=list)     #vehicles/pedestrians that must be in the scene (e.g: following, or yielding)
+    start_time:float = 0.0                              #scenario start time
+    direction:str = ''                                  #(straight) n_s, s_n, e_w, w_e (left turns) s_w, w_n (right turn) s_e, w_s, (not supported) e_n, n_w
 
     #metrics:
     time:float = 0.0
-    ed_nc:float = 0.0
-    ed_nc_vector:list = field(default_factory=list)
-    ed_nc_mean:float = 0.0
-    ed_nc_median:float = 0.0
-    ed_nc_max:float = 0.0
-
     ed:float = 0.0
     ed_vector:list = field(default_factory=list)
     ed_mean:float = 0.0
     ed_median:float = 0.0
     ed_max:float = 0.0
-
     ed_change:float = 0.0
 
     fd:float = 0.0
-    fd_nc:float = 0.0
     fd_change:float = 0.0
-
-
 
 
 
@@ -73,7 +63,7 @@ def evaluate_scenario(es:EvalScenario):
     es.time = float(traj_e[-1]['time']) - float(traj_e[0]['time'])
 
     # Euclidean distance
-    es.ed_vector, es.d0_vector_s, es.d0_vector_e, es.ed = get_euclideandistance(traj_s, traj_e)
+    es.ed_vector, es.ed = get_euclideandistance(traj_s, traj_e)
     ed_array = [x[1] for x in es.ed_vector]
     es.ed_mean = np.mean(ed_array)
     es.ed_median = np.median(ed_array)
@@ -152,15 +142,15 @@ def load_scenario_db(scenario_id):
                 es = EvalScenario()
                 es.scenario_id = scenario_id
                 es.track_id = int(row[2])
-                es.vehicle_type = row[3]
+                es.agent_type = row[3]
                 es.direction = row[4]
                 es.scenario_type = row[5]
                 #constraints
                 if (row[6] != ''):
                     if (',' in row[6]):
-                        es.const_vehicles = [int(cvid) for cvid in row[6].split(',')]
+                        es.const_agents = [int(cvid) for cvid in row[6].split(';')]
                     else:
-                        es.const_vehicles.append(int(row[6]))
+                        es.const_agents.append(int(row[6]))
                 #start time
                 if (row[7] != ''):
                     es.start_time = float(row[7])
@@ -287,8 +277,6 @@ def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
 
 def get_euclideandistance(P, Q = None):
     d_vector = []
-    d0_vector_e = []
-    d0_vector_s = []
 
     n = len(P)
     dt = 0
@@ -297,13 +285,11 @@ def get_euclideandistance(P, Q = None):
     for i in range(n):
         d = distance_2p(P[i]['x'], P[i]['y'], Q[i]['x'], Q[i]['y'])
         d_vector.append([P[i]['time'], d])
-        d0_vector_s.append([P[i]['time'], distance_2p(P[i]['x'], P[i]['y'], 0, 0)])
-        d0_vector_e.append([Q[i]['time'], distance_2p(Q[i]['x'], Q[i]['y'], 0, 0)])
         if i < (n-1):
             dt = P[i+1]['time'] - P[i]['time']
             total += d*dt
     score = total / (P[-1]['time'] - P[0]['time'])
-    return d_vector, d0_vector_s, d0_vector_e, score
+    return d_vector, score
 
 
 def distance_2p(x1, y1, x2, y2):
@@ -384,51 +370,34 @@ def ed_plot(es):
     plt.savefig(filename+'.png')
 
 
-    filename = 'plots/{}/{}_edvector_0'.format(es.scenario_type, es.scenario_id)
-    title = 'Experiment {} ({}) \n ED to 0'.format(es.scenario_id, es.scenario_type)
-    plt.cla()
-    plt.plot([node[0] for node in es.d0_vector_s], [node[1] for node in es.d0_vector_s], 'b', label="ed_0_s")
-    plt.plot([node[0] for node in es.d0_vector_e], [node[1] for node in es.d0_vector_e], 'r-', label="ed_0_e")
-    plt.suptitle(title)
-    plt.legend(loc="upper left")
-    plt.savefig(filename+'.png')
-
 def update_results_table(es:EvalScenario):
     print("Update results for scenario {}".format(es.scenario_id))
     #Write results to file
-    with open('results/results.csv', mode='r',encoding='utf-8-sig')as csv_file:
+    with open('results/results.csv', mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         lines = list(csv_reader)
+
         found = False
         for l in lines:
             if l[0] == es.scenario_id:
                 l[1] = es.scenario_type
                 l[2] = es.time
                 #nc
-                l[3] = format(es.ed_nc_mean, '.2f')
-                l[4] = format(es.ed_nc_median, '.2f')
-                l[5] = format(es.ed_nc_max, '.2f')
-                l[6] = format(es.ed_nc, '.2f')
-                #rc
-                l[7] = format(es.ed_mean, '.2f')
-                l[8] = format(es.ed_median, '.2f')
-                l[9] = format(es.ed_max, '.2f')
-                l[10] = format(es.ed, '.2f')
+                l[3] = format(es.ed_mean, '.2f')
+                l[4] = format(es.ed_median, '.2f')
+                l[5] = format(es.ed_max, '.2f')
+                l[6] = format(es.ed, '.2f')
 
-                l[11] = format(es.ed_change, '.2f')
-                #l[9] = format(es.fd_nc, '.2f')
-                #l[10] = format(es.fd, '.2f')
-                #l[11] = format(es.fd_change, '.2f')
+                l[7] = format(es.ed_change, '.2f')
+                #l[8] = format(es.fd_nc, '.2f')
+                #l[9] = format(es.fd, '.2f')
+                #l[10] = format(es.fd_change, '.2f')
                 found = True
+
         if not found:
             lines.append([es.scenario_id,
                         es.scenario_type,
                         es.time,
-                        format(es.ed_nc_mean, '.2f'),
-                        format(es.ed_nc_median, '.2f'),
-                        format(es.ed_nc_max, '.2f'),
-                        format(es.ed_nc, '.2f'),
-
                         format(es.ed_mean, '.2f'),
                         format(es.ed_median, '.2f'),
                         format(es.ed_max, '.2f'),
@@ -588,7 +557,7 @@ if __name__ == "__main__":
         for id in scenarios:
             try:
                 evaluate_scenario(scenarios[id])
-                #results = update_results_table(scenarios[id])
+                results = update_results_table(scenarios[id])
             except Exception as e:
                 print("ERROR. Can not run evaluation for scenario {}".format(id))
                 print(e)
@@ -603,12 +572,12 @@ if __name__ == "__main__":
                 except Exception as e:
                     print("ERROR. Can not run evaluation for scenario {}".format(id))
                     print(e)
-        generate_boxplots(results)
+        #generate_boxplots(results)
     #One scenario
     elif args.eval_id != "":
         try:
             evaluate_scenario(scenarios[args.eval_id])
-            #results = update_results_table(scenarios[args.eval_id])
+            results = update_results_table(scenarios[args.eval_id])
             #generate_boxplots(results)
         except Exception as e:
             print("ERROR. Can not run evaluation for scenario {}".format(args.eval_id))

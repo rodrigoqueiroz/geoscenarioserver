@@ -183,6 +183,8 @@ def setup_evaluation_scenario(gsfile, video_id, sim_traffic:SimTraffic, sim_conf
                     sim_traffic.add_pedestrian(pedestrian)
                     #start as inactive until the original trajectory starts
                     sim_traffic.pedestrians[epid].sim_state = ActorSimState.INACTIVE
+                    # set desired speed as average walking speed of empirical pedestrian
+                    sim_traffic.pedestrians[epid].default_desired_speed = es.avg_walking_speed
                 except Exception as e:
                     log.error("Route generation failed for route {}. Can't use this pedestrian for evaluation".format(epid))
                     return False, 0.0
@@ -282,13 +284,11 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     idx = 0
     while (len(lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))['lanelets']) == 0):
         idx += 1
-
     trajectory = trajectory[idx:]
 
     idx = len(trajectory) - 1
     while (len(lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))['lanelets']) == 0):
         idx -= 1
-
     trajectory = trajectory[:idx+1]
 
     #Traj Stats
@@ -297,6 +297,7 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     if (es.start_time < ts.start_time):
         es.start_time = ts.start_time
     es.end_time = ts.end_time
+    es.avg_walking_speed = ts.avg_walking_speed
     #Config
     config = SPConfig()
     config.btree_root = 'eval_walk.btree'
