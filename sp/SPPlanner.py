@@ -109,8 +109,9 @@ class SPPlanner(object):
                 distance_to_dest_via_green = distance_to_dest
 
                 for path in paths_to_accessible_crosswalks:
+                    ''' TODO: take aggressiveness_level into account '''
                     # inverted_path is True if there was a valid route found from a crosswalk to the planning position
-                    inverted_path = path[0].attributes['subtype'] == "crosswalk"
+                    inverted_path = (path[0].attributes['subtype'] == "crosswalk")
 
                     if inverted_path:
                         xwalk = path[0]
@@ -124,7 +125,7 @@ class SPPlanner(object):
                         entrance_pt = exit_pt
                         exit_pt = temp
 
-                    crossing_light_color = self.get_crossing_light_color(xwalk)
+                    crossing_light_color, _ = self.get_crossing_light_state(xwalk)
 
                     ''' choose between accessible crosswalks based on light state and if it brings ped closer to destination '''
                     if crossing_light_color == TrafficLightColor.Green or not crossing_light_color:
@@ -316,13 +317,14 @@ class SPPlanner(object):
         reg_elems = self.get_reg_elem_states(self.sp.current_lanelet)
 
         crossing_light_color = None
+        crossing_light_ttr = np.inf
         if self.sp.target_crosswalk['id'] != -1:
             if self.inverted_path:
                 crosswalk = self.sp.path[0]
             else:
                 crosswalk = self.sp.path[-1]
 
-            crossing_light_color = self.get_crossing_light_color(crosswalk)
+            crossing_light_color, crossing_light_ttr = self.get_crossing_light_state(crosswalk)
 
         pedestrian_speed = {'default_desired': self.sp.default_desired_speed,
                             'current_desired': self.sp.curr_desired_speed}
@@ -337,6 +339,7 @@ class SPPlanner(object):
                             selected_target_crosswalk = self.selected_target_crosswalk,
                             current_lanelet = self.sp.current_lanelet,
                             crossing_light_color = crossing_light_color,
+                            crossing_light_time_to_red = crossing_light_ttr,
                             destination = np.array(self.sim_config.pedestrian_goal_points[self.pid][-1]),
                             traffic_vehicles=self.sim_traffic.vehicles,
                             regulatory_elements=reg_elems,
@@ -434,13 +437,15 @@ class SPPlanner(object):
         return reg_elem_states
 
 
-    def get_crossing_light_color(self, crosswalk):
+    def get_crossing_light_state(self, crosswalk):
         if not crosswalk:
-            return None
+            return None, np.inf
 
         traffic_light_states = {}
+        traffic_light_ttr = {}
         for lid, tl in self.sim_traffic.traffic_lights.items():
             traffic_light_states[lid] = tl.current_color.value
+            traffic_light_ttr[lid] = tl.time_to_red
 
         # Get regulatory elements acting on this lanelet
         reg_elems = crosswalk.regulatoryElements
@@ -451,6 +456,6 @@ class SPPlanner(object):
                 if re.id not in traffic_light_states:
                     continue
 
-                return traffic_light_states[re.id]
+                return traffic_light_states[re.id], traffic_light_ttr[re.id]
 
-        return None
+        return None, np.inf

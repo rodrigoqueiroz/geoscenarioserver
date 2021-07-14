@@ -136,11 +136,14 @@ class BehaviorModels(object):
             tmax = kwargs['tmax'] if 'tmax' in kwargs else float('inf')
             return tmin < self.planner_state.sim_time < tmax
 
+        elif condition == "pedestrian_light_green":
+            return self.planner_state.crossing_light_color == TrafficLightColor.Green
+
         elif condition == "pedestrian_light_red":
             return self.planner_state.crossing_light_color == TrafficLightColor.Red
 
-        elif condition == "pedestrian_light_green":
-            return self.planner_state.crossing_light_color == TrafficLightColor.Green
+        elif condition == "pedestrian_light_yellow":
+            return self.planner_state.crossing_light_color == TrafficLightColor.Yellow
 
         elif condition == "crosswalk_has_light":
             return self.planner_state.crossing_light_color != None
@@ -152,7 +155,10 @@ class BehaviorModels(object):
             return past_crosswalk_halfway(self.planner_state)
 
         elif condition == "approaching_crosswalk":
-            return not self.planner_state.selected_target_crosswalk and approaching_crosswalk(self.planner_state)
+            return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state)
+
+        elif condition == "can_cross_before_red":
+            return can_cross_before_red(self.planner_state)
 
         return False
 

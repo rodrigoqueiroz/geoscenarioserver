@@ -11,7 +11,7 @@ behaviortree walk:
             ?
                 ->
                     condition c_crosswalk_has_light ( crosswalk_has_light() )
-                    subtree cross_xwalk_before_red()
+                    subtree enter_xwalk_on_green()
                 maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
         ->
             condition c_reached_exit ( reached_crosswalk_exit() )

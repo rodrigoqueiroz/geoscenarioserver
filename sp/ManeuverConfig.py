@@ -184,4 +184,5 @@ class MIncreaseWalkingSpeedConfig(MConfig):
 
 @dataclass
 class MSelectCrosswalkByLightConfig(MConfig):
+    aggressiveness_level:int = 1
     mkey:int = Maneuver.M_SELECTCROSSWALKBYLIGHT

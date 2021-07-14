@@ -146,3 +146,18 @@ def approaching_crosswalk(planner_state):
     dist_to_crosswalk_entrance = np.linalg.norm(crosswalk_entry - pedestrian_pos)
 
     return dist_to_crosswalk_entrance < threshold_dist
+
+def can_cross_before_red(planner_state):
+    """
+    return ((distance to entry) + (distance from entry to exit)) / (default desired speed) < (time to red)
+    """
+    pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
+    crosswalk_entry = planner_state.target_crosswalk["entry"]
+    crosswalk_exit = planner_state.target_crosswalk["exit"]
+
+    dist_pos_to_entry = np.linalg.norm(crosswalk_entry - pedestrian_pos)
+    dist_entry_to_exit = np.linalg.norm(crosswalk_exit - crosswalk_entry)
+
+    crossing_possible = (dist_pos_to_entry + dist_entry_to_exit) / planner_state.pedestrian_speed["default_desired"] < planner_state.crossing_light_time_to_red
+
+    return crossing_possible

@@ -103,7 +103,7 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']
 
 
-def plan_wait_at_crosswalk(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_wait_at_crosswalk(mconfig:MWaitAtCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     WAIT AT CROSSWALK MANEUVER
     """
@@ -114,7 +114,7 @@ def plan_wait_at_crosswalk(mconfig:MStopConfig, sp, pedestrian_state:PedestrianS
     return direction, xwalk_entrance, pedestrian_speed['default_desired']
 
 
-def plan_return_to_entrance(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_return_to_entrance(mconfig:MReturnToEntranceConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     RETURN TO CROSSWALK ENTRANCE MANEUVER
     """
@@ -126,7 +126,7 @@ def plan_return_to_entrance(mconfig:MStopConfig, sp, pedestrian_state:Pedestrian
     return direction, waypoint, pedestrian_speed['default_desired'] * 1.5
 
 
-def plan_increase_walking_speed(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_increase_walking_speed(mconfig:MIncreaseWalkingSpeedConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     INCREASE WALKING SPEED MANEUVER
     """
@@ -136,7 +136,7 @@ def plan_increase_walking_speed(mconfig:MStopConfig, sp, pedestrian_state:Pedest
     return direction, sp.current_waypoint, pedestrian_speed['default_desired'] * 1.5
 
 
-def plan_select_crosswalk_by_light(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_select_crosswalk_by_light(mconfig:MSelectCrosswalkByLightConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     SELECT CROSSWALK BY LIGHT MANEUVER
     """

@@ -6,14 +6,14 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='crossing light scenario' />
-    <tag k='timeout' v='70' />
+    <tag k='timeout' v='90' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5337348' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5337349' action='modify' visible='true' lat='43.47777518152' lon='-80.51973522868'>
+  <node id='-5337349' action='modify' visible='true' lat='43.47777550766' lon='-80.51973093097'>
     <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
@@ -27,7 +27,7 @@
     <tag k='states' v='G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5337351' action='modify' visible='true' lat='43.47824119465' lon='-80.51947693507'>
+  <node id='-5337351' action='modify' visible='true' lat='43.47826323834' lon='-80.51941145261'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>
@@ -51,5 +51,16 @@
     <tag k='name' v='ped_tl_e_w_north' />
     <tag k='states' v='R,G,Y,R' />
     <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5337356' action='modify' visible='true' lat='43.47823775882' lon='-80.51947524678'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_2_dest' />
+  </node>
+  <node id='-5337359' action='modify' visible='true' lat='43.47774936649' lon='-80.5202043298'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_2_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_2' />
   </node>
 </osm>
