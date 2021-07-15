@@ -35,7 +35,7 @@ class EvalScenario:
 
 
 def evaluate_trajectory(traj_file):
-    P = load_trajectory_log( 'traj_log/{}.csv'.format(traj_file) )   #empirical
+    P = load_trajectory_log('evaluation/traj_log/{}.csv'.format(traj_file) )   #empirical
 
     d_vector = []
     ds_vector = []
@@ -54,11 +54,11 @@ def evaluate_trajectory(traj_file):
 
 
 
-def evaluate_scenario(es:EvalScenario):
+def evaluate_scenario(es:EvalScenario, map_lines):
     print("Evaluate scenario {}".format(es.scenario_id))
 
-    traj_s = load_trajectory_log('traj_log/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id)) #synthetic nc
-    traj_e = load_trajectory_log('traj_log/{}_nc_{}.csv'.format(es.scenario_id, es.track_id))  #empirical nc
+    traj_s = load_trajectory_log('evaluation/traj_log/{}_nc_{}.csv'.format(es.scenario_id, -es.track_id)) #synthetic nc
+    traj_e = load_trajectory_log('evaluation/traj_log/{}_nc_{}.csv'.format(es.scenario_id, es.track_id))  #empirical nc
 
     es.time = float(traj_e[-1]['time']) - float(traj_e[0]['time'])
 
@@ -72,7 +72,7 @@ def evaluate_scenario(es:EvalScenario):
     # Frechet distance
     es.fd = get_frechet(traj_s, traj_e)
 
-    traj_plot_combined(es, traj_s, traj_e)
+    traj_plot_combined(es, traj_s, traj_e, map_lines)
     #speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
     ed_plot(es)
 
@@ -95,7 +95,7 @@ def evaluate_scenario(es:EvalScenario):
 
 def load_all_scenarios(video_id):
     scenarios = {}
-    with open('pedestrian_scenarios/pedestrian_scenarios_{}.csv'.format(video_id), mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios/pedestrian_scenarios_{}.csv'.format(video_id), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
@@ -128,7 +128,7 @@ def load_all_scenarios(video_id):
 
 def load_scenario_db(scenario_id):
     es = None
-    with open('pedestrian_scenarios.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios.csv', mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #header
@@ -137,7 +137,7 @@ def load_scenario_db(scenario_id):
                 #int(eval_vid):
                 #exclusions
                 if row[1] == 'x':
-                    print("Vehicle {} cannot be used for evaluation".format(scenario_id))
+                    print("Pedestrian {} cannot be used for evaluation".format(scenario_id))
                     return None
                 es = EvalScenario()
                 es.scenario_id = scenario_id
@@ -297,17 +297,23 @@ def distance_2p(x1, y1, x2, y2):
     return dist
 
 
-def traj_plot_combined(es:EvalScenario, traj_s, traj_e):
+def traj_plot_combined(es:EvalScenario, traj_s, traj_e, map_lines):
     plt.cla()
     fig=plt.figure()
+
     ax=fig.add_subplot(111)
+
+    # plot road
+    for line in map_lines:
+        ax.plot(line[0], line[1], color='#cccccc', zorder=0)
+
     ax.plot(   [node['x'] for node in traj_e],
                 [node['y'] for node in traj_e],
-                'r-', label="Empirical vehicle")
+                'r-', label="Empirical pedestrian")
 
     ax.plot(   [node['x'] for node in traj_s],
                 [node['y'] for node in traj_s],
-                'b-',label="SDV (b) ed={} m ed={} m".format(format(es.ed_mean, '.2f'),format(es.ed_max, '.2f')))
+                'b-',label="SP (b) ed={} m ed={} m".format(format(es.ed_mean, '.2f'),format(es.ed_max, '.2f')))
 
     #fig.subplots_adjust(bottom=0.05)
     box = ax.get_position()
@@ -318,7 +324,7 @@ def traj_plot_combined(es:EvalScenario, traj_s, traj_e):
     plt.xlabel('x (m)')
 
     plt.axis('equal')
-    filename = 'plots/{}/{}_trajectory'.format(es.scenario_type, es.scenario_id)
+    filename = 'evaluation/plots/{}/{}_trajectory'.format(es.scenario_type, es.scenario_id)
     plt.savefig(filename+'.png')
     plt.close(fig)
 
@@ -355,13 +361,13 @@ def speed_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e, traj_l, ymin
     #plt.axis.set_aspect('auto')
     plt.suptitle('Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id, es.scenario_type))
     plt.legend(loc="upper left")
-    filename = 'plots/{}/{}_speed'.format(es.scenario_type, es.scenario_id)
+    filename = 'evaluation/plots/{}/{}_speed'.format(es.scenario_type, es.scenario_id)
     plt.savefig(filename+'.png')
     plt.close(fig)
 
 
 def ed_plot(es):
-    filename = 'plots/{}/{}_edvector'.format(es.scenario_type, es.scenario_id)
+    filename = 'evaluation/plots/{}/{}_edvector'.format(es.scenario_type, es.scenario_id)
     title = 'Experiment {} ({}) \n ED {} m'.format(es.scenario_id, es.scenario_type, format(es.ed_mean, '.2f'))
     plt.cla()
     plt.plot([node[0] for node in es.ed_vector], [node[1] for node in es.ed_vector], 'k-', label="ed")
@@ -373,7 +379,7 @@ def ed_plot(es):
 def update_results_table(es:EvalScenario):
     print("Update results for scenario {}".format(es.scenario_id))
     #Write results to file
-    with open('results/results.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/results/results.csv', mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         lines = list(csv_reader)
 
@@ -409,7 +415,7 @@ def update_results_table(es:EvalScenario):
                         #format(es.fd_change, '.2f')
                         ])
 
-    with open('results/results.csv', mode='w',encoding='utf-8-sig') as csv_file:
+    with open('evaluation/results/results.csv', mode='w',encoding='utf-8-sig') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         csv_writer.writerows(lines)
 
@@ -457,7 +463,7 @@ def generate_boxplots(lines):
     #plt.cla()
     title = "Euclidean distance (ED) distribution.\n{} scenarios".format(datasize)
     data = [data_ed_nc, data_ed ] #, data_fd_nc, data_fd]
-    filename = 'results/boxplot_combined.png'
+    filename = 'evaluation/results/boxplot_combined.png'
     fig = plt.figure()
     ax = fig.add_subplot(111)
     bp = ax.boxplot(data)
@@ -471,7 +477,7 @@ def generate_boxplots(lines):
 
     #boxplot combined ED
     title = "Euclidean distance (ED) distribution per scenario type"
-    filename = 'results/boxplot_type_ed.png'
+    filename = 'evaluation/results/boxplot_type_ed.png'
     #plt.cla()
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -512,7 +518,7 @@ def generate_boxplots(lines):
     """
 
 def save_traj_plot(P, Q, es, fd_score, ed_score, config_str):
-    filename = 'plots/{}/{}_{}'.format(es.scenario_type, es.scenario_id, config_str)
+    filename = 'evaluation/plots/{}/{}_{}'.format(es.scenario_type, es.scenario_id, config_str)
     title = 'Experiment {} ({}) \n FD ={} m, ED {} m'.format(es.scenario_id,config_str, format(fd_score, '.3f'),format(ed_score, '.3f'))
     plt.cla()
     plt.plot(   [node['x'] for node in Q],    [node['y'] for node in Q], 'r-',label="emp")
@@ -524,7 +530,7 @@ def save_traj_plot(P, Q, es, fd_score, ed_score, config_str):
     #plt.show()
 
 def save_speed_plot(P, Q, L, es, config_str):
-    filename = 'plots/{}/{}_{}_speed'.format(es.scenario_type, es.scenario_id, config_str)
+    filename = 'evaluation/plots/{}/{}_{}_speed'.format(es.scenario_type, es.scenario_id, config_str)
     title = 'Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id,config_str)
 
     #vel
@@ -540,49 +546,3 @@ def save_speed_plot(P, Q, L, es, config_str):
     plt.suptitle(title)
     plt.legend(loc="upper left")
     plt.savefig(filename+'.png')
-
-if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument("-s", "--scenario", dest="eval_id", default="", help="Scenario Id for evaluation")
-    parser.add_argument("-v", "--video-id", dest="video_id", default="769", help="Video file id (default: 769)")
-    parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
-    parser.add_argument("-tf", "--traj_file", dest="traj_file", default="", help="Single Trajectory analysis")
-    parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
-    args = parser.parse_args()
-
-    scenarios = load_all_scenarios(args.video_id)
-
-    #All scenarios
-    if args.eval_all:
-        for id in scenarios:
-            try:
-                evaluate_scenario(scenarios[id])
-                results = update_results_table(scenarios[id])
-            except Exception as e:
-                print("ERROR. Can not run evaluation for scenario {}".format(id))
-                print(e)
-        #generate_boxplots(results)
-    #All scenarios from type
-    elif args.eval_type != "":
-        for id in scenarios:
-            if scenarios[id].scenario_type == args.eval_type:
-                try:
-                    evaluate_scenario(scenarios[id])
-                    results = update_results_table(scenarios[id])
-                except Exception as e:
-                    print("ERROR. Can not run evaluation for scenario {}".format(id))
-                    print(e)
-        #generate_boxplots(results)
-    #One scenario
-    elif args.eval_id != "":
-        try:
-            evaluate_scenario(scenarios[args.eval_id])
-            results = update_results_table(scenarios[args.eval_id])
-            #generate_boxplots(results)
-        except Exception as e:
-            print("ERROR. Can not run evaluation for scenario {}".format(args.eval_id))
-            raise e
-
-    #evaluate single trajectory
-    elif args.traj_file != "":
-        evaluate_trajectory(args.traj_file)
