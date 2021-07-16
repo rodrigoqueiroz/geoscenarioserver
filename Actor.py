@@ -12,7 +12,7 @@ import numpy as np
 import glog as log
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], state=None):
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None):
         self.id = id
         self.name = name
         self.sim_state = ActorSimState.ACTIVE
@@ -38,6 +38,8 @@ class Actor(object):
         self.state.d = frenet_state[3]
         self.state.d_vel = frenet_state[4]
         self.state.d_acc = frenet_state[5]
+
+        self.state.yaw = yaw
 
     def future_state(self, t):
         """ Predicts a new state based on time and vel.

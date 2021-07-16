@@ -9,30 +9,11 @@
 
 import datetime
 import time
+import math
+import glog as log
 
 class TickSync():
 
-    _start_clock = None
-    _last_log = 0.0
-    _logs = []
-
-    def clock_log(label):
-        now = datetime.datetime.now()
-        if TickSync._start_clock is None:
-            TickSync._start_clock = now
-            TickSync._last_log = now
-            log = [label,0.0,0.0]
-        else:
-            total = format((now - TickSync._start_clock).total_seconds(),'.4f')
-            delta = format((now - TickSync._last_log).total_seconds(),'.4f')
-            log = [label,total,delta]
-        TickSync._logs.append(log)
-        TickSync._last_log = now
-    
-    def print_clock_log():
-        for log in TickSync._logs:
-            print (log)
-    
     def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
@@ -52,6 +33,9 @@ class TickSync():
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
         self.drift = 0.0                    #diff between expected tick time and actual time caused by lag
     
+    def get_sim_time(self):
+        return self.sim_time
+
     def set_timeout(self,timeout):
         self.timeout = timeout
     
@@ -104,6 +88,58 @@ class TickSync():
                     format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         return True
 
+    def set_task(self,label,target_t,max_t = None):
+        #Note: a single task per object. 
+        #Todo: alllow tracking of multiple tasks in the same object
+        self.task_label = label
+        self.target_t = target_t
+        self.next_target_t = target_t
+        self.max_t = max_t
+
+    def get_task_time(self):
+        return self.target_t
+
+    def start_task(self):
+        self.target_t = self.next_target_t
+        self.task_start_time = datetime.datetime.now()
     
+    def end_task(self, block = True):
+        self.task_end_time = datetime.datetime.now()
+        delta_time = (self.task_end_time -  self.task_start_time).total_seconds()
+        diff = self.target_t - delta_time
+        if diff > 0:
+            #sleep for the remaining
+            if block:
+                time.sleep(diff) 
+        else:
+            log.error("Task {} took longer than expected. Plan Tick: {}, Expected: {}, Actual: {}".format
+                            (self.task_label, self.tick_count, self.target_t, delta_time))
+            #if variable taks time, target will be adjusted for next cycle
+            if self.max_t:
+                #increase target and cap by max t
+                new_t = math.ceil((abs(diff)+self.target_t )*100)/100
+                if new_t < self.max_t:
+                    self.next_target_t = new_t 
+                    log.warning("Task '{}' target adjusted from {:3}s to {:3}s".format(self.task_label, self.target_t, self.next_target_t))
+                else:
+                    self.next_target_t = self.max_t
+                    log.warning("Task '{}' target adjusted to max time {:3}s (consider reducing the tick rate)".format(self.task_label, self.next_target_t))
+                #returns the last target used
+                
+        #returns actual time 
+        return delta_time
 
    
+    
+    #For Debug only:
+    _last_log = None
+    def clock_log(label):
+        now = datetime.datetime.now()
+        if TickSync._last_log is None:
+            newlog = [label,0.0]
+        else:
+            _delta = format((now - TickSync._last_log).total_seconds(),'.4f')
+            newlog = [label,_delta]
+            
+        TickSync._last_log = now
+        log.debug(newlog)

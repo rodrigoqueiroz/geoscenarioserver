@@ -28,6 +28,8 @@ install_lanelet2_python38()
     echo ""
     echo "Installing Lanelet2 library from source for Python3.8..."
     echo ""
+    # Ensure catkin is installed
+    sudo apt-get -qq install python-catkin-tools 
     cd $REPO_DIR
     # In the case the repository was not cloned recursively
     git submodule update --init

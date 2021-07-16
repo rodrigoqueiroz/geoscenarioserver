@@ -9,14 +9,14 @@
     <tag k='version' v='2.0' />
   </node>
   <node id='-5005017' action='modify' visible='true' lat='49.00725781895' lon='8.4570859424'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-5005018' action='modify' visible='true' lat='49.00758115529' lon='8.45777709595'>
     <tag k='altitude' v='329' />

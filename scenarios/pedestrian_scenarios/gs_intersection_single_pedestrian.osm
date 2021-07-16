@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5335743' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='single pedestrian scenario' />
+    <tag k='timeout' v='50' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5335744' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5335745' action='modify' visible='true' lat='43.47786046289' lon='-80.51947049593'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_1_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_1' />
+  </node>
+  <node id='-5335746' action='modify' visible='true' lat='43.47821589603' lon='-80.52016359652'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_1_dest' />
+  </node>
+</osm>

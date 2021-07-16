@@ -57,6 +57,8 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
                 vehicle_state.s_vel - tvehicle.state.s_vel
             )
         log.info(state_str)
+        log.warn("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
+        return True
 
     # return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lid=target_lane_config.id))
     # Returning false for the experiments
@@ -102,14 +104,23 @@ def can_perform_lane_change():
 #def has_reached_goal_frenet(vehicle_state, goal_point, threshold=2):
 #    return False if not goal_point else goal_point[0] - vehicle_state.s < threshold
 
-def has_reached_goal_frenet(vehicle_state, frenet_goal_point, threshold=20, reverse=False):
+def has_reached_goal_frenet(vehicle_state, frenet_goal_point, route_complete, threshold=20, reverse=False):
     """ Checks if the vehicle has reached or passed the goal point in the frenet frame.
         @param frenet_goal_point:  Arraylike (s,d) goal position in the vehicle's frenet frame
     """
-    goal_s = 0 if reverse else frenet_goal_point[0]
-    direction = -1 if reverse else 1
+    if frenet_goal_point is None:
+        return False
+
+    # TODO: remove reverse from goal condition; all vehicles' goals will be the
+    #       last point in their route
+    # goal_s = 0 if reverse else frenet_goal_point[0]
+    # direction = -1 if reverse else 1
+    goal_s = frenet_goal_point[0]
+
     # A distance to goal with the same sign as direction means we've reached and passed it
-    return direction * (goal_s - vehicle_state.s) < threshold
+    # return direction * (goal_s - vehicle_state.s) < threshold
+    # The vehicle has completed its route and has reached or passed its goal
+    return route_complete and (goal_s - vehicle_state.s < threshold)
 
 def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig, time_gap=5, distance_gap=30):
     """ Determines whether there is a vehicle in front of a given vehicle in the same lane and within a specified
@@ -171,6 +182,9 @@ def get_leading_vehicle(vehicle_state, lane_config, traffic_vehicles):
     log.check_notnone(lane_config)
 
     cur_lane = lane_config.get_current_lane(vehicle_state.d)
+    #if cur_lane is None:
+        #print(vehicle_state.d)
+        #print(lane_config)
     log.check_notnone(cur_lane)
 
     vehicles_ahead = list(filter(

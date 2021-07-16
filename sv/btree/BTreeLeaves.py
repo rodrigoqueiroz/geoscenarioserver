@@ -68,6 +68,7 @@ class ManeuverAction(behaviour.Behaviour):
         self.name = name
         self.bmodel = bmodel
         self.mconfig = mconfig
+        self.mconfig_cpy = self.mconfig
         self.kwargs = kwargs
         # self.status = common.Status.SUCCESS
         # Some maneuvers can "finish" (eg. lane change and cutin) while some are indefinite
@@ -80,6 +81,7 @@ class ManeuverAction(behaviour.Behaviour):
             Maneuver behavior after it is instantiated.
         '''
         self.mconfig = new_mconfig
+        self.mconfig_cpy = self.mconfig
 
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
@@ -115,24 +117,30 @@ class ManeuverAction(behaviour.Behaviour):
                     self.bmodel.planner_state.lane_config.get_neighbour(self.mconfig.target_lid),
                     self.bmodel.planner_state.traffic_vehicles
                 )
-                # TODO check for None
-                self.mconfig.target_vid = target_vehicle.id
+                if target_vehicle is not None:
+                    self.mconfig.target_vid = target_vehicle.id
+                else:
+                    status = common.Status.FAILURE
+
+        elif self.mconfig.mkey == Maneuver.M_LANESWERVE:
+            if self.mconfig.target_lid is None:
+                self.mconfig.target_lid = self.bmodel.planner_state.lane_swerve_target
 
         elif self.mconfig.mkey == Maneuver.M_STOP:
             # If stopping at goal, set stop_pos to the goal point's s value
-            if self.mconfig.type == MStopConfig.Type.GOAL:
+            if self.mconfig.target == MStopConfig.StopTarget.GOAL:
                 self.mconfig.pos = self.bmodel.planner_state.goal_point_frenet[0]
             # If stopping at a stop line, find a regulatory element with a stop line applying to this vehicle
-            elif self.mconfig.type == MStopConfig.Type.STOP_LINE:
+            elif self.mconfig.target == MStopConfig.StopTarget.STOP_LINE:
                 for re_state in self.bmodel.planner_state.regulatory_elements:
                     if 'stop_position' in re_state._fields:
                         self.mconfig.pos = re_state.stop_position[0]
                         break
-                    # TODO: determine whether stop pos should be behind leading vehicles instead
+                    
 
         # Handle completion of lane swerve/cutin maneuver
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
-            if not self.maneuver_completed:
+            if not self.maneuver_completed and status is not common.Status.FAILURE:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(
                         self.bmodel.planner_state.vehicle_state,
                         self.bmodel.planner_state.lane_config,
@@ -146,5 +154,9 @@ class ManeuverAction(behaviour.Behaviour):
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)
+
+        elif self.maneuver_completed:
+            self.mconfig = self.mconfig_cpy
+            self.maneuver_completed = False
 
         return status

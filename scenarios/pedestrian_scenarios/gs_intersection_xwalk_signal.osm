@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5337347' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='crossing light scenario' />
+    <tag k='timeout' v='70' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5337348' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5337349' action='modify' visible='true' lat='43.47777518152' lon='-80.51973522868'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_1_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_1' />
+  </node>
+  <node id='-5337350' action='modify' visible='true' lat='43.47813723142' lon='-80.51971647758'>
+    <tag k='duration' v='10,15,29' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_n_s_east' />
+    <tag k='states' v='G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5337351' action='modify' visible='true' lat='43.47824119465' lon='-80.51947693507'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_1_dest' />
+  </node>
+  <node id='-5337352' action='modify' visible='true' lat='43.47792436689' lon='-80.51952497284'>
+    <tag k='duration' v='27,10,15,2' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_e_w_south' />
+    <tag k='states' v='R,G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5337353' action='modify' visible='true' lat='43.47784244222' lon='-80.51984951423'>
+    <tag k='duration' v='10,15,29' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_n_s_west' />
+    <tag k='states' v='G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+  <node id='-5337354' action='modify' visible='true' lat='43.47807862641' lon='-80.52000819077'>
+    <tag k='duration' v='27,10,15,2' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='ped_tl_e_w_north' />
+    <tag k='states' v='R,G,Y,R' />
+    <tag k='type' v='pedestrian' />
+  </node>
+</osm>

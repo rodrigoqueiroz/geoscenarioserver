@@ -19,8 +19,8 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
-DASH_RATE = 30              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by scenario.
+DASH_RATE = 10              #dash tick rate. Max is traffic rate.
+PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by the scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
@@ -48,15 +48,18 @@ COLL_TYPE_CORNERS = False       #vehicle is computed as 4 circles on the corners
 COLLISION_CORNER_RADIUS = 0.2   #radius for each corner
 
 #Planning
-PLANNER_RATE = 5            #Planner tick rate
-#Collision
-#collision and proximity cost have a great impacto on performance. 
-#For example, if the scenario does not require object avoidance, you can turn it off.
-VEH_COLLISION = False      	#If true, collision between vehicles with be considered during planning.
-PED_COLLISION = False       #If true, collision between vehicles and pedestrians on the road with be considered during planning.
-OBJ_COLLISION = False      	#If true, collision between vehicles and static objects on the road with be considered during planning.
-TRAJECTORY_SPLIT = 10       #In how many parts a trajectory is split for verification. Higher(100) = better precision, but impacts performance.
+PLANNER_RATE = 3                     #Planner tick rate
+PLANNING_TIME = 0.150                #[s] Must be less than 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
+USE_FIXED_PLANNING_TIME = False      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
+POINTS_PER_METER = 1.0               #The number of points per meter to be used along the vehicle's reference path
+                                     #Note that the value that is used may be slightly different
 
+#Debugging
+PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths
+                               #Each figure will contain the map (black), the route (red), and the global path (blue)
+                               #Figures are opened for each vehicle in the scenario
+                               #This should only be set when you want to see these figures
+                               #The program will crash after showing figures for all vehicles (an XIO error)
 
 #Evaluation
 EVALUATION_MODE = False
@@ -66,16 +69,22 @@ WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved 
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
-CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
+WAIT_FOR_CLIENT = True     #Hold Simulation start until a valid state is sent from client
+CLIENT_SHM = True          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943
 CS_SEM_KEY = 933433
 SHM_SIZE = 2048
 
+# osm file merging config
+# list of gs tags that must be unique per scenario
+UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
+
 @dataclass
 class SimConfig:
     lanelet_routes:Dict = field(default_factory=dict)
+    pedestrian_lanelet_routes:Dict = field(default_factory=dict)
     goal_points:Dict = field(default_factory=dict)
     pedestrian_goal_points:Dict = field(default_factory=dict)
     scenario_name:str = "Unamed scenario"

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
   <node id='-5149258' action='modify' visible='true' lat='49.00306767106' lon='8.4247432702'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />

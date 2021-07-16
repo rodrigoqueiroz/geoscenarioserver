@@ -5,21 +5,21 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
     <tag k='name' v='Straight Road Drive and Follow Scenario' />
-    <tag k='timeout' v='20' />
+    <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-2645831' action='modify' visible='true' lat='49.00726025868' lon='8.45718707844' />
   <node id='-2645832' action='modify' visible='true' lat='49.00814281693' lon='8.45832977088' />
   <node id='-2645833' action='modify' visible='true' lat='49.00725737909' lon='8.45710807062'>
-    <tag k='btree' v='trees/st_driveslow.btree' />
+    <tag k='btree' v='st_driveslow.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v2' />
-    <tag k='orientation' v='325' />
     <tag k='route' v='central_route' />
     <tag k='start_frenet' v='20,0,0,0,0,0' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-2645834' action='modify' visible='true' lat='49.00743600296' lon='8.45712129585'>
     <tag k='altitude' v='329' />
@@ -27,15 +27,15 @@
     <tag k='gs' v='origin' />
   </node>
   <node id='-2645835' action='modify' visible='true' lat='49.0072419153' lon='8.4571627156'>
-    <tag k='btree' v='trees/st_driveslow.btree' />
+    <tag k='btree' v='st_driveslow.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v3' />
-    <tag k='orientation' v='325' />
     <tag k='route' v='right_route' />
     <tag k='start_frenet' v='0,0,0,0,0,0' />
     <tag k='vid' v='3' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-2645836' action='modify' visible='true' lat='49.00727903789' lon='8.45712903582' />
   <node id='-2645837' action='modify' visible='true' lat='49.00816235206' lon='8.45828129331' />

@@ -7,7 +7,7 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='red to green light scenario' />
-    <tag k='timeout' v='180' />
+    <tag k='timeout' v='15' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5145299' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
@@ -20,20 +20,22 @@
   <node id='-5145303' action='modify' visible='true' lat='43.4784324437' lon='-80.52009363662' />
   <node id='-5145304' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
   <node id='-5145305' action='modify' visible='true' lat='43.47766483113' lon='-80.51939390079'>
-    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='ego_placeholder' />
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='240' />
   </node>
   <node id='-5145306' action='modify' visible='true' lat='43.4781426121' lon='-80.51962227458'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='red_light_runner' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='155' />
   </node>
   <node id='-5145307' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
     <tag k='duration' v='3,10,1,7' />

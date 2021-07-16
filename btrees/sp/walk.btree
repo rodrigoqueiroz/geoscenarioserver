@@ -1,0 +1,28 @@
+behaviortree crosswalk_signal:
+    ?
+        ->
+            condition c_goal ( reached_goal( threshold=1 ) )
+            maneuver m_stop_goal ( MStopConfig( type=2 ) )
+        ->
+            condition c_reached_entrance ( reached_crosswalk_entrance() )
+            ?
+                ->
+                    condition c_crosswalk_has_light ( crosswalk_has_light() )
+                    ?
+                        ->
+                            condition c_ped_greenlight ( pedestrian_light_green() )
+                            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+                        maneuver m_wait_at_crosswalk ( MWaitAtCrosswalkConfig() )
+                maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+        ->
+            condition c_reached_exit ( reached_crosswalk_exit() )
+            maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
+        ->
+            condition c_approaching_xwalk ( approaching_crosswalk() )
+            maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig() )
+        ->
+            condition c_in_crosswalk_area ( in_crosswalk_area() )
+            ->
+                condition c_ped_redlight ( pedestrian_light_red() )
+                maneuver m_increase_speed ( MIncreaseWalkingSpeedConfig() )
+        maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )

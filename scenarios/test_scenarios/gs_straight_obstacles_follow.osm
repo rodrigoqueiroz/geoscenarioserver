@@ -5,18 +5,18 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
     <tag k='name' v='Straight Road following and avoiding obstacles' />
-    <tag k='timeout' v='20' />
+    <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5145205' action='modify' visible='true' lat='49.00725430009' lon='8.45708929516'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-5145206' action='modify' visible='true' lat='49.00757411761' lon='8.45771674625'>
     <tag k='altitude' v='329' />
@@ -24,14 +24,14 @@
     <tag k='gs' v='origin' />
   </node>
   <node id='-5145207' action='modify' visible='true' lat='49.0072109053' lon='8.45702491711'>
-    <tag k='btree' v='trees/drive.btree' />
+    <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v2' />
-    <tag k='yaw' v='325' />
     <tag k='route' v='left_route' />
     <tag k='vid' v='2' />
+    <tag k='yaw' v='310' />
   </node>
   <node id='-5145208' action='modify' visible='true' lat='49.00727991761' lon='8.45713372968' />
   <node id='-5145209' action='modify' visible='true' lat='49.00830811807' lon='8.45846000253' />

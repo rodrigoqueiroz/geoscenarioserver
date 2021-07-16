@@ -102,20 +102,25 @@ void ASimVehicle::OnOverlap(AActor *self, AActor *other)
 {
     // UE_LOG(LogTemp, Error, TEXT("OVERLAP"));
 
-    UE_LOG(GeoScenarioModule, Warning,
-            TEXT("GS vehicle %s collided with %s"),
-            *self->GetName(),
-            *other->GetName());
-    this->isActive = false;
+    static const FName GSTAG(TEXT("gsvehicle"));
+    if (other->ActorHasTag(GSTAG)) {
+        UE_LOG(GeoScenarioModule, Warning,
+                TEXT("GS vehicle %s collided with %s"),
+                *self->GetName(),
+                *other->GetName());
+        this->isActive = false;
 
-    // Check if collided with a gs vehicle
-    ASimVehicle *otherGSV = Cast<ASimVehicle>(other);
-    if (otherGSV == nullptr) {
-        UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with ego"));
-    } else {
-        UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with GSV"));
-        otherGSV->SetActive(false);
+        // Check if collided with a gs vehicle
+        ASimVehicle *otherGSV = Cast<ASimVehicle>(other);
+        if (otherGSV == nullptr) {
+            UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with ego"));
+        } else {
+            UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with GSV"));
+            otherGSV->SetActive(false);
+        }
     }
+
+    // TODO: add check for pedestrians
 }
 
 void ASimVehicle::SetActive(bool active)
