@@ -5,7 +5,7 @@ behaviortree drive_tree:
             maneuver stop_reached_goal (MStopConfig())
         ->
             condition c_redlight (traffic_light_red(threshold=40))
-            maneuver stop_red_light (MStopConfig(type=3))
+            maneuver stop_red_light (MStopConfig(target=3))
         ->
             condition c_busy_lane(lane_occupied())
             maneuver m_follow_leading_v (MFollowConfig())

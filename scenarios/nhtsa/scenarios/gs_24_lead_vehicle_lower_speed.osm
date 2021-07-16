@@ -17,7 +17,7 @@
   <node id='-2749127' action='modify' visible='true' lat='43.47445043479' lon='-80.54696168755' />
   <node id='-2749128' action='modify' visible='true' lat='43.47487564417' lon='-80.54578845828' />
   <node id='-2749129' action='modify' visible='true' lat='43.47406398974' lon='-80.54807614135'>
-    <tag k='btree' v='nhtsa/behavior/fast_drive_scenario_tree.btree' />
+    <tag k='btree' v='fast_drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -27,7 +27,7 @@
     <tag k='vid' v='2' />
   </node>
   <node id='-2749130' action='modify' visible='true' lat='43.4743320601' lon='-80.54729352518'>
-    <tag k='btree' v='nhtsa/behavior/slow_drive_scenario_tree.btree' />
+    <tag k='btree' v='slow_drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />

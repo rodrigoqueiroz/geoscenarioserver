@@ -21,7 +21,7 @@
   <node id='-1976755' action='modify' visible='true' lat='43.4784324437' lon='-80.52009363662' />
   <node id='-1976756' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
   <node id='-1976758' action='modify' visible='true' lat='43.47830931276' lon='-80.51914479172'>
-    <tag k='btree' v='nhtsa/behavior/blind2redlight_scenario_tree.btree' />
+    <tag k='btree' v='blind2redlight_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -31,7 +31,7 @@
     <tag k='vid' v='1' />
   </node>
   <node id='-1976772' action='modify' visible='true' lat='43.47767101328' lon='-80.51939899385'>
-    <tag k='btree' v='nhtsa/behavior/drive_scenario_tree.btree' />
+    <tag k='btree' v='drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />

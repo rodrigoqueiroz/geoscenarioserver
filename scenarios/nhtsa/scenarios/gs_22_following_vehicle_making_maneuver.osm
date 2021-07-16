@@ -20,7 +20,7 @@
   <node id='-1977012' action='modify' visible='true' lat='43.47417127708' lon='-80.54766379817' />
   <node id='-1977013' action='modify' visible='true' lat='43.47406511231' lon='-80.54797383049' />
   <node id='-1977014' action='modify' visible='true' lat='43.47413996667' lon='-80.54777493645'>
-    <tag k='btree' v='nhtsa/behavior/drive_scenario_tree.btree' />
+    <tag k='btree' v='drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -30,7 +30,7 @@
     <tag k='vid' v='2' />
   </node>
   <node id='-1977015' action='modify' visible='true' lat='43.47418379703' lon='-80.54773694137'>
-    <tag k='btree' v='nhtsa/behavior/deccelerate_scenario_tree.btree' />
+    <tag k='btree' v='deccelerate_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -40,7 +40,7 @@
     <tag k='vid' v='1' />
   </node>
   <node id='-1977161' action='modify' visible='true' lat='43.47412128409' lon='-80.54792225495'>
-    <tag k='btree' v='nhtsa/behavior/lanechange_scenario_tree.btree' />
+    <tag k='btree' v='lanechange_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />

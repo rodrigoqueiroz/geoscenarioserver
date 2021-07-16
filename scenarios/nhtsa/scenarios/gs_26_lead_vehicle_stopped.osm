@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-101757' action='modify' visible='true' lat='43.47173989696' lon='-80.54712523884'>
+  <node id='-2775041' action='modify' visible='true' lat='43.47173989696' lon='-80.54712523884'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='nhtsa/maps/lanelet2_roads_around_campus.osm' />
@@ -9,15 +9,15 @@
     <tag k='timeout' v='180' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-101758' action='modify' visible='true' lat='43.4716043991' lon='-80.54654593605'>
+  <node id='-2775042' action='modify' visible='true' lat='43.4716043991' lon='-80.54654593605'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-101760' action='modify' visible='true' lat='43.47405685308' lon='-80.54809337461' />
-  <node id='-101761' action='modify' visible='true' lat='43.47445043479' lon='-80.54696168755' />
-  <node id='-101762' action='modify' visible='true' lat='43.47493209018' lon='-80.54562216132' />
-  <node id='-101763' action='modify' visible='true' lat='43.47405036465' lon='-80.54810497509'>
-    <tag k='btree' v='nhtsa/behavior/fast_drive_scenario_tree.btree' />
+  <node id='-2775043' action='modify' visible='true' lat='43.47405685308' lon='-80.54809337461' />
+  <node id='-2775044' action='modify' visible='true' lat='43.47445043479' lon='-80.54696168755' />
+  <node id='-2775045' action='modify' visible='true' lat='43.47493209018' lon='-80.54562216132' />
+  <node id='-2775046' action='modify' visible='true' lat='43.47405036465' lon='-80.54810497509'>
+    <tag k='btree' v='fast_drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -26,8 +26,8 @@
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='2' />
   </node>
-  <node id='-101764' action='modify' visible='true' lat='43.47448582808' lon='-80.54685632511'>
-    <tag k='btree' v='nhtsa/behavior/stopped_tree.btree' />
+  <node id='-2775047' action='modify' visible='true' lat='43.47448582808' lon='-80.54685632511'>
+    <tag k='btree' v='stopped_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -35,11 +35,12 @@
     <tag k='name' v='stopped_vehicle' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
+    <tag k='yaw' v='300' />
   </node>
-  <way id='-101783' action='modify' visible='true'>
-    <nd ref='-101760' />
-    <nd ref='-101761' />
-    <nd ref='-101762' />
+  <way id='-1950022' action='modify' visible='true'>
+    <nd ref='-2775043' />
+    <nd ref='-2775044' />
+    <nd ref='-2775045' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
   </way>

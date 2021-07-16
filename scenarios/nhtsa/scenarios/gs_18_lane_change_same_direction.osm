@@ -20,7 +20,7 @@
   <node id='-101761' action='modify' visible='true' lat='43.47374553871' lon='-80.54894985379' />
   <node id='-101762' action='modify' visible='true' lat='43.47456198578' lon='-80.5466688722' />
   <node id='-101763' action='modify' visible='true' lat='43.47356326566' lon='-80.5494755839'>
-    <tag k='btree' v='nhtsa/behavior/drive_scenario_tree.btree' />
+    <tag k='btree' v='drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -30,7 +30,7 @@
     <tag k='vid' v='2' />
   </node>
   <node id='-101764' action='modify' visible='true' lat='43.47354958912' lon='-80.54941515251'>
-    <tag k='btree' v='nhtsa/behavior/lanechange_scenario_tree.btree' />
+    <tag k='btree' v='lanechange_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />

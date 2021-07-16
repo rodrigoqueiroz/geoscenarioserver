@@ -17,7 +17,7 @@
   <node id='-101758' action='modify' visible='true' lat='43.46989612307' lon='-80.5441742915' />
   <node id='-101759' action='modify' visible='true' lat='43.468561827' lon='-80.54382349995' />
   <node id='-101760' action='modify' visible='true' lat='43.4697692589' lon='-80.54411360635'>
-    <tag k='btree' v='nhtsa/behavior/drive_scenario_tree.btree' />
+    <tag k='btree' v='drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -27,7 +27,7 @@
     <tag k='vid' v='2' />
   </node>
   <node id='-101761' action='modify' visible='true' lat='43.46965851012' lon='-80.54412062239'>
-    <tag k='btree' v='nhtsa/behavior/leaving_park_scenario_tree.btree' />
+    <tag k='btree' v='leaving_park_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
