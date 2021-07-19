@@ -5,7 +5,7 @@ behaviortree walk:
             maneuver m_stop_goal ( MStopConfig( type=2 ) )
         ->
             condition c_approaching_xwalk ( approaching_crosswalk() )
-            maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=1 ) )
+            maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=2 ) )
         ->
             condition c_reached_entrance ( reached_crosswalk_entrance() )
             ?
@@ -15,7 +15,7 @@ behaviortree walk:
                 maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
         ->
             condition c_reached_exit ( reached_crosswalk_exit() )
-            maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
+            maneuver m_exit_crosswalk ( MExitCrosswalkConfig( aggressiveness_level=2 ) )
         ->
             condition c_in_crosswalk_area ( in_crosswalk_area() )
             ->

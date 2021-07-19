@@ -160,6 +160,13 @@ class BehaviorModels(object):
         elif condition == "can_cross_before_red":
             return can_cross_before_red(self.planner_state)
 
+        elif condition == "vehicle_approaching_crosswalk":
+            ''' TODO: implement function to check if vehicles are approaching
+                crosswalk without intention of stopping.
+                (Possibly wait until any approaching vehicles are under threshold speed)
+            '''
+            return False
+
         return False
 
 

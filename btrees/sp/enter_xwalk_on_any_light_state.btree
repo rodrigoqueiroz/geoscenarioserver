@@ -1,0 +1,12 @@
+behaviortree enter_xwalk_on_any_light_state:
+    ?
+        ->
+            ?
+                condition c_ped_greenlight ( pedestrian_light_green() )
+                condition c_ped_yellowlight ( pedestrian_light_yellow() )
+            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+        ?
+            ->
+                condition c_vehicle_approaching ( vehicle_approaching_crosswalk() )
+                maneuver m_wait_at_crosswalk ( MWaitAtCrosswalkConfig() )
+            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )

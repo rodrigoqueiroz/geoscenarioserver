@@ -15,7 +15,7 @@ behaviortree walk:
                 maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
         ->
             condition c_reached_exit ( reached_crosswalk_exit() )
-            maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
+            maneuver m_exit_crosswalk ( MExitCrosswalkConfig( aggressiveness_level=2 ) )
         ->
             condition c_in_crosswalk_area ( in_crosswalk_area() )
             ->

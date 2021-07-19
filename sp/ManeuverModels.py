@@ -93,7 +93,7 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
 
         mid = (left_pt + right_pt) / 2
 
-        sp.sp_planner.plan_local_path(mid, False)
+        sp.sp_planner.plan_local_path(mid, False, mconfig.aggressiveness_level)
 
         sp.sp_planner.selected_target_crosswalk = False
 
@@ -141,7 +141,7 @@ def plan_select_crosswalk_by_light(mconfig:MSelectCrosswalkByLightConfig, sp, pe
     SELECT CROSSWALK BY LIGHT MANEUVER
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    sp.sp_planner.plan_local_path(pedestrian_pos, True)
+    sp.sp_planner.plan_local_path(pedestrian_pos, True, mconfig.aggressiveness_level)
     direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']

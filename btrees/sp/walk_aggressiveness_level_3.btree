@@ -11,11 +11,11 @@ behaviortree walk:
             ?
                 ->
                     condition c_crosswalk_has_light ( crosswalk_has_light() )
-                    subtree cross_xwalk_before_red()
+                    subtree enter_xwalk_on_any_light_state()
                 maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
         ->
             condition c_reached_exit ( reached_crosswalk_exit() )
-            maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
+            maneuver m_exit_crosswalk ( MExitCrosswalkConfig( aggressiveness_level=3 ) )
         ->
             condition c_in_crosswalk_area ( in_crosswalk_area() )
             ->
