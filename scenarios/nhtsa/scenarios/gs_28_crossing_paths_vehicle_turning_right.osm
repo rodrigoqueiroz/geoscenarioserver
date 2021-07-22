@@ -1,25 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-106810' action='modify' visible='true' lat='43.47452942027' lon='-80.54711001661' />
-  <node id='-106811' action='modify' visible='true' lat='43.47467544503' lon='-80.54670689709' />
-  <node id='-106812' action='modify' visible='true' lat='43.47173989696' lon='-80.54712523884'>
+  <node id='-2717238' action='modify' visible='true' lat='43.47987092093' lon='-80.52248512572'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='nhtsa/maps/lanelet2_roads_around_campus.osm' />
+    <tag k='lanelet' v='nhtsa/maps/lanelet2_university_weber_alt.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Lane change same direction scenario' />
     <tag k='timeout' v='180' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-106813' action='modify' visible='true' lat='43.4716043991' lon='-80.54654593605'>
+  <node id='-2717239' action='modify' visible='true' lat='43.47982886164' lon='-80.52249037686'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-106814' action='modify' visible='true' lat='43.47493553537' lon='-80.54666603099' />
-  <node id='-106815' action='modify' visible='true' lat='43.47421005118' lon='-80.5480073983' />
-  <node id='-106816' action='modify' visible='true' lat='43.47430582831' lon='-80.54773938254' />
-  <node id='-106817' action='modify' visible='true' lat='43.47512226782' lon='-80.54545840095' />
-  <node id='-106818' action='modify' visible='true' lat='43.47491739916' lon='-80.54605806732'>
+  <node id='-2717244' action='modify' visible='true' lat='43.47779534667' lon='-80.5202186715'>
     <tag k='btree' v='drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
@@ -29,7 +23,7 @@
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
   </node>
-  <node id='-106819' action='modify' visible='true' lat='43.47495152535' lon='-80.54665902682'>
+  <node id='-2717245' action='modify' visible='true' lat='43.47782825478' lon='-80.51949126698'>
     <tag k='btree' v='slow_drive_scenario_tree.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
@@ -39,17 +33,31 @@
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
   </node>
-  <way id='-101787' action='modify' visible='true'>
-    <nd ref='-106814' />
-    <nd ref='-106811' />
-    <nd ref='-106810' />
+  <node id='-2717451' action='modify' visible='true' lat='43.47815540651' lon='-80.51983707338'>
+    <tag k='duration' v='15' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl_s_n' />
+    <tag k='states' v='green' />
+  </node>
+  <node id='-2717452' action='modify' visible='true' lat='43.47777532419' lon='-80.51945683216' />
+  <node id='-2717454' action='modify' visible='true' lat='43.47807056455' lon='-80.51943004581' />
+  <node id='-2717455' action='modify' visible='true' lat='43.4777772856' lon='-80.52026512948' />
+  <node id='-2717528' action='modify' visible='true' lat='43.47791136886' lon='-80.51956459947' />
+  <node id='-2717547' action='modify' visible='true' lat='43.4779571073' lon='-80.51957465775' />
+  <node id='-2717558' action='modify' visible='true' lat='43.47801501017' lon='-80.51953911848' />
+  <node id='-2717579' action='modify' visible='true' lat='43.47805490959' lon='-80.51944390006' />
+  <way id='-1948520' action='modify' visible='true'>
+    <nd ref='-2717452' />
+    <nd ref='-2717528' />
+    <nd ref='-2717547' />
+    <nd ref='-2717558' />
+    <nd ref='-2717579' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
   </way>
-  <way id='-101788' action='modify' visible='true'>
-    <nd ref='-106817' />
-    <nd ref='-106816' />
-    <nd ref='-106815' />
+  <way id='-1948521' action='modify' visible='true'>
+    <nd ref='-2717455' />
+    <nd ref='-2717454' />
     <tag k='gs' v='route' />
     <tag k='name' v='ego_route' />
   </way>
