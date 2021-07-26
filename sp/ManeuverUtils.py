@@ -13,6 +13,7 @@ import glog as log
 from SimTraffic import *
 from sp.ManeuverConfig import *
 from SimConfig import *
+from mapping.LaneletMap import LaneletMap
 from util.Transformations import normalize
 from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation, point_in_rectangle
 
@@ -86,6 +87,7 @@ def in_crosswalk_area(planner_state):
         return False
     return planner_state.current_lanelet.attributes['subtype'] == 'crosswalk'
 
+
 def past_crosswalk_halfway(planner_state):
     P = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
     crosswalk = planner_state.current_lanelet
@@ -136,16 +138,22 @@ def has_line_of_sight_to_point(position, point, lanelet):
 
     return True
 
+
 def approaching_crosswalk(planner_state):
     if planner_state.target_crosswalk["id"] == -1:
         return False
 
     threshold_dist = 3
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
+
+    if not planner_state.lanelet_map.inside_lanelet_or_area(pedestrian_pos, planner_state.current_lanelet):
+        return False
+
     crosswalk_entry = planner_state.target_crosswalk["entry"]
     dist_to_crosswalk_entrance = np.linalg.norm(crosswalk_entry - pedestrian_pos)
 
     return dist_to_crosswalk_entrance < threshold_dist
+
 
 def can_cross_before_red(planner_state):
     """

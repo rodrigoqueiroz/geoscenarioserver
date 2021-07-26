@@ -120,13 +120,13 @@ class BehaviorModels(object):
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
                 return False
             entrance = self.planner_state.target_crosswalk['entry']
-            return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
+            return has_reached_point(self.planner_state.pedestrian_state, entrance, 2, **kwargs)
 
         elif condition == "reached_crosswalk_exit":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
                 return False
             exit = self.planner_state.target_crosswalk['exit']
-            return has_reached_point(self.planner_state.pedestrian_state, exit, **kwargs)
+            return has_reached_point(self.planner_state.pedestrian_state, exit, 2, **kwargs)
 
         elif condition == "at_desired_speed":
             return self.planner_state.pedestrian_speed['current_desired'] == self.planner_state.pedestrian_speed['default_desired']
@@ -148,6 +148,9 @@ class BehaviorModels(object):
         elif condition == "crosswalk_has_light":
             return self.planner_state.crossing_light_color != None
 
+        elif condition == "has_target_crosswalk":
+            return self.planner_state.target_crosswalk['id'] != -1
+
         elif condition == "in_crosswalk_area":
             return in_crosswalk_area(self.planner_state)
 
@@ -156,6 +159,9 @@ class BehaviorModels(object):
 
         elif condition == "approaching_crosswalk":
             return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state)
+
+        elif condition == "waiting_at_crosswalk_entrance":
+            return self.planner_state.previous_maneuver == Maneuver.M_WAITATCROSSWALK
 
         elif condition == "can_cross_before_red":
             return can_cross_before_red(self.planner_state)

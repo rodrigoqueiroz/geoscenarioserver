@@ -45,6 +45,7 @@ class SPPlanner(object):
         self.inverted_path = False
         self.previous_maneuver = None
         self.selected_target_crosswalk = False
+        self.planning_position = []
 
 
     def start(self):
@@ -53,7 +54,7 @@ class SPPlanner(object):
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
-        self.plan_local_path(planning_position=pedestrian_pos, consider_light_states=False)
+        self.plan_local_path(pedestrian_pos, False)
 
     def plan_local_path(self, planning_position, consider_light_states, aggressiveness_level = 1):
         # get list of lanelets and spaces containing the planning position
@@ -104,6 +105,7 @@ class SPPlanner(object):
             target_exit_pt = []
 
             if consider_light_states:
+                all_red_lights = True
                 self.selected_target_crosswalk = False
                 best_candidate_can_cross = {'id': -1,
                                             'entry': [],
@@ -112,7 +114,7 @@ class SPPlanner(object):
                                             'path': [],
                                             'inverted_path': False,
                                             'color': None,
-                                            'ttr': []};
+                                            'ttr': []}
                 best_candidate_must_wait = {'id': -1,
                                             'entry': [],
                                             'exit': [],
@@ -120,7 +122,8 @@ class SPPlanner(object):
                                             'path': [],
                                             'inverted_path': False,
                                             'color': None,
-                                            'ttr': []};
+                                            'ttr': []}
+                num_candidates = 0
 
                 for path in paths_to_accessible_crosswalks:
                     # inverted_path is True if there was a valid route found from a crosswalk to the planning position but not the other way
@@ -147,12 +150,15 @@ class SPPlanner(object):
                                         'inverted_path': inverted_path,
                                         'color': crossing_light_color,
                                         'ttr': crossing_light_ttr   }
+                        num_candidates += 1
 
                         if crossing_light_color == TrafficLightColor.Green or not crossing_light_color:
+                            all_red_lights = False
                             if exit_to_dest_dist < best_candidate_can_cross['exit_to_dest_dist']:
                                 best_candidate_can_cross = candidate
 
                         elif crossing_light_color == TrafficLightColor.Yellow:
+                            all_red_lights = False
                             better_can_cross = exit_to_dest_dist < best_candidate_can_cross['exit_to_dest_dist']
                             better_must_wait = exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist']
 
@@ -177,38 +183,6 @@ class SPPlanner(object):
                             elif exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist']:
                                 best_candidate_must_wait = candidate
 
-                    '''
-                    # choose between accessible crosswalks based on light state and if it brings ped closer to destination
-                    if crossing_light_color == TrafficLightColor.Green or not crossing_light_color:
-                        all_red_lights = False
-                        exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
-                        entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
-                        if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest_via_green):
-                            green_light_selected = True
-                            distance_to_dest = exit_to_dest_dist
-                            distance_to_dest_via_green = exit_to_dest_dist
-                            chosen_path = path
-                            target_id = xwalk.id
-                            target_entry_pt = entrance_pt
-                            target_exit_pt = exit_pt
-                            self.inverted_path = inverted_path
-                    elif crossing_light_color == TrafficLightColor.Red:
-                        if not green_light_selected:
-                            exit_to_dest_dist = np.linalg.norm(self.sp.destination - exit_pt)
-                            entrance_to_dest_dist = np.linalg.norm(self.sp.destination - entrance_pt)
-                            if (exit_to_dest_dist < entrance_to_dest_dist) and (exit_to_dest_dist < distance_to_dest):
-                                distance_to_dest = exit_to_dest_dist
-                                chosen_path = path
-                                target_id = xwalk.id
-                                target_entry_pt = entrance_pt
-                                target_exit_pt = exit_pt
-                                self.inverted_path = inverted_path
-                    else:
-                        all_red_lights = False
-
-                if not all_red_lights:
-                    self.selected_target_crosswalk = (target_id != -1)
-                '''
                 if best_candidate_can_cross['id'] != -1:
                     chosen_path = best_candidate_can_cross['path']
                     target_id = best_candidate_can_cross['id']
@@ -223,6 +197,16 @@ class SPPlanner(object):
                     target_exit_pt = best_candidate_must_wait['exit']
                     self.inverted_path = best_candidate_must_wait['inverted_path']
                     self.selected_target_crosswalk = True
+                elif num_candidates == 1:
+                    chosen_path = candidate['path']
+                    target_id = candidate['id']
+                    target_entry_pt = candidate['entry']
+                    target_exit_pt = candidate['exit']
+                    self.inverted_path = candidate['inverted_path']
+                    self.selected_target_crosswalk = True
+
+                if all_red_lights and num_candidates > 1:
+                    self.selected_target_crosswalk = False
             else:
                 for path in paths_to_accessible_crosswalks:
                     # inverted_path is True if there was a valid route found from a crosswalk to the planning position

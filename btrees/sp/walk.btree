@@ -4,21 +4,21 @@ behaviortree walk:
             condition c_goal ( reached_goal( threshold=1 ) )
             maneuver m_stop_goal ( MStopConfig( type=2 ) )
         ->
-            condition c_approaching_xwalk ( approaching_crosswalk() )
-            maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=2 ) )
-        ->
-            condition c_reached_entrance ( reached_crosswalk_entrance() )
+            condition c_has_target_crosswalk ( has_target_crosswalk() )
             ?
                 ->
-                    condition c_crosswalk_has_light ( crosswalk_has_light() )
-                    subtree cross_xwalk_before_red()
-                maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
-        ->
-            condition c_reached_exit ( reached_crosswalk_exit() )
-            maneuver m_exit_crosswalk ( MExitCrosswalkConfig( aggressiveness_level=2 ) )
-        ->
-            condition c_in_crosswalk_area ( in_crosswalk_area() )
-            ->
-                condition c_ped_redlight ( pedestrian_light_red() )
-                maneuver m_increase_speed ( MIncreaseWalkingSpeedConfig() )
+                    condition c_reached_exit ( reached_crosswalk_exit() )
+                    maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
+                ->
+                    ?
+                        condition c_reached_entrance ( reached_crosswalk_entrance() )
+                        condition c_waiting_at_entrance ( waiting_at_crosswalk_entrance() )
+                    ?
+                        ->
+                            condition c_crosswalk_has_light ( crosswalk_has_light() )
+                            subtree cross_xwalk_before_red()
+                        maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+                ->
+                    condition c_approaching_xwalk ( approaching_crosswalk() )
+                    maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=2 ) )
         maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
