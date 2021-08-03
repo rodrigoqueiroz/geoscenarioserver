@@ -66,14 +66,15 @@ class TrafficLight:
                 # determine time to next red light
                 self.time_to_red = inf
 
-                if TrafficLightColor.Red in self.states:
-                    self.time_to_red = 0.0
+                if self.type == TrafficLightType.pedestrian:
+                    if TrafficLightColor.Red in self.states:
+                        self.time_to_red = 0.0
 
-                    if self.current_color != TrafficLightColor.Red:
-                        next_states = self.states[i:] + self.states[:i]
-                        next_intervals = self.intervals[i:] + [x + self.intervals[-1] for x in self.intervals[1:i]]
-                        self.time_to_red = next_intervals[next_states.index(TrafficLightColor.Red)] - mtime
-                    break
+                        if self.current_color != TrafficLightColor.Red:
+                            next_states = self.states[i:] + self.states[:i]
+                            next_intervals = self.intervals[i:] + [x + self.intervals[-1] for x in self.intervals[1:i]]
+                            self.time_to_red = next_intervals[next_states.index(TrafficLightColor.Red)] - mtime
+                break
 
     def state_in(self, sim_time):
         '''
