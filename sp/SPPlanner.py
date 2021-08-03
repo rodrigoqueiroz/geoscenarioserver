@@ -245,6 +245,7 @@ class SPPlanner(object):
 
         ''' If no path containing a crosswalk chosen, construct path from sequence of consecutive lanelets '''
         if len(chosen_path) == 0 and not consider_light_states:
+            self.inverted_path = False
             invert_ll = False
             invert_candidate = False
             spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
@@ -298,6 +299,7 @@ class SPPlanner(object):
                 if invert_ll:
                     selected_ll = selected_ll.invert()
 
+                # append first lanelet to chosen_path
                 chosen_path.append(selected_ll)
 
                 previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
