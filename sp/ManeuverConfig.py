@@ -130,6 +130,8 @@ class MConfig:
     max_long_acc = 6.0              # maximum longitudinal acceleration [m/s/s]
     max_lat_acc = 4.9               # maximum lateral acceleration [m/s/s]
 
+    aggressiveness_level: int = 1
+
 
 @dataclass
 class MKeepInLaneConfig(MConfig):

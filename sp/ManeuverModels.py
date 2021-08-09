@@ -33,7 +33,7 @@ def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, targ
     elif (man_key == Maneuver.M_INCREASEWALKINGSPEED):
         return plan_increase_walking_speed(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
     elif (man_key == Maneuver.M_SELECTCROSSWALKBYLIGHT):
-        return plan_select_crosswalk_by_light(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
+        return plan_select_crosswalk_by_light(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, previous_maneuver)
 
 
 def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
@@ -44,7 +44,7 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
     direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     if sp.current_lanelet and sp.current_lanelet.attributes["type"] == "lanelet":
-        if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2:
+        if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2 or not has_line_of_sight_to_point(pedestrian_pos, sp.current_waypoint, sp.current_lanelet):
             direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint, sp.sp_planner.inverted_path)
 
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']
@@ -103,7 +103,7 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']
 
 
-def plan_wait_at_crosswalk(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_wait_at_crosswalk(mconfig:MWaitAtCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     WAIT AT CROSSWALK MANEUVER
     """
@@ -114,7 +114,7 @@ def plan_wait_at_crosswalk(mconfig:MStopConfig, sp, pedestrian_state:PedestrianS
     return direction, xwalk_entrance, pedestrian_speed['default_desired']
 
 
-def plan_return_to_entrance(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_return_to_entrance(mconfig:MReturnToEntranceConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     RETURN TO CROSSWALK ENTRANCE MANEUVER
     """
@@ -126,7 +126,7 @@ def plan_return_to_entrance(mconfig:MStopConfig, sp, pedestrian_state:Pedestrian
     return direction, waypoint, pedestrian_speed['default_desired'] * 1.5
 
 
-def plan_increase_walking_speed(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_increase_walking_speed(mconfig:MIncreaseWalkingSpeedConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
     """
     INCREASE WALKING SPEED MANEUVER
     """
@@ -136,12 +136,16 @@ def plan_increase_walking_speed(mconfig:MStopConfig, sp, pedestrian_state:Pedest
     return direction, sp.current_waypoint, pedestrian_speed['default_desired'] * 1.5
 
 
-def plan_select_crosswalk_by_light(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_select_crosswalk_by_light(mconfig:MSelectCrosswalkByLightConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):
     """
     SELECT CROSSWALK BY LIGHT MANEUVER
     """
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    sp.sp_planner.plan_local_path(pedestrian_pos, True)
+
+    if previous_maneuver != Maneuver.M_SELECTCROSSWALKBYLIGHT:
+        sp.sp_planner.planning_position = pedestrian_pos
+
+    sp.sp_planner.plan_local_path(sp.sp_planner.planning_position, True, mconfig.aggressiveness_level)
     direction = normalize(sp.current_waypoint - pedestrian_pos)
 
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']

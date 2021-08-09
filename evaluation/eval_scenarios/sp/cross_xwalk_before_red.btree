@@ -1,0 +1,10 @@
+behaviortree cross_xwalk_before_red:
+    ?
+        ->
+            condition c_ped_greenlight ( pedestrian_light_green() )
+            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+        ->
+            condition c_ped_yellowlight ( pedestrian_light_yellow() )
+            condition c_can_cross_before_red ( can_cross_before_red() )
+            maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+        maneuver m_wait_at_crosswalk ( MWaitAtCrosswalkConfig() )
