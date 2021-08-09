@@ -1,4 +1,4 @@
-behaviortree walk:
+behaviortree walk_aggressiveness_level_high:
     ?
         ->
             condition c_goal ( reached_goal( threshold=1 ) )
@@ -16,9 +16,9 @@ behaviortree walk:
                     ?
                         ->
                             condition c_crosswalk_has_light ( crosswalk_has_light() )
-                            subtree cross_xwalk_before_red()
+                            subtree enter_xwalk_on_any_light_state()
                         maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
                 ->
                     condition c_approaching_xwalk ( approaching_crosswalk() )
-                    maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=2 ) )
+                    maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=3 ) )
         maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
