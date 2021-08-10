@@ -29,19 +29,19 @@ if __name__ == "__main__":
     WRITE_TRAJECTORIES = True
 
 
-    # Master csv to guide all experiments.
+    # Master csv to guide all experiments
     scenarios = load_all_scenarios(args.video_id)
 
     if args.eval_all:
          for id in scenarios:
             try:
                 if args.recalibrate == 'b':
-                    start_server(args,scenarios[id], False)
-                    start_server(args,scenarios[id], True)
+                    start_server(args, scenarios[id], False)
+                    start_server(args, scenarios[id], True)
                 elif args.recalibrate == 'n':
-                    start_server(args,scenarios[id], False)
+                    start_server(args, scenarios[id], False)
                 else:
-                    start_server(args,scenarios[id], True)
+                    start_server(args, scenarios[id], True)
 
             except Exception as e:
                 print("ERROR. Can not run evaluation for scenario {}".format(id))

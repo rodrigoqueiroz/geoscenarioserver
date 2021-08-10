@@ -40,6 +40,7 @@ from ScenarioSetup import *
 @dataclass
 class EvalScenario:
     scenario_id:str = ''
+    video_id:str = ''
     track_id:int = 0
     agent_type:str = ''                           #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
     scenario_type:str = ''                          #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
@@ -81,7 +82,7 @@ def start_server(args, es, calibrate = False):
     sim_traffic = SimTraffic(lanelet_map, sim_config)
 
     #Scenario SETUP
-    res, time = setup_evaluation_scenario(args.gsfile, args.video_id, sim_traffic, sim_config, lanelet_map, es, calibrate)
+    res, time = setup_evaluation_scenario(args.gsfile, sim_traffic, sim_config, lanelet_map, es, calibrate)
     if not res:
         return
 
@@ -122,29 +123,28 @@ def start_server(args, es, calibrate = False):
     log.info('SIMULATION END')
     log.info('GeoScenario Evaluation Server SHUTDOWN')
 
-
-def setup_evaluation_scenario(gsfile, video_id, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, es, calibrate_behavior):
-    print("===== Setup scenario {} for evaluation. Recalibrate? {}".format(es.scenario_id,calibrate_behavior))
+def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, es, calibrate_behavior):
+    print("===== Setup scenario {} for evaluation. Recalibrate? {}".format(es.scenario_id, calibrate_behavior))
 
     #==========================  Load Base Scenario
     #if not parser.load_and_validate_geoscenario(full_scenario_path):
     base_btree_location = os.path.join(ROOT_DIR, "evaluation/eval_scenarios/") #default btree folders location
     btree_locations = [base_btree_location]
     log.info ("Btree search locations set (in order) as: " + str(btree_locations))
-    if not load_geoscenario_from_file(gsfile,sim_traffic,sim_config,lanelet_map,"",btree_locations):
+    if not load_geoscenario_from_file(gsfile, sim_traffic, sim_config, lanelet_map, "", btree_locations):
         log.error("Error loading GeoScenario file")
         return False, 0.0
 
     #========================== Load Tracks
     # Database to retrieve trajectory info
-    connection = sqlite3.connect('evaluation/db_files/uni_weber_{}.db'.format(video_id))
+    connection = sqlite3.connect('evaluation/db_files/uni_weber_{}.db'.format(es.video_id))
     c = connection.cursor()
 
     trajectories = {}
-    trajectories[es.track_id] = query_track(es.track_id, video_id, c, lanelet_map.projector)
+    trajectories[es.track_id] = query_track(es.track_id, es.video_id, c, lanelet_map.projector)
     #load tracks for dependencies (vehicles, pedestrians)
     for cid in es.const_agents:
-        trajectories[cid] = query_track(cid, video_id, c, lanelet_map.projector)
+        trajectories[cid] = query_track(cid, es.video_id, c, lanelet_map.projector)
 
     #========================== Estimate scenario configuration
     config = generate_config(es, lanelet_map, sim_traffic.traffic_lights, trajectories, calibrate_behavior)
@@ -196,9 +196,11 @@ def setup_evaluation_scenario(gsfile, video_id, sim_traffic:SimTraffic, sim_conf
     if calibrate_behavior:
         sim_config.scenario_name = "{}_rc".format(es.scenario_id)
         sim_traffic.log_file = sim_config.scenario_name
+        sim_traffic.video_id = es.video_id
     else:
         sim_config.scenario_name = "{}_nc".format(es.scenario_id)
         sim_traffic.log_file = sim_config.scenario_name
+        sim_traffic.video_id = es.video_id
 
     sim_config.plot_vid = -es.track_id
     sim_config.timeout = es.end_time
@@ -220,6 +222,7 @@ def load_all_scenarios(video_id):
                 continue
             es = EvalScenario()
             es.scenario_id = row[0]
+            es.video_id = video_id
             es.track_id = int(row[2])
             es.agent_type = row[3]
             es.direction = row[4]
@@ -361,7 +364,6 @@ def find_lateral_pos(lanelet_map:LaneletMap, trajectory):
     print(d_target)
     return d_target
 
-
 def find_stop_distance(laneletmap:LaneletMap, trajectory): #, traffic_light_states):
     """ Find stop distance from stop line.
     """
@@ -483,66 +485,3 @@ def find_gl_delay(laneletmap:LaneletMap, trajectory, traffic_lights):
 
     print("Delay after green light is {}".format(delay))
     return delay
-
-'''
-if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
-    parser.add_argument("-s", "--scenario", dest="gsfile", metavar="FILE", default="", help="GeoScenario file")
-    parser.add_argument("-e", "--eval", dest="eval_id", default="", help="Evaluation scenario ID")
-    parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
-    parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="y", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
-    parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusively")
-    parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
-
-
-    args = parser.parse_args()
-
-    CLIENT_SHM = False
-    WRITE_TRAJECTORIES = True
-
-    # Master csv to guide all experiments.
-    scenarios = load_all_scenarios()
-
-    if args.eval_all:
-         for id in scenarios:
-            try:
-                if args.recalibrate == 'b':
-                    start_server(args,scenarios[id], False)
-                    start_server(args,scenarios[id], True)
-                elif args.recalibrate == 'n':
-                    start_server(args,scenarios[id], False)
-                else:
-                    start_server(args,scenarios[id], True)
-
-            except Exception as e:
-                print("ERROR. Can not run evaluation for scenario{}".format(id))
-    #Run single scenario
-    elif args.eval_id != "":
-        try:
-            if args.recalibrate == 'b':
-                start_server(args, scenarios[args.eval_id], False)
-                start_server(args, scenarios[args.eval_id], True)
-            elif args.recalibrate == 'n':
-                start_server(args, scenarios[args.eval_id], False)
-            else: #default
-                start_server(args, scenarios[args.eval_id], True)
-
-        except Exception as e:
-            print("ERROR. Can not run simulation for scenario{}".format(args.eval_id))
-            raise e
-    #Run all scenarios from type
-    elif args.eval_type != "":
-        for eval_id in scenarios:
-            if scenarios[eval_id].scenario_type == args.eval_type:
-                #try:
-                if args.recalibrate == 'b':
-                    start_server(args, scenarios[eval_id], False)
-                    start_server(args, scenarios[eval_id], True)
-                elif args.recalibrate == 'n':
-                    start_server(args, scenarios[eval_id], False)
-                else: #default
-                    start_server(args, scenarios[eval_id], True)
-                #except Exception as e:
-                #    print("ERROR. Can not run simulation for scenario{}".format(eval_id))
-'''

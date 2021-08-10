@@ -87,4 +87,4 @@ if __name__ == "__main__":
 
     #evaluate single trajectory
     elif args.traj_file != "":
-        evaluate_trajectory(args.traj_file)
+        evaluate_trajectory(args.video_id, args.traj_file)
