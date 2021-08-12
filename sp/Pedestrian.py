@@ -113,12 +113,17 @@ class SP(Pedestrian):
         self.sp_planner = SPPlanner(self, self.sim_traffic, self.btree_locations)
         self.sp_planner.start()
 
+        # only used in evaluation
+        self.tp_counterpart = self.sim_traffic.pedestrians[abs(self.id)]
+
     def stop(self):
         if self.sp_planner:
             self.sp_planner.stop()
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
+
+        self.curr_desired_speed = normalize(np.array([self.tp_counterpart.state.x_vel, self.tp_counterpart.state.y_vel]))
 
         curr_pos = np.array([self.state.x, self.state.y])
         curr_vel = np.array([self.state.x_vel, self.state.y_vel])
