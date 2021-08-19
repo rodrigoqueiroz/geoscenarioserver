@@ -209,7 +209,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
 def load_all_scenarios(video_id):
     scenarios = {}
-    with open('evaluation/pedestrian_scenarios/pedestrian_scenarios_' + video_id + '.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios/full/pedestrian_scenarios_' + video_id + '.csv', mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header

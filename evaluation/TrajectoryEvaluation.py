@@ -97,7 +97,7 @@ def evaluate_scenario(es:EvalScenario, map_lines):
 
 def load_all_scenarios(video_id):
     scenarios = {}
-    with open('evaluation/pedestrian_scenarios/pedestrian_scenarios_{}.csv'.format(video_id), mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios/full/pedestrian_scenarios_{}.csv'.format(video_id), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
@@ -319,7 +319,7 @@ def traj_plot_combined(es:EvalScenario, traj_s, traj_e, map_lines):
 
     ax.plot(   [node['x'] for node in traj_s],
                 [node['y'] for node in traj_s],
-                'b-',label="SP (b) ed={} m ed={} m".format(format(es.ed_mean, '.2f'),format(es.ed_max, '.2f')))
+                'b-',label="SP avg ed={} m, max ed={} m".format(format(es.ed_mean, '.2f'),format(es.ed_max, '.2f')))
 
     #fig.subplots_adjust(bottom=0.05)
     box = ax.get_position()
