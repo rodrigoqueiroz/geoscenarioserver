@@ -130,7 +130,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
     #if not parser.load_and_validate_geoscenario(full_scenario_path):
     base_btree_location = os.path.join(ROOT_DIR, "evaluation/eval_scenarios/") #default btree folders location
     btree_locations = [base_btree_location]
-    log.info ("Btree search locations set (in order) as: " + str(btree_locations))
+    log.info ("Btree search locations set (in order) as: {}".format(str(btree_locations)))
     if not load_geoscenario_from_file(gsfile, sim_traffic, sim_config, lanelet_map, "", btree_locations):
         log.error("Error loading GeoScenario file")
         return False, 0.0
@@ -207,9 +207,9 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     return True, es.start_time
 
-def load_all_scenarios(video_id):
+def load_all_scenarios(video_id, scenario_folder):
     scenarios = {}
-    with open('evaluation/pedestrian_scenarios/full/pedestrian_scenarios_' + video_id + '.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open("evaluation/pedestrian_scenarios/{}/pedestrian_scenarios_{}.csv".format(scenario_folder, video_id), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header

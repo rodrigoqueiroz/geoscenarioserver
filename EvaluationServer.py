@@ -21,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("-rc", "--recalibrate", dest="recalibrate", default="n", help="[y/n/b] Recalibrate behavior to match reference vehicle (b for both)")
     parser.add_argument("-c", "--compare", dest="compare", default="y", help="[y/n/e] Compare trajectories? e=for exclusively")
     parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
+    parser.add_argument("-l", "--length", dest="eval_length", default="f", help="[f/s] Run full [f] or segmented [s] scenario")
 
 
     args = parser.parse_args()
@@ -28,12 +29,22 @@ if __name__ == "__main__":
     CLIENT_SHM = False
     WRITE_TRAJECTORIES = True
 
+    try:
+        if args.eval_length == 'f':
+            scenario_folder = "full"
+        elif args.eval_length == 's':
+            scenario_folder = "segmented"
+        else:
+            raise Exception
+    except Exception as e:
+        print("ERROR. Invalid scenario length argument")
+        print(e)
 
     # Master csv to guide all experiments
-    scenarios = load_all_scenarios(args.video_id)
+    scenarios = load_all_scenarios(args.video_id, scenario_folder)
 
     if args.eval_all:
-         for id in scenarios:
+        for id in scenarios:
             try:
                 if args.recalibrate == 'b':
                     start_server(args, scenarios[id], False)

@@ -48,9 +48,21 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
     parser.add_argument("-tf", "--traj_file", dest="traj_file", default="", help="Single Trajectory analysis")
     parser.add_argument("-a", "--all", dest="eval_all", action="store_true", help="Batch evaluation for all trajectories")
+    parser.add_argument("-l", "--length", dest="eval_length", default="f", help="[f/s] Run full [f] or segmented [s] scenario")
     args = parser.parse_args()
 
-    scenarios = load_all_scenarios(args.video_id)
+    try:
+        if args.eval_length == 'f':
+            scenario_folder = "full"
+        elif args.eval_length == 's':
+            scenario_folder = "segmented"
+        else:
+            raise Exception
+    except Exception as e:
+        print("ERROR. Invalid scenario length argument")
+        print(e)
+
+    scenarios = load_all_scenarios(args.video_id, scenario_folder)
 
     map_lines = get_lanelet_map_lines(args.video_id)
 

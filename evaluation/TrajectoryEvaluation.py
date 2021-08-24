@@ -95,9 +95,9 @@ def evaluate_scenario(es:EvalScenario, map_lines):
     #print("Experiment {} Frechet distance = {} (nc) {} (rc) Euclidean distance = {} (nc) {} (rc)".format(
     #    es.scenario_id, es.fd_nc,es.fd_rc,es.ed_nc,es.ed_rc))
 
-def load_all_scenarios(video_id):
+def load_all_scenarios(video_id, scenario_folder):
     scenarios = {}
-    with open('evaluation/pedestrian_scenarios/full/pedestrian_scenarios_{}.csv'.format(video_id), mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/pedestrian_scenarios/{}/pedestrian_scenarios_{}.csv'.format(scenario_folder, video_id), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
