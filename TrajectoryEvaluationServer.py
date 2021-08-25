@@ -59,7 +59,7 @@ if __name__ == "__main__":
         else:
             raise Exception
     except Exception as e:
-        print("ERROR. Invalid scenario length argument")
+        print("ERROR. Invalid scenario length directory argument")
         print(e)
 
     scenarios = load_all_scenarios(args.video_id, scenario_folder)
@@ -99,4 +99,4 @@ if __name__ == "__main__":
 
     #evaluate single trajectory
     elif args.traj_file != "":
-        evaluate_trajectory(args.video_id, args.traj_file)
+        evaluate_trajectory(args.video_id, args.traj_file, scenario_folder)

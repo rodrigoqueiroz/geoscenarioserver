@@ -37,7 +37,7 @@ if __name__ == "__main__":
         else:
             raise Exception
     except Exception as e:
-        print("ERROR. Invalid scenario length argument")
+        print("ERROR. Invalid scenario length directory argument")
         print(e)
 
     # Master csv to guide all experiments

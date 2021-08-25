@@ -41,6 +41,7 @@ from ScenarioSetup import *
 class EvalScenario:
     scenario_id:str = ''
     video_id:str = ''
+    scenario_length:str = ''
     track_id:int = 0
     agent_type:str = ''                           #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
     scenario_type:str = ''                          #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
@@ -197,10 +198,12 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
         sim_config.scenario_name = "{}_rc".format(es.scenario_id)
         sim_traffic.log_file = sim_config.scenario_name
         sim_traffic.video_id = es.video_id
+        sim_traffic.scenario_length = es.scenario_length
     else:
         sim_config.scenario_name = "{}_nc".format(es.scenario_id)
         sim_traffic.log_file = sim_config.scenario_name
         sim_traffic.video_id = es.video_id
+        sim_traffic.scenario_length = es.scenario_length
 
     sim_config.plot_vid = -es.track_id
     sim_config.timeout = es.end_time
@@ -223,6 +226,7 @@ def load_all_scenarios(video_id, scenario_folder):
             es = EvalScenario()
             es.scenario_id = row[0]
             es.video_id = video_id
+            es.scenario_length = scenario_folder
             es.track_id = int(row[2])
             es.agent_type = row[3]
             es.direction = row[4]

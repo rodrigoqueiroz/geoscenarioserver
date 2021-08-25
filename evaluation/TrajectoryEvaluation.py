@@ -15,6 +15,7 @@ TIMESTR = time.strftime("%m%d_%H%M")
 class EvalScenario:
     scenario_id:str = ''
     video_id:str = ''
+    scenario_length:str = ''
     track_id:int = 0
     agent_type:str = ''                                 #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
     scenario_type:str = ''                              #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
@@ -36,8 +37,8 @@ class EvalScenario:
 
 
 
-def evaluate_trajectory(video_id, traj_file):
-    P = load_trajectory_log('evaluation/traj_log/{}/{}.csv'.format(video_id, traj_file) )   #empirical
+def evaluate_trajectory(video_id, traj_file, scenario_folder):
+    P = load_trajectory_log('evaluation/traj_log/{}/{}/{}.csv'.format(scenario_folder, video_id, traj_file) )   #empirical
 
     d_vector = []
     ds_vector = []
@@ -59,8 +60,8 @@ def evaluate_trajectory(video_id, traj_file):
 def evaluate_scenario(es:EvalScenario, map_lines):
     print("Evaluate scenario {}".format(es.scenario_id))
 
-    traj_s = load_trajectory_log('evaluation/traj_log/{}/{}_nc_{}.csv'.format(es.video_id, es.scenario_id, -es.track_id)) #synthetic nc
-    traj_e = load_trajectory_log('evaluation/traj_log/{}/{}_nc_{}.csv'.format(es.video_id, es.scenario_id, es.track_id))  #empirical nc
+    traj_s = load_trajectory_log('evaluation/traj_log/{}/{}/{}_nc_{}.csv'.format(es.scenario_length, es.video_id, es.scenario_id, -es.track_id)) #synthetic nc
+    traj_e = load_trajectory_log('evaluation/traj_log/{}/{}/{}_nc_{}.csv'.format(es.scenario_length, es.video_id, es.scenario_id, es.track_id))  #empirical nc
 
     es.time = float(traj_e[-1]['time']) - float(traj_e[0]['time'])
 
@@ -111,6 +112,7 @@ def load_all_scenarios(video_id, scenario_folder):
             es = EvalScenario()
             es.scenario_id = row[0]
             es.video_id = video_id
+            es.scenario_length = scenario_folder
             es.track_id = int(row[2])
             es.agent_type = row[3]
             es.direction = row[4]
@@ -302,7 +304,7 @@ def distance_2p(x1, y1, x2, y2):
 
 def traj_plot_combined(es:EvalScenario, traj_s, traj_e, map_lines):
     # create directory for plots if it does not exist
-    Path("evaluation/plots/{}/{}".format(es.scenario_type, es.video_id)).mkdir(parents=True, exist_ok=True)
+    Path("evaluation/plots/{}/{}/{}".format(es.scenario_length, es.scenario_type, es.video_id)).mkdir(parents=True, exist_ok=True)
 
     plt.cla()
     fig=plt.figure()
@@ -330,7 +332,7 @@ def traj_plot_combined(es:EvalScenario, traj_s, traj_e, map_lines):
     plt.xlabel('x (m)')
 
     plt.axis('equal')
-    filename = 'evaluation/plots/{}/{}/{}_trajectory'.format(es.scenario_type, es.video_id, es.scenario_id)
+    filename = 'evaluation/plots/{}/{}/{}/{}_trajectory'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id)
     plt.savefig(filename+'.png')
     plt.close(fig)
 
@@ -367,13 +369,13 @@ def speed_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e, traj_l, ymin
     #plt.axis.set_aspect('auto')
     plt.suptitle('Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id, es.scenario_type))
     plt.legend(loc="upper left")
-    filename = 'evaluation/plots/{}/{}/{}_speed'.format(es.scenario_type, es.video_id, es.scenario_id)
+    filename = 'evaluation/plots/{}/{}/{}/{}_speed'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id)
     plt.savefig(filename+'.png')
     plt.close(fig)
 
 
 def ed_plot(es):
-    filename = 'evaluation/plots/{}/{}/{}_edvector'.format(es.scenario_type, es.video_id, es.scenario_id)
+    filename = 'evaluation/plots/{}/{}/{}/{}_edvector'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id)
     title = 'Experiment {} ({}) \n ED {} m'.format(es.scenario_id, es.scenario_type, format(es.ed_mean, '.2f'))
     plt.cla()
     plt.plot([node[0] for node in es.ed_vector], [node[1] for node in es.ed_vector], 'k-', label="ed")
@@ -385,7 +387,7 @@ def ed_plot(es):
 def update_results_table(es:EvalScenario):
     print("Update results for scenario {}".format(es.scenario_id))
     #Write results to file
-    with open('evaluation/results/results.csv', mode='r', encoding='utf-8-sig') as csv_file:
+    with open('evaluation/results/results_{}.csv'.format(es.scenario_length), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         lines = list(csv_reader)
 
@@ -422,7 +424,7 @@ def update_results_table(es:EvalScenario):
                         #format(es.fd_change, '.2f')
                         ])
 
-    with open('evaluation/results/results.csv', mode='w',encoding='utf-8-sig') as csv_file:
+    with open('evaluation/results/results_{}.csv'.format(es.scenario_length), mode='w',encoding='utf-8-sig') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
         csv_writer.writerows(lines)
 
@@ -525,7 +527,7 @@ def generate_boxplots(lines):
     """
 
 def save_traj_plot(P, Q, es, fd_score, ed_score, config_str):
-    filename = 'evaluation/plots/{}/{}/{}_{}'.format(es.scenario_type, es.video_id, es.scenario_id, config_str)
+    filename = 'evaluation/plots/{}/{}/{}/{}_{}'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id, config_str)
     title = 'Experiment {} ({}) \n FD ={} m, ED {} m'.format(es.scenario_id,config_str, format(fd_score, '.3f'),format(ed_score, '.3f'))
     plt.cla()
     plt.plot(   [node['x'] for node in Q],    [node['y'] for node in Q], 'r-',label="emp")
@@ -537,7 +539,7 @@ def save_traj_plot(P, Q, es, fd_score, ed_score, config_str):
     #plt.show()
 
 def save_speed_plot(P, Q, L, es, config_str):
-    filename = 'evaluation/plots/{}/{}/{}_{}_speed'.format(es.scenario_type, es.video_id, es.scenario_id, config_str)
+    filename = 'evaluation/plots/{}/{}/{}/{}_{}_speed'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id, config_str)
     title = 'Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id,config_str)
 
     #vel
