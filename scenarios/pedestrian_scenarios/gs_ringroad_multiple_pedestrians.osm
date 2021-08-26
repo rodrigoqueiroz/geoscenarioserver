@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5347115' action='modify' visible='true' lat='43.47300476029' lon='-80.54173413491'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Multiple Pedestrians Scenario' />
+    <tag k='timeout' v='200' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5347116' action='modify' visible='true' lat='43.47241560188' lon='-80.54077999405'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='500' />
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5347117' action='modify' visible='true' lat='43.4725076638' lon='-80.54070912369'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_2_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_2' />
+  </node>
+  <node id='-5347118' action='modify' visible='true' lat='43.47252531345' lon='-80.54105148234'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_1_dest' />
+  </node>
+  <node id='-5347119' action='modify' visible='true' lat='43.47248819888' lon='-80.54070308872'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_4_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_4' />
+  </node>
+  <node id='-5347120' action='modify' visible='true' lat='43.47251034022' lon='-80.54073259301'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_1_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_1' />
+  </node>
+  <node id='-5347121' action='modify' visible='true' lat='43.47250012114' lon='-80.5406977243'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_3_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_3' />
+  </node>
+  <node id='-5347122' action='modify' visible='true' lat='43.47222152889' lon='-80.54060451753'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_4_dest' />
+  </node>
+  <node id='-5347123' action='modify' visible='true' lat='43.47245145114' lon='-80.54104405942'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_2_dest' />
+  </node>
+  <node id='-5347124' action='modify' visible='true' lat='43.47237544151' lon='-80.54094721815'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_3_dest' />
+  </node>
+  <node id='-5347126' action='modify' visible='true' lat='43.47249241353' lon='-80.54074048919'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_5_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_1' />
+  </node>
+  <node id='-5347134' action='modify' visible='true' lat='43.4722907307' lon='-80.54087899579'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_5_dest' />
+  </node>
+</osm>

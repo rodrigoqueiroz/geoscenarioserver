@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-5339206' action='modify' visible='true' lat='43.47300476029' lon='-80.54173413491'>
+  <node id='-5343652' action='modify' visible='true' lat='43.47300476029' lon='-80.54173413491'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
@@ -9,20 +9,20 @@
     <tag k='timeout' v='200' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5339207' action='modify' visible='true' lat='43.47241560188' lon='-80.54077999405'>
+  <node id='-5343653' action='modify' visible='true' lat='43.47241560188' lon='-80.54077999405'>
     <tag k='altitude' v='320' />
     <tag k='area' v='500' />
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5339208' action='modify' visible='true' lat='43.47251253003' lon='-80.54069235988'>
+  <node id='-5343654' action='modify' visible='true' lat='43.47250498738' lon='-80.54077383198'>
     <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_1' />
   </node>
-  <node id='-5339209' action='modify' visible='true' lat='43.47257568223' lon='-80.54110036852'>
+  <node id='-5343655' action='modify' visible='true' lat='43.47253480594' lon='-80.54105208876'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>
