@@ -230,7 +230,7 @@ def load_all_scenarios(video_id, scenario_folder):
             es.track_id = int(row[2])
             es.agent_type = row[3]
             es.direction = row[4]
-            es.scenario_type = row[5]
+            es.scenario_type = row[5].split(";")
             #constraints
             if (row[6] != ''):
                 if (';' in row[6]):

@@ -116,7 +116,7 @@ def load_all_scenarios(video_id, scenario_folder):
             es.track_id = int(row[2])
             es.agent_type = row[3]
             es.direction = row[4]
-            es.scenario_type = row[5]
+            es.scenario_type = row[5].split(";")
             #constraints
             if (row[6] != ''):
                 if (';' in row[6]):
@@ -149,7 +149,7 @@ def load_scenario_db(scenario_id):
                 es.track_id = int(row[2])
                 es.agent_type = row[3]
                 es.direction = row[4]
-                es.scenario_type = row[5]
+                es.scenario_type = row[5].split(";")
                 #constraints
                 if (row[6] != ''):
                     if (',' in row[6]):
@@ -304,84 +304,87 @@ def distance_2p(x1, y1, x2, y2):
 
 def traj_plot_combined(es:EvalScenario, traj_s, traj_e, map_lines):
     # create directory for plots if it does not exist
-    Path("evaluation/plots/{}/{}/{}".format(es.scenario_length, es.scenario_type, es.video_id)).mkdir(parents=True, exist_ok=True)
+    for scenario_tag in es.scenario_type:
+        Path("evaluation/plots/{}/{}/{}".format(es.scenario_length, scenario_tag, es.video_id)).mkdir(parents=True, exist_ok=True)
 
-    plt.cla()
-    fig=plt.figure()
+        plt.cla()
+        fig=plt.figure()
 
-    ax=fig.add_subplot(111)
+        ax=fig.add_subplot(111)
 
-    # plot road
-    for line in map_lines:
-        ax.plot(line[0], line[1], color='#cccccc', zorder=0)
+        # plot road
+        for line in map_lines:
+            ax.plot(line[0], line[1], color='#cccccc', zorder=0)
 
-    ax.plot(   [node['x'] for node in traj_e],
-                [node['y'] for node in traj_e],
-                'r-', label="Empirical pedestrian")
+        ax.plot(   [node['x'] for node in traj_e],
+                    [node['y'] for node in traj_e],
+                    'r-', label="Empirical pedestrian")
 
-    ax.plot(   [node['x'] for node in traj_s],
-                [node['y'] for node in traj_s],
-                'b-',label="SP avg ed={} m, max ed={} m".format(format(es.ed_mean, '.2f'),format(es.ed_max, '.2f')))
+        ax.plot(   [node['x'] for node in traj_s],
+                    [node['y'] for node in traj_s],
+                    'b-',label="SP avg ed={} m, max ed={} m".format(format(es.ed_mean, '.2f'),format(es.ed_max, '.2f')))
 
-    #fig.subplots_adjust(bottom=0.05)
-    box = ax.get_position()
-    ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
-    ax.legend(loc="upper center",bbox_to_anchor=(0.5, -0.15))
-    plt.suptitle('Experiment {} ({}) \nTrajectory'.format(es.scenario_id, es.scenario_type))
-    plt.ylabel('y (m)')
-    plt.xlabel('x (m)')
+        #fig.subplots_adjust(bottom=0.05)
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
+        ax.legend(loc="upper center",bbox_to_anchor=(0.5, -0.15))
+        plt.suptitle('Experiment {} ({}) \nTrajectory'.format(es.scenario_id, scenario_tag))
+        plt.ylabel('y (m)')
+        plt.xlabel('x (m)')
 
-    plt.axis('equal')
-    filename = 'evaluation/plots/{}/{}/{}/{}_trajectory'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id)
-    plt.savefig(filename+'.png')
-    plt.close(fig)
+        plt.axis('equal')
+        filename = 'evaluation/plots/{}/{}/{}/{}_trajectory'.format(es.scenario_length, scenario_tag, es.video_id, es.scenario_id)
+        plt.savefig(filename+'.png')
+        plt.close(fig)
 
 
 def speed_plot_combined(es:EvalScenario, traj_s, traj_s_nc, traj_e, traj_l, ymin=-1, ymax=20):
-    plt.cla()
-    fig=plt.figure()
-    ax=fig.add_subplot(111)
+    for scenario_tag in es.scenario_type:
+        plt.cla()
+        fig=plt.figure()
+        ax=fig.add_subplot(111)
 
-    if traj_l:
-        ax.plot(   [node['time'] for node in traj_l],
-                    [node['speed'] for node in traj_l],
-                    'k--',label="Lead")
-    ax.plot(   [node['time'] for node in traj_e],
-                [node['speed'] for node in traj_e],
-                'r-',label="Empirical")
-    ax.plot(   [node['time'] for node in traj_s_nc],
-                [node['speed'] for node in traj_s_nc],
-                'b--',label="SDV (a)")
-    ax.plot(   [node['time'] for node in traj_s],
-                [node['speed'] for node in traj_s],
-                'b-',label="SDV (b)")
-    plt.ylabel('speed (m/s)')
-    plt.xlabel('time (s)')
+        if traj_l:
+            ax.plot(   [node['time'] for node in traj_l],
+                        [node['speed'] for node in traj_l],
+                        'k--',label="Lead")
+        ax.plot(   [node['time'] for node in traj_e],
+                    [node['speed'] for node in traj_e],
+                    'r-',label="Empirical")
+        ax.plot(   [node['time'] for node in traj_s_nc],
+                    [node['speed'] for node in traj_s_nc],
+                    'b--',label="SDV (a)")
+        ax.plot(   [node['time'] for node in traj_s],
+                    [node['speed'] for node in traj_s],
+                    'b-',label="SDV (b)")
+        plt.ylabel('speed (m/s)')
+        plt.xlabel('time (s)')
 
-    xmin = min([node['time'] for node in traj_e])
-    xmax = max([node['time'] for node in traj_e])
+        xmin = min([node['time'] for node in traj_e])
+        xmax = max([node['time'] for node in traj_e])
 
-    ax.set_xbound(lower=xmin, upper=xmax)
-    ax.set_ybound(lower=ymin, upper=ymax)
-    #plt.xlim(xmin,xmax)
-    #plt.ylim(0,30)
-    #plt.yticks(range(0, 30))
-    #plt.axis.set_aspect('auto')
-    plt.suptitle('Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id, es.scenario_type))
-    plt.legend(loc="upper left")
-    filename = 'evaluation/plots/{}/{}/{}/{}_speed'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id)
-    plt.savefig(filename+'.png')
-    plt.close(fig)
+        ax.set_xbound(lower=xmin, upper=xmax)
+        ax.set_ybound(lower=ymin, upper=ymax)
+        #plt.xlim(xmin,xmax)
+        #plt.ylim(0,30)
+        #plt.yticks(range(0, 30))
+        #plt.axis.set_aspect('auto')
+        plt.suptitle('Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id, scenario_tag))
+        plt.legend(loc="upper left")
+        filename = 'evaluation/plots/{}/{}/{}/{}_speed'.format(es.scenario_length, scenario_tag, es.video_id, es.scenario_id)
+        plt.savefig(filename+'.png')
+        plt.close(fig)
 
 
 def ed_plot(es):
-    filename = 'evaluation/plots/{}/{}/{}/{}_edvector'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id)
-    title = 'Experiment {} ({}) \n ED {} m'.format(es.scenario_id, es.scenario_type, format(es.ed_mean, '.2f'))
-    plt.cla()
-    plt.plot([node[0] for node in es.ed_vector], [node[1] for node in es.ed_vector], 'k-', label="ed")
-    plt.suptitle(title)
-    plt.legend(loc="upper left")
-    plt.savefig(filename+'.png')
+    for scenario_tag in es.scenario_type:
+        filename = 'evaluation/plots/{}/{}/{}/{}_edvector'.format(es.scenario_length, scenario_tag, es.video_id, es.scenario_id)
+        title = 'Experiment {} ({}) \n ED {} m'.format(es.scenario_id, scenario_tag, format(es.ed_mean, '.2f'))
+        plt.cla()
+        plt.plot([node[0] for node in es.ed_vector], [node[1] for node in es.ed_vector], 'k-', label="ed")
+        plt.suptitle(title)
+        plt.legend(loc="upper left")
+        plt.savefig(filename+'.png')
 
 
 def update_results_table(es:EvalScenario):
@@ -394,7 +397,7 @@ def update_results_table(es:EvalScenario):
         found = False
         for l in lines:
             if l[0] == es.video_id and l[1] == es.scenario_id:
-                l[2] = es.scenario_type
+                l[2] = ';'.join(es.scenario_type)
                 l[3] = es.time
                 #nc
                 l[4] = format(es.ed_mean, '.2f')
@@ -411,7 +414,7 @@ def update_results_table(es:EvalScenario):
         if not found:
             lines.append([es.video_id,
                         es.scenario_id,
-                        es.scenario_type,
+                        ';'.join(es.scenario_type),
                         es.time,
                         format(es.ed_mean, '.2f'),
                         format(es.ed_median, '.2f'),
@@ -527,31 +530,33 @@ def generate_boxplots(lines):
     """
 
 def save_traj_plot(P, Q, es, fd_score, ed_score, config_str):
-    filename = 'evaluation/plots/{}/{}/{}/{}_{}'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id, config_str)
-    title = 'Experiment {} ({}) \n FD ={} m, ED {} m'.format(es.scenario_id,config_str, format(fd_score, '.3f'),format(ed_score, '.3f'))
-    plt.cla()
-    plt.plot(   [node['x'] for node in Q],    [node['y'] for node in Q], 'r-',label="emp")
-    plt.plot(   [node['x'] for node in P],    [node['y'] for node in P], 'b-',label="synth")
-    plt.suptitle(title)
-    plt.legend(loc="upper left")
-    plt.axis('equal')
-    plt.savefig(filename+'.png')
-    #plt.show()
+    for scenario_tag in es.scenario_type:
+        filename = 'evaluation/plots/{}/{}/{}/{}_{}'.format(es.scenario_length, scenario_tag, es.video_id, es.scenario_id, config_str)
+        title = 'Experiment {} ({}) \n FD ={} m, ED {} m'.format(es.scenario_id,config_str, format(fd_score, '.3f'),format(ed_score, '.3f'))
+        plt.cla()
+        plt.plot(   [node['x'] for node in Q],    [node['y'] for node in Q], 'r-',label="emp")
+        plt.plot(   [node['x'] for node in P],    [node['y'] for node in P], 'b-',label="synth")
+        plt.suptitle(title)
+        plt.legend(loc="upper left")
+        plt.axis('equal')
+        plt.savefig(filename+'.png')
+        #plt.show()
 
 def save_speed_plot(P, Q, L, es, config_str):
-    filename = 'evaluation/plots/{}/{}/{}/{}_{}_speed'.format(es.scenario_length, es.scenario_type, es.video_id, es.scenario_id, config_str)
-    title = 'Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id,config_str)
+    for scenario_tag in es.scenario_type:
+        filename = 'evaluation/plots/{}/{}/{}/{}_{}_speed'.format(es.scenario_length, scenario_tag, es.video_id, es.scenario_id, config_str)
+        title = 'Experiment {} ({}) \nSpeed (m/s)'.format(es.scenario_id,config_str)
 
-    #vel
-    plt.cla()
-    if L:
-        plt.plot(   [node['time'] for node in L],    [node['speed'] for node in L], 'k--',label="lead")
-    plt.plot(   [node['time'] for node in Q],    [node['speed'] for node in Q], 'r-',label="emp")
-    plt.plot(   [node['time'] for node in P],    [node['speed'] for node in P], 'b-',label="synth")
-    plt.ylabel('speed (m/s)')
-    plt.xlabel('time (s)')
-    #plt.ylim(0,20)
-    #plt.xlim(0,50)
-    plt.suptitle(title)
-    plt.legend(loc="upper left")
-    plt.savefig(filename+'.png')
+        #vel
+        plt.cla()
+        if L:
+            plt.plot(   [node['time'] for node in L],    [node['speed'] for node in L], 'k--',label="lead")
+        plt.plot(   [node['time'] for node in Q],    [node['speed'] for node in Q], 'r-',label="emp")
+        plt.plot(   [node['time'] for node in P],    [node['speed'] for node in P], 'b-',label="synth")
+        plt.ylabel('speed (m/s)')
+        plt.xlabel('time (s)')
+        #plt.ylim(0,20)
+        #plt.xlim(0,50)
+        plt.suptitle(title)
+        plt.legend(loc="upper left")
+        plt.savefig(filename+'.png')
