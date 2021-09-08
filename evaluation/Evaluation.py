@@ -289,13 +289,17 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
 
     # clip start and end nodes that are outside of any lanelet in map
     idx = 0
-    while (len(lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))['lanelets']) == 0):
+    occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
+    while (len(occupied_spaces['lanelets']) == 0 and len(occupied_spaces['areas']) == 0):
         idx += 1
+        occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
     trajectory = trajectory[idx:]
 
     idx = len(trajectory) - 1
-    while (len(lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))['lanelets']) == 0):
+    occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
+    while (len(occupied_spaces['lanelets']) == 0 and len(occupied_spaces['areas']) == 0):
         idx -= 1
+        occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
     trajectory = trajectory[:idx+1]
 
     #Traj Stats
