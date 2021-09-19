@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from frechetdist import frdist
 import time
 from pathlib import Path
+from scipy.signal import butter, filtfilt
 
 TIMESTR = time.strftime("%m%d_%H%M")
 
@@ -34,6 +35,8 @@ class EvalScenario:
 
     fd:float = 0.0
     fd_change:float = 0.0
+
+    curvature_score:float = 0.0
 
 
 
@@ -74,6 +77,10 @@ def evaluate_scenario(es:EvalScenario, map_lines):
 
     # Frechet distance
     es.fd = get_frechet(traj_s, traj_e)
+
+    path_curvatures = get_curvature_of_paths(traj_s, traj_e)
+    plot_curvatures(es, path_curvatures)
+    es.curvature_score = get_curvature_matching_score(path_curvatures)
 
     traj_plot_combined(es, traj_s, traj_e, map_lines)
     #speed_plot_combined(es, traj_s, traj_s_nc, traj_e, traj_l)
@@ -279,6 +286,131 @@ def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
     Qlist = [[node['x'], node['y']] for node in SQ]
     score = frdist(Plist, Qlist)
     return score
+
+def get_curvature_of_paths(traj_s, traj_e):
+    curvature_vals = []
+
+    for path in [traj_s, traj_e]:
+        x_vals = [node['x'] for node in path]
+        y_vals = [node['y'] for node in path]
+        time_vals = [node['time'] for node in path]
+        dt = path[1]['time'] - path[0]['time']
+        two_dt = 2*dt
+
+        x_grad = [0]
+        y_grad = [0]
+        x_grad2 = [0]
+        y_grad2 = [0]
+        curvature = []
+
+        for i in range(1, len(x_vals)-1):
+            x_grad.append((x_vals[i+1] - x_vals[i-1]) / (time_vals[i+1] - time_vals[i-1]))
+        x_grad[0] = (x_vals[1] - x_vals[0]) / (time_vals[1] - time_vals[0])
+        x_grad.append((x_vals[-1] - x_vals[-2]) / (time_vals[-1] - time_vals[-2]))
+
+        for i in range(1, len(y_vals)-1):
+            y_grad.append((y_vals[i+1] - y_vals[i-1]) / (time_vals[i+1] - time_vals[i-1]))
+        y_grad[0] = (y_vals[1] - y_vals[0]) / (time_vals[1] - time_vals[0])
+        y_grad.append((y_vals[-1] - y_vals[-2]) / (time_vals[-1] - time_vals[-2]))
+
+        for i in range(1, len(x_grad)-1):
+            x_grad2.append((x_grad[i+1] - x_grad[i-1]) / (time_vals[i+1] - time_vals[i-1]))
+        x_grad2[0] = (x_grad[1] - x_grad[0]) / (time_vals[1] - time_vals[0])
+        x_grad2.append((x_grad[-1] - x_grad[-2]) / (time_vals[-1] - time_vals[-2]))
+
+        for i in range(1, len(y_grad)-1):
+            y_grad2.append((y_grad[i+1] - y_grad[i-1]) / (time_vals[i+1] - time_vals[i-1]))
+        y_grad2[0] = (y_grad[1] - y_grad[0]) / (time_vals[1] - time_vals[0])
+        y_grad2.append((y_grad[-1] - y_grad[-2]) / (time_vals[-1] - time_vals[-2]))
+
+        for i in range(len(y_vals)):
+            if x_grad[i] == 0 and y_grad[i] == 0:
+                curvature.append(0)
+            else:
+                curvature.append((x_grad[i]*y_grad2[i] - y_grad[i]*x_grad2[i]) / ((x_grad[i]**2 + y_grad[i]**2)**1.5))
+
+        curvature_vals.append(low_pass_filter(curvature))
+
+    return curvature_vals
+
+def low_pass_filter(vals):
+    # Filter requirements
+    fs = 30.0       # sample rate, Hz
+    cutoff = 1      # desired cutoff frequency of the filter, Hz
+    nyq = 0.5 * fs  # Nyquist Frequency
+    order = 4       # polynomial order of the signal (number of crosswalks taken * 2)
+
+    normal_cutoff = cutoff / nyq
+
+    # Get the filter coefficients
+    b, a = butter(order, normal_cutoff, btype='low', analog=False)
+    y = filtfilt(b, a, vals)
+
+    return y
+
+
+''' Low pass filter function from
+    https://github.com/rdeiaco/learning_lattice_planner/blob/master/ParameterComparison.jl
+    Currently not in use.'''
+# def low_pass_filter_ryan(vals):
+#     FILTER_ORDER = 19
+#     x_prev = random.sample(range(0, 1000), FILTER_ORDER)
+#     filtered_vals = []
+#
+#     for i in range(len(vals)):
+#         temp = vals[i]
+#         filtered_val = 0.0
+#
+#         for j in range(FILTER_ORDER):
+#             filtered_val += 1.0 / ((FILTER_ORDER+1) * x_prev[j])
+#
+#         filtered_val += 1.0 / ((FILTER_ORDER+1) * temp)
+#         filtered_vals.append(filtered_val)
+#
+#         for j in range(FILTER_ORDER-1, 0, -1):
+#             x_prev[j] = x_prev[j-1]
+#
+#         x_prev[0] = temp
+#
+#     return filtered_vals
+
+
+def get_curvature_matching_score(path_curvatures):
+    path_length_t = min(len(path_curvatures[0]), len(path_curvatures[1]))
+    curvature_score = abs(path_curvatures[1][0] - path_curvatures[0][0])
+
+    for i in range(1, path_length_t):
+        curvature_diff = abs(path_curvatures[1][i] - path_curvatures[0][i])
+        if curvature_diff > curvature_score:
+            curvature_score = curvature_diff
+
+    return curvature_score
+
+
+def plot_curvatures(es:EvalScenario, curvature):
+    for scenario_tag in es.scenario_type:
+        plt.cla()
+
+        fig, ax = plt.subplots()
+
+        ax.plot(range(len(curvature[0])),
+                curvature[0],
+                'b-', label="Model pedestrian curvature")
+
+        ax.plot(range(len(curvature[1])),
+                curvature[1],
+                'r-', label="Empirical pedestrian curvature")
+
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15))
+        plt.suptitle('Curvature of model and empirical paths')
+        plt.ylabel('y')
+        plt.xlabel('x')
+
+        filename = 'evaluation/plots/{}/{}/{}/{}_curvature'.format(es.scenario_length, scenario_tag, es.video_id, es.scenario_id)
+        plt.savefig(filename+'.png')
+        plt.close(fig)
 
 def get_euclideandistance(P, Q = None):
     d_vector = []
