@@ -42,6 +42,7 @@ class SPPlanner(object):
         self.btree_locations = btree_locations
         self.btype = sp.btype
 
+        self.turn_start_time = 0
         self.inverted_path = False
         self.previous_maneuver = None
         self.selected_target_crosswalk = False
@@ -444,6 +445,7 @@ class SPPlanner(object):
 
         # Get planner state
         planner_state = PedestrianPlannerState(
+                            sim_time = sim_time,
                             pedestrian_state=pedestrian_state,
                             pedestrian_speed=pedestrian_speed,
                             path = self.sp.path,
@@ -487,6 +489,7 @@ class SPPlanner(object):
             self.sp.direction, self.sp.current_waypoint, self.sp.curr_desired_speed = plan_maneuver(mconfig.mkey,
                                                                                             mconfig,
                                                                                             self.sp,
+                                                                                            planner_state.sim_time,
                                                                                             planner_state.pedestrian_state,
                                                                                             planner_state.pedestrian_speed,
                                                                                             planner_state.target_crosswalk,

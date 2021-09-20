@@ -16,14 +16,14 @@ from sp.ManeuverUtils import *
 from util.Transformations import normalize
 
 
-def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, vehicles, pedestrians, previous_maneuver):
+def plan_maneuver(man_key, mconfig, sp, sim_time, pedestrian_state, pedestrian_speed, target_crosswalk, vehicles, pedestrians, previous_maneuver):
     #Micro maneuver layer
     if (man_key == Maneuver.M_KEEPINLANE):
         return plan_keep_in_lane(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
     elif (man_key == Maneuver.M_STOP):
         return plan_stop(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
     elif (man_key == Maneuver.M_ENTERCROSSWALK):
-        return plan_enter_crosswalk(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, previous_maneuver)
+        return plan_enter_crosswalk(mconfig, sp, sim_time, pedestrian_state, pedestrian_speed, target_crosswalk, previous_maneuver)
     elif (man_key == Maneuver.M_EXITCROSSWALK):
         return plan_exit_crosswalk(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, previous_maneuver)
     elif (man_key == Maneuver.M_WAITATCROSSWALK):
@@ -60,7 +60,7 @@ def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestr
     return direction, sp.current_waypoint, 0.0
 
 
-def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):
+def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, sim_time, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):
     """
     ENTER CROSSWALK
     """
@@ -68,6 +68,9 @@ def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:Ped
     waypoint = target_crosswalk['exit']
 
     direction = normalize(waypoint - pedestrian_pos)
+    
+    sp.next_direction = direction
+    sp.sp_planner.turn_start_time = sim_time
 
     return direction, waypoint, pedestrian_speed['default_desired']
 

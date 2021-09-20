@@ -20,7 +20,7 @@ TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
 
 @dataclass
 class PedestrianPlannerState:
-    #sim_time: float
+    sim_time: float
     pedestrian_state: PedestrianState
     pedestrian_speed: Dict
     path: List

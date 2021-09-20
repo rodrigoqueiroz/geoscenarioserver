@@ -94,6 +94,8 @@ class SP(Pedestrian):
         self.path = None
         self.waypoints = []
         self.current_waypoint = None
+        self.next_direction = []
+        self.turn_duration = 3
         self.destination = np.array(goal_points[-1])
 
         self.current_lanelet = None
@@ -123,14 +125,23 @@ class SP(Pedestrian):
         curr_vel = np.array([self.state.x_vel, self.state.y_vel])
 
         self.sp_planner.run_planner(sim_time)
-        self.update_position_SFM(curr_pos, curr_vel)
+        self.update_position_SFM(curr_pos, curr_vel, sim_time)
 
-    def update_position_SFM(self, curr_pos, curr_vel):
+    def update_position_SFM(self, curr_pos, curr_vel, sim_time):
         '''
         Paper with details on SFM formulas:
         https://link.springer.com/content/pdf/10.1007/s12205-016-0741-9.pdf (access through University of Waterloo)
         This paper explains the calculations and parameters in other_pedestrian_interaction() and border_interaction()
         '''
+
+        if len(self.next_direction) != 0:
+            turn_time = sim_time - self.sp_planner.turn_start_time
+            direction_weight = turn_time / self.turn_duration
+            self.direction = normalize((1 - direction_weight) * self.direction + direction_weight * self.next_direction)
+
+            if direction_weight >= 1:
+                self.next_direction = []
+
         desired_vel = self.direction * self.curr_desired_speed
         accl_time = 0.5 # acceleration time
 
