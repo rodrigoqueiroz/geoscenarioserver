@@ -10,7 +10,7 @@ import time
 from copy import copy
 from multiprocessing import Array, Lock, Manager, Process, shared_memory
 from typing import Dict, List
-
+import sys
 import glog as log
 import lanelet2.core
 import numpy as np
@@ -26,7 +26,7 @@ from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
 from sv.SDVPlannerState import *
 from sv.SDVRoute import SDVRoute
-
+from signal import signal, SIGTERM
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes):
@@ -44,6 +44,7 @@ class SVPlanner(object):
         self.sim_traffic:SimTraffic = sim_traffic
 
         #Subprocess space
+        self.sync_planner = None
         self.root_btree_name = sdv.root_btree_name
         self.btree_reconfig = sdv.btree_reconfig
         self.behavior_model = None
@@ -93,12 +94,17 @@ class SVPlanner(object):
         
 
     #==SUB PROCESS=============================================
+    def before_exit(self,*args):
+        if self.sync_planner:
+            self.sync_planner.write_peformance_log()
+        sys.exit(0)
 
     def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata):
         log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
+        signal(SIGTERM, self.before_exit)
 
-        sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP")
-        sync_planning_task = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP")
+        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
+        
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -107,12 +113,12 @@ class SVPlanner(object):
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
         if USE_FIXED_PLANNING_TIME:
-            sync_planner.set_task(task_label,PLANNING_TIME)
+            self.sync_planner.set_task(task_label,PLANNING_TIME)
         else:
-            sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
+            self.sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
 
-        while sync_planner.tick():
-            sync_planner.start_task()
+        while self.sync_planner.tick():
+            self.sync_planner.start_task()
 
             # Get sim state from main process
             # All objects are copies and can be changed
@@ -132,8 +138,8 @@ class SVPlanner(object):
                 )
 
             # Get traffic, lane config and regulatory elements in current frenet frame
-            self.project_dynamic_objects(vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, sync_planner.get_task_time())
-            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+            self.project_dynamic_objects(vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
+            planner_state = self.get_planner_state(self.sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
@@ -148,7 +154,7 @@ class SVPlanner(object):
                 self.sdv_route.update_global_path(vehicle_state.x, vehicle_state.y)
 
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+                planner_state = self.get_planner_state(self.sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -191,11 +197,11 @@ class SVPlanner(object):
                 frenet_traj, cand = plan_maneuver(self.vid, mconfig,planner_state)
 
                 if EVALUATION_MODE and not self.last_plan:
-                    sync_planner.end_task(False) #blocks if < target
+                    self.sync_planner.end_task(False) #blocks if < target
                     task_delta_time = 0
                 else:
-                    sync_planner.end_task() #blocks if < target
-                    task_delta_time = sync_planner.get_task_time()
+                    self.sync_planner.end_task() #blocks if < target
+                    task_delta_time = self.sync_planner.get_task_time()
 
                 if frenet_traj is None:
                     log.warn("plan_maneuver return invalid trajectory.")

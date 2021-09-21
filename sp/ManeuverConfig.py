@@ -19,6 +19,10 @@ class Maneuver(Enum):
     M_STOP = 2
     M_ENTERCROSSWALK = 3
     M_EXITCROSSWALK = 4
+    M_WAITATCROSSWALK = 5
+    M_RETURNTOENTRANCE = 6
+    M_INCREASEWALKINGSPEED = 7
+    M_SELECTCROSSWALKBYLIGHT = 8
 
 
 class SamplingMethod(Enum):
@@ -126,6 +130,8 @@ class MConfig:
     max_long_acc = 6.0              # maximum longitudinal acceleration [m/s/s]
     max_lat_acc = 4.9               # maximum lateral acceleration [m/s/s]
 
+    aggressiveness_level: int = 1
+
 
 @dataclass
 class MKeepInLaneConfig(MConfig):
@@ -161,3 +167,23 @@ class MEnterCrosswalkConfig(MConfig):
 @dataclass
 class MExitCrosswalkConfig(MConfig):
     mkey:int = Maneuver.M_EXITCROSSWALK
+
+
+@dataclass
+class MWaitAtCrosswalkConfig(MConfig):
+    mkey:int = Maneuver.M_WAITATCROSSWALK
+
+
+@dataclass
+class MReturnToEntranceConfig(MConfig):
+    mkey:int = Maneuver.M_RETURNTOENTRANCE
+
+
+@dataclass
+class MIncreaseWalkingSpeedConfig(MConfig):
+    mkey:int = Maneuver.M_INCREASEWALKINGSPEED
+
+
+@dataclass
+class MSelectCrosswalkByLightConfig(MConfig):
+    mkey:int = Maneuver.M_SELECTCROSSWALKBYLIGHT

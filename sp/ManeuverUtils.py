@@ -13,11 +13,12 @@ import glog as log
 from SimTraffic import *
 from sp.ManeuverConfig import *
 from SimConfig import *
+from mapping.LaneletMap import LaneletMap
 from util.Transformations import normalize
-from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation
+from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation, point_in_rectangle
 
 
-def has_reached_point(pedestrian_state, point, threshold=1):
+def has_reached_point(pedestrian_state, point, threshold=1.5):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
         @param threshold: Max acceptable distance to point
@@ -82,10 +83,30 @@ def dir_to_follow_lane_border(pedestrian_state, current_lane, curr_waypoint, inv
 
 
 def in_crosswalk_area(planner_state):
-    cur_ll = planner_state.lanelet_map.get_occupying_lanelet_by_participant(planner_state.pedestrian_state.x, planner_state.pedestrian_state.y, "pedestrian")
-    if cur_ll == None:
+    if not planner_state.current_lanelet:
         return False
-    return cur_ll.attributes["subtype"] == "crosswalk"
+    return planner_state.current_lanelet.attributes['subtype'] == 'crosswalk'
+
+
+def past_crosswalk_halfway(planner_state):
+    P = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
+    crosswalk = planner_state.current_lanelet
+    right = crosswalk.rightBound
+    left = crosswalk.leftBound
+
+    # get four points of exit half of xwalk in counterclockwise direction
+    '''
+    ----------------D----------------> C
+                    |   exit half
+                    |   of crosswalk
+    ----------------A----------------> B
+    '''
+    B = np.array([right[-1].x, right[-1].y])
+    A = (np.array([right[0].x, right[0].y]) + B) / 2
+    C = np.array([left[-1].x, left[-1].y])
+    D = (np.array([left[0].x, left[0].y]) + C) / 2
+
+    return point_in_rectangle(P, A, B, C, D)
 
 
 def has_line_of_sight_to_point(position, point, lanelet):
@@ -117,24 +138,34 @@ def has_line_of_sight_to_point(position, point, lanelet):
 
     return True
 
-def point_in_rectangle(P, A, B, C, D):
-    ''' Checks if the point pt is in the rectangle defined by
-        points A, B, C, D in a counterclockwise orientation
-    '''
-    left_of_AB = (B[0]-A[0])*(P[1]-A[1]) - (B[1]-A[1])*(P[0]-A[0]) > 0
-    left_of_BC = (C[0]-B[0])*(P[1]-B[1]) - (C[1]-B[1])*(P[0]-B[0]) > 0
-    left_of_CD = (D[0]-C[0])*(P[1]-C[1]) - (D[1]-C[1])*(P[0]-C[0]) > 0
-    left_of_DA = (A[0]-D[0])*(P[1]-D[1]) - (A[1]-D[1])*(P[0]-D[0]) > 0
 
-    '''
-    Could not directly return (left_of_AB and left_of_BC and left_of_CD and left_of_DA)
-    for some reason so I had to split into two different bools (first_two and last_two).
+def approaching_crosswalk(planner_state):
+    if planner_state.target_crosswalk["id"] == -1:
+        return False
 
-    (left_of_AB and left_of_BC and left_of_CD and left_of_DA) apparently evaluates
-    to an empty list instead of True or False
-    '''
-    first_two = left_of_AB and left_of_BC
-    last_two = left_of_CD and left_of_DA
-    inside_rect = first_two and last_two
+    threshold_dist = 3
+    pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
 
-    return inside_rect
+    if not planner_state.lanelet_map.inside_lanelet_or_area(pedestrian_pos, planner_state.current_lanelet):
+        return False
+
+    crosswalk_entry = planner_state.target_crosswalk["entry"]
+    dist_to_crosswalk_entrance = np.linalg.norm(crosswalk_entry - pedestrian_pos)
+
+    return dist_to_crosswalk_entrance < threshold_dist
+
+
+def can_cross_before_red(planner_state):
+    """
+    return ((distance to entry) + (distance from entry to exit)) / (default desired speed) < (time to red)
+    """
+    pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
+    crosswalk_entry = planner_state.target_crosswalk["entry"]
+    crosswalk_exit = planner_state.target_crosswalk["exit"]
+
+    dist_pos_to_entry = np.linalg.norm(crosswalk_entry - pedestrian_pos)
+    dist_entry_to_exit = np.linalg.norm(crosswalk_exit - crosswalk_entry)
+
+    crossing_possible = (dist_pos_to_entry + dist_entry_to_exit) / planner_state.pedestrian_speed["default_desired"] < planner_state.crossing_light_time_to_red
+
+    return crossing_possible

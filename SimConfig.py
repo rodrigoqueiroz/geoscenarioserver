@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-#rqueiroz@guwaterloo.ca
+#rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
 # SimConfig
-# Class to hold configuration settings of the scenario + config constants
+# General configuration settings
 # --------------------------------------------
 
 from dataclasses import dataclass, field
 from typing import Dict
 import os
+import math
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -53,20 +54,20 @@ VEHICLE_LENGTH = 4.0        #vehicle length in [m]
 VEHICLE_WIDTH = 2.0         #vehicle width in [m]
 
 #Planning
-PLANNER_RATE = 3                     #Planner tick rate
-PLANNING_TIME = 0.33                #[s] Must be less than 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
+PLANNER_RATE = 3                    #Planner tick rate
+PLANNING_TIME = 0.33                #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
 USE_FIXED_PLANNING_TIME = True      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
 POINTS_PER_METER = 1.0               #The number of points per meter to be used along the vehicle's reference path
                                      #Note that the value that is used may be slightly different
 
-#Debugging
+#Debugging and Log
 PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths
                                #Each figure will contain the map (black), the route (red), and the global path (blue)
                                #Figures are opened for each vehicle in the scenario
                                #This should only be set when you want to see these figures
                                #The program will crash after showing figures for all vehicles (an XIO error)
-
-#Evaluation
+LOG_PERFORMANCE = False
+MAX_NVEHICLES = math.inf              #Limit max number of active vehicles (math.inf if no limit)
 EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
@@ -74,8 +75,8 @@ WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved 
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
 
 #Shared Memory
-WAIT_FOR_CLIENT = True     #Hold Simulation start until a valid state is sent from client
-CLIENT_SHM = True          #If True, server will create shared memory space to exchange data with client.
+WAIT_FOR_CLIENT = False     #Hold Simulation start until a valid state is sent from client
+CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943
