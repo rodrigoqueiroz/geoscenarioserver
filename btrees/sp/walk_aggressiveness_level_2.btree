@@ -1,4 +1,4 @@
-behaviortree walk:
+behaviortree walk_aggressiveness_level_med:
     ?
         ->
             condition c_goal ( reached_goal( threshold=1 ) )
