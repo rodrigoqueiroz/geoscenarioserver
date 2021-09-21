@@ -85,7 +85,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
+
     for vid, vnode in parser.vehicles.items():
+        if len(sim_traffic.vehicles) >= MAX_NVEHICLES:
+            break
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
@@ -125,7 +128,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 start_in_frenet = True
                 start_frenet = vnode.tags['start_frenet']
                 gs_sf = start_frenet.split(',')
-                print(gs_sf)
+                #print(gs_sf)
                 if len (gs_sf) != 6:
                     log.error("start state in Frenet must have 6 values [s,s_vel,s_acc,d,d_vel,d_acc].")
                     continue
