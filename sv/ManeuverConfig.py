@@ -38,7 +38,7 @@ class LaneConfig:
     right_bound:float = -2          #d
     _left_lane: LaneConfig = None
     _right_lane: LaneConfig = None
-    
+    stopline_pos:float = None
 
     def get_current_lane(self, d):
         if self.right_bound <= d <= self.left_bound:

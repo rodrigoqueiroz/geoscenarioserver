@@ -38,8 +38,7 @@ class Dashboard(object):
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
-
-
+        self.lanelet_map:LaneletMap = None
 
     def start(self):
         """ Start dashboard in subprocess.
@@ -166,6 +165,7 @@ class Dashboard(object):
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
             truncate_vector(sp,2)
+ 
             sp = ['p' + str(pid)] + [sim_state] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
@@ -258,6 +258,7 @@ class Dashboard(object):
         #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
         #fig.tight_layout(pad=0.1)
 
+    
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
 
         #road lines:
@@ -267,8 +268,26 @@ class Dashboard(object):
             plt.plot(line[0], line[1], color = '#cccccc',zorder=0)
 
         #pedestrian marking
+
         #regulatory elements:
-        #lights
+        
+        #stop lines
+        for stop_line in self.lanelet_map.get_stop_lines():
+            plt.plot([pt.x for pt in stop_line], [pt.y for pt in stop_line], 'r-') #red
+
+        #stop signs
+        for stop_sign in self.lanelet_map.get_stop_signs():
+            plt.plot(stop_sign.x, stop_sign.y, 'rH', markersize=10)
+
+        #All way Stops ()
+        #sign_points, stop_lines, lanelets = self.lanelet_map.get_all_way_stops()
+        #for point in sign_points:
+            #plt.plot(point[0], point[1], 'rH', markersize=10)
+        #for stop_line in stop_lines:
+            #plt.plot([pt.x for pt in stop_line], [pt.y for pt in stop_line], 'r-') #red
+
+
+        #lights (must be drawn after other stop lines)
         if traffic_light_states:
             for lid,state in traffic_light_states.items():
                 #find physical light locations
@@ -292,8 +311,7 @@ class Dashboard(object):
                 if tl_type != TrafficLightType.pedestrian:
                     label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
                     plt.gca().text(x+1, y, label, style='italic')
-                    plt.plot(line[0], line[1], color = colorcode, zorder=5)
-        #signs
+                    plt.plot(line[0], line[1], color = colorcode, zorder=5)        
 
     def plot_static_objects(self,static_objects,x_min,x_max,y_min,y_max):
         if static_objects:
@@ -387,6 +405,27 @@ class Dashboard(object):
         plt.xlabel('S')
         plt.ylabel('D')
 
+        #stop line (if exists)
+        if lane_config.stopline_pos is not None:
+            x, y = lane_config.stopline_pos
+            plt.axvline(x, color= 'r', linestyle='-', zorder=0)
+
+        #junction
+
+        #re
+        for re in regulatory_elements:
+            if isinstance(re, sv.SDVPlannerState.TrafficLightState):
+                colorcode,_ = self.get_color_by_type('trafficlight',re.color)
+                x, y = re.stop_position
+                plt.axvline(x, color= colorcode, linestyle='-', zorder=1)
+            elif isinstance(re, sv.SDVPlannerState.RightOfWayState):
+                pass
+                #for ll_id in re.row_lanelets:
+                    #colorfillcode = 'r' if re.row_lanelets[ll_id] > 0 else 'g'
+                    #ll = self.lanelet_map.laneletLayer[ll_id]
+            elif isinstance(re, sv.SDVPlannerState.AllWayStopState):
+                pass
+
         #other vehicles, from main vehicle POV:
         for vid,vehicle in vehicles.items():
             colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state)
@@ -419,17 +458,6 @@ class Dashboard(object):
             plt.plot(x, y, 'kx',markersize=6, zorder=10)
             label = "{}".format(oid)
             plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
-
-
-        #re
-        for re in regulatory_elements:
-            if isinstance(re, sv.SDVPlannerState.TrafficLightState):
-                colorcode,_ = self.get_color_by_type('trafficlight',re.color)
-                x, y = re.stop_position
-                plt.axvline(x, color= colorcode, linestyle='-', zorder=0)
-            else:
-                print(re)
-
 
         #main vehicle
         if goal_point_frenet is not None:
