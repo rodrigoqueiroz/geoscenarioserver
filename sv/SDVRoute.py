@@ -131,11 +131,13 @@ class SDVRoute(object):
                     if any(prev_ll.id == route_lane[-1].id for prev_ll in prev_lls):
                         lane_is_loop = True
                         break
+                    #Circle maps get stuck if there is a loop before the route
+                    if any(ll in prev_lane for ll in prev_lls):
+                        break
 
                     prev_ll = prev_lls[0]
                     prev_lane.append(prev_ll)
                     prev_lls = SDVRoute.lanelet_map.get_previous(prev_ll)
-
                 prev_lane.reverse()
 
             next_lane = []
@@ -144,6 +146,8 @@ class SDVRoute(object):
                 while len(next_lls) > 0:
                     if any(next_ll.id == route_lane[0].id for next_ll in next_lls):
                         lane_is_loop = True
+                        break
+                    if any(ll in next_lane for ll in next_lls):
                         break
 
                     next_ll = next_lls[0]

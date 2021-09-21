@@ -126,18 +126,6 @@ class ManeuverAction(behaviour.Behaviour):
             if self.mconfig.target_lid is None:
                 self.mconfig.target_lid = self.bmodel.planner_state.lane_swerve_target
 
-        elif self.mconfig.mkey == Maneuver.M_STOP:
-            # If stopping at goal, set stop_pos to the goal point's s value
-            if self.mconfig.target == MStopConfig.StopTarget.GOAL:
-                self.mconfig.pos = self.bmodel.planner_state.goal_point_frenet[0]
-            # If stopping at a stop line, find a regulatory element with a stop line applying to this vehicle
-            elif self.mconfig.target == MStopConfig.StopTarget.STOP_LINE:
-                for re_state in self.bmodel.planner_state.regulatory_elements:
-                    if 'stop_position' in re_state._fields:
-                        self.mconfig.pos = re_state.stop_position[0]
-                        break
-                    
-
         # Handle completion of lane swerve/cutin maneuver
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed and status is not common.Status.FAILURE:

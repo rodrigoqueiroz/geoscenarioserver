@@ -9,7 +9,7 @@ from sv.ManeuverConfig import *
 from sv.ManeuverUtils import *
 from sv.btree.BTreeInterpreter import *
 from sv.btree.BTreeLeaves import *
-from sv.SDVPlannerState import TrafficLightState
+from sv.SDVPlannerState import AllWayStopState, RightOfWayState, TrafficLightState
 from TrafficLight import TrafficLightColor
 
 class BehaviorModels(object):
@@ -111,6 +111,52 @@ class BehaviorModels(object):
                 self.planner_state.vehicle_state, self.planner_state.goal_point_frenet,
                 self.planner_state.route_complete, **kwargs
             )
+        
+        elif condition == "stop_sign_ahead":
+            if self.planner_state.lane_config.stopline_pos is None:
+                return False
+            threshold = kwargs['threshold' ] if 'threshold' in kwargs else 30.0
+            pos_s = self.planner_state.lane_config.stopline_pos[0]
+            dist = pos_s - self.planner_state.vehicle_state.s
+            return (dist < threshold)
+        
+        elif condition == "approaching_intersection":
+            #todo: make a single condition called ZONE and name all zone types. (on_intersection, at_intersection, at_road, on_traffic_light )
+            #On a intersection
+            for re_state in self.planner_state.regulatory_elements:
+                if isinstance(re_state, RightOfWayState) or isinstance(re_state, AllWayStopState):
+                    threshold = 30
+                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold 
+
+        elif condition == "row_intersection_occupied":
+            for re_state in self.planner_state.regulatory_elements:
+                if isinstance(re_state, RightOfWayState):
+                    #must be yielding
+                    if re_state.stop_position[0] - self.planner_state.vehicle_state.s  < 5 and self.planner_state.vehicle_state.s_vel < 0.01:
+                        for ll_id in re_state.row_lanelets:
+                            if re_state.row_lanelets[ll_id] == 1:
+                                print("BEHAVIOR: yielding and intersection busy")
+                                return True
+                        #print("BEHAVIOR: yielding and intersection free")
+                        return False #yielding and no vehicles detected in conflict
+                #print("BEHAVIOR: moving, not yielding")
+                return True #not yielding, consider as occupied
+            return False  #No row intersection detected
+
+        elif condition == "aw_intersection_free":
+            for re_state in self.planner_state.regulatory_elements:
+                if isinstance(re_state, AllWayStopState):
+                    #must be yielding
+                    if re_state.stop_position[0] - self.planner_state.vehicle_state.s  < 5:
+                        for ll_id in re_state.row_lanelets:
+                            if re_state.row_lanelets[ll_id] == 1:
+                                return False
+                        return True
+            return False
+        
+        elif condition == "vehicle_state":
+            s_vel = kwargs['s_vel']
+            return (self.planner_state.vehicle_state.s_vel > s_vel)
 
         elif condition == "lane_occupied":
             lane_occupied, lv_id = is_in_following_range(
