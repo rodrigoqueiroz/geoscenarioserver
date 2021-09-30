@@ -39,6 +39,7 @@ class Vehicle(Actor):
         super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
         self.type = Vehicle.N_TYPE
         self.radius = VEHICLE_RADIUS
+        self.model = ''
 
     def update_sim_state(self, new_state, delta_time):
         # NOTE: this may desync the sim and frenet vehicle state, so this should
@@ -54,7 +55,7 @@ class Vehicle(Actor):
         velocity = [self.state.x_vel, self.state.y_vel]
 
         #remote = 1 if self.is_remote else 0
-        return self.id, self.type, position, velocity, self.state.yaw_unreal, self.state.steer
+        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
 
 
 class SDV(Vehicle):
@@ -63,7 +64,7 @@ class SDV(Vehicle):
     '''
     def __init__(
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
-            yaw:float, lanelet_map:LaneletMap, lanelet_route:Route, route_nodes:List[Node],
+            yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
         self.btype = btype
         self.btree_locations = btree_locations
@@ -71,7 +72,7 @@ class SDV(Vehicle):
 
         if start_state_in_frenet:
             # assume frenet start_state is relative to the starting global path
-            self.sdv_route = SDVRoute(lanelet_route, lanelet_map)
+            self.sdv_route = SDVRoute(lanelet_map, route_nodes = route_nodes)
             x_vector, y_vector = frenet_to_sim_frame(
                 self.sdv_route.get_global_path(), start_state[0:3],
                 start_state[3:], 0
@@ -80,7 +81,7 @@ class SDV(Vehicle):
             start_state[0] = 0.0
             Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw)
         else:
-            self.sdv_route = SDVRoute(lanelet_route, lanelet_map, start_state[0], start_state[3])
+            self.sdv_route = SDVRoute(lanelet_map, start_state[0], start_state[3], route_nodes = route_nodes)
             s_vector, d_vector = sim_to_frenet_frame(
                 self.sdv_route.get_global_path(), start_state[0:3], start_state[3:], 0
             )
@@ -264,10 +265,11 @@ class EV(Vehicle):
     """
     An external vehicle (remote simulation)
     """
-    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
+    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, bsource=''):
         super().__init__(vid, name, start_state, yaw=yaw)
         self.type = Vehicle.EV_TYPE
         self.P = np.identity(2) * 0.5 # some large error
+        self.bsource = bsource
         # experiment w these values
         self.POS_VAR = 0.01 ** 2
         self.VEL_VAR = 0.1 ** 2
@@ -283,6 +285,7 @@ class EV(Vehicle):
         self.state.set_X([new_state.x, velocity[0], new_state.x_acc])
         self.state.set_Y([new_state.y, velocity[1], new_state.y_acc])
         # log.info(str(np.linalg.norm([self.state.x_vel, self.state.y_vel])))
+        self.state.yaw = new_state.yaw
 
     def get_kalman_state_estimate(self, new_state, current_state, delta_time):
         # Init current state as [position velocity]T
