@@ -147,6 +147,10 @@ class GSParser(object):
 
             node.tags[k] = float(v) if Utils.is_number(v) else v
 
+        #ignore if not a gs element
+        if not ('gs' in node.tags):
+            return True
+
         # if node has a pid or vid, add it to appropriate array in agent_ids
         if any([k in ['vid', 'pid'] for k in node.tags]):
             id_type = 'vid' if 'vid' in node.tags else 'pid'
