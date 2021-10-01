@@ -143,7 +143,7 @@ def approaching_crosswalk(planner_state):
     if planner_state.target_crosswalk["id"] == -1:
         return False
 
-    threshold_dist = 3
+    threshold_dist = 8
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
 
     if not planner_state.lanelet_map.inside_lanelet_or_area(pedestrian_pos, planner_state.current_lanelet):

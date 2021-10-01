@@ -13,7 +13,7 @@
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5338057' action='modify' visible='true' lat='43.47777550766' lon='-80.51973093097'>
+  <node id='-5338057' action='modify' visible='true' lat='43.47778376231' lon='-80.52010177774'>
     <tag k='btree' v='walk_aggressiveness_level_1.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
@@ -52,11 +52,11 @@
     <tag k='states' v='R,G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338063' action='modify' visible='true' lat='43.47822368924' lon='-80.51951174432'>
+  <node id='-5338063' action='modify' visible='true' lat='43.47810977574' lon='-80.51926034206'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_2_dest' />
   </node>
-  <node id='-5338064' action='modify' visible='true' lat='43.47776666301' lon='-80.52015896418'>
+  <node id='-5338064' action='modify' visible='true' lat='43.47813399408' lon='-80.51974261474'>
     <tag k='btree' v='walk_aggressiveness_level_2.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_2_dest' />

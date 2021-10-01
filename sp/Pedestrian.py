@@ -95,7 +95,9 @@ class SP(Pedestrian):
         self.waypoints = []
         self.current_waypoint = None
         self.next_direction = []
-        self.turn_duration = 3
+        self.previous_direction = []
+        self.turn_duration = 7
+        self.turn_degree = 0.5
         self.destination = np.array(goal_points[-1])
 
         self.current_lanelet = None
@@ -136,10 +138,11 @@ class SP(Pedestrian):
 
         if len(self.next_direction) != 0:
             turn_time = sim_time - self.sp_planner.turn_start_time
-            direction_weight = turn_time / self.turn_duration
-            self.direction = normalize((1 - direction_weight) * self.direction + direction_weight * self.next_direction)
+            direction_weight = (turn_time / self.turn_duration) ** self.turn_degree
+            self.direction = normalize((1 - direction_weight) * self.previous_direction + direction_weight * self.next_direction)
 
             if direction_weight >= 1:
+                self.direction = self.next_direction
                 self.next_direction = []
 
         desired_vel = self.direction * self.curr_desired_speed

@@ -122,7 +122,7 @@ class BehaviorModels(object):
             if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['entry']):
                 return False
             entrance = self.planner_state.target_crosswalk['entry']
-            return has_reached_point(self.planner_state.pedestrian_state, entrance, 5, **kwargs)
+            return has_reached_point(self.planner_state.pedestrian_state, entrance, 8, **kwargs)
 
         elif condition == "reached_crosswalk_exit":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):

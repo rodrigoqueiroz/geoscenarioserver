@@ -67,10 +67,14 @@ def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, sim_time, pedestrian
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     waypoint = target_crosswalk['exit']
 
+    previous_direction = normalize(target_crosswalk['entry'] - pedestrian_pos)
     direction = normalize(waypoint - pedestrian_pos)
-    
+
+    sp.previous_direction = previous_direction
     sp.next_direction = direction
-    sp.sp_planner.turn_start_time = sim_time
+
+    if previous_maneuver != Maneuver.M_ENTERCROSSWALK:
+        sp.sp_planner.turn_start_time = sim_time
 
     return direction, waypoint, pedestrian_speed['default_desired']
 
@@ -101,7 +105,11 @@ def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:Pedes
         sp.sp_planner.selected_target_crosswalk = False
 
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+    previous_direction = normalize(target_crosswalk['exit'] - pedestrian_pos)
     direction = normalize(sp.current_waypoint - pedestrian_pos)
+
+    sp.previous_direction = previous_direction
+    sp.next_direction = direction
 
     return direction, sp.current_waypoint, pedestrian_speed['default_desired']
 
