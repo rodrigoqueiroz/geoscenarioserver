@@ -14,7 +14,8 @@ from sv.ManeuverConfig import LaneConfig
 
 
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
-
+AllWayStopState= namedtuple('AllWayStopState', ['stop_position','yield_lanelets','intersecting_lanelets'])
+RightOfWayState=namedtuple('RightOfWayState',['stop_position', 'row_lanelets'])
 
 @dataclass
 class PlannerState:
@@ -28,4 +29,4 @@ class PlannerState:
     goal_point: Tuple[float,float] = None
     goal_point_frenet: Tuple[float,float] = None
     route_complete: bool = False
-    lane_swerve_target: int = None #deprecated?
+    lane_swerve_target: int = None

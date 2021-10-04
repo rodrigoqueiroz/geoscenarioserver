@@ -6,26 +6,27 @@
 # --------------------------------------------
 
 import datetime
-import numpy as np
-from multiprocessing import shared_memory, Process, Lock, Array, Manager
-from typing import Dict, List
-import glog as log
+import time
 from copy import copy
-from TickSync import TickSync
+from multiprocessing import Array, Lock, Manager, Process, shared_memory
+from typing import Dict, List
+import sys
+import glog as log
+import lanelet2.core
+import numpy as np
+from Actor import *
+from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
+from SimTraffic import *
+from TickSync import TickSync
+from util.Transformations import (OutsideRefPathException, frenet_to_sim_frame,frenet_to_sim_position, sim_to_frenet_frame,sim_to_frenet_position)
+from sv.btree.BehaviorModels import BehaviorModels
+from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
-from sv.btree.BehaviorModels import BehaviorModels
-from sv.SDVPlannerState import PlannerState, TrafficLightState
+from sv.SDVPlannerState import *
 from sv.SDVRoute import SDVRoute
-from util.Transformations import sim_to_frenet_frame, sim_to_frenet_position, frenet_to_sim_frame, frenet_to_sim_position, OutsideRefPathException
-import lanelet2.core
-from mapping.LaneletMap import *
-from Actor import *
-from sv.FrenetTrajectory import *
-from SimTraffic import *
-
-import time
+from signal import signal, SIGTERM
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes):
@@ -43,6 +44,7 @@ class SVPlanner(object):
         self.sim_traffic:SimTraffic = sim_traffic
 
         #Subprocess space
+        self.sync_planner = None
         self.root_btree_name = sdv.root_btree_name
         self.btree_reconfig = sdv.btree_reconfig
         self.behavior_model = None
@@ -92,12 +94,17 @@ class SVPlanner(object):
         
 
     #==SUB PROCESS=============================================
+    def before_exit(self,*args):
+        if self.sync_planner:
+            self.sync_planner.write_peformance_log()
+        sys.exit(0)
 
     def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata):
         log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
+        signal(SIGTERM, self.before_exit)
 
-        sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP")
-        sync_planning_task = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP")
+        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
+        
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -106,12 +113,12 @@ class SVPlanner(object):
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
         if USE_FIXED_PLANNING_TIME:
-            sync_planner.set_task(task_label,PLANNING_TIME)
+            self.sync_planner.set_task(task_label,PLANNING_TIME)
         else:
-            sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
+            self.sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
 
-        while sync_planner.tick():
-            sync_planner.start_task()
+        while self.sync_planner.tick():
+            self.sync_planner.start_task()
 
             # Get sim state from main process
             # All objects are copies and can be changed
@@ -131,8 +138,8 @@ class SVPlanner(object):
                 )
 
             # Get traffic, lane config and regulatory elements in current frenet frame
-            self.project_dynamic_objects(vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, sync_planner.get_task_time())
-            planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+            self.project_dynamic_objects(vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
+            planner_state = self.get_planner_state(self.sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
             if not planner_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
@@ -147,7 +154,7 @@ class SVPlanner(object):
                 self.sdv_route.update_global_path(vehicle_state.x, vehicle_state.y)
 
                 # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                planner_state = self.get_planner_state(sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+                planner_state = self.get_planner_state(self.sync_planner, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                 if not planner_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -187,20 +194,14 @@ class SVPlanner(object):
             if mconfig and planner_state.lane_config:
                 #replan maneuver
                 #traj, cand, unf = plan_maneuver( mconfig.mkey,
-                frenet_traj, cand = plan_maneuver(self.vid, 
-                                            mconfig,
-                                            planner_state.vehicle_state,
-                                            planner_state.lane_config,
-                                            planner_state.traffic_vehicles,
-                                            planner_state.pedestrians,
-                                            planner_state.static_objects)
+                frenet_traj, cand = plan_maneuver(self.vid, mconfig,planner_state)
 
                 if EVALUATION_MODE and not self.last_plan:
-                    sync_planner.end_task(False) #blocks if < target
+                    self.sync_planner.end_task(False) #blocks if < target
                     task_delta_time = 0
                 else:
-                    sync_planner.end_task() #blocks if < target
-                    task_delta_time = sync_planner.get_task_time()
+                    self.sync_planner.end_task() #blocks if < target
+                    task_delta_time = self.sync_planner.get_task_time()
 
                 if frenet_traj is None:
                     log.warn("plan_maneuver return invalid trajectory.")
@@ -319,7 +320,7 @@ class SVPlanner(object):
         lane_swerve_target = self.sdv_route.get_lane_swerve_direction(vehicle_state.s)
 
         # update lane config based on current (possibly outdated) reference frame
-        lane_config, reg_elems = self.read_map(vehicle_state, traffic_light_states)
+        lane_config, reg_elems = self.read_map(vehicle_state, traffic_light_states,traffic_vehicles)
         if not lane_config:
             # No map data for current position
             log.warn("no lane config")
@@ -379,7 +380,7 @@ class SVPlanner(object):
             lane_swerve_target=lane_swerve_target
         )
 
-    def read_map(self, vehicle_state:VehicleState, traffic_light_states:dict):
+    def read_map(self, vehicle_state:VehicleState, traffic_light_states:dict, traffic_vehicles:dict):
         """ Builds a lane config centered around the closest lanelet to vehicle_state lying
             on the reference_path.
         """
@@ -408,37 +409,108 @@ class SVPlanner(object):
             lower_lane_config = LaneConfig(-1, 30, middle_lane_config.right_bound, middle_lane_config.right_bound - lower_lane_width)
             middle_lane_config.set_right_lane(lower_lane_config)
 
+        #Get next lanelets in route and look for conflicts:
+        next_lalenets = self.laneletmap.get_next_by_route(self.sdv_route._lanelet_route, cur_ll)
+        conflicting = []
+        for c in self.sdv_route._lanelet_route.conflictingInMap(cur_ll):
+            conflicting.append(c)
+        for next_ll in next_lalenets:
+            for c in self.sdv_route._lanelet_route.conflictingInMap(next_ll):
+                conflicting.append(c)
+        #print("Conflicting now and next")
+        #for ll in conflicting:
+        #    print(ll.id)
+
+        #Get current lanelets from other vehicles (TODO: transfer to main process)
+        v_lanelet_ids = []
+        for vid,vehicle in traffic_vehicles.items():
+            ll = self.laneletmap.get_occupying_lanelet(vehicle.state.x, vehicle.state.y)
+            if ll is not None:
+                v_lanelet_ids.append(ll.id)
+
         # Get regulatory elements acting on this lanelet
         reg_elems = cur_ll.regulatoryElements
         reg_elem_states = []
         for re in reg_elems:
+            #TRAFFIC LIGHT
             if isinstance(re, lanelet2.core.TrafficLight):
                 # lanelet2 traffic lights must have a corresponding state from the main process
                 if re.id not in traffic_light_states:
                     continue
-
-                stop_linestring = re.parameters['ref_line']
-
-                try:
-                    # choose the closest point on the stop line as the stop position
-                    stop_pos = min(
-                            sim_to_frenet_position(
-                                self.sdv_route.get_reference_path(), stop_linestring[0][0].x,
-                                stop_linestring[0][0].y, self.sdv_route.get_reference_path_s_start(),
-                                max_dist_from_path=10.0
-                            ),
-                            sim_to_frenet_position(
-                                self.sdv_route.get_reference_path(), stop_linestring[0][-1].x,
-                                stop_linestring[0][-1].y, self.sdv_route.get_reference_path_s_start(),
-                                max_dist_from_path=10.0
-                            ),
-                            key=lambda p: p[0]
-                    )
+                my_stop_line = re.parameters['ref_line'][0]
+                stop_pos = self.get_closest_point_to_line(my_stop_line[0].x,my_stop_line[0].y,my_stop_line[-1].x,my_stop_line[-1].y )
+                if stop_pos is not None:
                     reg_elem_states.append(TrafficLightState(color=traffic_light_states[re.id], stop_position=stop_pos))
-                except OutsideRefPathException:
-                    pass
+            
+            #RIGHT OF WAY
+            elif isinstance(re, lanelet2.core.RightOfWay):
+                #Maneuvers: "Yield", ManeuverType::Yield)#"RightOfWay", ManeuverType::RightOfWay)#"Unknown", ManeuverType::Unknown)
+                maneuver = re.getManeuver(cur_ll)
+                if (maneuver == lanelet2.core.ManeuverType.Yield):
+                    #Yielding
+                    #stop_line = re.stopLine #can be used only when one ref_line exists (one yielding lanelet)
+                    stop_line = self.laneletmap.get_my_ref_line( cur_ll, re.yieldLanelets(), re.parameters["ref_line"] )
+                    stop_pos = self.get_closest_point_to_line( stop_line[0].x,stop_line[0].y,stop_line[-1].x,stop_line[-1].y )
+                    #print("Yield at {}".format(stop_pos))
+                    #RoW and occupancy
+                    row_lanelets = {}
+                    for ll in re.rightOfWayLanelets():
+                        #LL  in conflict
+                        if ll in conflicting:
+                            count = 0
+                            for v_ll_id in v_lanelet_ids:
+                                if v_ll_id == ll.id:
+                                    #log.warning("CONFLICT")
+                                    count = count+1
+                            row_lanelets[ll.id] = count
+                    #Intersecting:
+                    #for row_ll in row_lanelets:
+                    #    if row_ll in conflicting_next:
+                    #        log.warning("row ll {} conflict with my next ll {}".format( row_ll.attributes['name'], next_lls[0].attributes['name']) )
+                    #Add State
+                    middle_lane_config.stopline_pos = stop_pos
+                    reg_elem_states.append(RightOfWayState(stop_position=stop_pos, row_lanelets= row_lanelets)) #todo: add only intersecting with path
 
+                elif (maneuver == lanelet2.core.ManeuverType.RightOfWay):
+                    continue #ignore
+                elif (maneuver == lanelet2.core.ManeuverType.Unknown):
+                    log.warn("Role of lanelet {} in the RightOfWay is unknown".format(cur_ll.id))
+                    continue
+
+            #ALL WAY STOP
+            elif isinstance(re, lanelet2.core.AllWayStop):
+                yield_lanelets = re.lanelets()
+                stop_lines = re.stopLines() #equivalent to re.parameters["ref_line"]
+                traffic_signs = re.trafficSigns()
+                stop_line = self.laneletmap.get_my_ref_line(cur_ll,yield_lanelets,stop_lines)
+                if stop_line is not None:
+                    stop_pos = self.get_closest_point_to_line(stop_line[0].x,stop_line[0].y,stop_line[-1].x,stop_line[-1].y )
+                    if stop_pos is not None:
+                        middle_lane_config.stopline_pos = stop_pos
+                        reg_elem_states.append(AllWayStopState(stop_position=stop_pos, 
+                                                                yield_lanelets=[ll.id for ll in yield_lanelets],#for pickling
+                                                                intersecting_lanelets=None))
+        
         return middle_lane_config, reg_elem_states
+
+    def get_closest_point_to_line(self,x,y,x2,y2):
+            # choose the closest point from a cartesian line in current frenet (used for stop lines)
+            try:
+                pos = min(
+                        sim_to_frenet_position(
+                            self.sdv_route.get_reference_path(),x,y, self.sdv_route.get_reference_path_s_start(),
+                            max_dist_from_path=10.0
+                        ),
+                        sim_to_frenet_position(
+                            self.sdv_route.get_reference_path(), x2,y2, self.sdv_route.get_reference_path_s_start(),
+                            max_dist_from_path=10.0
+                        ),
+                        key=lambda p: p[0]
+                )
+                return pos
+            except OutsideRefPathException as e:
+                log.info(e)
+                return None
 
     def write_motion_plan(self, mplan_sharr, plan:MotionPlan): 
         if not plan:

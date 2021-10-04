@@ -7,7 +7,7 @@
 # --------------------------------------------
 
 import lanelet2
-from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight
+from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
@@ -24,6 +24,12 @@ from util.Utils import pairwise
 class LaneletMap(object):
     def __init__(self):
         self.lanelet_map = None
+        #cache
+        self.stop_lines = None
+        self.stop_signs = None
+        self.all_way_stops = None
+        
+
 
     def load_lanelet_map(self, filename, projector):
         self.lanelet_map, errors = lanelet2.io.loadRobust(filename, projector)
@@ -179,6 +185,74 @@ class LaneletMap(object):
 
     def get_crosswalks(self):
         return [ll for ll in self.lanelet_map.laneletLayer if ll.attributes["subtype"] == "crosswalk"]
+
+    def get_stop_lines(self):
+        if self.stop_lines is None:
+            self.stop_lines = []
+            for ls in self.lanelet_map.lineStringLayer:
+                if  "type" in ls.attributes: 
+                    type = ls.attributes["type"]
+                    if type == "stop_line":
+                        self.stop_lines.append(ls)
+        return self.stop_lines
+
+    def get_stop_signs(self):
+        if self.stop_signs is None:
+            self.stop_signs = []
+            for ls in self.lanelet_map.lineStringLayer:
+                if  "type" in ls.attributes: 
+                    if ls.attributes["type"] == "traffic_sign":
+                        if ls.attributes["subtype"] == "usR1-1":
+                            self.stop_signs.append( ls[0] ) #first node only
+            for node in self.lanelet_map.pointLayer:
+                if  "type" in node.attributes: 
+                    if node.attributes["type"] == "traffic_sign":
+                        if node.attributes["subtype"] == "usR1-1":
+                            self.stop_signs.append(node)
+        
+        return self.stop_signs
+
+    def get_my_ref_line(self, my_ll,yield_lanelets,stop_lines):
+        assert(len(stop_lines) == len(yield_lanelets))
+        my_index = None
+        for i in range(len(yield_lanelets)):
+            if my_ll.id == yield_lanelets[i].id:
+                my_index = i
+                break
+        if my_index is not None:
+            return stop_lines[i]
+        
+        return None
+
+
+    def get_all_way_stops(self):
+        signs = []
+        stop_lines = []
+        lanelets = []
+        #aws_res = [re for re in self.lanelet_map.regulatoryElementLayer if re.attributes["subtype"] == "all_way_stop"] <-- alternatve using primitives
+        aws_res = list(filter(lambda res: isinstance(res, AllWayStop), self.lanelet_map.regulatoryElementLayer))
+        for aws_re in aws_res:
+            #Stop Lines
+            #for stop_line in aws_re.parameters["ref_line"]:
+            for stop_line in aws_re.stopLines():
+                stop_lines.append(stop_line)
+            
+            #Stop Signs
+            #for stop_sign in aws_re.trafficSigns(): #<--- the trafficSigns() method does not work if the sign exists as Node instead of Way. Using the primitive instead.
+            for stop_sign in aws_re.parameters["refers"]:
+                #print(type(stop_sign))
+                if isinstance(stop_sign, ConstPoint3d):
+                    signs.append([stop_sign.x,stop_sign.y])
+                    
+                elif isinstance(stop_sign, ConstLineString3d):
+                    signs.append([stop_sign[0].x,stop_sign[0].y])
+            
+            #Yielding Lanelets
+            #for lanelet in aws_re.parameters["yield"]: #<-- No parameter as yield and no python convertion since they are ConstWeakLanelet
+            for ll in aws_re.lanelets():
+                lanelets.append(ll)
+        
+        return signs, stop_lines, lanelets
 
     @staticmethod
     def get_left_in_route(route, lanelet):
