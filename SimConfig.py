@@ -35,7 +35,7 @@ FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified vers
 SHOW_CPLOT = True           #whether to show the cartesian plot
 CPLOT_SIZE = 30			    #cartesian plot: road length in meters (shorter=better performance)
 REFERENCE_PATH = True       #reference path indicating the frenet frame for the vehicle
-SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape. 
+SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
 SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
 
 #Vehicle trajectory

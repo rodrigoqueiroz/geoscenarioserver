@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # --------------------------------------------
 # GEOSCENARIO Micro Maneuver Models for Motion Planning
