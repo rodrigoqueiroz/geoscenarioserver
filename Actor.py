@@ -24,7 +24,7 @@ class Actor(object):
 
         #state
         #start state in sim frame
-        self.state = state or ActorState()
+        self.state:ActorState = state or ActorState()
         self.state.x = start_state[0]
         self.state.x_vel = start_state[1]
         self.state.x_acc = start_state[2]
@@ -165,6 +165,7 @@ class ActorState:
 
     #the direction the actor is facing
     yaw:float = 0.0
+    yaw_unreal:float = 0.0
 
 
     #For easy shared memory parsing
