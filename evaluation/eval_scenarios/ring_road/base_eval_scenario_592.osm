@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5347333' action='modify' visible='true' lat='43.47110803016' lon='-80.53879884742'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='500' />
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5347334' action='modify' visible='true' lat='43.4712550841' lon='-80.53869813815'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='name' v='Evaluation Scenario' />
+    <tag k='timeout' v='115' />
+    <tag k='version' v='2.0' />
+  </node>
+</osm>
