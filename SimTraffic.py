@@ -303,10 +303,10 @@ class SimTraffic(object):
         if WRITE_TRAJECTORIES:
             print("Log all trajectories: ")
 
-            Path("evaluation/traj_log/{}/{}".format(self.scenario_length, self.video_id)).mkdir(parents=True, exist_ok=True)
+            Path("evaluation/traj_log/{}/{}/{}".format(self.map_location, self.scenario_length, self.video_id)).mkdir(parents=True, exist_ok=True)
 
             for vid,vlog in self.vehicles_log.items():
-                filename = "evaluation/traj_log/{}/{}/{}_{}.csv".format(self.scenario_length, self.video_id, self.log_file, vid)
+                filename = "evaluation/traj_log/{}/{}/{}/{}_{}.csv".format(self.map_location, self.scenario_length, self.video_id, self.log_file, vid)
                 with open(filename,mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #vlog.sort()
@@ -317,7 +317,7 @@ class SimTraffic(object):
                         csv_writer.writerow(line)
 
             for pid,plog in self.pedestrians_log.items():
-                filename = "evaluation/traj_log/{}/{}/{}_{}.csv".format(self.scenario_length, self.video_id, self.log_file, pid)
+                filename = "evaluation/traj_log/{}/{}/{}/{}_{}.csv".format(self.map_location, self.scenario_length, self.video_id, self.log_file, pid)
                 with open(filename, mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #plog.sort()

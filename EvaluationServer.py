@@ -15,6 +15,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-s", "--scenario", dest="gsfile", nargs='*', metavar="FILE", default="", help="GeoScenario file")
+    parser.add_argument("-m", "--map_location", dest="map_location", default="uni_weber", help="[uni_weber/ring_road] Map location directory name.")
     parser.add_argument("-v", "--video-id", dest="video_id", default="769", help="Video file id")
     parser.add_argument("-e", "--eval", dest="eval_id", default="", help="Evaluation scenario ID")
     parser.add_argument("-t", "--type", dest="eval_type", default="", help="Type for batch evaluation")
@@ -30,10 +31,17 @@ if __name__ == "__main__":
     WRITE_TRAJECTORIES = True
 
     try:
+        if args.map_location not in ["uni_weber", "ring_road"]:
+            raise Exception
+    except Exception as e:
+        print("ERROR. Invalid map location argument")
+        print(e)
+
+    try:
         if args.eval_length == 'f':
-            scenario_folder = "full"
+            scenario_length = "full"
         elif args.eval_length == 's':
-            scenario_folder = "segmented"
+            scenario_length = "segmented"
         else:
             raise Exception
     except Exception as e:
@@ -41,7 +49,7 @@ if __name__ == "__main__":
         print(e)
 
     # Master csv to guide all experiments
-    scenarios = load_all_scenarios(args.video_id, scenario_folder)
+    scenarios = load_all_scenarios(args.video_id, args.map_location, scenario_length)
 
     if args.eval_all:
         for id in scenarios:

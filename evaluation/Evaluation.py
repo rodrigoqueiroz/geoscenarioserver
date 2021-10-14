@@ -42,6 +42,7 @@ class EvalScenario:
     scenario_id:str = ''
     video_id:str = ''
     scenario_length:str = ''
+    map_location:str = ''
     track_id:int = 0
     agent_type:str = ''                           #Car, Pedestrian, Medium Vehicle, Heavy Vehicle
     scenario_type:str = ''                          #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
@@ -138,14 +139,14 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     #========================== Load Tracks
     # Database to retrieve trajectory info
-    connection = sqlite3.connect('evaluation/db_files/uni_weber_{}.db'.format(es.video_id))
+    connection = sqlite3.connect('evaluation/db_files/{}/{}_{}.db'.format(es.map_location, es.map_location, es.video_id))
     c = connection.cursor()
 
     trajectories = {}
-    trajectories[es.track_id] = query_track(es.track_id, es.video_id, c, lanelet_map.projector)
+    trajectories[es.track_id] = query_track(es.track_id, c, lanelet_map.projector)
     #load tracks for dependencies (vehicles, pedestrians)
     for cid in es.const_agents:
-        trajectories[cid] = query_track(cid, es.video_id, c, lanelet_map.projector)
+        trajectories[cid] = query_track(cid, c, lanelet_map.projector)
 
     #========================== Estimate scenario configuration
     config = generate_config(es, lanelet_map, sim_traffic.traffic_lights, trajectories, calibrate_behavior)
@@ -196,23 +197,22 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
     if calibrate_behavior:
         sim_config.scenario_name = "{}_rc".format(es.scenario_id)
-        sim_traffic.log_file = sim_config.scenario_name
-        sim_traffic.video_id = es.video_id
-        sim_traffic.scenario_length = es.scenario_length
     else:
         sim_config.scenario_name = "{}_nc".format(es.scenario_id)
-        sim_traffic.log_file = sim_config.scenario_name
-        sim_traffic.video_id = es.video_id
-        sim_traffic.scenario_length = es.scenario_length
+
+    sim_traffic.log_file = sim_config.scenario_name
+    sim_traffic.video_id = es.video_id
+    sim_traffic.scenario_length = es.scenario_length
+    sim_traffic.map_location = es.map_location
 
     sim_config.plot_vid = -es.track_id
     sim_config.timeout = es.end_time
 
     return True, es.start_time
 
-def load_all_scenarios(video_id, scenario_folder):
+def load_all_scenarios(video_id, map_location, scenario_length):
     scenarios = {}
-    with open("evaluation/pedestrian_scenarios/{}/pedestrian_scenarios_{}.csv".format(scenario_folder, video_id), mode='r', encoding='utf-8-sig') as csv_file:
+    with open("evaluation/pedestrian_scenarios/{}/{}/pedestrian_scenarios_{}.csv".format(map_location, scenario_length, video_id), mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if row[0] == "scenario_id": #skip header
@@ -226,7 +226,8 @@ def load_all_scenarios(video_id, scenario_folder):
             es = EvalScenario()
             es.scenario_id = row[0]
             es.video_id = video_id
-            es.scenario_length = scenario_folder
+            es.map_location = map_location
+            es.scenario_length = scenario_length
             es.track_id = int(row[2])
             es.agent_type = row[3]
             es.direction = row[4]
@@ -245,12 +246,12 @@ def load_all_scenarios(video_id, scenario_folder):
             scenarios[es.scenario_id] = es
     return scenarios
 
-def query_track(id, video_id, c, projector):
+def query_track(id, c, projector):
     query = "SELECT T.TRACK_ID, T.X, T.Y, T.SPEED, T.TAN_ACC, T.LAT_ACC, T.TIME, T.ANGLE, TK.TYPE \
-            FROM TRAJECTORIES_0{} T \
+            FROM TRAJECTORIES T \
             LEFT JOIN TRACKS TK ON T.TRACK_ID = TK.TRACK_ID \
             WHERE T.TRACK_ID = '{}' \
-            ORDER BY T.TIME".format(video_id, id)
+            ORDER BY T.TIME".format(id)
     c.execute(query)
     res = c.fetchall()
 
@@ -292,6 +293,7 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
     while (len(occupied_spaces['lanelets']) == 0 and len(occupied_spaces['areas']) == 0):
         idx += 1
+        print(idx)
         occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
     trajectory = trajectory[idx:]
 
