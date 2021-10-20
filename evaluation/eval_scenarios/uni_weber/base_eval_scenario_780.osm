@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
-  <node id='-5338228' action='modify' visible='true' lat='43.4784550044' lon='-80.51972915596'>
+  <node id='-5338573' action='modify' visible='true' lat='43.4784550044' lon='-80.51972915596'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
@@ -8,89 +8,89 @@
     <tag k='timeout' v='252' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5338229' visible='true' lat='43.47800032687' lon='-80.51977346677'>
+  <node id='-5338574' visible='true' lat='43.47800032687' lon='-80.51977346677'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5338230' action='modify' visible='true' lat='43.47787555287' lon='-80.51973063472'>
+  <node id='-5338575' action='modify' visible='true' lat='43.47787555287' lon='-80.51973063472'>
     <tag k='duration' v='4,30,4,66,30,4,52,45,4,13' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_n_s' />
     <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
     <tag k='type' v='default' />
   </node>
-  <node id='-5338231' action='modify' visible='true' lat='43.47817410046' lon='-80.51981690272'>
+  <node id='-5338576' action='modify' visible='true' lat='43.47817410046' lon='-80.51981690272'>
     <tag k='duration' v='34,4,66,30,4,67,30,4,13' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_s_n' />
     <tag k='states' v='G,Y,R,G,Y,R,G,Y,R' />
     <tag k='type' v='default' />
   </node>
-  <node id='-5338232' action='modify' visible='true' lat='43.4780236632' lon='-80.52000984684'>
+  <node id='-5338577' action='modify' visible='true' lat='43.4780236632' lon='-80.52000984684'>
     <tag k='duration' v='53,30,4,66,30,4,55,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_e_w' />
     <tag k='states' v='R,G,Y,R,G,Y,R,G' />
     <tag k='type' v='default' />
   </node>
-  <node id='-5338233' action='modify' visible='true' lat='43.47804143402' lon='-80.51956279257'>
+  <node id='-5338578' action='modify' visible='true' lat='43.47804143402' lon='-80.51956279257'>
     <tag k='duration' v='41,42,4,54,42,4,65' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_w_e' />
     <tag k='states' v='R,G,Y,R,G,Y,R' />
     <tag k='type' v='default' />
   </node>
-  <node id='-5338234' action='modify' visible='true' lat='43.47815027932' lon='-80.51988579467'>
+  <node id='-5338579' action='modify' visible='true' lat='43.47815027932' lon='-80.51988579467'>
     <tag k='duration' v='34,7,49,44,7,64,30,7,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_s_w' />
     <tag k='states' v='G,Y,R,G,Y,R,G,Y,R' />
     <tag k='type' v='left' />
   </node>
-  <node id='-5338235' action='modify' visible='true' lat='43.4779792153' lon='-80.51997809765'>
+  <node id='-5338580' action='modify' visible='true' lat='43.4779792153' lon='-80.51997809765'>
     <tag k='duration' v='53,30,7,63,30,7,52,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_e_s' />
     <tag k='states' v='R,G,Y,R,G,Y,R,G' />
     <tag k='type' v='left' />
   </node>
-  <node id='-5338236' action='modify' visible='true' lat='43.47808799738' lon='-80.51961489156'>
+  <node id='-5338581' action='modify' visible='true' lat='43.47808799738' lon='-80.51961489156'>
     <tag k='duration' v='41,42,7,51,42,7,62' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_w_n' />
     <tag k='states' v='R,G,Y,R,G,Y,R' />
     <tag k='type' v='left' />
   </node>
-  <node id='-5338237' action='modify' visible='true' lat='43.47790373225' lon='-80.51964416263'>
+  <node id='-5338582' action='modify' visible='true' lat='43.47790373225' lon='-80.51964416263'>
     <tag k='duration' v='4,30,7,49,44,7,49,45,7,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_n_e' />
     <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
     <tag k='type' v='left' />
   </node>
-  <node id='-5338344' action='modify' visible='true' lat='43.4781371437' lon='-80.51971629501'>
-    <tag k='duration' v='4,7,23,70,7,23,71,7,23,17' />
+  <node id='-5338583' action='modify' visible='true' lat='43.4781371437' lon='-80.51971629501'>
+    <tag k='duration' v='18,16,70,14,16,71,14,16,17' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='ped_tl_n_s_east' />
-    <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
+    <tag k='states' v='G,Y,R,G,Y,R,G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338345' action='modify' visible='true' lat='43.47807859715' lon='-80.5200080082'>
-    <tag k='duration' v='53,7,23,70,7,23,69' />
+  <node id='-5338584' action='modify' visible='true' lat='43.47807859715' lon='-80.5200080082'>
+    <tag k='duration' v='53,14,16,70,14,16,59,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='ped_tl_e_w_north' />
-    <tag k='states' v='R,G,Y,R,G,Y,R' />
+    <tag k='states' v='R,G,Y,R,G,Y,R,G' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338346' action='modify' visible='true' lat='43.4779242207' lon='-80.51952487083'>
-    <tag k='duration' v='53,7,23,70,7,23,69' />
+  <node id='-5338585' action='modify' visible='true' lat='43.4779242207' lon='-80.51952487083'>
+    <tag k='duration' v='41,26,16,58,26,16,69' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='ped_tl_e_w_south' />
     <tag k='states' v='R,G,Y,R,G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338347' action='modify' visible='true' lat='43.4778423545' lon='-80.51984937194'>
-    <tag k='duration' v='4,7,23,70,7,23,71,7,23,17' />
+  <node id='-5338586' action='modify' visible='true' lat='43.4778423545' lon='-80.51984937194'>
+    <tag k='duration' v='4,14,16,70,14,16,56,29,16,17' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='ped_tl_n_s_west' />
     <tag k='states' v='R,G,Y,R,G,Y,R,G,Y,R' />
