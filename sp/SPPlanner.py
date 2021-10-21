@@ -313,10 +313,11 @@ class SPPlanner(object):
             invert_candidate = False
             if len(spaces_of_dest) == 0:
                 spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
-            spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
+            spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets'] + spaces_of_dest['areas']]
 
             # list of lanelets containing both the destination and planning position
             curr_lls_containing_dest = [ll for ll in occupied_spaces['lanelets'] if ll.id in spaces_of_dest_ids]
+            curr_areas_containing_dest = [ll for ll in occupied_spaces['areas'] if ll.id in spaces_of_dest_ids]
 
             if len(curr_lls_containing_dest) > 0:
                 # current lanelet contains the ped's destination
@@ -331,6 +332,8 @@ class SPPlanner(object):
                     selected_ll = selected_ll.invert()
 
                 chosen_path.append(selected_ll)
+            elif len(curr_areas_containing_dest) > 0:
+                chosen_path.append(curr_areas_containing_dest[0])
             else:
                 ''' construct sequence of lanelets from planning position to destination by
                     considering all previous and following lanelets at each step and selecting
@@ -338,38 +341,60 @@ class SPPlanner(object):
                 '''
 
                 # current lanelet does not contain the ped's destination
-                selected_ll = occupied_spaces['lanelets'][0]
-                selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
+                if len(occupied_spaces['lanelets']) > 0:
+                    selected_ll = occupied_spaces['lanelets'][0]
+                    selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
 
-                if np.linalg.norm(self.sp.destination - selected_entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
-                    selected_exit_pt = selected_entrance_pt
-                    invert_candidate = True
-
-                for ll in occupied_spaces['lanelets'][1:]:
-                    entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
-
-                    if np.linalg.norm(self.sp.destination - exit_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
-                        selected_exit_pt = exit_pt
-                        selected_ll = ll
-                        invert_candidate = False
-
-                    if np.linalg.norm(self.sp.destination - entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
-                        selected_exit_pt = entrance_pt
-                        selected_ll = ll
+                    if np.linalg.norm(self.sp.destination - selected_entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                        selected_exit_pt = selected_entrance_pt
                         invert_candidate = True
 
-                invert_ll = invert_candidate
+                    for ll in occupied_spaces['lanelets'][1:]:
+                        entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
 
-                if invert_ll:
-                    selected_ll = selected_ll.invert()
+                        if np.linalg.norm(self.sp.destination - exit_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                            selected_exit_pt = exit_pt
+                            selected_ll = ll
+                            invert_candidate = False
 
-                # append first lanelet to chosen_path
-                chosen_path.append(selected_ll)
+                        if np.linalg.norm(self.sp.destination - entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                            selected_exit_pt = entrance_pt
+                            selected_ll = ll
+                            invert_candidate = True
 
-                previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
-                following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+                    invert_ll = invert_candidate
 
-                next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
+                    if invert_ll:
+                        selected_ll = selected_ll.invert()
+
+                    # append first lanelet to chosen_path
+                    chosen_path.append(selected_ll)
+
+                    previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
+                    following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+
+                    next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
+                else:
+                    # pedestrian is currently in an area
+                    selected_area = occupied_spaces['areas'][0]
+
+                    # find lanelet attached to area that brings ped closer to destination
+                    '''
+                    1) loop through nodes in area, check if they belong to ways that are a part of a lanelet
+                        a) if so, check if lanelet either contains dest or brings ped closer
+                    '''
+                    # check if current area and space with destination are connected
+                    for ll in spaces_of_dest['lanelets']:
+                        if self.lanelet_map.area_and_lanelet_share_node(selected_area, ll):
+                            chosen_path.append(selected_area)
+
+                            entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
+                            if np.linalg.norm(exit_pt - planning_position) < np.linalg.norm(entrance_pt - planning_position):
+                                ll = ll.invert()
+                                entrance_pt = exit_pt
+                            chosen_path.append(ll)
+                            next_lls_containing_dest = [ll]
+                            break
 
                 # build path of connected previous/following lanelets until lanelet containing destination is next
                 while len(next_lls_containing_dest) == 0:
@@ -405,8 +430,8 @@ class SPPlanner(object):
                     following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
                     spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
                     next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
-
                 chosen_path.append(next_lls_containing_dest[0])
+
 
         self.sp.path = chosen_path
         self.sp.waypoints = iter(waypoints)
