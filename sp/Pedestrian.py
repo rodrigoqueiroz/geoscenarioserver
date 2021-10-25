@@ -245,7 +245,7 @@ class SP(Pedestrian):
         friction_factor_weight = omega*max(0, rij-dij)
 
 
-        fij = (A*np.exp((rij-dij)/B) * body_factor_weight)*nij + friction_factor_weight*delta_vij*tij + evasive_effect
+        fij = (A*np.exp((rij-dij)/B) * body_factor_weight)*nij + friction_factor_weight*delta_vij*tij# + evasive_effect
 
         return fij
 

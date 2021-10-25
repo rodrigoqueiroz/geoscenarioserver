@@ -88,6 +88,9 @@ def start_server(args, es, calibrate = False):
     if not res:
         return
 
+    if args.no_dash:
+        sim_config.show_dashboard = False
+
     sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", sim_start_time = float(time))
     sync_global.set_timeout(sim_config.timeout)
 
@@ -120,7 +123,8 @@ def start_server(args, es, calibrate = False):
         #    break
 
     sim_traffic.stop_all()
-    dashboard.quit()
+    if sim_config.show_dashboard:
+        dashboard.quit()
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario Evaluation Server SHUTDOWN')
