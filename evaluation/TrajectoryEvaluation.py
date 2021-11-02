@@ -9,6 +9,7 @@ from frechetdist import frdist
 import time
 from pathlib import Path
 from scipy.signal import butter, filtfilt
+from scipy.spatial.distance import directed_hausdorff
 
 TIMESTR = time.strftime("%m%d_%H%M")
 
@@ -36,6 +37,8 @@ class EvalScenario:
 
     fd:float = 0.0
     fd_change:float = 0.0
+
+    hd:float = 0.0
 
     curvature_score:float = 0.0
 
@@ -78,6 +81,9 @@ def evaluate_scenario(es:EvalScenario, map_lines):
 
     # Frechet distance
     es.fd = get_frechet(traj_s, traj_e)
+
+    # Hausdorff distance
+    es.hd = get_hausdorff(traj_s, traj_e)
 
     path_curvatures = get_curvature_of_paths(traj_s, traj_e)
     plot_curvatures(es, path_curvatures)
@@ -288,6 +294,18 @@ def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
     Qlist = [[node['x'], node['y']] for node in SQ]
     score = frdist(Plist, Qlist)
     return score
+
+
+def get_hausdorff(X, Y):
+    size = min([len(X),len(Y)]) #max size
+    SX = [node for node in X[:size]]
+    SY = [node for node in Y[:size]]
+
+    Xlist = [np.array([node['x'], node['y']]) for node in SX]
+    Ylist = [np.array([node['x'], node['y']]) for node in SY]
+
+    return max(directed_hausdorff(Xlist, Ylist), directed_hausdorff(Ylist, Xlist))
+
 
 def get_curvature_of_paths(traj_s, traj_e):
     curvature_vals = []
