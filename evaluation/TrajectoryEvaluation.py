@@ -35,6 +35,8 @@ class EvalScenario:
     ed_max:float = 0.0
     ed_change:float = 0.0
 
+    ade:float = 0.0
+
     fd:float = 0.0
     fd_change:float = 0.0
 
@@ -79,11 +81,22 @@ def evaluate_scenario(es:EvalScenario, map_lines):
     es.ed_median = np.median(ed_array)
     es.ed_max = np.max(ed_array)
 
+    # get list of trajectory nodes without time dependency
+    s_list = [np.array([node['x'], node['y']]) for node in traj_s]
+    e_list = [np.array([node['x'], node['y']]) for node in traj_e]
+
+    # Average Displacement Error
+    es.ade = get_avgdisplacementerror(s_list, e_list)
+
     # Frechet distance
-    es.fd = get_frechet(traj_s, traj_e)
+    es.fd = get_frechet(s_list, e_list, samples=None)
 
     # Hausdorff distance
-    es.hd = get_hausdorff(traj_s, traj_e)
+    es.hd = get_hausdorff(s_list, e_list)
+
+    print("Average Displacement Error: {}".format(es.ade))
+    print("Frechet Distance: {}".format(es.fd))
+    print("Hausdorff Distance: {}".format(es.hd))
 
     path_curvatures = get_curvature_of_paths(traj_s, traj_e)
     plot_curvatures(es, path_curvatures)
@@ -269,16 +282,15 @@ def get_samples(traj_p, traj_q, traj_l = None, trim = 1.0, samples = None):
             L =  [ node for node in traj_l[:size]]
     return P, Q, L
 
-def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
-    L = None
+def get_frechet(P, Q, trim = 1.0, samples = 300):
     #trim ending of trajectory in %
-    #print("trim trajectory in {} of {}".format(trim, len(traj_p)))
-    P = traj_p[:int(len(traj_p)*trim)]
-    Q = traj_q[:int(len(traj_q)*trim)]
+    P = P[:int(len(P)*trim)]
+    Q = Q[:int(len(Q)*trim)]
+
     if samples is not None:
         #sample indexes to preserve original order
         #check for maximum sample size
-        sample_size = min([len(P),len(Q),samples])
+        sample_size = min([len(P), len(Q), samples])
         #todo: sample time. using index only works if both are collected with in same simulation with same number of points collected
         #indexes = sorted(random.sample(range(len(traj_p)), sample_size))
         max_index = len(P)-1
@@ -290,21 +302,16 @@ def get_frechet(traj_p, traj_q, trim = 1.0, samples = 300):
         SP = [node for node in P[:size]]
         SQ = [node for node in Q[:size]]
 
-    Plist = [[node['x'], node['y']] for node in SP]
-    Qlist = [[node['x'], node['y']] for node in SQ]
-    score = frdist(Plist, Qlist)
+    score = frdist(SP, SQ)
     return score
 
 
-def get_hausdorff(X, Y):
-    size = min([len(X),len(Y)]) #max size
-    SX = [node for node in X[:size]]
-    SY = [node for node in Y[:size]]
+def get_hausdorff(P, Q):
+    size = min([len(P),len(Q)]) #max size
+    SP = [node for node in P[:size]]
+    SQ = [node for node in Q[:size]]
 
-    Xlist = [np.array([node['x'], node['y']]) for node in SX]
-    Ylist = [np.array([node['x'], node['y']]) for node in SY]
-
-    return max(directed_hausdorff(Xlist, Ylist), directed_hausdorff(Ylist, Xlist))
+    return max(directed_hausdorff(SP, SQ), directed_hausdorff(SQ, SP))
 
 
 def get_curvature_of_paths(traj_s, traj_e):
@@ -422,6 +429,13 @@ def get_euclideandistance(P, Q = None):
             total += d*dt
     score = total / (P[-1]['time'] - P[0]['time'])
     return d_vector, score
+
+
+def get_avgdisplacementerror(P, Q):
+    n = min([len(P),len(Q)]) #max size
+
+    ADE = sum([np.linalg.norm(P[i] - Q[i])**2 for i in range(n)]) / n
+    return ADE
 
 
 def distance_2p(x1, y1, x2, y2):
