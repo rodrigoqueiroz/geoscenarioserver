@@ -12,6 +12,7 @@ from sv.btree.BTreeLeaves import *
 from sv.SDVPlannerState import AllWayStopState, RightOfWayState, TrafficLightState
 from TrafficLight import TrafficLightColor
 
+
 class BehaviorModels(object):
     ''''
         Behavior Layer using a simplified version from BTree/BTreeFactory.
@@ -21,7 +22,7 @@ class BehaviorModels(object):
         Outputs: Maneuver (mconfig), ref path changed
     '''
 
-    def __init__(self, vid, root_btree_name, reconfig = "", btree_locations = [], btype = ""):
+    def __init__(self, vid, root_btree_name, reconfig="", btree_locations=[], btype=""):
         self.btype = btype
         self.btree_locations = btree_locations
         self.vid = vid
@@ -36,7 +37,7 @@ class BehaviorModels(object):
         self.current_mconfig = None
         self.ref_path_changed = False
 
-    def build(self,reconfig):
+    def build(self, reconfig):
         #if it's defined by btree file. Use interpreter.
         if '.btree' in self.root_btree_name and len(self.btree_locations) > 0:
             #assume self.root_btree_name has no path, and is just name.btree
@@ -58,12 +59,13 @@ class BehaviorModels(object):
                 Example: args="m_lane_swerve=MLaneSwerveConfig(target_lid=1);c_should_cutin=should_cutin,args=(target_lane_id=1)"
             '''
 
-            if reconfig !="":
+            if reconfig != "":
                 log.info("Behavior model will be reconfigured {}".format(reconfig))
-                interpreter.reconfigure_nodes(btree_name=self.root_btree_name,tree=tree, args=reconfig)
+                interpreter.reconfigure_nodes(
+                    btree_name=self.root_btree_name, tree=tree, args=reconfig)
 
-        else: 
-            #btree file not given properly. 
+        else:
+            #btree file not given properly.
             #interpreter = BTreeInterpreter(self.vid, bmodel=self)
             #TODO: add build_tree_from_code
             #tree = interpreter.build_tree_from_code(tree_name=self.root_btree_name)
@@ -87,10 +89,11 @@ class BehaviorModels(object):
         self.tree.root.tick_once()
 
         display.unicode_symbols = my_str_symbols
-        snapshot_str = display._generate_text_tree(self.tree.root,
-                                                   show_status=True,
-                                                   visited=self.snapshot_visitor.visited,
-                                                   previously_visited=self.snapshot_visitor.visited)
+        snapshot_str = ""
+        # snapshot_str = display._generate_text_tree(self.tree.root,
+        #                                            show_status=True,
+        #                                            visited=self.snapshot_visitor.visited,
+        #                                            previously_visited=self.snapshot_visitor.visited)
         #print (snapshot_str)
         return self.current_mconfig, self.ref_path_changed, snapshot_str
 
@@ -100,7 +103,6 @@ class BehaviorModels(object):
     def set_ref_path_changed(self, val):
         self.ref_path_changed = val
 
-    
     def test_condition(self, condition, kwargs):
         '''Built-in condition checks
            TODO: add logic combinations with multiple conditions
@@ -111,49 +113,49 @@ class BehaviorModels(object):
                 self.planner_state.vehicle_state, self.planner_state.goal_point_frenet,
                 self.planner_state.route_complete, **kwargs
             )
-        
+
         elif condition == "stop_sign_ahead":
             if self.planner_state.lane_config.stopline_pos is None:
                 return False
-            threshold = kwargs['threshold' ] if 'threshold' in kwargs else 30.0
+            threshold = kwargs['threshold'] if 'threshold' in kwargs else 30.0
             pos_s = self.planner_state.lane_config.stopline_pos[0]
             dist = pos_s - self.planner_state.vehicle_state.s
             return (dist < threshold)
-        
+
         elif condition == "approaching_intersection":
             #todo: make a single condition called ZONE and name all zone types. (on_intersection, at_intersection, at_road, on_traffic_light )
             #On a intersection
             for re_state in self.planner_state.regulatory_elements:
                 if isinstance(re_state, RightOfWayState) or isinstance(re_state, AllWayStopState):
                     threshold = 30
-                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold 
+                    return re_state.stop_position[0] - self.planner_state.vehicle_state.s < threshold
 
         elif condition == "row_intersection_occupied":
             for re_state in self.planner_state.regulatory_elements:
                 if isinstance(re_state, RightOfWayState):
                     #must be yielding
-                    if re_state.stop_position[0] - self.planner_state.vehicle_state.s  < 5 and self.planner_state.vehicle_state.s_vel < 0.01:
+                    if re_state.stop_position[0] - self.planner_state.vehicle_state.s < 5 and self.planner_state.vehicle_state.s_vel < 0.01:
                         for ll_id in re_state.row_lanelets:
                             if re_state.row_lanelets[ll_id] == 1:
                                 print("BEHAVIOR: yielding and intersection busy")
                                 return True
                         #print("BEHAVIOR: yielding and intersection free")
-                        return False #yielding and no vehicles detected in conflict
+                        return False  # yielding and no vehicles detected in conflict
                 #print("BEHAVIOR: moving, not yielding")
-                return True #not yielding, consider as occupied
-            return False  #No row intersection detected
+                return True  # not yielding, consider as occupied
+            return False  # No row intersection detected
 
         elif condition == "aw_intersection_free":
             for re_state in self.planner_state.regulatory_elements:
                 if isinstance(re_state, AllWayStopState):
                     #must be yielding
-                    if re_state.stop_position[0] - self.planner_state.vehicle_state.s  < 5:
+                    if re_state.stop_position[0] - self.planner_state.vehicle_state.s < 5:
                         for ll_id in re_state.row_lanelets:
                             if re_state.row_lanelets[ll_id] == 1:
                                 return False
                         return True
             return False
-        
+
         elif condition == "vehicle_state":
             s_vel = kwargs['s_vel']
             return (self.planner_state.vehicle_state.s_vel > s_vel)
@@ -164,13 +166,14 @@ class BehaviorModels(object):
                 self.planner_state.vehicle_state,
                 self.planner_state.traffic_vehicles,
                 self.planner_state.lane_config,
-                kwargs['time_gap'] if 'time_gap' in kwargs else 5 ,
-                kwargs['distance_gap'] if 'distance_gap' in kwargs else 30 )
+                kwargs['time_gap'] if 'time_gap' in kwargs else 5,
+                kwargs['distance_gap'] if 'distance_gap' in kwargs else 30)
             return lane_occupied
 
         elif condition == "should_cutin":
             target_lane_id = kwargs['target_lane_id']
-            target_lane_config = self.planner_state.lane_config.get_neighbour(target_lane_id)
+            target_lane_config = self.planner_state.lane_config.get_neighbour(
+                target_lane_id)
             if not target_lane_config:
                 log.warn("No reachable {} lane for lane changing vehicle {}".format(
                     "LEFT" if target_lane_id == 1 else "RIGHT",
@@ -190,7 +193,8 @@ class BehaviorModels(object):
 
         elif condition == "reached_gap":
             target_lane_id = kwargs['target_lane_id']
-            target_lane_config = self.planner_state.lane_config.get_neighbour(target_lane_id)
+            target_lane_config = self.planner_state.lane_config.get_neighbour(
+                target_lane_id)
             if not target_lane_config:
                 log.warn("No reachable {} lane for lane changing vehicle {}".format(
                     "LEFT" if target_lane_id == 1 else "RIGHT",
