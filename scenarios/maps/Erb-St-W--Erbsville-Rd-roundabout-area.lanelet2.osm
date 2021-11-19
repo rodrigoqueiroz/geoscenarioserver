@@ -183,7 +183,7 @@
   <node id='5486' visible='true' version='1' lat='43.44848632169' lon='-80.56557166415'>
     <tag k='ele' v='329' />
   </node>
-  <node id='5489' visible='true' version='1' lat='43.44820384394' lon='-80.56574767414'>
+  <node id='5489' action='modify' visible='true' version='1' lat='43.44820384387' lon='-80.56574767422'>
     <tag k='ele' v='329' />
   </node>
   <node id='5490' visible='true' version='1' lat='43.44826748558' lon='-80.56555431621'>
@@ -330,13 +330,13 @@
   <node id='5567' visible='true' version='1' lat='43.44817545067' lon='-80.56573773799'>
     <tag k='ele' v='329' />
   </node>
-  <node id='5569' visible='true' version='1' lat='43.44801614806' lon='-80.56609819514'>
+  <node id='5569' action='modify' visible='true' version='1' lat='43.44801614808' lon='-80.56609819514'>
     <tag k='ele' v='329' />
   </node>
   <node id='5570' visible='true' version='1' lat='43.44814355067' lon='-80.56572516311'>
     <tag k='ele' v='329' />
   </node>
-  <node id='5573' visible='true' version='1' lat='43.44798978773' lon='-80.56607754851'>
+  <node id='5573' action='modify' visible='true' version='1' lat='43.44798978791' lon='-80.56607754852'>
     <tag k='ele' v='329' />
   </node>
   <node id='5574' visible='true' version='1' lat='43.44810447992' lon='-80.56569999743'>
@@ -3924,7 +3924,7 @@
   <node id='7489' visible='true' version='1' lat='43.44619803893' lon='-80.57076429491'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7490' action='modify' visible='true' version='1' lat='43.44620282841' lon='-80.5707643519'>
+  <node id='7490' visible='true' version='1' lat='43.44620282841' lon='-80.5707643519'>
     <tag k='ele' v='329' />
   </node>
   <node id='7494' visible='true' version='1' lat='43.44624384009' lon='-80.57082354487'>
@@ -4689,64 +4689,49 @@
   <node id='7884' visible='true' version='1' lat='43.44828356505' lon='-80.56595130569'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7888' action='delete' visible='true' version='1' lat='43.44611069017' lon='-80.57095430505'>
+  <node id='8041' visible='true' version='1' lat='43.44813974518' lon='-80.56571204722'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7889' action='delete' visible='true' version='1' lat='43.44611715205' lon='-80.57090123458'>
+  <node id='8042' visible='true' version='1' lat='43.4481236784' lon='-80.56569886422'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7892' action='delete' visible='true' version='1' lat='43.44614818472' lon='-80.57090437342'>
+  <node id='8045' action='delete' visible='true' version='1' lat='43.44804447231' lon='-80.56611869423'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7893' action='delete' visible='true' version='1' lat='43.44615030719' lon='-80.57085200444'>
+  <node id='8046' action='delete' visible='true' version='1' lat='43.44801614814' lon='-80.56609819519'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7896' action='delete' visible='true' version='1' lat='43.44620029207' lon='-80.57082641333'>
+  <node id='8047' action='delete' visible='true' version='1' lat='43.44801614808' lon='-80.56609819514'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7897' action='delete' visible='true' version='1' lat='43.44620282841' lon='-80.5707643519'>
+  <node id='8048' action='delete' visible='true' version='1' lat='43.44798978791' lon='-80.56607754852'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7900' action='delete' visible='true' version='1' lat='43.44644720563' lon='-80.57085540797'>
+  <node id='8050' visible='true' version='1' lat='43.44804705226' lon='-80.56579083619'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7901' action='delete' visible='true' version='1' lat='43.44648699115' lon='-80.57085316849'>
+  <node id='8051' visible='true' version='1' lat='43.4480569395' lon='-80.56576694202'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7904' action='delete' visible='true' version='1' lat='43.44648863665' lon='-80.57090088791'>
+  <node id='8054' action='delete' visible='true' version='1' lat='43.44826966184' lon='-80.56606030489'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7905' action='delete' visible='true' version='1' lat='43.44652748662' lon='-80.57088676847'>
+  <node id='8055' action='delete' visible='true' version='1' lat='43.44829014218' lon='-80.56602239187'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7908' action='delete' visible='true' version='1' lat='43.44652888207' lon='-80.57143068903'>
+  <node id='8057' visible='true' version='1' lat='43.44811502706' lon='-80.56611989605'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7909' action='delete' visible='true' version='1' lat='43.446529948' lon='-80.57137341849'>
+  <node id='8058' visible='true' version='1' lat='43.44812985793' lon='-80.56612978329'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7912' action='delete' visible='true' version='1' lat='43.44649724772' lon='-80.57142889117'>
+  <node id='8061' action='delete' visible='true' version='1' lat='43.44825701371' lon='-80.56578908501'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7913' action='delete' visible='true' version='1' lat='43.44649730763' lon='-80.57148717907'>
+  <node id='8062' action='delete' visible='true' version='1' lat='43.44823038447' lon='-80.5657677519'>
     <tag k='ele' v='329' />
   </node>
-  <node id='7916' action='delete' visible='true' version='1' lat='43.44645362485' lon='-80.57156832065'>
-    <tag k='ele' v='329' />
-  </node>
-  <node id='7917' action='delete' visible='true' version='1' lat='43.4464551392' lon='-80.57150997337'>
-    <tag k='ele' v='329' />
-  </node>
-  <node id='7920' action='delete' visible='true' version='1' lat='43.44619974132' lon='-80.57148649446'>
-    <tag k='ele' v='329' />
-  </node>
-  <node id='7921' action='delete' visible='true' version='1' lat='43.44615807102' lon='-80.57148946295'>
-    <tag k='ele' v='329' />
-  </node>
-  <node id='7924' action='delete' visible='true' version='1' lat='43.44611044149' lon='-80.57143474578'>
-    <tag k='ele' v='329' />
-  </node>
-  <node id='7925' action='delete' visible='true' version='1' lat='43.44615495407' lon='-80.57143161947'>
+  <node id='8063' action='delete' visible='true' version='1' lat='43.44820384387' lon='-80.56574767422'>
     <tag k='ele' v='329' />
   </node>
   <way id='5367' visible='true' version='1'>
@@ -8345,73 +8330,117 @@
     <tag k='qgis_fid' v='323499' />
     <tag k='type' v='virtual' />
   </way>
-  <way id='7887' action='modify' visible='true' version='1'>
+  <way id='7887' visible='true' version='1'>
     <nd ref='7317' />
     <nd ref='7329' />
     <tag k='qgis_fid' v='317384' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7891' action='modify' visible='true' version='1'>
+  <way id='7891' visible='true' version='1'>
     <nd ref='7348' />
     <nd ref='7351' />
     <tag k='qgis_fid' v='317385' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7895' action='modify' visible='true' version='1'>
+  <way id='7895' visible='true' version='1'>
     <nd ref='7473' />
     <nd ref='7490' />
     <tag k='qgis_fid' v='317396' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7899' action='modify' visible='true' version='1'>
+  <way id='7899' visible='true' version='1'>
     <nd ref='6570' />
     <nd ref='6580' />
     <tag k='qgis_fid' v='323188' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7903' action='modify' visible='true' version='1'>
+  <way id='7903' visible='true' version='1'>
     <nd ref='6596' />
     <nd ref='6601' />
     <tag k='qgis_fid' v='317393' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7907' action='modify' visible='true' version='1'>
+  <way id='7907' visible='true' version='1'>
     <nd ref='7627' />
     <nd ref='7618' />
     <tag k='qgis_fid' v='317389' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7911' action='modify' visible='true' version='1'>
+  <way id='7911' visible='true' version='1'>
     <nd ref='7647' />
     <nd ref='7653' />
     <tag k='qgis_fid' v='323313' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7915' action='modify' visible='true' version='1'>
+  <way id='7915' visible='true' version='1'>
     <nd ref='7678' />
     <nd ref='7665' />
     <tag k='qgis_fid' v='317388' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7919' action='modify' visible='true' version='1'>
+  <way id='7919' visible='true' version='1'>
     <nd ref='7027' />
     <nd ref='7039' />
     <tag k='qgis_fid' v='317387' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='7923' action='modify' visible='true' version='1'>
+  <way id='7923' visible='true' version='1'>
     <nd ref='7057' />
     <nd ref='7053' />
     <tag k='qgis_fid' v='317386' />
+    <tag k='subtype' v='solid' />
+    <tag k='type' v='stop' />
+  </way>
+  <way id='8040' visible='true' version='1'>
+    <nd ref='8041' />
+    <nd ref='8042' />
+    <tag k='name' v='2' />
+    <tag k='qgis_fid' v='2' />
+    <tag k='type' v='traffic_light' />
+  </way>
+  <way id='8044' action='modify' visible='true' version='1'>
+    <nd ref='5566' />
+    <nd ref='5569' />
+    <nd ref='5573' />
+    <tag k='qgis_fid' v='323500' />
+    <tag k='subtype' v='solid' />
+    <tag k='type' v='stop' />
+  </way>
+  <way id='8049' visible='true' version='1'>
+    <nd ref='8050' />
+    <nd ref='8051' />
+    <tag k='name' v='1' />
+    <tag k='qgis_fid' v='1' />
+    <tag k='type' v='traffic_light' />
+  </way>
+  <way id='8053' action='modify' visible='true' version='1'>
+    <nd ref='5713' />
+    <nd ref='5376' />
+    <tag k='qgis_fid' v='321661' />
+    <tag k='subtype' v='solid' />
+    <tag k='type' v='stop' />
+  </way>
+  <way id='8056' visible='true' version='1'>
+    <nd ref='8057' />
+    <nd ref='8058' />
+    <tag k='name' v='3' />
+    <tag k='qgis_fid' v='3' />
+    <tag k='type' v='traffic_light' />
+  </way>
+  <way id='8060' action='modify' visible='true' version='1'>
+    <nd ref='5390' />
+    <nd ref='5383' />
+    <nd ref='5489' />
+    <tag k='qgis_fid' v='323501' />
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
@@ -8445,6 +8474,7 @@
   <relation id='5404' visible='true' version='1'>
     <member type='way' ref='5398' role='left' />
     <member type='way' ref='5401' role='right' />
+    <member type='relation' ref='8059' role='regulatory_element' />
     <tag k='left_marking' v='line_thin' />
     <tag k='location' v='urban' />
     <tag k='right_marking' v='line_thin' />
@@ -8535,6 +8565,7 @@
   <relation id='5495' visible='true' version='1'>
     <member type='way' ref='5488' role='left' />
     <member type='way' ref='5398' role='right' />
+    <member type='relation' ref='8059' role='regulatory_element' />
     <tag k='left_marking' v='line_thin' />
     <tag k='location' v='urban' />
     <tag k='right_marking' v='line_thin' />
@@ -8751,6 +8782,7 @@
   <relation id='5739' visible='true' version='1'>
     <member type='way' ref='5375' role='left' />
     <member type='way' ref='5736' role='right' />
+    <member type='relation' ref='8052' role='regulatory_element' />
     <tag k='left_marking' v='line_thin' />
     <tag k='location' v='urban' />
     <tag k='right_marking' v='line_thin' />
@@ -8769,6 +8801,7 @@
   <relation id='5768' visible='true' version='1'>
     <member type='way' ref='5753' role='left' />
     <member type='way' ref='5765' role='right' />
+    <member type='relation' ref='8043' role='regulatory_element' />
     <tag k='left_marking' v='line_thin' />
     <tag k='location' v='urban' />
     <tag k='right_marking' v='line_thin' />
@@ -8778,6 +8811,7 @@
   <relation id='5772' visible='true' version='1'>
     <member type='way' ref='5765' role='left' />
     <member type='way' ref='5769' role='right' />
+    <member type='relation' ref='8043' role='regulatory_element' />
     <tag k='left_marking' v='line_thin' />
     <tag k='location' v='urban' />
     <tag k='right_marking' v='line_thin' />
@@ -10486,6 +10520,24 @@
     <member type='relation' ref='7801' role='right_of_way' />
     <member type='relation' ref='7058' role='yield' />
     <tag k='subtype' v='right_of_way' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='8043' visible='true' version='1'>
+    <member type='way' ref='8044' role='ref_line' />
+    <member type='way' ref='8040' role='refers' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='8052' visible='true' version='1'>
+    <member type='way' ref='8053' role='ref_line' />
+    <member type='way' ref='8049' role='refers' />
+    <tag k='subtype' v='traffic_light' />
+    <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='8059' visible='true' version='1'>
+    <member type='way' ref='8060' role='ref_line' />
+    <member type='way' ref='8056' role='refers' />
+    <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
 </osm>
