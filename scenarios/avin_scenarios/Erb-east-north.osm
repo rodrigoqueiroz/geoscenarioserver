@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-102019' action='modify' lat='43.44631735598' lon='-80.57116856514'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-102020' action='modify' lat='43.44712619738' lon='-80.56998200123'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/Erb-St-W--Erbsville-Rd-roundabout-area.lanelet2.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='AVIN Lanelet2 test scenario' />
+    <tag k='timeout' v='1200' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-102021' action='modify' lat='43.45005956059' lon='-80.56053945392'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='route' v='the_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='155' />
+  </node>
+  <node id='-102022' action='modify' lat='43.44880718651' lon='-80.56410422849' />
+  <node id='-102023' action='modify' lat='43.44719897745' lon='-80.57189483905' />
+  <node id='-102071' action='modify' lat='43.44825894833' lon='-80.56571820928' />
+  <node id='-102085' action='modify' lat='43.4479489022' lon='-80.56654613359' />
+  <node id='-102100' action='modify' lat='43.44719185037' lon='-80.56873646499' />
+  <node id='-102119' action='modify' lat='43.44650326736' lon='-80.57079841573' />
+  <node id='-102135' action='modify' lat='43.44688370093' lon='-80.56974517025' />
+  <way id='-102040' action='modify'>
+    <nd ref='-102022' />
+    <nd ref='-102071' />
+    <nd ref='-102085' />
+    <nd ref='-102100' />
+    <nd ref='-102135' />
+    <nd ref='-102119' />
+    <nd ref='-102023' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='the_route' />
+  </way>
+</osm>

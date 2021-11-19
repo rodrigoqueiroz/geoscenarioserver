@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-102240' action='modify' lat='43.44631604702' lon='-80.57115774757'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-102241' action='modify' lat='43.44712619738' lon='-80.56998200123'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/Erb-St-W--Erbsville-Rd-roundabout-area.lanelet2.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='AVIN Lanelet2 test scenario' />
+    <tag k='timeout' v='1200' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-102242' action='modify' lat='43.44709998879' lon='-80.5674967014'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V1' />
+    <tag k='route' v='the_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='245' />
+  </node>
+  <node id='-102243' action='modify' lat='43.4484519891' lon='-80.56616404855' />
+  <node id='-102258' action='modify' lat='43.44718366985' lon='-80.56755411184'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V2' />
+    <tag k='route' v='the_route_2' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='245' />
+  </node>
+  <node id='-102267' action='modify' lat='43.44724082342' lon='-80.56758352731' />
+  <node id='-102268' action='modify' lat='43.4499965074' lon='-80.56050758259' />
+  <node id='-102318' action='modify' lat='43.44749703792' lon='-80.56754970637' />
+  <node id='-102335' action='modify' lat='43.44762001798' lon='-80.56730023657' />
+  <node id='-102369' action='modify' lat='43.4480478376' lon='-80.56615041692' />
+  <node id='-102384' action='modify' lat='43.44832509887' lon='-80.56601592908' />
+  <way id='-102207' action='modify'>
+    <nd ref='-102242' />
+    <nd ref='-102318' />
+    <nd ref='-102335' />
+    <nd ref='-102369' />
+    <nd ref='-102384' />
+    <nd ref='-102243' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='the_route' />
+  </way>
+  <way id='-102209' action='modify'>
+    <nd ref='-102267' />
+    <nd ref='-102268' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='the_route_2' />
+  </way>
+</osm>
