@@ -8400,10 +8400,10 @@
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='8040' visible='true' version='1'>
+  <way id='8040' action='modify' visible='true' version='1'>
     <nd ref='8041' />
     <nd ref='8042' />
-    <tag k='name' v='2' />
+    <tag k='name' v='tl2' />
     <tag k='qgis_fid' v='2' />
     <tag k='type' v='traffic_light' />
   </way>
@@ -8415,10 +8415,10 @@
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='8049' visible='true' version='1'>
+  <way id='8049' action='modify' visible='true' version='1'>
     <nd ref='8050' />
     <nd ref='8051' />
-    <tag k='name' v='1' />
+    <tag k='name' v='tl1' />
     <tag k='qgis_fid' v='1' />
     <tag k='type' v='traffic_light' />
   </way>
@@ -8429,10 +8429,10 @@
     <tag k='subtype' v='solid' />
     <tag k='type' v='stop' />
   </way>
-  <way id='8056' visible='true' version='1'>
+  <way id='8056' action='modify' visible='true' version='1'>
     <nd ref='8057' />
     <nd ref='8058' />
-    <tag k='name' v='3' />
+    <tag k='name' v='tl3' />
     <tag k='qgis_fid' v='3' />
     <tag k='type' v='traffic_light' />
   </way>
