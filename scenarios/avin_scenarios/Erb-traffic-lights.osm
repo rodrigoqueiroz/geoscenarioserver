@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-102136' action='modify' lat='43.44815969432' lon='-80.56591879082'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-102137' action='modify' lat='43.44879397851' lon='-80.56441524596'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/Erb-St-W--Erbsville-Rd-roundabout-area.lanelet2.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='AVIN Lanelet2 test scenario' />
+    <tag k='timeout' v='1200' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-102138' action='modify' lat='43.44832042199' lon='-80.56543398266'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V1' />
+    <tag k='route' v='R1' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='155' />
+  </node>
+  <node id='-102139' action='modify' lat='43.44830666472' lon='-80.56547396725' />
+  <node id='-102140' action='modify' lat='43.44758315113' lon='-80.56759574018' />
+  <node id='-102152' action='modify' lat='43.44805629703' lon='-80.56576620788'>
+    <tag k='duration' v='15,3,20' />
+    <tag k='ele' v='329' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl1' />
+    <tag k='states' v='green,yellow,red' />
+  </node>
+  <node id='-102153' action='modify' lat='43.44812303593' lon='-80.56569813008'>
+    <tag k='duration' v='20,15,3' />
+    <tag k='ele' v='329' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl2' />
+    <tag k='states' v='red,green,yellow' />
+  </node>
+  <node id='-102154' action='modify' lat='43.44812921546' lon='-80.56612904915'>
+    <tag k='duration' v='20,15,3' />
+    <tag k='ele' v='329' />
+    <tag k='gs' v='trafficlight' />
+    <tag k='name' v='tl3' />
+    <tag k='states' v='red,green,yellow' />
+  </node>
+  <node id='-102234' action='modify' lat='43.44797833885' lon='-80.5661566677'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V2' />
+    <tag k='route' v='R2' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='335' />
+  </node>
+  <node id='-102250' action='modify' lat='43.44798843938' lon='-80.56611973654' />
+  <node id='-102251' action='modify' lat='43.44855777661' lon='-80.56460869413' />
+  <node id='-102258' action='modify' lat='43.44833144835' lon='-80.56609912586'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V3' />
+    <tag k='route' v='R3' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-102273' action='modify' lat='43.44830454111' lon='-80.56606898397' />
+  <node id='-102274' action='modify' lat='43.44858848157' lon='-80.56453167488' />
+  <node id='-102279' action='modify' lat='43.44835067943' lon='-80.56545414532'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V4' />
+    <tag k='route' v='R4' />
+    <tag k='vid' v='4' />
+    <tag k='yaw' v='155' />
+  </node>
+  <node id='-102286' action='modify' lat='43.4483381551' lon='-80.56549289782' />
+  <node id='-102287' action='modify' lat='43.44845887421' lon='-80.56616688698' />
+  <node id='-102294' action='modify' lat='43.44792921041' lon='-80.56640419776'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='V5' />
+    <tag k='route' v='R5' />
+    <tag k='vid' v='5' />
+    <tag k='yaw' v='335' />
+  </node>
+  <node id='-102305' action='modify' lat='43.44794739128' lon='-80.5663458971' />
+  <node id='-102306' action='modify' lat='43.44851866816' lon='-80.56471019926' />
+  <way id='-102145' action='modify'>
+    <nd ref='-102139' />
+    <nd ref='-102140' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='R1' />
+  </way>
+  <way id='-102206' action='modify'>
+    <nd ref='-102250' />
+    <nd ref='-102251' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='R2' />
+  </way>
+  <way id='-102213' action='modify'>
+    <nd ref='-102273' />
+    <nd ref='-102274' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='R3' />
+  </way>
+  <way id='-102220' action='modify'>
+    <nd ref='-102286' />
+    <nd ref='-102287' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='R4' />
+  </way>
+  <way id='-102229' action='modify'>
+    <nd ref='-102305' />
+    <nd ref='-102306' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='R5' />
+  </way>
+</osm>
