@@ -163,10 +163,10 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
         if agent_type == "Pedestrian":
             name = ('ped_'+ format(id, '03d'))
-            pedestrian = TP(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], 0.0, trajectory, False)
-            sim_traffic.add_pedestrian(pedestrian)
 
             if id == es.track_id:
+                pedestrian = TP(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], 0.0, config.route_nodes, False)
+                sim_traffic.add_pedestrian(pedestrian)
                 #set reference trajectory pedestrian to run in ghost mode (not visible in traffic)
                 sim_traffic.pedestrians[id].ghost_mode = True
 
@@ -194,6 +194,9 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
                 except Exception as e:
                     log.error("Route generation failed for route {}. Can't use this pedestrian for evaluation".format(epid))
                     return False, 0.0
+            else:
+                pedestrian = TP(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], 0.0, trajectory, False)
+                sim_traffic.add_pedestrian(pedestrian)
         else:
             name = ('veh_'+ format(id, '03d'))
             vehicle = TV(id, name, [-1000.0,0.0,0.0,-1000.0,0.0,0.0], 0.0, trajectory, False)
@@ -246,7 +249,9 @@ def load_all_scenarios(video_id, map_location, scenario_length):
             if (row[7] != ''):
                 es.start_time = float(row[7])
             if (row[8] != ''):
-                es.end_time = float(row[8])
+                max_sim_time = 1000
+                #es.end_time = float(row[8])
+                es.end_time = max_sim_time
             scenarios[es.scenario_id] = es
     return scenarios
 
@@ -286,7 +291,7 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     using the original track to extract stats
     '''
     trajectory = trajectories[es.track_id]['trajectory']
-    trajectory.sort(key=lambda x: x.time)       #Sorting nodes using time (if not sorted during query)
+    #trajectory.sort(key=lambda x: x.time)       #Sorting nodes using time (if not sorted during query)
     if (trajectory[0].time < es.start_time):    #if trajectory starts before scenario, clip nodes
         trajectory = [node for node in trajectory if node.time >= es.start_time]
     if (trajectory[-1].time > es.end_time):    #if trajectory ends before scenario, clip nodes
@@ -313,18 +318,18 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     #scenario starts only when vehicle enters the scene
     if (es.start_time < ts.start_time):
         es.start_time = ts.start_time
-    es.end_time = ts.end_time
+    #es.end_time = ts.end_time
     es.avg_walking_speed = ts.avg_walking_speed
     #Config
     config = SPConfig()
     config.btree_root = 'eval_walk.btree'
     #Standard
     #config.route_nodes = [ trajectory[0], trajectory[-1]]
-    config.route_nodes = trajectory[::10] # every 10 nodes in trajectory
-    config.start_state = [ trajectory[0].x, ts.start_vel_x,0.0, trajectory[0].y, ts.start_vel_y,0.0 ]
+    config.route_nodes = trajectory
+    config.start_state = [ trajectory[0].x, ts.start_vel_x, 0.0, trajectory[0].y, ts.start_vel_y, 0.0 ]
     config.btree_reconfig = ""
 
-    print("Both start at x_sp {} x_tp {}".format(config.start_state[0],trajectory[0].x))
+    #print("Both start at x_sp {} x_tp {}".format(config.start_state[0],trajectory[0].x))
 
     #Summary:
     print("======= Experiment Summary =======")

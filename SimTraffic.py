@@ -9,7 +9,7 @@
 
 from multiprocessing import shared_memory, Lock, Manager, Array
 from pathlib import Path
-import numpy as np
+import numpy
 import glog as log
 from copy import copy
 import csv
@@ -151,7 +151,10 @@ class SimTraffic(object):
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
 
         #tick pedestrians:
+        eval_pid = 0
         for pid in self.pedestrians:
+            if pid < 0:
+                eval_pid = pid
             self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
 
         #Update traffic light states
@@ -167,6 +170,16 @@ class SimTraffic(object):
         #Collisions at Server Side
         if self.detect_collisions(tick_count, delta_time, sim_time):
             return -1
+
+        # end simulation if both TP and SP eval pedestrians reached destinations
+        eval_ped = self.pedestrians[eval_pid]
+        eval_tp_ped = self.pedestrians[-eval_pid]
+        # check if TP pedestrian is at destination
+        if sim_time >= eval_tp_ped.trajectory[-1].time:
+            # if SP pedestrian is at destination, end simulation
+            eval_ped_pos = numpy.array([eval_ped.state.x, eval_ped.state.y])
+            if numpy.linalg.norm(eval_ped.destination - eval_ped_pos) < 0.1:
+                return -1
 
         return 0
 
@@ -273,7 +286,7 @@ class SimTraffic(object):
                 vid,
                 "DISABLED" if vid in disabled_vehicles else "ACTIVE",
                 state.x, state.y, state.z,
-                np.linalg.norm([state.x_vel, state.y_vel])
+                numpy.linalg.norm([state.x_vel, state.y_vel])
             )
         log.info(state_str)
 
@@ -290,8 +303,11 @@ class SimTraffic(object):
                     self.vehicles_log[vid].append(line)
 
             for pid, pedestrian in sorted(self.pedestrians.items()):
-                if pedestrian.sim_state == ActorSimState.ACTIVE or pedestrian.sim_state == ActorSimState.INVISIBLE:
-                    if pid < 0 or -pid in self.pedestrians:
+                if (pedestrian.sim_state == ActorSimState.ACTIVE) or (pedestrian.sim_state == ActorSimState.INVISIBLE):
+                    # only record trajectories for evaluation pedestrians
+                    # this second condition really shouldn't be necessary but for some reason it is
+                    # this will be investigated
+                    if (pid < 0 or -pid in self.pedestrians) and (pedestrian.sim_state != ActorSimState.INACTIVE):
                         sp = pedestrian.state.get_state_vector()
                         line = [pid, "pedestrian", pedestrian.type, int(pedestrian.sim_state), tick_count, sim_time, delta_time] + sp
 

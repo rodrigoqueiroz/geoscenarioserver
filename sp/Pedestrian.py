@@ -68,7 +68,7 @@ class TP(Pedestrian):
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
             self.state.set_X([9999, 0, 0]) #forcing
-            self.state.set_Y([9999,0,0])
+            self.state.set_Y([9999, 0, 0])
 
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)

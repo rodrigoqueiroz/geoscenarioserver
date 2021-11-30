@@ -64,18 +64,18 @@ class Actor(object):
 
     def force_stop(self):
         #keep current position while forcing vel and acc to 0.0
-        self.state.x_vel = self.state.x_acc = self.state.y_vel  = self.state.y_acc = 0.0
-        self.state.s_vel = self.state.s_acc = self.state.d_vel  = self.state.d_acc = 0.0
+        self.state.x_vel = self.state.x_acc = self.state.y_vel = self.state.y_acc = 0.0
+        self.state.s_vel = self.state.s_acc = self.state.d_vel = self.state.d_acc = 0.0
         pass
 
     def remove(self):
         self.sim_state = ActorSimState.INACTIVE
-        log.warn("Actor id {} is now INACTIVE".format(self.id))
+        log.warn("Actor ID {} is now INACTIVE".format(self.id))
 
     def tick(self, tick_count, delta_time, sim_time):
         pass
 
-    def follow_trajectory(self,sim_time, trajectory):
+    def follow_trajectory(self, sim_time, trajectory):
         if trajectory:
             start_time = float(trajectory[0].time) #first node
             end_time = float(trajectory[-1].time) #last node
@@ -87,7 +87,7 @@ class Actor(object):
                     self.sim_state = ActorSimState.ACTIVE
                     if self.ghost_mode:
                         self.sim_state = ActorSimState.INVISIBLE
-                        log.warn("vid {} is now INVISIBLE".format(self.id))
+                        log.warn("Actor ID {} is now INVISIBLE".format(self.id))
                     if EVALUATION_MODE:
                         if -self.id in self.sim_traffic.vehicles:
                             self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE
@@ -113,11 +113,11 @@ class Actor(object):
                         #print("t{} x{} -> nt{} nx{}. Interp pdiff{} ix{}".format(node.time, node.x, next.time, next.x,pdiff,x))
                         break
             #After trajectory, stay in last position or get removed
-            if sim_time > end_time:
+            if (sim_time > end_time) and (self.sim_state != ActorSimState.INACTIVE):
                 if not self.keep_active:
                     self.state.set_X([-9999, 0, 0])
-                    self.state.set_Y([-9999,0,0])
-                    if self.sim_state is ActorSimState.ACTIVE:
+                    self.state.set_Y([-9999, 0, 0])
+                    if self.sim_state in [ActorSimState.ACTIVE, ActorSimState.INVISIBLE]:
                         self.remove()
                 else:
                     self.force_stop()
