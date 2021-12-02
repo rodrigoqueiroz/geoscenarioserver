@@ -249,9 +249,7 @@ def load_all_scenarios(video_id, map_location, scenario_length):
             if (row[7] != ''):
                 es.start_time = float(row[7])
             if (row[8] != ''):
-                max_sim_time = 1000
-                #es.end_time = float(row[8])
-                es.end_time = max_sim_time
+                es.end_time = float(row[8]) + 30.0
             scenarios[es.scenario_id] = es
     return scenarios
 

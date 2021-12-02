@@ -1,8 +1,8 @@
 scenario_id,selected,track_id,type,direction,scenario_type,constraint_agents,start_time,end_time
-1,s,25,Pedestrian,,placeholder,,0,3.003
-2,s,75,Pedestrian,,placeholder,81;118,59.059,120.453667
-3,s,81,Pedestrian,,placeholder,75;118;152;161;185,62.395667,183.349833
-4,s,118,Pedestrian,,placeholder,75;81,93.5935,108.6085
-5,s,152,Pedestrian,,placeholder,81;161;185,133.967167,200.533667
-6,s,161,Pedestrian,,placeholder,81;152;185,138.471667,199.199
-7,s,185,Pedestrian,,placeholder,81;152;161,168.835333,200.533667
+1,s,25,Pedestrian,,0_crosswalks,,0,3.003
+2,s,75,Pedestrian,,2_crosswalks,81;118,59.059,120.453667
+3,s,81,Pedestrian,,1_crosswalk,75;118;152;161;185,62.395667,183.349833
+4,s,118,Pedestrian,,0_crosswalks,75;81,93.5935,108.6085
+5,s,152,Pedestrian,,0_crosswalks,81;161;185,133.967167,200.533667
+6,s,161,Pedestrian,,2_crosswalks,81;152;185,138.471667,199.199
+7,s,185,Pedestrian,,1_crosswalk,81;152;161,168.835333,200.533667
