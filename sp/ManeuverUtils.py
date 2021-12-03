@@ -18,13 +18,13 @@ from util.Transformations import normalize
 from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation, point_in_rectangle
 
 
-def has_reached_point(pedestrian_state, point, threshold=1.5):
+def has_reached_point(pedestrian_state, point, **kwargs):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
         @param threshold: Max acceptable distance to point
     """
+    threshold = kwargs["threshold"]
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-
     return np.linalg.norm(np.asarray(point) - pedestrian_pos) < threshold
 
 
@@ -139,11 +139,11 @@ def has_line_of_sight_to_point(position, point, lanelet):
     return True
 
 
-def approaching_crosswalk(planner_state):
+def approaching_crosswalk(planner_state, **kwargs):
     if planner_state.target_crosswalk["id"] == -1:
         return False
 
-    threshold_dist = 3
+    threshold = kwargs["threshold"]
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
 
     if not planner_state.lanelet_map.inside_lanelet_or_area(pedestrian_pos, planner_state.current_lanelet):
@@ -152,20 +152,26 @@ def approaching_crosswalk(planner_state):
     crosswalk_entry = planner_state.target_crosswalk["entry"]
     dist_to_crosswalk_entrance = np.linalg.norm(crosswalk_entry - pedestrian_pos)
 
-    return dist_to_crosswalk_entrance < threshold_dist
+    return dist_to_crosswalk_entrance < threshold
 
 
-def can_cross_before_red(planner_state):
+def can_cross_before_red(planner_state, **kwargs):
     """
     return ((distance to entry) + (distance from entry to exit)) / (default desired speed) < (time to red)
     """
+
+    speed_increase_pct = 1.0 + kwargs["speed_increase_pct"]
+
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
     crosswalk_entry = planner_state.target_crosswalk["entry"]
     crosswalk_exit = planner_state.target_crosswalk["exit"]
 
     dist_pos_to_entry = np.linalg.norm(crosswalk_entry - pedestrian_pos)
     dist_entry_to_exit = np.linalg.norm(crosswalk_exit - crosswalk_entry)
+    dist_from_xwalk_exit = kwargs["dist_from_xwalk_exit"]
 
-    crossing_possible = (dist_pos_to_entry + dist_entry_to_exit) / planner_state.pedestrian_speed["default_desired"] < planner_state.crossing_light_time_to_red
+    crossing_possible = (dist_pos_to_entry + dist_entry_to_exit - dist_from_xwalk_exit) \
+                        / (planner_state.pedestrian_speed["default_desired"] * speed_increase_pct) \
+                        < planner_state.crossing_light_time_to_red
 
     return crossing_possible
