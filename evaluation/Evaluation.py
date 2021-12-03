@@ -48,7 +48,8 @@ class EvalScenario:
     scenario_type:str = ''                          #free, follow, free_follow, rlstop, glstart, yield_turnright, yield_turnleft, lcleft, lcright
     const_agents:list = field(default_factory=list)    #vehicles/pedestrians that must be in the scene (e.g: following, or yielding)
     start_time:float = 0.0                          #scenario start time
-    end_time:float = 0.0                            #scenario end time
+    traj_end_time:float = 0.0                       #last traj time for the empirical ped
+    max_sim_time:float = 0.0                        #maximum scenario time
     direction:str = ''                              #n_s, s_n, e_w, w_e
 
 
@@ -213,7 +214,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
     sim_traffic.map_location = es.map_location
 
     sim_config.plot_vid = -es.track_id
-    sim_config.timeout = es.end_time
+    sim_config.timeout = es.max_sim_time
 
     return True, es.start_time
 
@@ -249,7 +250,8 @@ def load_all_scenarios(video_id, map_location, scenario_length):
             if (row[7] != ''):
                 es.start_time = float(row[7])
             if (row[8] != ''):
-                es.end_time = float(row[8]) + 30.0
+                es.traj_end_time = float(row[8])
+            es.max_sim_time = 500
             scenarios[es.scenario_id] = es
     return scenarios
 
@@ -292,8 +294,8 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     #trajectory.sort(key=lambda x: x.time)       #Sorting nodes using time (if not sorted during query)
     if (trajectory[0].time < es.start_time):    #if trajectory starts before scenario, clip nodes
         trajectory = [node for node in trajectory if node.time >= es.start_time]
-    if (trajectory[-1].time > es.end_time):    #if trajectory ends before scenario, clip nodes
-        trajectory = [node for node in trajectory if node.time <= es.end_time]
+    if (trajectory[-1].time > es.traj_end_time):    #if trajectory ends before scenario, clip nodes
+        trajectory = [node for node in trajectory if node.time <= es.traj_end_time]
 
     # clip start and end nodes that are outside of any lanelet in map
     idx = 0

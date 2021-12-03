@@ -89,14 +89,10 @@ def evaluate_scenario(es:EvalScenario, map_lines):
     es.ade = get_avgdisplacementerror(s_list, e_list)
 
     # Frechet distance
-    es.fd = get_frechet(s_list, e_list, samples=None)
+    es.fd = get_frechet(s_list, e_list)
 
     # Hausdorff distance
     es.hd = get_hausdorff(s_list, e_list)
-
-    print("Average Displacement Error: {}".format(es.ade))
-    print("Frechet Distance: {}".format(es.fd))
-    print("Hausdorff Distance: {}".format(es.hd))
 
     path_curvatures = get_curvature_of_paths(traj_s, traj_e)
     plot_curvatures(es, path_curvatures)
@@ -282,7 +278,7 @@ def get_samples(traj_p, traj_q, traj_l = None, trim = 1.0, samples = None):
             L =  [ node for node in traj_l[:size]]
     return P, Q, L
 
-def get_frechet(P, Q, trim = 1.0, samples = 300):
+def get_frechet(P, Q, trim = 1.0, samples=494):
     #trim ending of trajectory in %
     P = P[:int(len(P)*trim)]
     Q = Q[:int(len(Q)*trim)]
@@ -293,7 +289,7 @@ def get_frechet(P, Q, trim = 1.0, samples = 300):
         sample_size = min([len(P), len(Q), samples])
         #todo: sample time. using index only works if both are collected with in same simulation with same number of points collected
         #indexes = sorted(random.sample(range(len(traj_p)), sample_size))
-        max_index = len(P)-1
+        max_index = min([len(P), len(Q)]) - 1
         indexes = np.linspace(0, max_index, sample_size, dtype=int, endpoint=False)
         SP = [P[i] for i in indexes]
         SQ = [Q[i] for i in indexes]
@@ -311,7 +307,7 @@ def get_hausdorff(P, Q):
     SP = [node for node in P[:size]]
     SQ = [node for node in Q[:size]]
 
-    return max(directed_hausdorff(SP, SQ), directed_hausdorff(SQ, SP))
+    return max(directed_hausdorff(SP, SQ)[0], directed_hausdorff(SQ, SP)[0])
 
 
 def get_curvature_of_paths(traj_s, traj_e):
@@ -417,7 +413,7 @@ def plot_curvatures(es:EvalScenario, curvature):
 def get_euclideandistance(P, Q = None):
     d_vector = []
 
-    n = len(P)
+    n = min(len(P), len(Q))
     dt = 0
     total = 0
 
@@ -547,7 +543,10 @@ def update_results_table(es:EvalScenario):
                 l[6] = format(es.ed_max, '.2f')
                 l[7] = format(es.ed, '.2f')
 
-                l[8] = format(es.ed_change, '.2f')
+                l[8] = format(es.ade, '.2f')
+                l[9] = format(es.fd, '.2f')
+                l[10] = format(es.hd, '.2f')
+                #l[8] = format(es.ed_change, '.2f')
                 #l[9] = format(es.fd_nc, '.2f')
                 #l[10] = format(es.fd, '.2f')
                 #l[11] = format(es.fd_change, '.2f')
@@ -563,7 +562,10 @@ def update_results_table(es:EvalScenario):
                         format(es.ed_max, '.2f'),
                         format(es.ed, '.2f'),
 
-                        format(es.ed_change, '.2f')
+                        format(es.ade, '.2f'),
+                        format(es.fd, '.2f'),
+                        format(es.hd, '.2f')
+                        #format(es.ed_change, '.2f')
                         #format(es.fd_nc, '.2f'),
                         #format(es.fd, '.2f'),
                         #format(es.fd_change, '.2f')
