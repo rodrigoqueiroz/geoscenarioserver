@@ -63,4 +63,15 @@
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_2' />
   </node>
+  <node id='-5338435' action='modify' visible='true' lat='43.47786911985' lon='-80.51947964166'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_3_dest' />
+  </node>
+  <node id='-5338436' action='modify' visible='true' lat='43.47797511675' lon='-80.520223518'>
+    <tag k='btree' v='walk_aggressiveness_level_3.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_3_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_3' />
+  </node>
 </osm>
