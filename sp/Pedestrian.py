@@ -97,16 +97,15 @@ class SP(Pedestrian):
             'mass': round(random.uniform(50, 80), 2),
             'desired_speed': 1.5, # random.uniform(0.6, 1.2)
             'acceleration_time': 0.5,
-            'A': 0.81, # 1500, # 1500~2000
-            'B': 0.74, # 0.08,
+            'A': 10, # 1500, # 1500~2000
+            'B': 0.8, # 0.08,
             'C': 12, # 0~500
             'D': 0.35, # 0~1
             'E': 400, # 0~500
             'F': 0.82, # 0~1
-            'phi': 120000,
-            'omega': 240000
+            'phi': 120,
+            'omega': 240
         }
-        # blah
 
         self.path = None
         self.waypoints = []

@@ -1,7 +1,7 @@
 behaviortree walk_tree:
     ?
         ->
-            condition c_goal ( reached_goal( threshold=1 ) )
+            condition c_goal ( reached_goal( threshold=0.5 ) )
             maneuver m_stop_goal ( MStopConfig( type=2 ) )
         ->
             condition c_has_target_crosswalk ( has_target_crosswalk() )
