@@ -25,6 +25,8 @@ from dash.Dashboard import *
 from gsc.GSParser import GSParser
 from sv.Vehicle import Vehicle
 from sp.Pedestrian import Pedestrian
+from sp.btree.BehaviorModels import BehaviorModels
+from sp.btree.BTreeLeaves import ManeuverAction, BCondition
 from Actor import TrajNode
 from sv.ManeuverConfig import *
 from sv.SDVPlanner import LaneConfig
@@ -51,6 +53,7 @@ class EvalScenario:
     traj_end_time:float = 0.0                       #last traj time for the empirical ped
     max_sim_time:float = 0.0                        #maximum scenario time
     direction:str = ''                              #n_s, s_n, e_w, w_e
+    model_parameters:dict = field(default_factory=dict)
 
 
 @dataclass
@@ -130,6 +133,8 @@ def start_server(args, es, calibrate = False):
     log.info('SIMULATION END')
     log.info('GeoScenario Evaluation Server SHUTDOWN')
 
+    write_parameters_config_log(es)
+
 def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, es, calibrate_behavior):
     print("===== Setup scenario {} for evaluation. Recalibrate? {}".format(es.scenario_id, calibrate_behavior))
 
@@ -192,6 +197,10 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
                     sim_traffic.pedestrians[epid].sim_state = ActorSimState.INACTIVE
                     # set desired speed as average walking speed of empirical pedestrian
                     sim_traffic.pedestrians[epid].default_desired_speed = es.avg_walking_speed
+
+                    # get model parameters
+                    es.model_parameters = get_model_parameters(pedestrian)
+
                 except Exception as e:
                     log.error("Route generation failed for route {}. Can't use this pedestrian for evaluation".format(epid))
                     return False, 0.0
@@ -302,7 +311,6 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
     while (len(occupied_spaces['lanelets']) == 0 and len(occupied_spaces['areas']) == 0):
         idx += 1
-        print(idx)
         occupied_spaces = lanelet_map.get_spaces_list_occupied_by_pedestrian(np.array([trajectory[idx].x, trajectory[idx].y]))
     trajectory = trajectory[idx:]
 
@@ -332,13 +340,84 @@ def generate_config(es:EvalScenario, lanelet_map:LaneletMap, traffic_lights, tra
     #print("Both start at x_sp {} x_tp {}".format(config.start_state[0],trajectory[0].x))
 
     #Summary:
-    print("======= Experiment Summary =======")
-    print(es)
-    print(ts)
-    print(config)
-    print("==================================")
+    # print("======= Experiment Summary =======")
+    # print(es)
+    # print(ts)
+    # print(config)
+    # print("==================================")
 
     return config
+
+def get_model_parameters(sp_ped):
+    model_parameters = {'aggressiveness_level_enter_xwalk': 2}
+
+    # add SFM parameters
+    model_parameters.update(sp_ped.SFM_parameters)
+
+    # add BT parameters
+    bmodel = BehaviorModels(sp_ped.id,
+                            sp_ped.root_btree_name,
+                            sp_ped.btree_reconfig,
+                            sp_ped.btree_locations,
+                            sp_ped.btype)
+
+    # breadth first search of tree
+    visited = [bmodel.tree.root]
+    queue = [bmodel.tree.root]
+
+    while queue:
+        s = queue.pop(0)
+        if type(s) == ManeuverAction:
+            if s.name == 'm_select_xwalk_by_light':
+                model_parameters['aggressiveness_level_select_xwalk'] = s.mconfig.aggressiveness_level
+        elif type(s) == BCondition:
+            if s.name == 'c_goal':
+                model_parameters['goal_threshold'] = s.kwargs['threshold']
+            elif s.name == 'c_reached_exit':
+                model_parameters['xwalk_exit_threshold'] = s.kwargs['threshold']
+            elif s.name == 'c_reached_entrance':
+                model_parameters['xwalk_entry_threshold'] = s.kwargs['threshold']
+            elif s.name == 'c_approaching_crosswalk':
+                model_parameters['approaching_xwalk_threshold'] = s.kwargs['threshold']
+            elif s.name == 'c_can_cross_before_red':
+                model_parameters['speed_increase_pct'] = s.kwargs['speed_increase_pct']
+                model_parameters['dist_from_xwalk_exit'] = s.kwargs['dist_from_xwalk_exit']
+
+        for neighbour in s.children:
+            if neighbour not in visited:
+                visited.append(neighbour)
+                queue.append(neighbour)
+
+    return model_parameters
+
+def write_parameters_config_log(es):
+    model_parameters_list = sorted(es.model_parameters.items())
+    model_parameters_keys = [x[0] for x in model_parameters_list]
+    model_parameters_values = [x[1] for x in model_parameters_list]
+
+    Path('evaluation/parameter_config/{}'.format(es.map_location, es.scenario_length)).mkdir(parents=True, exist_ok=True)
+    with open('evaluation/parameter_config/{}/parameter_config_{}.csv'.format(es.map_location, es.scenario_length), mode='r', encoding='utf-8-sig') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        rows = list(csv_reader)
+
+        if len(rows) <= 1:
+            rows = [['file_id', 'scenario_id'] + model_parameters_keys]
+
+        scenario_exists = False
+        for row in rows:
+            # print(row[0])
+            # print(row[1])
+            if row[0] == str(es.video_id) and row[1] == str(es.scenario_id):
+                row[2:] = model_parameters_values
+                scenario_exists = True
+
+        if not scenario_exists:
+            rows.append([es.video_id, es.scenario_id] + model_parameters_values)
+
+    with open('evaluation/parameter_config/{}/parameter_config_{}.csv'.format(es.map_location, es.scenario_length), mode='w', encoding='utf-8-sig') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=',')
+        csv_writer.writerows(rows)
+
 
 def generate_traj_stats(trajectory):
     ts = TrajStats()
