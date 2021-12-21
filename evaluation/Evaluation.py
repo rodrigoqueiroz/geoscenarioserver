@@ -200,6 +200,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
 
                     # get model parameters
                     es.model_parameters = get_model_parameters(pedestrian)
+                    es.model_parameters['desired_speed'] = es.avg_walking_speed
 
                 except Exception as e:
                     log.error("Route generation failed for route {}. Can't use this pedestrian for evaluation".format(epid))

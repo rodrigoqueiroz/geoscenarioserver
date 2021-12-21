@@ -30,7 +30,7 @@ class Pedestrian(Actor):
     EP_TYPE = 3
     SP_TYPE = 4
 
-    PEDESTRIAN_RADIUS = 0.2
+    PEDESTRIAN_RADIUS = 0.25
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, yaw=yaw)
@@ -97,8 +97,8 @@ class SP(Pedestrian):
             'mass': round(random.uniform(50, 80), 2),
             'desired_speed': 1.5, # random.uniform(0.6, 1.2)
             'acceleration_time': 0.5,
-            'A': 1500, # 1500~2000
-            'B': 0.08,
+            'A': 0.81, # 1500, # 1500~2000
+            'B': 0.74, # 0.08,
             'C': 12, # 0~500
             'D': 0.35, # 0~1
             'E': 400, # 0~500
@@ -106,6 +106,7 @@ class SP(Pedestrian):
             'phi': 120000,
             'omega': 240000
         }
+        # blah
 
         self.path = None
         self.waypoints = []
@@ -259,13 +260,11 @@ class SP(Pedestrian):
 
         evasive_effect = (C*np.exp((rij-dij)/D)*ref + E*np.exp((rij-dij)/F)*evade_l_r)*(1-same_dest)
 
-        # body compression factor (phi*max(0, rij-dij)*nij)
-        # will be taken into account in high density scenarios
-        body_factor_weight = 1 # phi*max(0, rij-dij)
+        body_factor_weight = phi*max(0, rij-dij)
         friction_factor_weight = omega*max(0, rij-dij)
 
 
-        fij = (A*np.exp((rij-dij)/B) * body_factor_weight)*nij + friction_factor_weight*delta_vij*tij# + evasive_effect
+        fij = (A*np.exp((rij-dij)/B) + body_factor_weight)*nij + friction_factor_weight*delta_vij*tij# + evasive_effect
 
         return fij
 
