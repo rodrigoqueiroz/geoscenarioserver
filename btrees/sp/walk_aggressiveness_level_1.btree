@@ -19,6 +19,6 @@ behaviortree walk_aggressiveness_level_low:
                             subtree enter_xwalk_on_green()
                         maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
                 ->
-                    condition c_approaching_xwalk ( approaching_crosswalk( threshold=3 ) )
+                    condition c_approaching_crosswalk ( approaching_crosswalk( threshold=3 ) )
                     maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=1 ) )
         maneuver m_keep_in_lane ( MKeepInLaneConfig( vel=MP(1.0,30,6) ) )
