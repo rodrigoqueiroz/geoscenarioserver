@@ -46,6 +46,7 @@ class SPPlanner(object):
         self.inverted_path = False
         self.previous_maneuver = None
         self.selected_target_crosswalk = False
+        self.intersection_entry_pt = []
         self.intersection_exit_pt = []
 
 
@@ -65,7 +66,10 @@ class SPPlanner(object):
             self.plan_local_path(pedestrian_pos, consider_light_states=False)
 
     def get_closest_intersection_point(self, pt):
-        ''' find exit point of intersection to use as intermediate destination point in planning '''
+        ''' find exit or entry point of intersection to use as:
+                intermediate destination point in planning (for exit pt) and
+                relative distance to intersection entrance (for entry pt)
+        '''
         xwalk_exit_pts = []
         spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(pt)
 
