@@ -13,56 +13,7 @@ from Actor import *
 import glog as log
 from sv.SDVTrafficState import TrafficState
 
-def get_node_param(kwargs, param_name, default = None, required = False):
-    if param_name in kwargs:
-        return kwargs[param_name]
-    elif required:
-            log.error("Missing required node parameter {}".format(param_name))
-    return default
 
-def get_vehicle_by_ids(traffic_state:TrafficState, kwargs):
-    ''' zids: zone clockwise from front 0 1 2 3 4 5 6 7)
-            0: front, 1: front right, 2: right, 3: back right
-            4: back, 5: back left, 2: left, 3: front left
-        lid: lane
-            -1 (negative) : RIGHT
-            +1 (positive) : LEFT
-        vid: vehicle in traffic
-    '''
-    vehicle = None
-
-    vid = get_node_param(kwargs,'vid', None)
-    if vid:
-        if vid in traffic_state.traffic_vehicles:
-            vehicle = traffic_state.traffic_vehicles[vid]
-        else:
-            return None
-    lid = get_node_param(kwargs,'lid', None)
-    if lid:
-        if lid < 0: 
-            vehicle = traffic_state.road_occupancy.left
-        else:
-            vehicle = traffic_state.road_occupancy.right
-    zid = get_node_param(kwargs,'zid', None)
-    if zid:
-        if zid == 0: 
-            vehicle = traffic_state.road_occupancy.front
-        elif zid == 1: 
-            vehicle = traffic_state.road_occupancy.right_front
-        elif zid == 2: 
-            vehicle = traffic_state.road_occupancy.right
-        elif zid == 3: 
-            vehicle = traffic_state.road_occupancy.right_back
-        elif zid == 4: 
-            vehicle = traffic_state.road_occupancy.back
-        elif zid == 5: 
-            vehicle = traffic_state.road_occupancy.left_back
-        elif zid == 6: 
-            vehicle = traffic_state.road_occupancy.left
-        elif zid == 7: 
-            vehicle = traffic_state.road_occupancy.left_front
-        
-    return vehicle
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
     current_lane = None
