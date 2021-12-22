@@ -20,7 +20,7 @@ import glog as log
 from SimTraffic import *
 from SimConfig import *
 from util.Utils import *
-import sv.SDVPlannerState
+import sv.SDVTrafficState
 from sv.Vehicle import *
 from Actor import *
 from TrafficLight import *
@@ -414,16 +414,16 @@ class Dashboard(object):
 
         #re
         for re in regulatory_elements:
-            if isinstance(re, sv.SDVPlannerState.TrafficLightState):
+            if isinstance(re, sv.SDVTrafficState.TrafficLightState):
                 colorcode,_ = self.get_color_by_type('trafficlight',re.color)
                 x, y = re.stop_position
                 plt.axvline(x, color= colorcode, linestyle='-', zorder=1)
-            elif isinstance(re, sv.SDVPlannerState.RightOfWayState):
+            elif isinstance(re, sv.SDVTrafficState.RightOfWayState):
                 pass
                 #for ll_id in re.row_lanelets:
                     #colorfillcode = 'r' if re.row_lanelets[ll_id] > 0 else 'g'
                     #ll = self.lanelet_map.laneletLayer[ll_id]
-            elif isinstance(re, sv.SDVPlannerState.AllWayStopState):
+            elif isinstance(re, sv.SDVTrafficState.AllWayStopState):
                 pass
 
         #other vehicles, from main vehicle POV:
