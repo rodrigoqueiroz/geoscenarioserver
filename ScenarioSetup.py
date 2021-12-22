@@ -95,17 +95,18 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         model = vnode.tags['model'] if 'model' in vnode.tags else ''
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
-        yaw = 90.0
-        if 'yaw' in vnode.tags:
-            yaw = (float(vnode.tags['yaw']) + 90.0) % 360.0
-            # Place yaw in the range [-180.0, 180.0)
-            if yaw < -180.0:
-                yaw += 360.0
-            elif yaw >= 180.0:
-                yaw -= 360.0
-
+        #yaw = 90.0
+        #if 'yaw' in vnode.tags:
+        #    yaw = (float(vnode.tags['yaw']) + 90.0) % 360.0
+        #    # Place yaw in the range [-180.0, 180.0)
+        #    if yaw < -180.0:
+        #        yaw += 360.0
+        #    elif yaw >= 180.0:
+        #        yaw -= 360.0
+        yaw = float(vnode.tags['yaw'])*-1 if 'yaw' in vnode.tags else 0.0
+        #print(yaw)
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
-        log.info("Vehicle {}, behavior type {}".format(vid,btype))
+        log.info("Vehicle {}, behavior type {}".format(vid,btype))    
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
             #start state
@@ -151,8 +152,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]   
             route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
             #btree
-            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
-
+            #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
+            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree" 
             try:
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, route_nodes,
