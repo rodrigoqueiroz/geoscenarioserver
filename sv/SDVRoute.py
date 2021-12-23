@@ -210,7 +210,7 @@ class SDVRoute(object):
         if SimConfig.PLOT_VEHICLE_ROUTES:
             for sdv_path in self._sdv_paths:
                 plt.figure()
-                map_lines = SDVRoute.lanelet_map.get_lines()
+                data = SDVRoute.lanelet_map.get_lines()
                 for xs, ys, type, subtype in data:
                     line_format = get_line_format(type, subtype)
                     if line_format is None:
