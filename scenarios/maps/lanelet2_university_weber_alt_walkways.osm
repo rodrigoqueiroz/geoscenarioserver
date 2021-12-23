@@ -999,6 +999,8 @@
     <nd ref='-5335768' />
     <nd ref='-5335769' />
     <nd ref='-5335931' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950805' visible='true'>
     <nd ref='-5335770' />
@@ -1025,6 +1027,8 @@
     <nd ref='-5335982' />
     <nd ref='-5335963' />
     <nd ref='-5335925' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950810' visible='true'>
     <nd ref='-5335777' />
@@ -1057,6 +1061,8 @@
     <nd ref='-5335791' />
     <nd ref='-5335792' />
     <nd ref='-5335946' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950815' action='modify' visible='true'>
     <nd ref='-5335793' />
@@ -1273,6 +1279,8 @@
     <nd ref='-5335920' />
     <nd ref='-5335921' />
     <nd ref='-5336002' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950839' visible='true'>
     <nd ref='-5335922' />
@@ -1288,6 +1296,8 @@
     <nd ref='-5335927' />
     <nd ref='-5335928' />
     <nd ref='-5335929' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950842' visible='true'>
     <nd ref='-5335930' />
@@ -1326,6 +1336,8 @@
     <nd ref='-5335942' />
     <nd ref='-5335943' />
     <nd ref='-5335774' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950850' action='modify' visible='true'>
     <nd ref='-5335944' />
@@ -1357,6 +1369,8 @@
     <nd ref='-5335952' />
     <nd ref='-5335953' />
     <nd ref='-5335760' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950855' visible='true'>
     <nd ref='-5335954' />
@@ -1717,6 +1731,8 @@
     <nd ref='-5335797' />
     <nd ref='-5335972' />
     <nd ref='-5336098' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950929' action='modify' visible='true'>
     <nd ref='-5336101' />
@@ -1733,6 +1749,8 @@
     <nd ref='-5335983' />
     <nd ref='-5335817' />
     <nd ref='-5336101' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950930' action='modify' visible='true'>
     <nd ref='-5335760' />
@@ -1872,6 +1890,8 @@
   <way id='-1950946' action='modify' visible='true'>
     <nd ref='-5336002' />
     <nd ref='-5335821' />
+    <tag k="subtype" v="high" />
+    <tag k="type" v="curbstone" />
   </way>
   <way id='-1950947' action='modify' visible='true'>
     <nd ref='-5336068' />
