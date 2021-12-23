@@ -522,21 +522,29 @@ class LaneletMap(object):
         data = np.array([[pt.x for pt in points], [pt.y for pt in points]])
         return data
 
+
     def get_lines(self, x_min=0, y_min=0, x_max=0, y_max=0):
         data = []
 
         if (x_min == x_max == y_min == y_max):
             lines = self.lanelet_map.lineStringLayer
         else:
-            searchBox = BoundingBox2d(BasicPoint2d(x_min, y_min), BasicPoint2d(x_max, y_max))
+            searchBox = BoundingBox2d(BasicPoint2d(
+                x_min, y_min), BasicPoint2d(x_max, y_max))
             lines = self.lanelet_map.lineStringLayer.search(searchBox)
 
         for line in lines:
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
-            data.append([xs,ys])
+            subtype = None
+            try:
+                subtype = line.attributes["subtype"]
+            except KeyError:
+                pass
+            data.append((xs, ys, line.attributes["type"], subtype))
 
         return data
+
 
     def plot_all_lanelets(self, x_min=0, y_min=0, x_max=0, y_max=0):
         """ Plots all lanelets within given boundaries.
@@ -606,3 +614,31 @@ class LaneletMap(object):
         point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
         point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)
         return distance(point_on_leftbound, point_on_rightbound)
+        
+
+def get_line_format(type: str, subtype: str):
+    color = 'red'  # color for unhandled type
+    linestyle = 'solid'  # most lines are solid
+    linewidth = 1  # default width
+    if type == 'road_border':
+        color = 'black'
+        linewidth = 2
+    elif type == 'virtual':
+        color = 'lightgray'
+        linestyle = 'dotted'
+    elif type == 'line_thin':
+        color = 'gray'
+        linestyle = subtype
+    elif type == 'line_thick' or type == 'stop':
+        color = 'gray'
+        linestyle = subtype
+        linewidth = 5
+    elif type == 'curbstone':
+        color = 'darkgray'
+        if subtype == 'high':
+            linewidth = 2
+    elif type == "traffic_light":
+        return None  # do not draw
+    else:
+        print(f'Unhandled format of line type: {type}, subtype: {subtype}')
+    return (color, linestyle, linewidth)

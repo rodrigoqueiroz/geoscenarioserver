@@ -15,6 +15,7 @@ from copy import copy
 from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
 from sp.ManeuverConfig import *
+from sp.ConditionConfig import *
 from sp.ManeuverModels import plan_maneuver
 from sp.btree.BehaviorModels import BehaviorModels
 from sp.SPPlannerState import PedestrianPlannerState, TrafficLightState
@@ -45,6 +46,7 @@ class SPPlanner(object):
         self.inverted_path = False
         self.previous_maneuver = None
         self.selected_target_crosswalk = False
+        self.intersection_entry_pt = []
         self.intersection_exit_pt = []
 
 
@@ -53,18 +55,27 @@ class SPPlanner(object):
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-        self.get_intersection_exit_point()
-        pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
-        self.plan_local_path(pedestrian_pos, False)
 
-    def get_intersection_exit_point(self):
-        ''' find exit point of intersection to use as intermediate destination point in planning '''
+        pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
+        self.intersection_entry_pt = self.get_closest_intersection_point(pedestrian_pos)
+        self.intersection_exit_pt = self.get_closest_intersection_point(self.sp.destination)
+
+        if np.linalg.norm(pedestrian_pos - self.intersection_entry_pt) < 5:
+            self.plan_local_path(pedestrian_pos, consider_light_states=True)
+        else:
+            self.plan_local_path(pedestrian_pos, consider_light_states=False)
+
+    def get_closest_intersection_point(self, pt):
+        ''' find exit or entry point of intersection to use as:
+                intermediate destination point in planning (for exit pt) and
+                relative distance to intersection entrance (for entry pt)
+        '''
         xwalk_exit_pts = []
-        spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
+        spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(pt)
 
         ''' check if there is a valid route from each lanelet and area occupied by the destination
-            to each crosswalk. If there is, this crosswalk's exit point is considered in determining
-            the exit point of the intersection for the pedestrian.
+            to each crosswalk. If there is, this crosswalk's entry/exit point is considered in determining
+            the intersection point for the pedestrian.
         '''
         for xwalk in self.sim_traffic.crosswalks:
             found_accessible_xwalk = False
@@ -102,7 +113,7 @@ class SPPlanner(object):
                 # crosswalk is accessible from area if they share a node
                 if self.lanelet_map.area_and_lanelet_share_node(area, xwalk):
                     entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
-                    if np.linalg.norm(exit_pt - self.sp.destination) < np.linalg.norm(entrance_pt - self.sp.destination):
+                    if np.linalg.norm(exit_pt - pt) < np.linalg.norm(entrance_pt - pt):
                         xwalk_exit_pts.append(exit_pt)
                     else:
                         xwalk_exit_pts.append(entrance_pt)
@@ -111,9 +122,9 @@ class SPPlanner(object):
                 area_idx += 1
 
         if len(xwalk_exit_pts) == 0:
-            self.intersection_exit_pt = self.sp.destination
+            return pt
         else:
-            self.intersection_exit_pt = sum(xwalk_exit_pts) / len(xwalk_exit_pts)
+            return sum(xwalk_exit_pts) / len(xwalk_exit_pts)
 
 
     def plan_local_path(self, planning_position, consider_light_states, aggressiveness_level = 1):
@@ -235,7 +246,9 @@ class SPPlanner(object):
                             else:
                                 dist_pos_to_entry = np.linalg.norm(entrance_pt - planning_position)
                                 dist_entry_to_exit = np.linalg.norm(exit_pt - entrance_pt)
-                                if better_can_cross and (dist_pos_to_entry + dist_entry_to_exit) / self.sp.default_desired_speed < crossing_light_ttr:
+                                if better_can_cross and (dist_pos_to_entry + dist_entry_to_exit - CCanCrossBeforeRedConfig.dist_from_xwalk_exit) \
+                                                        / (self.sp.default_desired_speed * (1.0 + CCanCrossBeforeRedConfig.speed_increase_pct)) \
+                                                        < crossing_light_ttr:
                                     best_candidate_can_cross = candidate
                                 elif better_must_wait:
                                     best_candidate_must_wait = candidate
