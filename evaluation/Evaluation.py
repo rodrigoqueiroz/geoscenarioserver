@@ -27,6 +27,7 @@ from sv.Vehicle import Vehicle
 from sp.Pedestrian import Pedestrian
 from sp.btree.BehaviorModels import BehaviorModels
 from sp.btree.BTreeLeaves import ManeuverAction, BCondition
+from sp.ConditionConfig import *
 from Actor import TrajNode
 from sv.ManeuverConfig import *
 from sv.SDVPlanner import LaneConfig
@@ -381,8 +382,15 @@ def get_model_parameters(sp_ped):
             elif s.name == 'c_approaching_crosswalk':
                 model_parameters['approaching_xwalk_threshold'] = s.kwargs['threshold']
             elif s.name == 'c_can_cross_before_red':
-                model_parameters['speed_increase_pct'] = s.kwargs['speed_increase_pct']
-                model_parameters['dist_from_xwalk_exit'] = s.kwargs['dist_from_xwalk_exit']
+                if 'speed_increase_pct' in s.kwargs:
+                    model_parameters['speed_increase_pct'] = s.kwargs['speed_increase_pct']
+                else:
+                    model_parameters['speed_increase_pct'] = CCanCrossBeforeRedConfig.speed_increase_pct
+
+                if 'dist_from_xwalk_exit' in s.kwargs:
+                    model_parameters['dist_from_xwalk_exit'] = s.kwargs['dist_from_xwalk_exit']
+                else:
+                    model_parameters['dist_from_xwalk_exit'] = CCanCrossBeforeRedConfig.dist_from_xwalk_exit
 
         for neighbour in s.children:
             if neighbour not in visited:
