@@ -91,10 +91,11 @@ class BehaviorModels(object):
         self.tree.root.tick_once()
 
         display.unicode_symbols = my_str_symbols
-        snapshot_str = display._generate_text_tree(self.tree.root,
-                                                   show_status=True,
-                                                   visited=self.snapshot_visitor.visited,
-                                                   previously_visited=self.snapshot_visitor.visited)
+        snapshot_str = ""
+        # snapshot_str = display._generate_text_tree(self.tree.root,
+        #                                            show_status=True,
+        #                                            visited=self.snapshot_visitor.visited,
+        #                                            previously_visited=self.snapshot_visitor.visited)
         #print (snapshot_str)
         return self.current_mconfig, snapshot_str
 
