@@ -1516,26 +1516,32 @@
   <way id='-1952441' visible='true'>
     <nd ref='-5338765' />
     <nd ref='-5338766' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952442' visible='true'>
     <nd ref='-5338767' />
     <nd ref='-5338768' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952443' visible='true'>
     <nd ref='-5338777' />
     <nd ref='-5338778' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952444' visible='true'>
     <nd ref='-5338779' />
     <nd ref='-5338780' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952445' visible='true'>
     <nd ref='-5338781' />
     <nd ref='-5338782' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952446' visible='true'>
     <nd ref='-5338783' />
     <nd ref='-5338784' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952447' action='modify' visible='true'>
     <nd ref='-5338789' />
@@ -2003,18 +2009,22 @@
   <way id='-1952509' action='modify' visible='true'>
     <nd ref='-5338786' />
     <nd ref='-5338785' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952510' action='modify' visible='true'>
     <nd ref='-5338788' />
     <nd ref='-5338787' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952511' action='modify' visible='true'>
     <nd ref='-5338775' />
     <nd ref='-5338776' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952512' action='modify' visible='true'>
     <nd ref='-5338773' />
     <nd ref='-5338774' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952513' action='modify' visible='true'>
     <nd ref='-5338748' />
@@ -2055,10 +2065,12 @@
   <way id='-1952517' action='modify' visible='true'>
     <nd ref='-5338771' />
     <nd ref='-5338772' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <way id='-1952518' action='modify' visible='true'>
     <nd ref='-5338769' />
     <nd ref='-5338770' />
+    <tag k='type' v='pedestrian_marking' />
   </way>
   <relation id='-5001883' action='modify' visible='true'>
     <member type='way' ref='-1952483' role='stop_line' />
