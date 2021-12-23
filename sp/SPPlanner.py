@@ -247,7 +247,7 @@ class SPPlanner(object):
                                 dist_pos_to_entry = np.linalg.norm(entrance_pt - planning_position)
                                 dist_entry_to_exit = np.linalg.norm(exit_pt - entrance_pt)
                                 if better_can_cross and (dist_pos_to_entry + dist_entry_to_exit - CCanCrossBeforeRedConfig.dist_from_xwalk_exit) \
-                                                        / (self.sp.default_desired_speed * CCanCrossBeforeRedConfig.speed_increase_pct) \
+                                                        / (self.sp.default_desired_speed * (1.0 + CCanCrossBeforeRedConfig.speed_increase_pct)) \
                                                         < crossing_light_ttr:
                                     best_candidate_can_cross = candidate
                                 elif better_must_wait:
