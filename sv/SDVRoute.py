@@ -8,7 +8,7 @@ import numpy as np
 from scipy.interpolate import splprep, splev
 
 from gsc.GSParser import Node
-from mapping.LaneletMap import LaneletMap
+from mapping.LaneletMap import LaneletMap, get_line_format
 import SimConfig
 from util.Transformations import OutsideRefPathException, sim_to_frenet_position
 from util.Utils import distance_2p
@@ -211,8 +211,14 @@ class SDVRoute(object):
             for sdv_path in self._sdv_paths:
                 plt.figure()
                 map_lines = SDVRoute.lanelet_map.get_lines()
-                for line in map_lines:
-                    plt.plot(line[0], line[1], '-', color='black')
+                for xs, ys, type, subtype in data:
+                    line_format = get_line_format(type, subtype)
+                    if line_format is None:
+                        pass
+                    else:
+                        color, linestyle, linewidth = line_format
+                        plt.plot(xs, ys, color=color, linestyle=linestyle,
+                                 linewidth=linewidth, zorder=0)
 
                 for ll in route_lls:
                     l_lanelet_x = []
