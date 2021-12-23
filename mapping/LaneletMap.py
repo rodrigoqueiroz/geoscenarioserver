@@ -536,12 +536,17 @@ class LaneletMap(object):
         for line in lines:
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
+            type = 'virtual' # all unmarked lines are assumed to be virtual
+            try:
+                type = line.attributes["type"]
+            except KeyError:
+                pass
             subtype = None
             try:
                 subtype = line.attributes["subtype"]
             except KeyError:
                 pass
-            data.append((xs, ys, line.attributes["type"], subtype))
+            data.append((xs, ys, type, subtype))
 
         return data
 
