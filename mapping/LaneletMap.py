@@ -8,7 +8,7 @@
 
 import lanelet2
 from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop
-from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
+from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d, inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType, Route
@@ -28,8 +28,6 @@ class LaneletMap(object):
         self.stop_lines = None
         self.stop_signs = None
         self.all_way_stops = None
-        
-
 
     def load_lanelet_map(self, filename, projector):
         self.lanelet_map, errors = lanelet2.io.loadRobust(filename, projector)
@@ -38,12 +36,16 @@ class LaneletMap(object):
         self.projector = projector
 
         # generate routing table
-        traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
-        self.routing_graph = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules)
+        traffic_rules = lanelet2.traffic_rules.create(
+            Locations.Germany, Participants.Vehicle)
+        self.routing_graph = lanelet2.routing.RoutingGraph(
+            self.lanelet_map, traffic_rules)
 
         # generate routing table specifically for pedestrians
-        traffic_rules_pedestrians = lanelet2.traffic_rules.create(Locations.Germany, Participants.Pedestrian)
-        self.routing_graph_pedestrians = lanelet2.routing.RoutingGraph(self.lanelet_map, traffic_rules_pedestrians)
+        traffic_rules_pedestrians = lanelet2.traffic_rules.create(
+            Locations.Germany, Participants.Pedestrian)
+        self.routing_graph_pedestrians = lanelet2.routing.RoutingGraph(
+            self.lanelet_map, traffic_rules_pedestrians)
 
         # Add participant attribute to all lanelets
         for elem in self.lanelet_map.laneletLayer:
@@ -57,7 +59,6 @@ class LaneletMap(object):
                 elem.attributes["one_way"] = "no"
                 elem.attributes["participant:pedestrian"] = "yes"
 
-
     def get_right(self, lanelet):
         return self.routing_graph.right(lanelet)
 
@@ -67,10 +68,10 @@ class LaneletMap(object):
     def get_next(self, lanelet):
         return self.routing_graph.following(lanelet)
 
-    def get_previous(self, lanelet:Lanelet):
+    def get_previous(self, lanelet: Lanelet):
         return self.routing_graph.previous(lanelet)
 
-    def get_right_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+    def get_right_by_route(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
         right = []
@@ -82,7 +83,7 @@ class LaneletMap(object):
 
         return right
 
-    def get_left_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+    def get_left_by_route(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
         left = []
@@ -94,7 +95,7 @@ class LaneletMap(object):
 
         return left
 
-    def get_next_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+    def get_next_by_route(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
         following = []
@@ -105,7 +106,7 @@ class LaneletMap(object):
 
         return following
 
-    def get_previous_by_route(self, lanelet_route:Route, lanelet:Lanelet):
+    def get_previous_by_route(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
         previous = []
@@ -116,7 +117,7 @@ class LaneletMap(object):
 
         return previous
 
-    def route_full_lane(self, lanelet_route:Route, lanelet:Lanelet):
+    def route_full_lane(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: this is a wrapper for lanelet_route.fullLane(lanelet)
         # Currently, if lanelet is on lanelet_route.shortestPath(), then there are
         # cases where lanelet_route.fullLane(lanelet) is not the full lane that
@@ -157,7 +158,8 @@ class LaneletMap(object):
 
     def get_traffic_light_by_name(self, name):
         #filter regulatory elemments for TL only
-        tl_res = list(filter(lambda res: isinstance(res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
+        tl_res = list(filter(lambda res: isinstance(
+            res, TrafficLight), self.lanelet_map.regulatoryElementLayer))
         for tl_re in tl_res:
             #physical lights in the re
             for tl in tl_re.trafficLights:
@@ -167,21 +169,20 @@ class LaneletMap(object):
                     return tl_re
         return None
 
-
     def get_traffic_light_pos(self, id):
         tl = self.lanelet_map.regulatoryElementLayer[id]
         x = 0
         y = 0
         linepoints = []
         if tl:
-            for physical_ligh in tl.trafficLights: #LineString3d
-                x = physical_ligh[0].x #LineString3d node 0
+            for physical_ligh in tl.trafficLights:  # LineString3d
+                x = physical_ligh[0].x  # LineString3d node 0
                 y = physical_ligh[0].y
             line = self.lanelet_map.lineStringLayer[tl.stopLine.id]
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
-            linepoints = [xs,ys]
-        return x,y,linepoints
+            linepoints = [xs, ys]
+        return x, y, linepoints
 
     def get_crosswalks(self):
         return [ll for ll in self.lanelet_map.laneletLayer if ll.attributes["subtype"] == "crosswalk"]
@@ -190,7 +191,7 @@ class LaneletMap(object):
         if self.stop_lines is None:
             self.stop_lines = []
             for ls in self.lanelet_map.lineStringLayer:
-                if  "type" in ls.attributes: 
+                if "type" in ls.attributes:
                     type = ls.attributes["type"]
                     if type == "stop_line":
                         self.stop_lines.append(ls)
@@ -200,19 +201,19 @@ class LaneletMap(object):
         if self.stop_signs is None:
             self.stop_signs = []
             for ls in self.lanelet_map.lineStringLayer:
-                if  "type" in ls.attributes: 
+                if "type" in ls.attributes:
                     if ls.attributes["type"] == "traffic_sign":
                         if ls.attributes["subtype"] == "usR1-1":
-                            self.stop_signs.append( ls[0] ) #first node only
+                            self.stop_signs.append(ls[0])  # first node only
             for node in self.lanelet_map.pointLayer:
-                if  "type" in node.attributes: 
+                if "type" in node.attributes:
                     if node.attributes["type"] == "traffic_sign":
                         if node.attributes["subtype"] == "usR1-1":
                             self.stop_signs.append(node)
-        
+
         return self.stop_signs
 
-    def get_my_ref_line(self, my_ll,yield_lanelets,stop_lines):
+    def get_my_ref_line(self, my_ll, yield_lanelets, stop_lines):
         assert(len(stop_lines) == len(yield_lanelets))
         my_index = None
         for i in range(len(yield_lanelets)):
@@ -221,37 +222,37 @@ class LaneletMap(object):
                 break
         if my_index is not None:
             return stop_lines[i]
-        
-        return None
 
+        return None
 
     def get_all_way_stops(self):
         signs = []
         stop_lines = []
         lanelets = []
         #aws_res = [re for re in self.lanelet_map.regulatoryElementLayer if re.attributes["subtype"] == "all_way_stop"] <-- alternatve using primitives
-        aws_res = list(filter(lambda res: isinstance(res, AllWayStop), self.lanelet_map.regulatoryElementLayer))
+        aws_res = list(filter(lambda res: isinstance(
+            res, AllWayStop), self.lanelet_map.regulatoryElementLayer))
         for aws_re in aws_res:
             #Stop Lines
             #for stop_line in aws_re.parameters["ref_line"]:
             for stop_line in aws_re.stopLines():
                 stop_lines.append(stop_line)
-            
+
             #Stop Signs
             #for stop_sign in aws_re.trafficSigns(): #<--- the trafficSigns() method does not work if the sign exists as Node instead of Way. Using the primitive instead.
             for stop_sign in aws_re.parameters["refers"]:
                 #print(type(stop_sign))
                 if isinstance(stop_sign, ConstPoint3d):
-                    signs.append([stop_sign.x,stop_sign.y])
-                    
+                    signs.append([stop_sign.x, stop_sign.y])
+
                 elif isinstance(stop_sign, ConstLineString3d):
-                    signs.append([stop_sign[0].x,stop_sign[0].y])
-            
+                    signs.append([stop_sign[0].x, stop_sign[0].y])
+
             #Yielding Lanelets
             #for lanelet in aws_re.parameters["yield"]: #<-- No parameter as yield and no python convertion since they are ConstWeakLanelet
             for ll in aws_re.lanelets():
                 lanelets.append(ll)
-        
+
         return signs, stop_lines, lanelets
 
     @staticmethod
@@ -270,7 +271,7 @@ class LaneletMap(object):
             return rightRelation.lanelet
         return None
 
-    def get_route(self, from_lanelet_id:int, to_lanelet_id:int):
+    def get_route(self, from_lanelet_id: int, to_lanelet_id: int):
         from_ll = self.lanelet_map.laneletLayer[from_lanelet_id]
         to_ll = self.lanelet_map.laneletLayer[to_lanelet_id]
         # Route object automatically constructs a sub-laneletmap
@@ -278,7 +279,7 @@ class LaneletMap(object):
         assert route
         return route
 
-    def get_pedestrian_route(self, from_lanelet_id:int, to_lanelet_id:int):
+    def get_pedestrian_route(self, from_lanelet_id: int, to_lanelet_id: int):
         from_ll = self.lanelet_map.laneletLayer[from_lanelet_id]
         to_ll = self.lanelet_map.laneletLayer[to_lanelet_id]
         # Route object automatically constructs a sub-laneletmap
@@ -286,24 +287,25 @@ class LaneletMap(object):
         assert route
         return route
 
-    def get_route_via(self, lanelets:List[Lanelet]):
+    def get_route_via(self, lanelets: List[Lanelet]):
         assert len(lanelets) >= 2
 
         #for i in range(len(lanelets)):
         if len(lanelets) > 2:
-            route = self.routing_graph.getRouteVia(lanelets[0], lanelets[1:-1], lanelets[-1])
+            route = self.routing_graph.getRouteVia(
+                lanelets[0], lanelets[1:-1], lanelets[-1])
         else:
             route = self.routing_graph.getRoute(lanelets[0], lanelets[1])
         assert route
         return route
 
-    def get_shortest_path(self, from_lanelet_id:int, to_lanelet_id:int):
+    def get_shortest_path(self, from_lanelet_id: int, to_lanelet_id: int):
         route = self.get_route(from_lanelet_id, to_lanelet_id)
         shortest_path = route.shortestPath()
         assert(shortest_path)
         return shortest_path
 
-    def get_pedestrian_shortest_path(self, from_lanelet_id:int, to_lanelet_id:int):
+    def get_pedestrian_shortest_path(self, from_lanelet_id: int, to_lanelet_id: int):
         route = self.get_pedestrian_route(from_lanelet_id, to_lanelet_id)
         shortest_path = route.shortestPath()
         assert(shortest_path)
@@ -320,10 +322,11 @@ class LaneletMap(object):
             raise Exception("Lanelet Error: vehicle not part of any lanelet.")
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
-            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            intersecting_lls = list(
+                filter(lambda ll: inside(ll, point), intersecting_lls))
             if len(intersecting_lls) > 1:
                 log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                    (x,y), [ll.id for ll in intersecting_lls]))
+                    (x, y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
         return intersecting_lls[0]
 
@@ -338,15 +341,18 @@ class LaneletMap(object):
 
         if len(intersecting_lls) == 0:
             if participant == "vehicle":
-                raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+                raise Exception(
+                    "Lanelet Error: vehicle not part of any lanelet.")
             else:
                 # case: non-vehicle agent is not on any lanelet
                 return None
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
-            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            intersecting_lls = list(
+                filter(lambda ll: inside(ll, point), intersecting_lls))
             # filter results for lanelets with allowed participants matching participant_tag
-            participant_lls = list(filter(lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
+            participant_lls = list(filter(
+                lambda ll: participant_tag in ll.attributes and ll.attributes[participant_tag] == "yes", intersecting_lls))
 
             # case: agent is on one lanelet where they are the allowed participant
             if len(participant_lls) == 1:
@@ -370,7 +376,6 @@ class LaneletMap(object):
 
         return intersecting_lls[0]
 
-
     def get_spaces_list_occupied_by_pedestrian(self, position):
         spaces_list = {'lanelets': [], 'areas': []}
 
@@ -384,15 +389,18 @@ class LaneletMap(object):
         # filter lanelets
         if len(intersecting_lls) > 0:
             # filter results for lanelets containing the point
-            intersecting_lls = list(filter(lambda ll: inside(ll, point), intersecting_lls))
+            intersecting_lls = list(
+                filter(lambda ll: inside(ll, point), intersecting_lls))
             # filter results for lanelets with allowed participants matching participant_tag
-            pedestrian_lls = list(filter(lambda ll: 'participant:pedestrian' in ll.attributes and ll.attributes['participant:pedestrian'] == "yes", intersecting_lls))
+            pedestrian_lls = list(filter(
+                lambda ll: 'participant:pedestrian' in ll.attributes and ll.attributes['participant:pedestrian'] == "yes", intersecting_lls))
             spaces_list['lanelets'] = pedestrian_lls
 
         # filter areas
         if len(intersecting_areas) > 0:
             # filter results for lanelets containing the point
-            intersecting_areas = list(filter(lambda area: distance(point, area) <= 0.0, intersecting_areas))
+            intersecting_areas = list(
+                filter(lambda area: distance(point, area) <= 0.0, intersecting_areas))
             # note: pedestrians are allowed in all areas so there is no need to filter by participant
             spaces_list['areas'] = intersecting_areas
 
@@ -410,10 +418,11 @@ class LaneletMap(object):
 
         if len(intersecting_areas) > 1:
             # filter results for areas containing the point
-            intersecting_areas = list(filter(lambda area: inside(area, point), intersecting_lls))
+            intersecting_areas = list(
+                filter(lambda area: inside(area, point), intersecting_lls))
             if len(intersecting_areas) > 1:
                 log.warn("Point {} part of more than one area ({}), cannot automatically resolve.".format(
-                    (x,y), [area.id for area in intersecting_areas]))
+                    (x, y), [area.id for area in intersecting_areas]))
                 return intersecting_areas[1]
 
         if len(intersecting_areas) == 0:
@@ -433,7 +442,8 @@ class LaneletMap(object):
 
             @param lanelet_route:   the lanelet2 Route object that ref_path goes through.
         """
-        point_on_path = project(ConstLineString2d(ref_path), BasicPoint2d(x, y))
+        point_on_path = project(
+            ConstLineString2d(ref_path), BasicPoint2d(x, y))
         return self.get_occupying_lanelet_by_route(lanelet_route, point_on_path.x, point_on_path.y)
 
     def get_occupying_lanelet_by_route(self, lanelet_route, x, y):
@@ -453,16 +463,18 @@ class LaneletMap(object):
                 return
 
         for ll in route_submap.laneletLayer:
-                if inside(ll, BasicPoint2d(x, y)):
-                    ret = ll
-                    break
+            if inside(ll, BasicPoint2d(x, y)):
+                ret = ll
+                break
         return ret
 
     def area_and_lanelet_share_node(self, area, lanelet):
         """ Return True if either left or right bounds of the lanelet share a node with the area
         """
-        share_area_node_with_left = any([node in area.outerBound[0] for node in lanelet.leftBound])
-        share_area_node_with_right = any([node in area.outerBound[0] for node in lanelet.rightBound])
+        share_area_node_with_left = any(
+            [node in area.outerBound[0] for node in lanelet.leftBound])
+        share_area_node_with_right = any(
+            [node in area.outerBound[0] for node in lanelet.rightBound])
 
         return share_area_node_with_left or share_area_node_with_right
 
@@ -505,7 +517,8 @@ class LaneletMap(object):
                 path.append(Point3d(0, q.x, q.y, 0.0))
                 path_length += distance(p, q)
 
-                if path_length >= meters_after_end: break
+                if path_length >= meters_after_end:
+                    break
             next_ll = self.get_next(next_ll)
 
         path_ls = ConstLineString3d(0, path)
@@ -516,12 +529,12 @@ class LaneletMap(object):
         if (x_min == x_max == y_min == y_max):
             points = self.lanelet_map.pointLayer
         else:
-            searchBox = BoundingBox2d(BasicPoint2d(x_min, y_min), BasicPoint2d(x_max, y_max))
+            searchBox = BoundingBox2d(BasicPoint2d(
+                x_min, y_min), BasicPoint2d(x_max, y_max))
             points = self.lanelet_map.pointLayer.search(searchBox)
 
         data = np.array([[pt.x for pt in points], [pt.y for pt in points]])
         return data
-
 
     def get_lines(self, x_min=0, y_min=0, x_max=0, y_max=0):
         data = []
@@ -536,7 +549,7 @@ class LaneletMap(object):
         for line in lines:
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
-            type = 'virtual' # all unmarked lines are assumed to be virtual
+            type = 'virtual'  # all unmarked lines are assumed to be virtual
             try:
                 type = line.attributes["type"]
             except KeyError:
@@ -550,7 +563,6 @@ class LaneletMap(object):
 
         return data
 
-
     def plot_all_lanelets(self, x_min=0, y_min=0, x_max=0, y_max=0):
         """ Plots all lanelets within given boundaries.
             Center line is ommited.
@@ -560,7 +572,8 @@ class LaneletMap(object):
         if (x_min == x_max == y_min == y_max):
             lanelets = self.lanelet_map.laneletLayer
         else:
-            searchBox = BoundingBox2d(BasicPoint2d(x_min, y_min), BasicPoint2d(x_max, y_max))
+            searchBox = BoundingBox2d(BasicPoint2d(
+                x_min, y_min), BasicPoint2d(x_max, y_max))
             lanelets = self.lanelet_map.laneletLayer.search(searchBox)
 
         for lanelet in lanelets:
@@ -575,7 +588,7 @@ class LaneletMap(object):
         for ll_id in lanelet_ids:
             LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
 
-    def plot_lanelets(self, lanelets:iter):
+    def plot_lanelets(self, lanelets: iter):
         for ll in lanelets:
             # LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
             LaneletMap.plot_ll(ll)
@@ -588,7 +601,7 @@ class LaneletMap(object):
         for line in lines:
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]
-            data.append([xs,ys])
+            data.append([xs, ys])
 
         return data
 
@@ -606,7 +619,6 @@ class LaneletMap(object):
             [pt.y for pt in lanelet.centerline],
             'go')
 
-
     @staticmethod
     def get_lane_width(lanelet, x, y):
         """ Two ways to do this: project the point onto leftbound and rightbound and add their distances
@@ -614,12 +626,15 @@ class LaneletMap(object):
             Either way the width would be discontinuous as you move along s.
             @param s:   length along the lanelet centerline
         """
-        point_on_centerline = project(ConstLineString2d(lanelet.centerline), BasicPoint2d(x, y))
+        point_on_centerline = project(ConstLineString2d(
+            lanelet.centerline), BasicPoint2d(x, y))
         # project on left and right bounds
-        point_on_leftbound = project(ConstLineString2d(lanelet.leftBound), point_on_centerline)
-        point_on_rightbound = project(ConstLineString2d(lanelet.rightBound), point_on_centerline)
+        point_on_leftbound = project(ConstLineString2d(
+            lanelet.leftBound), point_on_centerline)
+        point_on_rightbound = project(ConstLineString2d(
+            lanelet.rightBound), point_on_centerline)
         return distance(point_on_leftbound, point_on_rightbound)
-        
+
 
 def get_line_format(type: str, subtype: str):
     color = 'red'  # color for unhandled type
@@ -642,6 +657,9 @@ def get_line_format(type: str, subtype: str):
         color = 'darkgray'
         if subtype == 'high':
             linewidth = 2
+    elif type == 'pedestrian_marking':
+        color = 'gray'
+        linestyle = 'solid'
     elif type == "traffic_light":
         return None  # do not draw
     else:
