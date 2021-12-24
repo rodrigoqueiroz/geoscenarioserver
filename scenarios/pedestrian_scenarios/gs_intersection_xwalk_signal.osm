@@ -27,7 +27,7 @@
     <tag k='states' v='G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338059' action='modify' visible='true' lat='43.47820861525' lon='-80.52016079271'>
+  <node id='-5338059' action='modify' visible='true' lat='43.47805590504' lon='-80.5194008981'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>
@@ -63,11 +63,11 @@
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_2' />
   </node>
-  <node id='-5338435' action='modify' visible='true' lat='43.47786911985' lon='-80.51947964166'>
+  <node id='-5338435' action='modify' visible='true' lat='43.47826699228' lon='-80.51988802813'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_3_dest' />
   </node>
-  <node id='-5338436' action='modify' visible='true' lat='43.47797511675' lon='-80.520223518'>
+  <node id='-5338436' action='modify' visible='true' lat='43.4782372006' lon='-80.51945054137'>
     <tag k='btree' v='walk_aggressiveness_level_3.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_3_dest' />
