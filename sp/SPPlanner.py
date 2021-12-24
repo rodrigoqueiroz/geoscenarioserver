@@ -57,13 +57,16 @@ class SPPlanner(object):
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
-        self.intersection_entry_pt = self.get_closest_intersection_point(pedestrian_pos)
+        #self.intersection_entry_pt = self.get_closest_intersection_point(pedestrian_pos)
         self.intersection_exit_pt = self.get_closest_intersection_point(self.sp.destination)
 
-        if np.linalg.norm(pedestrian_pos - self.intersection_entry_pt) < 5:
-            self.plan_local_path(pedestrian_pos, consider_light_states=True)
-        else:
-            self.plan_local_path(pedestrian_pos, consider_light_states=False)
+        self.plan_local_path(pedestrian_pos, consider_light_states=False)
+
+        # TODO: copy this line into Rodrigo's merge
+        if self.sp.target_crosswalk['id'] != -1 and np.linalg.norm(pedestrian_pos - self.sp.target_crosswalk['entry']) < 2:
+            # plan again taking light state into account and using aggressiveness_level from MConfig
+            self.plan_local_path(pedestrian_pos, consider_light_states=True, aggressiveness_level=MConfig.aggressiveness_level)
+
 
     def get_closest_intersection_point(self, pt):
         ''' find exit or entry point of intersection to use as:

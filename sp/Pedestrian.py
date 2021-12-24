@@ -30,7 +30,7 @@ class Pedestrian(Actor):
     EP_TYPE = 3
     SP_TYPE = 4
 
-    PEDESTRIAN_RADIUS = 0.2
+    PEDESTRIAN_RADIUS = 0.25
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, yaw=yaw)
@@ -92,16 +92,31 @@ class SP(Pedestrian):
 
         self.type = Pedestrian.SP_TYPE
 
+        self.SFM_parameters = {
+            'radius': self.radius,
+            'mass': round(random.uniform(50, 80), 2),
+            'desired_speed': 1.5, # random.uniform(0.6, 1.2)
+            'acceleration_time': 0.5,
+            'A': 10, # 1500, # 1500~2000
+            'B': 0.8, # 0.08,
+            'C': 12, # 0~500
+            'D': 0.35, # 0~1
+            'E': 400, # 0~500
+            'F': 0.82, # 0~1
+            'phi': 120,
+            'omega': 240
+        }
+
         self.path = None
         self.waypoints = []
         self.current_waypoint = None
         self.destination = np.array(goal_points[-1])
 
         self.current_lanelet = None
-        self.default_desired_speed = 1.5 # random.uniform(0.6, 1.2)
+        self.default_desired_speed = self.SFM_parameters['desired_speed']
         self.curr_desired_speed = self.default_desired_speed
         self.direction = None
-        self.mass = random.uniform(50,80)
+        self.mass = self.SFM_parameters['mass']
 
         self.maneuver_sequence = []
 
@@ -139,7 +154,8 @@ class SP(Pedestrian):
         This paper explains the calculations and parameters in other_pedestrian_interaction() and border_interaction()
         '''
         desired_vel = self.direction * self.curr_desired_speed
-        accl_time = 0.5 # acceleration time
+        #accl_time = 0.5 # acceleration time
+        accl_time = self.SFM_parameters['acceleration_time']
 
         delta_vel = desired_vel - curr_vel
 
@@ -176,16 +192,20 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
-    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, phi=120000, omega=240000):
+    def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped):
         '''
         Calculates repulsive forces between pedestrians
         '''
-        A = 1500 # 1500~2000
-        B = 0.08
-        C = 12 # 0~500
-        D = 0.35 # 0~1
-        E = 400 # 0~500
-        F = 0.82 # 0~1
+
+        A = self.SFM_parameters['A']
+        B = self.SFM_parameters['B']
+        C = self.SFM_parameters['C']
+        D = self.SFM_parameters['D']
+        E = self.SFM_parameters['E']
+        F = self.SFM_parameters['F']
+
+        phi = self.SFM_parameters['phi']
+        omega = self.SFM_parameters['omega']
 
         other_ped_pos = np.array([other_ped.state.x, other_ped.state.y])
         other_ped_vel = np.array([other_ped.state.x_vel, other_ped.state.y_vel])
@@ -239,20 +259,21 @@ class SP(Pedestrian):
 
         evasive_effect = (C*np.exp((rij-dij)/D)*ref + E*np.exp((rij-dij)/F)*evade_l_r)*(1-same_dest)
 
-        # body compression factor (phi*max(0, rij-dij)*nij)
-        # will be taken into account in high density scenarios
-        body_factor_weight = 1 # phi*max(0, rij-dij)
+        body_factor_weight = phi*max(0, rij-dij)
         friction_factor_weight = omega*max(0, rij-dij)
 
 
-        fij = (A*np.exp((rij-dij)/B) * body_factor_weight)*nij + friction_factor_weight*delta_vij*tij# + evasive_effect
+        fij = (A*np.exp((rij-dij)/B) + body_factor_weight)*nij + friction_factor_weight*delta_vij*tij# + evasive_effect
 
         return fij
 
 
-    def border_interaction(self, curr_pos, vi, border, phi=12000, omega=24000):
-        A = 1500 # 1500~2000
-        B = 0.08
+    def border_interaction(self, curr_pos, vi, border):
+        A = self.SFM_parameters['A']
+        B = self.SFM_parameters['B']
+
+        phi = self.SFM_parameters['phi']
+        omega = self.SFM_parameters['omega']
 
         ri = self.radius
         diW, niW = distance_point_to_border(curr_pos, border)

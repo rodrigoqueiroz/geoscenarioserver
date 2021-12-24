@@ -169,12 +169,3 @@ def plan_return_to_entrance(mconfig:MStopConfig, sp, pedestrian_state:Pedestrian
     direction = normalize(waypoint - pedestrian_pos)
 
     return direction, waypoint, pedestrian_speed['default_desired'] * 2
-
-def plan_increase_walking_speed(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
-    """
-    INCREASE WALKING SPEED MANEUVER
-    """
-    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-    direction = normalize(sp.current_waypoint - pedestrian_pos)
-
-    return direction, sp.current_waypoint, pedestrian_speed['default_desired'] * 2
