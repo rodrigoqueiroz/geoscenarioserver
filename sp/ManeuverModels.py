@@ -69,7 +69,7 @@ def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, pedestrian_state:Ped
 
     direction = normalize(waypoint - pedestrian_pos)
 
-    return direction, waypoint, pedestrian_speed['current_desired']
+    return direction, waypoint, max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])
 
 
 def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):
