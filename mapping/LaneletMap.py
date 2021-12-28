@@ -43,14 +43,16 @@ class LaneletMap(object):
                 log.info(
                     f'Setting circular references for RightOfWay {regelem.id}')
                 for lanelet in regelem.yieldLanelets():
-                    lanelet.addRegulatoryElement(regelem)
-                    log.info(f'Added to lanelet {lanelet.id}')
+                    if regelem not in lanelet.regulatoryElements:
+                        lanelet.addRegulatoryElement(regelem)
+                        log.info(f'Added to lanelet {lanelet.id}')
             if isinstance(regelem, AllWayStop):
                 log.info(
                     f'Setting circular references for AllWayStop {regelem.id}')
                 for lanelet in regelem.lanelets():
-                    lanelet.addRegulatoryElement(regelem)
-                    log.info(f'Added to lanelet {lanelet.id}')
+                    if regelem not in lanelet.regulatoryElements:
+                        lanelet.addRegulatoryElement(regelem)
+                        log.info(f'Added to lanelet {lanelet.id}')
 
         # generate routing table
         traffic_rules = lanelet2.traffic_rules.create(Locations.Germany, Participants.Vehicle)
