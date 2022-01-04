@@ -3,22 +3,22 @@
 #rqueiroz@uwaterloo.ca
 
 from py_trees import *
-import random
 from TickSync import TickSync
 from sv.ManeuverConfig import *
 import sv.ManeuverUtils
 
-#alternative:
 class BCondition(behaviour.Behaviour):
-    def __init__(self, bmodel, name, condition, repeat=True, **kwargs):
+    def __init__(self, behavior_layer, name, label, condition, repeat=True, **kwargs):
         super(BCondition, self).__init__(name)
         self.name = name
         self.condition = condition
-        self.bmodel = bmodel
+        self.behavior_layer = behavior_layer
         self.kwargs = kwargs
         self.repeat = repeat
         self.triggered = False
         self.ts = None
+        self.tree_label = label
+        
 
     def reconfigure(self, condition, args):
         ''' Some situations require that the conditions are updated. 
@@ -34,7 +34,7 @@ class BCondition(behaviour.Behaviour):
     def update(self):
         self.logger.debug("  %s [BCondition::update()]" % self.name)
         status = common.Status.FAILURE
-        #print("BCondition {} {}".format(self.name,self.kwargs))
+        #log.info("BCondition {} {}".format(self.name,self.kwargs))
         try:
             if self.repeat or not self.triggered:
                 #wait condition
@@ -51,7 +51,7 @@ class BCondition(behaviour.Behaviour):
                         print("wait condition timeout {}".format(self.ts.sim_time))
                         status = common.Status.SUCCESS
                 #other conditions
-                elif self.bmodel.test_condition(self.condition, self.kwargs):
+                elif self.behavior_layer.test_condition(self.condition, self.kwargs):
                     #print("SUCCESS")
                     status = common.Status.SUCCESS
                     self.triggered = True
@@ -63,17 +63,17 @@ class BCondition(behaviour.Behaviour):
 
 
 class ManeuverAction(behaviour.Behaviour):
-    def __init__(self, bmodel, name, mconfig, **kwargs):
+    def __init__(self, behavior_layer, name, label, mconfig, **kwargs):
         super(ManeuverAction, self).__init__(name)
         self.name = name
-        self.bmodel = bmodel
+        self.behavior_layer = behavior_layer
         self.mconfig = mconfig
         self.mconfig_cpy = self.mconfig
         self.kwargs = kwargs
-        # self.status = common.Status.SUCCESS
         # Some maneuvers can "finish" (eg. lane change and cutin) while some are indefinite
         # eg. vel keep and follow
         self.maneuver_completed = False
+        self.tree_label = label
 
     def reconfigure(self, new_mconfig):
         ''' Some situations require that the maneuver configurations
@@ -90,8 +90,7 @@ class ManeuverAction(behaviour.Behaviour):
             If the maneuver cannot be performed it returns FAILURE.
         """
         self.logger.debug("  %s [ManeuverAction::update()]" % self.name)
-        #print("MAction {}".format(self.name))
-
+        
         status = common.Status.SUCCESS
 
         #Maneuver specific logic for runtime configuration:
@@ -101,9 +100,9 @@ class ManeuverAction(behaviour.Behaviour):
 
         elif self.mconfig.mkey == Maneuver.M_FOLLOW:
             leading_vehicle = sv.ManeuverUtils.get_leading_vehicle(
-                self.bmodel.planner_state.vehicle_state,
-                self.bmodel.planner_state.lane_config,
-                self.bmodel.planner_state.traffic_vehicles)
+                self.behavior_layer.get_traffic_state().vehicle_state,
+                self.behavior_layer.get_traffic_state().lane_config,
+                self.behavior_layer.get_traffic_state().traffic_vehicles)
             if leading_vehicle is not None:
                 self.mconfig.target_vid = leading_vehicle.id
             else:
@@ -113,9 +112,9 @@ class ManeuverAction(behaviour.Behaviour):
             if self.mconfig.target_vid is None:
                 # find target vehicle in adjacent lane
                 target_vehicle = sv.ManeuverUtils.get_closest_vehicle_in_lane(
-                    self.bmodel.planner_state.vehicle_state,
-                    self.bmodel.planner_state.lane_config.get_neighbour(self.mconfig.target_lid),
-                    self.bmodel.planner_state.traffic_vehicles
+                    self.behavior_layer.get_traffic_state().vehicle_state,
+                    self.behavior_layer.get_traffic_state().lane_config.get_neighbour(self.mconfig.target_lid),
+                    self.behavior_layer.get_traffic_state().traffic_vehicles
                 )
                 if target_vehicle is not None:
                     self.mconfig.target_vid = target_vehicle.id
@@ -124,24 +123,24 @@ class ManeuverAction(behaviour.Behaviour):
 
         elif self.mconfig.mkey == Maneuver.M_LANESWERVE:
             if self.mconfig.target_lid is None:
-                self.mconfig.target_lid = self.bmodel.planner_state.lane_swerve_target
+                self.mconfig.target_lid = self.behavior_layer.get_traffic_state().lane_swerve_target
 
         # Handle completion of lane swerve/cutin maneuver
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed and status is not common.Status.FAILURE:
                 if sv.ManeuverUtils.lane_swerve_or_cutin_completed(
-                        self.bmodel.planner_state.vehicle_state,
-                        self.bmodel.planner_state.lane_config,
+                        self.behavior_layer.get_traffic_state().vehicle_state,
+                        self.behavior_layer.get_traffic_state().lane_config,
                         self.mconfig,
-                        self.bmodel.planner_state.traffic_vehicles):
+                        self.behavior_layer.get_traffic_state().traffic_vehicles):
                     status = common.Status.SUCCESS
-                    self.bmodel.set_ref_path_changed(True)
+                    self.behavior_layer.set_ref_path_changed(True)
                     self.maneuver_completed = True
                 else:
                     status = common.Status.RUNNING
 
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
-            self.bmodel.set_maneuver(self.mconfig)
+            self.behavior_layer.set_maneuver(self.mconfig)
 
         elif self.maneuver_completed:
             self.mconfig = self.mconfig_cpy

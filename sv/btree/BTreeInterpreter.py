@@ -6,7 +6,7 @@ from py_trees import *
 from sv.ManeuverConfig import MVelKeepConfig
 from sv.ManeuverUtils import *
 from sv.btree.BTreeLeaves import *
-
+from sv.btree.BTreeConstants import *
 from antlr4 import *
 from sv.btree.parser.BTreeDSLLexer import BTreeDSLLexer
 from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
@@ -57,7 +57,7 @@ class BTreeInterpreter(object):
         ParseTreeWalker().walk(listener, ast)
         pytree = listener.getTreeStr()
         subtrees = listener.getSubtrees()
-
+        
         return pytree, subtrees
 
     def execute(self, pytree):
@@ -208,7 +208,7 @@ class BTreeListener(BTreeDSLListener):
     def map(self, symbol):
         if symbol == "->" : return "Sequence"
         if symbol == "?"  : return "Selector"
-        if symbol == "||" : return "Parallel"
+        if symbol == "=>" : return "Parallel"
 
         raise RuntimeError("No symbol matched (" + symbol + ")")
 
@@ -247,7 +247,7 @@ class BTreeListener(BTreeDSLListener):
     def exitRootNode(self,ctx):
         node = ctx.node()
         if node.leafNode() != None:
-            raise RuntimeError("The root node must be an operator (e.g. '?', '->', '||').")
+            raise RuntimeError("The root node must be an operator (e.g. '?', '->', '=>').")
         elif node.nodeComposition() != None:
             nodeComp_op = self.map(node.nodeComposition().OPERATOR().getText())
             if node.nodeComposition().name() == None:
@@ -307,7 +307,7 @@ class BTreeListener(BTreeDSLListener):
     def exitManeuver(self, ctx):
         name=ctx.name().getText()
         mconfig = ctx.mconfig().getText()
-        s = name + " = " + "ManeuverAction(parser.bmodel," + "\""+ name + "\""+"," + mconfig + ")"
+        s = name + " = " + "ManeuverAction(parser.bmodel," + "\""+name+"\"" + "," + "\""+mconfig+"\"" + "," + mconfig + ")"
         self.exec_stack.append(s)
         self.nodes += name + ","
 
@@ -315,12 +315,13 @@ class BTreeListener(BTreeDSLListener):
     def exitCondition(self, ctx):
         name = ctx.name().getText()
         cconfig_name = ctx.cconfig().name().getText()
-        s = name + " = " + "BCondition(parser.bmodel," + "\"" + name + "\"" + "," + "\"" + cconfig_name + "\""
         cconfig_params = ""
         if hasattr(ctx.cconfig().params(), '__iter__'):
             for param in ctx.cconfig().params(): cconfig_params += "," + param.getText()
         else:
             cconfig_params = ctx.cconfig().params().getText()
+        label = "(" + cconfig_params + ")" if cconfig_params != "" else ""
+        s = name + " = " + "BCondition(parser.bmodel," + "\""+name+"\"" + "," + "\""+ label +"\"" + "," + "\"" + cconfig_name + "\""
         if cconfig_params != "": s += cconfig_params
         s += ")"
         self.exec_stack.append(s)

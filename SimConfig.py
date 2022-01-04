@@ -40,8 +40,12 @@ SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
 
 #Vehicle trajectory
 VEH_TRAJ_CHART = False      #(!HEAVY, not stable) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
+
 #BTree
 SHOW_BTREE = True           #whether to show the current behaviour tree
+SHOW_MCONFIG = True         #whether to show the last selected maneuver config together with tree
+GENERATE_GRAPH_TREE = True  #whether to generate a behavior tree graph plot inside /log
+
 # trajectory plots
 SHOW_TRAJ = False
 
@@ -50,14 +54,14 @@ COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collisi
 
 #Standard vehicle dimensions
 VEHICLE_RADIUS = 1.0        #vehicle radius
-VEHICLE_LENGTH = 4.0        #vehicle length in [m]
-VEHICLE_WIDTH = 2.0         #vehicle width in [m]
+VEHICLE_LENGTH = 4.5        #vehicle length in [m]
+VEHICLE_WIDTH = 1.8         #vehicle width in [m]
 
 #Planning
 PLANNER_RATE = 3                    #Planner tick rate
 PLANNING_TIME = 0.33                #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
 USE_FIXED_PLANNING_TIME = True      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
-POINTS_PER_METER = 1.0               #The number of points per meter to be used along the vehicle's reference path
+POINTS_PER_METER = 3.0               #The number of points per meter to be used along the vehicle's reference path
                                      #Note that the value that is used may be slightly different
 
 #Debugging and Log
@@ -72,7 +76,12 @@ EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
-CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm])
+CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm], Carla uses [m])
+
+#Carla
+CARLA_COSIMULATION = False
+CARLA_SERVER = 'localhost'
+CARLA_PORT = 2000
 
 #Shared Memory
 WAIT_FOR_CLIENT = False     #Hold Simulation start until a valid state is sent from client
@@ -89,9 +98,7 @@ UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
 
 @dataclass
 class SimConfig:
-    lanelet_routes:Dict = field(default_factory=dict)
     pedestrian_lanelet_routes:Dict = field(default_factory=dict)
-    goal_points:Dict = field(default_factory=dict)
     pedestrian_goal_points:Dict = field(default_factory=dict)
     scenario_name:str = "Unamed scenario"
     map_name:str = "Unknown map"

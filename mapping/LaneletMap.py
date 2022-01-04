@@ -336,7 +336,9 @@ class LaneletMap(object):
         intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
 
         if len(intersecting_lls) == 0:
-            raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+            #raise Exception("Lanelet Error: vehicle not part of any lanelet.")
+            log.error("Lanelet Error: vehicle not part of any lanelet.")
+            return None
         elif len(intersecting_lls) > 1:
             # filter results for lanelets containing the point
             intersecting_lls = list(

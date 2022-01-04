@@ -11,6 +11,9 @@ from SimConfig import *
 import numpy as np
 from Actor import *
 import glog as log
+from sv.SDVTrafficState import TrafficState
+
+
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
     current_lane = None

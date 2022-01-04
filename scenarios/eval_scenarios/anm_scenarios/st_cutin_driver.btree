@@ -1,0 +1,10 @@
+behaviortree cut_in_driver:
+    ?
+        ->
+            condition c_trigger( sim_time(t=4))
+            ->
+                condition c_gap(gap( target_lane=RIGHT, distance=5, pbound = 10) )              ;
+                maneuver m_swerve( MCutInConfig( target_lane=RIGHT, delta_s=(5, -3) ))          ;
+        subtree drive_tree(m_vel_keep=MVelKeepConfig( vel=MP(14.0,10,6) ))                      ;
+
+

@@ -15,7 +15,7 @@
     <tag k='name' v='origin' />
   </node>
   <node id='-101768' action='modify' visible='true' lat='43.46871515959' lon='-80.54003734612'>
-    <tag k='btree' v='st_cut_in_ego.btree' />
+    <tag k='btree' v='st_cut_in_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='cutin_vehicle' />
@@ -29,15 +29,6 @@
   </node>
   <node id='-101770' action='modify' visible='true' lat='43.46842472376' lon='-80.5401873663' />
   <node id='-101771' action='modify' visible='true' lat='43.46808544315' lon='-80.54375551996' />
-  <node id='-111886' action='modify' visible='true' lat='43.46871334639' lon='-80.54009892114'>
-    <tag k='btree' v='drive.btree' />
-    <tag k='btype' v='SDV' />
-    <tag k='gs' v='placeholder' />
-    <tag k='name' v='ego_placeholder' />
-    <tag k='route' v='inner_route' />
-    <tag k='vid' v='2' />
-    <tag k='yaw' v='100' />
-  </node>
   <node id='-111930' action='modify' visible='true' lat='43.46768629647' lon='-80.54060075761' />
   <node id='-111931' action='modify' visible='true' lat='43.46771882217' lon='-80.54361637621' />
   <way id='-101784' action='modify' visible='true'>

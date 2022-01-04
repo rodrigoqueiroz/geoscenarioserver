@@ -65,16 +65,19 @@ class LaneConfig:
             if (self._left_lane.id == l_id):
                 return self._left_lane
         return None
-
+    
     def get_central_d(self):
         return (self.left_bound - self.right_bound)/2 + self.right_bound
+    
+    def get_lane_width(self):
+        return (self.left_bound - self.right_bound)
 
 @dataclass
 class LT:
     '''
     Lateral target configuration for sampling in the lane width space.
     @param target: distance [in meters] from the lane centre ( < 0 is right, > 0 is left)
-    The target value will be used exclusevely if a single sample is used (nsamples=1)
+    The target value will be used exclusevely if a single sample is used (nsamples=1) 
     or as the mean if the sampling method is NORMAL (sigma as standard deviation).
     If nsamples > 1 and sampling is LINEAR or NORMAL, all the available lateral space is used.
     Note that limit_lane_width is important to keep the lateral space within lane boundaries.
@@ -84,25 +87,27 @@ class LT:
     nsamples:int = 1                        #number of sampling points on the lane width for lateral planning
     sampling:int = SamplingMethod.NORMAL    #sampling method
     sigma:float = 1.0                       #std dev for sampling from normal
-    limit_lane_width:bool = True            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
-    limit_vehicle_size:bool = True          #Limit sampling values by vehicle size (within boundaries)
+    #limit_lane_width:bool = True            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
+    #limit_vehicle_size:bool = True          #Limit sampling values by vehicle size (within boundaries)
+    limit_lane_width:int = 1            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
+    limit_vehicle_size:int = 1          #Limit sampling values by vehicle size (within boundaries)
 
     def get_samples(self, lane_config:LaneConfig):
         target = lane_config.get_central_d() + self.target
         if (self.nsamples<=1):
             return tuple([target])
-
-        if self.limit_lane_width:
+        
+        if int(self.limit_lane_width) == 1:     
             up = lane_config.left_bound
             lo = lane_config.right_bound
         else:
             up = lane_config._left_lane.left_bound if lane_config._left_lane else lane_config.left_bound
             lo = lane_config._right_lane.right_bound if lane_config._right_lane else lane_config.right_bound
-
-        vsize = VEHICLE_RADIUS if self.limit_vehicle_size else 0
+        
+        vsize = VEHICLE_RADIUS if self.limit_vehicle_size==1 else 0
         up = up - vsize
         lo = lo + vsize
-
+        
         if (self.sampling== SamplingMethod.LINEAR):
             return linear_samples(self.nsamples,lo,up)
         elif (self.sampling== SamplingMethod.UNIFORM):
@@ -122,15 +127,15 @@ class MP:
     nsamples:int = 1                #number of samples
     sampling:int = SamplingMethod.UNIFORM
     sigma:float = 1                 #std dev for sampling from normal
-
+    
     def get_samples(self):
         if self.nsamples<=1 or self.bound_p==0.0:
             return tuple([self.value])
         lo = self.value - (self.value * self.bound_p / 100)
         up = self.value + (self.value * self.bound_p / 100)
-        if lo < 0:
+        if lo < 0: 
             lo = 0.0
-
+        
         if (self.sampling==SamplingMethod.LINEAR):
             return linear_samples(self.nsamples,lo,up)
         elif (self.sampling==SamplingMethod.UNIFORM):
@@ -165,8 +170,8 @@ class MConfig:
         'total_lat_jerk_cost':      1,
         'total_long_acc_cost':      1,
         'total_lat_acc_cost':       1,
-        'proximity_cost':           10, #10
-
+        'proximity_cost':           10, #10 
+        
     })
 
     #Cost thresholds
@@ -181,12 +186,12 @@ class MConfig:
     max_lat_jerk:float = 10.0               # maximum lateral jerk [m/s/s/s]
     max_long_acc:float = 12.0              # maximum longitudinal acceleration [m/s/s]
     max_lat_acc:float = 4.9               # maximum lateral acceleration [m/s/s]
-
+    
     #Lateral lane target. By default, targets center
     lat_target:LT = LT(0.0,1)
 
-    #Precision defines how feasibility and costs are computed (and how integrals are approximated).
-    #Higher(100) = better precision, but impacts performance.
+    #Precision defines how feasibility and costs are computed (and how integrals are approximated). 
+    #Higher(100) = better precision, but impacts performance. 
     #Use with caution when multiple vehicles are used in simulation
     cost_precision:float = 10             #from 10 to 100.
 
@@ -223,7 +228,6 @@ class MStopConfig(MConfig):
 
     def __post_init__(self):
         self.max_long_acc = 30.0
-
 
 @dataclass
 class MFollowConfig(MConfig):

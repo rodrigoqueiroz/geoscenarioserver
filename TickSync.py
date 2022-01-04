@@ -174,4 +174,4 @@ class TickSync():
             newlog = [label,_delta]
             
         TickSync._last_log = now
-        log.debug(newlog)
+        log.info(newlog)
