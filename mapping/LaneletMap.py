@@ -645,6 +645,9 @@ def get_line_format(type: str, subtype: str):
     if type == 'road_border':
         color = 'black'
         linewidth = 2
+    elif type == 'guard_rail':
+        color = 'purple'
+        linewidth = 2
     elif type == 'virtual':
         color = 'lightgray'
         linestyle = 'dotted'
