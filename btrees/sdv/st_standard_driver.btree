@@ -1,0 +1,9 @@
+behaviortree standard_driver:
+    ?   
+        ->
+            condition c_intersection ( approaching_intersection(distance=40) )
+            subtree handle_intersection()
+        ->
+            subtree drive()
+
+    

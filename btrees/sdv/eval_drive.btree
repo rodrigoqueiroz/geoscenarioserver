@@ -1,6 +1,6 @@
-behaviortree eval_drive:
+behaviortree st_eval_driver:
     ?
         ->
-            condition c_vehicle_ahead( lane_occupied() )
+            condition c_laneocc ( lane_occupied(zid=FRONT, distance=30) )
             maneuver m_follow_lead ( MFollowConfig() )
         maneuver m_vkeeping ( MVelKeepConfig() )
