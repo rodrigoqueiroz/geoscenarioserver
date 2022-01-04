@@ -657,7 +657,7 @@ def get_line_format(type: str, subtype: str):
     elif (type == 'line_thick' or type == 'stop_line' or type == 'stop'):
         color = 'gray'
         linestyle = subtype
-        linewidth = 5
+        linewidth = 3
     elif type == 'curbstone':
         color = 'darkgray'
         if subtype == 'high':
