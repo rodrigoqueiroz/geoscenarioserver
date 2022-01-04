@@ -7,8 +7,8 @@
 # --------------------------------------------
 
 import lanelet2
-from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop, RightOfWay
-from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
+from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop
+from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d, inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType, Route
@@ -34,23 +34,6 @@ class LaneletMap(object):
         assert not errors, log.error(errors)
 
         self.projector = projector
-
-        # Set up circular references from reg elems
-        for regelem in self.lanelet_map.regulatoryElementLayer:
-            if isinstance(regelem, RightOfWay):
-                log.info(
-                    f'Setting circular references for RightOfWay {regelem.id}')
-                for lanelet in regelem.yieldLanelets():
-                    if regelem not in lanelet.regulatoryElements:
-                        lanelet.addRegulatoryElement(regelem)
-                        log.info(f'Added to lanelet {lanelet.id}')
-            if isinstance(regelem, AllWayStop):
-                log.info(
-                    f'Setting circular references for AllWayStop {regelem.id}')
-                for lanelet in regelem.lanelets():
-                    if regelem not in lanelet.regulatoryElements:
-                        lanelet.addRegulatoryElement(regelem)
-                        log.info(f'Added to lanelet {lanelet.id}')
 
         # generate routing table
         traffic_rules = lanelet2.traffic_rules.create(
@@ -662,16 +645,19 @@ def get_line_format(type: str, subtype: str):
     if type == 'road_border':
         color = 'black'
         linewidth = 2
+    elif type == 'guard_rail':
+        color = 'purple'
+        linewidth = 2
     elif type == 'virtual':
         color = 'lightgray'
         linestyle = 'dotted'
     elif type == 'line_thin':
         color = 'gray'
         linestyle = subtype
-    elif type == 'line_thick' or type == 'stop':
+    elif (type == 'line_thick' or type == 'stop_line' or type == 'stop'):
         color = 'gray'
         linestyle = subtype
-        linewidth = 5
+        linewidth = 3
     elif type == 'curbstone':
         color = 'darkgray'
         if subtype == 'high':
