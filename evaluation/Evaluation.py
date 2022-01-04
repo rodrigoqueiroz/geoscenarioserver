@@ -198,6 +198,7 @@ def setup_evaluation_scenario(gsfile, sim_traffic:SimTraffic, sim_config:SimConf
                     sim_traffic.pedestrians[epid].sim_state = ActorSimState.INACTIVE
                     # set desired speed as average walking speed of empirical pedestrian
                     sim_traffic.pedestrians[epid].default_desired_speed = es.avg_walking_speed
+                    sim_traffic.pedestrians[epid].curr_desired_speed = es.avg_walking_speed
 
                     # get model parameters
                     es.model_parameters = get_model_parameters(pedestrian)

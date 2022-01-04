@@ -179,7 +179,7 @@ class SimTraffic(object):
             # if SP pedestrian is at destination, end simulation
             eval_ped_pos = numpy.array([eval_ped.state.x, eval_ped.state.y])
             eval_ped_speed = numpy.linalg.norm([eval_ped.state.x_vel, eval_ped.state.y_vel])
-            if numpy.linalg.norm(eval_ped.destination - eval_ped_pos) < 0.5 and eval_ped_speed < 0.01:
+            if numpy.linalg.norm(eval_ped.destination - eval_ped_pos) < 0.5 and eval_ped_speed < 0.02:
                 return -1
 
         return 0

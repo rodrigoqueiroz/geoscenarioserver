@@ -47,8 +47,8 @@ def get_lanelet_map_lines(video_id, map_location):
         x_max = 20
         y_min = -20
         y_max = 20
-        
-    map_lines = lanelet_map.get_lines(x_min,y_min,x_max,y_max)
+
+    map_lines = lanelet_map.get_lines(x_min, y_min, x_max, y_max)
 
     return map_lines
 
