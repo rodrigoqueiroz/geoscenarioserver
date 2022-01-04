@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
@@ -7,19 +7,21 @@
 # dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
 # --------------------------------------------
 
-from multiprocessing import shared_memory, Lock, Manager, Array
+from multiprocessing import  Manager, Array
 import numpy as np
 import glog as log
 from copy import copy
 import csv
 from shm.SimSharedMemory import *
-from TickSync import TickSync
 from Actor import *
 from sv.Vehicle import Vehicle
 from sp.Pedestrian import *
 from TrafficLight import TrafficLight
-import datetime
 import time
+try:
+    from shm.CarlaSync import *
+except:
+    log.warning("Carla API not found")
 
 
 class SimTraffic(object):
@@ -39,6 +41,7 @@ class SimTraffic(object):
         self.sim_client_shm = None
         self.sim_client_tick_count = 0
         self.cosimulation = False
+        self.carla_sync = None
 
         #Internal ShM
         self.traffic_state_sharr = None
@@ -77,6 +80,11 @@ class SimTraffic(object):
 
 
     def start(self):
+        #Optional CARLA co-sim
+        if CARLA_COSIMULATION:
+            self.carla_sync = CarlaSync()
+            self.carla_sync.create_gs_actors(self.vehicles)
+    
         #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
         self.write_traffic_state(0 , 0.0, 0.0)
@@ -101,6 +109,9 @@ class SimTraffic(object):
                 pedestrian.start_planner()
 
     def stop_all(self):
+        if self.carla_sync:
+            self.carla_sync.quit()
+
         self.write_log_trajectories()
         for vid in self.vehicles:
             self.vehicles[vid].stop()
@@ -142,6 +153,16 @@ class SimTraffic(object):
                 if self.vehicles[vid].type is Vehicle.EV_TYPE and vid in vstates:
                     if new_client_state:
                         self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
+        
+        #Read Carla socket
+        if self.carla_sync:
+            vstates, disabled_vehicles = self.carla_sync.read_carla_state(nv)
+            #Update Remote Dynamic Actors
+            for vid in self.vehicles:
+                #update carla remote agents if new state is available
+                if self.vehicles[vid].type is Vehicle.EV_TYPE and vid in vstates:
+                    self.vehicles[vid].update_sim_state(vstates[vid], delta_time) #client_delta_time
+
 
         #tick vehicles (all types)
         for vid in self.vehicles:
@@ -230,6 +251,11 @@ class SimTraffic(object):
         #Write out simulator state
         if (self.sim_client_shm):
             self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrians)
+        
+        #Carla socket
+        if self.carla_sync:
+            self.carla_sync.write_server_state(tick_count, delta_time, self.vehicles)
+     
 
 
     def detect_collisions(self,tick_count, delta_time, sim_time):

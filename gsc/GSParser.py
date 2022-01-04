@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
@@ -146,6 +146,10 @@ class GSParser(object):
             v = osm_tag.get('v')
 
             node.tags[k] = float(v) if Utils.is_number(v) else v
+
+        #ignore if not a gs element
+        if not ('gs' in node.tags):
+            return True
 
         # if node has a pid or vid, add it to appropriate array in agent_ids
         if any([k in ['vid', 'pid'] for k in node.tags]):

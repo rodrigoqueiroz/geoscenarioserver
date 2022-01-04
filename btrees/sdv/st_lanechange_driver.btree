@@ -1,0 +1,7 @@
+behaviortree st_lanechange:
+    ?
+        ->
+            condition lc( sim_time (repeat=False, tmin=3, tmax=10))   
+            condition c_newtarget (set_target_lane(lid=RIGHT)
+            maneuver m_swerve( MLaneSwerveConfig(target_lid=RIGHT,lat_target=LT(0,4,2,1,1,1) )
+        subtree drive()

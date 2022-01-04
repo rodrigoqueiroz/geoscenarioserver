@@ -1,8 +1,8 @@
 behaviortree st_lateral_demo:
     ?
         ->
-            condition c_goal ( reached_goal( threshold=20 ) )
-            maneuver m_stop_goal ( MStopConfig(target=2) )
+            condition c_goal ( reached_goal( distance=20 ) )
+            maneuver m_stop_goal ( MStopConfig(target= GOAL_POINT) )
         ->
             condition c_a               (sim_time       ( tmin=1, tmax=4 ))
             maneuver m_drive_centre     (MVelKeepConfig ( vel=MP(8), lat_target=LT(0.0) ))

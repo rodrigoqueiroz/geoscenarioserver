@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # --------------------------------------------
 # GEOSCENARIO Micro Maneuver Models for Motion Planning
 # --------------------------------------------
-from sv.SDVPlannerState import PlannerState
+from sv.SDVTrafficState import *
 import numpy as np
 from copy import copy
 import itertools
@@ -42,7 +42,7 @@ def plan_maneuver(vid, mconfig, traffic_state):
     return None, None
     
 
-def plan_velocity_keeping(vid, mconfig:MVelKeepConfig, traffic_state:PlannerState):
+def plan_velocity_keeping(vid, mconfig:MVelKeepConfig, traffic_state:TrafficState):
     """
     VELOCITY KEEPING
     Driving with no vehicle directly ahead
@@ -71,10 +71,14 @@ def plan_velocity_keeping(vid, mconfig:MVelKeepConfig, traffic_state:PlannerStat
                 #add target
                 target_state_set.append((s_target,d_target,t))
 
+    
+
     best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver=quartic_polynomial_solver)
+    #log.info('PLAN VK {} target vel {}'.format(vid,target_vel))
+    #log.info(best)
     return best, candidates 
 
-def plan_reversing(vid, mconfig:MReverseConfig, traffic_state:PlannerState):
+def plan_reversing(vid, mconfig:MReverseConfig, traffic_state:TrafficState):
     """
     REVERSING
     Driving in reverse
@@ -97,7 +101,7 @@ def plan_reversing(vid, mconfig:MReverseConfig, traffic_state:PlannerState):
     best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver=quartic_polynomial_solver)
     return best, candidates 
 
-def plan_following(vid, mconfig:MFollowConfig, traffic_state:PlannerState):
+def plan_following(vid, mconfig:MFollowConfig, traffic_state:TrafficState):
     """
     VEHICLE FOLLOWING
     Moving target point, requiring a certain temporal safety distance to the vehicle ahead (constant time gap law).
@@ -166,7 +170,7 @@ def plan_following(vid, mconfig:MFollowConfig, traffic_state:PlannerState):
     return best, candidates
 
 
-def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:PlannerState):
+def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:TrafficState):
     """
     LANE CHANGE SWERVE
     Swerve maneuver to another lane
@@ -204,7 +208,7 @@ def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:PlannerState):
     best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver=quartic_polynomial_solver)
     return best, candidates 
 
-def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:PlannerState):
+def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:TrafficState):
     """
     CUT-IN LANE SWERVE
     """
@@ -231,7 +235,7 @@ def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:PlannerState):
     for t in mconfig.time.get_samples():
         #main goal is relative to target vehicle predicted final position
         state_relative_to = vehicles[target_id].future_state(t)
-        log.info("cuttee future state at t={}: {:.3f} {:.3f} {:.3f}".format(t, state_relative_to[0], state_relative_to[1], state_relative_to[2]))
+        #log.info("cuttee future state at t={}: {:.3f} {:.3f} {:.3f}".format(t, state_relative_to[0], state_relative_to[1], state_relative_to[2]))
         
         #Bugfix: sampling should be in the delta, not the final S position
         delta_s_pos =        MP(delta[0], delt_s_sampling[0][0], delt_s_sampling[0][1])
@@ -239,7 +243,7 @@ def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:PlannerState):
         delta_s_acc =    MP(delta[2], delt_s_sampling[2][0], delt_s_sampling[1][1])
         
         #+= 2 * VEHICLE_RADIUS
-        state_relative_to[0] += VEHICLE_LENGTH
+        state_relative_to[0] += VEHICLE_LENGTH*2
 
         dts_samples = delta_s_pos.get_samples()
         dts_vel_samples = delta_s_vel.get_samples()
@@ -248,7 +252,7 @@ def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:PlannerState):
         for dts in dts_samples:
             for dts_vel in dts_vel_samples:
                 for dts_acc in dts_acc_samples:
-                    log.info("with delta: {:.3f} {:.3f} {:.3f}".format(dts, dts_vel, dts_acc))
+                    #log.info("with delta: {:.3f} {:.3f} {:.3f}".format(dts, dts_vel, dts_acc))
                     goal_state_relative = np.array(state_relative_to[0:3]) + np.array([dts,dts_vel,dts_acc])
                     s = goal_state_relative[0]
                     s_vel = goal_state_relative[1]
@@ -286,19 +290,25 @@ def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:PlannerState):
     best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver=quintic_polynomial_solver)
     
     #stat
-    #print(best.target_state[0])
+    #if best:
+    #    print(best.target_state)
+    #else:
+    #    causes = []
+    #    for traj in candidates:
+    #        causes.append(traj.unfeasibility_cause)
+    #    print(list(set(causes)))
     #print(best.fs(best.T))
-    a = best.target_state[0]
-    b = vehicles[target_id].future_state(best.T)[0]
-    c = traffic_state.vehicle_state.s #should be zero
-    d = vehicles[target_id].state.s #
-    print ("CTI: v_s{}, tarv_s{}, diff{}, tar_delta{}, tar_s {}, tarv_fut_s {}, diff {}".format(
-            c,      d,      (c-d),      delta,      a,          b,          (a-b-VEHICLE_LENGTH)))
+    #a = best.target_state[0]
+    #b = vehicles[target_id].future_state(best.T)[0]
+    #c = traffic_state.vehicle_state.s #should be zero
+    #d = vehicles[target_id].state.s #
+    #print ("CTI: v_s{}, tarv_s{}, diff{}, tar_delta{}, tar_s {}, tarv_fut_s {}, diff {}".format(
+    #        c,      d,      (c-d),      delta,      a,          b,          (a-b-VEHICLE_LENGTH)))
 
     return best, candidates
 
 
-def plan_stop(vid, mconfig:MStopConfig, traffic_state:PlannerState):
+def plan_stop(vid, mconfig:MStopConfig, traffic_state:TrafficState):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.
@@ -312,13 +322,6 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:PlannerState):
     s_start = vehicle_state.get_S()
     d_start = vehicle_state.get_D()
 
-    #Already stopped?
-    if (abs(s_start[1]) <= 0.05):
-        log.warn('Vehicle already stopped')
-        # (s_coef, d_coef, t)
-        ft = FrenetTrajectory()
-        return ft, None
-
     # Find s position for dynamic target 
     if mconfig.target == MStopConfig.StopTarget.GOAL:
         mconfig.pos = traffic_state.goal_point_frenet[0]
@@ -329,12 +332,22 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:PlannerState):
                 mconfig.pos = re_state.stop_position[0]
                 break
     
-    #log.info('PLAN STOP' + str(mconfig.pos))
-
     #adjust target pos to vehicle length
-    #target_pos = mconfig.pos - VEHICLE_RADIUS -  mconfig.distance
     target_pos = mconfig.pos - VEHICLE_LENGTH/2 - mconfig.distance 
+
+    #Already stopped?
+    if (abs(s_start[1]) <= 0.05):
+        log.warn('Vehicle already stopped')
+        #TODO: Need another stop maneuver (yielding) for proper configuration
+        #if already stopped and not at stopping point, move to it
+        if target_pos > 1:
+            log.info("PLAN STOP: move to adjust target pos {}".format(target_pos))
+            return plan_velocity_keeping(vid, MVelKeepConfig(), traffic_state)
+        ft = FrenetTrajectory()
+        return ft, None
     
+    #log.info('PLAN STOP at pos {} target {}'.format(mconfig.pos, mconfig.target))
+
     #adjust target pos to possible dynamic elements:
     lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
     if lv:
@@ -349,18 +362,22 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:PlannerState):
     target_time = MP(expected_time,40,6) #bound >40% recommended for safely finding a suitable stop time
     
     # within a certain distance generating new trajectory doesn't make sense
-    if abs(target_pos - vehicle_state.s) < 1:
-        log.warn('Vehicle {} stop target position is too close. diff={}'.format(vid,target_pos - vehicle_state.s))
+    if target_pos < 1: 
+        #or abs(target_pos - vehicle_state.s) < 1:
+        log.warn('PLAN STOP Vehicle {} target position {} is too close or behind'.format(vid,target_pos))
         #mconfig.type = MStopConfig.Type.NOW
+        #s_solver = quartic_polynomial_solver
         return None, None
 
     # when vehicle is past the target point, switch to STOP NOW
-    if (target_pos - vehicle_state.s) < 0:
-        log.warn('Vehicle {} stop target position behind. diff={}'.format(vid,target_pos - vehicle_state.s))
-        #mconfig.type = MStopConfig.Type.NOW    
-        s_solver = quartic_polynomial_solver    
-    else:
-        s_solver = quintic_polynomial_solver
+    #if (target_pos - vehicle_state.s) < 0:
+    #    log.warn('Vehicle {} stop target position behind. diff={}'.format(vid,target_pos - vehicle_state.s))
+    #    #mconfig.type = MStopConfig.Type.NOW    
+    #    #s_solver = quartic_polynomial_solver
+    #    return None, None
+    #else:
+
+    s_solver = quintic_polynomial_solver
 
     #targets
     target_state_set = []
@@ -380,7 +397,7 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:PlannerState):
 
 #===TRAJECTORY OPTIMIZATION ===
 
-def optimized_trajectory(vid:int, mconfig:MConfig, traffic_state:PlannerState, target_state_set, s_solver):
+def optimized_trajectory(vid:int, mconfig:MConfig, traffic_state:TrafficState, target_state_set, s_solver):
     """
     Generates and select the best trajectory for the maneuver.
     Returns the resulting trajectory and a list of candidates for debug purposes.
@@ -415,9 +432,9 @@ def optimized_trajectory(vid:int, mconfig:MConfig, traffic_state:PlannerState, t
         maneuver_cost(ft, mconfig, lane_config, vehicles, pedestrians, static_objects)
     
     if len(feasible) == 0:
-        #log.debug("No feasible trajectory to select from state {}".format(start_state))
+        #log.warn("No feasible trajectory to select from state {}".format(start_state))
         #for traj in frenet_trajectories:
-        #    log.debug(traj.unfeasibility_cause)
+        #    log.warn(traj.unfeasibility_cause)
         return None, frenet_trajectories
     
     #select best by total cost

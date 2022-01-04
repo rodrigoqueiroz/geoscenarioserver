@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TRAJECTORY EVALUATION
@@ -428,6 +428,7 @@ def total_acc_cost(x_coef, T, expected_acc_per_sec):
 def direction_cost(frenet_traj:FrenetTrajectory, start_state):
     ''' Rejects trajectories that have a backwards component. '''
     T = frenet_traj.T
+    vel_threshold =  -0.0001 #some trajectories have a small inversion at the beginning
     # if end state is before start state
     if start_state[0] > frenet_traj.fs(T):
         return 1
@@ -435,7 +436,7 @@ def direction_cost(frenet_traj:FrenetTrajectory, start_state):
     dt = float(T) / 100.0
     for i in range(100):
         t = dt * i
-        if frenet_traj.fs_vel(t) < 0:
+        if frenet_traj.fs_vel(t) < vel_threshold:
             return 1
     return 0
 

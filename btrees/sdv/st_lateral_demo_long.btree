@@ -1,0 +1,30 @@
+behaviortree st_lateral_demo_long:
+    ?
+        ->
+            condition c_goal ( reached_goal( threshold=20 ) )
+            maneuver m_stop_goal ( MStopConfig(target=2) )
+        ->
+            condition c_a               (sim_time       ( tmin=1, tmax=4 ))
+            maneuver m_drive_centre     (MVelKeepConfig ( vel=MP(8), lat_target=LT(0.0) ))
+        ->
+            condition c_b               (sim_time       ( tmin=4, tmax=8 ))
+            maneuver m_drive_left       (MVelKeepConfig ( vel=MP(8), lat_target=LT(1.0) ))
+        ->
+            condition c_c               (sim_time       ( tmin=8, tmax=12 ))
+            maneuver m_drive_right      (MVelKeepConfig ( vel=MP(8), lat_target=LT(-1.0) ))
+        ->
+            condition c_d               (sim_time       ( tmin=12, tmax=16 ))
+            maneuver m_uniform          (MVelKeepConfig ( vel=MP(8), lat_target=LT(0.0,4,2) ))
+        ->
+            condition c_e               (sim_time       ( tmin=16, tmax=20 ))
+            maneuver m_lin              (MVelKeepConfig ( vel=MP(8), lat_target=LT(0.0,3,1) ))
+        ->
+            condition c_f               (sim_time       ( tmin=30, tmax=35, repeat = False ))
+            maneuver m_ls_wide          (MLaneSwerveConfig    ( target_lid=-1, lat_target=LT(1.0,3,1) ))
+        ->
+            condition c_g               (sim_time       ( tmin=35, tmax=40, repeat = False ))
+            maneuver m_ls_short         (MLaneSwerveConfig    ( target_lid=1,lat_target=LT(-1.0,3,1) ))
+        ->
+            maneuver m_normal           (MVelKeepConfig       ( vel=MP(8), lat_target=LT(0.0,4,3) ))
+
+

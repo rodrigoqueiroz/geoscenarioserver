@@ -88,7 +88,7 @@
     <tag k='vid' v='6' />
     <tag k='yaw' v='230' />
   </node>
-  <node id='-5149552' action='modify' visible='true' lat='43.47243889765' lon='-80.540710774'>
+  <node id='-5149552' action='modify' visible='true' lat='43.47243059524' lon='-80.54072133443'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
@@ -98,7 +98,7 @@
     <tag k='vid' v='7' />
     <tag k='yaw' v='230' />
   </node>
-  <node id='-5149553' action='modify' visible='true' lat='43.4724984648' lon='-80.54078102984'>
+  <node id='-5149553' action='modify' visible='true' lat='43.47252571568' lon='-80.54084406175'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
@@ -108,7 +108,7 @@
     <tag k='vid' v='8' />
     <tag k='yaw' v='230' />
   </node>
-  <node id='-5149554' action='modify' visible='true' lat='43.47255457084' lon='-80.54086285305'>
+  <node id='-5149554' action='modify' visible='true' lat='43.4725733058' lon='-80.54089671594'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
@@ -188,7 +188,7 @@
     <tag k='vid' v='16' />
     <tag k='yaw' v='230' />
   </node>
-  <node id='-5149562' action='modify' visible='true' lat='43.47300847364' lon='-80.54135467498'>
+  <node id='-5149562' action='modify' visible='true' lat='43.47300701378' lon='-80.5413613805'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
@@ -208,7 +208,7 @@
     <tag k='vid' v='18' />
     <tag k='yaw' v='230' />
   </node>
-  <node id='-5149564' action='modify' visible='true' lat='43.47313619843' lon='-80.54147658928'>
+  <node id='-5149564' action='modify' visible='true' lat='43.47313522519' lon='-80.5414819537'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
