@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@gsd.uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
@@ -645,6 +645,9 @@ def get_line_format(type: str, subtype: str):
     if type == 'road_border':
         color = 'black'
         linewidth = 2
+    elif type == 'guard_rail':
+        color = 'purple'
+        linewidth = 2
     elif type == 'virtual':
         color = 'lightgray'
         linestyle = 'dotted'
@@ -654,7 +657,7 @@ def get_line_format(type: str, subtype: str):
     elif (type == 'line_thick' or type == 'stop_line' or type == 'stop'):
         color = 'gray'
         linestyle = subtype
-        linewidth = 5
+        linewidth = 3
     elif type == 'curbstone':
         color = 'darkgray'
         if subtype == 'high':
