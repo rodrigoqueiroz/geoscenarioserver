@@ -1,13 +1,12 @@
+from Actor import TrajNode
 from math import floor
 from typing import List
-
+import glog as log
 from lanelet2.core import ConstLineString3d, Lanelet, Point3d
 from lanelet2.routing import Route
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy.interpolate import splprep, splev
-
-from gsc.GSParser import Node
 from mapping.LaneletMap import LaneletMap
 import SimConfig
 from util.Transformations import OutsideRefPathException, sim_to_frenet_position
@@ -16,15 +15,21 @@ from util.Utils import distance_2p
 class SDVRoute(object):
     lanelet_map = None
 
-    def __init__(self, lanelet_route:Route, lanelet_map:LaneletMap, start_x:float=None, start_y:float=None, route_nodes:List[Node]=None):
+    def __init__(self, lanelet_map:LaneletMap, start_x:float=None, start_y:float=None, route_nodes:List[TrajNode]=None):
         # NOTE: start_x and start_y should only be None in the case where x and 
         #       y aren't known; e.g., when starting with frenet state
 
         if SDVRoute.lanelet_map is None:
             SDVRoute.lanelet_map = lanelet_map
 
-        self._lanelet_route:Route = lanelet_route
-
+        try:
+            lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]   #a valid lanelet route
+            self._lanelet_route:Route = lanelet_map.get_route_via(lanelets_in_route)
+            self.goal_points = (route_nodes[-1].x, route_nodes[-1].y)
+        except Exception as e:
+            log.error("Failed to initialize route")
+            raise e
+     
         self._sdv_paths:List[SDVPath] = None
         self._current_sdv_path:SDVPath = None
         self._set_sdv_paths()
@@ -32,6 +37,7 @@ class SDVRoute(object):
         # This is True if the vehicle should lane swerve to stay on its route
         self._should_lane_swerve:bool = False
 
+        #if start in frenet
         if (start_x is None) or (start_y is None):
             curr_ll = self._lanelet_route.shortestPath()[0]
             start_x = curr_ll.centerline[0].x
@@ -41,8 +47,10 @@ class SDVRoute(object):
         self._update_should_lane_swerve(start_s, self.get_global_path(), 0)
         self.update_reference_path(start_s)
 
-        self._route_nodes:List[Node] = route_nodes
+        self._route_nodes:List[TrajNode] = route_nodes
         self._update_route_progress(True)
+
+        
 
     def get_global_path(self):
         return self._current_sdv_path.get_global_path()

@@ -1,0 +1,8 @@
+behaviortree st_cutin_ego:
+    ?   
+        ->
+            condition c_gap(gap(lid=RIGHT, distance=2))
+            maneuver m_cutin(MCutInConfig(target_lid=-1, delta_s=(2, 3, 0), time=MP(4,40,6)))
+        maneuver m_vk(MVelKeepConfig(vel=MP(16.0,10,6)))
+
+        
