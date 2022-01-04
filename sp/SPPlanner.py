@@ -15,6 +15,7 @@ from copy import copy
 from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
 from sp.ManeuverConfig import *
+from sp.ConditionConfig import *
 from sp.ManeuverModels import plan_maneuver
 from sp.btree.BehaviorModels import BehaviorModels
 from sp.SPPlannerState import PedestrianPlannerState, TrafficLightState
@@ -45,6 +46,7 @@ class SPPlanner(object):
         self.inverted_path = False
         self.previous_maneuver = None
         self.selected_target_crosswalk = False
+        self.intersection_entry_pt = []
         self.intersection_exit_pt = []
 
 
@@ -53,18 +55,27 @@ class SPPlanner(object):
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-        self.get_intersection_exit_point()
-        pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
-        self.plan_local_path(pedestrian_pos, False)
 
-    def get_intersection_exit_point(self):
-        ''' find exit point of intersection to use as intermediate destination point in planning '''
+        pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
+        self.intersection_entry_pt = self.get_closest_intersection_point(pedestrian_pos)
+        self.intersection_exit_pt = self.get_closest_intersection_point(self.sp.destination)
+
+        if np.linalg.norm(pedestrian_pos - self.intersection_entry_pt) < 5:
+            self.plan_local_path(pedestrian_pos, consider_light_states=True)
+        else:
+            self.plan_local_path(pedestrian_pos, consider_light_states=False)
+
+    def get_closest_intersection_point(self, pt):
+        ''' find exit or entry point of intersection to use as:
+                intermediate destination point in planning (for exit pt) and
+                relative distance to intersection entrance (for entry pt)
+        '''
         xwalk_exit_pts = []
-        spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
+        spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(pt)
 
         ''' check if there is a valid route from each lanelet and area occupied by the destination
-            to each crosswalk. If there is, this crosswalk's exit point is considered in determining
-            the exit point of the intersection for the pedestrian.
+            to each crosswalk. If there is, this crosswalk's entry/exit point is considered in determining
+            the intersection point for the pedestrian.
         '''
         for xwalk in self.sim_traffic.crosswalks:
             found_accessible_xwalk = False
@@ -102,7 +113,7 @@ class SPPlanner(object):
                 # crosswalk is accessible from area if they share a node
                 if self.lanelet_map.area_and_lanelet_share_node(area, xwalk):
                     entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
-                    if np.linalg.norm(exit_pt - self.sp.destination) < np.linalg.norm(entrance_pt - self.sp.destination):
+                    if np.linalg.norm(exit_pt - pt) < np.linalg.norm(entrance_pt - pt):
                         xwalk_exit_pts.append(exit_pt)
                     else:
                         xwalk_exit_pts.append(entrance_pt)
@@ -111,9 +122,9 @@ class SPPlanner(object):
                 area_idx += 1
 
         if len(xwalk_exit_pts) == 0:
-            self.intersection_exit_pt = self.sp.destination
+            return pt
         else:
-            self.intersection_exit_pt = sum(xwalk_exit_pts) / len(xwalk_exit_pts)
+            return sum(xwalk_exit_pts) / len(xwalk_exit_pts)
 
 
     def plan_local_path(self, planning_position, consider_light_states, aggressiveness_level = 1):
@@ -235,7 +246,9 @@ class SPPlanner(object):
                             else:
                                 dist_pos_to_entry = np.linalg.norm(entrance_pt - planning_position)
                                 dist_entry_to_exit = np.linalg.norm(exit_pt - entrance_pt)
-                                if better_can_cross and (dist_pos_to_entry + dist_entry_to_exit) / self.sp.default_desired_speed < crossing_light_ttr:
+                                if better_can_cross and (dist_pos_to_entry + dist_entry_to_exit - CCanCrossBeforeRedConfig.dist_from_xwalk_exit) \
+                                                        / (self.sp.default_desired_speed * (1.0 + CCanCrossBeforeRedConfig.speed_increase_pct)) \
+                                                        < crossing_light_ttr:
                                     best_candidate_can_cross = candidate
                                 elif better_must_wait:
                                     best_candidate_must_wait = candidate
@@ -313,10 +326,11 @@ class SPPlanner(object):
             invert_candidate = False
             if len(spaces_of_dest) == 0:
                 spaces_of_dest = self.lanelet_map.get_spaces_list_occupied_by_pedestrian(self.sp.destination)
-            spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
+            spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets'] + spaces_of_dest['areas']]
 
             # list of lanelets containing both the destination and planning position
             curr_lls_containing_dest = [ll for ll in occupied_spaces['lanelets'] if ll.id in spaces_of_dest_ids]
+            curr_areas_containing_dest = [ll for ll in occupied_spaces['areas'] if ll.id in spaces_of_dest_ids]
 
             if len(curr_lls_containing_dest) > 0:
                 # current lanelet contains the ped's destination
@@ -331,6 +345,8 @@ class SPPlanner(object):
                     selected_ll = selected_ll.invert()
 
                 chosen_path.append(selected_ll)
+            elif len(curr_areas_containing_dest) > 0:
+                chosen_path.append(curr_areas_containing_dest[0])
             else:
                 ''' construct sequence of lanelets from planning position to destination by
                     considering all previous and following lanelets at each step and selecting
@@ -338,38 +354,60 @@ class SPPlanner(object):
                 '''
 
                 # current lanelet does not contain the ped's destination
-                selected_ll = occupied_spaces['lanelets'][0]
-                selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
+                if len(occupied_spaces['lanelets']) > 0:
+                    selected_ll = occupied_spaces['lanelets'][0]
+                    selected_entrance_pt, selected_exit_pt = get_lanelet_entry_exit_points(selected_ll)
 
-                if np.linalg.norm(self.sp.destination - selected_entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
-                    selected_exit_pt = selected_entrance_pt
-                    invert_candidate = True
-
-                for ll in occupied_spaces['lanelets'][1:]:
-                    entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
-
-                    if np.linalg.norm(self.sp.destination - exit_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
-                        selected_exit_pt = exit_pt
-                        selected_ll = ll
-                        invert_candidate = False
-
-                    if np.linalg.norm(self.sp.destination - entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
-                        selected_exit_pt = entrance_pt
-                        selected_ll = ll
+                    if np.linalg.norm(self.sp.destination - selected_entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                        selected_exit_pt = selected_entrance_pt
                         invert_candidate = True
 
-                invert_ll = invert_candidate
+                    for ll in occupied_spaces['lanelets'][1:]:
+                        entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
 
-                if invert_ll:
-                    selected_ll = selected_ll.invert()
+                        if np.linalg.norm(self.sp.destination - exit_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                            selected_exit_pt = exit_pt
+                            selected_ll = ll
+                            invert_candidate = False
 
-                # append first lanelet to chosen_path
-                chosen_path.append(selected_ll)
+                        if np.linalg.norm(self.sp.destination - entrance_pt) < np.linalg.norm(self.sp.destination - selected_exit_pt):
+                            selected_exit_pt = entrance_pt
+                            selected_ll = ll
+                            invert_candidate = True
 
-                previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
-                following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+                    invert_ll = invert_candidate
 
-                next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
+                    if invert_ll:
+                        selected_ll = selected_ll.invert()
+
+                    # append first lanelet to chosen_path
+                    chosen_path.append(selected_ll)
+
+                    previous_lls = self.lanelet_map.routing_graph_pedestrians.previous(selected_ll)
+                    following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
+
+                    next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
+                else:
+                    # pedestrian is currently in an area
+                    selected_area = occupied_spaces['areas'][0]
+
+                    # find lanelet attached to area that brings ped closer to destination
+                    '''
+                    1) loop through nodes in area, check if they belong to ways that are a part of a lanelet
+                        a) if so, check if lanelet either contains dest or brings ped closer
+                    '''
+                    # check if current area and space with destination are connected
+                    for ll in spaces_of_dest['lanelets']:
+                        if self.lanelet_map.area_and_lanelet_share_node(selected_area, ll):
+                            chosen_path.append(selected_area)
+
+                            entrance_pt, exit_pt = get_lanelet_entry_exit_points(ll)
+                            if np.linalg.norm(exit_pt - planning_position) < np.linalg.norm(entrance_pt - planning_position):
+                                ll = ll.invert()
+                                entrance_pt = exit_pt
+                            chosen_path.append(ll)
+                            next_lls_containing_dest = [ll]
+                            break
 
                 # build path of connected previous/following lanelets until lanelet containing destination is next
                 while len(next_lls_containing_dest) == 0:
@@ -405,8 +443,8 @@ class SPPlanner(object):
                     following_lls = self.lanelet_map.routing_graph_pedestrians.following(selected_ll)
                     spaces_of_dest_ids = [ll.id for ll in spaces_of_dest['lanelets']]
                     next_lls_containing_dest = [ll for ll in (previous_lls + following_lls) if ll.id in spaces_of_dest_ids]
-
                 chosen_path.append(next_lls_containing_dest[0])
+
 
         self.sp.path = chosen_path
         self.sp.waypoints = iter(waypoints)
