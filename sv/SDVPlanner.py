@@ -201,7 +201,7 @@ class SVPlanner(object):
                     task_delta_time = self.sync_planner.get_task_time()
 
                 if frenet_traj is None:
-                    log.warn("plan_maneuver return invalid trajectory.")
+                    log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
                     pass
                 else:
                     plan = MotionPlan()
