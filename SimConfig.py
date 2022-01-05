@@ -25,17 +25,17 @@ PLOT_VID = 1               	#vehicle to center the main plot around, if not defi
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
-MPLOT_SIZE = 100			#map plot: road length in meters (shorter=better performance)
+MPLOT_SIZE = 60			#map plot: road length in meters (shorter=better performance)
 #Frenet Map
 SHOW_FFPLOT = True          #whether to show the frenet frame plot
 FFPLOT_ASPECT = False  		#frenet frame plot: keep S and D aspect ratio (same scale)
-FFPLOT_LENGTH = 100			#frenet frame plot: road length (s) in meters
+FFPLOT_LENGTH = 60			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
 #Cartesian
 SHOW_CPLOT = True           #whether to show the cartesian plot
-CPLOT_SIZE = 50			    #cartesian plot: road length in meters (shorter=better performance)
+CPLOT_SIZE = 60			    #cartesian plot: road length in meters (shorter=better performance)
 REFERENCE_PATH = True       #reference path indicating the frenet frame for the vehicle
-SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
+SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape. 
 SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
 
 #Vehicle trajectory
