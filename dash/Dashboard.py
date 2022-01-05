@@ -132,7 +132,8 @@ class Dashboard(object):
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
-            self.map_canvas.draw()
+            if SHOW_MPLOT:
+                self.map_canvas.draw()
             self.window.update()
 
     def quit(self):
@@ -256,8 +257,7 @@ class Dashboard(object):
         plt.gca().xaxis.set_visible(True)
         plt.gca().yaxis.set_visible(True)
         plt.margins(0,0)
-        #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
-        #fig.tight_layout(pad=0.1)
+        plt.subplots_adjust(bottom=0.05,top=0.95,left=0.05,right=0.95,hspace=0,wspace=0)
 
     
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
@@ -660,7 +660,6 @@ class Dashboard(object):
     def create_gui(self):
         #Window
         window = tk.Tk()
-        window.geometry("1600x1000")
 
         # Main containers:
         # title frame
@@ -683,14 +682,15 @@ class Dashboard(object):
         vehicle_frame.grid(row=6, sticky="nsew")
 
         #global sub containers
-        map_frame = tk.Frame(global_frame, width = 600, height = 300, bg = "red") #create
-        map_frame.grid(row=0, column=1, sticky="nsew") #set pos
+        if SHOW_MPLOT:
+            map_frame = tk.Frame(global_frame, width = 600, height = 300, bg = "red") #create
+            map_frame.grid(row=0, column=1, sticky="nsew") #set pos
 
         tab_frame = tk.Frame(global_frame, width = 1000, height = 300, bg = "blue")
         tab_frame.grid(row=0, column=2, sticky="nsew")
 
         #vehicle sub containers
-        cart_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
+        cart_frame = tk.Frame(vehicle_frame if SHOW_MPLOT else global_frame, width = 300, height = 300, bg = "white")
         fren_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
         bt_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
         traj_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
@@ -731,10 +731,11 @@ class Dashboard(object):
         # global container:
 
         # map
-        fig_map = plt.figure(Dashboard.MAP_FIG_ID)
-        #fig_map.set_size_inches(6,6,forward=True)
-        self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
-        self.map_canvas.get_tk_widget().pack()
+        if SHOW_MPLOT:
+            fig_map = plt.figure(Dashboard.MAP_FIG_ID)
+            #fig_map.set_size_inches(6,6,forward=True)
+            self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
+            self.map_canvas.get_tk_widget().pack()
 
         # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
@@ -759,7 +760,8 @@ class Dashboard(object):
 
         # vehicle cart
         fig_cart = plt.figure(Dashboard.CART_FIG_ID)
-        #fig_cart.set_size_inches(6,4,forward=True)
+        if not SHOW_MPLOT:
+            fig_cart.set_size_inches(8, 8, forward=True)
         self.cart_canvas = FigureCanvasTkAgg(fig_cart, cart_frame)
         self.cart_canvas.get_tk_widget().pack()
 
