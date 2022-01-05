@@ -7,7 +7,7 @@
 # --------------------------------------------
 
 import lanelet2
-from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop
+from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop, RightOfWay
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d, inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
 from lanelet2.projection import UtmProjector
