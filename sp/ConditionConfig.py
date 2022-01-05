@@ -19,5 +19,5 @@ class Condition(Enum):
 @dataclass
 class CCanCrossBeforeRedConfig():
     ckey:int = Condition.C_CANCROSSBEFORERED
-    speed_increase_pct:float = 0.5
-    dist_from_xwalk_exit:float = 1.5
+    speed_increase_pct:float = 0.75
+    dist_from_xwalk_exit:float = 3
