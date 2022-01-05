@@ -258,7 +258,8 @@ class SPPlanner(object):
                         elif crossing_light_color == TrafficLightColor.Red:
                             if aggressiveness_level == 3 and exit_to_dest_dist < best_candidate_can_cross['exit_to_dest_dist']:
                                 best_candidate_can_cross = candidate
-                            elif exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist']:
+                            elif exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist'] \
+                                    or best_candidate_must_wait['color'] != TrafficLightColor.Red:
                                 best_candidate_must_wait = candidate
 
                 if best_candidate_can_cross['id'] != -1:
