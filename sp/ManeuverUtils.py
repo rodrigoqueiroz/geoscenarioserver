@@ -162,12 +162,12 @@ def can_cross_before_red(planner_state, **kwargs):
     """
 
     if 'speed_increase_pct' in kwargs:
-        speed_increase_pct = 1.0 + kwargs['speed_increase_pct']
+        speed_increase_pct = kwargs['speed_increase_pct']
     else:
-        speed_increase_pct = 1.0 + CCanCrossBeforeRedConfig.speed_increase_pct
+        speed_increase_pct = CCanCrossBeforeRedConfig.speed_increase_pct
 
     if 'dist_from_xwalk_exit' in kwargs:
-        dist_from_xwalk_exit = kwargs["dist_from_xwalk_exit"]
+        dist_from_xwalk_exit = kwargs['dist_from_xwalk_exit']
     else:
         dist_from_xwalk_exit = CCanCrossBeforeRedConfig.dist_from_xwalk_exit
 
@@ -178,8 +178,22 @@ def can_cross_before_red(planner_state, **kwargs):
     dist_pos_to_entry = np.linalg.norm(crosswalk_entry - pedestrian_pos)
     dist_entry_to_exit = np.linalg.norm(crosswalk_exit - crosswalk_entry)
 
-    crossing_possible = (dist_pos_to_entry + dist_entry_to_exit - dist_from_xwalk_exit) \
-                        / (planner_state.pedestrian_speed["default_desired"] * speed_increase_pct) \
-                        < planner_state.crossing_light_time_to_red
+    # determine max acceptable speed and speed required to fully cross the crosswalk
+    max_speed = planner_state.pedestrian_speed['default_desired'] * (1.0 + speed_increase_pct)
+    speed_to_fully_cross = (dist_pos_to_entry + dist_entry_to_exit) / planner_state.crossing_light_time_to_red
 
-    return crossing_possible
+    # check if the pedestrian can fully cross with an acceptable speed
+    if speed_to_fully_cross <= max_speed:
+        planner_state.pedestrian_speed['current_desired'] = max(planner_state.pedestrian_speed['default_desired'],
+                                                                speed_to_fully_cross)
+        return True
+
+    # check if the pedestrian can sufficiently cross with an acceptable speed
+    speed_to_sufficiently_cross = (dist_pos_to_entry + dist_entry_to_exit - dist_from_xwalk_exit) \
+                                    / planner_state.crossing_light_time_to_red
+    if speed_to_sufficiently_cross <= max_speed:
+        planner_state.pedestrian_speed['current_desired'] = max(planner_state.pedestrian_speed['default_desired'],
+                                                                speed_to_sufficiently_cross)
+        return True
+
+    return False
