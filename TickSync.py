@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TickSync
@@ -174,4 +174,4 @@ class TickSync():
             newlog = [label,_delta]
             
         TickSync._last_log = now
-        log.debug(newlog)
+        log.info(newlog)

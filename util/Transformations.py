@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #d43sharm@uwaterloo.ca
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------

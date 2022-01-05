@@ -1,0 +1,641 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5149528' action='modify' visible='true' lat='43.47342325104' lon='-80.54198358035'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Campus ring road stress test' />
+    <tag k='timeout' v='120' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5149529' action='modify' visible='true' lat='43.47338455184' lon='-80.54197311468'>
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5149530' action='modify' visible='true' lat='43.47267422578' lon='-80.54100610251' />
+  <node id='-5149531' action='modify' visible='true' lat='43.47304614132' lon='-80.54139631311' />
+  <node id='-5149532' action='modify' visible='true' lat='43.47397034069' lon='-80.5421865224' />
+  <node id='-5149533' action='modify' visible='true' lat='43.47443424098' lon='-80.54249778331' />
+  <node id='-5149534' action='modify' visible='true' lat='43.47268272607' lon='-80.54813411343' />
+  <node id='-5149535' action='modify' visible='true' lat='43.46645306025' lon='-80.54133395123' />
+  <node id='-5149536' action='modify' visible='true' lat='43.46854916542' lon='-80.54011130815' />
+  <node id='-5149537' action='modify' visible='true' lat='43.47047751797' lon='-80.53844581797' />
+  <node id='-5149538' action='modify' visible='true' lat='43.47174229558' lon='-80.53978963051' />
+  <node id='-5149544' action='modify' visible='true' lat='43.47174074863' lon='-80.54496647' />
+  <node id='-5149545' action='modify' visible='true' lat='43.47226544327' lon='-80.54052588386' />
+  <node id='-5149546' action='modify' visible='true' lat='43.47209979661' lon='-80.5402980923'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='5,0,0,0,0,0' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149547' action='modify' visible='true' lat='43.47213503281' lon='-80.54035493709'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='20,0,0,0,0,0' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149548' action='modify' visible='true' lat='43.47218529968' lon='-80.54042737257'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='30,0,0,0,0,0' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149549' action='modify' visible='true' lat='43.47222244635' lon='-80.54046964859'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='40,0,0,0,0,0' />
+    <tag k='vid' v='4' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149550' action='modify' visible='true' lat='43.47225630737' lon='-80.5405163025'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='50,0,0,0,0,0' />
+    <tag k='vid' v='5' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149551' action='modify' visible='true' lat='43.47230649077' lon='-80.54057748417'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='60,0,0,0,0,0' />
+    <tag k='vid' v='6' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149552' action='modify' visible='true' lat='43.47234981569' lon='-80.54064220926'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='70,0,0,0,0,0' />
+    <tag k='vid' v='7' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149553' action='modify' visible='true' lat='43.47252571568' lon='-80.54084406175'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='80,0,0,0,0,0' />
+    <tag k='vid' v='8' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149554' action='modify' visible='true' lat='43.4725733058' lon='-80.54089671594'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='90,0,0,0,0,0' />
+    <tag k='vid' v='9' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149555' action='modify' visible='true' lat='43.47261215541' lon='-80.54093865668'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='100,0,0,0,0,0' />
+    <tag k='vid' v='10' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149556' action='modify' visible='true' lat='43.47267959311' lon='-80.54101816765'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='110,0,0,0,0,0' />
+    <tag k='vid' v='11' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149557' action='modify' visible='true' lat='43.47274459937' lon='-80.54108855947'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='120,0,0,0,0,0' />
+    <tag k='vid' v='12' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149558' action='modify' visible='true' lat='43.47281132746' lon='-80.54116114053'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='130,0,0,0,0,0' />
+    <tag k='vid' v='13' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149559' action='modify' visible='true' lat='43.47287317338' lon='-80.5412166463'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='140,0,0,0,0,0' />
+    <tag k='vid' v='14' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149560' action='modify' visible='true' lat='43.47293322673' lon='-80.54128086717'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='150,0,0,0,0,0' />
+    <tag k='vid' v='15' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149561' action='modify' visible='true' lat='43.47297084084' lon='-80.54131575172'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='160,0,0,0,0,0' />
+    <tag k='vid' v='16' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149562' action='modify' visible='true' lat='43.47300701378' lon='-80.5413613805'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='170,0,0,0,0,0' />
+    <tag k='vid' v='17' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149563' action='modify' visible='true' lat='43.47309245592' lon='-80.54143552705'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='180,0,0,0,0,0' />
+    <tag k='vid' v='18' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149564' action='modify' visible='true' lat='43.47313522519' lon='-80.5414819537'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='190,0,0,0,0,0' />
+    <tag k='vid' v='19' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149565' action='modify' visible='true' lat='43.47317262941' lon='-80.54150361865'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='200,0,0,0,0,0' />
+    <tag k='vid' v='20' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149566' action='modify' visible='true' lat='43.4732069234' lon='-80.54153670306'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='210,0,0,0,0,0' />
+    <tag k='vid' v='21' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149567' action='modify' visible='true' lat='43.47324069911' lon='-80.54156538466'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='220,0,0,0,0,0' />
+    <tag k='vid' v='22' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149568' action='modify' visible='true' lat='43.47327296024' lon='-80.54159423425'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='230,0,0,0,0,0' />
+    <tag k='vid' v='23' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149569' action='modify' visible='true' lat='43.47330864639' lon='-80.54162309922'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='240,0,0,0,0,0' />
+    <tag k='vid' v='24' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149570' action='modify' visible='true' lat='43.47333861388' lon='-80.54165634208'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='250,0,0,0,0,0' />
+    <tag k='vid' v='25' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149571' action='modify' visible='true' lat='43.47336884513' lon='-80.54168399614'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle3' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='260,0,0,0,0,0' />
+    <tag k='vid' v='26' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149572' action='modify' visible='true' lat='43.47339906048' lon='-80.54170865651'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='270,0,0,0,0,0' />
+    <tag k='vid' v='27' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149573' action='modify' visible='true' lat='43.47343137622' lon='-80.54173800866'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='280,0,0,0,0,0' />
+    <tag k='vid' v='28' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149574' action='modify' visible='true' lat='43.47346217742' lon='-80.54177088156'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle2' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='290,0,0,0,0,0' />
+    <tag k='vid' v='29' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149575' action='modify' visible='true' lat='43.47349056423' lon='-80.54179773487'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='300,0,0,0,0,0' />
+    <tag k='vid' v='30' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149587' action='modify' visible='true' lat='43.47377322604' lon='-80.54204537553'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='340,0,0,0,0,0' />
+    <tag k='vid' v='34' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149588' action='modify' visible='true' lat='43.473742425' lon='-80.54201250263'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='330,0,0,0,0,0' />
+    <tag k='vid' v='33' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149589' action='modify' visible='true' lat='43.47371010943' lon='-80.54198315048'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='320,0,0,0,0,0' />
+    <tag k='vid' v='32' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149590' action='modify' visible='true' lat='43.47367989423' lon='-80.54195849011'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='310,0,0,0,0,0' />
+    <tag k='vid' v='31' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149591' action='modify' visible='true' lat='43.47380161271' lon='-80.54207222884'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='350,0,0,0,0,0' />
+    <tag k='vid' v='35' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149615' action='modify' visible='true' lat='43.47394889295' lon='-80.54217747433'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='390,0,0,0,0,0' />
+    <tag k='vid' v='39' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149616' action='modify' visible='true' lat='43.47397727954' lon='-80.54220432764'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='400,0,0,0,0,0' />
+    <tag k='vid' v='40' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149617' action='modify' visible='true' lat='43.4738550748' lon='-80.54209595332'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='360,0,0,0,0,0' />
+    <tag k='vid' v='36' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149618' action='modify' visible='true' lat='43.47388577652' lon='-80.54211524928'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='370,0,0,0,0,0' />
+    <tag k='vid' v='37' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149619' action='modify' visible='true' lat='43.473918092' lon='-80.54214460143'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='380,0,0,0,0,0' />
+    <tag k='vid' v='38' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149661' action='modify' visible='true' lat='43.47415643375' lon='-80.54231795703'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='440,0,0,0,0,0' />
+    <tag k='vid' v='44' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149662' action='modify' visible='true' lat='43.4743950351' lon='-80.54245947478'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='500,0,0,0,0,0' />
+    <tag k='vid' v='50' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149663' action='modify' visible='true' lat='43.47419747208' lon='-80.54234413979'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='450,0,0,0,0,0' />
+    <tag k='vid' v='45' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149664' action='modify' visible='true' lat='43.47432270956' lon='-80.542424559'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='480,0,0,0,0,0' />
+    <tag k='vid' v='48' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149665' action='modify' visible='true' lat='43.47436080942' lon='-80.54243530368'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='490,0,0,0,0,0' />
+    <tag k='vid' v='49' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149666' action='modify' visible='true' lat='43.47405531677' lon='-80.54223710658'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='410,0,0,0,0,0' />
+    <tag k='vid' v='41' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149667' action='modify' visible='true' lat='43.47427968891' lon='-80.54239721851'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='470,0,0,0,0,0' />
+    <tag k='vid' v='47' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149668' action='modify' visible='true' lat='43.47408553177' lon='-80.54226176695'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='420,0,0,0,0,0' />
+    <tag k='vid' v='42' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149669' action='modify' visible='true' lat='43.47424120165' lon='-80.54236920538'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='460,0,0,0,0,0' />
+    <tag k='vid' v='46' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5149670' action='modify' visible='true' lat='43.4743447882' lon='-80.54243496402' />
+  <node id='-5149671' action='modify' visible='true' lat='43.47411784715' lon='-80.5422911191'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='campus_vehicle4' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='430,0,0,0,0,0' />
+    <tag k='vid' v='43' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152952' action='modify' visible='true' lat='43.47469799893' lon='-80.5427196214'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='57' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='570,0,0,0,0,0' />
+    <tag k='vid' v='57' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152953' action='modify' visible='true' lat='43.47462983239' lon='-80.54263134124'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='55' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='550,0,0,0,0,0' />
+    <tag k='vid' v='55' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152954' action='modify' visible='true' lat='43.47455020803' lon='-80.54257832055'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='53' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='530,0,0,0,0,0' />
+    <tag k='vid' v='53' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152955' action='modify' visible='true' lat='43.47451789288' lon='-80.5425489684'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='52' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='520,0,0,0,0,0' />
+    <tag k='vid' v='52' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152956' action='modify' visible='true' lat='43.47472696958' lon='-80.54277688311'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='58' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='580,0,0,0,0,0' />
+    <tag k='vid' v='58' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152957' action='modify' visible='true' lat='43.47477273265' lon='-80.54282282923'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='59' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='590,0,0,0,0,0' />
+    <tag k='vid' v='59' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152958' action='modify' visible='true' lat='43.47458879435' lon='-80.54260515848'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='54' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='540,0,0,0,0,0' />
+    <tag k='vid' v='54' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152959' action='modify' visible='true' lat='43.47466589817' lon='-80.54268280791'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='56' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='560,0,0,0,0,0' />
+    <tag k='vid' v='56' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152960' action='modify' visible='true' lat='43.4744876781' lon='-80.54252430803'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='51' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='510,0,0,0,0,0' />
+    <tag k='vid' v='51' />
+    <tag k='yaw' v='230' />
+  </node>
+  <node id='-5152961' action='modify' visible='true' lat='43.47480568086' lon='-80.54288572191'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='60' />
+    <tag k='route' v='north_route' />
+    <tag k='start_frenet' v='600,0,0,0,0,0' />
+    <tag k='vid' v='60' />
+    <tag k='yaw' v='230' />
+  </node>
+  <way id='-1950102' action='modify' visible='true'>
+    <nd ref='-5149545' />
+    <nd ref='-5149530' />
+    <nd ref='-5149531' />
+    <nd ref='-5149532' />
+    <nd ref='-5149533' />
+    <nd ref='-5149534' />
+    <nd ref='-5149535' />
+    <nd ref='-5149536' />
+    <nd ref='-5149537' />
+    <nd ref='-5149538' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+</osm>

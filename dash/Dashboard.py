@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@gsd.uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
@@ -20,11 +20,12 @@ import glog as log
 from SimTraffic import *
 from SimConfig import *
 from util.Utils import *
-import sv.SDVPlannerState
+import sv.SDVTrafficState
 from sv.Vehicle import *
 from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
+from mapping.LaneletMap import get_line_format
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -264,8 +265,14 @@ class Dashboard(object):
         #road lines:
         #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
         data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
-        for line in data:
-            plt.plot(line[0], line[1], color = '#cccccc',zorder=0)
+        for xs, ys, type, subtype in data:
+            line_format = get_line_format(type, subtype)
+            if line_format is None:
+                pass
+            else:
+                color, linestyle, linewidth = line_format
+                plt.plot(xs, ys, color=color, linestyle=linestyle,
+                         linewidth=linewidth, zorder=0)
 
         #pedestrian marking
 
@@ -414,16 +421,16 @@ class Dashboard(object):
 
         #re
         for re in regulatory_elements:
-            if isinstance(re, sv.SDVPlannerState.TrafficLightState):
+            if isinstance(re, sv.SDVTrafficState.TrafficLightState):
                 colorcode,_ = self.get_color_by_type('trafficlight',re.color)
                 x, y = re.stop_position
                 plt.axvline(x, color= colorcode, linestyle='-', zorder=1)
-            elif isinstance(re, sv.SDVPlannerState.RightOfWayState):
+            elif isinstance(re, sv.SDVTrafficState.RightOfWayState):
                 pass
                 #for ll_id in re.row_lanelets:
                     #colorfillcode = 'r' if re.row_lanelets[ll_id] > 0 else 'g'
                     #ll = self.lanelet_map.laneletLayer[ll_id]
-            elif isinstance(re, sv.SDVPlannerState.AllWayStopState):
+            elif isinstance(re, sv.SDVTrafficState.AllWayStopState):
                 pass
 
         #other vehicles, from main vehicle POV:
