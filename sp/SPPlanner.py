@@ -46,7 +46,6 @@ class SPPlanner(object):
         self.inverted_path = False
         self.previous_maneuver = None
         self.selected_target_crosswalk = False
-        self.intersection_entry_pt = []
         self.intersection_exit_pt = []
 
 
@@ -57,13 +56,14 @@ class SPPlanner(object):
         self.behavior_model = BehaviorModels(self.pid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         pedestrian_pos = np.array([self.sp.state.x, self.sp.state.y])
-        self.intersection_entry_pt = self.get_closest_intersection_point(pedestrian_pos)
         self.intersection_exit_pt = self.get_closest_intersection_point(self.sp.destination)
 
-        if np.linalg.norm(pedestrian_pos - self.intersection_entry_pt) < 5:
-            self.plan_local_path(pedestrian_pos, consider_light_states=True)
-        else:
-            self.plan_local_path(pedestrian_pos, consider_light_states=False)
+        self.plan_local_path(pedestrian_pos, consider_light_states=False)
+
+        if self.sp.target_crosswalk['id'] != -1 and np.linalg.norm(pedestrian_pos - self.sp.target_crosswalk['entry']) < 2:
+            # plan again taking light state into account and using aggressiveness_level from MConfig
+            self.plan_local_path(pedestrian_pos, consider_light_states=True, aggressiveness_level=MConfig.aggressiveness_level)
+
 
     def get_closest_intersection_point(self, pt):
         ''' find exit or entry point of intersection to use as:
@@ -233,8 +233,14 @@ class SPPlanner(object):
 
                         elif crossing_light_color == TrafficLightColor.Yellow:
                             all_red_lights = False
-                            better_can_cross = exit_to_dest_dist < best_candidate_can_cross['exit_to_dest_dist']
-                            better_must_wait = exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist']
+                            dist_pos_to_entry = np.linalg.norm(entrance_pt - planning_position)
+                            dist_entry_to_exit = np.linalg.norm(exit_pt - entrance_pt)
+                            better_can_cross = exit_to_dest_dist < best_candidate_can_cross['exit_to_dest_dist'] \
+                                                and (dist_pos_to_entry + dist_entry_to_exit - CCanCrossBeforeRedConfig.dist_from_xwalk_exit) \
+                                                    / (self.sp.default_desired_speed * (1.0 + CCanCrossBeforeRedConfig.speed_increase_pct)) \
+                                                    < crossing_light_ttr
+                            better_must_wait = exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist'] \
+                                                and best_candidate_must_wait['color'] != TrafficLightColor.Red
 
                             if aggressiveness_level == 1:
                                 if better_must_wait:
@@ -244,11 +250,7 @@ class SPPlanner(object):
                                 if better_can_cross:
                                     best_candidate_can_cross = candidate
                             else:
-                                dist_pos_to_entry = np.linalg.norm(entrance_pt - planning_position)
-                                dist_entry_to_exit = np.linalg.norm(exit_pt - entrance_pt)
-                                if better_can_cross and (dist_pos_to_entry + dist_entry_to_exit - CCanCrossBeforeRedConfig.dist_from_xwalk_exit) \
-                                                        / (self.sp.default_desired_speed * (1.0 + CCanCrossBeforeRedConfig.speed_increase_pct)) \
-                                                        < crossing_light_ttr:
+                                if better_can_cross:
                                     best_candidate_can_cross = candidate
                                 elif better_must_wait:
                                     best_candidate_must_wait = candidate
@@ -256,7 +258,8 @@ class SPPlanner(object):
                         elif crossing_light_color == TrafficLightColor.Red:
                             if aggressiveness_level == 3 and exit_to_dest_dist < best_candidate_can_cross['exit_to_dest_dist']:
                                 best_candidate_can_cross = candidate
-                            elif exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist']:
+                            elif exit_to_dest_dist < best_candidate_must_wait['exit_to_dest_dist'] \
+                                    or best_candidate_must_wait['color'] != TrafficLightColor.Red:
                                 best_candidate_must_wait = candidate
 
                 if best_candidate_can_cross['id'] != -1:
