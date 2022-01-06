@@ -16,7 +16,7 @@
   </node>
   <node id='-5009670' action='modify' visible='true' lat='43.43528472732' lon='-80.57990521852' />
   <node id='-5009671' action='modify' visible='true' lat='43.43526860371' lon='-80.58015765097'>
-    <tag k='btree' v='standard_driver.btree' />
+    <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
@@ -27,7 +27,7 @@
     <tag k='yaw' v='310' />
   </node>
   <node id='-5009672' action='modify' visible='true' lat='43.43589206171' lon='-80.57976166653'>
-    <tag k='btree' v='standard_driver.btree' />
+    <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
