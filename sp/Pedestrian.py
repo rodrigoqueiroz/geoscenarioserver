@@ -266,14 +266,16 @@ class SP(Pedestrian):
         B = 0.08
         lambda_i = 0.5
 
-        l = 2.5
-        w = 1
+        l = VEHICLE_LENGTH / 2
+        w = VEHICLE_WIDTH / 2
+
         veh_pos = np.array([vehicle.state.x, vehicle.state.y])
-        veh_vel = np.array([vehicle.state.x_vel, vehicle.state.y_vel]) #TODO: use yaw information instead of velocity direction
+        veh_yaw_rad = np.radians(vehicle.state.yaw)
+        veh_heading = np.array([np.cos(veh_yaw_rad), np.sin(veh_yaw_rad)])
 
         # angle btw ped's position and vehicle's velocity vector
-        dot_product = max(min(np.dot(curr_pos-veh_pos, veh_vel), 1.0), -1.0) # stay within [-1,1] domain for arccos
-        theta = np.arccos(dot_product) / (normalize(curr_pos-veh_pos)*normalize(veh_vel))
+        dot_product = max(min(np.dot(curr_pos-veh_pos, veh_heading), 1.0), -1.0) # stay within [-1,1] domain for arccos
+        theta = np.arccos(dot_product) / (np.linalg.norm(curr_pos-veh_pos)*np.linalg.norm(veh_heading))
         epsilon = np.sqrt(l**2 - w**2) / l
 
         ri = self.radius
