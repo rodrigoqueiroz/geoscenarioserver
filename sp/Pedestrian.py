@@ -261,8 +261,8 @@ class SP(Pedestrian):
 
         return fiW
 
-    def vehicle_interaction(self, curr_pos, curr_vel, vehicle, phi=12000, omega=24000):
-        A = 1500 # 1500~2000
+    def vehicle_interaction(self, curr_pos, curr_vel, vehicle):
+        A = 100
         B = 0.08
         lambda_i = 0.5
 
