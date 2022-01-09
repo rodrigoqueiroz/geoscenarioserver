@@ -12,19 +12,20 @@ from Actor import *
 import glog as log
 from SimTraffic import *
 from sp.ManeuverConfig import *
+from sp.ConditionConfig import *
 from SimConfig import *
 from mapping.LaneletMap import LaneletMap
 from util.Transformations import normalize
 from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation, point_in_rectangle
 
 
-def has_reached_point(pedestrian_state, point, threshold=1.5):
+def has_reached_point(pedestrian_state, point, **kwargs):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
         @param threshold: Max acceptable distance to point
     """
+    threshold = kwargs["threshold"]
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
-
     return np.linalg.norm(np.asarray(point) - pedestrian_pos) < threshold
 
 
@@ -139,11 +140,11 @@ def has_line_of_sight_to_point(position, point, lanelet):
     return True
 
 
-def approaching_crosswalk(planner_state):
+def approaching_crosswalk(planner_state, **kwargs):
     if planner_state.target_crosswalk["id"] == -1:
         return False
 
-    threshold_dist = 8
+    threshold = kwargs["threshold"]
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
 
     if not planner_state.lanelet_map.inside_lanelet_or_area(pedestrian_pos, planner_state.current_lanelet):
@@ -152,13 +153,24 @@ def approaching_crosswalk(planner_state):
     crosswalk_entry = planner_state.target_crosswalk["entry"]
     dist_to_crosswalk_entrance = np.linalg.norm(crosswalk_entry - pedestrian_pos)
 
-    return dist_to_crosswalk_entrance < threshold_dist
+    return dist_to_crosswalk_entrance < threshold
 
 
-def can_cross_before_red(planner_state):
+def can_cross_before_red(planner_state, **kwargs):
     """
     return ((distance to entry) + (distance from entry to exit)) / (default desired speed) < (time to red)
     """
+
+    if 'speed_increase_pct' in kwargs:
+        speed_increase_pct = kwargs['speed_increase_pct']
+    else:
+        speed_increase_pct = CCanCrossBeforeRedConfig.speed_increase_pct
+
+    if 'dist_from_xwalk_exit' in kwargs:
+        dist_from_xwalk_exit = kwargs['dist_from_xwalk_exit']
+    else:
+        dist_from_xwalk_exit = CCanCrossBeforeRedConfig.dist_from_xwalk_exit
+
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
     crosswalk_entry = planner_state.target_crosswalk["entry"]
     crosswalk_exit = planner_state.target_crosswalk["exit"]
@@ -166,6 +178,22 @@ def can_cross_before_red(planner_state):
     dist_pos_to_entry = np.linalg.norm(crosswalk_entry - pedestrian_pos)
     dist_entry_to_exit = np.linalg.norm(crosswalk_exit - crosswalk_entry)
 
-    crossing_possible = (dist_pos_to_entry + dist_entry_to_exit) / planner_state.pedestrian_speed["default_desired"] < planner_state.crossing_light_time_to_red
+    # determine max acceptable speed and speed required to fully cross the crosswalk
+    max_speed = planner_state.pedestrian_speed['default_desired'] * (1.0 + speed_increase_pct)
+    speed_to_fully_cross = (dist_pos_to_entry + dist_entry_to_exit) / planner_state.crossing_light_time_to_red
 
-    return crossing_possible
+    # check if the pedestrian can fully cross with an acceptable speed
+    if speed_to_fully_cross <= max_speed:
+        planner_state.pedestrian_speed['current_desired'] = max(planner_state.pedestrian_speed['default_desired'],
+                                                                speed_to_fully_cross)
+        return True
+
+    # check if the pedestrian can sufficiently cross with an acceptable speed
+    speed_to_sufficiently_cross = (dist_pos_to_entry + dist_entry_to_exit - dist_from_xwalk_exit) \
+                                    / planner_state.crossing_light_time_to_red
+    if speed_to_sufficiently_cross <= max_speed:
+        planner_state.pedestrian_speed['current_desired'] = max(planner_state.pedestrian_speed['default_desired'],
+                                                                speed_to_sufficiently_cross)
+        return True
+
+    return False

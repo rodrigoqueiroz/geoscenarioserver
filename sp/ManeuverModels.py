@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #slarter@uwaterloo.ca
 # --------------------------------------------
@@ -47,7 +47,7 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
         if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2 or not has_line_of_sight_to_point(pedestrian_pos, sp.current_waypoint, sp.current_lanelet):
             direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint, sp.sp_planner.inverted_path)
 
-    return direction, sp.current_waypoint, pedestrian_speed['default_desired']
+    return direction, sp.current_waypoint, max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])
 
 
 def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
@@ -76,7 +76,7 @@ def plan_enter_crosswalk(mconfig:MEnterCrosswalkConfig, sp, sim_time, pedestrian
     if previous_maneuver != Maneuver.M_ENTERCROSSWALK:
         sp.sp_planner.turn_start_time = sim_time
 
-    return direction, waypoint, pedestrian_speed['default_desired']
+    return direction, waypoint, max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])
 
 
 def plan_exit_crosswalk(mconfig:MExitCrosswalkConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, previous_maneuver):

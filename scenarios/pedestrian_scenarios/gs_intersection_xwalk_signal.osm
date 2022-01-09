@@ -13,7 +13,7 @@
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5338057' action='modify' visible='true' lat='43.47778376231' lon='-80.52010177774'>
+  <node id='-5338057' action='modify' visible='true' lat='43.47805153959' lon='-80.51938417355'>
     <tag k='btree' v='walk_aggressiveness_level_1.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_1_dest' />
@@ -27,7 +27,7 @@
     <tag k='states' v='G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338059' action='modify' visible='true' lat='43.47820861525' lon='-80.52016079271'>
+  <node id='-5338059' action='modify' visible='true' lat='43.4778825246' lon='-80.51949146907'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_1_dest' />
   </node>
@@ -52,7 +52,7 @@
     <tag k='states' v='R,G,Y,R' />
     <tag k='type' v='pedestrian' />
   </node>
-  <node id='-5338063' action='modify' visible='true' lat='43.47810977574' lon='-80.51926034206'>
+  <node id='-5338063' action='modify' visible='true' lat='43.47817298974' lon='-80.52012245142'>
     <tag k='gs' v='location' />
     <tag k='name' v='ped_2_dest' />
   </node>
@@ -62,5 +62,27 @@
     <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='pedestrian_2' />
+  </node>
+  <node id='-5338435' action='modify' visible='true' lat='43.47826699228' lon='-80.51988802813'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_3_dest' />
+  </node>
+  <node id='-5338436' action='modify' visible='true' lat='43.4782021491' lon='-80.52015699492'>
+    <tag k='btree' v='walk_aggressiveness_level_3.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_3_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_3' />
+  </node>
+  <node id='-5339311' action='modify' visible='true' lat='43.47822291063' lon='-80.51952626786'>
+    <tag k='btree' v='walk_aggressiveness_level_2.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_4_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='pedestrian_4' />
+  </node>
+  <node id='-5339319' action='modify' visible='true' lat='43.47806142317' lon='-80.51939688076'>
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_4_dest' />
   </node>
 </osm>

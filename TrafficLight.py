@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
@@ -43,7 +43,6 @@ class TrafficLight:
         self.current_color = states[0]
         self.states = states
         self.type = tl_type
-        self.time_to_red = 0.0
 
         # intervals in sim time for each state
         if intervals is not None:
@@ -53,6 +52,13 @@ class TrafficLight:
             self.intervals = [0]
             for duration in durations:
                 self.intervals.append(self.intervals[-1] + duration)
+
+        # calculate time to red
+        self.time_to_red = inf
+        for state_idx in range(len(self.states)):
+            if self.states[state_idx] == TrafficLightColor.Red:
+                self.time_to_red = self.intervals[state_idx]
+                break
 
     def tick(self, tick_count, delta_time, sim_time):
         mtime = sim_time % self.intervals[-1]

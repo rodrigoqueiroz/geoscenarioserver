@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@gsd.uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
@@ -20,11 +20,12 @@ import glog as log
 from SimTraffic import *
 from SimConfig import *
 from util.Utils import *
-import sv.SDVPlannerState
+import sv.SDVTrafficState
 from sv.Vehicle import *
 from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
+from mapping.LaneletMap import get_line_format
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -131,7 +132,8 @@ class Dashboard(object):
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
-            self.map_canvas.draw()
+            if SHOW_MPLOT:
+                self.map_canvas.draw()
             self.window.update()
 
     def quit(self):
@@ -255,8 +257,7 @@ class Dashboard(object):
         plt.gca().xaxis.set_visible(True)
         plt.gca().yaxis.set_visible(True)
         plt.margins(0,0)
-        #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
-        #fig.tight_layout(pad=0.1)
+        plt.subplots_adjust(bottom=0.05,top=0.95,left=0.05,right=0.95,hspace=0,wspace=0)
 
     
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
@@ -264,8 +265,14 @@ class Dashboard(object):
         #road lines:
         #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
         data = self.lanelet_map.get_lines(x_min,y_min,x_max,y_max)
-        for line in data:
-            plt.plot(line[0], line[1], color = '#cccccc',zorder=0)
+        for xs, ys, type, subtype in data:
+            line_format = get_line_format(type, subtype)
+            if line_format is None:
+                pass
+            else:
+                color, linestyle, linewidth = line_format
+                plt.plot(xs, ys, color=color, linestyle=linestyle,
+                         linewidth=linewidth, zorder=0)
 
         #pedestrian marking
 
@@ -414,16 +421,16 @@ class Dashboard(object):
 
         #re
         for re in regulatory_elements:
-            if isinstance(re, sv.SDVPlannerState.TrafficLightState):
+            if isinstance(re, sv.SDVTrafficState.TrafficLightState):
                 colorcode,_ = self.get_color_by_type('trafficlight',re.color)
                 x, y = re.stop_position
                 plt.axvline(x, color= colorcode, linestyle='-', zorder=1)
-            elif isinstance(re, sv.SDVPlannerState.RightOfWayState):
+            elif isinstance(re, sv.SDVTrafficState.RightOfWayState):
                 pass
                 #for ll_id in re.row_lanelets:
                     #colorfillcode = 'r' if re.row_lanelets[ll_id] > 0 else 'g'
                     #ll = self.lanelet_map.laneletLayer[ll_id]
-            elif isinstance(re, sv.SDVPlannerState.AllWayStopState):
+            elif isinstance(re, sv.SDVTrafficState.AllWayStopState):
                 pass
 
         #other vehicles, from main vehicle POV:
@@ -653,7 +660,6 @@ class Dashboard(object):
     def create_gui(self):
         #Window
         window = tk.Tk()
-        window.geometry("1600x1000")
 
         # Main containers:
         # title frame
@@ -676,14 +682,15 @@ class Dashboard(object):
         vehicle_frame.grid(row=6, sticky="nsew")
 
         #global sub containers
-        map_frame = tk.Frame(global_frame, width = 600, height = 300, bg = "red") #create
-        map_frame.grid(row=0, column=1, sticky="nsew") #set pos
+        if SHOW_MPLOT:
+            map_frame = tk.Frame(global_frame, width = 600, height = 300, bg = "red") #create
+            map_frame.grid(row=0, column=1, sticky="nsew") #set pos
 
         tab_frame = tk.Frame(global_frame, width = 1000, height = 300, bg = "blue")
         tab_frame.grid(row=0, column=2, sticky="nsew")
 
         #vehicle sub containers
-        cart_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
+        cart_frame = tk.Frame(vehicle_frame if SHOW_MPLOT else global_frame, width = 300, height = 300, bg = "white")
         fren_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
         bt_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
         traj_frame = tk.Frame(vehicle_frame, width = 300, height = 300, bg = "white")
@@ -724,10 +731,11 @@ class Dashboard(object):
         # global container:
 
         # map
-        fig_map = plt.figure(Dashboard.MAP_FIG_ID)
-        #fig_map.set_size_inches(6,6,forward=True)
-        self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
-        self.map_canvas.get_tk_widget().pack()
+        if SHOW_MPLOT:
+            fig_map = plt.figure(Dashboard.MAP_FIG_ID)
+            #fig_map.set_size_inches(6,6,forward=True)
+            self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
+            self.map_canvas.get_tk_widget().pack()
 
         # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
@@ -752,7 +760,8 @@ class Dashboard(object):
 
         # vehicle cart
         fig_cart = plt.figure(Dashboard.CART_FIG_ID)
-        #fig_cart.set_size_inches(6,4,forward=True)
+        if not SHOW_MPLOT:
+            fig_cart.set_size_inches(8, 8, forward=True)
         self.cart_canvas = FigureCanvasTkAgg(fig_cart, cart_frame)
         self.cart_canvas.get_tk_widget().pack()
 

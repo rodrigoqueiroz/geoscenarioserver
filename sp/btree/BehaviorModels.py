@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 
@@ -122,7 +122,7 @@ class BehaviorModels(object):
             if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['entry']):
                 return False
             entrance = self.planner_state.target_crosswalk['entry']
-            return has_reached_point(self.planner_state.pedestrian_state, entrance, 8, **kwargs)
+            return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
 
         elif condition == "reached_crosswalk_exit":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
@@ -130,7 +130,7 @@ class BehaviorModels(object):
             if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['exit']):
                 return False
             exit = self.planner_state.target_crosswalk['exit']
-            return has_reached_point(self.planner_state.pedestrian_state, exit, 2, **kwargs)
+            return has_reached_point(self.planner_state.pedestrian_state, exit, **kwargs)
 
         elif condition == "at_desired_speed":
             return self.planner_state.pedestrian_speed['current_desired'] == self.planner_state.pedestrian_speed['default_desired']
@@ -162,13 +162,13 @@ class BehaviorModels(object):
             return past_crosswalk_halfway(self.planner_state)
 
         elif condition == "approaching_crosswalk":
-            return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state)
+            return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state, **kwargs)
 
         elif condition == "waiting_at_crosswalk_entrance":
             return self.planner_state.previous_maneuver == Maneuver.M_WAITATCROSSWALK
 
         elif condition == "can_cross_before_red":
-            return can_cross_before_red(self.planner_state)
+            return can_cross_before_red(self.planner_state, **kwargs)
 
         elif condition == "vehicle_approaching_crosswalk":
             ''' TODO: implement function to check if vehicles are approaching
