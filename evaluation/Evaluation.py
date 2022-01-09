@@ -286,7 +286,7 @@ def query_track(id, c, projector):
         node.x = cart_pt.x
         node.y = cart_pt.y
         node.speed = float(row[3]) / 3.6 #NOTE: assuming speed from DB is km/h
-        node.yaw = float(row[7]) #degrees(float(row[7]))  #NOTE: assuming angle from DB is radians and UTM84
+        node.yaw = degrees(float(row[7])) # float(row[7]) #NOTE: assuming angle from DB is radians and UTM84
         node.x_vel, node.y_vel = speed_to_vel(node.speed, node.yaw)
         #node.tan_acc = float(row[4])
         #node.lat_acc = float(row[5])
@@ -372,7 +372,7 @@ def get_model_parameters(sp_ped):
         s = queue.pop(0)
         if type(s) == ManeuverAction:
             if s.name == 'm_select_xwalk_by_light':
-                model_parameters['aggressiveness_level_select_xwalk'] = s.mconfig.aggressiveness_level
+                model_parameters['aggressiveness_level_select_xwalk'] = 2 # s.mconfig.aggressiveness_level
         elif type(s) == BCondition:
             if s.name == 'c_goal':
                 model_parameters['goal_threshold'] = s.kwargs['threshold']

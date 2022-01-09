@@ -110,6 +110,7 @@ class Actor(object):
                         y_vel = node.y_vel + ((next.y_vel - node.y_vel) * pdiff)
                         self.state.set_X([x, x_vel, 0])
                         self.state.set_Y([y, y_vel, 0])
+                        self.state.yaw = node.yaw
                         #print("t{} x{} -> nt{} nx{}. Interp pdiff{} ix{}".format(node.time, node.x, next.time, next.x,pdiff,x))
                         break
             #After trajectory, stay in last position or get removed
