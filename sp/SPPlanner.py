@@ -91,8 +91,13 @@ class SPPlanner(object):
                     # ensure there is only one crosswalk in path to target crosswalk (excluding current lanelet)
                     num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_xwalk)])
                     if num_xwalks_in_path == 1:
-                        entrance_pt, _ = get_lanelet_entry_exit_points(xwalk)
-                        xwalk_exit_pts.append(entrance_pt)
+                        entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
+
+                        if len(path_to_xwalk) == 1 and np.linalg.norm(pt - exit_pt) < np.linalg.norm(pt - entrance_pt):
+                            # pt is within the crosswalk
+                            xwalk_exit_pts.append(exit_pt)
+                        else:
+                            xwalk_exit_pts.append(entrance_pt)
                         found_accessible_xwalk = True
                 else:
                     # check if there is a route from xwalk to lanelet
@@ -103,8 +108,13 @@ class SPPlanner(object):
                         # ensure there is only one crosswalk in path from target crosswalk (excluding current lanelet)
                         num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_ll)])
                         if num_xwalks_in_path == 1:
-                            _, exit_pt = get_lanelet_entry_exit_points(xwalk)
-                            xwalk_exit_pts.append(exit_pt)
+                            entrance_pt, exit_pt = get_lanelet_entry_exit_points(xwalk)
+
+                            if len(path_to_ll) == 1 and np.linalg.norm(pt - entrance_pt) < np.linalg.norm(pt - exit_pt):
+                                # pt is within the crosswalk
+                                xwalk_exit_pts.append(entrance_pt)
+                            else:
+                                xwalk_exit_pts.append(exit_pt)
                             found_accessible_xwalk = True
                 ll_idx += 1
 
@@ -145,6 +155,7 @@ class SPPlanner(object):
                     num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_xwalk)])
                     if num_xwalks_in_path == 1:
                         paths_to_accessible_crosswalks.append(path_to_xwalk)
+                        break
                 else:
                     # check if there is a route from xwalk to lanelet
                     # (this case is necessary due to lanelet direction restrictions on the lanelet map)
@@ -156,6 +167,7 @@ class SPPlanner(object):
                         num_xwalks_in_path = sum([path_seg.attributes["subtype"] == "crosswalk" for path_seg in list(path_to_ll)])
                         if num_xwalks_in_path == 1:
                             paths_to_accessible_crosswalks.append(path_to_ll)
+                            break
 
             for area in occupied_spaces['areas']:
                 # crosswalk is accessible from area if they share a node
@@ -167,6 +179,7 @@ class SPPlanner(object):
                         xwalk = xwalk.invert()
 
                     paths_to_accessible_crosswalks.append([area, xwalk])
+                    break
 
         ''' Choose the path with the crosswalk that bring ped closest to destination '''
         chosen_path = []
