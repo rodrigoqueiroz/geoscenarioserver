@@ -197,3 +197,16 @@ def can_cross_before_red(planner_state, **kwargs):
         return True
 
     return False
+
+def speed_to_ensure_collision(pedestrian_state, vehicle_state, collision_pt):
+    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+
+    vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
+    vehicle_speed = np.linalg.norm(np.array([vehicle_state.x_vel, vehicle_state.y_vel]))
+
+    dist_veh_col = np.linalg.norm(collision_pt - vehicle_pos)
+    dist_ped_col = np.linalg.norm(collision_pt - pedestrian_pos)
+
+    speed_for_collision = (dist_ped_col * vehicle_speed) / dist_veh_col
+
+    return speed_for_collision
