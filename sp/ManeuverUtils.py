@@ -210,3 +210,8 @@ def speed_to_ensure_collision(pedestrian_state, vehicle_state, collision_pt):
     speed_for_collision = (dist_ped_col * vehicle_speed) / dist_veh_col
 
     return speed_for_collision
+
+def get_xwalk_vehicle_collision_pt(lanelet_map, xwalk, vehicle):
+    collision_pt = (3*xwalk['entry'] + xwalk['exit']) / 4
+
+    return collision_pt

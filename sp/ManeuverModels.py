@@ -47,9 +47,9 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
         if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2 or not has_line_of_sight_to_point(pedestrian_pos, sp.current_waypoint, sp.current_lanelet):
             direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint, sp.sp_planner.inverted_path)
 
-    if mconfig.ensure_collision:
-        collision_vehicle_state = list(vehicles.values())[0].state
-        collision_pt = (2*target_crosswalk['entry'] + target_crosswalk['exit']) / 2
+    if mconfig.collision_vehicle_vid != -1 and target_crosswalk['id'] != -1:
+        collision_vehicle_state = vehicles[mconfig.collision_vehicle_vid].state
+        collision_pt = get_xwalk_vehicle_collision_pt(sp.sp_planner.lanelet_map, target_crosswalk, collision_vehicle_state)
         desired_speed = speed_to_ensure_collision(pedestrian_state, collision_vehicle_state, collision_pt)
     else:
         desired_speed = max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])

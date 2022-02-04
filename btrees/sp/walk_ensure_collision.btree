@@ -21,4 +21,4 @@ behaviortree walk:
                 ->
                     condition c_approaching_crosswalk ( approaching_crosswalk( threshold=5 ) )
                     maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=2 ) )
-        maneuver m_keep_in_lane ( MKeepInLaneConfig( ensure_collision=1 ) )
+        maneuver m_keep_in_lane ( MKeepInLaneConfig( collision_vehicle_vid=1 ) )
