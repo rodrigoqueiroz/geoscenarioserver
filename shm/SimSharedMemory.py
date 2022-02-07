@@ -131,6 +131,13 @@ class SimSharedMemory(object):
                     vs.z = float(z) / CLIENT_METER_UNIT
                     vs.x_vel = float(x_vel) / CLIENT_METER_UNIT
                     vs.y_vel = -float(y_vel) / CLIENT_METER_UNIT
+                    
+                    #Estimating yaw because is not being published by client.
+                    #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
+                    if (vs.y_vel > 0.01) or (vs.x_vel > 0.01): 
+                        vs.yaw = math.degrees(math.atan2(vs.y_vel,vs.x_vel))
+                        print(" xvel {} yvel {} yaw {} ".format(vs.x_vel, vs.y_vel, vs.yaw))
+
                     vstates[vid] = vs
                     if not int(is_active):
                         disabled_vehicles.append(vid)
