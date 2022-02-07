@@ -209,18 +209,15 @@ class SDV(Vehicle):
             self.state.y = y_vector[0]
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
-            #GSServer transformation
-            heading = np.array([x_vector[1], y_vector[1]]) 
-            if self.motion_plan.reversing:
-                heading *= -1
-            self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
-            #Unreal yaw (TODO: move translation to client)
-            heading = np.array([self.state.y_vel,self.state.x_vel])
+            #GSServer and Unreal transformations
+            heading = np.array([self.state.x_vel, self.state.y_vel])
+            heading_unreal = np.array([self.state.y_vel,self.state.x_vel])
             if self.motion_plan:
                 if self.motion_plan.reversing:
-                    heading *= -1 
-            self.state.yaw_unreal = math.degrees(math.atan2(heading[1], heading[0]))
-            
+                    heading *= -1
+                    heading_unreal *=1
+            self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
+            self.state.yaw_unreal = math.degrees(math.atan2(heading_unreal[1], heading_unreal[0]))
             
             #DEBUG:
             #Note: use this log to evaluate if the "jump back" issue returns
