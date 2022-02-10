@@ -49,8 +49,8 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
 
     if mconfig.collision_vehicle_vid != -1 and target_crosswalk['id'] != -1:
         collision_vehicle_state = vehicles[mconfig.collision_vehicle_vid].state
-        collision_pt = get_xwalk_vehicle_collision_pt(sp.sp_planner.lanelet_map, target_crosswalk, collision_vehicle_state)
-        desired_speed = speed_to_ensure_collision(pedestrian_state, collision_vehicle_state, collision_pt)
+        collision_pt = get_xwalk_vehicle_collision_pt(target_crosswalk, pedestrian_state, collision_vehicle_state)
+        desired_speed = speed_to_ensure_collision(pedestrian_state, collision_vehicle_state, collision_pt) if collision_pt[0] else 0
     else:
         desired_speed = max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])
 
