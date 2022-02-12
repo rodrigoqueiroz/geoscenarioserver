@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "SimVehicle.h"
+#include "SimPedestrian.h"
 #include "GeoScenarioModule.h"
 #include "GSClient.generated.h"
 
@@ -31,11 +32,29 @@ struct VehicleState
     float steer = 0;
 };
 
+struct PedestrianState
+{
+    float x = 0;
+    float y = 0;
+    float z = 0;
+    float x_vel = 0;
+    float y_vel = 0;
+    float yaw = 0;
+};
+
 struct GSVehicle
 {
 	int vid = -1;
 	int v_type = 0;
 	VehicleState vehicle_state;
+	AActor* actor;
+};
+
+struct GSPedestrian
+{
+	int pid = -1;
+	int p_type = 0;
+	PedestrianState pedestrian_state;
 	AActor* actor;
 };
 
@@ -59,12 +78,16 @@ protected:
 	FrameStat framestat;
     FrameStat server_framestat;
 	TMap<uint16_t, GSVehicle> vehicles;
+	TMap<uint16_t, GSPedestrian> pedestrians;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	AActor* FindVehicleActor(int vid);
+	AActor* FindPedestrianActor(int pid);
 	void CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot);
+	void CreatePedestrian(int pid, int p_type, FVector &loc, FRotator &rot);
 	void ReadServerState(float deltaTime);
 	void UpdateRemoteVehicleStates(float deltaTime);
+	void UpdateRemotePedestrianStates(float deltaTime);
 	void WriteClientState(int tickCount, float deltaTime);
 
 public:
