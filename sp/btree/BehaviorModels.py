@@ -10,6 +10,7 @@ from sp.ManeuverConfig import *
 from sp.ManeuverUtils import *
 from sp.btree.BTreeInterpreter import *
 from sp.btree.BTreeLeaves import *
+from sp.btree.BTreeRender import *
 from sp.SPPlannerState import TrafficLightState
 from TrafficLight import TrafficLightColor
 
@@ -30,14 +31,15 @@ class BehaviorModels(object):
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
 
-        #Build Tree
-        self.tree = self.build(reconfig)
-
         #Runtime status:
         self.planner_state = None
         #decision
-        self.current_mconfig = None
+        self._current_mconfig = None
         self.ref_path_changed = False
+
+        #Build Tree
+        self.tree = None
+        self.build(reconfig)
 
     def build(self,reconfig):
 
@@ -71,12 +73,12 @@ class BehaviorModels(object):
             interpreter = BTreeInterpreter(self.pid, bmodel=self)
             tree = interpreter.build_tree_from_code(btree_name=self.root_btree_name)
             '''
-            pass
+            return None
 
-        self.snapshot_visitor = visitors.SnapshotVisitor()
-        tree.visitors.append(self.snapshot_visitor)
+        if GENERATE_GRAPH_TREE:
+            generate_graph_tree(tree, self.pid)
 
-        return tree
+        self.tree = tree
 
     def __str__(self):
         return "==== Behavior Tree. Pedestrian " + str(self.pid) + " s====\n" + display.unicode_tree(root=self.tree.root)
@@ -90,16 +92,19 @@ class BehaviorModels(object):
         self.planner_state = planner_state
         self.tree.root.tick_once()
 
-        display.unicode_symbols = my_str_symbols
-        snapshot_str = display._generate_text_tree(self.tree.root,
-                                                   show_status=True,
-                                                   visited=self.snapshot_visitor.visited,
-                                                   previously_visited=self.snapshot_visitor.visited)
+        snapshot_str = generate_string_tree(self.tree, self.pid,  self._current_mconfig)
+        return self._current_mconfig, snapshot_str
+
+        # display.unicode_symbols = my_str_symbols
+        # snapshot_str = display._generate_text_tree(self.tree.root,
+        #                                            show_status=True,
+        #                                            visited=self.snapshot_visitor.visited,
+        #                                            previously_visited=self.snapshot_visitor.visited)
         #print (snapshot_str)
-        return self.current_mconfig, snapshot_str
+        return self._current_mconfig, snapshot_str
 
     def set_maneuver(self, mconfig):
-        self.current_mconfig = mconfig
+        self._current_mconfig = mconfig
 
     def set_ref_path_changed(self, val):
         self.ref_path_changed = val
