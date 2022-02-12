@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-1377' action='modify' visible='true' lat='43.47838427301' lon='-80.51894927626' />
+  <node id='-1379' action='modify' visible='true' lat='43.47822695195' lon='-80.51937820687' />
+  <node id='-1381' action='modify' visible='true' lat='43.47987156384' lon='-80.52248869752'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber-king_hickory.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Running red light scenario' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-1383' action='modify' visible='true' lat='43.47982885633' lon='-80.52249023191'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-1385' action='modify' visible='true' lat='43.4779836917' lon='-80.52006818186' />
+  <node id='-1387' action='modify' visible='true' lat='43.47769088382' lon='-80.51942391304' />
+  <node id='-1389' action='modify' visible='true' lat='43.47782242828' lon='-80.51953756132' />
+  <node id='-1391' action='modify' visible='true' lat='43.4784324437' lon='-80.52009363662' />
+  <node id='-1393' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
+  <node id='-1395' action='modify' visible='true' lat='43.47766483113' lon='-80.51939390079'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicledisabled' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-1397' action='modify' visible='true' lat='43.47840565476' lon='-80.51888864076'>
+    <tag k='btree' v='drive_scenario_tree' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='red_light_runner' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <way id='-1399' action='modify' visible='true'>
+    <nd ref='-1377' />
+    <nd ref='-1379' />
+    <nd ref='-1385' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1401' action='modify' visible='true'>
+    <nd ref='-1387' />
+    <nd ref='-1389' />
+    <nd ref='-1391' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>

@@ -11,6 +11,9 @@ from SimConfig import *
 import numpy as np
 from Actor import *
 import glog as log
+from sv.SDVTrafficState import TrafficState
+
+
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
     current_lane = None
@@ -211,11 +214,28 @@ def reached_gap(vehicle_state, target_lane_config, traffic_vehicles, meters):
     if target_vehicle is None:
         log.warn("No target vehicle in {} lane.".format('LEFT' if target_lane_config.id == 1 else 'RIGHT'))
         return True
-    gap = vehicle_state.s - VEHICLE_RADIUS - (target_vehicle.state.s + VEHICLE_RADIUS)
+    gap = range_gap(vehicle_state,target_vehicle)
+    #print("GAP" + str(gap))
     return gap > meters
 
 #def ttc(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
-#def range(self_id, vehicle_state, other_vehicles, lane_config:LaneConfig):
+
+def range_gap(vehicle_state, target_vehicle):
+    """Longitudinal distance between vehicles (front bumper to back bumper) if same or paralell lanes.
+        If behind target, gap is negative. If ahead, gap is positive.
+        Gap is zero if there is no distance between vehicle limits.
+    """
+    #gap = vehicle_state.s - VEHICLE_RADIUS - (target_vehicle.state.s + VEHICLE_RADIUS)
+    half_length = VEHICLE_LENGTH /2
+    #ahead, positive or zero
+    if vehicle_state.s > target_vehicle.state.s:
+        #back bump - target front bump
+        range = max((vehicle_state.s - half_length) - (target_vehicle.state.s + half_length), 0)
+    #behind, negative or zero        
+    else:
+        #front bump - target back bump
+        range = min((vehicle_state.s + half_length) - (target_vehicle.state.s - half_length), 0)
+    return range
 
 #Ricardo's implementation:
 

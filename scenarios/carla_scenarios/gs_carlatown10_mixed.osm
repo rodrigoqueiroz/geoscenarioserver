@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2766169' action='modify' visible='true' lat='0.00004638106' lon='-0.00000036851'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/Town10HD.xodr_ll2.osm' />
+    <tag k='mapcosim' v='Town10' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Scenario Town10 Traffic Test' />
+    <tag k='timeout' v='70' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2766170' action='modify' visible='true' lat='0.0' lon='0.0'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-2766173' action='modify' visible='true' lat='0.00032642542' lon='-0.00062046712'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='name' v='v3' />
+    <tag k='nogs' v='vehicle' />
+    <tag k='route' v='route1' />
+    <tag k='vid' v='3' />
+  </node>
+  <node id='-2766244' action='modify' visible='true' lat='0.00025152844' lon='-0.00037622533'>
+    <tag k='bsource' v='carla_autopilot' />
+    <tag k='btype' v='EV' />
+    <tag k='model' v='vehicle.audi.tt' />
+    <tag k='name' v='v20_carlaagent' />
+    <tag k='nogs' v='vehicle' />
+    <tag k='vid' v='20' />
+    <tag k='yaw' v='270' />
+  </node>
+  <node id='-2766486' action='modify' visible='true' lat='0.00033078994' lon='-0.00066776502'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='name' v='v4' />
+    <tag k='nogs' v='vehicle' />
+    <tag k='route' v='route1' />
+    <tag k='vid' v='4' />
+  </node>
+  <node id='-2766488' action='modify' visible='true' lat='0.00061448235' lon='0.00057052541'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='route' v='route1' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='180' />
+  </node>
+  <node id='-2766490' action='modify' visible='true' lat='0.00061509048' lon='0.000533132'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='route1' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='180' />
+  </node>
+  <node id='-2766670' action='modify' visible='true' lat='0.00061317786' lon='0.00048829219' />
+  <node id='-2766671' action='modify' visible='true' lat='0.00061327059' lon='0.00009246666' />
+  <node id='-2766672' action='modify' visible='true' lat='0.00062151085' lon='-0.00004589794' />
+  <node id='-2766726' action='modify' visible='true' lat='0.0006638892' lon='-0.00014899249'>
+    <tag k='area' v='no' />
+    <tag k='continuous' v='no' />
+    <tag k='gs' v='location' />
+    <tag k='name' v='spectator' />
+  </node>
+  <node id='-2766740' action='modify' visible='true' lat='0.00058202704' lon='0.00061403442'>
+    <tag k='bsource' v='carla_autopilot' />
+    <tag k='btype' v='EV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='vehicle.audi.tt' />
+    <tag k='name' v='carla_v3' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='180' />
+  </node>
+  <node id='-2766742' action='modify' visible='true' lat='0.00057796954' lon='0.00066520403'>
+    <tag k='bsource' v='carla_autopilot' />
+    <tag k='btype' v='EV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='vehicle.audi.tt' />
+    <tag k='name' v='carla_v4' />
+    <tag k='vid' v='4' />
+    <tag k='yaw' v='180' />
+  </node>
+  <way id='-1949929' action='modify' visible='true'>
+    <nd ref='-2766670' />
+    <nd ref='-2766671' />
+    <nd ref='-2766672' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='route1' />
+  </way>
+</osm>

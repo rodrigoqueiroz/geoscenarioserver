@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2766169' action='modify' visible='true' lat='0.0001158969' lon='0.0000715038'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/Town10HD.xodr_ll2.osm' />
+    <tag k='mapcosim' v='Town10' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Scenario Town10 test' />
+    <tag k='timeout' v='70' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2766170' action='modify' visible='true' lat='0.0' lon='0.0'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-2766171' action='modify' visible='true' lat='-0.00012306228' lon='-0.00022207013' />
+  <node id='-2766172' action='modify' visible='true' lat='0.00052245153' lon='-0.00003505901' />
+  <node id='-2766173' action='modify' visible='true' lat='-0.00011821084' lon='-0.00017951284'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='route1' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-2766227' action='modify' visible='true' lat='0.00006258116' lon='-0.00092796449' />
+  <node id='-2766244' action='modify' visible='true' lat='-0.00042890202' lon='-0.00096534261'>
+    <tag k='bsource' v='carla_autopilot' />
+    <tag k='btype' v='EV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='vehicle.audi.tt' />
+    <tag k='name' v='v3' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='270' />
+  </node>
+  <node id='-2766290' action='modify' visible='true' lat='0.00017653932' lon='-0.00093005946' />
+  <way id='-1949882' action='modify' visible='true'>
+    <nd ref='-2766171' />
+    <nd ref='-2766227' />
+    <nd ref='-2766290' />
+    <nd ref='-2766172' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='route1' />
+  </way>
+</osm>

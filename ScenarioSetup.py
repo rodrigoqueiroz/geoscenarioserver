@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # GeoScenario Setup
@@ -55,6 +55,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
     projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
+    
     parser.project_nodes(projector,altitude)
     lanelet_map.load_lanelet_map(map_file, projector)
     sim_config.map_name = parser.globalconfig.tags['lanelet']
@@ -85,22 +86,27 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
+    log.info("Scenario Setup: initializing vehicles.")
     for vid, vnode in parser.vehicles.items():
+        if len(sim_traffic.vehicles) >= MAX_NVEHICLES:
+            break
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
+        model = vnode.tags['model'] if 'model' in vnode.tags else ''
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
-        yaw = 90.0
-        if 'yaw' in vnode.tags:
-            yaw = (float(vnode.tags['yaw']) + 90.0) % 360.0
-            # Place yaw in the range [-180.0, 180.0)
-            if yaw < -180.0:
-                yaw += 360.0
-            elif yaw >= 180.0:
-                yaw -= 360.0
-
+        #yaw = 90.0
+        #if 'yaw' in vnode.tags:
+        #    yaw = (float(vnode.tags['yaw']) + 90.0) % 360.0
+        #    # Place yaw in the range [-180.0, 180.0)
+        #    if yaw < -180.0:
+        #        yaw += 360.0
+        #    elif yaw >= 180.0:
+        #        yaw -= 360.0
+        yaw = float(vnode.tags['yaw'])*-1 if 'yaw' in vnode.tags else 0.0
+        #print(yaw)
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
-
+        log.info("Vehicle {}, behavior type {}".format(vid,btype))    
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
             #start state
@@ -125,7 +131,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 start_in_frenet = True
                 start_frenet = vnode.tags['start_frenet']
                 gs_sf = start_frenet.split(',')
-                print(gs_sf)
+                #print(gs_sf)
                 if len (gs_sf) != 6:
                     log.error("start state in Frenet must have 6 values [s,s_vel,s_acc,d,d_vel,d_acc].")
                     continue
@@ -136,32 +142,36 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 d_vel = float(gs_sf[4].strip())
                 d_acc = float(gs_sf[5].strip())
                 start_state = [s,s_vel,s_acc,d,d_vel,d_acc]     #vehicle start state in frenet frame
-                print(start_state)
+                #print(start_state)
 
             #route
             if 'route' not in vnode.tags:
                 log.error("SDV {} requires a route .".format(vid))
                 continue
-            try:
-                myroute = vnode.tags['route']
-                root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "drive_tree" #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
-                route_nodes = parser.routes[myroute].nodes
-                lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]   #a valid lanelet route
-                sim_config.lanelet_routes[vid] = lanelet_map.get_route_via(lanelets_in_route)
-                sim_config.goal_points[vid] = (route_nodes[-1].x, route_nodes[-1].y)
-            except Exception as e:
-                log.error("Route generation failed for route {}.".format(myroute))
-                raise e
+            gs_route = vnode.tags['route']
+            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]   
+            route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
+            #btree
+            #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
+            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree" 
             try:
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
-                                lanelet_map, sim_config.lanelet_routes[vid],
-                                route_nodes,
+                                lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
                                 btype=btype
                             )
+                #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
+                #                lanelet_map, sim_config.lanelet_routes[vid],
+                #                route_nodes,
+                #                start_state_in_frenet=start_in_frenet,
+                #                btree_locations=btree_locations,
+                #                btype=btype
+                #            )
+                #reconfig btree
                 if 'btconfig' in vnode.tags:
                     vehicle.btree_reconfig = vnode.tags['btconfig']
+                vehicle.model = model
                 sim_traffic.add_vehicle(vehicle)
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
@@ -190,6 +200,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                             start_state =  start_state,                     #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
                             yaw = yaw,
                             trajectory = trajectory)                        #a valid trajectory with at least x,y,time per node
+                            
                 sim_traffic.add_vehicle(vehicle)
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
@@ -198,18 +209,22 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         # Path Vehicle (PV)
         elif btype == 'pv':
             vehicle = Vehicle(vid, name, start_state, yaw=yaw)
+            vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.warning("Path-based vehicles are still not supported in GeoScenario Server {}".format(vid))
             continue
 
         # External Vehicle (EV)
         elif btype == 'ev':
-            vehicle = EV(vid, name, start_state, yaw) #<Locaton
+            bsource = vnode.tags['bsource']
+            vehicle = EV(vid, name, start_state, yaw, bsource) 
+            vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
 
         # Neutral Vehicle
         else:
             vehicle = Vehicle(vid, name, start_state, yaw=yaw)
+            vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
         #=========
 
@@ -310,6 +325,9 @@ def load_geoscenario_from_code(scenario_name:str, sim_traffic:SimTraffic, sim_co
     elif scenario_name == 'my_scenario':
         return my_scenario(sim_traffic, sim_config, lanelet_map)
 
+'''
+TODO: Adapt the sample scenario to current format
+
 def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
     """ Sample scenario using a Lanelet map
     """
@@ -358,7 +376,7 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
 
     return True
 
-    '''
+
     #More examples:
     # Add traffic light states
     #states = [TrafficLightColor.Red,TrafficLightColor.Green,TrafficLightColor.Yellow]   #states (alternate in a loop)

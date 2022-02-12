@@ -1,0 +1,3 @@
+behaviortree observer_driver:
+    ->
+        subtree drive( m_keepvelocity=MVelKeepConfig(vel=MP(10, 10, 6)))

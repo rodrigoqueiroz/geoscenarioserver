@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 #slarter@uwaterloo.ca
@@ -29,6 +29,7 @@ class PedestrianPlannerState:
     target_crosswalk: Dict
     selected_target_crosswalk: bool
     crossing_light_color: TrafficLightColor
+    crossing_light_time_to_red: float
     destination: List
     traffic_vehicles: Dict
     pedestrians: List

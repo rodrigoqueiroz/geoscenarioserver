@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5009641' action='modify' visible='true' lat='43.43636135998' lon='-80.5797781031' />
+  <node id='-5009642' action='modify' visible='true' lat='43.43543371156' lon='-80.57979051079'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_firetower_4waystop.osm' />
+    <tag k='name' v='Vehicle passing parked vehicle' />
+    <tag k='timeout' v='25' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5009643' action='modify' visible='true' lat='43.43537306152' lon='-80.57978848592'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5009644' action='modify' visible='true' lat='43.43522824429' lon='-80.57961688105' />
+  <node id='-5009645' action='modify' visible='true' lat='43.43515855911' lon='-80.57960779812'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='notgs' v='vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='90' />
+  </node>
+  <node id='-5009646' action='modify' visible='true' lat='43.43591786834' lon='-80.5796932702'>
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v2_parked_vehicle' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='90' />
+  </node>
+  <way id='-1949889' action='modify' visible='true'>
+    <nd ref='-5009644' />
+    <nd ref='-5009641' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+</osm>

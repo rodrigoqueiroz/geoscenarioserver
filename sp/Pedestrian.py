@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #slarter@uwaterloo.ca
 # --------------------------------------------
@@ -149,11 +149,16 @@ class SP(Pedestrian):
         f_adapt = (delta_vel * self.mass) / accl_time
 
         f_other_ped = np.zeros(2)
+        f_vehicle = np.zeros(2)
         f_borders = np.zeros(2)
 
         # repulsive forces from other pedestrians
         for other_ped in {ped for (pid,ped) in self.sim_traffic.pedestrians.items() if pid != self.id}:
             f_other_ped += self.other_pedestrian_interaction(curr_pos, curr_vel, other_ped)
+
+        # repulsive forces from vehicles
+        for vehicle in {veh for (vid,veh) in self.sim_traffic.vehicles.items()}:
+            f_vehicle += self.vehicle_interaction(curr_pos, curr_vel, vehicle)
 
 
         # repulsive forces from borders
@@ -161,7 +166,7 @@ class SP(Pedestrian):
             f_borders += self.border_interaction(curr_pos, curr_vel, border)
 
 
-        f_sum = f_adapt + f_other_ped + f_borders
+        f_sum = f_adapt + f_other_ped + f_vehicle + f_borders
 
         curr_acc = f_sum / self.mass
         curr_vel += curr_acc * dt
@@ -244,7 +249,7 @@ class SP(Pedestrian):
         return fij
 
 
-    def border_interaction(self, curr_pos, vi, border, phi=12000, omega=24000):
+    def border_interaction(self, curr_pos, curr_vel, border, phi=12000, omega=24000):
         A = 1500 # 1500~2000
         B = 0.08
 
@@ -252,6 +257,33 @@ class SP(Pedestrian):
         diW, niW = distance_point_to_border(curr_pos, border)
         tiW = np.array([-niW[1], niW[0]])
 
-        fiW = (A*np.exp((ri-diW)/B) + phi*max(0,ri-diW))*niW - omega*max(0,ri-diW)*np.dot(vi,tiW)*tiW
+        fiW = (A*np.exp((ri-diW)/B) + phi*max(0,ri-diW))*niW - omega*max(0,ri-diW)*np.dot(curr_vel,tiW)*tiW
 
         return fiW
+
+    def vehicle_interaction(self, curr_pos, curr_vel, vehicle):
+        A = 200
+        B = 0.08
+        lambda_i = 0.5
+
+        l = VEHICLE_LENGTH / 2
+        w = VEHICLE_WIDTH / 2
+
+        veh_pos = np.array([vehicle.state.x, vehicle.state.y])
+        veh_yaw_rad = np.radians(vehicle.state.yaw)
+        veh_heading = np.array([np.cos(veh_yaw_rad), np.sin(veh_yaw_rad)])
+
+        # angle btw ped's position and vehicle's velocity vector
+        dot_product = max(min(np.dot(curr_pos-veh_pos, veh_heading), 1.0), -1.0) # stay within [-1,1] domain for arccos
+        theta = np.arccos(dot_product) / (np.linalg.norm(curr_pos-veh_pos)*np.linalg.norm(veh_heading))
+        epsilon = np.sqrt(l**2 - w**2) / l
+
+        ri = self.radius
+        rv = w / np.sqrt(1 - (epsilon**2 * np.cos(theta)**2))
+        riv = ri + rv
+        div = np.linalg.norm(curr_pos - veh_pos)
+        niv = normalize(curr_pos - veh_pos)
+
+        fiv = A*np.exp((riv-div)/B)*niv * (lambda_i + ((1 - lambda_i)*((1+np.cos(theta)) / 2)))
+
+        return fiv

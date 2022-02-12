@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TickSync
@@ -10,6 +10,9 @@
 import datetime
 import time
 import math
+import csv
+from SimConfig import *
+from util.Utils import truncate
 import glog as log
 
 class TickSync():
@@ -32,6 +35,13 @@ class TickSync():
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
         self.drift = 0.0                    #diff between expected tick time and actual time caused by lag
+        #stats
+        self.performance_log = []
+        self.target_performance_stats = [
+            self.label,
+            self.timeout,
+            self.tick_rate,
+            self.expected_tick_duration]
     
     def get_sim_time(self):
         return self.sim_time
@@ -78,15 +88,38 @@ class TickSync():
         passed_time = (now - self._sim_start_clock).total_seconds()
         self.sim_time =  self.sim_start_time + passed_time
         self.tick_count+=1
+        #stats
+        self.update_stats()
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
-                self.print('{} TIMEOUT: {:.3}s'.format(self.label,self.sim_time))
+                log.info('{} TIMEOUT: {:.3}s'.format(self.label,self.sim_time))
                 return False
-
-        self.print('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
-                    format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         return True
+    
+    def update_stats(self):
+        if LOG_PERFORMANCE:
+            self.performance_log.append([
+                self.tick_count,
+                truncate(self.sim_time,3),
+                truncate(self.delta_time,3),
+                truncate(self.drift,3)
+            ])
+        if self.verbose:
+            log.info('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
+                    format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
+        
+    def write_peformance_log(self):
+        if LOG_PERFORMANCE:
+            logtime = time.strftime("%Y%m%d-%H%M%S")
+            filename = "log/{}_performance_log.csv".format(self.label)
+            log.info('Writting performance log: {}'.format(filename))
+            with open(filename,mode='w') as csv_file:
+                csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                titleline =['tickcount', 'sim_time','delta_time', 'drift']
+                csv_writer.writerow(titleline)
+                for line in self.performance_log:
+                    csv_writer.writerow(line)
 
     def set_task(self,label,target_t,max_t = None):
         #Note: a single task per object. 
@@ -129,7 +162,6 @@ class TickSync():
         #returns actual time 
         return delta_time
 
-   
     
     #For Debug only:
     _last_log = None
@@ -142,4 +174,4 @@ class TickSync():
             newlog = [label,_delta]
             
         TickSync._last_log = now
-        log.debug(newlog)
+        log.info(newlog)

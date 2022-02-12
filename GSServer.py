@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
@@ -90,7 +90,7 @@ def start_server(args, m=MVelKeepConfig()):
         except Exception as e:
             log.error(e)
             break
-
+    sync_global.write_peformance_log()
     traffic.stop_all()
     dashboard.quit()
 

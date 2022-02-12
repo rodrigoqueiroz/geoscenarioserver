@@ -38,7 +38,7 @@ class LaneConfig:
     right_bound:float = -2          #d
     _left_lane: LaneConfig = None
     _right_lane: LaneConfig = None
-    
+    stopline_pos:float = None
 
     def get_current_lane(self, d):
         if self.right_bound <= d <= self.left_bound:
@@ -68,6 +68,9 @@ class LaneConfig:
     
     def get_central_d(self):
         return (self.left_bound - self.right_bound)/2 + self.right_bound
+    
+    def get_lane_width(self):
+        return (self.left_bound - self.right_bound)
 
 @dataclass
 class LT:
@@ -84,22 +87,24 @@ class LT:
     nsamples:int = 1                        #number of sampling points on the lane width for lateral planning
     sampling:int = SamplingMethod.NORMAL    #sampling method
     sigma:float = 1.0                       #std dev for sampling from normal
-    limit_lane_width:bool = True            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
-    limit_vehicle_size:bool = True          #Limit sampling values by vehicle size (within boundaries)
+    #limit_lane_width:bool = True            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
+    #limit_vehicle_size:bool = True          #Limit sampling values by vehicle size (within boundaries)
+    limit_lane_width:int = 1            #Limit sampling values by lane width. If False, should be only used with NORMAL sampling
+    limit_vehicle_size:int = 1          #Limit sampling values by vehicle size (within boundaries)
 
     def get_samples(self, lane_config:LaneConfig):
         target = lane_config.get_central_d() + self.target
         if (self.nsamples<=1):
             return tuple([target])
         
-        if self.limit_lane_width:     
+        if int(self.limit_lane_width) == 1:     
             up = lane_config.left_bound
             lo = lane_config.right_bound
         else:
             up = lane_config._left_lane.left_bound if lane_config._left_lane else lane_config.left_bound
             lo = lane_config._right_lane.right_bound if lane_config._right_lane else lane_config.right_bound
         
-        vsize = VEHICLE_RADIUS if self.limit_vehicle_size else 0
+        vsize = VEHICLE_RADIUS if self.limit_vehicle_size==1 else 0
         up = up - vsize
         lo = lo + vsize
         
@@ -223,14 +228,14 @@ class MStopConfig(MConfig):
 
     def __post_init__(self):
         self.max_long_acc = 30.0
-    
 
 @dataclass
 class MFollowConfig(MConfig):
     #target
     target_vid:int = None           #target vehicle id
-    time:MP = MP(4.0,50,10)          #duration in [s] as MP
+    time:MP = MP(4.0,50,10)         #duration in [s] as MP
     time_gap:float = 3.0            #[s]
+    stop_distance:float = 3.0       #target distance when lead vehicle stops
     mkey:int = Maneuver.M_FOLLOW
 
 @dataclass

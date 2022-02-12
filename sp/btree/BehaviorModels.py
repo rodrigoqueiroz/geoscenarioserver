@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 
@@ -119,11 +119,15 @@ class BehaviorModels(object):
         elif condition == "reached_crosswalk_entrance":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
                 return False
+            if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['entry']):
+                return False
             entrance = self.planner_state.target_crosswalk['entry']
             return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
 
         elif condition == "reached_crosswalk_exit":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
+                return False
+            if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['exit']):
                 return False
             exit = self.planner_state.target_crosswalk['exit']
             return has_reached_point(self.planner_state.pedestrian_state, exit, **kwargs)
@@ -136,14 +140,20 @@ class BehaviorModels(object):
             tmax = kwargs['tmax'] if 'tmax' in kwargs else float('inf')
             return tmin < self.planner_state.sim_time < tmax
 
-        elif condition == "pedestrian_light_red":
-            return self.planner_state.crossing_light_color == TrafficLightColor.Red
-
         elif condition == "pedestrian_light_green":
             return self.planner_state.crossing_light_color == TrafficLightColor.Green
 
+        elif condition == "pedestrian_light_red":
+            return self.planner_state.crossing_light_color == TrafficLightColor.Red
+
+        elif condition == "pedestrian_light_yellow":
+            return self.planner_state.crossing_light_color == TrafficLightColor.Yellow
+
         elif condition == "crosswalk_has_light":
             return self.planner_state.crossing_light_color != None
+
+        elif condition == "has_target_crosswalk":
+            return self.planner_state.target_crosswalk['id'] != -1
 
         elif condition == "in_crosswalk_area":
             return in_crosswalk_area(self.planner_state)
@@ -152,7 +162,20 @@ class BehaviorModels(object):
             return past_crosswalk_halfway(self.planner_state)
 
         elif condition == "approaching_crosswalk":
-            return not self.planner_state.selected_target_crosswalk and approaching_crosswalk(self.planner_state)
+            return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state, **kwargs)
+
+        elif condition == "waiting_at_crosswalk_entrance":
+            return self.planner_state.previous_maneuver == Maneuver.M_WAITATCROSSWALK
+
+        elif condition == "can_cross_before_red":
+            return can_cross_before_red(self.planner_state, **kwargs)
+
+        elif condition == "vehicle_approaching_crosswalk":
+            ''' TODO: implement function to check if vehicles are approaching
+                crosswalk without intention of stopping.
+                (Possibly wait until any approaching vehicles are under threshold speed)
+            '''
+            return False
 
         return False
 

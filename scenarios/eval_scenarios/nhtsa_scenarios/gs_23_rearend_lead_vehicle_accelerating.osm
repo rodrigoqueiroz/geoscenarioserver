@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-25781' action='modify' visible='true' lat='43.47173989696' lon='-80.54712523884'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_roads_around_campus.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Lane change same direction scenario' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-25783' action='modify' visible='true' lat='43.4716043991' lon='-80.54654593605'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-25787' action='modify' visible='true' lat='43.47364976069' lon='-80.54921786955' />
+  <node id='-25789' action='modify' visible='true' lat='43.47407639865' lon='-80.54802943969' />
+  <node id='-25791' action='modify' visible='true' lat='43.47513671009' lon='-80.54507313101' />
+  <node id='-25793' action='modify' visible='true' lat='43.47427040614' lon='-80.547491111'>
+    <tag k='btree' v='fast_drive_scenario_tree' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-25795' action='modify' visible='true' lat='43.47451886698' lon='-80.54677698883'>
+    <tag k='btree' v='accelerate_scenario_tree' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='accelerating_vehicle' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <way id='-25799' action='modify' visible='true'>
+    <nd ref='-25787' />
+    <nd ref='-25789' />
+    <nd ref='-25791' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>
