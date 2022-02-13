@@ -26,7 +26,7 @@ ASimPedestrian::ASimPedestrian()
 
     // SetActorEnableCollision(true);
 
-	FString MeshName = "/Game/Agents/Pedestrian/SUV/SUVMesh.SUVMesh";
+	FString MeshName = "/Game/Agents/Pedestrians/FusePed/StaticPed.StaticPed";
 	UStaticMesh *MeshAsset = Cast<UStaticMesh>(
       StaticLoadObject(UStaticMesh::StaticClass(), NULL, *MeshName));
     Mesh->SetStaticMesh(MeshAsset);
