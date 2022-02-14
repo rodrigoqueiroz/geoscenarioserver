@@ -9,7 +9,7 @@
 ASimPedestrian::ASimPedestrian()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 0.1f;
+	PrimaryActorTick.TickInterval = 0.05f;
 	// mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BaseMesh"));
     // mesh->SetupAttachment(RootComponent);
 	// static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshContainer(TEXT("SkeletalMesh'/Game/GeoScenarioContent/Vehicle/Sedan/Sedan_SkelMesh.Sedan_SkelMesh'"));
@@ -37,7 +37,7 @@ void ASimPedestrian::BeginPlay()
 	Super::BeginPlay();
 
     // bounding box
-	FVector outExt;
+	  FVector outExt;
     FVector outPos;
     FRotator outOrien;
 

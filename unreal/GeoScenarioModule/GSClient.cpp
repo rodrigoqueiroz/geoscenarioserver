@@ -149,11 +149,11 @@ void AGSClient::ReadServerState(float deltaTime)
 	}
 	//parse frame stats
 	float server_delta_time;
-	int server_tick_count, nvehicles, npedestrians, vid, pid;
-	iss >> server_tick_count >> server_delta_time >> nvehicles;
+	int server_tick_count, nvehicles{0}, npedestrians{0}, vid{0}, pid{0};
+	iss >> server_tick_count >> server_delta_time >> nvehicles >> npedestrians;
 
 	// parse vehicles
-	int vehicles_read = 0;
+	unsigned int vehicles_read = 0;
 	while (vehicles_read < nvehicles)
 	{
 		iss >> vid;
@@ -207,70 +207,65 @@ void AGSClient::ReadServerState(float deltaTime)
 			gsvptr->actor->SetActorRotation(rot);
 		}
 	}
+
+	// parse pedestrians
+	unsigned int pedestrians_read = 0;
+	while (pedestrians_read < npedestrians)
+	{
+		iss >> pid;
+		if (pid==0) {continue;} //garbage at the end of string
+		pedestrians_read++;
+
+		int p_type;
+		float x, y, z, x_vel, y_vel, yaw;
+		iss >> p_type >> x >> y >> z >> x_vel >> y_vel >> yaw;
+		// Unreal's y axis is inverted from GS server's.
+		y *= -1;
+		y_vel *= -1;
+		yaw -= 90;
+			// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
+
+		FVector loc = {x, y, z};
+		FRotator rot = {0.0f, yaw, 0.0f};
+
+		GSPedestrian* gspptr = pedestrians.Find(pid);
+		if (!gspptr)
+		{
+			// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
+			// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
+			//creates only if actor is spawned or found.
+			CreatePedestrian(pid, p_type, loc, rot);
+
+			//debug
+			continue;
+		}
+
+		if (p_type == 4)
+		{
+			if (server_framestat.tick_count == server_tick_count)
+			{
+				//same tick, no new state
+				//Predict new state based on Unreal tick time
+				gspptr->pedestrian_state.x  = gspptr->pedestrian_state.x + (gspptr->pedestrian_state.x_vel * deltaTime);
+				gspptr->pedestrian_state.y  = gspptr->pedestrian_state.y + (gspptr->pedestrian_state.y_vel * deltaTime);
+			}
+			else
+			{
+				gspptr->pedestrian_state.x = loc.X;
+				gspptr->pedestrian_state.y = loc.Y;
+				gspptr->pedestrian_state.z = loc.Z;
+				gspptr->pedestrian_state.x_vel = x_vel;
+				gspptr->pedestrian_state.y_vel = y_vel;
+				gspptr->pedestrian_state.yaw = rot.Yaw;
+			}
+			gspptr->actor->SetActorLocation(loc);
+			gspptr->actor->SetActorRotation(rot);
+		}
+	}
 	//Update Server Tick
 	server_framestat.tick_count = server_tick_count;
 	server_framestat.delta_time = server_delta_time;
 	//UE_LOG(GeoScenarioModule, Log, TEXT("SHM [ tick = %d server_delta_time = %.3f"), server_tick_count, server_delta_time);
-}
-
-// parse pedestrians
-int pedestrians_read = 0;
-while (pedestrians_read < npedestrians)
-{
-	iss >> pid;
-	if (pid==0) {continue;} //garbage at the end of string
-	pedestrians_read++;
-
-	int v_type;
-	float x, y, z, x_vel, y_vel, yaw;
-	iss >> p_type >> x >> y >> z >> x_vel >> y_vel >> yaw;
-	// Unreal's y axis is inverted from GS server's.
-	y *= -1;
-	y_vel *= -1;
-	yaw -= 90;
-		// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
-
-	FVector loc = {x, y, z};
-	FRotator rot = {0.0f, yaw, 0.0f};
-
-	GSPedestrian* gspptr = pedestrians.Find(pid);
-	if (!gspptr)
-	{
-		// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
-		// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
-		//creates only if actor is spawned or found.
-		CreatePedestrian(pid, p_type, loc, rot);
-
-		//debug
-		continue;
-	}
-
-	if (p_type == 4)
-	{
-		if (server_framestat.tick_count == server_tick_count)
-		{
-			//same tick, no new state
-			//Predict new state based on Unreal tick time
-			gspptr->pedestrian_state.x  = gspptr->pedestrian_state.x + (gspptr->pedestrian_state.x_vel * deltaTime);
-			gspptr->pedestrian_state.y  = gspptr->pedestrian_state.y + (gspptr->pedestrian_state.y_vel * deltaTime);
-		}
-		else
-		{
-			gspptr->pedestrian_state.x = loc.X;
-			gspptr->pedestrian_state.y = loc.Y;
-			gspptr->pedestrian_state.z = loc.Z;
-			gspptr->pedestrian_state.x_vel = x_vel;
-			gspptr->pedestrian_state.y_vel = y_vel;
-			gspptr->pedestrian_state.yaw = rot.Yaw;
-		}
-		gspptr->actor->SetActorLocation(loc);
-		gspptr->actor->SetActorRotation(rot);
-	}
-}
-//Update Server Tick
-server_framestat.tick_count = server_tick_count;
-server_framestat.delta_time = server_delta_time;
-//UE_LOG(GeoScenarioModule, Log, TEXT("SHM [ tick = %d server_delta_time = %.3f"), server_tick_count, server_delta_time);
 }
 
 void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
@@ -408,7 +403,7 @@ void AGSClient::CreatePedestrian(int pid, int p_type, FVector &loc, FRotator &ro
 		gsp.pedestrian_state.z = loc.Z;
 		gsp.pedestrian_state.yaw = rot.Yaw;
 
-		pedestrians.Add(vid, gsp);
+		pedestrians.Add(pid, gsp);
 	}
 	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSPedestrian pid=%d p_type=%d"), pid, p_type);}
 }
