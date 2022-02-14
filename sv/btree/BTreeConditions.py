@@ -302,10 +302,9 @@ class BTreeConditions:
         smax = traffic_state.vehicle_state.s + VEHICLE_LENGTH/2 + distance_gap
         vehicles_in_lane = list(filter(
             lambda v: smin < v.state.s < smax,
-            get_vehicles_in_lane(traffic_state.lane_config, traffic_state.traffic_vehicles)
+            get_vehicles_in_lane(target_lane_config, traffic_state.traffic_vehicles)
             ))
-
-        return len(vehicles_in_lane) != 0
+        return len(vehicles_in_lane) == 0
 
     # metrics
 
