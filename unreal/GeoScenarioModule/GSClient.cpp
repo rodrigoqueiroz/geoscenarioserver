@@ -153,7 +153,7 @@ void AGSClient::ReadServerState(float deltaTime)
 	iss >> server_tick_count >> server_delta_time >> nvehicles >> npedestrians;
 
 	// parse vehicles
-	unsigned int vehicles_read = 0;
+	int vehicles_read{0};
 	while (vehicles_read < nvehicles)
 	{
 		iss >> vid;
@@ -209,7 +209,7 @@ void AGSClient::ReadServerState(float deltaTime)
 	}
 
 	// parse pedestrians
-	unsigned int pedestrians_read = 0;
+	int pedestrians_read{0};
 	while (pedestrians_read < npedestrians)
 	{
 		iss >> pid;
@@ -273,7 +273,9 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
-		if (gsv.v_type != 2) continue;
+		if (gsv.v_type != 2) {
+			continue;
+		}
 
 		// Update the vehicle's vehicle_state based on its actor's location.
 		// Actual movement of the vehicle is updated in another class.
@@ -298,7 +300,9 @@ void AGSClient::UpdateRemotePedestrianStates(float deltaTime)
 	for (auto& elem : pedestrians)
 	{
 		GSPedestrian &gsp = elem.Value;
-		if (gsp.p_type != 2) continue;
+		if (gsp.p_type != 1 && gsp.p_type != 4) {
+			continue;
+		}
 
 		// Update the pedestrian's pedestrian_state based on its actor's location.
 		// Actual movement of the pedestrian is updated in another class.
