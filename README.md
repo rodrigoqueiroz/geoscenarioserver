@@ -7,7 +7,6 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 - python3.8
 - python3.8-dev
-- python3.8-venv
 - python3-tk
 - python3-pip
 
@@ -23,10 +22,6 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - antlr4-python3-runtime
 - antlr-denter
 
-### Source packages
-
-- Lanelet2 (submodule)
-
 To automatically install the dependencies, execute
 ```
 bash scripts/install_dependencies.bash
@@ -41,18 +36,19 @@ optional arguments:
                         GeoScenario file. If no file is provided, the GSServer will load a scenario from code
   -q VERBOSE, --quiet VERBOSE
                         don't print messages to stdout
-  -m, --map-path 
+  -m, --map-path
                         Set the prefix to append to the value of the attribute `globalconfig->lanelet`
                         e.g. --map-path $HOME/wise-sim-test-suite/maps
-  -b, --btree-locations 
+  -b, --btree-locations
                         Add higher priority locations to search for btrees by agent btypes
                         e.g. --btree-locations $HOME/wise-sim-test-suite/btrees
+  --verify_map          Lanelet map file
 ```
 
 - GeoScenario files (2.0 required) must be placed inside *scenarios/*
 - If a file is not given, you must provide a manual problem startup from code.
 - LaneletMap files must be placed inside *scenarios/maps* (a map file is mandatory).
-- Co-Simulator (Unreal or other) is optional.
+- Co-Simulator ([WISE Sim](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/wise-sim),  [Carla](https://carla.org/), or other) is optional.
 
 ## Loading multiple scenario files
 
@@ -83,6 +79,9 @@ python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.
 - Use the shared memory keys inside SimConfig to read/write the server shared memory blocks.
 - We provide a GeoScenario Client for Unreal in */unreal*.
 
+# Contributors
 
-rqueiroz@gsd.uwaterloo.ca
-d43sharm@uwaterloo.ca
+1. Rodrigo Queiroz rqueiroz@uwaterloo.ca
+2. Scott Larter scott.larter@uwaterloo.ca
+3. Divit Sharma d43sharm@uwaterloo.ca
+4. Michał Antkiewicz michal.antkiewicz@uwaterloo.ca
