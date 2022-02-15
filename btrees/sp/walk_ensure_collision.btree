@@ -1,0 +1,24 @@
+behaviortree walk:
+    ?
+        ->
+            condition c_goal ( reached_goal( threshold=1 ) )
+            maneuver m_stop_goal ( MStopConfig( type=2 ) )
+        ->
+            condition c_has_target_crosswalk ( has_target_crosswalk() )
+            ?
+                ->
+                    condition c_reached_exit ( reached_crosswalk_exit( threshold=1.5 ) )
+                    maneuver m_exit_crosswalk ( MExitCrosswalkConfig() )
+                ->
+                    ?
+                        condition c_reached_entrance ( reached_crosswalk_entrance( threshold=1.5 ) )
+                        condition c_waiting_at_entrance ( waiting_at_crosswalk_entrance() )
+                    ?
+                        ->
+                            condition c_crosswalk_has_light ( crosswalk_has_light() )
+                            subtree cross_xwalk_before_red()
+                        maneuver m_enter_crosswalk ( MEnterCrosswalkConfig() )
+                ->
+                    condition c_approaching_crosswalk ( approaching_crosswalk( threshold=5 ) )
+                    maneuver m_select_xwalk_by_light ( MSelectCrosswalkByLightConfig( aggressiveness_level=2 ) )
+        maneuver m_keep_in_lane ( MKeepInLaneConfig( collision_vehicle_vid=1 ) )

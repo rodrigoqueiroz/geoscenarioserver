@@ -11,7 +11,7 @@ from sp.ManeuverUtils import *
 
 #alternative:
 class BCondition(behaviour.Behaviour):
-    def __init__(self, bmodel, name, condition, repeat=True, **kwargs):
+    def __init__(self, bmodel, name, label, condition, repeat=True, **kwargs):
         super(BCondition, self).__init__(name)
         self.name = name
         self.condition = condition
@@ -20,6 +20,8 @@ class BCondition(behaviour.Behaviour):
         self.repeat = repeat
         self.triggered = False
         self.ts = None
+        self.tree_label = label
+
 
     def reconfigure(self, condition, args):
         ''' Some situations require that the conditions are updated.
@@ -35,19 +37,24 @@ class BCondition(behaviour.Behaviour):
     def update(self):
         self.logger.debug("  %s [BCondition::update()]" % self.name)
         status = common.Status.FAILURE
-        #print("BCondition {} {}".format(self.name,self.kwargs))
+        #log.info("BCondition {} {}".format(self.name,self.kwargs))
         try:
             if self.repeat or not self.triggered:
+                #wait condition
                 if self.condition == "wait": #return SUCC while waiting
+                    time = float(self.kwargs['time'])
+                    if time <=0:
+                        return status
                     if not self.ts:
-                        time = self.kwargs['time']
+                        time = float(self.kwargs['time'])
                         self.ts = TickSync()
                         self.ts.set_timeout(time)
                         print("Create wait condition {}".format(self.ts.sim_time))
                     if self.ts.tick():
-                        print("timeout {}".format(self.ts.sim_time))
+                        print("wait condition timeout {}".format(self.ts.sim_time))
                         status = common.Status.SUCCESS
-                elif self.bmodel.test_condition(self.condition, self.kwargs):
+                #other conditions
+            elif self.bmodel.test_condition(self.condition, self.kwargs):
                     #print("SUCCESS")
                     status = common.Status.SUCCESS
                     self.triggered = True
@@ -59,16 +66,17 @@ class BCondition(behaviour.Behaviour):
 
 
 class ManeuverAction(behaviour.Behaviour):
-    def __init__(self, bmodel, name, mconfig, **kwargs):
+    def __init__(self, bmodel, name, label, mconfig, **kwargs):
         super(ManeuverAction, self).__init__(name)
         self.name = name
         self.bmodel = bmodel
         self.mconfig = mconfig
+        self.mconfig_cpy = self.mconfig
         self.kwargs = kwargs
-        # self.status = common.Status.SUCCESS
         # Some maneuvers can "finish" (eg. lane change and cutin) while some are indefinite
         # eg. vel keep and follow
         self.maneuver_completed = False
+        self.tree_label = label
 
     def reconfigure(self, new_mconfig):
         ''' Some situations require that the maneuver configurations
@@ -76,6 +84,7 @@ class ManeuverAction(behaviour.Behaviour):
             Maneuver behavior after it is instantiated.
         '''
         self.mconfig = new_mconfig
+        self.mconfig_cpy = self.mconfig
 
     def update(self):
         """ Maneuver actions are decisions on what will be performed next.
@@ -84,11 +93,9 @@ class ManeuverAction(behaviour.Behaviour):
             If the maneuver cannot be performed it returns FAILURE.
         """
         self.logger.debug("  %s [ManeuverAction::update()]" % self.name)
-        #print("MAction {}".format(self.name))
 
         status = common.Status.SUCCESS
 
-        # Maneuver specific logic for runtime configuration:
         if self.mconfig.mkey == Maneuver.M_KEEPINLANE:
             pass
 
@@ -113,7 +120,12 @@ class ManeuverAction(behaviour.Behaviour):
             if in_crosswalk_area(self.bmodel.planner_state):
                 status = common.Status.RUNNING
 
+
         if not self.maneuver_completed and status == common.Status.SUCCESS or status == common.Status.RUNNING:
             self.bmodel.set_maneuver(self.mconfig)
+
+        elif self.maneuver_completed:
+            self.mconfig = self.mconfig_cpy
+            self.maneuver_completed = False
 
         return status

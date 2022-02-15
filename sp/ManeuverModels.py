@@ -19,7 +19,7 @@ from util.Transformations import normalize
 def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, vehicles, pedestrians, previous_maneuver):
     #Micro maneuver layer
     if (man_key == Maneuver.M_KEEPINLANE):
-        return plan_keep_in_lane(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
+        return plan_keep_in_lane(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, vehicles)
     elif (man_key == Maneuver.M_STOP):
         return plan_stop(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk)
     elif (man_key == Maneuver.M_ENTERCROSSWALK):
@@ -36,7 +36,7 @@ def plan_maneuver(man_key, mconfig, sp, pedestrian_state, pedestrian_speed, targ
         return plan_select_crosswalk_by_light(mconfig, sp, pedestrian_state, pedestrian_speed, target_crosswalk, previous_maneuver)
 
 
-def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):
+def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk, vehicles):
     """
     KEEP IN LANE
     """
@@ -47,7 +47,14 @@ def plan_keep_in_lane(mconfig:MKeepInLaneConfig, sp, pedestrian_state:Pedestrian
         if np.linalg.norm(pedestrian_pos - sp.current_waypoint) > 2 or not has_line_of_sight_to_point(pedestrian_pos, sp.current_waypoint, sp.current_lanelet):
             direction = dir_to_follow_lane_border(pedestrian_state, sp.current_lanelet, sp.current_waypoint, sp.sp_planner.inverted_path)
 
-    return direction, sp.current_waypoint, max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])
+    if mconfig.collision_vehicle_vid != -1 and target_crosswalk['id'] != -1:
+        collision_vehicle_state = vehicles[mconfig.collision_vehicle_vid].state
+        collision_pt = get_xwalk_vehicle_collision_pt(target_crosswalk, pedestrian_state, collision_vehicle_state)
+        desired_speed = speed_to_ensure_collision(pedestrian_state, collision_vehicle_state, collision_pt) if collision_pt[0] else 0
+    else:
+        desired_speed = max(pedestrian_speed['current_desired'], pedestrian_speed['default_desired'])
+
+    return direction, sp.current_waypoint, desired_speed
 
 
 def plan_stop(mconfig:MStopConfig, sp, pedestrian_state:PedestrianState, pedestrian_speed, target_crosswalk):

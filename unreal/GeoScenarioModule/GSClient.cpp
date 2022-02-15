@@ -39,8 +39,9 @@ void AGSClient::Tick(float DeltaTime)
 	//UE_LOG(GeoScenarioModule, Log, TEXT("GSClient TICK=%d DeltaTime=%f"), framestat.tick_count, framestat.delta_time);
 	// Update vehicles coming from the server
 	ReadServerState(DeltaTime);
-	// Update states of remote vehicles
+	// Update states of remote vehicles and pedestrians
 	UpdateRemoteVehicleStates(DeltaTime);
+	UpdateRemotePedestrianStates(DeltaTime);
 	WriteClientState(framestat.tick_count, framestat.delta_time);
 
 	// log for experiments
@@ -148,11 +149,11 @@ void AGSClient::ReadServerState(float deltaTime)
 	}
 	//parse frame stats
 	float server_delta_time;
-	int server_tick_count, nvehicles, vid;
-	iss >> server_tick_count >> server_delta_time >> nvehicles;
+	int server_tick_count, nvehicles{0}, npedestrians{0}, vid{0}, pid{0};
+	iss >> server_tick_count >> server_delta_time >> nvehicles >> npedestrians;
 
 	// parse vehicles
-	int vehicles_read = 0;
+	int vehicles_read{0};
 	while (vehicles_read < nvehicles)
 	{
 		iss >> vid;
@@ -206,6 +207,61 @@ void AGSClient::ReadServerState(float deltaTime)
 			gsvptr->actor->SetActorRotation(rot);
 		}
 	}
+
+	// parse pedestrians
+	int pedestrians_read{0};
+	while (pedestrians_read < npedestrians)
+	{
+		iss >> pid;
+		if (pid==0) {continue;} //garbage at the end of string
+		pedestrians_read++;
+
+		int p_type;
+		float x, y, z, x_vel, y_vel, yaw;
+		iss >> p_type >> x >> y >> z >> x_vel >> y_vel >> yaw;
+		// Unreal's y axis is inverted from GS server's.
+		y *= -1;
+		y_vel *= -1;
+		yaw -= 90;
+			// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
+
+		FVector loc = {x, y, z};
+		FRotator rot = {0.0f, yaw, 0.0f};
+
+		GSPedestrian* gspptr = pedestrians.Find(pid);
+		if (!gspptr)
+		{
+			// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
+			// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
+			//creates only if actor is spawned or found.
+			CreatePedestrian(pid, p_type, loc, rot);
+
+			//debug
+			continue;
+		}
+
+		if (p_type == 4)
+		{
+			if (server_framestat.tick_count == server_tick_count)
+			{
+				//same tick, no new state
+				//Predict new state based on Unreal tick time
+				gspptr->pedestrian_state.x  = gspptr->pedestrian_state.x + (gspptr->pedestrian_state.x_vel * deltaTime);
+				gspptr->pedestrian_state.y  = gspptr->pedestrian_state.y + (gspptr->pedestrian_state.y_vel * deltaTime);
+			}
+			else
+			{
+				gspptr->pedestrian_state.x = loc.X;
+				gspptr->pedestrian_state.y = loc.Y;
+				gspptr->pedestrian_state.z = loc.Z;
+				gspptr->pedestrian_state.x_vel = x_vel;
+				gspptr->pedestrian_state.y_vel = y_vel;
+				gspptr->pedestrian_state.yaw = rot.Yaw;
+			}
+			gspptr->actor->SetActorLocation(loc);
+			gspptr->actor->SetActorRotation(rot);
+		}
+	}
 	//Update Server Tick
 	server_framestat.tick_count = server_tick_count;
 	server_framestat.delta_time = server_delta_time;
@@ -217,7 +273,9 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
-		if (gsv.v_type != 2) continue;
+		if (gsv.v_type != 2) {
+			continue;
+		}
 
 		// Update the vehicle's vehicle_state based on its actor's location.
 		// Actual movement of the vehicle is updated in another class.
@@ -234,6 +292,33 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 		// update yaw
 		FRotator rot = gsv.actor->GetActorRotation();
 		gsv.vehicle_state.yaw = rot.Yaw;
+	}
+}
+
+void AGSClient::UpdateRemotePedestrianStates(float deltaTime)
+{
+	for (auto& elem : pedestrians)
+	{
+		GSPedestrian &gsp = elem.Value;
+		if (gsp.p_type != 1 && gsp.p_type != 4) {
+			continue;
+		}
+
+		// Update the pedestrian's pedestrian_state based on its actor's location.
+		// Actual movement of the pedestrian is updated in another class.
+		// Need to ensure remote movement is finished before reading its state
+		// Maybe using a different component with a different tick group?
+		FVector loc = gsp.actor->GetActorLocation();
+		// update velocity
+		gsp.pedestrian_state.x_vel = (loc[0] - gsp.pedestrian_state.x) / deltaTime;
+		gsp.pedestrian_state.y_vel = (loc[1] - gsp.pedestrian_state.y) / deltaTime;
+		// update position
+		gsp.pedestrian_state.x = loc[0];
+		gsp.pedestrian_state.y = loc[1];
+		gsp.pedestrian_state.z = loc[2];
+		// update yaw
+		FRotator rot = gsp.actor->GetActorRotation();
+		gsp.pedestrian_state.yaw = rot.Yaw;
 	}
 }
 
@@ -286,6 +371,46 @@ void AGSClient::CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot)
 	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d v_type=%d"), vid, v_type);}
 }
 
+void AGSClient::CreatePedestrian(int pid, int p_type, FVector &loc, FRotator &rot)
+{
+	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSPedestrian pid=%d p_type=%d"), pid, p_type);
+	GSPedestrian gsp = GSPedestrian();
+	gsp.pid = pid;
+	gsp.p_type = p_type;
+	gsp.pedestrian_state =  PedestrianState();
+	if (p_type == 4 || p_type == 1) // SP or TP
+	{
+		// spawn actor
+		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Pedestrian"));
+
+		ASimPedestrian *sp = (ASimPedestrian*)GetWorld()->SpawnActor(ASimPedestrian::StaticClass(), &loc, &rot);
+		//sp->manager = this;
+		//sp->id = pid;
+		gsp.actor = (AActor*) sp;
+
+		// add the tag to server pedestrians
+		FString GSPedestrian = "gspedestrian";
+		FName GSTag = FName(*GSPedestrian);
+		gsp.actor->Tags.Add(GSTag);
+
+		// add the tag to publish bbox
+		FString PubBbox = "Bbox:1";
+		FName BboxTag = FName(*PubBbox);
+		gsp.actor->Tags.Add(BboxTag);
+	}
+
+	//check if success
+	if (gsp.actor != nullptr)
+	{
+		gsp.pedestrian_state.x = loc.X;
+		gsp.pedestrian_state.y = loc.Y;
+		gsp.pedestrian_state.z = loc.Z;
+		gsp.pedestrian_state.yaw = rot.Yaw;
+
+		pedestrians.Add(pid, gsp);
+	}
+	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSPedestrian pid=%d p_type=%d"), pid, p_type);}
+}
 
 AActor* AGSClient::FindVehicleActor(int vid)
 {
@@ -319,6 +444,38 @@ AActor* AGSClient::FindVehicleActor(int vid)
 	return nullptr;
 }
 
+AActor* AGSClient::FindPedestrianActor(int pid)
+{
+	static const FName GSTAG(TEXT("gspedestrian")); //faster than FString
+	for(TActorIterator<AActor> Itr(GetWorld()); Itr; ++Itr)
+	{
+		if (Itr->ActorHasTag(GSTAG))
+		{
+			for (FName tag: Itr->Tags)
+			{
+				FString str = tag.ToString();
+				if (str.Contains(":"))
+				{
+					FString key, value;
+ 					str.Split(TEXT(":"),&key,&value);
+					//UE_LOG(GeoScenarioModule, Log, TEXT("KEY %s VALUE %s"), *key, *value);
+					if (key == "pid")
+					{
+						int32 tagpid = FCString::Atoi(*value);
+						if (pid == tagpid)
+						{
+							UE_LOG(GeoScenarioModule, Log, TEXT("GeoScenario pedestrian actor FOUND. Id %d"), tagpid);
+							return *Itr;
+						}
+					}
+				}
+			}
+		}
+	}
+	UE_LOG(GeoScenarioModule, Error, TEXT("GeoScenario pedestrian actor NOT found. Id %d"), pid);
+	return nullptr;
+}
+
 
 void AGSClient::WriteClientState(int tickCount, float deltaTime)
 {
@@ -326,7 +483,7 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 
 	std::stringstream oss;
 	// output the correct number of pedestrians
-	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << " " << 0 /* pedestrians.Num() */ << '\n';
+	oss << tickCount << " " << deltaTime << " " << vehicles.Num() << " " << pedestrians.Num() << '\n';
 	for (auto& Elem : vehicles)
 	{
 		GSVehicle &gsv = Elem.Value;
@@ -349,6 +506,27 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 		}
 	}
 	/* repeat the loop for pedestrians */
+	for (auto& Elem : pedestrians)
+	{
+		GSPedestrian &gsp = Elem.Value;
+		//Write out Client Pedestrian states
+		//todo: include full state
+		if (gsp.actor != nullptr)
+		{
+			FVector loc = gsp.actor->GetActorLocation();
+			loc[2] = 0.0f;
+			ASimPedestrian *sp = Cast<ASimPedestrian>(gsp.actor);
+			int active = sp != nullptr ? (int)(sp->GetActive()) : 1;
+			oss << Elem.Key << " "
+				<< gsp.pedestrian_state.x << " " << gsp.pedestrian_state.y << " " << gsp.pedestrian_state.z << " "
+				<< gsp.pedestrian_state.x_vel << " " << gsp.pedestrian_state.y_vel << " " /* TODO: gsp.pedestrian_state.yaw << " " */
+				<< active << '\n';
+		}
+		else
+		{
+			UE_LOG(GeoScenarioModule, Error, TEXT("Cannot write Pedestrian state to CS ShM. Actor is null."));
+		}
+	}
   // UE_LOG(GeoScenarioModule, Log,
   //        TEXT("WriteClientState: %s | %s"),
   //             *FString(oss.str().c_str()),

@@ -140,6 +140,7 @@ class MKeepInLaneConfig(MConfig):
     #time_lowvel:MP = MP(6.0,10,3)      #duration in [s] as MP when starting
     #vel_threshold:float = 7            #upper bound for lowvel in [m/s]
     max_diff:float = 1.5               #max vel diff (current to target).
+    collision_vehicle_vid:int = -1
     mkey:int = Maneuver.M_KEEPINLANE
 
 

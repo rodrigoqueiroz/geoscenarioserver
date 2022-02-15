@@ -197,3 +197,43 @@ def can_cross_before_red(planner_state, **kwargs):
         return True
 
     return False
+
+def speed_to_ensure_collision(pedestrian_state, vehicle_state, collision_pt):
+    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+    vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
+
+    vehicle_speed = np.linalg.norm(np.array([vehicle_state.x_vel, vehicle_state.y_vel]))
+
+    dist_veh_col = np.linalg.norm(collision_pt - vehicle_pos) # - (VEHICLE_LENGTH / 2)
+    dist_ped_col = np.linalg.norm(collision_pt - pedestrian_pos)
+
+    speed_for_collision = (dist_ped_col * vehicle_speed) / dist_veh_col
+
+    return speed_for_collision
+
+def get_xwalk_vehicle_collision_pt(xwalk, ped_state, vehicle_state):
+    '''
+    Get point of intersection between line segment across crosswalk
+    and the vehicle's velocity vector
+    Return None if no intersection
+    '''
+    p1 = xwalk['entry']
+    p2 = xwalk['exit']
+
+    d_xwalk = p2-p1
+    p_veh = np.array([vehicle_state.x, vehicle_state.y])
+    veh_yaw_rad = np.radians(vehicle_state.yaw)
+    d_veh = np.array([np.cos(veh_yaw_rad), np.sin(veh_yaw_rad)])
+
+    # system of equations
+    a = np.array([[d_veh[0], -d_xwalk[0]], [d_veh[1], -d_xwalk[1]]])
+    b = np.array([p1[0]-p_veh[0], p1[1]-p_veh[1]])
+
+    x = np.linalg.solve(a, b)
+
+    if x[0] < 0 or x[1] < 0 or x[1] > 1:
+        return [None, None]
+
+    collision_pt = p_veh + x[0]*d_veh
+
+    return collision_pt
