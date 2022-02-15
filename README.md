@@ -10,6 +10,8 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - python3.8-venv
 - python3-tk
 - python3-pip
+- python3-pil
+- python3-pil.imagetk
 
 ### Python packages
 
@@ -41,10 +43,10 @@ optional arguments:
                         GeoScenario file. If no file is provided, the GSServer will load a scenario from code
   -q VERBOSE, --quiet VERBOSE
                         don't print messages to stdout
-  -m, --map-path 
+  -m, --map-path
                         Set the prefix to append to the value of the attribute `globalconfig->lanelet`
                         e.g. --map-path $HOME/anm_unreal_test_suite/maps
-  -b, --btree-locations 
+  -b, --btree-locations
                         Add higher priority locations to search for btrees by agent btypes
                         e.g. --btree-locations $HOME/anm_unreal_test_suite/btrees
 ```
