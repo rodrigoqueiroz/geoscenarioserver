@@ -175,6 +175,8 @@ class SP(Pedestrian):
         self.state.set_X([curr_pos[0], curr_vel[0], curr_acc[0]])
         self.state.set_Y([curr_pos[1], curr_vel[1], curr_acc[1]])
 
+        self.state.yaw = math.degrees(math.atan2(curr_vel[1], curr_vel[0]))
+
     def other_pedestrian_interaction(self, curr_pos, curr_vel, other_ped, phi=120000, omega=240000):
         '''
         Calculates repulsive forces between pedestrians
