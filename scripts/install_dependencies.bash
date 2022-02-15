@@ -10,7 +10,7 @@ install_python_dependencies()
     echo "Installing Python3.8 and other packages"
     echo ""
     # Ensure we have Python3.8 and pip3
-    sudo apt-get install -qq python3.8 python3.8-dev python3-tk python3-pip
+    sudo apt-get install -qq python3.8 python3.8-dev python3-tk python3-pip python3-pil python3-pil.imagetk
 
     echo ""
     echo "Installing the required dependencies for catkin for Python3.8"
@@ -29,7 +29,7 @@ install_lanelet2_python38()
     echo "Installing Lanelet2 library from source for Python3.8..."
     echo ""
     # Ensure catkin is installed
-    sudo apt-get -qq install python-catkin-tools 
+    sudo apt-get -qq install python-catkin-tools
     cd $REPO_DIR
     # In the case the repository was not cloned recursively
     git submodule update --init
