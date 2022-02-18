@@ -6,7 +6,3 @@ catkin_ws
 *.DS_Store
 test_btree_parser
 evaluation/db_files/*
-evaluation/traj_log/*
-evaluation/parameter_config/*
-evaluation/plots/*
-evaluation/results/*
