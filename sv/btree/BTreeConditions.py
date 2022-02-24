@@ -37,7 +37,9 @@ class BTreeConditions:
             state = traffic_state.vehicle_state
 
         if state is not None:
-            #s_pos = get_node_param(kwargs,'s_pos')
+            s_pos = get_node_param(kwargs,'s_pos')
+            if s_pos and not (state.d_pos >= s_pos):
+                return False
             s_vel = get_node_param(kwargs,'s_vel')
             if s_vel and not (state.s_vel >= s_vel):
                 return False
@@ -60,16 +62,16 @@ class BTreeConditions:
         """ Checks if vehicle state has reached delta values at minimum.
             Always compare between self the the vehicle with vid (or per occupancy zone)
         """
-
+        
         #retrieve vehicle by looking at vid or zid. 
         vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
         if not vehicle:
             return False
-        my_state = traffic_state.vehicle_state
+        my_state:VehicleState = traffic_state.vehicle_state
         v_state = vehicle.state
 
-        s_pos = get_node_param(kwargs,'s_pos')
-        if s_pos and not (abs(v_state.s_pos - my_state.s_pos) >= s_pos):
+        s_pos = get_node_param(kwargs,['s_pos', 's'])
+        if s_pos and not (abs(v_state.s - my_state.s) >= s_pos):
             return False
         s_vel = get_node_param(kwargs,'s_vel')
         if s_vel and not (abs(v_state.s_vel - my_state.s_vel) >= s_vel):
@@ -77,8 +79,8 @@ class BTreeConditions:
         s_acc = get_node_param(kwargs,'s_acc')
         if s_acc and not (abs(v_state.s_acc - my_state.s_acc) >= s_acc):
             return False
-        d_pos = get_node_param(kwargs,'d_pos')
-        if d_pos and not (abs(v_state.d_pos - my_state.d_pos) >= d_pos):
+        d_pos = get_node_param(kwargs,['d_pos','d'])
+        if d_pos and not (abs(v_state.d - my_state.d) >= d_pos):
             return False
         d_vel = get_node_param(kwargs,'d_vel')
         if d_vel and not (abs(v_state.d_vel - my_state.d_vel) >= d_vel):
@@ -216,7 +218,7 @@ class BTreeConditions:
                 pos_s = traffic_state.lane_config.stopline_pos[0]
                 dist = pos_s - traffic_state.vehicle_state.s
                 vel = abs(traffic_state.vehicle_state.s_vel)
-                print("BEHAVIOR: dist {},vel{}".format(dist,vel))
+                #print("BEHAVIOR: dist {},vel{}".format(dist,vel))
                 return (dist < dist_threshold and vel < vel_threshold)
         
     def vehicle_parked(self,traffic_state:TrafficState, kwargs):
@@ -279,19 +281,20 @@ class BTreeConditions:
         '''
         #REVISE: Time Gap
         lid = get_node_param(kwargs,['lid','target_lid','target_lane_id','target_lane'], required=True)
+        
 
         if lid is None:
             #check if target is by route
             if traffic_state.lane_swerve_target is not None:
                 lid = traffic_state.lane_swerve_target
         
-
         distance_gap = get_node_param(kwargs,['gap', 'distance_gap'], default=20)
         time_gap = get_node_param(kwargs,['time_gap'], default=2)
+        include_opposite = get_node_param(kwargs,['include_opposite'], default=False,int_to_boolean=True)
         if not lid:
             return False
         
-        target_lane_config = traffic_state.lane_config.get_neighbour(lid)
+        target_lane_config = traffic_state.lane_config.get_neighbour(lid,include_opposite)
         if not target_lane_config:
             log.warn("No reachable {} lane for lane changing vehicle {}".format(
                 "LEFT" if lid == 1 else "RIGHT",traffic_state.vid))
@@ -318,7 +321,7 @@ class BTreeConditions:
             gap = range_gap(traffic_state.vehicle_state,vehicle)
             if distance_threshold: 
                 result = (gap > distance_threshold)
-                print (result)
+                #print (result)
             if time_threshold:
                 if gap > 0:
                     time_to_vehicle = gap / vehicle.state.s_vel if vehicle.state.s_vel != 0 else float('inf')
@@ -425,11 +428,14 @@ class BTreeConditions:
 #====================
 
 
-def get_node_param(kwargs, param_names, default = None, required = False):
+def get_node_param(kwargs, param_names, default = None, required = False, int_to_boolean=False):
     if type(param_names) == list:
         for name in param_names:
             if name in kwargs:
-                return kwargs[name]
+                value = kwargs[name]
+                if int_to_boolean:
+                    value = bool(int(value))
+                return value
     elif param_names in kwargs:
             return kwargs[param_names]
     if required:
@@ -481,6 +487,6 @@ def get_vehicle_by_ids(traffic_state:TrafficState, kwargs):
         if vid:
             if vid in traffic_state.traffic_vehicles:
                 return traffic_state.traffic_vehicles[vid]
-        
+        #print(traffic_state.traffic_vehicles)
         log.warn("No Vehicle found with IDs {} ".format(kwargs))
         return None

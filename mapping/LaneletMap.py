@@ -76,11 +76,68 @@ class LaneletMap(object):
                 elem.attributes["one_way"] = "no"
                 elem.attributes["participant:pedestrian"] = "yes"
 
+    def get_conflicting_by_route(self, lanelet_route:Route, lanelet:Lanelet, with_intersecting_points = False):
+        ''''
+            Returns a list of conflicting Lanelets with both current and succeeding
+            lanelets based on the route. 
+            The list is order by distance from lanelet start 
+            and a longitudinal distance from start is assigned
+        '''
+        next_lalenets = self.get_next_by_route(lanelet_route, lanelet)
+        conflicting = []
+        for c in lanelet_route.conflictingInMap(lanelet):
+            conflicting.append(c)
+            if with_intersecting_points:
+                intersecting_points = [] #BasicPoints2d 
+                self.lanelet_map.intersection(
+                    lanelet.centerline2d.basicLineString, 
+                    c.centerline2d.basicLineString, 
+                    intersecting_points)
+        for next_ll in next_lalenets:
+            for c in lanelet_route.conflictingInMap(next_ll):
+                conflicting.append(c)
+        
+        return conflicting
+
     def get_right(self, lanelet):
-        return self.routing_graph.right(lanelet)
+        #routable lanelet, if exists
+        right_ll =  self.routing_graph.right(lanelet)
+        if right_ll:
+            return right_ll,  "routable"
+        #adjacent, non-routable lanelet, if exists
+        right_ll = self.routing_graph.adjacentRight(lanelet) # allowLaneChanges=True # param not available
+        if right_ll:
+            return right_ll, "adjacent"
+        #adjacent, but opposite direction
+        lls = self.lanelet_map.laneletLayer.findUsages(lanelet.rightBound.invert())
+        if len(lls) > 0:
+            right_ll = lls[0]
+        if len(lls) > 1:
+            log.warn("multiple right adjacent lanelets found for {}. Using {}".format(lanelet.id, right_ll.id))
+        if right_ll:
+            return right_ll, "opposite"
+        #Not found
+        return None, ""
 
     def get_left(self, lanelet):
-        return self.routing_graph.left(lanelet)
+        #routable lanelet, if exists
+        left_ll =  self.routing_graph.left(lanelet)
+        if left_ll:
+            return left_ll,  "routable"
+        #adjacent, non-routable lanelet, if exists
+        left_ll = self.routing_graph.adjacentLeft(lanelet) # allowLaneChanges=True # param not available
+        if left_ll:
+            return left_ll, "adjacent"
+        #adjacent, but opposite direction
+        lls = self.lanelet_map.laneletLayer.findUsages(lanelet.leftBound.invert())
+        for ll in lls:
+            left_ll = ll
+        if len(lls) > 1:
+            log.warn("multiple left adjacent lanelets found for {}. Using {}".format(lanelet.id, left_ll.id))
+        if left_ll:
+            return left_ll, "opposite"
+        #Not found
+        return None, ""
 
     def get_next(self, lanelet):
         return self.routing_graph.following(lanelet)
@@ -104,7 +161,7 @@ class LaneletMap(object):
         # NOTE: lanelet must be on lanelet_route
 
         left = []
-
+        # Provides all lanelets left of a given lanelet within the Route
         left_relations = lanelet_route.leftRelations(lanelet)
         for relation in left_relations:
             if relation.relationType == RelationType.Left:

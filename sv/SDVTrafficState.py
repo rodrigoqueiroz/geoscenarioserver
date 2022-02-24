@@ -152,6 +152,7 @@ def get_traffic_state(
 
     # transform other vehicles and pedestrians to frenet frame based on this vehicle
     for vid, vehicle in list(traffic_vehicles.items()):
+        #log.warning("Adding Vehicle {} to traffic snapshot".format(vid))
         try:
             s_vector, d_vector = sim_to_frenet_frame(
                 sdv_route.get_reference_path(), vehicle.state.get_X(),
@@ -160,6 +161,7 @@ def get_traffic_state(
             vehicle.state.set_S(s_vector)
             vehicle.state.set_D(d_vector)
         except OutsideRefPathException:
+            #log.warning("Vehicle {} outside ref path".format(vid))
             del traffic_vehicles[vid]
     
     for pid, pedestrian in list(traffic_pedestrians.items()):
@@ -266,28 +268,35 @@ def read_map(laneletmap:LaneletMap, sdv_route:SDVRoute, vehicle_state:VehicleSta
     # LaneConfig(id, velocity, leftbound, rightbound).
     # /2 to center it on its centerline
     middle_lane_config = LaneConfig(0, 30, middle_lane_width / 2, middle_lane_width / -2)
-
-    if laneletmap.get_left(cur_ll):
-        upper_lane_width = LaneletMap.get_lane_width(laneletmap.get_left(cur_ll), vehicle_state.x, vehicle_state.y)
+    
+    #if laneletmap.get_left(cur_ll):
+    left_ll, relationship = laneletmap.get_left(cur_ll)
+    if left_ll:
+        #print("LEFT {} {} {}".format(left_ll,relationship,type(left_ll)))
+        upper_lane_width = LaneletMap.get_lane_width(left_ll, vehicle_state.x, vehicle_state.y)
         upper_lane_config = LaneConfig(1, 30, middle_lane_config.left_bound + upper_lane_width, middle_lane_config.left_bound)
-        middle_lane_config.set_left_lane(upper_lane_config)
-
-    if laneletmap.get_right(cur_ll):
-        lower_lane_width = LaneletMap.get_lane_width(laneletmap.get_right(cur_ll), vehicle_state.x, vehicle_state.y)
+        middle_lane_config.set_left_lane(upper_lane_config,relationship)
+    #if laneletmap.get_right(cur_ll):
+    right_ll, relationship   = laneletmap.get_right(cur_ll)
+    if right_ll:
+        lower_lane_width = LaneletMap.get_lane_width(right_ll, vehicle_state.x, vehicle_state.y)
         lower_lane_config = LaneConfig(-1, 30, middle_lane_config.right_bound, middle_lane_config.right_bound - lower_lane_width)
-        middle_lane_config.set_right_lane(lower_lane_config)
+        middle_lane_config.set_right_lane(lower_lane_config,relationship)
 
     #Get next lanelets in route and look for conflicts:
     next_lalenets = laneletmap.get_next_by_route(sdv_route._lanelet_route, cur_ll)
-    conflicting = []
-    for c in sdv_route._lanelet_route.conflictingInMap(cur_ll):
-        conflicting.append(c)
-    for next_ll in next_lalenets:
-        for c in sdv_route._lanelet_route.conflictingInMap(next_ll):
-            conflicting.append(c)
+    conflicting = laneletmap.get_conflicting_by_route(sdv_route._lanelet_route,cur_ll)
+
+    #conflicting = []
+    #for c in sdv_route._lanelet_route.conflictingInMap(cur_ll):
+    #    conflicting.append(c)
+    #for next_ll in next_lalenets:
+    #    for c in sdv_route._lanelet_route.conflictingInMap(next_ll):
+    #        conflicting.append(c)
     #print("Conflicting now and next")
     #for ll in conflicting:
     #    print(ll.id)
+
 
     #Get Road Zone
     #default, approaching intersection, at intersection, exiting intersection
