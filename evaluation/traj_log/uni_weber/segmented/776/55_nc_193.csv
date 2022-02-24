@@ -1,2 +1,0 @@
-id,agent_type,type,sim_state,tick_count,sim_time,delta_time,x,x_vel,x_acc,y,y_vel,y_acc,s,s_vel,s_acc,d,d_vel,d_acc,yaw
-193,pedestrian,1,2,1,186.9868,0.0,9999,0,0,9999,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
