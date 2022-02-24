@@ -54,10 +54,10 @@ class BCondition(behaviour.Behaviour):
                         print("wait condition timeout {}".format(self.ts.sim_time))
                         status = common.Status.SUCCESS
                 #other conditions
-            elif self.bmodel.test_condition(self.condition, self.kwargs):
-                    #print("SUCCESS")
-                    status = common.Status.SUCCESS
-                    self.triggered = True
+                elif self.bmodel.test_condition(self.condition, self.kwargs):
+                        #print("SUCCESS")
+                        status = common.Status.SUCCESS
+                        self.triggered = True
 
         except KeyError as e:
             raise RuntimeError("Missing condition '" + self.name + "'.")
