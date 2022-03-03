@@ -210,6 +210,8 @@ class ActorState:
     def set_D(self, D):
         self.d, self.d_vel, self.d_acc = D
 
+    def get_cartesian_speed(self):
+        return math.sqrt(abs(self.x_vel)**2 + abs(self.y_vel)**2)
 
 @dataclass
 class VehicleState(ActorState):
