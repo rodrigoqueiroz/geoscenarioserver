@@ -61,6 +61,7 @@ class SDVRoute(object):
         start, end, direction = self._current_sdv_path.get_lane_swerve_info()
 
         if self._should_lane_swerve:
+            #print("should lane swerve to {}".format(direction))
             return direction
         return None
 

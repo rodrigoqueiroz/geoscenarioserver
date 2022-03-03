@@ -1,0 +1,6 @@
+behaviortree DeccelarateScenarioTree:
+    ?
+        ->
+            condition lc( sim_time (repeat=True, tmin=5))
+            maneuver keep_velocity (MVelKeepConfig(vel=MP(4,10,6)))
+        subtree drive_tree( keep_velocity=MVelKeepConfig(vel=MP(12, 10, 6)) )

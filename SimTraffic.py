@@ -361,6 +361,7 @@ class SimTraffic(object):
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[ i+3 : i+16 ]
             vehicle.state.set_state_vector(state_vector)
+            vehicle.name = self.vehicles[vid].name  #thread safe. It does not change.
             vehicles[vid] = vehicle
 
         pedestrians = {}

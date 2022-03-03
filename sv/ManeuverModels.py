@@ -327,17 +327,17 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:TrafficState):
         mconfig.pos = traffic_state.goal_point_frenet[0]
     elif mconfig.target == MStopConfig.StopTarget.STOP_LINE:
        mconfig.pos = lane_config.stopline_pos
-       for re_state in traffic_state.regulatory_elements:
-            if 'stop_position' in re_state._fields:
-                mconfig.pos = re_state.stop_position[0]
-                break
+       for intersection in traffic_state.intersections:
+            mconfig.pos = intersection.stop_position[0]
+            break
+    #log.info("PLAN STOP: can not find stop position in intersection")            
     
     #adjust target pos to vehicle length
     target_pos = mconfig.pos - VEHICLE_LENGTH/2 - mconfig.distance 
 
     #Already stopped?
     if (abs(s_start[1]) <= 0.05):
-        log.warn('Vehicle already stopped')
+        #log.warn('Vehicle already stopped')
         #TODO: Need another stop maneuver (yielding) for proper configuration
         #if already stopped and not at stopping point, move to it
         if target_pos > 1:

@@ -1,0 +1,11 @@
+behaviortree st_drifting_driver:
+    ?
+        ->
+            condition c_minspeed ( vehicle_moving( vel=3.0 ) )
+            -> 
+                condition c_start  (gap ( distance=0, vid=99 ))
+                maneuver m_startdrift ( MVelKeepConfig(vel=MP(13.0,10,6), lat_target=LT(1.0))
+            ->
+                condition c_gap  (gap ( distance=5, vid=99 ))
+                maneuver m_finaldrift ( MVelKeepConfig(vel=MP(10.0,10,6), lat_target=LT(2.0,1,1,1,0,0), fc_collision=0, fc_off_lane=0) )
+        maneuver m_normal ( MVelKeepConfig(vel=MP(13.0,10,6),fc_off_lane=0))

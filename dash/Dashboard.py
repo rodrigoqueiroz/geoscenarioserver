@@ -336,7 +336,7 @@ class Dashboard(object):
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
                     continue
-                colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state)
+                colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state, vehicle.name)
                 x = vehicle.state.x
                 y = vehicle.state.y
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
@@ -355,7 +355,7 @@ class Dashboard(object):
                         circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                         ax.add_artist(circle1)
                     #label
-                    label = "v{}".format(vid)
+                    label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
                     label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
                     ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
                     #arrow
@@ -441,12 +441,12 @@ class Dashboard(object):
 
         #other vehicles, from main vehicle POV:
         for vid,vehicle in vehicles.items():
-            colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state)
+            colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state,vehicle.name)
             vs = vehicle.state
             plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
             circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
             gca.add_artist(circle1)
-            label = "v{}".format(int(vid))
+            label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
             gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
@@ -514,14 +514,16 @@ class Dashboard(object):
         #fig.tight_layout(pad=0.05)
 
 
-    def get_color_by_type(self,actor,a_type,sim_state = None):
+    def get_color_by_type(self,actor,a_type,sim_state = None, name = ''):
         #color
         colorcode = 'k' #black
         if actor== 'vehicle':
-            if a_type == Vehicle.SDV_TYPE:
+            if name.lower() == 'ego':
+                colorcode = 'g' #always green for Ego
+            elif a_type == Vehicle.SDV_TYPE:
                 colorcode = 'b' #blue
             elif a_type == Vehicle.EV_TYPE:
-                colorcode = 'g' #green
+                colorcode = 'c' #cyan
             elif a_type == Vehicle.TV_TYPE:
                 colorcode = 'k' #black
         elif actor== 'pedestrian':

@@ -37,7 +37,9 @@ class LaneConfig:
     left_bound:float = 2            #d
     right_bound:float = -2          #d
     _left_lane: LaneConfig = None
+    _left_relationship:str = ""     #routable, adjacent, opposite
     _right_lane: LaneConfig = None
+    _right_relationship:str = ""
     stopline_pos:float = None
 
     def get_current_lane(self, d):
@@ -49,21 +51,25 @@ class LaneConfig:
             return self._left_lane
         return None
 
-    def set_left_lane(self,lane):
+    def set_left_lane(self,lane,relationship):
         self._left_lane = lane
+        self._left_relationship = relationship
         lane._right_lane = self
 
-    def set_right_lane(self,lane):
+    def set_right_lane(self,lane,relationship):
         self._right_lane = lane
+        self._right_relationship = relationship
         lane._left_lane = self
 
-    def get_neighbour(self,l_id):
-        if (self._right_lane):
-            if (self._right_lane.id == l_id):
-                return self._right_lane
-        if (self._left_lane):
-            if (self._left_lane.id == l_id):
-                return self._left_lane
+    def get_neighbour(self,l_id, include_opposite = True):
+        if l_id > 0: #LEFT
+            if (self._left_lane):
+                if include_opposite or self._left_relationship is not "opposite":
+                    return self._left_lane
+        if l_id < 0: #RIGHT
+            if (self._right_lane):
+                if include_opposite or self._right_relationship is not "opposite":
+                    return self._left_lane
         return None
     
     def get_central_d(self):
@@ -194,6 +200,16 @@ class MConfig:
     #Higher(100) = better precision, but impacts performance. 
     #Use with caution when multiple vehicles are used in simulation
     cost_precision:float = 10             #from 10 to 100.
+
+    #Temp solution for the problem of Btrees not parsing dictionary values
+    #Allows to modify feasibility constraints and costs
+    fc_collision:int = 1
+    fc_off_lane:int = 1
+    lane_offset_cost:float = 1.0
+    def __post_init__(self):
+        self.feasibility_constraints['collision'] = self.fc_collision
+        self.feasibility_constraints['off_lane'] = self.fc_off_lane
+        self.cost_weight['lane_offset_cost'] = self.lane_offset_cost
 
 @dataclass
 class MVelKeepConfig(MConfig):
