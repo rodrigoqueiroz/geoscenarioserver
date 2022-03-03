@@ -1,4 +1,4 @@
-#include "SimVehicle.h"
+#include "SimPedestrian.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/SkeletalMesh.h"
@@ -6,7 +6,7 @@
 #include "EngineUtils.h"
 #include "GeoScenarioModule.h"
 
-ASimVehicle::ASimVehicle()
+ASimPedestrian::ASimPedestrian()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickInterval = 0.05f;
@@ -26,18 +26,18 @@ ASimVehicle::ASimVehicle()
 
     // SetActorEnableCollision(true);
 
-	FString MeshName = "/Game/Agents/Vehicles/SUV/SUVMesh.SUVMesh";
+	FString MeshName = "/Game/Agents/Pedestrians/FusePed/StaticPed.StaticPed";
 	UStaticMesh *MeshAsset = Cast<UStaticMesh>(
       StaticLoadObject(UStaticMesh::StaticClass(), NULL, *MeshName));
     Mesh->SetStaticMesh(MeshAsset);
 }
 
-void ASimVehicle::BeginPlay()
+void ASimPedestrian::BeginPlay()
 {
 	Super::BeginPlay();
 
     // bounding box
-	FVector outExt;
+	  FVector outExt;
     FVector outPos;
     FRotator outOrien;
 
@@ -54,22 +54,22 @@ void ASimVehicle::BeginPlay()
       RootComponent,
       FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 
-    this->OnActorBeginOverlap.AddDynamic(this, &ASimVehicle::OnOverlap);
+    this->OnActorBeginOverlap.AddDynamic(this, &ASimPedestrian::OnOverlap);
 
     this->isActive = true;
 }
 
-void ASimVehicle::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ASimPedestrian::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 }
 
-void ASimVehicle::Tick(float DeltaTime)
+void ASimPedestrian::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void ASimVehicle::GetBoundingBox(FVector &outPosition, FVector &outExtent, FRotator &outOrientation)
+void ASimPedestrian::GetBoundingBox(FVector &outPosition, FVector &outExtent, FRotator &outOrientation)
 {
     // Get location and rotation of the actor in world coordinate frame to place
     // the bounding box in the correct position
@@ -98,42 +98,42 @@ void ASimVehicle::GetBoundingBox(FVector &outPosition, FVector &outExtent, FRota
     }
 }
 
-void ASimVehicle::OnOverlap(AActor *self, AActor *other)
+void ASimPedestrian::OnOverlap(AActor *self, AActor *other)
 {
     // UE_LOG(LogTemp, Error, TEXT("OVERLAP"));
 
-    static const FName GSTAG(TEXT("gsvehicle"));
+    static const FName GSTAG(TEXT("gspedestrian"));
     if (other->ActorHasTag(GSTAG)) {
         UE_LOG(GeoScenarioModule, Warning,
-                TEXT("GS vehicle %s collided with %s"),
+                TEXT("GS pedestrian %s collided with %s"),
                 *self->GetName(),
                 *other->GetName());
         this->isActive = false;
 
-        // Check if collided with a gs vehicle
-        ASimVehicle *otherGSV = Cast<ASimVehicle>(other);
-        if (otherGSV == nullptr) {
-            UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with ego"));
-        } else {
-            UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with GSV"));
-            otherGSV->SetActive(false);
-        }
+        // Check if collided with a gs pedestrian
+        // ASimPedestrian *otherGSP = Cast<ASimPedestrian>(other);
+        // if (otherGSP == nullptr) {
+        //     UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with ego"));
+        // } else {
+        //     UE_LOG(GeoScenarioModule, Warning, TEXT("Collided with GSP"));
+        //     otherGSP->SetActive(false);
+        // }
     }
 
     // TODO: add check for pedestrians
 }
 
-void ASimVehicle::SetActive(bool active)
+void ASimPedestrian::SetActive(bool active)
 {
     this->isActive = active;
 }
 
-bool ASimVehicle::GetActive() const
+bool ASimPedestrian::GetActive() const
 {
     return this->isActive;
 }
 
-void ASimVehicle::OnHit(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult& Hit)
+void ASimPedestrian::OnHit(class UPrimitiveComponent* HitComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 otherBodyIndex, bool fromSweep, const FHitResult& Hit)
 {
     // UE_LOG(LogTemp, Error, TEXT("COLLISION"));
 }
