@@ -1,10 +1,12 @@
+
 behaviortree st_cutin_driver:
     ?
         ->
             condition c_trigger( sim_time(tmin=4))
             ->
-                condition c_gap(gap( vid=99, distance=2, pbound = 10) )
-                maneuver m_swerve( MCutInConfig( target_lid=RIGHT, delta_s=(5, -3,0) ) )
-        maneuver m_vel_keep(MVelKeepConfig( vel=MP(14.0,10,6)))
+                condition c_gap(gap( vid=99, distance=5, pbound = 10) )                             ;
+                maneuver m_swerve( MCutInConfig( target_lid=RIGHT, delta_s=(5, -3,0) ) )            ;
+        maneuver m_vel_keep(MVelKeepConfig( vel=MP(14.0,10,6)))                                     ;
+
 
 

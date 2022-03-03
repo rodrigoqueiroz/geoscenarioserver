@@ -26,10 +26,10 @@
     <tag k='vid' v='1' />
     <tag k='yaw' v='90' />
   </node>
-  <node id='-5009646' action='modify' visible='true' lat='43.43591786834' lon='-80.57969259965'>
+  <node id='-5009646' action='modify' visible='true' lat='43.43591884217' lon='-80.57970265793'>
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
-    <tag k='name' v='v2_parked_vehicle' />
+    <tag k='name' v='v2_parked_blocking' />
     <tag k='vid' v='2' />
     <tag k='yaw' v='88' />
   </node>
