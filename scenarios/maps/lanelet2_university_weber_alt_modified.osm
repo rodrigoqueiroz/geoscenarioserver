@@ -718,17 +718,26 @@
   <node id='-2716442' action='modify' visible='true' lat='43.47800815391' lon='-80.51997959441' />
   <node id='-2716443' action='modify' visible='true' lat='43.47795981398' lon='-80.51997755259' />
   <node id='-2716444' action='modify' visible='true' lat='43.47794121455' lon='-80.519964988' />
-  <way id='-103094' visible='true'>
+  <node id='-2716587' action='modify' visible='true' lat='43.47792990764' lon='-80.51989508' />
+  <node id='-2716588' action='modify' visible='true' lat='43.47795126835' lon='-80.51986098357' />
+  <node id='-2716589' action='modify' visible='true' lat='43.47797462414' lon='-80.51983885534' />
+  <node id='-2716590' action='modify' visible='true' lat='43.47806172169' lon='-80.51980666883' />
+  <node id='-2716591' action='modify' visible='true' lat='43.47808653717' lon='-80.51980599828' />
+  <node id='-2716592' action='modify' visible='true' lat='43.47812789628' lon='-80.51980800994' />
+  <node id='-2716593' action='modify' visible='true' lat='43.47816147012' lon='-80.51982075043' />
+  <node id='-2716647' action='modify' visible='true' lat='43.47800673834' lon='-80.51981940933' />
+  <node id='-2716675' action='modify' visible='true' lat='43.47803301357' lon='-80.51981203325' />
+  <way id='-103436' visible='true'>
     <nd ref='-2716180' />
     <nd ref='-2716357' />
   </way>
-  <way id='-103095' action='modify' visible='true'>
+  <way id='-103437' action='modify' visible='true'>
     <nd ref='-2716181' />
     <nd ref='-2716227' />
     <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
-  <way id='-103096' visible='true'>
+  <way id='-103438' visible='true'>
     <nd ref='-2716182' />
     <nd ref='-2716183' />
     <nd ref='-2716386' />
@@ -745,23 +754,23 @@
     <nd ref='-2716191' />
     <nd ref='-2716353' />
   </way>
-  <way id='-103097' visible='true'>
+  <way id='-103439' visible='true'>
     <nd ref='-2716192' />
     <nd ref='-2716228' />
   </way>
-  <way id='-103098' visible='true'>
+  <way id='-103440' visible='true'>
     <nd ref='-2716193' />
     <nd ref='-2716352' />
   </way>
-  <way id='-103099' visible='true'>
+  <way id='-103441' visible='true'>
     <nd ref='-2716194' />
     <nd ref='-2716314' />
   </way>
-  <way id='-103100' visible='true'>
+  <way id='-103442' visible='true'>
     <nd ref='-2716195' />
     <nd ref='-2716307' />
   </way>
-  <way id='-103101' visible='true'>
+  <way id='-103443' visible='true'>
     <nd ref='-2716196' />
     <nd ref='-2716197' />
     <nd ref='-2716402' />
@@ -771,25 +780,25 @@
     <nd ref='-2716385' />
     <nd ref='-2716347' />
   </way>
-  <way id='-103102' visible='true'>
+  <way id='-103444' visible='true'>
     <nd ref='-2716199' />
     <nd ref='-2716200' />
   </way>
-  <way id='-103103' visible='true'>
+  <way id='-103445' visible='true'>
     <nd ref='-2716201' />
     <nd ref='-2716244' />
   </way>
-  <way id='-103104' visible='true'>
+  <way id='-103446' visible='true'>
     <nd ref='-2716202' />
     <nd ref='-2716215' />
   </way>
-  <way id='-103105' visible='true'>
+  <way id='-103447' visible='true'>
     <nd ref='-2716203' />
     <nd ref='-2716204' />
     <nd ref='-2716205' />
     <nd ref='-2716206' />
   </way>
-  <way id='-103106' visible='true'>
+  <way id='-103448' visible='true'>
     <nd ref='-2716206' />
     <nd ref='-2716207' />
     <nd ref='-2716208' />
@@ -803,7 +812,7 @@
     <nd ref='-2716214' />
     <nd ref='-2716368' />
   </way>
-  <way id='-103107' visible='true'>
+  <way id='-103449' visible='true'>
     <nd ref='-2716215' />
     <nd ref='-2716216' />
     <nd ref='-2716217' />
@@ -817,22 +826,22 @@
     <nd ref='-2716223' />
     <nd ref='-2716325' />
   </way>
-  <way id='-103108' visible='true'>
+  <way id='-103450' visible='true'>
     <nd ref='-2716224' />
     <nd ref='-2716225' />
     <nd ref='-2716226' />
   </way>
-  <way id='-103109' visible='true'>
+  <way id='-103451' visible='true'>
     <nd ref='-2716227' />
     <nd ref='-2716378' />
   </way>
-  <way id='-103110' visible='true'>
+  <way id='-103452' visible='true'>
     <nd ref='-2716228' />
     <nd ref='-2716399' />
     <nd ref='-2716397' />
     <nd ref='-2716379' />
   </way>
-  <way id='-103111' visible='true'>
+  <way id='-103453' visible='true'>
     <nd ref='-2716228' />
     <nd ref='-2716229' />
     <nd ref='-2716230' />
@@ -844,7 +853,7 @@
     <nd ref='-2716236' />
     <nd ref='-2716378' />
   </way>
-  <way id='-103112' visible='true'>
+  <way id='-103454' visible='true'>
     <nd ref='-2716237' />
     <nd ref='-2716238' />
     <nd ref='-2716239' />
@@ -853,17 +862,17 @@
     <nd ref='-2716240' />
     <nd ref='-2716241' />
   </way>
-  <way id='-103113' action='modify' visible='true'>
+  <way id='-103455' action='modify' visible='true'>
     <nd ref='-2716242' />
     <nd ref='-2716241' />
     <nd ref='-2716428' />
     <nd ref='-2716243' />
   </way>
-  <way id='-103114' visible='true'>
+  <way id='-103456' visible='true'>
     <nd ref='-2716244' />
     <nd ref='-2716269' />
   </way>
-  <way id='-103115' visible='true'>
+  <way id='-103457' visible='true'>
     <nd ref='-2716245' />
     <nd ref='-2716246' />
     <nd ref='-2716247' />
@@ -871,7 +880,7 @@
     <nd ref='-2716249' />
     <nd ref='-2716261' />
   </way>
-  <way id='-103116' visible='true'>
+  <way id='-103458' visible='true'>
     <nd ref='-2716250' />
     <nd ref='-2716251' />
     <nd ref='-2716252' />
@@ -882,12 +891,12 @@
     <nd ref='-2716257' />
     <nd ref='-2716377' />
   </way>
-  <way id='-103117' visible='true'>
+  <way id='-103459' visible='true'>
     <nd ref='-2716258' />
     <nd ref='-2716259' />
     <nd ref='-2716260' />
   </way>
-  <way id='-103118' visible='true'>
+  <way id='-103460' visible='true'>
     <nd ref='-2716261' />
     <nd ref='-2716262' />
     <nd ref='-2716263' />
@@ -898,7 +907,7 @@
     <nd ref='-2716268' />
     <nd ref='-2716307' />
   </way>
-  <way id='-103119' visible='true'>
+  <way id='-103461' visible='true'>
     <nd ref='-2716269' />
     <nd ref='-2716382' />
     <nd ref='-2716270' />
@@ -912,7 +921,7 @@
     <nd ref='-2716278' />
     <nd ref='-2716258' />
   </way>
-  <way id='-103120' visible='true'>
+  <way id='-103462' visible='true'>
     <nd ref='-2716279' />
     <nd ref='-2716280' />
     <nd ref='-2716281' />
@@ -925,7 +934,7 @@
     <nd ref='-2716288' />
     <nd ref='-2716245' />
   </way>
-  <way id='-103121' visible='true'>
+  <way id='-103463' visible='true'>
     <nd ref='-2716289' />
     <nd ref='-2716290' />
     <nd ref='-2716291' />
@@ -940,7 +949,7 @@
     <nd ref='-2716300' />
     <nd ref='-2716380' />
   </way>
-  <way id='-103122' visible='true'>
+  <way id='-103464' visible='true'>
     <nd ref='-2716227' />
     <nd ref='-2716301' />
     <nd ref='-2716302' />
@@ -950,7 +959,7 @@
     <nd ref='-2716306' />
     <nd ref='-2716258' />
   </way>
-  <way id='-103123' visible='true'>
+  <way id='-103465' visible='true'>
     <nd ref='-2716307' />
     <nd ref='-2716308' />
     <nd ref='-2716309' />
@@ -960,7 +969,7 @@
     <nd ref='-2716313' />
     <nd ref='-2716279' />
   </way>
-  <way id='-103124' visible='true'>
+  <way id='-103466' visible='true'>
     <nd ref='-2716314' />
     <nd ref='-2716315' />
     <nd ref='-2716316' />
@@ -973,35 +982,35 @@
     <nd ref='-2716323' />
     <nd ref='-2716362' />
   </way>
-  <way id='-103125' action='modify' visible='true'>
+  <way id='-103467' action='modify' visible='true'>
     <nd ref='-2716384' />
     <nd ref='-2716398' />
     <nd ref='-2716400' />
     <nd ref='-2716347' />
   </way>
-  <way id='-103126' visible='true'>
+  <way id='-103468' visible='true'>
     <nd ref='-2716325' />
     <nd ref='-2716326' />
     <nd ref='-2716327' />
   </way>
-  <way id='-103127' visible='true'>
+  <way id='-103469' visible='true'>
     <nd ref='-2716328' />
     <nd ref='-2716329' />
     <nd ref='-2716330' />
   </way>
-  <way id='-103128' visible='true'>
+  <way id='-103470' visible='true'>
     <nd ref='-2716331' />
     <nd ref='-2716332' />
     <nd ref='-2716333' />
     <nd ref='-2716376' />
   </way>
-  <way id='-103129' visible='true'>
+  <way id='-103471' visible='true'>
     <nd ref='-2716334' />
     <nd ref='-2716335' />
     <nd ref='-2716336' />
     <nd ref='-2716237' />
   </way>
-  <way id='-103130' action='modify' visible='true'>
+  <way id='-103472' action='modify' visible='true'>
     <nd ref='-2716337' />
     <nd ref='-2716338' />
     <nd ref='-2716339' />
@@ -1013,64 +1022,66 @@
     <nd ref='-2716343' />
     <nd ref='-2716428' />
   </way>
-  <way id='-103131' visible='true'>
+  <way id='-103473' action='modify' visible='true'>
     <nd ref='-2716344' />
     <nd ref='-2716279' />
+    <tag k='type' v='line_solid' />
   </way>
-  <way id='-103132' action='modify' visible='true'>
+  <way id='-103474' action='modify' visible='true'>
     <nd ref='-2716345' />
     <nd ref='-2716346' />
   </way>
-  <way id='-103133' visible='true'>
+  <way id='-103475' visible='true'>
     <nd ref='-2716347' />
     <nd ref='-2716348' />
     <nd ref='-2716349' />
     <nd ref='-2716350' />
     <nd ref='-2716351' />
   </way>
-  <way id='-103134' visible='true'>
+  <way id='-103476' visible='true'>
     <nd ref='-2716352' />
     <nd ref='-2716380' />
   </way>
-  <way id='-103135' visible='true'>
+  <way id='-103477' visible='true'>
     <nd ref='-2716353' />
     <nd ref='-2716354' />
     <nd ref='-2716355' />
     <nd ref='-2716356' />
   </way>
-  <way id='-103136' visible='true'>
+  <way id='-103478' action='modify' visible='true'>
     <nd ref='-2716357' />
+    <nd ref='-2716587' />
     <nd ref='-2716377' />
   </way>
-  <way id='-103137' visible='true'>
+  <way id='-103479' visible='true'>
     <nd ref='-2716199' />
     <nd ref='-2716261' />
   </way>
-  <way id='-103138' visible='true'>
+  <way id='-103480' visible='true'>
     <nd ref='-2716358' />
     <nd ref='-2716359' />
     <nd ref='-2716360' />
     <nd ref='-2716361' />
     <nd ref='-2716337' />
   </way>
-  <way id='-103139' visible='true'>
+  <way id='-103481' visible='true'>
     <nd ref='-2716362' />
     <nd ref='-2716363' />
   </way>
-  <way id='-103140' visible='true'>
+  <way id='-103482' visible='true'>
     <nd ref='-2716279' />
     <nd ref='-2716344' />
   </way>
-  <way id='-103141' visible='true'>
+  <way id='-103483' visible='true'>
     <nd ref='-2716364' />
     <nd ref='-2716365' />
     <nd ref='-2716196' />
   </way>
-  <way id='-103142' action='modify' visible='true'>
+  <way id='-103484' action='modify' visible='true'>
     <nd ref='-2716366' />
     <nd ref='-2716362' />
   </way>
-  <way id='-103143' action='modify' visible='true'>
+  <way id='-103485' action='modify' visible='true'>
     <nd ref='-2716381' />
     <nd ref='-2716390' />
     <nd ref='-2716392' />
@@ -1078,149 +1089,151 @@
     <nd ref='-2716401' />
     <nd ref='-2716242' />
   </way>
-  <way id='-103144' visible='true'>
+  <way id='-103486' action='modify' visible='true'>
     <nd ref='-2716367' />
     <nd ref='-2716289' />
+    <tag k='subtype' v='dashed' />
+    <tag k='type' v='line_thin' />
   </way>
-  <way id='-103145' visible='true'>
+  <way id='-103487' visible='true'>
     <nd ref='-2716368' />
     <nd ref='-2716369' />
     <nd ref='-2716370' />
     <nd ref='-2716371' />
   </way>
-  <way id='-103146' visible='true'>
+  <way id='-103488' visible='true'>
     <nd ref='-2716372' />
     <nd ref='-2716373' />
     <nd ref='-2716374' />
     <nd ref='-2716375' />
     <nd ref='-2716182' />
   </way>
-  <way id='-103147' visible='true'>
+  <way id='-103489' visible='true'>
     <nd ref='-2716376' />
     <nd ref='-2716250' />
   </way>
-  <way id='-103148' visible='true'>
+  <way id='-103490' visible='true'>
     <nd ref='-2716244' />
     <nd ref='-2716269' />
   </way>
-  <way id='-103149' visible='true'>
+  <way id='-103491' visible='true'>
     <nd ref='-2716289' />
     <nd ref='-2716261' />
   </way>
-  <way id='-103150' visible='true'>
+  <way id='-103492' visible='true'>
     <nd ref='-2716377' />
     <nd ref='-2716224' />
   </way>
-  <way id='-103151' visible='true'>
+  <way id='-103493' visible='true'>
     <nd ref='-2716378' />
     <nd ref='-2716353' />
   </way>
-  <way id='-103152' visible='true'>
+  <way id='-103494' visible='true'>
     <nd ref='-2716314' />
     <nd ref='-2716245' />
   </way>
-  <way id='-103153' visible='true'>
+  <way id='-103495' visible='true'>
     <nd ref='-2716269' />
     <nd ref='-2716279' />
   </way>
-  <way id='-103154' visible='true'>
+  <way id='-103496' visible='true'>
     <nd ref='-2716337' />
     <nd ref='-2716324' />
   </way>
-  <way id='-103155' visible='true'>
+  <way id='-103497' visible='true'>
     <nd ref='-2716237' />
     <nd ref='-2716345' />
   </way>
-  <way id='-103156' action='modify' visible='true'>
+  <way id='-103498' action='modify' visible='true'>
     <nd ref='-2716250' />
     <nd ref='-2716383' />
   </way>
-  <way id='-103157' visible='true'>
+  <way id='-103499' visible='true'>
     <nd ref='-2716245' />
     <nd ref='-2716328' />
   </way>
-  <way id='-103158' visible='true'>
+  <way id='-103500' visible='true'>
     <nd ref='-2716379' />
     <nd ref='-2716368' />
   </way>
-  <way id='-103159' visible='true'>
+  <way id='-103501' visible='true'>
     <nd ref='-2716380' />
     <nd ref='-2716325' />
   </way>
-  <way id='-103160' action='modify' visible='true'>
+  <way id='-103502' action='modify' visible='true'>
     <nd ref='-2716182' />
     <nd ref='-2716433' />
   </way>
-  <way id='-103161' action='modify' visible='true'>
+  <way id='-103503' action='modify' visible='true'>
     <nd ref='-2716269' />
     <nd ref='-2716261' />
     <tag k='note' v='stop line for tl e s' />
   </way>
-  <way id='-103162' action='modify' visible='true'>
+  <way id='-103504' action='modify' visible='true'>
     <nd ref='-2716436' />
     <nd ref='-2716196' />
   </way>
-  <way id='-103163' visible='true'>
+  <way id='-103505' visible='true'>
     <nd ref='-2716245' />
     <nd ref='-2716250' />
   </way>
-  <way id='-103164' visible='true'>
+  <way id='-103506' visible='true'>
     <nd ref='-2716381' />
     <nd ref='-2716382' />
   </way>
-  <way id='-103165' visible='true'>
+  <way id='-103507' visible='true'>
     <nd ref='-2716383' />
     <nd ref='-2716384' />
   </way>
-  <way id='-103166' visible='true'>
+  <way id='-103508' visible='true'>
     <nd ref='-2716385' />
     <nd ref='-2716386' />
   </way>
-  <way id='-103167' visible='true'>
+  <way id='-103509' visible='true'>
     <nd ref='-2716387' />
     <nd ref='-2716388' />
   </way>
-  <way id='-103168' visible='true'>
+  <way id='-103510' visible='true'>
     <nd ref='-2716389' />
     <nd ref='-2716390' />
   </way>
-  <way id='-103169' visible='true'>
+  <way id='-103511' visible='true'>
     <nd ref='-2716391' />
     <nd ref='-2716392' />
   </way>
-  <way id='-103170' visible='true'>
+  <way id='-103512' visible='true'>
     <nd ref='-2716393' />
     <nd ref='-2716394' />
   </way>
-  <way id='-103171' visible='true'>
+  <way id='-103513' visible='true'>
     <nd ref='-2716395' />
     <nd ref='-2716396' />
   </way>
-  <way id='-103172' visible='true'>
+  <way id='-103514' visible='true'>
     <nd ref='-2716397' />
     <nd ref='-2716398' />
   </way>
-  <way id='-103173' visible='true'>
+  <way id='-103515' visible='true'>
     <nd ref='-2716399' />
     <nd ref='-2716400' />
   </way>
-  <way id='-103174' visible='true'>
+  <way id='-103516' visible='true'>
     <nd ref='-2716401' />
     <nd ref='-2716402' />
   </way>
-  <way id='-103175' visible='true'>
+  <way id='-103517' visible='true'>
     <nd ref='-2716403' />
     <nd ref='-2716404' />
   </way>
-  <way id='-103176' visible='true'>
+  <way id='-103518' visible='true'>
     <nd ref='-2716405' />
     <nd ref='-2716406' />
   </way>
-  <way id='-103177' visible='true'>
+  <way id='-103519' visible='true'>
     <nd ref='-2716407' />
     <nd ref='-2716408' />
   </way>
-  <way id='-103178' action='modify' visible='true'>
+  <way id='-103520' action='modify' visible='true'>
     <nd ref='-2716409' />
     <nd ref='-2716410' />
     <nd ref='-2716411' />
@@ -1228,18 +1241,18 @@
     <tag k='name' v='tl_e_w' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103179' action='modify' visible='true'>
+  <way id='-103521' action='modify' visible='true'>
     <nd ref='-2716206' />
     <nd ref='-2716381' />
     <tag k='type' v='virtual' />
   </way>
-  <way id='-103180' action='modify' visible='true'>
+  <way id='-103522' action='modify' visible='true'>
     <nd ref='-2716215' />
     <nd ref='-2716366' />
     <tag k='subtype' v='dashed' />
     <tag k='type' v='line_thin' />
   </way>
-  <way id='-103181' action='modify' visible='true'>
+  <way id='-103523' action='modify' visible='true'>
     <nd ref='-2716414' />
     <nd ref='-2716415' />
     <nd ref='-2716416' />
@@ -1247,7 +1260,7 @@
     <tag k='name' v='tl_s_n' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103182' action='modify' visible='true'>
+  <way id='-103524' action='modify' visible='true'>
     <nd ref='-2716417' />
     <nd ref='-2716419' />
     <nd ref='-2716420' />
@@ -1255,19 +1268,19 @@
     <tag k='name' v='tl_n_s' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103183' action='modify' visible='true'>
+  <way id='-103525' action='modify' visible='true'>
     <nd ref='-2716383' />
     <nd ref='-2716307' />
   </way>
-  <way id='-103184' action='modify' visible='true'>
+  <way id='-103526' action='modify' visible='true'>
     <nd ref='-2716346' />
     <nd ref='-2716258' />
   </way>
-  <way id='-103185' action='modify' visible='true'>
+  <way id='-103527' action='modify' visible='true'>
     <nd ref='-2716324' />
     <nd ref='-2716384' />
   </way>
-  <way id='-103186' action='modify' visible='true'>
+  <way id='-103528' action='modify' visible='true'>
     <nd ref='-2716421' />
     <nd ref='-2716422' />
     <nd ref='-2716423' />
@@ -1275,7 +1288,7 @@
     <tag k='name' v='tl_w_e' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103187' action='modify' visible='true'>
+  <way id='-103529' action='modify' visible='true'>
     <nd ref='-2716424' />
     <nd ref='-2716426' />
     <nd ref='-2716427' />
@@ -1283,7 +1296,7 @@
     <tag k='name' v='tl_n_e' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103188' action='modify' visible='true'>
+  <way id='-103530' action='modify' visible='true'>
     <nd ref='-2716430' />
     <nd ref='-2716431' />
     <nd ref='-2716432' />
@@ -1291,12 +1304,12 @@
     <tag k='name' v='tl_s_w' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103189' action='modify' visible='true'>
+  <way id='-103531' action='modify' visible='true'>
     <nd ref='-2716434' />
     <nd ref='-2716435' />
     <tag k='note' v='stop for lanelet -1325' />
   </way>
-  <way id='-103190' action='modify' visible='true'>
+  <way id='-103532' action='modify' visible='true'>
     <nd ref='-2716437' />
     <nd ref='-2716438' />
     <nd ref='-2716439' />
@@ -1304,7 +1317,7 @@
     <tag k='name' v='tl_w_n' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103191' action='modify' visible='true'>
+  <way id='-103533' action='modify' visible='true'>
     <nd ref='-2716440' />
     <nd ref='-2716441' />
     <nd ref='-2716442' />
@@ -1312,50 +1325,63 @@
     <tag k='name' v='tl_e_s' />
     <tag k='type' v='traffic_light' />
   </way>
-  <way id='-103192' action='modify' visible='true'>
+  <way id='-103534' action='modify' visible='true'>
     <nd ref='-2716443' />
     <nd ref='-2716444' />
     <tag k='note' v='stop line for tl w n' />
   </way>
+  <way id='-1947957' action='modify' visible='true'>
+    <nd ref='-2716357' />
+    <nd ref='-2716587' />
+    <nd ref='-2716588' />
+    <nd ref='-2716589' />
+    <nd ref='-2716647' />
+    <nd ref='-2716675' />
+    <nd ref='-2716590' />
+    <nd ref='-2716591' />
+    <nd ref='-2716592' />
+    <nd ref='-2716593' />
+    <nd ref='-2716379' />
+  </way>
   <relation id='-3000170' visible='true'>
-    <member type='way' ref='-103166' role='left' />
-    <member type='way' ref='-103167' role='right' />
+    <member type='way' ref='-103508' role='left' />
+    <member type='way' ref='-103509' role='right' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000171' visible='true'>
-    <member type='way' ref='-103168' role='left' />
-    <member type='way' ref='-103169' role='right' />
+    <member type='way' ref='-103510' role='left' />
+    <member type='way' ref='-103511' role='right' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000172' visible='true'>
-    <member type='way' ref='-103170' role='left' />
-    <member type='way' ref='-103171' role='right' />
+    <member type='way' ref='-103512' role='left' />
+    <member type='way' ref='-103513' role='right' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000173' visible='true'>
-    <member type='way' ref='-103172' role='left' />
-    <member type='way' ref='-103173' role='right' />
+    <member type='way' ref='-103514' role='left' />
+    <member type='way' ref='-103515' role='right' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000174' visible='true'>
-    <member type='way' ref='-103174' role='left' />
-    <member type='way' ref='-103175' role='right' />
+    <member type='way' ref='-103516' role='left' />
+    <member type='way' ref='-103517' role='right' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000175' visible='true'>
-    <member type='way' ref='-103176' role='left' />
-    <member type='way' ref='-103177' role='right' />
+    <member type='way' ref='-103518' role='left' />
+    <member type='way' ref='-103519' role='right' />
     <tag k='subtype' v='crosswalk' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000176' visible='true'>
-    <member type='way' ref='-103139' role='left' />
-    <member type='way' ref='-103113' role='right' />
+    <member type='way' ref='-103481' role='left' />
+    <member type='way' ref='-103455' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1316' />
@@ -1364,8 +1390,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-3000177' visible='true'>
-    <member type='way' ref='-103140' role='left' />
-    <member type='way' ref='-103139' role='right' />
+    <member type='way' ref='-103482' role='left' />
+    <member type='way' ref='-103481' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1317' />
@@ -1375,9 +1401,9 @@
   </relation>
   <relation id='-3000178' action='modify' visible='true'>
     <member type='relation' ref='-4000000' role='regulatory_element' />
-    <member type='way' ref='-103140' role='left' />
-    <member type='way' ref='-103144' role='right' />
-    <member type='way' ref='-103192' role='stop_line' />
+    <member type='way' ref='-103482' role='left' />
+    <member type='way' ref='-103486' role='right' />
+    <member type='way' ref='-103534' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1318' />
@@ -1386,16 +1412,16 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000000' action='modify' visible='true'>
-    <member type='way' ref='-103190' role='refers' />
-    <member type='way' ref='-103192' role='ref_line' />
+    <member type='way' ref='-103532' role='refers' />
+    <member type='way' ref='-103534' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-4000001' action='modify' visible='true'>
     <member type='relation' ref='-5000028' role='regulatory_element' />
-    <member type='way' ref='-103144' role='left' />
-    <member type='way' ref='-103094' role='right' />
-    <member type='way' ref='-103162' role='stop_line' />
+    <member type='way' ref='-103486' role='left' />
+    <member type='way' ref='-103436' role='right' />
+    <member type='way' ref='-103504' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1319' />
@@ -1405,9 +1431,9 @@
   </relation>
   <relation id='-4000002' action='modify' visible='true'>
     <member type='relation' ref='-5000028' role='regulatory_element' />
-    <member type='way' ref='-103094' role='left' />
-    <member type='way' ref='-103095' role='right' />
-    <member type='way' ref='-103162' role='stop_line' />
+    <member type='way' ref='-103436' role='left' />
+    <member type='way' ref='-103437' role='right' />
+    <member type='way' ref='-103504' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1320' />
@@ -1417,9 +1443,9 @@
   </relation>
   <relation id='-4000003' action='modify' visible='true'>
     <member type='relation' ref='-5000028' role='regulatory_element' />
-    <member type='way' ref='-103095' role='left' />
-    <member type='way' ref='-103141' role='right' />
-    <member type='way' ref='-103162' role='stop_line' />
+    <member type='way' ref='-103437' role='left' />
+    <member type='way' ref='-103483' role='right' />
+    <member type='way' ref='-103504' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1321' />
@@ -1430,8 +1456,8 @@
   <relation id='-4000004' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000171' role='' />
-    <member type='way' ref='-103111' role='left' />
-    <member type='way' ref='-103096' role='right' />
+    <member type='way' ref='-103453' role='left' />
+    <member type='way' ref='-103438' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1322' />
@@ -1440,8 +1466,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000005' visible='true'>
-    <member type='way' ref='-103117' role='left' />
-    <member type='way' ref='-103133' role='right' />
+    <member type='way' ref='-103459' role='left' />
+    <member type='way' ref='-103475' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1323' />
@@ -1450,8 +1476,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000006' visible='true'>
-    <member type='way' ref='-103100' role='left' />
-    <member type='way' ref='-103117' role='right' />
+    <member type='way' ref='-103442' role='left' />
+    <member type='way' ref='-103459' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1324' />
@@ -1461,9 +1487,9 @@
   </relation>
   <relation id='-4000007' action='modify' visible='true'>
     <member type='relation' ref='-4000008' role='regulatory_element' />
-    <member type='way' ref='-103100' role='left' />
-    <member type='way' ref='-103099' role='right' />
-    <member type='way' ref='-103189' role='stop_line' />
+    <member type='way' ref='-103442' role='left' />
+    <member type='way' ref='-103441' role='right' />
+    <member type='way' ref='-103531' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1325' />
@@ -1472,16 +1498,16 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000008' action='modify' visible='true'>
-    <member type='way' ref='-103188' role='refers' />
-    <member type='way' ref='-103189' role='ref_line' />
+    <member type='way' ref='-103530' role='refers' />
+    <member type='way' ref='-103531' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-4000009' action='modify' visible='true'>
     <member type='relation' ref='-5000024' role='regulatory_element' />
-    <member type='way' ref='-103099' role='left' />
-    <member type='way' ref='-103098' role='right' />
-    <member type='way' ref='-103160' role='stop_line' />
+    <member type='way' ref='-103441' role='left' />
+    <member type='way' ref='-103440' role='right' />
+    <member type='way' ref='-103502' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1326' />
@@ -1491,9 +1517,9 @@
   </relation>
   <relation id='-4000010' action='modify' visible='true'>
     <member type='relation' ref='-5000024' role='regulatory_element' />
-    <member type='way' ref='-103098' role='left' />
-    <member type='way' ref='-103097' role='right' />
-    <member type='way' ref='-103160' role='stop_line' />
+    <member type='way' ref='-103440' role='left' />
+    <member type='way' ref='-103439' role='right' />
+    <member type='way' ref='-103502' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1327' />
@@ -1503,9 +1529,9 @@
   </relation>
   <relation id='-4000011' action='modify' visible='true'>
     <member type='relation' ref='-5000024' role='regulatory_element' />
-    <member type='way' ref='-103097' role='left' />
-    <member type='way' ref='-103146' role='right' />
-    <member type='way' ref='-103160' role='stop_line' />
+    <member type='way' ref='-103439' role='left' />
+    <member type='way' ref='-103488' role='right' />
+    <member type='way' ref='-103502' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1328' />
@@ -1516,8 +1542,8 @@
   <relation id='-4000012' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103122' role='left' />
-    <member type='way' ref='-103101' role='right' />
+    <member type='way' ref='-103464' role='left' />
+    <member type='way' ref='-103443' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1329' />
@@ -1527,8 +1553,8 @@
   </relation>
   <relation id='-4000013' action='modify' visible='true'>
     <member type='relation' ref='-5000021' role='regulatory_element' />
-    <member type='way' ref='-103104' role='left' />
-    <member type='way' ref='-103105' role='right' />
+    <member type='way' ref='-103446' role='left' />
+    <member type='way' ref='-103447' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1330' />
@@ -1537,8 +1563,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000014' visible='true'>
-    <member type='way' ref='-103103' role='left' />
-    <member type='way' ref='-103104' role='right' />
+    <member type='way' ref='-103445' role='left' />
+    <member type='way' ref='-103446' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1331' />
@@ -1547,8 +1573,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000015' visible='true'>
-    <member type='way' ref='-103102' role='left' />
-    <member type='way' ref='-103103' role='right' />
+    <member type='way' ref='-103444' role='left' />
+    <member type='way' ref='-103445' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1332' />
@@ -1557,8 +1583,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000016' visible='true'>
-    <member type='way' ref='-103102' role='left' />
-    <member type='way' ref='-103108' role='right' />
+    <member type='way' ref='-103444' role='left' />
+    <member type='way' ref='-103450' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1333' />
@@ -1567,8 +1593,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000017' visible='true'>
-    <member type='way' ref='-103108' role='left' />
-    <member type='way' ref='-103135' role='right' />
+    <member type='way' ref='-103450' role='left' />
+    <member type='way' ref='-103477' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1334' />
@@ -1579,8 +1605,8 @@
   <relation id='-4000018' visible='true'>
     <member type='relation' ref='-3000171' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103149' role='left' />
-    <member type='way' ref='-103136' role='right' />
+    <member type='way' ref='-103491' role='left' />
+    <member type='way' ref='-103478' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1336' />
@@ -1591,8 +1617,8 @@
   <relation id='-4000019' visible='true'>
     <member type='relation' ref='-3000171' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103136' role='left' />
-    <member type='way' ref='-103109' role='right' />
+    <member type='way' ref='-103478' role='left' />
+    <member type='way' ref='-103451' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1337' />
@@ -1603,8 +1629,8 @@
   <relation id='-4000020' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000173' role='' />
-    <member type='way' ref='-103152' role='left' />
-    <member type='way' ref='-103134' role='right' />
+    <member type='way' ref='-103494' role='left' />
+    <member type='way' ref='-103476' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1338' />
@@ -1615,8 +1641,8 @@
   <relation id='-4000021' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000173' role='' />
-    <member type='way' ref='-103134' role='left' />
-    <member type='way' ref='-103110' role='right' />
+    <member type='way' ref='-103476' role='left' />
+    <member type='way' ref='-103452' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1339' />
@@ -1625,9 +1651,9 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-4000022' visible='true'>
-    <member type='way' ref='-103137' role='left' />
-    <member type='way' ref='-103148' role='right' />
-    <member type='way' ref='-103161' role='stop_line' />
+    <member type='way' ref='-103479' role='left' />
+    <member type='way' ref='-103490' role='right' />
+    <member type='way' ref='-103503' role='stop_line' />
     <member type='relation' ref='-5000000' role='regulatory_element' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
@@ -1637,14 +1663,14 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000000' action='modify' visible='true'>
-    <member type='way' ref='-103161' role='ref_line' />
-    <member type='way' ref='-103191' role='refers' />
+    <member type='way' ref='-103503' role='ref_line' />
+    <member type='way' ref='-103533' role='refers' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-5000001' visible='true'>
-    <member type='way' ref='-103137' role='left' />
-    <member type='way' ref='-103150' role='right' />
+    <member type='way' ref='-103479' role='left' />
+    <member type='way' ref='-103492' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1344' />
@@ -1653,8 +1679,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000002' visible='true'>
-    <member type='way' ref='-103150' role='left' />
-    <member type='way' ref='-103151' role='right' />
+    <member type='way' ref='-103492' role='left' />
+    <member type='way' ref='-103493' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1345' />
@@ -1665,8 +1691,8 @@
   <relation id='-5000003' visible='true'>
     <member type='relation' ref='-3000171' role='' />
     <member type='relation' ref='-3000173' role='' />
-    <member type='way' ref='-103116' role='left' />
-    <member type='way' ref='-103115' role='right' />
+    <member type='way' ref='-103458' role='left' />
+    <member type='way' ref='-103457' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1346' />
@@ -1677,8 +1703,8 @@
   <relation id='-5000004' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000171' role='' />
-    <member type='way' ref='-103118' role='left' />
-    <member type='way' ref='-103119' role='right' />
+    <member type='way' ref='-103460' role='left' />
+    <member type='way' ref='-103461' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1347' />
@@ -1689,8 +1715,8 @@
   <relation id='-5000005' visible='true'>
     <member type='relation' ref='-3000173' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103120' role='left' />
-    <member type='way' ref='-103121' role='right' />
+    <member type='way' ref='-103462' role='left' />
+    <member type='way' ref='-103463' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1348' />
@@ -1701,8 +1727,8 @@
   <relation id='-5000006' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103123' role='left' />
-    <member type='way' ref='-103124' role='right' />
+    <member type='way' ref='-103465' role='left' />
+    <member type='way' ref='-103466' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1349' />
@@ -1713,9 +1739,9 @@
   <relation id='-5000007' action='modify' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000173' role='' />
-    <member type='way' ref='-103184' role='left' />
-    <member type='way' ref='-103125' role='right' />
-    <member type='way' ref='-103165' role='stop_line' />
+    <member type='way' ref='-103526' role='left' />
+    <member type='way' ref='-103467' role='right' />
+    <member type='way' ref='-103507' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1378' />
@@ -1726,9 +1752,9 @@
   <relation id='-5000008' action='modify' visible='true'>
     <member type='relation' ref='-3000170' role='' />
     <member type='relation' ref='-3000173' role='' />
-    <member type='way' ref='-103183' role='left' />
-    <member type='way' ref='-103184' role='right' />
-    <member type='way' ref='-103165' role='stop_line' />
+    <member type='way' ref='-103525' role='left' />
+    <member type='way' ref='-103526' role='right' />
+    <member type='way' ref='-103507' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1379' />
@@ -1737,8 +1763,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000009' visible='true'>
-    <member type='way' ref='-103129' role='left' />
-    <member type='way' ref='-103138' role='right' />
+    <member type='way' ref='-103471' role='left' />
+    <member type='way' ref='-103480' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1380' />
@@ -1747,8 +1773,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000010' visible='true'>
-    <member type='way' ref='-103127' role='left' />
-    <member type='way' ref='-103128' role='right' />
+    <member type='way' ref='-103469' role='left' />
+    <member type='way' ref='-103470' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1382' />
@@ -1757,8 +1783,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000011' visible='true'>
-    <member type='way' ref='-103127' role='left' />
-    <member type='way' ref='-103126' role='right' />
+    <member type='way' ref='-103469' role='left' />
+    <member type='way' ref='-103468' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1383' />
@@ -1767,8 +1793,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000012' visible='true'>
-    <member type='way' ref='-103126' role='left' />
-    <member type='way' ref='-103145' role='right' />
+    <member type='way' ref='-103468' role='left' />
+    <member type='way' ref='-103487' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1384' />
@@ -1779,9 +1805,9 @@
   <relation id='-5000013' visible='true'>
     <member type='relation' ref='-3000171' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103142' role='left' />
-    <member type='way' ref='-103143' role='right' />
-    <member type='way' ref='-103164' role='stop_line' />
+    <member type='way' ref='-103484' role='left' />
+    <member type='way' ref='-103485' role='right' />
+    <member type='way' ref='-103506' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1386' />
@@ -1792,9 +1818,9 @@
   <relation id='-5000014' visible='true'>
     <member type='relation' ref='-3000171' role='' />
     <member type='relation' ref='-3000174' role='' />
-    <member type='way' ref='-103153' role='left' />
-    <member type='way' ref='-103142' role='right' />
-    <member type='way' ref='-103164' role='stop_line' />
+    <member type='way' ref='-103495' role='left' />
+    <member type='way' ref='-103484' role='right' />
+    <member type='way' ref='-103506' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1387' />
@@ -1804,8 +1830,8 @@
   </relation>
   <relation id='-5000015' action='modify' visible='true'>
     <member type='relation' ref='-5000025' role='regulatory_element' />
-    <member type='way' ref='-103155' role='left' />
-    <member type='way' ref='-103154' role='right' />
+    <member type='way' ref='-103497' role='left' />
+    <member type='way' ref='-103496' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1388' />
@@ -1815,8 +1841,8 @@
   </relation>
   <relation id='-5000016' action='modify' visible='true'>
     <member type='relation' ref='-5000025' role='regulatory_element' />
-    <member type='way' ref='-103147' role='left' />
-    <member type='way' ref='-103155' role='right' />
+    <member type='way' ref='-103489' role='left' />
+    <member type='way' ref='-103497' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1389' />
@@ -1826,9 +1852,9 @@
   </relation>
   <relation id='-5000017' action='modify' visible='true'>
     <member type='relation' ref='-5000029' role='regulatory_element' />
-    <member type='way' ref='-103157' role='left' />
-    <member type='way' ref='-103147' role='right' />
-    <member type='way' ref='-103163' role='stop_line' />
+    <member type='way' ref='-103499' role='left' />
+    <member type='way' ref='-103489' role='right' />
+    <member type='way' ref='-103505' role='stop_line' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1390' />
@@ -1837,8 +1863,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000018' visible='true'>
-    <member type='way' ref='-103157' role='left' />
-    <member type='way' ref='-103159' role='right' />
+    <member type='way' ref='-103499' role='left' />
+    <member type='way' ref='-103501' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1391' />
@@ -1847,8 +1873,8 @@
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000019' visible='true'>
-    <member type='way' ref='-103159' role='left' />
-    <member type='way' ref='-103158' role='right' />
+    <member type='way' ref='-103501' role='left' />
+    <member type='way' ref='-103500' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='left_marking' v='none' />
     <tag k='name' v='-1392' />
@@ -1880,61 +1906,71 @@
     <tag k='type' v='intersection' />
   </relation>
   <relation id='-5000021' action='modify' visible='true'>
-    <member type='way' ref='-103164' role='ref_line' />
-    <member type='way' ref='-103178' role='refers' />
+    <member type='way' ref='-103506' role='ref_line' />
+    <member type='way' ref='-103520' role='refers' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-5000022' action='modify' visible='true'>
     <member type='relation' ref='-5000021' role='regulatory_element' />
-    <member type='way' ref='-103179' role='right' />
-    <member type='way' ref='-103180' role='left' />
+    <member type='way' ref='-103521' role='right' />
+    <member type='way' ref='-103522' role='left' />
     <tag k='lane_type' v='driving' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000023' action='modify' visible='true'>
     <member type='relation' ref='-5000021' role='regulatory_element' />
-    <member type='way' ref='-103114' role='left' />
-    <member type='way' ref='-103180' role='right' />
+    <member type='way' ref='-103456' role='left' />
+    <member type='way' ref='-103522' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000024' action='modify' visible='true'>
-    <member type='way' ref='-103181' role='refers' />
-    <member type='way' ref='-103160' role='ref_line' />
+    <member type='way' ref='-103523' role='refers' />
+    <member type='way' ref='-103502' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-5000025' action='modify' visible='true'>
-    <member type='way' ref='-103182' role='refers' />
-    <member type='way' ref='-103165' role='ref_line' />
+    <member type='way' ref='-103524' role='refers' />
+    <member type='way' ref='-103507' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-5000026' action='modify' visible='true'>
     <member type='relation' ref='-5000025' role='regulatory_element' />
-    <member type='way' ref='-103185' role='right' />
-    <member type='way' ref='-103132' role='left' />
+    <member type='way' ref='-103527' role='right' />
+    <member type='way' ref='-103474' role='left' />
     <tag k='lane_type' v='driving' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000027' action='modify' visible='true'>
     <member type='relation' ref='-5000025' role='regulatory_element' />
-    <member type='way' ref='-103156' role='left' />
-    <member type='way' ref='-103132' role='right' />
+    <member type='way' ref='-103498' role='left' />
+    <member type='way' ref='-103474' role='right' />
     <tag k='lane_type' v='driving' />
     <tag k='type' v='lanelet' />
   </relation>
   <relation id='-5000028' action='modify' visible='true'>
-    <member type='way' ref='-103186' role='refers' />
-    <member type='way' ref='-103162' role='ref_line' />
+    <member type='way' ref='-103528' role='refers' />
+    <member type='way' ref='-103504' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
   </relation>
   <relation id='-5000029' action='modify' visible='true'>
-    <member type='way' ref='-103187' role='refers' />
-    <member type='way' ref='-103163' role='ref_line' />
+    <member type='way' ref='-103529' role='refers' />
+    <member type='way' ref='-103505' role='ref_line' />
     <tag k='subtype' v='traffic_light' />
     <tag k='type' v='regulatory_element' />
+  </relation>
+  <relation id='-5000034' action='modify' visible='true'>
+    <member type='way' ref='-1947957' role='right' />
+    <member type='way' ref='-103463' role='left' />
+    <tag k='lane_type' v='driving' />
+    <tag k='left_marking' v='none' />
+    <tag k='name' v='99_unnofficial_turning_left' />
+    <tag k='right_marking' v='none' />
+    <tag k='speed_limit' v='50' />
+    <tag k='type' v='lanelet' />
   </relation>
 </osm>
