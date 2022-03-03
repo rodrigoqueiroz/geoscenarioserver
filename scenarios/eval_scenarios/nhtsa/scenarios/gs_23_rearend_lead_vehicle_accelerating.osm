@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-101755' action='modify' visible='true' lat='43.47173989696' lon='-80.54712523884'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='nhtsa/maps/lanelet2_roads_around_campus.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Lane change same direction scenario' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-101756' action='modify' visible='true' lat='43.4716043991' lon='-80.54654593605'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-101757' action='modify' visible='true' lat='43.47364976069' lon='-80.54921786955' />
+  <node id='-101758' action='modify' visible='true' lat='43.47407639865' lon='-80.54802943969' />
+  <node id='-101759' action='modify' visible='true' lat='43.47513671009' lon='-80.54507313101' />
+  <node id='-101760' action='modify' visible='true' lat='43.47441979481' lon='-80.54706799253'>
+    <tag k='btree' v='drive_scenario_tree.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego_placeholder' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-101761' action='modify' visible='true' lat='43.4745504964' lon='-80.54671060416'>
+    <tag k='btree' v='wait_to_accelarate_scenario_tree.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='accelerating_vehicle' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <way id='-101782' action='modify' visible='true'>
+    <nd ref='-101757' />
+    <nd ref='-101758' />
+    <nd ref='-101759' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>
