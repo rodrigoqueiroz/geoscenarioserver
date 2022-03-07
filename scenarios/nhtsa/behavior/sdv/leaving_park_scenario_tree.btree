@@ -1,0 +1,6 @@
+behaviortree LeavingParkScenarioTree:
+    ?
+        ->
+            condition lc( sim_time (repeat=False, tmin=1, tmax=3))
+            subtree lanechange_tree (m_lane_swerve=MLaneSwerveConfig(target_lid=1))
+        subtree drive_tree (keep_velocity=MVelKeepConfig(vel=MP(6, 10, 6)))

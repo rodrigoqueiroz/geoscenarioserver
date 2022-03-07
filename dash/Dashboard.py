@@ -167,7 +167,7 @@ class Dashboard(object):
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
             truncate_vector(sp,2)
- 
+
             sp = ['p' + str(pid)] + [sim_state] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
@@ -259,7 +259,7 @@ class Dashboard(object):
         plt.margins(0,0)
         plt.subplots_adjust(bottom=0.05,top=0.95,left=0.05,right=0.95,hspace=0,wspace=0)
 
-    
+
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
 
         #road lines:
@@ -277,7 +277,7 @@ class Dashboard(object):
         #pedestrian marking
 
         #regulatory elements:
-        
+
         #stop lines
         for stop_line in self.lanelet_map.get_stop_lines():
             plt.plot([pt.x for pt in stop_line], [pt.y for pt in stop_line], 'r-') #red
@@ -318,7 +318,7 @@ class Dashboard(object):
                 if tl_type != TrafficLightType.pedestrian:
                     label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
                     plt.gca().text(x+1, y, label, style='italic')
-                    plt.plot(line[0], line[1], color = colorcode, zorder=5)        
+                    plt.plot(line[0], line[1], color = colorcode, zorder=5)
 
     def plot_static_objects(self,static_objects,x_min,x_max,y_min,y_max):
         if static_objects:
@@ -336,7 +336,7 @@ class Dashboard(object):
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
                     continue
-                colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state)
+                colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state, vehicle.name)
                 x = vehicle.state.x
                 y = vehicle.state.y
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
@@ -355,7 +355,7 @@ class Dashboard(object):
                         circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                         ax.add_artist(circle1)
                     #label
-                    label = "v{}".format(vid)
+                    label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
                     label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
                     ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
                     #arrow
@@ -366,10 +366,10 @@ class Dashboard(object):
                             vx = -vx
                             vy = -vy
                         plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
-                    
 
 
-    def plot_pedestrians(self,pedestrians,x_min,x_max,y_min,y_max):
+
+    def plot_pedestrians(self, pedestrians, x_min, x_max, y_min, y_max, show_arrow=True):
         if pedestrians:
             for pid, pedestrian in pedestrians.items():
                 if pedestrian.sim_state is ActorSimState.INACTIVE:
@@ -390,6 +390,12 @@ class Dashboard(object):
                     plt.gca().add_artist(circle1)
                     label = "p{}".format(pid)
                     plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
+
+                    #arrow
+                    if (show_arrow):
+                        vx = pedestrian.state.x_vel
+                        vy = pedestrian.state.y_vel
+                        plt.arrow(x, y, vx/2, vy/2, head_width=0.5, head_length=0.5, color=colorcode, zorder=10)
 
     def plot_frenet_chart(self, center_id, planner_state, debug_ref_path, traj, cand, unf, traj_s_shift):
         #Frenet Frame plot
@@ -435,12 +441,12 @@ class Dashboard(object):
 
         #other vehicles, from main vehicle POV:
         for vid,vehicle in vehicles.items():
-            colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state)
+            colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state,vehicle.name)
             vs = vehicle.state
             plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
             circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
             gca.add_artist(circle1)
-            label = "v{}".format(int(vid))
+            label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
             gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
@@ -508,14 +514,16 @@ class Dashboard(object):
         #fig.tight_layout(pad=0.05)
 
 
-    def get_color_by_type(self,actor,a_type,sim_state = None):
+    def get_color_by_type(self,actor,a_type,sim_state = None, name = ''):
         #color
         colorcode = 'k' #black
         if actor== 'vehicle':
-            if a_type == Vehicle.SDV_TYPE:
+            if name.lower() == 'ego':
+                colorcode = 'g' #always green for Ego
+            elif a_type == Vehicle.SDV_TYPE:
                 colorcode = 'b' #blue
             elif a_type == Vehicle.EV_TYPE:
-                colorcode = 'g' #green
+                colorcode = 'c' #cyan
             elif a_type == Vehicle.TV_TYPE:
                 colorcode = 'k' #black
         elif actor== 'pedestrian':

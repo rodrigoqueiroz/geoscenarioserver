@@ -1,0 +1,5 @@
+behaviortree st_ego_driver:
+    ?
+        ->
+            subtree routing()
+        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(9.0,10,6))

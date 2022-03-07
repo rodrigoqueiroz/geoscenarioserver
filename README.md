@@ -9,6 +9,8 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - python3.8-dev
 - python3-tk
 - python3-pip
+- python3-pil
+- python3-pil.imagetk
 
 ### Python packages
 

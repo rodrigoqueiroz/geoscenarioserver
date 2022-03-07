@@ -1,0 +1,3 @@
+behaviortree BlindToRedLightScenarioTree:
+    ->
+        subtree blindtoredlight_tree(keep_velocity=MVelKeepConfig(vel=MP(12, 10, 6)))

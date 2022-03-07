@@ -1,0 +1,9 @@
+behaviortree st_ego_driver:
+    ?
+        ->
+            subtree routing()
+        ->
+            condition c_gap         ( gap ( distance=2, vid=99 ) )
+            condition c_minspeed    ( vehicle_moving( vel=1.0 ) )
+            maneuver m_turning      ( MLaneSwerveConfig( target_lid=LEFT) )
+        maneuver m_keepvelocity     ( MVelKeepConfig( vel=MP(12.0,10,6) )

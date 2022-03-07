@@ -4,9 +4,11 @@ from TrafficLight import TrafficLightColor
 from sv.SDVTrafficState import *
 from sv.btree.BTreeConstants import *
 
+
 class BTreeConditions:
         
     def __init__(self):
+        self.yielding_vehicles = None
         pass
 
     #===========================================================
@@ -37,7 +39,9 @@ class BTreeConditions:
             state = traffic_state.vehicle_state
 
         if state is not None:
-            #s_pos = get_node_param(kwargs,'s_pos')
+            s_pos = get_node_param(kwargs,'s_pos')
+            if s_pos and not (state.d_pos >= s_pos):
+                return False
             s_vel = get_node_param(kwargs,'s_vel')
             if s_vel and not (state.s_vel >= s_vel):
                 return False
@@ -60,16 +64,16 @@ class BTreeConditions:
         """ Checks if vehicle state has reached delta values at minimum.
             Always compare between self the the vehicle with vid (or per occupancy zone)
         """
-
+        
         #retrieve vehicle by looking at vid or zid. 
         vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
         if not vehicle:
             return False
-        my_state = traffic_state.vehicle_state
+        my_state:VehicleState = traffic_state.vehicle_state
         v_state = vehicle.state
 
-        s_pos = get_node_param(kwargs,'s_pos')
-        if s_pos and not (abs(v_state.s_pos - my_state.s_pos) >= s_pos):
+        s_pos = get_node_param(kwargs,['s_pos', 's'])
+        if s_pos and not (abs(v_state.s - my_state.s) >= s_pos):
             return False
         s_vel = get_node_param(kwargs,'s_vel')
         if s_vel and not (abs(v_state.s_vel - my_state.s_vel) >= s_vel):
@@ -77,8 +81,8 @@ class BTreeConditions:
         s_acc = get_node_param(kwargs,'s_acc')
         if s_acc and not (abs(v_state.s_acc - my_state.s_acc) >= s_acc):
             return False
-        d_pos = get_node_param(kwargs,'d_pos')
-        if d_pos and not (abs(v_state.d_pos - my_state.d_pos) >= d_pos):
+        d_pos = get_node_param(kwargs,['d_pos','d'])
+        if d_pos and not (abs(v_state.d - my_state.d) >= d_pos):
             return False
         d_vel = get_node_param(kwargs,'d_vel')
         if d_vel and not (abs(v_state.d_vel - my_state.d_vel) >= d_vel):
@@ -180,6 +184,7 @@ class BTreeConditions:
         '''Checks if given vehicle is moving. 
             If no id is given, assumes self
         '''
+        #log.info("VID {} condition vehicle moving".format(traffic_state.vid))
         vel_threshold = get_node_param(kwargs,"vel",0.05) #threshold to identify as moving
 
         if 'vid' in kwargs or 'lid' in kwargs or 'zid' in kwargs:
@@ -216,7 +221,7 @@ class BTreeConditions:
                 pos_s = traffic_state.lane_config.stopline_pos[0]
                 dist = pos_s - traffic_state.vehicle_state.s
                 vel = abs(traffic_state.vehicle_state.s_vel)
-                print("BEHAVIOR: dist {},vel{}".format(dist,vel))
+                #print("BEHAVIOR: dist {},vel{}".format(dist,vel))
                 return (dist < dist_threshold and vel < vel_threshold)
         
     def vehicle_parked(self,traffic_state:TrafficState, kwargs):
@@ -240,6 +245,7 @@ class BTreeConditions:
         if abs(vehicle_state.s_vel) < vel_threshold: #stopped
             if traffic_state.lane_config._right_lane is None:    #is the rightmost lane
                 if vehicle_state.d < (-distance_threshold):  #is positioned at the right of lane centre
+                    print(vehicle_state.d)
                     #if (vehicle.state.d - VEHICLE_WIDTH/2) < traffic_state.lane_config.get_central_d())
                     return True
             return False     
@@ -279,46 +285,45 @@ class BTreeConditions:
         '''
         #REVISE: Time Gap
         lid = get_node_param(kwargs,['lid','target_lid','target_lane_id','target_lane'], required=True)
-
         if lid is None:
             #check if target is by route
             if traffic_state.lane_swerve_target is not None:
                 lid = traffic_state.lane_swerve_target
-        
-
         distance_gap = get_node_param(kwargs,['gap', 'distance_gap'], default=20)
         time_gap = get_node_param(kwargs,['time_gap'], default=2)
+        include_opposite = get_node_param(kwargs,['include_opposite'], default=False,int_to_boolean=True)
         if not lid:
             return False
         
-        target_lane_config = traffic_state.lane_config.get_neighbour(lid)
+        target_lane_config = traffic_state.lane_config.get_neighbour(lid,include_opposite)
         if not target_lane_config:
             log.warn("No reachable {} lane for lane changing vehicle {}".format(
                 "LEFT" if lid == 1 else "RIGHT",traffic_state.vid))
             return False
-
-        #Check GAP
         smin = traffic_state.vehicle_state.s - VEHICLE_LENGTH/2 - distance_gap
         smax = traffic_state.vehicle_state.s + VEHICLE_LENGTH/2 + distance_gap
         vehicles_in_lane = list(filter(
             lambda v: smin < v.state.s < smax,
             get_vehicles_in_lane(target_lane_config, traffic_state.traffic_vehicles)
             ))
+
         return len(vehicles_in_lane) == 0
 
     # metrics
 
     def gap(self,traffic_state:TrafficState, kwargs):
-        distance_threshold = get_node_param(kwargs,"distance", None)
         time_threshold = get_node_param(kwargs,"time", None)
-        pbound = get_node_param(kwargs,"pbound", None)
+        distance_threshold = get_node_param(kwargs,"distance", None)
+        #pbound = get_node_param(kwargs,"pbound", None)
+        #min_distance = get_node_param(kwargs,"min_distance", None)
+        #max_distance = get_node_param(kwargs,"max_distance", None)
         vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
         result = False
         if vehicle:
             gap = range_gap(traffic_state.vehicle_state,vehicle)
             if distance_threshold: 
                 result = (gap > distance_threshold)
-                print (result)
+                #print (result)
             if time_threshold:
                 if gap > 0:
                     time_to_vehicle = gap / vehicle.state.s_vel if vehicle.state.s_vel != 0 else float('inf')
@@ -332,14 +337,15 @@ class BTreeConditions:
     def approaching_intersection(self,traffic_state:TrafficState, kwargs):    
         '''checks if vehicle is approaching a regulated intersection
         '''
-        #condition c_intersection ( approaching_intersection(distance=40) )
         threshold = get_node_param(kwargs,'distance',30)
         #approaching an intersection
-        for re_state in traffic_state.regulatory_elements:
-            if (isinstance(re_state, RightOfWayState) 
-            or isinstance(re_state, AllWayStopState) 
-            or isinstance(re_state, TrafficLightState)):
-                return re_state.stop_position[0] -traffic_state.vehicle_state.s < threshold 
+        for intersection in traffic_state.intersections:
+            if (isinstance(intersection, RightOfWayIntersection) 
+            or isinstance(intersection, AllWayStopIntersection) 
+            or isinstance(intersection, TrafficLightIntersection)):
+                if intersection.stop_position is None:
+                    continue
+                return intersection.stop_position[0] -traffic_state.vehicle_state.s < threshold 
         return False
     
     def approaching_stop_sign(self,traffic_state:TrafficState, kwargs):
@@ -354,15 +360,15 @@ class BTreeConditions:
 
     def intersection_type(self,traffic_state:TrafficState, kwargs):
         mytype = get_node_param(kwargs,'type',30)
-        for re_state in traffic_state.regulatory_elements:
-            if isinstance(re_state, RightOfWayState) and mytype == RIGHT_OF_WAY:
+        for intersection in traffic_state.intersections:
+            if isinstance(intersection, RightOfWayIntersection) and mytype == RIGHT_OF_WAY:
                 return True 
-            if isinstance(re_state, AllWayStopState) and mytype ==  ALL_WAY_STOP:
+            if isinstance(intersection, AllWayStopIntersection) and mytype ==  ALL_WAY_STOP:
                 return True 
-            if isinstance(re_state, TrafficLightState) and mytype == TRAFFIC_LIGHT:
+            if isinstance(intersection, TrafficLightIntersection) and mytype == TRAFFIC_LIGHT:
                 return True 
-            #if isinstance(re_state, TrafficLightState)) and mytype == PEDESTRIAN_CROSS:
-            #    return True 
+            if isinstance(intersection, PedestrianIntersection) and mytype == PEDESTRIAN_CROSS:
+                return True 
         return False
 
     def unsignalized_intersection(self,traffic_state:TrafficState, kwargs):
@@ -370,30 +376,106 @@ class BTreeConditions:
         return False
 
     def yield_role(self,traffic_state:TrafficState, kwargs):
-        #TODO: only vehicles with yield role get the reg eleme. change this
-        for re_state in traffic_state.regulatory_elements:
-            if isinstance(re_state, RightOfWayState):
+        #Only vehicles with yield role get the reg eleme. change this
+        for intersection in traffic_state.intersections:
+            if isinstance(intersection, RightOfWayIntersection):
                 return True
         return False
 
     def intersection_occupied(self,traffic_state:TrafficState, kwargs):
-        #revise
-        for re_state in traffic_state.regulatory_elements:
-            if isinstance(re_state, RightOfWayState):
-                for ll_id in re_state.row_lanelets:
-                    if re_state.row_lanelets[ll_id] == 1:
-                        #print("BEHAVIOR: intersection busy")
-                        return True
-                    #print("BEHAVIOR: intersection free")    
-                    return False
-            if isinstance(re_state, AllWayStopState):
-                #must be yielding
-                if re_state.stop_position[0] - traffic_state.vehicle_state.s  < 5:
-                    for ll_id in re_state.row_lanelets:
-                        if re_state.row_lanelets[ll_id] == 1:
-                            return True
-                    return False
-        return False  #No intersection detected
+        #print("=== Intersection VID {} occupied? {}".format(
+        #    traffic_state.vid, 
+        #    traffic_state.road_occupancy.intersecting_zone))
+        for intersection in traffic_state.intersections:
+            if isinstance(intersection, RightOfWayIntersection):
+                if len(traffic_state.road_occupancy.row_zone) > 0:
+                    print("Occupied row zone {}".format(traffic_state.road_occupancy.row_zone))
+                    return True
+            if isinstance(intersection, AllWayStopIntersection):
+                if len(traffic_state.road_occupancy.intersecting_zone) > 0:
+                    #print("Occupied".format(traffic_state.vid))
+                    return True
+        #print("Free".format(traffic_state.vid))
+        #print(traffic_state.road_occupancy)
+        return False  #No intersection detected or free
+
+    def aws_yielding(self,traffic_state:TrafficState, kwargs):
+        #if not (traffic_state.vid == 2):
+        #    return False
+        vel_threshold = 0.03  #for vehicles that start moving
+        wait_time_threshold = 5
+        draw_p = 0.05 #chances of breaking order (0 to 1)
+
+        for intersection in traffic_state.intersections:
+            if isinstance(intersection, AllWayStopIntersection):
+                yielding_vehicles = traffic_state.road_occupancy.yielding_zone
+                #intersection_vehicles = traffic_state.road_occupancy.intersecting_zone
+                #appr_yielding_zone = traffic_state.road_occupancy.appr_yielding_zone
+                #Debug
+                #print("====Yield Inters VID {}, memory {}, yieldzone {}, appyz {},intersection {}".format(
+                #    traffic_state.vid, 
+                #    self.yielding_vehicles,
+                #    yielding_vehicles,
+                #    appr_yielding_zone,
+                #    intersection_vehicles))
+                if len(traffic_state.road_occupancy.yielding_zone)==0: 
+                    #no vehicles, go
+                    #print("no vehicles")
+                    self.yielding_vehicles = None
+                    return False #go
+                else:
+                    #has yielding vehicles
+                    #first time
+                    if self.yielding_vehicles is None: 
+                        self.yielding_vehicles = [traffic_state.sim_time, yielding_vehicles] #save current state
+                        #print("first time, then wait")
+                        return True #wait
+                    else:
+                        if len(self.yielding_vehicles[1]) == 0:
+                            #I have priority
+                            #print("have priority")
+                            #before, check if any yielding vehicle started moving
+                            for vid in yielding_vehicles:
+                                vehicle = get_vehicle_by_ids(traffic_state, {'vid':vid} )
+                                if vehicle:
+                                    speed = vehicle.state.get_cartesian_speed()
+                                    if speed  > vel_threshold:
+                                        #print("but other vehicle {} started moving".format(vid))
+                                        return True #wait
+                            self.yielding_vehicles = None
+                            return False
+                        else:
+                            #no priority
+                            wait_time = traffic_state.sim_time - self.yielding_vehicles[0]
+                            #print("wait time is {}".format(wait_time))
+                            #remove gone vehicles from list.
+                            for vid in self.yielding_vehicles[1]:
+                                if vid is not traffic_state.vid:
+                                    if vid not in traffic_state.road_occupancy.yielding_zone: 
+                                        self.yielding_vehicles[1].remove(vid)
+                            #take a chance if waiting too long
+                            if wait_time > wait_time_threshold:
+                                #print("no priority >> take a chance")
+                                if random.random() <= draw_p:
+                                #if random.choices(population= [0,1], weights=[1-draw_weight,draw_weight], k=1)[0] > 0:
+                                    #print("DRAW GO")
+                                    #before, check if any yielding vehicle started moving
+                                    for vid in yielding_vehicles:
+                                        vehicle = get_vehicle_by_ids(traffic_state, {'vid':vid} )
+                                        if vehicle:
+                                            speed = vehicle.state.get_cartesian_speed()
+                                            #print("vid {} vel {}".format(vid,speed))
+                                            if speed > vel_threshold:
+                                                #print("but other vehicle {} started moving".format(vid))
+                                                return True #wait
+                                    self.yielding_vehicles = None
+                                    return False
+                                else:
+                                    #print(":( wait")
+                                    return True
+            return True # wait
+                
+        return False
 
     def lane_occupied(self,traffic_state:TrafficState, kwargs):
         lane_occupied, lv_id = is_in_following_range(
@@ -409,13 +491,13 @@ class BTreeConditions:
 
     def traffic_light_state(self,traffic_state:TrafficState, kwargs):
         color = get_node_param(kwargs,'color',30)
-        for re_state in traffic_state.regulatory_elements:
-            if isinstance(re_state, TrafficLightState):
-                if re_state.color == TrafficLightColor.Green and color == GREEN:
+        for intersection in traffic_state.intersections:
+            if isinstance(intersection, TrafficLightIntersection):
+                if intersection.color == TrafficLightColor.Green and color == GREEN:
                     return True 
-                if re_state.color == TrafficLightColor.Red and color == RED:
+                if intersection.color == TrafficLightColor.Red and color == RED:
                     return True 
-                if re_state.color == TrafficLightColor.Yellow and color == YELLOW:
+                if intersection.color == TrafficLightColor.Yellow and color == YELLOW:
                     return True 
 
 
@@ -425,11 +507,14 @@ class BTreeConditions:
 #====================
 
 
-def get_node_param(kwargs, param_names, default = None, required = False):
+def get_node_param(kwargs, param_names, default = None, required = False, int_to_boolean=False):
     if type(param_names) == list:
         for name in param_names:
             if name in kwargs:
-                return kwargs[name]
+                value = kwargs[name]
+                if int_to_boolean:
+                    value = bool(int(value))
+                return value
     elif param_names in kwargs:
             return kwargs[param_names]
     if required:
@@ -481,6 +566,8 @@ def get_vehicle_by_ids(traffic_state:TrafficState, kwargs):
         if vid:
             if vid in traffic_state.traffic_vehicles:
                 return traffic_state.traffic_vehicles[vid]
-        
+            elif vid in traffic_state.traffic_vehicles_orp:
+                return traffic_state.traffic_vehicles_orp[vid]
+        #print(traffic_state.traffic_vehicles)
         log.warn("No Vehicle found with IDs {} ".format(kwargs))
         return None

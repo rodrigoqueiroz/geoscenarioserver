@@ -7,7 +7,7 @@ install_python_dependencies()
     echo "Installing Python3.8 and other packages"
     echo ""
     # Ensure we have Python3.8 and pip3
-    sudo apt-get install -qq python3.8 python3.8-dev python3-tk python3-pip
+    sudo apt-get install -qq python3.8 python3.8-dev python3-tk python3-pip python3-pil python3-pil.imagetk
 
     echo ""
     echo "Installing the required dependencies for GeoScenario Server for Python3.8"

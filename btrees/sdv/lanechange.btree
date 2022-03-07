@@ -9,7 +9,7 @@ behaviortree lanechange:
                     maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=LEFT) )
                 ->
                     condition c_target_right( target_lane(lid=RIGHT) )
-                    condition c_can_left( can_lane_change(gap=20, lid=RIGHT) )
+                    condition c_can_right( can_lane_change(gap=20, lid=RIGHT) )
                     maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=RIGHT) )
                 
         
