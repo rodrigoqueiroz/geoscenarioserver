@@ -6,7 +6,12 @@
 # --------------------------------------------
 
 from types import LambdaType
-from lanelet2.projection import UtmProjector
+try:
+    from lanelet2.projection import LocalCartesianProjector
+    use_local_cartesian=True
+except ImportError:
+    from lanelet2.projection import UtmProjector
+    use_local_cartesian=False
 from lanelet2.core import GPSPoint
 from mapping.LaneletMap import *
 from SimConfig import SimConfig
@@ -54,8 +59,14 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
-    projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
     
+    if use_local_cartesian:
+        projector = LocalCartesianProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
+        log.info("Using LocalCartesianProjector")
+    else:
+        projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
+        log.info("Using UTMProjector")
+
     parser.project_nodes(projector,altitude)
     lanelet_map.load_lanelet_map(map_file, projector)
     sim_config.map_name = parser.globalconfig.tags['lanelet']
