@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-#rqueiroz@gsd.uwaterloo.ca
-#d43sharm@uwaterloo.ca
+# rqueiroz@uwaterloo.ca
+# d43sharm@uwaterloo.ca
+# mantkiew@uwaterloo.ca
 # --------------------------------------------
 # LaneletMap
 # Class to parse a Lanelet 2 map and interface with lanelet2 library
@@ -10,7 +11,6 @@ import lanelet2
 from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop, RightOfWay
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
-from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType, Route
 
 from matplotlib import pyplot as plt
