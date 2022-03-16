@@ -231,7 +231,7 @@ def range_gap(vehicle_state, target_vehicle):
     if vehicle_state.s > target_vehicle.state.s:
         #back bump - target front bump
         range = max((vehicle_state.s - half_length) - (target_vehicle.state.s + half_length), 0)
-    #behind, negative or zero
+    #behind, negative or zero        
     else:
         #front bump - target back bump
         range = min((vehicle_state.s + half_length) - (target_vehicle.state.s - half_length), 0)
