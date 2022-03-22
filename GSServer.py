@@ -13,7 +13,13 @@ from SimConfig import SimConfig
 from dash.Dashboard import *
 from mapping.LaneletMap import *
 from ScenarioSetup import *
-from lanelet2.projection import UtmProjector
+try:
+    from lanelet2.projection import LocalCartesianProjector
+    use_local_cartesian=True
+except ImportError:
+    from lanelet2.projection import UtmProjector
+    use_local_cartesian=False
+
 import glog as log
 
 def start_server(args, m=MVelKeepConfig()):
@@ -99,7 +105,12 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('GeoScenario server shutdown')
 
 def verify_map_file(map_file, lanelet_map:LaneletMap):
-    projector = UtmProjector(lanelet2.io.Origin(43.0, -80))
+    if use_local_cartesian:
+        projector = LocalCartesianProjector(lanelet2.io.Origin(43.4681668322, -80.5436763174, 302))
+        log.info("Using LocalCartesianProjector")
+    else:
+        projector = UtmProjector(lanelet2.io.Origin(43.4681668322, -80.5436763174, 302))
+        log.info("Using UTMProjector")
     lanelet_map.load_lanelet_map(map_file, projector)
 
 

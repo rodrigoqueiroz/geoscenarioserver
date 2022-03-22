@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-#rqueiroz@gsd.uwaterloo.ca
-#d43sharm@uwaterloo.ca
+# rqueiroz@uwaterloo.ca
+# d43sharm@uwaterloo.ca
+# mantkiew@uwaterloo.ca
 # --------------------------------------------
 # LaneletMap
 # Class to parse a Lanelet 2 map and interface with lanelet2 library
@@ -10,7 +11,6 @@ import lanelet2
 from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop, RightOfWay
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
-from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType, Route
 
 from matplotlib import pyplot as plt
@@ -76,11 +76,63 @@ class LaneletMap(object):
                 elem.attributes["one_way"] = "no"
                 elem.attributes["participant:pedestrian"] = "yes"
 
+    def get_conflicting_by_route(self, lanelet_route:Route, lanelet:Lanelet, with_intersecting_points = False):
+        ''''
+            Returns a list of conflicting Lanelets with both current and succeeding
+            lanelets based on the route. 
+            The list is order by distance from lanelet start 
+            and a longitudinal distance from start is assigned
+        '''
+        conflicting = []
+        for c in lanelet_route.conflictingInMap(lanelet):
+            conflicting.append(c)
+            if with_intersecting_points:
+                intersecting_points = [] #BasicPoints2d 
+                self.lanelet_map.intersection(
+                    lanelet.centerline2d.basicLineString, 
+                    c.centerline2d.basicLineString, 
+                    intersecting_points)
+        return conflicting
+
     def get_right(self, lanelet):
-        return self.routing_graph.right(lanelet)
+        #routable lanelet, if exists
+        right_ll =  self.routing_graph.right(lanelet)
+        if right_ll:
+            return right_ll,  "routable"
+        #adjacent, non-routable lanelet, if exists
+        right_ll = self.routing_graph.adjacentRight(lanelet) # allowLaneChanges=True # param not available
+        if right_ll:
+            return right_ll, "adjacent"
+        #adjacent, but opposite direction
+        lls = self.lanelet_map.laneletLayer.findUsages(lanelet.rightBound.invert())
+        if len(lls) > 0:
+            right_ll = lls[0]
+        if len(lls) > 1:
+            log.warn("multiple right adjacent lanelets found for {}. Using {}".format(lanelet.id, right_ll.id))
+        if right_ll:
+            return right_ll, "opposite"
+        #Not found
+        return None, ""
 
     def get_left(self, lanelet):
-        return self.routing_graph.left(lanelet)
+        #routable lanelet, if exists
+        left_ll =  self.routing_graph.left(lanelet)
+        if left_ll:
+            return left_ll,  "routable"
+        #adjacent, non-routable lanelet, if exists
+        left_ll = self.routing_graph.adjacentLeft(lanelet) # allowLaneChanges=True # param not available
+        if left_ll:
+            return left_ll, "adjacent"
+        #adjacent, but opposite direction
+        lls = self.lanelet_map.laneletLayer.findUsages(lanelet.leftBound.invert())
+        for ll in lls:
+            left_ll = ll
+        if len(lls) > 1:
+            log.warn("multiple left adjacent lanelets found for {}. Using {}".format(lanelet.id, left_ll.id))
+        if left_ll:
+            return left_ll, "opposite"
+        #Not found
+        return None, ""
 
     def get_next(self, lanelet):
         return self.routing_graph.following(lanelet)
@@ -104,7 +156,7 @@ class LaneletMap(object):
         # NOTE: lanelet must be on lanelet_route
 
         left = []
-
+        # Provides all lanelets left of a given lanelet within the Route
         left_relations = lanelet_route.leftRelations(lanelet)
         for relation in left_relations:
             if relation.relationType == RelationType.Left:
@@ -115,13 +167,10 @@ class LaneletMap(object):
     def get_next_by_route(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: lanelet must be on lanelet_route
 
-        following = []
-
-        following_relations = lanelet_route.followingRelations(lanelet)
-        for relation in following_relations:
-            following.append(relation.lanelet)
-
-        return following
+        next = []
+        for relation in lanelet_route.followingRelations(lanelet):
+            next.append(relation.lanelet)
+        return next
 
     def get_previous_by_route(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: lanelet must be on lanelet_route
@@ -133,6 +182,28 @@ class LaneletMap(object):
             previous.append(relation.lanelet)
 
         return previous
+
+    def get_next_sequence_by_route(self, lanelet_route: Route, lanelet: Lanelet, distance = None):
+        ''' Returns a single chain of next lanelets on the route, up to the distance threshold
+            Lanelet must be on lanelet_route
+        '''
+        sequence = []
+        for relation in lanelet_route.followingRelations(lanelet):
+            sequence.append(relation.lanelet)
+            distance_covered = length2d(relation.lanelet) #length of centerline in 2d
+            #print(distance_covered)
+            #include next lanelets if distance not covered
+            if (distance is not None) and (distance_covered <  distance):
+                next_relations = lanelet_route.followingRelations(relation.lanelet)
+                #only include following lanelets if it is a single path forward, otherwise can't make assumptions of continuity
+                #this will avoid mixing up paths with intersections
+                if len(next_relations)==1 :
+                    next_lanelet = next_relations[0].lanelet
+                    sequence.append(next_lanelet)
+                    distance_covered += length2d(next_lanelet)
+            #print("Following sequence {} distance {}".format(len(sequence),distance_covered))
+        
+        return sequence
 
     def route_full_lane(self, lanelet_route: Route, lanelet: Lanelet):
         # NOTE: this is a wrapper for lanelet_route.fullLane(lanelet)
@@ -238,7 +309,7 @@ class LaneletMap(object):
                 my_index = i
                 break
         if my_index is not None:
-            return stop_lines[i]
+            return stop_lines[my_index]
 
         return None
 
@@ -344,10 +415,23 @@ class LaneletMap(object):
             intersecting_lls = list(
                 filter(lambda ll: inside(ll, point), intersecting_lls))
             if len(intersecting_lls) > 1:
-                log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
-                    (x, y), [ll.id for ll in intersecting_lls]))
+                #log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #    (x, y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
         return intersecting_lls[0]
+
+    def get_all_occupying_lanelets(self, x, y):
+        ''' Returns a list of overlapping lanelets.
+            If not match, returns empty list."
+         '''
+        point = BasicPoint2d(x, y)
+        searchbox = BoundingBox2d(point, point)
+        intersecting_lls = self.lanelet_map.laneletLayer.search(searchbox)
+        if len(intersecting_lls) > 1:
+            # filter results for lanelets containing the point
+            intersecting_lls = list(
+                filter(lambda ll: inside(ll, point), intersecting_lls))
+        return intersecting_lls
 
     def get_occupying_lanelet_by_participant(self, x, y, participant):
         point = BasicPoint2d(x, y)

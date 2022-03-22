@@ -225,6 +225,10 @@ class SVPlanner(object):
                 if (self.last_plan is not None) and (frenet_traj is None):
                     # shift the trajectories to the old frenet frame they are positioned in
                     traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
+                
+                #For pickling
+                traffic_state.intersections = [ intersection.to_primitives() for intersection in traffic_state.intersections]
+
                 debug_shdata[int(self.vid)] = (
                     traffic_state,
                     snapshot_tree,
