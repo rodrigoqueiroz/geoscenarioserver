@@ -19,12 +19,11 @@ from util.Transformations import normalize
 from util.Utils import get_lanelet_entry_exit_points, line_segments_intersect, orientation, point_in_rectangle
 
 
-def has_reached_point(pedestrian_state, point, **kwargs):
+def has_reached_point(pedestrian_state, point, threshold):
     """ Checks if the pedestrian has reached a given point in the cartesian frame
         @param point: Array [x,y] node position
         @param threshold: Max acceptable distance to point
     """
-    threshold = kwargs["threshold"]
     pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
     return np.linalg.norm(np.asarray(point) - pedestrian_pos) < threshold
 
@@ -140,11 +139,10 @@ def has_line_of_sight_to_point(position, point, lanelet):
     return True
 
 
-def approaching_crosswalk(planner_state, **kwargs):
+def approaching_crosswalk(planner_state, threshold):
     if planner_state.target_crosswalk["id"] == -1:
         return False
-
-    threshold = kwargs["threshold"]
+        
     pedestrian_pos = np.array([planner_state.pedestrian_state.x, planner_state.pedestrian_state.y])
 
     if not planner_state.lanelet_map.inside_lanelet_or_area(pedestrian_pos, planner_state.current_lanelet):
