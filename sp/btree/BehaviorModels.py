@@ -115,11 +115,13 @@ class BehaviorModels(object):
 
         if condition == "reached_goal":
             goal = self.planner_state.destination
-            return has_reached_point(self.planner_state.pedestrian_state, goal, **kwargs)
+            threshold = kwargs["threshold"] if "threshold" in kwargs else 1
+            return has_reached_point(self.planner_state.pedestrian_state, goal, threshold)
 
         elif condition == "reached_curr_waypoint":
             waypoint = self.planner_state.waypoint
-            return has_reached_point(self.planner_state.pedestrian_state, waypoint, **kwargs)
+            threshold = kwargs["threshold"] if "threshold" in kwargs else 1
+            return has_reached_point(self.planner_state.pedestrian_state, waypoint, threshold)
 
         elif condition == "reached_crosswalk_entrance":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
@@ -127,7 +129,8 @@ class BehaviorModels(object):
             if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['entry']):
                 return False
             entrance = self.planner_state.target_crosswalk['entry']
-            return has_reached_point(self.planner_state.pedestrian_state, entrance, **kwargs)
+            threshold = kwargs["threshold"] if "threshold" in kwargs else 1.5
+            return has_reached_point(self.planner_state.pedestrian_state, entrance, threshold)
 
         elif condition == "reached_crosswalk_exit":
             if (self.planner_state.target_crosswalk['id'] == -1 or not self.planner_state.selected_target_crosswalk):
@@ -135,7 +138,8 @@ class BehaviorModels(object):
             if not all(self.planner_state.waypoint == self.planner_state.target_crosswalk['exit']):
                 return False
             exit = self.planner_state.target_crosswalk['exit']
-            return has_reached_point(self.planner_state.pedestrian_state, exit, **kwargs)
+            threshold = kwargs["threshold"] if "threshold" in kwargs else 1.5
+            return has_reached_point(self.planner_state.pedestrian_state, exit, threshold)
 
         elif condition == "at_desired_speed":
             return self.planner_state.pedestrian_speed['current_desired'] == self.planner_state.pedestrian_speed['default_desired']
@@ -155,7 +159,7 @@ class BehaviorModels(object):
             return self.planner_state.crossing_light_color == TrafficLightColor.Yellow
 
         elif condition == "crosswalk_has_light":
-            return self.planner_state.crossing_light_color != None
+            return self.planner_state.crossing_light_color is not None
 
         elif condition == "has_target_crosswalk":
             return self.planner_state.target_crosswalk['id'] != -1
@@ -167,7 +171,8 @@ class BehaviorModels(object):
             return past_crosswalk_halfway(self.planner_state)
 
         elif condition == "approaching_crosswalk":
-            return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state, **kwargs)
+            threshold = kwargs["threshold"] if "threshold" in kwargs else 3
+            return (not self.planner_state.selected_target_crosswalk) and approaching_crosswalk(self.planner_state, threshold)
 
         elif condition == "waiting_at_crosswalk_entrance":
             return self.planner_state.previous_maneuver == Maneuver.M_WAITATCROSSWALK
