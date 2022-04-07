@@ -70,19 +70,21 @@ class Dashboard(object):
             if not self.window:
                 return
 
-            #clear
-            self.clear_vehicle_charts()
-            self.tree_msg.configure(text= "")
-
-            #get new data
-            header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
+            # get new data
+            header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(
+                traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
-            config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
-            config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
-            config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time)
+            display_rate = 1 / sync_dash.delta_time if sync_dash.delta_time > 0 else 0
 
-            #config/stats
+            config_txt = "Scenario: {}   |   Map: {}".format(
+                self.sim_traffic.sim_config.scenario_name,
+                self.sim_traffic.sim_config.map_name)
+            config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {:.2f} ({}) Hz".format(
+                TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE)
+            config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(
+                tickcount, sim_time_formated, delta_time)
+            # config/stats
             self.scenario_config_lb['text'] = config_txt
 
             #global Map
