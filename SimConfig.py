@@ -28,7 +28,8 @@ SHOW_MPLOT = True           #whether to show the global map cartesian plot
 MPLOT_SIZE = 60			#map plot: road length in meters (shorter=better performance)
 #Frenet Map
 SHOW_FFPLOT = True          #whether to show the frenet frame plot
-FFPLOT_ASPECT = False  		#frenet frame plot: keep S and D aspect ratio (same scale)
+SHOW_OCCUPANCY = True       #whether to show road and intersection occupancy inside the frenet plot
+FFPLOT_ASPECT = True  		#frenet frame plot: keep S and D aspect ratio (same scale)
 FFPLOT_LENGTH = 60			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
 #Cartesian
