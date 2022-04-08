@@ -11,6 +11,7 @@ from TickSync import TickSync
 from SimTraffic import SimTraffic
 from SimConfig import SimConfig
 from dash.Dashboard import *
+from dash.Dashboard2 import *
 from mapping.LaneletMap import *
 from ScenarioSetup import *
 try:
@@ -78,6 +79,13 @@ def start_server(args, m=MVelKeepConfig()):
     else:
         log.warn("Dashboard will not start")
 
+    # GUI / Debug screen
+    dashboard2 = Dashboard2(traffic, sim_config)
+    if sim_config.show_dashboard:
+        dashboard2.start()
+    else:
+        log.warn("Dashboard2 will not start")
+
     if WAIT_FOR_INPUT:
         input("waiting for [ENTER]...")
 
@@ -99,6 +107,7 @@ def start_server(args, m=MVelKeepConfig()):
     sync_global.write_peformance_log()
     traffic.stop_all()
     dashboard.quit()
+    dashboard2.quit()
 
     #SIM END
     log.info('SIMULATION END')
