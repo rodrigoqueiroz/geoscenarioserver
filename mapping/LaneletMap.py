@@ -674,27 +674,6 @@ class LaneletMap(object):
 
         return data
 
-    def plot_all_lanelets(self, x_min=0, y_min=0, x_max=0, y_max=0):
-        """ Plots all lanelets within given boundaries.
-            Center line is ommited.
-            @param drawline: draw as lines (heavier). If false, draw as points.
-            @param split: split left and right lanelet into using color scheme.
-        """
-        if (x_min == x_max == y_min == y_max):
-            lanelets = self.lanelet_map.laneletLayer
-        else:
-            searchBox = BoundingBox2d(BasicPoint2d(
-                x_min, y_min), BasicPoint2d(x_max, y_max))
-            lanelets = self.lanelet_map.laneletLayer.search(searchBox)
-
-        for lanelet in lanelets:
-            xs = [pt.x for pt in lanelet.rightBound]
-            ys = [pt.y for pt in lanelet.rightBound]
-            plt.plot(xs, ys, 'b-')
-            xs = [pt.x for pt in lanelet.leftBound]
-            ys = [pt.y for pt in lanelet.leftBound]
-            plt.plot(xs, ys, 'g-')
-
     def plot_lanelet_ids(self, lanelet_ids):
         for ll_id in lanelet_ids:
             LaneletMap.plot_ll(self.lanelet_map.laneletLayer[ll_id])
@@ -747,43 +726,32 @@ class LaneletMap(object):
         return distance(point_on_leftbound, point_on_rightbound)
 
 
+LINE_FORMAT_DEFAULT = ('gray', 'solid', 1)
+LINE_FORMAT = {
+    'road_border': ('red', 'solid', 1),
+    'guard_rail': ('m', 'solid', 2),
+    'virtual': ('lightgray', 'dotted', 1),
+
+    ('line_thin', 'solid'): ('gray', 'solid', 1),
+    ('line_thin', 'dashed'): ('gray', 'dashed', 1),
+    ('line_thick', 'solid'): ('gold', 'solid', 1),
+    ('line_thick', 'dashed'): ('gold', 'dashed', 1),
+    'stop_line': ('gray', 'solid', 1),
+    'stop': LINE_FORMAT_DEFAULT,
+    'curbstone': ('darkgray', 'solid', 1),
+    'high': LINE_FORMAT_DEFAULT,
+    'pedestrian_marking': ('gray', 'dashed', 1),
+    'zebra_marking': ('gray', 'dashed', 2),
+    'bump': ('lightgray', 'solid', 4),
+    'traffic_light': None
+}
+
+
 def get_line_format(type: str, subtype: str):
-    color = 'red'  # color for unhandled type
-    linestyle = 'solid'  # most lines are solid
-    linewidth = 1  # default width
-    if type == 'road_border':
-        color = 'black'
-        linewidth = 2
-    elif type == 'guard_rail':
-        color = 'purple'
-        linewidth = 2
-    elif type == 'virtual':
-        color = 'lightgray'
-        linestyle = 'dotted'
-    elif type == 'line_thin':
-        color = 'gray'
-        linestyle = subtype
-    elif (type == 'line_thick' or type == 'stop_line' or type == 'stop'):
-        color = 'gray'
-        linestyle = subtype
-        linewidth = 3
-    elif type == 'curbstone':
-        color = 'darkgray'
-        if subtype == 'high':
-            linewidth = 2
-    elif type == 'pedestrian_marking':
-        color = 'gray'
-        linestyle = 'dashed'
-    elif type == 'zebra_marking':
-        color = 'gray'
-        linestyle = 'dashed'
-        linewidth = 2
-    elif type == 'bump':
-        color = 'lightgray'
-        linestyle = 'solid'
-        linewidth = 4
-    elif type == "traffic_light":
-        return None  # do not draw
+    if (type, subtype) in LINE_FORMAT:
+        return LINE_FORMAT[(type, subtype)]
+    elif type in LINE_FORMAT:
+        return LINE_FORMAT[type]
     else:
         print(f'Unhandled format of line type: {type}, subtype: {subtype}')
-    return (color, linestyle, linewidth)
+    return LINE_FORMAT_DEFAULT

@@ -6,27 +6,30 @@
 # Simulation Dashboard2 and Trajectory Plots V2
 # --------------------------------------------
 import numpy as np
-from math import sqrt, exp
-from multiprocessing import Process
-import datetime
-from PIL import Image, ImageTk
-import glog as log
 from SimTraffic import *
-from SimConfig import *
-from util.Utils import *
 import sv.SDVTrafficState
 from sv.Vehicle import *
 from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
-from mapping.LaneletMap import get_line_format
+from mapping.LaneletMap import LINE_FORMAT
 
+from matplotlib import colors
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import pyqtgraph as pg
 
 
+LINE_STYLE_MAPPING = {
+    'dashdot': Qt.DashDotLine,
+    'dashed': Qt.DashLine,
+    'dotted': Qt.DotLine,
+    'solid': Qt.SolidLine
+}
+
 class Dashboard2(object):
+    TITLE = "GeoScenario Server"
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
@@ -63,10 +66,11 @@ class Dashboard2(object):
         self._process.start()
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
+
         self.window, w = self.create_gui(traffic_state_sharr, debug_shdata)
         self.window.exec()
 
-    def update(self, traffic_state_sharr, debug_shdata):
+    def update(self, traffic_state_sharr, debug_shdata, first_frame):
         # Calculate Display Rate
         current_time = time.time()
         display_delta_time = current_time - self.last_time
@@ -80,10 +84,7 @@ class Dashboard2(object):
         display_rate = 1 / display_delta_time if display_delta_time > 0 else 0
 
         # Config/Stats
-        config_txt = "Scenario: {}   |   Map: {}".format(
-            self.sim_traffic.sim_config.scenario_name,
-            self.sim_traffic.sim_config.map_name)
-        config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard2 Rate: {:.2f} ({}) Hz".format(
+        config_txt = "Traffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard2 Rate: {:7.2f} ({}) Hz".format(
             TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE)
         config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(
             tickcount, sim_time_formated, delta_time)
@@ -91,8 +92,8 @@ class Dashboard2(object):
         self.l.setText(config_txt)
 
         # # global Map
-        # if SHOW_MPLOT:
-        #     self.plot_map_chart(vehicles, pedestrians, traffic_lights, static_objects)
+        if SHOW_MPLOT:
+            self.plot_map_chart(vehicles, pedestrians, traffic_lights, static_objects, first_frame)
         #
         # # vehicles table
         # self.update_table(vehicles)
@@ -134,13 +135,6 @@ class Dashboard2(object):
         #         pid = int(self.center_id)
         #         if SHOW_CPLOT:  # cartesian plot with lanelet map
         #             self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, traffic_lights, static_objects)
-        #
-        # self.cart_canvas.draw()
-        # self.fren_canvas.draw()
-        # self.traj_canvas.draw()
-        # if SHOW_MPLOT:
-        #     self.map_canvas.draw()
-        # self.window.update()
 
     def quit(self):
         self._process.terminate()
@@ -177,10 +171,7 @@ class Dashboard2(object):
             sp = ['p' + str(pid)] + [sim_state] + sp
             self.tab.insert('', 'end', 'p' + str(pid), values=(sp))
 
-    def plot_map_chart(self, vehicles, pedestrians, traffic_light_states, static_objects):
-        # -Global Map cartesian plot
-        fig = plt.figure(Dashboard2.MAP_FIG_ID, frameon=False)
-        plt.cla()
+    def plot_map_chart(self, vehicles, pedestrians, traffic_light_states, static_objects, first_frame):
 
         # boundaries (center is GeoScenario origin)
         x_min = -(MPLOT_SIZE / 2)
@@ -188,21 +179,23 @@ class Dashboard2(object):
         x_max = (MPLOT_SIZE / 2)
         y_max = (MPLOT_SIZE / 2)
 
-        self.plot_road(x_min, x_max, y_min, y_max, traffic_light_states)
-        self.plot_static_objects(static_objects, x_min, x_max, y_min, y_max)
-        self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max)
-        self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
-
-        # layout
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.gca().set_aspect('equal', adjustable='box')
-        # plt.gca().xaxis.set_visible(False)
-        # plt.gca().yaxis.set_visible(False)
-        plt.gca().axis("off")
-        plt.margins(0, 0)
-        # plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
-        fig.tight_layout(pad=0.0)
+        if first_frame:
+            self.plot_road(x_min, x_max, y_min, y_max)
+            self.plot_static_objects(static_objects, x_min, x_max, y_min, y_max)
+        self.plot_traffic_lights(traffic_light_states)
+        # self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max)
+        # self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
+        #
+        # # layout
+        # plt.xlim(x_min, x_max)
+        # plt.ylim(y_min, y_max)
+        # plt.gca().set_aspect('equal', adjustable='box')
+        # # plt.gca().xaxis.set_visible(False)
+        # # plt.gca().yaxis.set_visible(False)
+        # plt.gca().axis("off")
+        # plt.margins(0, 0)
+        # # plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
+        # fig.tight_layout(pad=0.0)
 
     def plot_pedestrian_cartesian_chart(self, center_id, vehicles, pedestrians, traffic_lights=None,
                                         static_objects=None):
@@ -244,7 +237,8 @@ class Dashboard2(object):
         y_min = vehicles[center_id].state.y - (CPLOT_SIZE / 2)
         y_max = vehicles[center_id].state.y + (CPLOT_SIZE / 2)
 
-        self.plot_road(x_min, x_max, y_min, y_max, traffic_lights)
+        self.plot_road(x_min, x_max, y_min, y_max)
+        self.plot_traffic_lights(traffic_lights)
         self.plot_static_objects(static_objects, x_min, x_max, y_min, y_max)
         if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
@@ -264,39 +258,39 @@ class Dashboard2(object):
         plt.margins(0, 0)
         plt.subplots_adjust(bottom=0.05, top=0.95, left=0.05, right=0.95, hspace=0, wspace=0)
 
-    def plot_road(self, x_min, x_max, y_min, y_max, traffic_light_states=None):
-
-        # road lines:
-        # self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)
+    def plot_road(self, x_min, x_max, y_min, y_max):
         data = self.lanelet_map.get_lines(x_min, y_min, x_max, y_max)
         for xs, ys, type, subtype in data:
-            line_format = get_line_format(type, subtype)
-            if line_format is None:
-                pass
+            xs.append(np.nan)
+            ys.append(np.nan)
+            print(type, subtype)
+            if (type, subtype) in self.map_roads:
+                plot_item = self.map_roads[(type, subtype)]
+            elif type in self.map_roads:
+                plot_item = self.map_roads[type]
+            X, Y = plot_item.getData()
+            if X is not None:
+                plot_item.setData(x=np.append(X, xs), y=np.append(Y, ys))
             else:
-                color, linestyle, linewidth = line_format
-                plt.plot(xs, ys, color=color, linestyle=linestyle,
-                         linewidth=linewidth, zorder=0)
+                plot_item.setData(x=xs, y=ys)
 
         # pedestrian marking
 
         # regulatory elements:
 
-        # stop lines
-        for stop_line in self.lanelet_map.get_stop_lines():
-            plt.plot([pt.x for pt in stop_line], [pt.y for pt in stop_line], 'r-')  # red
+        # # stop lines
+        # for stop_line in self.lanelet_map.get_stop_lines():
+        #     self.map_roads["stop_line"].setData(x=[pt.x for pt in stop_line] + [np.nan],
+        #                                         y=[pt.y for pt in stop_line] + [np.nan], clear=False)
+        #
+        # # stop signs
+        # for stop_sign in self.lanelet_map.get_stop_signs():
+        #     self.map_roads["stop_sign"].setData(x=[pt.x for pt in stop_line],
+        #                                         y=[pt.y for pt in stop_line],
+        #                                         symbol="x")
 
-        # stop signs
-        for stop_sign in self.lanelet_map.get_stop_signs():
-            plt.plot(stop_sign.x, stop_sign.y, 'rH', markersize=10)
 
-        # All way Stops ()
-        # sign_points, stop_lines, lanelets = self.lanelet_map.get_all_way_stops()
-        # for point in sign_points:
-        # plt.plot(point[0], point[1], 'rH', markersize=10)
-        # for stop_line in stop_lines:
-        # plt.plot([pt.x for pt in stop_line], [pt.y for pt in stop_line], 'r-') #red
-
+    def plot_traffic_lights(self, traffic_light_states=None):
         # lights (must be drawn after other stop lines)
         if traffic_light_states:
             for lid, state in traffic_light_states.items():
@@ -325,13 +319,20 @@ class Dashboard2(object):
 
     def plot_static_objects(self, static_objects, x_min, x_max, y_min, y_max):
         if static_objects:
+            X = []
+            Y = []
             for oid, obj in static_objects.items():
                 x = obj.x
                 y = obj.y
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-                    plt.plot(x, y, 'kX', markersize=4, zorder=10)
                     label = "{}".format(oid)
-                    plt.gca().text(x + 1, y + 1, label, style='italic', zorder=10)
+                    X.append(x)
+                    Y.append(y)
+                    text = pg.TextItem(label, anchor=(0, 1), angle=0)
+                    text.setPos(x, y)
+                    text.setColor('w')
+                    self.map.addItem(text)
+            self.map_static.setData(X, Y, clear=True)
 
     def plot_vehicles(self, vehicles, x_min, x_max, y_min, y_max, show_arrow=False):
         ax = plt.gca()
@@ -667,50 +668,107 @@ class Dashboard2(object):
             t += 0.25
         plt.plot(X, Y, color=color)
 
+    def create_gui_title(self):
+        title_W = QWidget()
+        title_W.setStyleSheet("background-color:black;")
+
+        hbox = QHBoxLayout()
+        title_L = QLabel(Dashboard2.TITLE)
+        title_L.setStyleSheet("background-color: black;"
+                              "color: white;"
+                              "font-family: OpenSans; font-size: 40px;")
+        hbox.addWidget(title_L)
+        hbox.addStretch()
+        hbox.setSpacing(5)
+        hbox.setContentsMargins(20, 0, 0, 0)
+        logo = QLabel()
+        logo.setPixmap(QPixmap(ROOT_DIR + "/dash/img/logos.png"))
+        hbox.addWidget(logo)
+        title_W.setLayout(hbox)
+        return title_W
+
+    def create_gui_stats(self):
+        stats_W = QWidget()
+
+        self.l = QLabel()
+        self.l.setAlignment(Qt.AlignRight)
+
+        self.r = QLabel()
+        config_txt = "Scenario: {}\nMap: {}".format(
+            self.sim_traffic.sim_config.scenario_name,
+            self.sim_traffic.sim_config.map_name)
+        self.r.setText(config_txt)
+
+        hbox = QHBoxLayout()
+        hbox.setSpacing(20)
+        hbox.setContentsMargins(20, 0, 20, 0)
+        hbox.addWidget(self.r)
+        hbox.addStretch()
+        hbox.addWidget(self.l)
+        stats_W.setLayout(hbox)
+
+        return stats_W
+
+    def create_gui_map(self):
+        map_W = pg.PlotWidget(name="Map")
+        map_W.addLegend()
+        self.map_static = map_W.plot(pen=None, symbolBrush=(0, 0, 200),
+                                        symbolPen='w', symbol='x', symbolSize=14, name="Static Objects")
+
+        self.map_roads = {}
+        for type, fmt in LINE_FORMAT.items():
+            if fmt is None:
+                continue
+            color, style, width = fmt
+            if style in LINE_STYLE_MAPPING:
+                style = LINE_STYLE_MAPPING[style]
+            else:
+                style = LINE_STYLE_MAPPING["solid"]
+            color = np.rint(np.dot(colors.to_rgba(color), 255))
+            if isinstance(type, tuple):
+                type_name = "%s (%s)" % type
+            else:
+                type_name = str(type)
+            self.map_roads[type] = map_W.plot(pen=pg.mkPen(color=color, width=width, style=style),
+                                              name=type_name, connect='finite')
+
+        return map_W
+
     def create_gui(self, traffic_state_sharr, debug_shdata):
+        # Main containers:
+        # title frame
+        # stats frame
+        # global frame  [  map  | table  ]
+        # vehicle frame [  cart | frenet | btree ]
         app = QApplication([])
         window = QMainWindow()
-        self.l = QLabel("Start")
+        root = QWidget()
+        window.setCentralWidget(root)
+        window.setWindowTitle(Dashboard2.TITLE + " (Dashboard V2)")
 
-        window.setCentralWidget(self.l)
-        window.setWindowTitle("GeoScenario Server (Dashboard V2)")
+        stack = QVBoxLayout()
+        stack.setSpacing(5)
+        stack.setContentsMargins(0, 0, 0, 0)
 
-        window.show()
+        title_W = self.create_gui_title()
+        title_W.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed))
+        stack.addWidget(title_W)
 
-        self.timer = QTimer()
-        self.timer.setInterval(1000 / DASH_RATE)
-        self.timer.timeout.connect(lambda: self.update(traffic_state_sharr, debug_shdata))
-        self.timer.start()
+        stats_W = self.create_gui_stats()
+        stats_W.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed))
+        stack.addWidget(stats_W)
 
-        return app, window
-        # # Window
-        # window = tk.Tk()
+        # self.plotWidget = pg.plot(title="Three plot curves")
         #
-        # # Main containers:
-        # # title frame
-        # # stats frame
-        # # global frame  [  map  | table  ]
-        # # vehicle frame [  cart | frenet | btree ]
-        # title_frame = tk.Frame(window, width=1200, height=50, bg="black")
-        # title_frame.grid(row=0, sticky="nsew")
-        # # tk.ttk.Separator(window,orient=tk.HORIZONTAL).grid(row=1, column=0, sticky='ew' )
-        #
-        # stats_frame = tk.Frame(window, width=1200, height=50, bg="white")
-        # stats_frame.grid(row=2, sticky="nsew")
-        # tk.ttk.Separator(window, orient=tk.HORIZONTAL).grid(row=3, column=0, sticky='ew')
-        #
-        # global_frame = tk.Frame(window, width=1200, height=300, bg="white")
-        # global_frame.grid(row=4, sticky="nsew")
-        # tk.ttk.Separator(window, orient=tk.HORIZONTAL).grid(row=5, column=0, sticky='ew')
-        #
-        # vehicle_frame = tk.Frame(window, width=1200, height=300, bg="white")
-        # vehicle_frame.grid(row=6, sticky="nsew")
-        #
-        # # global sub containers
-        # if SHOW_MPLOT:
-        #     map_frame = tk.Frame(global_frame, width=600, height=300, bg="red")  # create
-        #     map_frame.grid(row=0, column=1, sticky="nsew")  # set pos
-        #
+        # stack.addWidget(self.plotWidget)
+        # self.plotdata = []
+        # for i in range(3):
+        #     self.plotdata.append(self.plotWidget.plot(pen=(i, 3)))
+
+        if SHOW_MPLOT:
+            self.map = self.create_gui_map()
+            stack.addWidget(self.map)
+
         # tab_frame = tk.Frame(global_frame, width=1000, height=300, bg="blue")
         # tab_frame.grid(row=0, column=2, sticky="nsew")
         #
@@ -816,5 +874,17 @@ class Dashboard2(object):
         # matplotlib.rc('ytick', labelsize=6)
         # matplotlib.rc('legend', fontsize=8)
         # matplotlib.rc('figure', titlesize=8)
-        #
-        # return window
+
+        stack.addStretch()
+        root.setLayout(stack)
+
+        window.show()
+
+        self.update(traffic_state_sharr, debug_shdata, True)
+
+        self.timer = QTimer()
+        self.timer.setInterval(1000 / DASH_RATE)
+        self.timer.timeout.connect(lambda: self.update(traffic_state_sharr, debug_shdata, False))
+        self.timer.start()
+
+        return app, window
