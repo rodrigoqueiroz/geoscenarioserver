@@ -273,6 +273,8 @@ class Dashboard(object):
                 pass
             else:
                 color, linestyle, linewidth = line_format
+                if color in ('w', 'white'):
+                    color = 'gray'
                 plt.plot(xs, ys, color=color, linestyle=linestyle,
                          linewidth=linewidth, zorder=0)
 
@@ -319,7 +321,7 @@ class Dashboard(object):
                 if tl_type != TrafficLightType.pedestrian:
                     label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
                     plt.gca().text(x + 1, y, label, style='italic')
-                    plt.plot(line[0], line[1], color=colorcode, zorder=5)
+                    plt.plot(line[0], line[1], color=colorcode, linewidth=4, zorder=5)
 
     def plot_static_objects(self, static_objects, x_min, x_max, y_min, y_max):
         if static_objects:
@@ -668,6 +670,7 @@ class Dashboard(object):
     def create_gui(self):
         # Window
         window = tk.Tk()
+        window.geometry("1200x1200+1000-100")
 
         # Main containers:
         # title frame

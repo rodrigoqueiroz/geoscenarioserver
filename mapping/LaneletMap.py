@@ -728,20 +728,20 @@ class LaneletMap(object):
 
 LINE_FORMAT_DEFAULT = ('gray', 'solid', 1)
 LINE_FORMAT = {
-    'road_border': ('red', 'solid', 1),
+    'road_border': ('red', 'solid', 2),
     'guard_rail': ('m', 'solid', 2),
     'virtual': ('lightgray', 'dotted', 1),
-
-    ('line_thin', 'solid'): ('gray', 'solid', 1),
-    ('line_thin', 'dashed'): ('gray', 'dashed', 1),
-    ('line_thick', 'solid'): ('gold', 'solid', 1),
-    ('line_thick', 'dashed'): ('gold', 'dashed', 1),
-    'stop_line': ('gray', 'solid', 1),
+    ('line_thin', 'solid'): ('w', 'solid', 1),
+    ('line_thin', 'dashed'): ('w', 'dashed', 1),
+    ('line_thick', 'solid'): ('gold', 'solid', 2),
+    ('line_thick', 'dashed'): ('gold', 'dashed', 2),
+    'stop_line': ('w', 'solid', 3),
     'stop': LINE_FORMAT_DEFAULT,
-    'curbstone': ('darkgray', 'solid', 1),
+    'stop_sign': LINE_FORMAT_DEFAULT,
+    'curbstone': ('darkgray', 'solid', 2),
     'high': LINE_FORMAT_DEFAULT,
-    'pedestrian_marking': ('gray', 'dashed', 1),
-    'zebra_marking': ('gray', 'dashed', 2),
+    'pedestrian_marking': ('w', 'dashed', 1),
+    'zebra_marking': ('w', 'dashed', 2),
     'bump': ('lightgray', 'solid', 4),
     'traffic_light': None
 }
