@@ -90,9 +90,15 @@ class MapPlot(pg.PlotWidget):
         # Configure
         self.addLegend()
         self.setAspectLocked(True)
-        self.map_static = self.plot(pen=None, symbolBrush=(0, 0, 200),
-                                    symbolPen='w', symbol='x', symbolSize=14, name="Static Objects")
+        self.map_static = self.plot(
+            pen=None, symbolBrush=(0, 0, 200),
+            symbolPen='w', symbol='x', symbolSize=14, name="Static Objects")
 
+        # If Local
+        if local:
+            self.map_path = pg.PlotDataItem(pen=pg.mkPen(color='b', width=4, style=Qt.DashLine), name='Path')
+            self.addItem(self.map_path)
+            self.map_path.setZValue(-1)
         # Plot Item Containers
         self.traffic_lights = {}
         self.controlled_stop_lines = {}
@@ -123,8 +129,9 @@ class MapPlot(pg.PlotWidget):
                 type_name = "%s (%s)" % type
             else:
                 type_name = str(type)
-            self.map_roads[type] = self.plot(pen=pg.mkPen(color=color, width=width, style=style),
-                                             name=type_name, connect='finite')
+            self.map_roads[type] = self.plot(
+                pen=pg.mkPen(color=color, width=width, style=style),
+                name=type_name, connect='finite')
 
     def plot_map_chart(self, vehicles, pedestrians, traffic_light_states, static_objects, first_frame):
         # Boundaries (center is GeoScenario origin)
@@ -159,12 +166,12 @@ class MapPlot(pg.PlotWidget):
             self.plot_static_objects(static_objects, x_min, x_max, y_min, y_max)
             self.plot_traffic_lights(traffic_lights)
         else:
-            pass#self.update_traffic_lights(traffic_lights)
-        #
-        # if REFERENCE_PATH and reference_path is not None:
-        #     path_x, path_y = zip(*reference_path)
-        #     plt.plot(path_x, path_y, 'b--', alpha=0.5, zorder=0)
-        #     # 505050
+            self.update_traffic_lights(traffic_lights)
+
+        if REFERENCE_PATH and reference_path is not None:
+            path_x, path_y = zip(*reference_path)
+            self.map_path.setData(path_x, path_y)
+
         self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max, True)
         # TODO
         # self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
@@ -226,42 +233,48 @@ class MapPlot(pg.PlotWidget):
     def plot_traffic_lights(self, traffic_light_states=None):
         if traffic_light_states:
             for lid, state in traffic_light_states.items():
-                tl = self.sim_traffic.traffic_lights[lid]
-                # find physical light locations
-                x, y, line = self.lanelet_map.get_traffic_light_pos(lid)
-                print("[{}] Traffic light {} at {}, {}, with state {}".format(self, lid, x, y, state))
+                self.plot_traffic_light(lid, state)
 
-                colorcode, alpha = Dashboard2.get_color_by_type('trafficlight', state)
-                tl_type = tl.type
-                symbol_size = 14
-                if tl_type == TrafficLightType.pedestrian:
-                    symbol_size = 8
-                if tl_type == TrafficLightType.left:
-                    symbol = 't3'
-                elif tl_type == TrafficLightType.right:
-                    symbol = 't2'
-                else:
-                    symbol = 'o'
-                self.traffic_lights[lid] = self.plot(
-                    x=[x], y=[y], pen=None, symbolBrush=colorcode,
-                    symbolPen=pg.mkPen(color='y', width=2), symbol=symbol, symbolSize=symbol_size)
+    def plot_traffic_light(self, lid, state):
+        tl = self.sim_traffic.traffic_lights[lid]
+        # find physical light locations
+        x, y, line = self.lanelet_map.get_traffic_light_pos(lid)
+        print("[{}] Traffic light {} at {}, {}, with state {}".format(self, lid, x, y, state))
 
-                if tl_type != TrafficLightType.pedestrian:
-                    label = "{}".format(tl.name)
-                    text = pg.TextItem(label, anchor=(0, 1), color='w')
-                    text.setPos(x, y)
-                    self.addItem(text)
-                    self.controlled_stop_lines[lid] = self.plot(
-                        x=line[0], y=line[1], pen=pg.mkPen(color=colorcode, width=4), symbol=None)
+        colorcode, alpha = Dashboard2.get_color_by_type('trafficlight', state)
+        tl_type = tl.type
+        symbol_size = 14
+        if tl_type == TrafficLightType.pedestrian:
+            symbol_size = 8
+        if tl_type == TrafficLightType.left:
+            symbol = 't3'
+        elif tl_type == TrafficLightType.right:
+            symbol = 't2'
+        else:
+            symbol = 'o'
+        self.traffic_lights[lid] = self.plot(
+            x=[x], y=[y], pen=None, symbolBrush=colorcode,
+            symbolPen=pg.mkPen(color='y', width=2), symbol=symbol, symbolSize=symbol_size)
+
+        if tl_type != TrafficLightType.pedestrian:
+            label = "{}".format(tl.name)
+            text = pg.TextItem(label, anchor=(0, 1), color='w')
+            text.setPos(x, y)
+            self.addItem(text)
+            self.controlled_stop_lines[lid] = self.plot(
+                x=line[0], y=line[1], pen=pg.mkPen(color=colorcode, width=4), symbol=None)
 
     def update_traffic_lights(self, traffic_light_states=None):
         if traffic_light_states:
             for lid, state in traffic_light_states.items():
-                colorcode, alpha = Dashboard2.get_color_by_type('trafficlight', state)
-                tfl = self.traffic_lights[lid]
-                tfl.setSymbolBrush(colorcode)
-                tfl_line = self.controlled_stop_lines[lid]
-                tfl_line.setPen(pg.mkPen(color=colorcode, width=4), symbol=None)
+                try:
+                    tfl = self.traffic_lights[lid]
+                    colorcode, alpha = Dashboard2.get_color_by_type('trafficlight', state)
+                    tfl.setSymbolBrush(colorcode)
+                    tfl_line = self.controlled_stop_lines[lid]
+                    tfl_line.setPen(pg.mkPen(color=colorcode, width=4), symbol=None)
+                except KeyError:
+                    self.plot_traffic_light(lid, state)
 
     def plot_vehicles(self, vehicles, x_min, x_max, y_min, y_max, show_arrow=False):
         if vehicles:
@@ -429,8 +442,8 @@ class Dashboard2(object):
                                                   static_objects, first_frame=first_frame)
                     if SHOW_FFPLOT:  # frenet frame plot
                         self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
-                    if VEH_TRAJ_CHART:  # vehicle traj plot
-                        self.plot_vehicle_sd(traj, cand)
+                    # if VEH_TRAJ_CHART:  # vehicle traj plot
+                    #     self.plot_vehicle_sd(traj, cand)
 
                     # behavior tree
                     self.btree_text.setText(
@@ -448,12 +461,11 @@ class Dashboard2(object):
     def quit(self):
         self._process.terminate()
 
-    def change_tab_focus(self, arg):
+    def change_tab_focus(self, arg: pg.TreeWidgetItem):
         print(arg)
-        # focus = self.tab.focus()
-        # if (focus):
-        #     self.center_id = focus  # sets center_id to an int or string
-        #     # log.info("Changed focus to {}".format(self.center_id))
+        if arg is not None:
+            self.center_id = arg.text(0)  # sets center_id to an int or string
+            print("Changed focus to {}".format(self.center_id))
 
     def update_table(self, vehicles):
         # ('id', 'sim_st') +
@@ -739,8 +751,6 @@ class Dashboard2(object):
         stats_W.setLayout(hbox)
 
         return stats_W
-
-
 
     def create_gui(self, traffic_state_sharr, debug_shdata):
         # Main containers:
