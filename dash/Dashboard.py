@@ -4,63 +4,23 @@
 # ---------------------------------------------
 # Simulation Dashboard and Trajectory Plots
 # --------------------------------------------
-import numpy as np
-from math import sqrt, exp
+
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from multiprocessing import Process
-from TickSync import TickSync
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-import datetime
 from PIL import Image, ImageTk
-import glog as log
-from SimTraffic import *
-from SimConfig import *
-from util.Utils import *
-import sv.SDVTrafficState
-from sv.Vehicle import *
-from Actor import *
-from TrafficLight import *
-from sp.Pedestrian import *
-from mapping.LaneletMap import get_line_format
 
+from dash.DashboardBase import *
 
-class Dashboard(object):
+class Dashboard(DashboardBase):
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
-
-    def __init__(self, sim_traffic: SimTraffic, sim_config: SimConfig):
-        self.sim_traffic: SimTraffic = sim_traffic
-        self.center_id = int(sim_config.plot_vid)
-        self.sim_config = sim_config
-        self.window = None
-        self.center_pedestrian = False
-        self.lanelet_map: LaneletMap = None
-
-    def start(self):
-        """ Start dashboard in subprocess.
-            global constant SHOW_DASHBOARD must be true
-            Traffic must have started, otherwise the shared array is not ready
-        """
-
-        if not self.sim_traffic:
-            log.error("Dashboard requires a traffic to start")
-            return
-
-        if not (self.sim_traffic.traffic_state_sharr):
-            log.error("Dashboard can not start before traffic")
-            return
-
-        self.lanelet_map = self.sim_traffic.lanelet_map
-        self._process = Process(target=self.run_dash_process,
-                                args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata),
-                                daemon=True)
-        self._process.start()
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
 
@@ -139,9 +99,6 @@ class Dashboard(object):
             if SHOW_MPLOT:
                 self.map_canvas.draw()
             self.window.update()
-
-    def quit(self):
-        self._process.terminate()
 
     def change_tab_focus(self, event):
         focus = self.tab.focus()
