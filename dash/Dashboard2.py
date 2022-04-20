@@ -27,6 +27,23 @@ LINE_STYLE_MAPPING = {
 }
 
 
+class ScrollLabel(QScrollArea):
+    # https://www.geeksforgeeks.org/pyqt5-scrollable-label/
+    def __init__(self, *args, **kwargs):
+        QScrollArea.__init__(self, *args, **kwargs)
+        self.setWidgetResizable(True)
+        content = QWidget(self)
+        self.setWidget(content)
+        lay = QVBoxLayout(content)
+        self.label = QLabel(content)
+        self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.label.setWordWrap(True)
+        lay.addWidget(self.label)
+
+    def setText(self, text):
+        self.label.setText(text)
+
+
 class VehicleBox(pg.GraphicsObject):
     def __init__(self):
         self.pos = (0, 0)
@@ -120,13 +137,14 @@ class MapPlot(pg.PlotWidget):
             self.plot_road(x_min, x_max, y_min, y_max)
             self.plot_static_objects(static_objects, x_min, x_max, y_min, y_max)
             self.plot_traffic_lights(traffic_light_states)
+            self.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
         else:
             self.update_traffic_lights(traffic_light_states)
         self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max)
         # TODO
         # self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
 
-        self.plotItem.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
+        # self.plotItem.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
 
     def plot_cartesian_chart(self, center_id, vehicles, pedestrians, reference_path=None, traffic_lights=None,
                              static_objects=None, first_frame=False):
@@ -150,7 +168,6 @@ class MapPlot(pg.PlotWidget):
         self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max, True)
         # TODO
         # self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
-
         self.plotItem.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
 
     def plot_road(self, x_min, x_max, y_min, y_max):
@@ -414,10 +431,10 @@ class Dashboard2(object):
                         self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
                     if VEH_TRAJ_CHART:  # vehicle traj plot
                         self.plot_vehicle_sd(traj, cand)
+
                     # behavior tree
-                    # TODO
-                    # self.tree_msg.configure(
-                    #     text="==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))
+                    self.btree_text.setText(
+                        "==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))
                 else:
                     # vehicles without planner:
                     self.local_map.plot_cartesian_chart(vid, vehicles, pedestrians, first_frame=first_frame)
@@ -431,27 +448,40 @@ class Dashboard2(object):
     def quit(self):
         self._process.terminate()
 
-    def change_tab_focus(self, event):
-        focus = self.tab.focus()
-        if (focus):
-            self.center_id = focus  # sets center_id to an int or string
-            # log.info("Changed focus to {}".format(self.center_id))
+    def change_tab_focus(self, arg):
+        print(arg)
+        # focus = self.tab.focus()
+        # if (focus):
+        #     self.center_id = focus  # sets center_id to an int or string
+        #     # log.info("Changed focus to {}".format(self.center_id))
 
     def update_table(self, vehicles):
-        # TODO
-        # current_set = self.tab.get_children()
-        # if current_set:
-        #     self.tab.delete(*current_set)
-        # for vid in vehicles:
-        #     vehicle = vehicles[vid]
-        #     sim_state = vehicles[vid].sim_state
-        #     sv = vehicle.state.get_state_vector()
-        #     truncate_vector(sv, 2)
-        #     sv = ['v' + str(vid)] + [sim_state] + sv
-        #     self.tab.insert('', 'end', 'v' + str(vid), values=(sv))
-        # if self.tab.exists(self.center_id):
-        #     self.tab.selection_set(self.center_id)
-        pass
+        # ('id', 'sim_st') +
+        # ('x', 'x_vel', 'x_acc', 'y', 'y_vel', 'y_acc', 's', 's_vel', 's_acc', 'd', 'd_vel', 'd_acc', 'yaw')
+        added = set()
+
+        # Update
+        for i in range(self.table.topLevelItemCount()):
+            item = self.table.topLevelItem(i)
+            vid = int(item.text(0)[1:])
+            vehicle = vehicles[vid]
+            sim_state = vehicle.sim_state
+            sv = vehicle.state.get_state_vector()
+            truncate_vector(sv, 2)
+            for i, x in enumerate(sv):
+                item.setText(i + 2, str(x))
+            added.add(vid)
+
+        # Add
+        for vid in set(vehicles.keys()).difference(added):
+            vehicle = vehicles[vid]
+            sim_state = vehicle.sim_state
+            sv = vehicle.state.get_state_vector()
+            truncate_vector(sv, 2)
+            sv = ['v' + str(vid), sim_state, *sv]
+            sv = [str(x) for x in sv]
+            item = QTreeWidgetItem(sv)
+            self.table.addTopLevelItem(item)
 
     def update_pedestrian_table(self, pedestrians):
         # TODO
@@ -509,8 +539,8 @@ class Dashboard2(object):
 
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     # plt.plot(x, y, colorcode + '.', markersize=1, zorder=10)
-                    circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,
-                                         alpha=alpha)
+                    # circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,
+                    #                      alpha=alpha)
                     # plt.gca().add_artist(circle1)
                     label = "p{}".format(pid)
                     # plt.gca().text(x + 1, y + 1, label, style='italic', zorder=10)
@@ -669,113 +699,6 @@ class Dashboard2(object):
 
         return colorcode, alpha
 
-    @staticmethod
-    def plot_trajectory(s_coef, d_coef, T, traj_s_shift, tcolor='grey'):
-        # TODO
-        s_eq = to_equation(s_coef)
-        d_eq = to_equation(d_coef)
-        X = []
-        Y = []
-        t = 0
-        while t <= T + 0.01:
-            X.append(s_eq(t) + traj_s_shift)
-            Y.append(d_eq(t))
-            t += 0.25
-        # plot trajectory curve
-        plt.plot(X, Y, color=tcolor)
-
-    @staticmethod
-    def plot_vehicle_sd(trajectory, cand):
-        # TOOD
-        if not trajectory:
-            return
-        s_coef = trajectory[0]
-        d_coef = trajectory[1]
-        T = trajectory[2]
-
-        fig = plt.figure(Dashboard2.TRAJ_FIG_ID)
-        # adjust layout
-        plt.tight_layout(pad=0.1)
-        # fig.set_size_inches(4,4)
-
-        nrows = 3
-        ncols = 1
-        i = 1
-        # S(t) curve
-        plt.subplot(nrows, ncols, i)
-        plt.cla()
-        Dashboard2.plot_curve(s_coef, T, 'S', 'T', 'T (s)')
-        # S Vel(t) curve
-        i += 1
-        plt.subplot(nrows, ncols, i)
-        plt.cla()
-        plt.xlim(0, int(round(T)))
-        plt.ylim(-15, 15)
-        s_vel_coef = differentiate(s_coef)
-        Dashboard2.plot_curve(s_vel_coef, T, 'Long Vel (m/s)', '', 'T (s)')
-
-        # #   S Acc(t) curve
-        i += 1
-        s_acc_coef = differentiate(s_vel_coef)
-        plt.subplot(nrows, ncols, i)
-        plt.cla()
-        plt.xlim(0, int(round(T)))
-        plt.ylim(-8, 8)
-        # if cand:
-        #     for t in cand:
-        #         Dashboard2.plot_curve(differentiate(differentiate(t[0])),t[2],'Long Vel (m/s)', '', 'T (s)', color='grey')
-        Dashboard2.plot_curve(s_acc_coef, T, 'Long Acc (m/ss)', '', 'T (s)', color='black')
-        #   S Jerk(t) curve
-        # i+=1
-        # s_jerk_coef = differentiate(s_acc_coef)
-        # plt.subplot(1,8,4)
-        # Dashboard2.plot_curve(s_jerk_coef,T,'Jerk', 'T')
-        #   D(t) curve
-        # i+=1
-        # plt.subplot(nrows,ncols,i)
-        # plt.cla()
-        # Dashboard2.plot_curve(d_coef,T, 'D', 'T')
-        #   D Vel(t) curve
-        i += 1
-        # d_vel_coef = differentiate(d_coef)
-        # plt.subplot(nrows,ncols,i)
-        # plt.cla()
-        # plt.xlim(0,int(round(T)))
-        # plt.ylim(-2,2)
-        # Dashboard2.plot_curve(d_vel_coef,T, 'Lat Vel (m/s)', '', 'T (s)')
-        #   D Acc(t) curve
-        i += 1
-        # d_acc_coef = differentiate(d_vel_coef)
-        # plt.subplot(nrows,ncols,i)
-        # plt.cla()
-        # plt.xlim(0,int(round(T)))
-        # plt.ylim(-2,2)
-        # Dashboard2.plot_curve(d_acc_coef,T, 'Lat Acc (m/ss)', '', 'T (s)')
-        # D Jerk(t) curve
-        # d_jerk_coef = differentiate(d_acc_coef)
-        # plt.subplot(1,8,8)
-        # Dashboard2.plot_curve(d_jerk_coef,T,'Jerk', T )
-
-    @staticmethod
-    def plot_curve(coef, T, title, ylabel, xlabel, color="black"):
-        # TODO
-        # layout
-        plt.title(title)
-        plt.ylabel(ylabel)
-        plt.xlabel(xlabel)
-        plt.axhline(0, color="grey")
-        plt.axvline(0, color="grey")
-        # plot equation
-        eq = to_equation(coef)
-        X = []
-        Y = []
-        t = 0
-        while t <= T + 0.01:
-            X.append(t)
-            Y.append(eq(t))
-            t += 0.25
-        plt.plot(X, Y, color=color)
-
     def create_gui_title(self):
         title_W = QWidget()
         title_W.setStyleSheet("background-color:black;")
@@ -848,29 +771,6 @@ class Dashboard2(object):
             self.global_map.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
             stack.addWidget(self.global_map)
 
-        # tab_frame = tk.Frame(global_frame, width=1000, height=300, bg="blue")
-        # tab_frame.grid(row=0, column=2, sticky="nsew")
-
-        #
-        # # vehicle table
-        # tab = ttk.Treeview(tab_frame, show=['headings'])
-        # tab['columns'] = (
-        #     'id', 'sim_st',
-        #     'x', 'x_vel', 'x_acc',
-        #     'y', 'y_vel', 'y_acc',
-        #     's', 's_vel', 's_acc',
-        #     'd', 'd_vel', 'd_acc',
-        #     'yaw'
-        # )
-        # for col in tab['columns']:
-        #     tab.heading(col, text=col, anchor='center')
-        #     tab.column(col, anchor='center', width=65, minwidth=65)
-        # tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
-        # # tab.grid(row=0,column=0, sticky='nsew')
-        # tab.pack(fill='both', expand=True)  # x and y
-        # self.tab = tab
-        #
-
         # Local Vehicle Map
         self.local_map = MapPlot(self.lanelet_map, self.sim_traffic, local=True)
         self.local_map.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
@@ -895,8 +795,40 @@ class Dashboard2(object):
         # tree_msg.grid(row=0, column=0, sticky='nsew')
         #
 
-        # stack.addStretch()
         root.setLayout(stack)
+
+        # Actor Table
+        table_dock = QDockWidget("Actors", window)
+        self.table = table = QTreeWidget()
+        table.setHeaderLabels((
+            'id', 'sim_st',
+            'x', 'x_vel', 'x_acc',
+            'y', 'y_vel', 'y_acc',
+            's', 's_vel', 's_acc',
+            'd', 'd_vel', 'd_acc',
+            'yaw'
+        ))
+        for col in range(table.columnCount()):
+            table.setColumnWidth(col, 65)
+
+        table.itemDoubleClicked.connect(self.change_tab_focus)
+
+        table.setMaximumSize(800, 800)
+        table.setMinimumSize(600, 400)
+        table.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        table_dock.setWidget(table)
+        table_dock.setFloating(False)
+        window.addDockWidget(Qt.RightDockWidgetArea, table_dock)
+
+        # B Tree Text
+        tree_dock = QDockWidget("B Tree", window)
+        self.btree_text = ScrollLabel()
+        self.btree_text.setMaximumSize(800, 800)
+        self.btree_text.setMinimumSize(600, 400)
+        self.btree_text.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        tree_dock.setWidget(self.btree_text)
+        tree_dock.setFloating(False)
+        window.addDockWidget(Qt.RightDockWidgetArea, tree_dock)
 
         window.show()
 

@@ -65,7 +65,7 @@ class Dashboard(object):
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
 
         self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
+        sync_dash = TickSync(DASH_RATE_FALLBACK, realtime=True, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
             if not self.window:
@@ -82,7 +82,7 @@ class Dashboard(object):
                 self.sim_traffic.sim_config.scenario_name,
                 self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {:.2f} ({}) Hz".format(
-                TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE)
+                TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE_FALLBACK)
             config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(
                 tickcount, sim_time_formated, delta_time)
             # config/stats
