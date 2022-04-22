@@ -168,7 +168,10 @@ class MapPlot(pg.PlotWidget):
         self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max, True)
         # TODO
         # self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
-        self.plotItem.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
+        pit: pg.PlotItem = self.getPlotItem()
+        pit.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
+        pit.vb.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
+        pit.setMouseEnabled(False, False)
 
     def plot_road(self, x_min, x_max, y_min, y_max):
         # Road Markings
@@ -319,7 +322,7 @@ class MapPlot(pg.PlotWidget):
                             vel = pg.ArrowItem(
                                 tipAngle=30, baseAngle=20, headLen=2, tailLen=4,
                                 tailWidth=.4,
-                                pen=None, brush='b',
+                                pen=None, brush='g',
                                 pxMode=False)
                             self.addItem(vel)
                             vplots['vel'] = vel
@@ -349,8 +352,8 @@ class Dashboard2(DashboardBase):
     TRAJ_FIG_ID = 4
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
-        self.window, w = self.create_gui(traffic_state_sharr, debug_shdata)
-        self.window.exec()
+        self.create_gui(traffic_state_sharr, debug_shdata)
+        self.app.exec()
 
     def update(self, traffic_state_sharr, debug_shdata, first_frame):
         # Calculate Display Rate
@@ -381,6 +384,26 @@ class Dashboard2(DashboardBase):
         self.update_table(vehicles)
         # Pedestrians at the bottom of vehicle's table
         self.update_pedestrian_table(pedestrians)
+
+        if SHOW_INDIVIDUAL_VEHICLE_PLOTS:
+            for vid in vehicles:
+                if vid in debug_shdata:
+                    planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                    if vid in self.local_maps:
+                        self.local_maps[vid].plot_cartesian_chart(
+                            vid, vehicles, pedestrians, ref_path, traffic_lights,
+                            static_objects, first_frame=first_frame)
+                    elif len(self.local_maps) < 5:
+                        plot = self.local_maps[vid] = MapPlot(self.lanelet_map, self.sim_traffic, local=True)
+                        plot.plot_cartesian_chart(
+                            vid, vehicles, pedestrians, ref_path, traffic_lights,
+                            static_objects, first_frame=first_frame)
+
+                        dock = QDockWidget(f"Vehicle {vid}", self.window)
+                        plot.setMinimumSize(80, 150)
+                        dock.setWidget(plot)
+                        dock.setFloating(False)
+                        self.window.addDockWidget(Qt.BottomDockWidgetArea, dock)
 
         # find valid vehicle to focus plots and btree (if available)
         vid = None
@@ -720,8 +743,10 @@ class Dashboard2(DashboardBase):
         # stats frame
         # global frame  [  map  | table  ]
         # vehicle frame [  cart | frenet | btree ]
-        app = QApplication([])
-        window = QMainWindow()
+        self.local_maps = {}
+
+        self.app = app = QApplication([])
+        self.window = window = QMainWindow()
         root = QWidget()
         window.setCentralWidget(root)
         window.setWindowTitle(Dashboard2.TITLE + " (Dashboard V2)")
@@ -785,7 +810,7 @@ class Dashboard2(DashboardBase):
         table.itemDoubleClicked.connect(self.change_tab_focus)
 
         table.setMaximumSize(800, 800)
-        table.setMinimumSize(600, 400)
+        table.setMinimumSize(500, 300)
         table.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         table_dock.setWidget(table)
         table_dock.setFloating(False)
@@ -795,7 +820,7 @@ class Dashboard2(DashboardBase):
         tree_dock = QDockWidget("B Tree", window)
         self.btree_text = ScrollLabel()
         self.btree_text.setMaximumSize(800, 800)
-        self.btree_text.setMinimumSize(600, 400)
+        self.btree_text.setMinimumSize(500, 300)
         self.btree_text.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         tree_dock.setWidget(self.btree_text)
         tree_dock.setFloating(False)
