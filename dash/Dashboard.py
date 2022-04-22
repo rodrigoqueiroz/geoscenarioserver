@@ -4,7 +4,6 @@
 # ---------------------------------------------
 # Simulation Dashboard and Trajectory Plots
 # --------------------------------------------
-
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -14,6 +13,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
 
+from TickSync import TickSync
 from dash.DashboardBase import *
 
 class Dashboard(DashboardBase):
@@ -25,7 +25,7 @@ class Dashboard(DashboardBase):
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
 
         self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
+        sync_dash = TickSync(DASH_RATE_FALLBACK, realtime=True, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
             if not self.window:
@@ -42,7 +42,7 @@ class Dashboard(DashboardBase):
                 self.sim_traffic.sim_config.scenario_name,
                 self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {:.2f} ({}) Hz".format(
-                TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE)
+                TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE_FALLBACK)
             config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(
                 tickcount, sim_time_formated, delta_time)
             # config/stats
@@ -230,6 +230,8 @@ class Dashboard(DashboardBase):
                 pass
             else:
                 color, linestyle, linewidth = line_format
+                if color in ('w', 'white'):
+                    color = 'gray'
                 plt.plot(xs, ys, color=color, linestyle=linestyle,
                          linewidth=linewidth, zorder=0)
 
@@ -276,7 +278,7 @@ class Dashboard(DashboardBase):
                 if tl_type != TrafficLightType.pedestrian:
                     label = "{}".format(self.sim_traffic.traffic_lights[lid].name)
                     plt.gca().text(x + 1, y, label, style='italic')
-                    plt.plot(line[0], line[1], color=colorcode, zorder=5)
+                    plt.plot(line[0], line[1], color=colorcode, linewidth=4, zorder=5)
 
     def plot_static_objects(self, static_objects, x_min, x_max, y_min, y_max):
         if static_objects:
@@ -625,6 +627,7 @@ class Dashboard(DashboardBase):
     def create_gui(self):
         # Window
         window = tk.Tk()
+        window.geometry("1200x1200+1000-100")
 
         # Main containers:
         # title frame
@@ -668,7 +671,7 @@ class Dashboard(DashboardBase):
                 c += 1
 
         # Content:
-        window.title = 'GeoScenario Server'
+        window.title('GeoScenario Server (Dashboard V1)')
         str_title = ' GeoScenario Server '
         img_logos = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/logos.png").resize((380, 50)))
         img_gs = pimg = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/gs.png").resize((40, 40)))
