@@ -1,7 +1,6 @@
 import numpy as np
 from math import sqrt, exp
 from multiprocessing import Process
-from TickSync import TickSync
 import datetime
 import glog as log
 from SimTraffic import *
@@ -23,6 +22,9 @@ class DashboardBase:
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map: LaneletMap = None
+
+        self.last_time = 0
+        self._process = None
 
     def start(self):
         """ Start Dashboard in subprocess.

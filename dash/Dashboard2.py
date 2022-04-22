@@ -76,12 +76,15 @@ Plots both global map and cartesian (local) map.
 class MapPlot(pg.PlotWidget):
     def __init__(self, lanelet_map, sim_traffic, local=False):
         super().__init__(name="Vehicle Map" if local else "Global Map")
+        if lanelet_map is None or not isinstance(lanelet_map, LaneletMap):
+            raise ValueError("Lanelet map is not valid for plot.")
         self.lanelet_map = lanelet_map
         self.sim_traffic = sim_traffic
         self.local = local
 
         # Configure
-        self.addLegend()
+        if not local:
+            self.addLegend()
         self.setAspectLocked(True)
         self.map_static = self.plot(
             pen=None, symbolBrush=(0, 0, 200),
@@ -126,7 +129,7 @@ class MapPlot(pg.PlotWidget):
                 pen=pg.mkPen(color=color, width=width, style=style),
                 name=type_name, connect='finite')
 
-    def plot_map_chart(self, vehicles, pedestrians, traffic_light_states, static_objects, first_frame):
+    def plot_global(self, vehicles, pedestrians, traffic_light_states, static_objects, first_frame):
         # Boundaries (center is GeoScenario origin)
         x_min = -(MPLOT_SIZE / 2)
         y_min = -(MPLOT_SIZE / 2)
@@ -146,20 +149,21 @@ class MapPlot(pg.PlotWidget):
 
         # self.plotItem.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
 
-    def plot_cartesian_chart(self, center_id, vehicles, pedestrians, reference_path=None, traffic_lights=None,
-                             static_objects=None, first_frame=False):
-        # Boundaries
-        x_min = vehicles[center_id].state.x - (CPLOT_SIZE / 2)
-        x_max = vehicles[center_id].state.x + (CPLOT_SIZE / 2)
-        y_min = vehicles[center_id].state.y - (CPLOT_SIZE / 2)
-        y_max = vehicles[center_id].state.y + (CPLOT_SIZE / 2)
-
+    def plot_local(self, center_id, vehicles, pedestrians, reference_path=None, traffic_lights=None,
+                   static_objects=None, first_frame=False):
         if first_frame:
+            x_min, x_max, y_min, y_max = -(MPLOT_SIZE / 2), MPLOT_SIZE / 2, -(MPLOT_SIZE / 2), MPLOT_SIZE / 2
             self.plot_road(x_min, x_max, y_min, y_max)
             self.plot_static_objects(static_objects, x_min, x_max, y_min, y_max)
             self.plot_traffic_lights(traffic_lights)
         else:
             self.update_traffic_lights(traffic_lights)
+
+        # Boundaries
+        x_min = vehicles[center_id].state.x - (CPLOT_SIZE / 2)
+        x_max = vehicles[center_id].state.x + (CPLOT_SIZE / 2)
+        y_min = vehicles[center_id].state.y - (CPLOT_SIZE / 2)
+        y_max = vehicles[center_id].state.y + (CPLOT_SIZE / 2)
 
         if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
@@ -168,6 +172,7 @@ class MapPlot(pg.PlotWidget):
         self.plot_vehicles(vehicles, x_min, x_max, y_min, y_max, True)
         # TODO
         # self.plot_pedestrians(pedestrians, x_min, x_max, y_min, y_max)
+
         pit: pg.PlotItem = self.getPlotItem()
         pit.vb.setLimits(xMin=x_min, xMax=x_max, yMin=y_min, yMax=y_max)
         pit.vb.setRange(xRange=(x_min, x_max), yRange=(y_min, y_max))
@@ -263,13 +268,14 @@ class MapPlot(pg.PlotWidget):
     def update_traffic_lights(self, traffic_light_states=None):
         if traffic_light_states:
             for lid, state in traffic_light_states.items():
-                try:
+                if lid in self.traffic_lights:
                     tfl = self.traffic_lights[lid]
                     colorcode, alpha = Dashboard2.get_color_by_type('trafficlight', state)
                     tfl.setSymbolBrush(colorcode)
-                    tfl_line = self.controlled_stop_lines[lid]
-                    tfl_line.setPen(pg.mkPen(color=colorcode, width=4), symbol=None)
-                except KeyError:
+                    if lid in self.controlled_stop_lines:
+                        tfl_line = self.controlled_stop_lines[lid]
+                        tfl_line.setPen(pg.mkPen(color=colorcode, width=4), symbol=None)
+                else:
                     self.plot_traffic_light(lid, state)
 
     def plot_vehicles(self, vehicles, x_min, x_max, y_min, y_max, show_arrow=False):
@@ -315,9 +321,6 @@ class MapPlot(pg.PlotWidget):
                     if show_arrow:
                         vx = vehicle.state.x_vel
                         vy = vehicle.state.y_vel
-                        if vehicle.state.s_vel < 0:
-                            vx = -vx
-                            vy = -vy
                         if 'vel' not in vplots:
                             vel = pg.ArrowItem(
                                 tipAngle=30, baseAngle=20, headLen=2, tailLen=4,
@@ -369,7 +372,7 @@ class Dashboard2(DashboardBase):
         display_rate = 1 / display_delta_time if display_delta_time > 0 else 0
 
         # Config/Stats
-        config_txt = "Traffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard2 Rate: {:7.2f} ({}) Hz".format(
+        config_txt = "Traffic: {:7.2f}Hz   |   Planner: {:7.2f}Hz   |   Dashboard: {:7.2f} ({}) Hz".format(
             TRAFFIC_RATE, PLANNER_RATE, display_rate, DASH_RATE)
         config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(
             tickcount, sim_time_formated, delta_time)
@@ -378,7 +381,7 @@ class Dashboard2(DashboardBase):
 
         # Global Map
         if SHOW_MPLOT:
-            self.global_map.plot_map_chart(vehicles, pedestrians, traffic_lights, static_objects, first_frame)
+            self.global_map.plot_global(vehicles, pedestrians, traffic_lights, static_objects, first_frame)
 
         # Vehicle's table
         self.update_table(vehicles)
@@ -390,20 +393,11 @@ class Dashboard2(DashboardBase):
                 if vid in debug_shdata:
                     planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
                     if vid in self.local_maps:
-                        self.local_maps[vid].plot_cartesian_chart(
+                        self.local_maps[vid].plot_local(
                             vid, vehicles, pedestrians, ref_path, traffic_lights,
-                            static_objects, first_frame=first_frame)
+                            static_objects, first_frame=False)
                     elif len(self.local_maps) < 5:
-                        plot = self.local_maps[vid] = MapPlot(self.lanelet_map, self.sim_traffic, local=True)
-                        plot.plot_cartesian_chart(
-                            vid, vehicles, pedestrians, ref_path, traffic_lights,
-                            static_objects, first_frame=first_frame)
-
-                        dock = QDockWidget(f"Vehicle {vid}", self.window)
-                        plot.setMinimumSize(80, 150)
-                        dock.setWidget(plot)
-                        dock.setFloating(False)
-                        self.window.addDockWidget(Qt.BottomDockWidgetArea, dock)
+                        self.create_local_map(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
 
         # find valid vehicle to focus plots and btree (if available)
         vid = None
@@ -423,7 +417,7 @@ class Dashboard2(DashboardBase):
                     # read vehicle planning data from debug_shdata
                     planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
                     if SHOW_CPLOT:  # cartesian plot with lanelet map
-                        self.local_map.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights,
+                        self.local_map.plot_local(vid, vehicles, pedestrians, ref_path, traffic_lights,
                                                   static_objects, first_frame=first_frame)
                     # if SHOW_FFPLOT:  # frenet frame plot
                     #     self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
@@ -435,7 +429,8 @@ class Dashboard2(DashboardBase):
                         "==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))
                 else:
                     # vehicles without planner:
-                    self.local_map.plot_cartesian_chart(vid, vehicles, pedestrians, first_frame=first_frame)
+                    if SHOW_CPLOT:
+                        self.local_map.plot_local(vid, vehicles, pedestrians, first_frame=first_frame)
         # elif self.center_pedestrian and self.center_id in pedestrians: TODO
         #     if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
         #         pid = int(self.center_id)
@@ -451,6 +446,19 @@ class Dashboard2(DashboardBase):
         if arg is not None:
             self.center_id = arg.text(0)  # sets center_id to an int or string
             print("Changed focus to {}".format(self.center_id))
+
+    def create_local_map(self, vid, vehicles, pedestrians, ref_path, traffic_lights,
+            static_objects):
+        plot = self.local_maps[vid] = MapPlot(self.lanelet_map, self.sim_traffic, local=True)
+        plot.plot_local(
+            vid, vehicles, pedestrians, ref_path, traffic_lights,
+            static_objects, first_frame=True)
+
+        dock = QDockWidget(f"Vehicle {vid}", self.window)
+        plot.setMinimumSize(80, 225)
+        dock.setWidget(plot)
+        dock.setFloating(False)
+        self.window.addDockWidget(Qt.BottomDockWidgetArea, dock)
 
     def update_table(self, vehicles):
         # ('id', 'sim_st') +
@@ -766,12 +774,14 @@ class Dashboard2(DashboardBase):
         if SHOW_MPLOT:
             self.global_map = MapPlot(self.lanelet_map, self.sim_traffic)
             self.global_map.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
+            self.global_map.setMinimumSize(500, 500)
             stack.addWidget(self.global_map)
 
         # Local Vehicle Map
-        self.local_map = MapPlot(self.lanelet_map, self.sim_traffic, local=True)
-        self.local_map.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
-        stack.addWidget(self.local_map)
+        if SHOW_CPLOT:
+            self.local_map = MapPlot(self.lanelet_map, self.sim_traffic, local=True)
+            self.local_map.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
+            stack.addWidget(self.local_map)
 
         # # vehicle frenet
         # fig_fren = plt.figure(Dashboard2.FRE_FIG_ID)
@@ -810,8 +820,7 @@ class Dashboard2(DashboardBase):
         table.itemDoubleClicked.connect(self.change_tab_focus)
 
         table.setMaximumSize(800, 800)
-        table.setMinimumSize(500, 300)
-        table.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        table.setMinimumSize(300, 100)
         table_dock.setWidget(table)
         table_dock.setFloating(False)
         window.addDockWidget(Qt.RightDockWidgetArea, table_dock)
@@ -820,8 +829,7 @@ class Dashboard2(DashboardBase):
         tree_dock = QDockWidget("B Tree", window)
         self.btree_text = ScrollLabel()
         self.btree_text.setMaximumSize(800, 800)
-        self.btree_text.setMinimumSize(500, 300)
-        self.btree_text.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        self.btree_text.setMinimumSize(200, 200)
         tree_dock.setWidget(self.btree_text)
         tree_dock.setFloating(False)
         window.addDockWidget(Qt.RightDockWidgetArea, tree_dock)

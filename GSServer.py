@@ -72,12 +72,12 @@ def start_server(args, m=MVelKeepConfig()):
     log.info('SIMULATION START')
     traffic.start()
 
-    #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config)
-    if sim_config.show_dashboard:
-        dashboard.start()
-    else:
-        log.warn("Dashboard will not start")
+    # #GUI / Debug screen
+    # dashboard = Dashboard(traffic, sim_config)
+    # if sim_config.show_dashboard:
+    #     dashboard.start()
+    # else:
+    #     log.warn("Dashboard will not start")
 
     # GUI / Debug screen
     dashboard2 = Dashboard2(traffic, sim_config)
@@ -90,10 +90,10 @@ def start_server(args, m=MVelKeepConfig()):
         input("waiting for [ENTER]...")
 
     while sync_global.tick():
-        if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+        if sim_config.show_dashboard and not dashboard2._process.is_alive(): # might/might not be wanted
             break
         try:
-            #Update Traffic
+            # Update Traffic
             sim_status = traffic.tick(
                 sync_global.tick_count,
                 sync_global.delta_time,
@@ -106,7 +106,7 @@ def start_server(args, m=MVelKeepConfig()):
             break
     sync_global.write_peformance_log()
     traffic.stop_all()
-    dashboard.quit()
+    # dashboard.quit()
     dashboard2.quit()
 
     #SIM END

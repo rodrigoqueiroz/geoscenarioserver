@@ -53,7 +53,7 @@ FFPLOT_LITE = False
 
 # --- Local Map
 # whether to show the cartesian plot
-SHOW_CPLOT = True
+SHOW_CPLOT = False
 # cartesian plot: road length in meters (shorter=better performance)
 CPLOT_SIZE = 60
 # reference path indicating the frenet frame for the vehicle

@@ -4,7 +4,6 @@
 # ---------------------------------------------
 # Simulation Dashboard and Trajectory Plots
 # --------------------------------------------
-
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -14,6 +13,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from PIL import Image, ImageTk
 
+from TickSync import TickSync
 from dash.DashboardBase import *
 
 class Dashboard(DashboardBase):
