@@ -3,14 +3,7 @@
 # ---------------------------------------------
 # Simulation Dashboard and Trajectory Plots V2
 # --------------------------------------------
-import numpy as np
-from SimTraffic import *
-import sv.SDVTrafficState
-from sv.Vehicle import *
-from Actor import *
-from TrafficLight import *
-from sp.Pedestrian import *
-from mapping.LaneletMap import LINE_FORMAT
+from dash.DashboardBase import *
 
 from matplotlib import colors
 from PyQt5.QtWidgets import *
@@ -348,45 +341,14 @@ class MapPlot(pg.PlotWidget):
             self.vehicle_centers.setZValue(1)
 
 
-class Dashboard2(object):
+class Dashboard2(DashboardBase):
     TITLE = "GeoScenario Server"
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
 
-    def __init__(self, sim_traffic: SimTraffic, sim_config: SimConfig):
-        self.sim_traffic: SimTraffic = sim_traffic
-        self.center_id = int(sim_config.plot_vid)
-        self.sim_config = sim_config
-        self.window = None
-        self.center_pedestrian = False
-        self.lanelet_map: LaneletMap = None
-
-    def start(self):
-        """ Start Dashboard2 in subprocess.
-            global constant SHOW_Dashboard2 must be true
-            Traffic must have started, otherwise the shared array is not ready
-        """
-
-        if not self.sim_traffic:
-            log.error("Dashboard2 requires a traffic to start")
-            return
-
-        if not self.sim_traffic.traffic_state_sharr:
-            log.error("Dashboard2 can not start before traffic")
-            return
-
-        self.last_time = time.time()
-
-        self.lanelet_map = self.sim_traffic.lanelet_map
-        self._process = Process(target=self.run_dash_process,
-                                args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata),
-                                daemon=True)
-        self._process.start()
-
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
-
         self.window, w = self.create_gui(traffic_state_sharr, debug_shdata)
         self.window.exec()
 
@@ -440,8 +402,8 @@ class Dashboard2(object):
                     if SHOW_CPLOT:  # cartesian plot with lanelet map
                         self.local_map.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights,
                                                   static_objects, first_frame=first_frame)
-                    if SHOW_FFPLOT:  # frenet frame plot
-                        self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
+                    # if SHOW_FFPLOT:  # frenet frame plot
+                    #     self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
                     # if VEH_TRAJ_CHART:  # vehicle traj plot
                     #     self.plot_vehicle_sd(traj, cand)
 
@@ -803,7 +765,6 @@ class Dashboard2(object):
         #                       bg='white', foreground='black')
         # self.tree_msg = tree_msg
         # tree_msg.grid(row=0, column=0, sticky='nsew')
-        #
 
         root.setLayout(stack)
 
