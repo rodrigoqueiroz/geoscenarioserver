@@ -28,8 +28,16 @@ install_lanelet2_python38()
     echo ""
     echo "Installing Lanelet2 library from source for Python3.8..."
     echo ""
-    # Ensure catkin is installed
-    sudo apt-get -qq install python-catkin-tools
+    # Ensure catkin is installed.
+    ROS_VERSION=$(rosversion -ds)
+    if [[ "$ROS_VERSION" == "noetic" ]]; then
+    	sudo apt-get -qq install python3-catkin-tools
+    elif [[ "$ROS_VERSION" == "melodic" ]]; then
+    	sudo apt-get -qq install python-catkin-tools
+    else
+    	echo "The ROS distribution $ROS_VERSION is currently unsupported!"
+    fi
+    
     cd $REPO_DIR
     # In the case the repository was not cloned recursively
     git submodule update --init
@@ -40,6 +48,11 @@ install_lanelet2_python38()
 
     mkdir -p $REPO_DIR/catkin_ws/src
     ln -sfn $REPO_DIR/Lanelet2 $REPO_DIR/catkin_ws/src/Lanelet2
+    # for noetic: package mrt_cmake_modules has to be source build.
+    if [[ "$ROS_VERSION" == "noetic" ]]; then
+    	git clone https://github.com/KIT-MRT/mrt_cmake_modules.git mrt_cmake_modules
+    	ln -sfn $REPO_DIR/mrt_cmake_modules $REPO_DIR/catkin_ws/src/mrt_cmake_modules
+    fi
 
     source "$SCRIPT_DIR/catkin_utils.bash"
 
@@ -67,13 +80,17 @@ install_lanelet2_binary()
         exit 1
     fi
     ROS_VERSION=$(rosversion -ds)
-    sudo apt-get -qq install libpugixml-dev "ros-${ROS_VERSION}-mrt-cmake-modules" "ros-${ROS_VERSION}-lanelet2"
+    sudo apt-get -qq install libpugixml-dev
+   
+# Under Noetic distribution, mrt-cmake-modules does not include the newest version of the findboostpython script, thus reporting error when source build lanelet2-python. Should be source built. (Ref:https://github.com/fzi-forschungszentrum-informatik/Lanelet2/issues/221)
+if [[ "$ROS_VERSION" == "melodic" ]]; then
+     sudo apt-get -qq install "ros-${ROS_VERSION}-mrt-cmake-modules" "ros-${ROS_VERSION}-lanelet2"
+     fi
 }
 
 install_python_dependencies
 install_lanelet2_binary
 install_lanelet2_python38
-
 echo ""
 echo "Successfully installed GeoScenario Server dependencies."
 echo ""

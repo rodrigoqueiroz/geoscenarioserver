@@ -20,7 +20,7 @@ create_catkin_workspace()
 
     # Suppress output from config, since it is shown again on build
     catkin init --workspace .
-    catkin config --extend /opt/ros/melodic \
+    catkin config --extend /opt/ros/$ROS_DISTRO \
         --install-space /opt/ros/lanelet2 \
         --install \
         --mkdirs  \
