@@ -191,6 +191,7 @@ class SVPlanner(object):
             if mconfig and traffic_state.lane_config:
                 #replan maneuver
                 #traj, cand, unf = plan_maneuver( mconfig.mkey,
+                # Jinwei comment: TODO: Maneuvers are generated Here
                 frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
 
                 if EVALUATION_MODE and not self.last_plan:

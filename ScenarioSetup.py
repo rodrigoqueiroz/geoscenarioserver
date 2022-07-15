@@ -160,7 +160,9 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("SDV {} requires a route .".format(vid))
                 continue
             gs_route = vnode.tags['route']
-            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]   
+            # TODO: This is the nodes with long/lat coordinates at the 
+            # top of the gs configuration file. Don't know what that mean as the doc doesn't say.
+            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]
             route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
             #btree
             #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
