@@ -54,11 +54,12 @@ class SVPlanner(object):
         c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
         #Process based
-        self._process = Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr, 
-            self._mplan_sharr, 
-            self._debug_shdata), daemon=True)
-        self._process.start()
+        # self._process = Process(target=self.run_planner_process, args=(
+        #     self.traffic_state_sharr, 
+        #     self._mplan_sharr, 
+        #     self._debug_shdata), daemon=True)
+        # self._process.start()
+        self.run_planner_process(self.traffic_state_sharr, self._mplan_sharr, self._debug_shdata)
 
     def stop(self):
         if self._process:
@@ -192,7 +193,7 @@ class SVPlanner(object):
                 #replan maneuver
                 #traj, cand, unf = plan_maneuver( mconfig.mkey,
                 # Jinwei comment: TODO: Maneuvers are generated Here
-                frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
+                frenet_traj, cand = plan_maneuver(self.vid, mconfig, traffic_state)
 
                 if EVALUATION_MODE and not self.last_plan:
                     self.sync_planner.end_task(False) #blocks if < target
