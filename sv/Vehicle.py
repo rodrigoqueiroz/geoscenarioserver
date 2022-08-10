@@ -34,6 +34,7 @@ class Vehicle(Actor):
     SDV_TYPE = 1
     EV_TYPE = 2
     TV_TYPE = 3
+    GTV_TYPE = 4
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
@@ -56,6 +57,42 @@ class Vehicle(Actor):
 
         #remote = 1 if self.is_remote else 0
         return self.id, self.type, position, velocity, self.state.yaw_unreal, self.state.steer
+
+
+class GTPV(Vehicle):
+    '''
+    Game-theoretic Planner Vehicle Model
+    '''
+    def __init__(
+            self, vid:int, name:str, start_state:List[float],
+            yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
+            start_state_in_frenet:bool=False, btype:str=""):
+        self.btype = btype
+        self.btree_locations = btree_locations
+        self.route_nodes = route_nodes
+
+        if start_state_in_frenet:
+            # assume frenet start_state is relative to the starting global path
+            self.sdv_route = SDVRoute(lanelet_map, route_nodes = route_nodes)
+            x_vector, y_vector = frenet_to_sim_frame(
+                self.sdv_route.get_global_path(), start_state[0:3],
+                start_state[3:], 0
+            )
+            self.sdv_route.update_reference_path(start_state[0])
+            start_state[0] = 0.0
+            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw)
+        else:
+            self.sdv_route = SDVRoute(lanelet_map, start_state[0], start_state[3], route_nodes = route_nodes)
+            s_vector, d_vector = sim_to_frenet_frame(
+                self.sdv_route.get_global_path(), start_state[0:3], start_state[3:], 0
+            )
+            self.sdv_route.update_reference_path(s_vector[0])
+            s_vector[0] = 0.0
+            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw)
+
+        self.type = Vehicle.GTV_TYPE
+
+
 
 
 class SDV(Vehicle):
