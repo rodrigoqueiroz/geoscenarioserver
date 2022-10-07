@@ -1,0 +1,20 @@
+behaviortree drive_int:
+    ?
+        ->
+            condition c_intersection ( approaching_intersection(distance=40) )
+            subtree handle_intersection()  
+        ->
+            subtree routing()
+        ->
+            condition c_laneocc ( lane_occupied(zid=FRONT, distance=30) )
+            ?
+                -> 
+                    condition c_vmov ( vehicle_moving(zid=FRONT) ) 
+                    maneuver m_follow_lead ( MFollowConfig() )
+                ?
+                    ->
+                        condition c_vs (vehicle_stopped(vel=6))
+                        condition c_vp (vehicle_parked(zid=FRONT))
+                        maneuver m_drivearound ( MVelKeepConfig( vel=MP(10.0,10,6), lat_target=LT(0,4,1,1,1,0) ) )
+                    maneuver m_follow_lead ( MFollowConfig() )
+        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(14.0,10,6))

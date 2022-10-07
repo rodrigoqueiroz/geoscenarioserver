@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+   <node id='-1' action='modify' visible='true' lat='43.43546830252' lon='-80.57998660207'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/ll2_firetower_4waystop.osm' />
+    <tag k='name' v='NHTSA S30 - Crossing Paths - NSJ - Straight' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5163462' action='modify' visible='true' lat='43.43528872699' lon='-80.57984527441'>
+    <tag k='btree' v='st_30_stop_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='turning_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-5163463' action='modify' visible='true' lat='43.43577294277' lon='-80.57967737821' />
+  <node id='-5163464' action='modify' visible='true' lat='43.43504474283' lon='-80.57959560259'>
+    <tag k='btree' v='st_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+    <tag k='yaw' v='270' />
+  </node>
+  <node id='-5163465' action='modify' visible='true' lat='43.43548036383' lon='-80.57964357013' />
+  <node id='-5163466' action='modify' visible='true' lat='43.43512224741' lon='-80.57960473034' />
+  <node id='-5163467' action='modify' visible='true' lat='43.43551677963' lon='-80.57996922207'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+ 
+  <node id='-5163471' action='modify' visible='true' lat='43.43576525511' lon='-80.57969164583' />
+  <way id='-1951840' action='modify' visible='true'>
+    <nd ref='-5163466' />
+    <nd ref='-5163463' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+  <way id='-1951841' action='modify' visible='true'>
+    <nd ref='-5163465' />
+    <nd ref='-5163471' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+</osm>

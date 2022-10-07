@@ -24,6 +24,7 @@ from enum import Enum, IntEnum
 import itertools
 from copy import copy, deepcopy
 from math import sqrt
+from SimConfig import *
 
 #Reg Elements State (for pickling)
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
@@ -294,31 +295,57 @@ def fill_occupancy(my_vid: int, vehicle_state:VehicleState,lane_config:LaneConfi
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id. 
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
+    half_length = VEHICLE_LENGTH/2
+
     #Lane zones
     front = []
     back = []
     right = []
+    right_front = []
+    right_back = []
     left = []
+    left_front = []
+    left_back = []
     left_lane = lane_config._left_lane
     right_lane = lane_config._right_lane
     for vid, vehicle in traffic_vehicles.items():
             their_lane = lane_config.get_current_lane(vehicle.state.d)
-            if their_lane:
-                if their_lane.id == lane_config.id:
-                    if vehicle.state.s > vehicle_state.s:
-                        front.append(vehicle)
-                    else:
-                        back.append(vehicle)
-                elif left_lane and their_lane.id == left_lane.id:
-                    left.append(vehicle)
-                elif right_lane and their_lane.id == right_lane.id:
-                    right.append(vehicle)
+            if abs(vehicle.state.s-vehicle_state.s) < 50: #limit to vehicles within 50 range
+                if their_lane:
+                    #same lane
+                    if their_lane.id == lane_config.id:
+                        if vehicle.state.s > vehicle_state.s:
+                            front.append(vehicle)
+                        else:
+                            back.append(vehicle)
+                    #left lane
+                    elif left_lane and their_lane.id == left_lane.id:
+                        if (vehicle.state.s - half_length) >= (vehicle_state.s + half_length):
+                            left_front.append(vehicle)
+                        elif (vehicle.state.s + half_length) <= (vehicle_state.s - half_length):
+                            left_back.append(vehicle)
+                        else:
+                            left.append(vehicle)
+                    #right lane
+                    elif right_lane and their_lane.id == right_lane.id:
+                        if (vehicle.state.s - half_length) > (vehicle_state.s + half_length):
+                            right_front.append(vehicle)
+                        elif (vehicle.state.s + half_length) < (vehicle_state.s - half_length):
+                            right_back.append(vehicle)
+                        else:
+                            right.append(vehicle)
                 
     occupancy = RoadOccupancy()
     occupancy.front = min(front, key=lambda v: v.state.s).id if len(front) > 0 else None
     occupancy.back = max(back, key=lambda v: v.state.s).id if len(back) > 0 else None
-    occupancy.left = min(left, key=lambda v: v.state.s).id if len(left) > 0 else None
-    occupancy.right = max(right, key=lambda v: v.state.s).id if len(right) > 0 else None
+    
+    occupancy.left = min(left, key=lambda v: v.state.d).id if len(left) > 0 else None
+    occupancy.left_back = max(left_back, key=lambda v: v.state.s).id if len(left_back) > 0 else None
+    occupancy.left_front = min(left_front, key=lambda v: v.state.s).id if len(left_front) > 0 else None
+    
+    occupancy.right = max(right, key=lambda v: v.state.d).id if len(right) > 0 else None
+    occupancy.right_back = max(right_back, key=lambda v: v.state.s).id if len(right_back) > 0 else None
+    occupancy.right_front = min(right_front, key=lambda v: v.state.s).id if len(right_front) > 0 else None
     
     # vehicle and lanelets mapping [vehicle, [ll1,ll2]]
     vehicle_lanelet_map = {}

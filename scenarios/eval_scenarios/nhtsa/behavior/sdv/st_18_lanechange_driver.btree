@@ -1,9 +1,8 @@
 behaviortree st_lanechange_driver:
     ?
         ->
-            subtree routing()
-        ->
-            condition c_lc( sim_time (repeat=False, tmin=3, tmax=10))
+            condition c_minspeed ( vehicle_moving( vel=5.0 ) )
             condition c_gap  (gap ( distance=5, vid=99 ))
+            condition c_target( set_target_lane(vid=99)) 
             subtree lanechange()
-        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(14.0,10,6))
+        subtree drive(m_keepvelocity=MVelKeepConfig(vel=MP(16.0,10,6)))

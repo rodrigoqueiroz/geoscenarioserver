@@ -397,19 +397,32 @@ class Dashboard(object):
                         vy = pedestrian.state.y_vel
                         plt.arrow(x, y, vx/2, vy/2, head_width=0.5, head_length=0.5, color=colorcode, zorder=10)
 
-    def plot_frenet_chart(self, center_id, planner_state, debug_ref_path, traj, cand, unf, traj_s_shift):
+    def plot_frenet_chart(self, center_id, traffic_state:TrafficState, debug_ref_path, traj, cand, unf, traj_s_shift):
         #Frenet Frame plot
         fig = plt.figure(Dashboard.FRE_FIG_ID)
         plt.cla()
         gca = plt.gca()
 
-        vehicle_state = planner_state.vehicle_state
-        vehicles = planner_state.traffic_vehicles
-        pedestrians = planner_state.pedestrians
-        lane_config = planner_state.lane_config
-        static_objects = planner_state.static_objects
-        regulatory_elements = planner_state.regulatory_elements
-        goal_point_frenet = planner_state.goal_point_frenet
+        vehicle_state:VehicleState = traffic_state.vehicle_state
+        vehicles = traffic_state.traffic_vehicles
+        pedestrians = traffic_state.pedestrians
+        lane_config:LaneConfig = traffic_state.lane_config
+        static_objects = traffic_state.static_objects
+        regulatory_elements = traffic_state.regulatory_elements
+        goal_point_frenet = traffic_state.goal_point_frenet
+        
+        #layout
+        #plt.rc('axes', axisbelow=True) #plt.axis.set_axisbelow(True) #keep grid below data
+        plt.grid(True, zorder=1)
+        #center plot around main vehicle
+        x_lim_a = vehicle_state.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
+        x_lim_b = vehicle_state.s + ( (4/5) * FFPLOT_LENGTH )   #2/3 ahead
+        plt.xlim(x_lim_a,x_lim_b)
+        plt.ylim(vehicle_state.d-8,vehicle_state.d+8)
+        if FFPLOT_ASPECT:
+            plt.gca().set_aspect('equal', adjustable='box')
+        #fig.patch.set_facecolor('lightgray')
+        fig.tight_layout(pad=0.05)
 
         #road
         plt.axhline(lane_config.left_bound, color="k", linestyle='-', zorder=0)
@@ -421,9 +434,53 @@ class Dashboard(object):
         #stop line (if exists)
         if lane_config.stopline_pos is not None:
             x, y = lane_config.stopline_pos
-            plt.axvline(x, color= 'r', linestyle='-', zorder=0)
+            plt.axvline(x, color= 'r', linestyle='-', zorder=1)
 
-        #junction
+        
+        #road_occupancy
+        if SHOW_OCCUPANCY:
+            road_occupancy:RoadOccupancy = traffic_state.road_occupancy
+            cellsize = 1
+            size = cellsize*3
+            anchorx = vehicle_state.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
+            anchory = vehicle_state.d + 8 - size
+            rect = plt.Rectangle( (anchorx,anchory),size,size,linewidth=1, zorder=2, edgecolor='k', facecolor = "none") #overall
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx+1,anchory+1),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "b") #Self
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx+1,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right else 'none') #right
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx+2,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right_front else 'none') #right front
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right_back else 'none') #right back
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx+1,anchory+2),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.left else 'none') #left
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx+2,anchory+2),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.left_front else 'none') #left front
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx,anchory+2),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.left_back else 'none') #left back
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx+2,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.front else 'none') #front
+            plt.gca().add_patch(rect)
+            rect = plt.Rectangle( (anchorx,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.back else 'none') #back
+            plt.gca().add_patch(rect)
+            
+            anchorx = anchorx + size + 1
+            y_label = "y: " + str(road_occupancy.yielding_zone)
+            i_label = "i: " + str(road_occupancy.intersecting_zone)
+            gca.text(anchorx, anchory, y_label)
+            gca.text(anchorx, anchory + cellsize, i_label)
+        
+        
+            #junction
+            #size = 3
+            #intersections = traffic_state.intersections
+            #anchorx = FFPLOT_LENGTH - size*3
+            #anchory = vehicle_state.d+8-(size*3)
+            #for intersection in intersections:
+            #    if isinstance(intersection, sv.SDVTrafficState.AllWayStopIntersection):
+            #        intersection.
+
 
         #re
         for re in regulatory_elements:
@@ -487,31 +544,17 @@ class Dashboard(object):
         if traj:
             Dashboard.plot_trajectory(traj[0], traj[1], traj[2], traj_s_shift, 'blue')
 
-
-
-        vs = vehicle_state
-        vid = center_id
-
-        plt.plot( vs.s, vs.d, ".",zorder=20)
-        circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color='b', fill=False, zorder=20)
+        plt.plot( vehicle_state.s, vehicle_state.d, ".",zorder=20)
+        circle1 = plt.Circle((vehicle_state.s, vehicle_state.d), VEHICLE_RADIUS, color='b', fill=False, zorder=20)
         gca.add_artist(circle1)
         #label = "id{}| [ {:.3}m, {:.3}m/s, {:.3}m/ss] ".format(center_id, float(vs.s), float(vs.s_vel), float(vs.s_acc))
-        label = "v{}".format(int(vid))
-        gca.text(vs.s, vs.d+1.5, label,zorder=20)
+        label = "v{}".format(int(center_id))
+        gca.text(vehicle_state.s, vehicle_state.d+1.5, label,zorder=20)
 
         # update lane config based on current (possibly outdated) reference frame
         #lane_config = self.read_map(vehicle_state, self.reference_path)
 
-        #layout
-        plt.grid(True)
-        #center plot around main vehicle
-        x_lim_a = vs.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
-        x_lim_b = vs.s + ( (4/5) * FFPLOT_LENGTH )   #2/3 ahead
-        plt.xlim(x_lim_a,x_lim_b)
-        plt.ylim(vs.d-8,vs.d+8)
-        #plt.gca().set_aspect('equal', adjustable='box')
-        #fig.patch.set_facecolor('lightgray')
-        #fig.tight_layout(pad=0.05)
+        
 
 
     def get_color_by_type(self,actor,a_type,sim_state = None, name = ''):

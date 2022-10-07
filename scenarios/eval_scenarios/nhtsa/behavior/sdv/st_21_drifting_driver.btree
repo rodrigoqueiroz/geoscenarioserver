@@ -1,18 +1,14 @@
 behaviortree st_drifting_driver:
     ?
+
         ->
-            subtree routing()
-        ->
-            condition c_after  (gap ( distance=10, vid=99 ))
-            maneuver m_normal ( MVelKeepConfig(vel=MP(9.0,10,6),fc_off_lane=0))
-        ->
-            condition c_gap  (gap ( distance=-30, vid=99 ))
+            condition c_final  (gap ( min=-30, max=0, vid=99 ))
             maneuver m_finaldrift ( MVelKeepConfig(vel=MP(9.0,10,6), lat_target=LT(3.0,1,1,1,0,0), fc_collision=0, fc_off_lane=0) )
         ->
-            condition c_b  (gap ( distance=-60, vid=99 ))
-            maneuver m_contdrift ( MVelKeepConfig(vel=MP(9.0,10,6), lat_target=LT(1.5))
+            condition c_mid  (gap ( min=-60, max=-30, vid=99 ))
+            maneuver m_contdrift ( MVelKeepConfig(vel=MP(9.0,10,6), lat_target=LT(1.5)))
         ->
-            condition c_c  (gap ( distance=-90, vid=99 ))
-            maneuver m_startdrift ( MVelKeepConfig(vel=MP(9.0,10,6), lat_target=LT(1.0))
-        ->
-            maneuver m_normal ( MVelKeepConfig(vel=MP(9.0,10,6))
+            condition c_start  (gap ( min=-90, max=-60, vid=99 ))
+            maneuver m_startdrift ( MVelKeepConfig(vel=MP(9.0,10,6), lat_target=LT(1.0)) )
+        subtree drive( m_vel_keeping = MVelKeepConfig(vel=MP(9.0,10,6),lat_target=LT(0.0,1,1,1,0,0), fc_off_lane=0) ) 
+

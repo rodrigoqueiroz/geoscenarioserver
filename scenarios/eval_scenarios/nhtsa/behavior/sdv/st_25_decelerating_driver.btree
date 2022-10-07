@@ -1,0 +1,6 @@
+behaviortree decelerating_driver:
+    ?
+        ->
+            condition dist_to_ego ( distance(vid=99,max=30))
+            maneuver keep_velocity (MVelKeepConfig(vel=MP(4,10,6)))
+        subtree drive( m_keepvelocity=MVelKeepConfig(vel=MP(12, 10, 6)) )
