@@ -1,0 +1,3 @@
+behaviortree StoppedScenarioTree:
+    ->
+        condition c(sim_time (repeat=False, tmin=2, tmax=10))

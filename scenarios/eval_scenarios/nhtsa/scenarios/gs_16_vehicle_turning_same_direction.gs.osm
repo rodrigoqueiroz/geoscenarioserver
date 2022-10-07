@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2716445' action='modify' visible='true' lat='43.47828598467' lon='-80.51995644575' />
+  <node id='-2716446' action='modify' visible='true' lat='43.4783631933' lon='-80.52003132477' />
+  <node id='-2716447' action='modify' visible='true' lat='43.47777735805' lon='-80.51987086152'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_university_weber_alt_modified.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA 16 Vehicle Turning - Same Direction' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2716448' action='modify' visible='true' lat='43.47801978471' lon='-80.51977583639'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-2716451' action='modify' visible='true' lat='43.47827299972' lon='-80.51999621906' />
+  <node id='-2716452' action='modify' visible='true' lat='43.47834291381' lon='-80.52006413232' />
+  <node id='-2716454' action='modify' visible='true' lat='43.47777748271' lon='-80.52037324345'>
+    <tag k='btree' v='st_16_turning_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='turning_vehicle' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-2716455' action='modify' visible='true' lat='43.47778195371' lon='-80.52043834984'>
+    <tag k='btree' v='st_16_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+  </node>
+  <way id='-1947847' action='modify' visible='true'>
+    <nd ref='-2716445' />
+    <nd ref='-2716446' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='west_north_route' />
+  </way>
+  <way id='-1947848' action='modify' visible='true'>
+    <nd ref='-2716451' />
+    <nd ref='-2716452' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>

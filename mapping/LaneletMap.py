@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-#rqueiroz@gsd.uwaterloo.ca
-#d43sharm@uwaterloo.ca
+# rqueiroz@uwaterloo.ca
+# d43sharm@uwaterloo.ca
+# mantkiew@uwaterloo.ca
 # --------------------------------------------
 # LaneletMap
 # Class to parse a Lanelet 2 map and interface with lanelet2 library
@@ -8,9 +9,8 @@
 
 import lanelet2
 from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop, RightOfWay
-from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d,inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
+from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d, inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
 from lanelet2.traffic_rules import Locations, Participants
-from lanelet2.projection import UtmProjector
 from lanelet2.routing import RelationType, Route
 
 from matplotlib import pyplot as plt
@@ -190,19 +190,20 @@ class LaneletMap(object):
         sequence = []
         for relation in lanelet_route.followingRelations(lanelet):
             sequence.append(relation.lanelet)
-            distance_covered = length2d(relation.lanelet) #length of centerline in 2d
+            # length of centerline in 2d
+            distance_covered = length2d(relation.lanelet)
             #print(distance_covered)
             #include next lanelets if distance not covered
-            if (distance is not None) and (distance_covered <  distance):
-                next_relations = lanelet_route.followingRelations(relation.lanelet)
+            if (distance is not None) and (distance_covered < distance):
+                next_relations = lanelet_route.followingRelations(
+                    relation.lanelet)
                 #only include following lanelets if it is a single path forward, otherwise can't make assumptions of continuity
                 #this will avoid mixing up paths with intersections
-                if len(next_relations)==1 :
+                if len(next_relations) == 1:
                     next_lanelet = next_relations[0].lanelet
                     sequence.append(next_lanelet)
                     distance_covered += length2d(next_lanelet)
             #print("Following sequence {} distance {}".format(len(sequence),distance_covered))
-        
         return sequence
 
     def route_full_lane(self, lanelet_route: Route, lanelet: Lanelet):
@@ -765,7 +766,15 @@ def get_line_format(type: str, subtype: str):
             linewidth = 2
     elif type == 'pedestrian_marking':
         color = 'gray'
+        linestyle = 'dashed'
+    elif type == 'zebra_marking':
+        color = 'gray'
+        linestyle = 'dashed'
+        linewidth = 2
+    elif type == 'bump':
+        color = 'lightgray'
         linestyle = 'solid'
+        linewidth = 4
     elif type == "traffic_light":
         return None  # do not draw
     else:
