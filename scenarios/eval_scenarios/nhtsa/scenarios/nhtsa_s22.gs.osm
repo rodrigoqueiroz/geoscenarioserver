@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5168346' action='modify' visible='true' lat='43.4750079407' lon='-80.54542078176' />
+  <node id='-5168348' action='modify' visible='true' lat='43.47173989696' lon='-80.54712523884'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/Waterloo_Region.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA S22 - Following Making Maneuver' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5168349' action='modify' visible='true' lat='43.4716043991' lon='-80.54654593605'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5168350' action='modify' visible='true' lat='43.4748619165' lon='-80.54583806933' />
+  <node id='-5168351' action='modify' visible='true' lat='43.47499032002' lon='-80.54539712641' />
+  <node id='-5168353' action='modify' visible='true' lat='43.47481448753' lon='-80.54588438967' />
+  <node id='-5168354' action='modify' visible='true' lat='43.47399638867' lon='-80.54815614053'>
+    <tag k='btree' v='st_22_lead_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='other_vehicle' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-5168355' action='modify' visible='true' lat='43.47390768233' lon='-80.5484090567'>
+    <tag k='btree' v='st_22_following_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='turning_vehicle' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-5168356' action='modify' visible='true' lat='43.47396897502' lon='-80.54834202066'>
+    <tag k='btree' v='st_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+  </node>
+  <node id='-5168379' action='modify' visible='true' lat='43.47403564021' lon='-80.54816700585'>
+    <tag k='btree' v='st_22_lead_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='other_vehicle' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='3' />
+  </node>
+  <way id='-1952034' action='modify' visible='true'>
+    <nd ref='-5168350' />
+    <nd ref='-5168346' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1952035' action='modify' visible='true'>
+    <nd ref='-5168353' />
+    <nd ref='-5168351' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>

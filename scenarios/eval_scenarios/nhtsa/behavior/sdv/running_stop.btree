@@ -1,0 +1,8 @@
+behaviortree running_stop:
+    ?   
+        ->
+            ?
+                condition c_row_occ ( row_occupied(vid = 99))
+                condition c_row_iego ( intersection_occupied(vid = 99))
+            condition dist_to_ego(distance(vid=99,max=40))
+            maneuver m_runstopsign (MVelKeepConfig(target_vid=99, target_delta=2))

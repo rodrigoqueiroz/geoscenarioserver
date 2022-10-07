@@ -1,3 +1,0 @@
-behaviortree FastDriveScenarioTree:
-    ->
-        subtree drive_tree( keep_velocity=MVelKeepConfig(vel=MP(40, 10, 6)) )

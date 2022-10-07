@@ -1,4 +1,0 @@
-behaviortree ReverseScenarioTree:
-    ->
-        condition lc( sim_time (repeat=False, tmin=2, tmax=10))
-        subtree reverse_tree(m_reverse=MReverseConfig(time=MP(2.0,20,3)))

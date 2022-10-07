@@ -1,9 +1,9 @@
 behaviortree st_passing_driver:
     ?
         ->
-            subtree routing()
-        ->
-            condition c_c  (gap ( distance=-90, vid=99 ))
-            maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=1, lat_target = LT(-1.5,1) ) )
-        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(12.0,10,6),lat_target = LT(1.0,1))
-        
+            condition c_minspeed ( vehicle_moving( vel=10.0 ) )
+            condition c_final  (gap ( min=-60, max=0, vid=99 ))
+            maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=1, lat_target = LT(-1.5,1), fc_collision=0, fc_off_lane=0)  ) 
+        subtree drive( m_vel_keeping=MVelKeepConfig(vel=MP(14.0,10,6),lat_target=LT(1.0,1,1,1,0,0),fc_off_lane=0) , m_follow_lead=MFollowConfig(time_gap=1.0) ) 
+
+

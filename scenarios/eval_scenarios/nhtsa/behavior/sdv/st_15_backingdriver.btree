@@ -1,0 +1,8 @@
+behaviortree backingdriver:
+    ?
+        ->
+            condition dist_to_ego ( distance(vid=99,max=20) )
+            subtree drive()
+        ->
+            condition dist_to_ego ( distance(vid=99,max=80) )
+            maneuver m_reverse(MReverseConfig())

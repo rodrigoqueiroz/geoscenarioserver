@@ -1,0 +1,7 @@
+behaviortree st_ego_driver:
+    ?
+        ->
+            subtree routing()
+        ->
+            condition c_st(sim_time(repeat=False,tmin=5)
+            maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(9.0,10,6), lat_target=LT(2.0,4,1,1,1,1), lane_offset_cost=0 ) )

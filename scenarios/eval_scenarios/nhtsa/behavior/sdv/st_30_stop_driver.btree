@@ -1,0 +1,6 @@
+behaviortree st_stoprunner:
+    ?   
+        ->
+            subtree running_stop()
+        ->
+            subtree drive_with_intersection()

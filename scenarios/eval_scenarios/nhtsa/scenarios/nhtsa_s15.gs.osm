@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5163605' action='modify' visible='true' lat='43.46729147212' lon='-80.54074609972' />
+  <node id='-5163606' action='modify' visible='true' lat='43.4665889887' lon='-80.54112719499' />
+  <node id='-5163607' action='modify' visible='true' lat='43.46679288125' lon='-80.54099030289' />
+  <node id='-5163608' action='modify' visible='true' lat='43.46686194485' lon='-80.54123324482'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5163609' action='modify' visible='true' lat='43.46679419057' lon='-80.54080911882' />
+  <node id='-5163610' action='modify' visible='true' lat='43.46693192046' lon='-80.54126075246'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/Waterloo_Region.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA S15 - Backing' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5163611' action='modify' visible='true' lat='43.46680270085' lon='-80.54094196447'>
+    <tag k='btree' v='st_15_backingdriver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='backing_vehicle' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-5163612' action='modify' visible='true' lat='43.46640615885' lon='-80.5415086577'>
+    <tag k='btree' v='st_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+  </node>
+  <way id='-1951906' action='modify' visible='true'>
+    <nd ref='-5163607' />
+    <nd ref='-5163609' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1951907' action='modify' visible='true'>
+    <nd ref='-5163606' />
+    <nd ref='-5163605' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>

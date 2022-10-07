@@ -1,0 +1,3 @@
+behaviortree st_ego_driver:
+    ?
+        subtree drive()

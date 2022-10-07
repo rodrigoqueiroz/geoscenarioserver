@@ -1,0 +1,8 @@
+behaviortree st_redlightrunner:
+    ?
+        -> 
+            condition c_tl ( intersection_type(type=TRAFFIC_LIGHT) )
+            condition c_rl ( traffic_light_state(color=RED) )
+            condition dist_to_ego ( distance(vid=99,max=50) )
+            maneuver m_keepvelocity ( MVelKeepConfig(target_vid=99, target_delta=2) )
+        subtree drive(m_keepvelocity = MVelKeepConfig(target_vid=99, target_delta=2) )

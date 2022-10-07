@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5168292' action='modify' visible='true' lat='43.4350552206' lon='-80.57966262606' />
+  <node id='-5168293' action='modify' visible='true' lat='43.43548036383' lon='-80.57964357013' />
+  <node id='-5168294' action='modify' visible='true' lat='43.43547721379' lon='-80.5796979371' />
+  <node id='-5168295' action='modify' visible='true' lat='43.43567274051' lon='-80.57966884705' />
+  <node id='1' action='modify' visible='true' version='1' lat='43.43559587569' lon='-80.5799946487'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/ll2_firetower_4waystop.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA S05 - Running Stop Sign' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='2' action='modify' visible='true' version='1' lat='43.43555378558' lon='-80.57999470305'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='3' action='modify' visible='true' version='1' lat='43.43527655393' lon='-80.5800491223'>
+    <tag k='btree' v='st_05_stoprunner.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='turning_vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='4' action='modify' visible='true' version='1' lat='43.43568407118' lon='-80.57972770138'>
+    <tag k='btree' v='st_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+    <tag k='yaw' v='90' />
+  </node>
+  <way id='5' action='modify' visible='true' version='1'>
+    <nd ref='-5168294' />
+    <nd ref='-5168292' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+  <way id='6' action='modify' visible='true' version='1'>
+    <nd ref='-5168293' />
+    <nd ref='-5168295' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+</osm>

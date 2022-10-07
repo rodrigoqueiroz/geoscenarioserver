@@ -1,5 +1,3 @@
 behaviortree st_lead_driver:
     ?
-        ->
-            subtree routing()
-        maneuver m_keepvelocity ( MVelKeepConfig(vel=MP(9.0,10,6))
+         subtree drive( m_vel_keeping = MVelKeepConfig(vel=MP(8.0,10,6))

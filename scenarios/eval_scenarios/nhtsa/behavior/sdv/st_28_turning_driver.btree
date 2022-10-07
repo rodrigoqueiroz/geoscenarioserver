@@ -1,0 +1,8 @@
+behaviortree turning_driver:
+   ?
+        ->
+            condition dist_to_ego ( distance(vid=99,max=30))
+            subtree drive_int (m_keepvelocity= MVelKeepConfig(vel=MP(10, 10, 6)) )
+        ->
+            condition dist_to_ego ( distance(vid=99,max=80))
+            subtree drive_int (m_keepvelocity = MVelKeepConfig(vel=MP(2, 10, 6)) )

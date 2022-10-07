@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5168331' action='modify' visible='true' lat='43.47169299867' lon='-80.54007110225'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA S20 - Making a maneuver - opposite direction' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5168332' action='modify' visible='true' lat='43.47172459721' lon='-80.54007196904'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5168333' action='modify' visible='true' lat='43.47230491727' lon='-80.54058696397' />
+  <node id='-5168334' action='modify' visible='true' lat='43.47141860573' lon='-80.53936697483' />
+  <node id='-5168335' action='modify' visible='true' lat='43.47126937411' lon='-80.53911771465' />
+  <node id='-5168336' action='modify' visible='true' lat='43.47220443685' lon='-80.54052032925'>
+    <tag k='btree' v='st_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+  </node>
+  <node id='-5168337' action='modify' visible='true' lat='43.47122865' lon='-80.53895040309'>
+    <tag k='btree' v='st_20_lead_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='leading_vehicle' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-5168338' action='modify' visible='true' lat='43.47218376032' lon='-80.54041075473' />
+  <node id='-5168339' action='modify' visible='true' lat='43.4711990907' lon='-80.53890414309'>
+    <tag k='btree' v='st_20_passing_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='passing_vehicle' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <way id='-1952032' action='modify' visible='true'>
+    <nd ref='-5168338' />
+    <nd ref='-5168333' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1952033' action='modify' visible='true'>
+    <nd ref='-5168334' />
+    <nd ref='-5168335' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>

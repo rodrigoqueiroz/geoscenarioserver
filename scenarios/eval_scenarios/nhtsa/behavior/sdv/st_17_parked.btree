@@ -1,0 +1,13 @@
+behaviortree parked:
+    ?
+        ->
+            condition distance ( distance(vid=99,max=10) )
+            subtree drive()
+        ->
+            condition distance_frenet ( distance(vid=99,max=30) )
+            maneuver m_cutin( MCutInConfig(target_vid=99, delta_s =(0,3,0), time=MP(3), max_long_jerk=20 ) )
+        ->
+            condition distance ( distance(vid=99,max=40) )
+            maneuver m_normal ( MVelKeepConfig( vel=MP(1.0))
+        
+      
