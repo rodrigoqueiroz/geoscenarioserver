@@ -1,4 +1,0 @@
-behaviortree SlowDriveScenarioTree:
-    ->
-        condition lc( sim_time (repeat=False, tmin=2, tmax=10))
-        subtree drive_tree( keep_velocity=MVelKeepConfig(vel=MP(6, 10, 6)) )

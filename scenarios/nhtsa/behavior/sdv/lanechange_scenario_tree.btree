@@ -1,6 +1,0 @@
-behaviortree lanechange_scenario_tree:
-    ?
-        ->
-            condition lc( sim_time (repeat=False, tmin=3, tmax=10))
-            subtree lanechange_tree ()
-        subtree drive_tree (keep_velocity=MVelKeepConfig(vel=MP(12, 10, 6)))
