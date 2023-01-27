@@ -1,3 +1,5 @@
+Lentlet2/
+mrt_cmake_modules/
 catkin_ws
 .venv
 scenarios/plots/*
