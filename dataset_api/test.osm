@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<osm version="0.6" generator="GSBuilder">
+	<node id="-2673118" action="modify" visible="true" lat="0.0" lon="0.0">
+		<tag k="author" v="Jinwei"/>
+		<tag k="collision" v="yes"/>
+	</node>
+</osm>
