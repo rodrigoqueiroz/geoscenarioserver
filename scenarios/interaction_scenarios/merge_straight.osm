@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2637117' action='modify' visible='true' lat='0.00835508172' lon='0.00940985911'>
+    <tag k='author' v='Jinwei Zhang' />
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/interaction_maps/DR_CHN_Merging_ZS.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Simply drive straight in the merging scenario' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2637118' action='modify' visible='true' lat='0.00861226435' lon='0.00907512695' />
+  <node id='-2637121' action='modify' visible='true' lat='0.00855672357' lon='0.00989771443' />
+  <node id='-2637149' action='modify' visible='true' lat='0.00000000000' lon='0.00000000000'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-2637171' action='modify' visible='true' lat='0.00861980361' lon='0.00904596863'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='example_route' />
+    <tag k='start' v='yes' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='17' />
+  </node>
+  <node id='-2637202' action='modify' visible='true' lat='0.00853697793' lon='0.00931834926' />
+  <node id='-2637204' action='modify' visible='true' lat='0.00859905216' lon='0.01019423044' />
+  <node id='-2637234' action='modify' visible='true' lat='0.00854213191' lon='0.00928599957'>
+    <tag k='btree' v='st_lanechange_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='route' v='merging_route' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='5' />
+  </node>
+  <way id='-1947586' action='modify' visible='true'>
+    <nd ref='-2637118' />
+    <nd ref='-2637121' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='example_route' />
+  </way>
+  <way id='-1947609' action='modify' visible='true'>
+    <nd ref='-2637202' />
+    <nd ref='-2637204' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='merging_route' />
+  </way>
+</osm>
