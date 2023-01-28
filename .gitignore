@@ -2,6 +2,7 @@ Lentlet2/
 mrt_cmake_modules/
 catkin_ws
 .venv
+*-checkpoint.ipynb
 scenarios/plots/*
 scenarios/logs/*
 *__pycache__/
