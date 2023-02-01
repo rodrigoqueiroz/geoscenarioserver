@@ -12,7 +12,7 @@
   </node>
   <node id='-2637118' action='modify' visible='true' lat='0.00861226435' lon='0.00907512695' />
   <node id='-2637121' action='modify' visible='true' lat='0.00855672357' lon='0.00989771443' />
-  <node id='-2637149' action='modify' visible='true' lat='0.00000000000' lon='0.00000000000'>
+  <node id='-2637149' action='modify' visible='true' lat='0.0' lon='0.0'>
     <tag k='altitude' v='300' />
     <tag k='area' v='100' />
     <tag k='gs' v='origin' />
@@ -24,6 +24,7 @@
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
     <tag k='route' v='example_route' />
+    <tag k='start_cartesian' v='10,0,0,0' />
     <tag k='start' v='yes' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='17' />
@@ -39,6 +40,7 @@
     <tag k='name' v='v2' />
     <tag k='route' v='merging_route' />
     <tag k='start' v='yes' />
+    <tag k='start_cartesian' v='10,0,0,0' />
     <tag k='usespeedprofile' v='no' />
     <tag k='vid' v='2' />
     <tag k='yaw' v='5' />
