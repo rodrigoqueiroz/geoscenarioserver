@@ -67,7 +67,8 @@ class GSWriter():
             return None
         
     
-    def wgs84ToUtm(self, lat: float, lon: float, ele: None or float=None) -> List[float] or None:
+    # convert WGS84 (latitide/longitude) to UTM (meters)
+    def ll2m(self, lat: float, lon: float, ele: None or float=None) -> List[float] or None:
         try:
             if type(self.projector) == UtmProjector:
                 if not ele: # set the default latitude as origin.
@@ -80,7 +81,8 @@ class GSWriter():
             error('EmptyObjectError: Cannot do projection before defining projector attribute as type of lanelet2 utmProjector.')
             return None
     
-    def utmToWgs84(self, x: float, y: float, z: None or float=None) -> List[float] or None:
+    # convert UTM (meters) to WGS84 (latitide/longitude)
+    def m2ll(self, x: float, y: float, z: None or float=None) -> List[float] or None:
         try:
             if type(self.projector) == UtmProjector:
                 # set the default latitude as origin.
@@ -219,6 +221,10 @@ class GSWriter():
                    route_name: str,
                    behavior_type: str,
                    starting_yaw_deg: float,
+                   starting_vx: float,
+                   starting_vy: float,
+                   starting_ax: float,
+                   starting_ay: float,
                    trajectory_lat: List[float],
                    trajectory_lon: List[float],
                    icon_lat: float,
@@ -267,6 +273,11 @@ class GSWriter():
         # add yaw tag
         t_yaw = self.getTag('yaw', str(starting_yaw_deg))
         self.attachTagToNodeTree(t_yaw, n)
+        # add vehicle initial state tag 
+        # with the format of [vx, vy, ax, ay] in m/s and m/s^2
+        init_state_str = str(starting_vx)+','+str(starting_vy)+','+str(starting_ax)+','+str(starting_ay)
+        t_start_cartesian = self.getTag('start_cartesian', init_state_str)
+        self.attachTagToNodeTree(t_start_cartesian, n)
         # add some extra tags
         t_gs = self.getTag('gs', 'vehicle')
         self.attachTagToNodeTree(t_gs, n)
@@ -277,7 +288,7 @@ class GSWriter():
         self.addNodeToTree(n)
         
         # record vehicle node id into the object
-        self.vehicles.append(node_id)
+        self.ways.append(node_id)
         
         # return vehicle node object
         return n
@@ -287,6 +298,10 @@ class GSWriter():
                    route_name: str,
                    behavior_type: str,
                    starting_yaw_deg: float,
+                   starting_vx: float,
+                   starting_vy: float,
+                   starting_ax: float,
+                   starting_ay: float,
                    trajectory_lat: List[float],
                    trajectory_lon: List[float],
                    icon_lat: float,
@@ -302,6 +317,10 @@ class GSWriter():
                            route_name,
                            behavior_type,
                            starting_yaw_deg,
+                           starting_vx,
+                           starting_vy,
+                           starting_ax,
+                           starting_ay,
                            trajectory_lat,
                            trajectory_lon,
                            icon_lat,
@@ -314,7 +333,6 @@ class GSWriter():
                            uses_speed_profile
                            )
         self.addNodeToTree(v)
-
 
 class Tester():
     def __init__(self):
@@ -333,20 +351,23 @@ class Tester():
                                 timeout=20)
         # Add first vehicle, going straight and driven by the normal behavior tree.
         gsw_tester.addVehicle(vehicle_name = 'v1', 
-                            route_name = 'example_route', 
-                            behavior_type = 'SDV', 
-                            starting_yaw_deg = '17', 
-                            trajectory_lat = [0.00861226435, 0.00855672357], 
-                            trajectory_lon = [0.00907512695, 0.00989771443], 
-                            icon_lat = 0.00861980361, 
-                            icon_lon = 0.00904596863, 
-                            vehicle_id = 1, 
-                            behavior_tree_dir = 'drive.btree')
+                      route_name = 'example_route', 
+                      behavior_type = 'SDV', 
+                      starting_yaw_deg = '17',
+                      starting_vx = 10.0,
+                      starting_vy = 0.0,
+                      starting_ax = 0.0,
+                      starting_ay = 0.0,
+                      trajectory_lat = [0.00861226435, 0.00855672357], 
+                      trajectory_lon = [0.00907512695, 0.00989771443], 
+                      icon_lat = 0.00861980361, 
+                      icon_lon = 0.00904596863, 
+                      vehicle_id = 1, 
+                      behavior_tree_dir = 'drive.btree')
         # Add second vehicle, changing lane from right to the left
-        gsw_tester.addVehicle('v2', 'merging_route', 'SDV', '5', [0.00853697793, 0.00859905216], [0.00931834926, 0.01019423044], 0.00854213191, 0.00928599957, 2, 'st_lanechange_driver.btree')
+        gsw_tester.addVehicle('v2', 'merging_route', 'SDV', '5', 10, 0, 0, 0, [0.00853697793, 0.00859905216], [0.00931834926, 0.01019423044], 0.00854213191, 0.00928599957, 2, 'st_lanechange_driver.btree')
         # Write down the GS configuration file
-        gsw_tester.writeOSM('gsw_tester.osm', file_dir='~/')
-        return None
+        gsw_tester.writeOSM('gsw_tester.osm')
 
     def erroneous_origin_test(self):
         gsw_exception_tester = GSWriter(auto_origin=False)
@@ -359,8 +380,8 @@ class Tester():
         gsw_exception_tester_2 = GSWriter()
         # inject an erroneous projector 
         gsw_exception_tester_2.projector = [0, 0, 0]
-        gsw_exception_tester_2.utmToWgs84(1000, 1000, 100)
-        gsw_exception_tester_2.wgs84ToUtm(0.1, 0.1, 100)
+        gsw_exception_tester_2.m2ll(1000, 1000, 100)
+        gsw_exception_tester_2.ll2m(0.1, 0.1, 100)
         return None
 
 # Testers
