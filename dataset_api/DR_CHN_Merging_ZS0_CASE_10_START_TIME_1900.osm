@@ -1,0 +1,458 @@
+<?xml version="1.0" ?>
+<osm version="0.6" generator="GSWriter">
+	<node id="-1000" action="modify" visible="true" lat="0.0" lon="0.0">
+		<tag k="altitude" v="300"/>
+		<tag k="area" v="100"/>
+		<tag k="gs" v="origin"/>
+	</node>
+	<node id="-1001" action="modify" visible="true" lat="9.034831792182725e-05" lon="9.034831792182725e-05">
+		<tag k="gs" v="globalconfig"/>
+		<tag k="name" v="default scenario name"/>
+		<tag k="lanelet" v="/mnt/Data/Research_Dataset/interaction_dataset/INTERACTION-Dataset-DR-multi-v1_2/maps/DR_CHN_Merging_ZS0.osm"/>
+		<tag k="collision" v="yes"/>
+		<tag k="mutate" v="no"/>
+		<tag k="timeout" v="1.4"/>
+		<tag k="version" v="2.0"/>
+	</node>
+	<node id="-1005" action="modify" visible="true" lat="0.008708467129433094" lon="0.009187538580488486"/>
+	<node id="-1006" action="modify" visible="true" lat="0.008715712816148448" lon="0.009148921575936164"/>
+	<way id="-1004" action="modify" visible="true">
+		<nd ref="-1005"/>
+		<nd ref="-1006"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v1_route"/>
+	</way>
+	<node id="-1003" action="modify" visible="true" lat="0.008708467129433094" lon="0.009187538580488486">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v1"/>
+		<tag k="route" v="v1_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="1"/>
+		<tag k="yaw" v="-169.65280313823675"/>
+		<tag k="start_cartesian" v="-3.483,0.638,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1010" action="modify" visible="true" lat="0.008728596219993418" lon="0.0091022993422043"/>
+	<node id="-1011" action="modify" visible="true" lat="0.00873707063749208" lon="0.00906178872748864"/>
+	<way id="-1009" action="modify" visible="true">
+		<nd ref="-1010"/>
+		<nd ref="-1011"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v2_route"/>
+	</way>
+	<node id="-1008" action="modify" visible="true" lat="0.008728596219993418" lon="0.0091022993422043">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v2"/>
+		<tag k="route" v="v2_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="2"/>
+		<tag k="yaw" v="-168.5641833274882"/>
+		<tag k="start_cartesian" v="-3.38,0.685,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1015" action="modify" visible="true" lat="0.00866443503008464" lon="0.009695374796993228"/>
+	<node id="-1016" action="modify" visible="true" lat="0.008662700126969666" lon="0.009670210513238686"/>
+	<way id="-1014" action="modify" visible="true">
+		<nd ref="-1015"/>
+		<nd ref="-1016"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v3_route"/>
+	</way>
+	<node id="-1013" action="modify" visible="true" lat="0.00866443503008464" lon="0.009695374796993228">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v3"/>
+		<tag k="route" v="v3_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="3"/>
+		<tag k="yaw" v="176.12722622321505"/>
+		<tag k="start_cartesian" v="-2.045,-0.139,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1020" action="modify" visible="true" lat="0.008675744442759844" lon="0.00940699045929172"/>
+	<node id="-1021" action="modify" visible="true" lat="0.0086832971441828" lon="0.009346439948191954"/>
+	<way id="-1019" action="modify" visible="true">
+		<nd ref="-1020"/>
+		<nd ref="-1021"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v4_route"/>
+	</way>
+	<node id="-1018" action="modify" visible="true" lat="0.008675744442759844" lon="0.00940699045929172">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v4"/>
+		<tag k="route" v="v4_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="4"/>
+		<tag k="yaw" v="-173.66350770415252"/>
+		<tag k="start_cartesian" v="-4.89,0.542,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1025" action="modify" visible="true" lat="0.008710225437683506" lon="0.009879960498829998"/>
+	<node id="-1026" action="modify" visible="true" lat="0.008707957519632917" lon="0.00986058472236273"/>
+	<way id="-1024" action="modify" visible="true">
+		<nd ref="-1025"/>
+		<nd ref="-1026"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v5_route"/>
+	</way>
+	<node id="-1023" action="modify" visible="true" lat="0.008710225437683506" lon="0.009879960498829998">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v5"/>
+		<tag k="route" v="v5_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="5"/>
+		<tag k="yaw" v="172.91866257048244"/>
+		<tag k="start_cartesian" v="-1.449,-0.181,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1030" action="modify" visible="true" lat="0.00868985942502425" lon="0.009714651669897378"/>
+	<node id="-1031" action="modify" visible="true" lat="0.0086874740724989" lon="0.009697618223108773"/>
+	<way id="-1029" action="modify" visible="true">
+		<nd ref="-1030"/>
+		<nd ref="-1031"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v6_route"/>
+	</way>
+	<node id="-1028" action="modify" visible="true" lat="0.00868985942502425" lon="0.009714651669897378">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v6"/>
+		<tag k="route" v="v6_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="6"/>
+		<tag k="yaw" v="172.91866257048244"/>
+		<tag k="start_cartesian" v="-1.507,-0.188,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1035" action="modify" visible="true" lat="0.008693529303224371" lon="0.009928207167537728"/>
+	<node id="-1036" action="modify" visible="true" lat="0.008689671210060443" lon="0.009904999320956787"/>
+	<way id="-1034" action="modify" visible="true">
+		<nd ref="-1035"/>
+		<nd ref="-1036"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v7_route"/>
+	</way>
+	<node id="-1033" action="modify" visible="true" lat="0.008693529303224371" lon="0.009928207167537728">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v7"/>
+		<tag k="route" v="v7_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="7"/>
+		<tag k="yaw" v="171.83004275973389"/>
+		<tag k="start_cartesian" v="-1.869,-0.268,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1040" action="modify" visible="true" lat="0.00869931969757465" lon="0.00980481768439434"/>
+	<node id="-1041" action="modify" visible="true" lat="0.008696347075262447" lon="0.009787766291980748"/>
+	<way id="-1039" action="modify" visible="true">
+		<nd ref="-1040"/>
+		<nd ref="-1041"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v8_route"/>
+	</way>
+	<node id="-1038" action="modify" visible="true" lat="0.00869931969757465" lon="0.00980481768439434">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v8"/>
+		<tag k="route" v="v8_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="8"/>
+		<tag k="yaw" v="170.05387359482833"/>
+		<tag k="start_cartesian" v="-1.593,-0.28,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1045" action="modify" visible="true" lat="0.008687265874795656" lon="0.009648115277878233"/>
+	<node id="-1046" action="modify" visible="true" lat="0.008684636568837922" lon="0.00962969977212813"/>
+	<way id="-1044" action="modify" visible="true">
+		<nd ref="-1045"/>
+		<nd ref="-1046"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v9_route"/>
+	</way>
+	<node id="-1043" action="modify" visible="true" lat="0.008687265874795656" lon="0.009648115277878233">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v9"/>
+		<tag k="route" v="v9_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="9"/>
+		<tag k="yaw" v="174.46564861733566"/>
+		<tag k="start_cartesian" v="-1.554,-0.151,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1050" action="modify" visible="true" lat="0.008696406402774578" lon="0.009297098453755037"/>
+	<node id="-1051" action="modify" visible="true" lat="0.008707157456320884" lon="0.009236135099857101"/>
+	<way id="-1049" action="modify" visible="true">
+		<nd ref="-1050"/>
+		<nd ref="-1051"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v10_route"/>
+	</way>
+	<node id="-1048" action="modify" visible="true" lat="0.008696406402774578" lon="0.009297098453755037">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v10"/>
+		<tag k="route" v="v10_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="10"/>
+		<tag k="yaw" v="-169.9392820358022"/>
+		<tag k="start_cartesian" v="-5.433,0.962,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1055" action="modify" visible="true" lat="0.008669773369707374" lon="0.009532883763859523"/>
+	<node id="-1056" action="modify" visible="true" lat="0.008673621817673685" lon="0.009479656407136439"/>
+	<way id="-1054" action="modify" visible="true">
+		<nd ref="-1055"/>
+		<nd ref="-1056"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v11_route"/>
+	</way>
+	<node id="-1053" action="modify" visible="true" lat="0.008669773369707374" lon="0.009532883763859523">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v11"/>
+		<tag k="route" v="v11_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="11"/>
+		<tag k="yaw" v="-179.45038143497385"/>
+		<tag k="start_cartesian" v="-3.961,0.039,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1060" action="modify" visible="true" lat="0.008675811145146185" lon="0.009841218155817621"/>
+	<node id="-1061" action="modify" visible="true" lat="0.008673443881684452" lon="0.009826607802874587"/>
+	<way id="-1059" action="modify" visible="true">
+		<nd ref="-1060"/>
+		<nd ref="-1061"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v12_route"/>
+	</way>
+	<node id="-1058" action="modify" visible="true" lat="0.008675811145146185" lon="0.009841218155817621">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v12"/>
+		<tag k="route" v="v12_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="12"/>
+		<tag k="yaw" v="171.5435638621685"/>
+		<tag k="start_cartesian" v="-1.628,-0.241,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1065" action="modify" visible="true" lat="0.008662049147045285" lon="0.009611562630696735"/>
+	<node id="-1066" action="modify" visible="true" lat="0.008662581883594733" lon="0.009570917443495475"/>
+	<way id="-1064" action="modify" visible="true">
+		<nd ref="-1065"/>
+		<nd ref="-1066"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v13_route"/>
+	</way>
+	<node id="-1063" action="modify" visible="true" lat="0.008662049147045285" lon="0.009611562630696735">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v13"/>
+		<tag k="route" v="v13_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="13"/>
+		<tag k="yaw" v="178.18987428568602"/>
+		<tag k="start_cartesian" v="-2.943,-0.094,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1070" action="modify" visible="true" lat="0.008701064955095154" lon="0.009995075591669345"/>
+	<node id="-1071" action="modify" visible="true" lat="0.008696990006842582" lon="0.009969767728585488"/>
+	<way id="-1069" action="modify" visible="true">
+		<nd ref="-1070"/>
+		<nd ref="-1071"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v14_route"/>
+	</way>
+	<node id="-1068" action="modify" visible="true" lat="0.008701064955095154" lon="0.009995075591669345">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v14"/>
+		<tag k="route" v="v14_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="14"/>
+		<tag k="yaw" v="169.99657781531525"/>
+		<tag k="start_cartesian" v="-2.254,-0.397,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1075" action="modify" visible="true" lat="0.008668582618255592" lon="0.009766227880155576"/>
+	<node id="-1076" action="modify" visible="true" lat="0.008668103682728068" lon="0.009755521390009125"/>
+	<way id="-1074" action="modify" visible="true">
+		<nd ref="-1075"/>
+		<nd ref="-1076"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v15_route"/>
+	</way>
+	<node id="-1073" action="modify" visible="true" lat="0.008668582618255592" lon="0.009766227880155576">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v15"/>
+		<tag k="route" v="v15_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="15"/>
+		<tag k="yaw" v="176.5855924593197"/>
+		<tag k="start_cartesian" v="-1.155,-0.069,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1080" action="modify" visible="true" lat="0.008724474132646376" lon="0.009959509737418326"/>
+	<node id="-1081" action="modify" visible="true" lat="0.00872081482189782" lon="0.009938186519121484"/>
+	<way id="-1079" action="modify" visible="true">
+		<nd ref="-1080"/>
+		<nd ref="-1081"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v16_route"/>
+	</way>
+	<node id="-1078" action="modify" visible="true" lat="0.008724474132646376" lon="0.009959509737418326">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v16"/>
+		<tag k="route" v="v16_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="16"/>
+		<tag k="yaw" v="168.9079580045667"/>
+		<tag k="start_cartesian" v="-2.132,-0.419,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1085" action="modify" visible="true" lat="0.008717761986169756" lon="0.01005880289652783"/>
+	<node id="-1086" action="modify" visible="true" lat="0.008711916174271727" lon="0.010031018102948597"/>
+	<way id="-1084" action="modify" visible="true">
+		<nd ref="-1085"/>
+		<nd ref="-1086"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v17_route"/>
+	</way>
+	<node id="-1083" action="modify" visible="true" lat="0.008717761986169756" lon="0.01005880289652783">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v17"/>
+		<tag k="route" v="v17_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="17"/>
+		<tag k="yaw" v="168.10581709138356"/>
+		<tag k="start_cartesian" v="-2.351,-0.496,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1090" action="modify" visible="true" lat="0.008742589920161957" lon="0.010057393714500318"/>
+	<node id="-1091" action="modify" visible="true" lat="0.008736454952888564" lon="0.010024933244674017"/>
+	<way id="-1089" action="modify" visible="true">
+		<nd ref="-1090"/>
+		<nd ref="-1091"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v18_route"/>
+	</way>
+	<node id="-1088" action="modify" visible="true" lat="0.008742589920161957" lon="0.010057393714500318">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v18"/>
+		<tag k="route" v="v18_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="18"/>
+		<tag k="yaw" v="169.59550735872367"/>
+		<tag k="start_cartesian" v="-3.377,-0.619,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1095" action="modify" visible="true" lat="0.008733853788854915" lon="0.010136126474324492"/>
+	<node id="-1096" action="modify" visible="true" lat="0.008728947612617928" lon="0.010109005779394664"/>
+	<way id="-1094" action="modify" visible="true">
+		<nd ref="-1095"/>
+		<nd ref="-1096"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v19_route"/>
+	</way>
+	<node id="-1093" action="modify" visible="true" lat="0.008733853788854915" lon="0.010136126474324492">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v19"/>
+		<tag k="route" v="v19_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="19"/>
+		<tag k="yaw" v="169.59550735872367"/>
+		<tag k="start_cartesian" v="-2.419,-0.445,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1100" action="modify" visible="true" lat="0.008771665465103726" lon="0.010205193406919388"/>
+	<node id="-1101" action="modify" visible="true" lat="0.008761961565372884" lon="0.010155430255474052"/>
+	<way id="-1099" action="modify" visible="true">
+		<nd ref="-1100"/>
+		<nd ref="-1101"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v20_route"/>
+	</way>
+	<node id="-1098" action="modify" visible="true" lat="0.008771665465103726" lon="0.010205193406919388">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v20"/>
+		<tag k="route" v="v20_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="20"/>
+		<tag k="yaw" v="170.28305671288066"/>
+		<tag k="start_cartesian" v="-3.613,-0.62,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+	<node id="-1105" action="modify" visible="true" lat="0.008748021195417335" lon="0.010218269343062136"/>
+	<node id="-1106" action="modify" visible="true" lat="0.008739970803234564" lon="0.010183098604991336"/>
+	<way id="-1104" action="modify" visible="true">
+		<nd ref="-1105"/>
+		<nd ref="-1106"/>
+		<tag k="gs" v="route"/>
+		<tag k="name" v="v21_route"/>
+	</way>
+	<node id="-1103" action="modify" visible="true" lat="0.008748021195417335" lon="0.010218269343062136">
+		<tag k="btree" v="drive.btree"/>
+		<tag k="btype" v="SDV"/>
+		<tag k="model" v="light_vehicle"/>
+		<tag k="name" v="v21"/>
+		<tag k="route" v="v21_route"/>
+		<tag k="usespeedprofile" v="no"/>
+		<tag k="vid" v="21"/>
+		<tag k="yaw" v="167.18908461917422"/>
+		<tag k="start_cartesian" v="-3.074,-0.699,0,0"/>
+		<tag k="gs" v="vehicle"/>
+		<tag k="cycles" v="1"/>
+	</node>
+</osm>
