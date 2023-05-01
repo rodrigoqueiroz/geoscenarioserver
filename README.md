@@ -25,7 +25,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - [py_trees](https://github.com/splintered-reality/py_trees)
 - tk
 - sysv-ipc
-- antlr4-python3-runtime
+- antlr4-python3-runtime==4.9.3 (later versions cause a parsing error `Exception: Could not deserialize ATN with version (expected 4).`)
 - antlr-denter
 
 To automatically install the dependencies, execute

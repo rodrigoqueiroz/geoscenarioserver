@@ -20,7 +20,7 @@ install_python_dependencies()
     echo ""
     echo "Installing the required dependencies for GeoScenario Server for Python3.8"
     echo ""
-    python3.8 -m pip -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime tk sysv-ipc antlr-denter
+    python3.8 -m pip -q install numpy scipy glog matplotlib py_trees antlr4-python3-runtime==4.9.3 tk sysv-ipc antlr-denter
 }
 
 install_lanelet2_python38()
