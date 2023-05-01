@@ -72,7 +72,8 @@ install_lanelet2_binary()
 
 install_python_dependencies
 install_lanelet2_binary
-install_lanelet2_python38
+# No need to install from source anymore as all pull requests with the required fixes have been merged
+# install_lanelet2_python38
 
 echo ""
 echo "Successfully installed GeoScenario Server dependencies."
