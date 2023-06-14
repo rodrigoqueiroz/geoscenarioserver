@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-128810' action='modify' visible='true' lat='43.47100198097' lon='-80.53911623584'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA S21 - Opposite direction not making a maneuver (drifting)' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-128811' action='modify' visible='true' lat='43.47095766481' lon='-80.53901249648'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-128812' action='modify' visible='true' lat='43.47220077955' lon='-80.54045687684' />
+  <node id='-128813' action='modify' visible='true' lat='43.47194416559' lon='-80.54017566085' />
+  <node id='-128814' action='modify' visible='true' lat='43.47126937411' lon='-80.53911771465' />
+  <node id='-128815' action='modify' visible='true' lat='43.47196112372' lon='-80.54019846417'>
+    <tag k='btree' v='st_21_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='ego_route' />
+    <tag k='vid' v='99' />
+  </node>
+  <node id='-128817' action='modify' visible='true' lat='43.47178106262' lon='-80.53995051686' />
+  <node id='-128818' action='modify' visible='true' lat='43.47118422338' lon='-80.53887250786' />
+  <node id='-128819' action='modify' visible='true' lat='43.47122731543' lon='-80.53896248113'>
+    <tag k='btree' v='st_21_drifting_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='drifting_vehicle' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='3' />
+  </node>
+  <way id='-103226' action='modify' visible='true'>
+    <nd ref='-128818' />
+    <nd ref='-128812' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-103227' action='modify' visible='true'>
+    <nd ref='-128813' />
+    <nd ref='-128817' />
+    <nd ref='-128814' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ego_route' />
+  </way>
+</osm>

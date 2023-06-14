@@ -1,0 +1,38 @@
+behaviortree handle_intersection:
+    ?
+        ->
+            condition c_row ( intersection_type(type=RIGHT_OF_WAY) )
+            ?
+                ->
+                    condition c_role ( yield_role )
+                    ?
+                        ->
+                            condition c_row_iocc ( intersection_occupied() )
+                            maneuver m_yield ( MStopConfig(target=STOP_LINE) )
+                        ->
+                            condition c_row_move ( vehicle_moving )
+                            maneuver m_yield ( MStopConfig(target=STOP_LINE) )
+        ->
+            condition c_aws ( intersection_type(type=ALL_WAY_STOP) )
+            ?
+                ->
+                    condition c_aws_move ( vehicle_moving )
+                    maneuver m_yield ( MStopConfig(target=STOP_LINE) )
+                ->
+                    condition c_aws_iocc ( intersection_occupied )
+                    maneuver m_yield ( MStopConfig(target=STOP_LINE) )
+                ->
+                    condition c_aws_occ ( aws_occupied )
+                    ->
+                        condition c_aws_yield (aws_yield )
+                        maneuver m_yield ( MStopConfig(target=STOP_LINE) )
+        ->
+            condition c_tl ( intersection_type(type=TRAFFIC_LIGHT) )
+            ?
+                ->
+                    condition c_rl ( traffic_light_state(color=RED) )
+                    maneuver m_srl ( MStopConfig( target=STOP_LINE ) )
+                ->
+                    condition c_yl (  traffic_light_state(color=YELLOW) )
+                    maneuver m_syl ( MStopConfig( target=STOP_LINE ) )
+    

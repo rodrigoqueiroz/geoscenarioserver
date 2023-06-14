@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-2749145' action='modify' visible='true' lat='49.00817498511' lon='8.45768565693'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-2749146' action='modify' visible='true' lat='49.00782212317' lon='8.45784142109' />
+  <node id='-2749147' action='modify' visible='true' lat='49.00820596876' lon='8.4576897346'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='eval_scenarios/nhtsa/maps/ll2_mapping_example.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA S25 - Lead vehicle decelerating' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2749148' action='modify' visible='true' lat='49.00724796512' lon='8.45708081374'>
+    <tag k='btree' v='st_ego.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='ego' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='99' />
+  </node>
+  <node id='-2749150' action='modify' visible='true' lat='49.00773967736' lon='8.457710544'>
+    <tag k='btree' v='st_25_decelerating_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='stopped_vehicle' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-2749151' action='modify' visible='true' lat='49.00839333622' lon='8.4585611519' />
+  <way id='-1949639' action='modify' visible='true'>
+    <nd ref='-2749146' />
+    <nd ref='-2749151' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+</osm>

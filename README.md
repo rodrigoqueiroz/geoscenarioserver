@@ -1,7 +1,10 @@
 #   GeoScenario Server
+
 Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees and Maneuver Models.
 
 ## Dependencies
+
+- Ubuntu 20.04
 
 ### Apt packages
 
@@ -21,16 +24,19 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - [py_trees](https://github.com/splintered-reality/py_trees)
 - tk
 - sysv-ipc
-- antlr4-python3-runtime
+- antlr4-python3-runtime==4.9.3 (later versions cause a parsing error `Exception: Could not deserialize ATN with version (expected 4).`)
 - antlr-denter
 
 To automatically install the dependencies, execute
+
 ```
 bash scripts/install_dependencies.bash
 ```
 
 ## Running
+
 - run `python3.8 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
+
 ```
 optional arguments:
   -h, --help            show this help message and exit
