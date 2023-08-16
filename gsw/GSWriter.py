@@ -82,16 +82,30 @@ class GSWriter():
             return None
     
     # convert UTM (meters) to WGS84 (latitide/longitude)
-    def m2ll(self, x: float, y: float, z: None or float=None) -> List[float] or None:
+    def m2ll(self, 
+             x: float or List[float], 
+             y: float or List[float],
+             z: float or List[float] or None=None) -> List[float] or List[List[float]] or None:
         try:
             if type(self.projector) == UtmProjector:
                 # set the default latitude as origin.
                 if not z:
                     # Note that the latitude in WGS84 and height in UTM are the same unit 
                     # in meters, therefore they are interchangable
-                    z = self.origin[2] 
-                gps_point = self.projector.reverse(BasicPoint3d(x, y, z))
-                return [gps_point.lat, gps_point.lon, gps_point.alt]
+                    z = self.origin[2]
+                if type(x) == list:
+                    assert len(x) == len(y)
+                    # TODO: take care of the case when z is a list
+                    lon_arr = []
+                    lat_arr = []
+                    for x_point, y_point in zip(x, y):
+                        gps_point = self.projector.reverse(BasicPoint3d(x_point, y_point, z))
+                        lon_arr.append(gps_point.lon)
+                        lat_arr.append(gps_point.lat)
+                    return [lat_arr, lon_arr, z]
+                elif type(x) == float:
+                    gps_point = self.projector.reverse(BasicPoint3d(x, y, z))
+                    return [gps_point.lat, gps_point.lon, gps_point.alt]
             else:
                 raise Exception
         except Exception:
@@ -184,7 +198,11 @@ class GSWriter():
     def attachTagToNodeTree(self, tag: minidom.Element, node: minidom.Element) -> None:
         node.appendChild(tag)
 
-    def getWay(self, lat_arr: List[float], lon_arr: List[float], name: str, way_id: int) -> minidom.Element:
+    def getWay(self, lat_arr: List[float], lon_arr: List[float], name: str, way_id: int, 
+               interpolate: bool=True,
+               speed_arr: List[float] or None=None, 
+               timestamp_arr: List[float] or None=None, 
+               yaw_arr: List[float] or None=None) -> minidom.Element:
         w = minidom.Document().createElement('way')
         wid = way_id
         w.setAttribute('id', str(way_id))
@@ -192,9 +210,30 @@ class GSWriter():
         w.setAttribute('visible', 'true')
         node_id_list = []
         assert len(lat_arr) == len(lon_arr)
-        for lon, lat in zip(lat_arr, lon_arr):
+
+        # initialize the trajectory flag as false
+        trajectory_flag = False
+
+        # check if the speed, timestamp, yaw array is valid
+        if speed_arr is not None:
+            assert len(speed_arr) == len(lat_arr)
+            assert len(timestamp_arr) == len(lat_arr)
+            assert len(yaw_arr) == len(lat_arr)
+            trajectory_flag = True
+
+        # add the nodes to the way
+        for i in range(len(lat_arr)):
             nid = self.getId()
-            n = self.getNode(lon, lat, nid)
+            n = self.getNode(lat_arr[i], lon_arr[i], nid)
+            # add the tags to the node for trajectory of TV
+            if trajectory_flag:
+                t_speed = self.getTag('speed', str(speed_arr[i]))
+                self.attachTagToNodeTree(t_speed, n)
+                # print(timestamp_arr)
+                t_timestamp = self.getTag('time', str(timestamp_arr[i]))
+                self.attachTagToNodeTree(t_timestamp, n)
+                t_yaw = self.getTag('yaw', str(yaw_arr[i]))
+                self.attachTagToNodeTree(t_yaw, n)
             node_id_list.append(nid)
             self.addNodeToTree(n)
                 
@@ -203,16 +242,22 @@ class GSWriter():
             r.setAttribute('ref', str(nid))
             w.appendChild(r)
         
-        t_gs = self.getTag('gs', 'route')
-        self.attachTagToNodeTree(t_gs, w)
+        if trajectory_flag:
+            t_gs = self.getTag('gs', 'trajectory')
+            self.attachTagToNodeTree(t_gs, w)
+            # add interpolation tag
+            t_interpolate = self.getTag('interpolate', self.__python2xml__(interpolate))
+            self.attachTagToNodeTree(t_interpolate, w)
+        else:
+            t_gs = self.getTag('gs', 'route')
+            self.attachTagToNodeTree(t_gs, w)
         t_name = self.getTag('name', str(name))
         self.attachTagToNodeTree(t_name, w)
-        
         self.reference_dict[wid] = node_id_list
         self.ways.append(wid)
-        
+            
         return w
-    
+
     def addWayToTree(self, way: minidom.Element) -> None:
         self.osm.appendChild(way)
     
@@ -263,7 +308,7 @@ class GSWriter():
         self.attachTagToNodeTree(t_route, n)
         # add start tag
         t_start = self.getTag('start', self.__python2xml__(start))
-        self.attachTagToNodeTree(t_route, n)
+        self.attachTagToNodeTree(t_start, n)
         # add uses_speed_profile tag
         t_usespeedprofile = self.getTag('usespeedprofile', self.__python2xml__(uses_speed_profile))
         self.attachTagToNodeTree(t_usespeedprofile, n)
@@ -292,109 +337,212 @@ class GSWriter():
         
         # return vehicle node object
         return n
-    
-    def addVehicle(self,
-                   vehicle_name: str,
-                   route_name: str,
-                   behavior_type: str,
-                   starting_yaw_deg: float,
-                   starting_vx: float,
-                   starting_vy: float,
-                   starting_ax: float,
-                   starting_ay: float,
-                   trajectory_lat: List[float],
-                   trajectory_lon: List[float],
-                   icon_lat: float,
-                   icon_lon: float,
-                   vehicle_id: int,
-                   behavior_tree_dir: str or None=None,
-                   vehicle_model: str='light_vehicle',
-                   start: bool = True,
-                   uses_speed_profile: bool = False
-                  ):
+
+    def getSDV(self,
+               vehicle_name: str,
+               route_name: str,
+               starting_yaw_deg: float,
+               starting_vx: float,
+               starting_vy: float,
+               starting_ax: float,
+               starting_ay: float,
+               trajectory_lat: List[float],
+               trajectory_lon: List[float],
+               icon_lat: float,
+               icon_lon: float,
+               vehicle_id: int,
+               node_id: int,
+               behavior_tree_dir: str or None=None, 
+               vehicle_model: str='light_vehicle',
+               start: bool = True,
+               uses_speed_profile: bool = False
+               ):
+        # prepare id for objects
         node_id = self.getId()
-        v = self.getVehicle(vehicle_name,
-                           route_name,
-                           behavior_type,
-                           starting_yaw_deg,
-                           starting_vx,
-                           starting_vy,
-                           starting_ax,
-                           starting_ay,
-                           trajectory_lat,
-                           trajectory_lon,
-                           icon_lat,
-                           icon_lon,
-                           vehicle_id,
-                           node_id,
-                           behavior_tree_dir, 
-                           vehicle_model,
-                           start,
-                           uses_speed_profile
-                           )
+        way_id = self.getId()
+        # add vehicle's route object to osm tree
+        w = self.getWay(trajectory_lat, trajectory_lon, route_name, way_id)
+        self.addWayToTree(w)
+        
+        # Vehicle representation is based on the definition of node.
+        n = self.getNode(icon_lat, icon_lon, node_id)
+        # add behavior tree tag
+        if behavior_tree_dir:
+            t_btree = self.getTag('btree', behavior_tree_dir)
+            self.attachTagToNodeTree(t_btree, n)
+        # add behavior type tag as SDV
+        t_btype = self.getTag('btype', 'SDV')
+        self.attachTagToNodeTree(t_btype, n)
+        # add car model tag
+        t_model = self.getTag('model', vehicle_model)
+        self.attachTagToNodeTree(t_model, n)
+        # add vehicle name tag
+        t_name = self.getTag('name', vehicle_name)
+        self.attachTagToNodeTree(t_name, n)
+        # add route name tag, so the vehicle node can link with way.
+        t_route = self.getTag('route', route_name)
+        self.attachTagToNodeTree(t_route, n)
+        # add start tag
+        t_start = self.getTag('start', self.__python2xml__(start))
+        self.attachTagToNodeTree(t_start, n)
+        # add uses_speed_profile tag
+        t_usespeedprofile = self.getTag('usespeedprofile', self.__python2xml__(uses_speed_profile))
+        self.attachTagToNodeTree(t_usespeedprofile, n)
+        # add vehicle id tag
+        t_vid = self.getTag('vid', str(vehicle_id))
+        self.attachTagToNodeTree(t_vid, n)
+        # add yaw tag
+        t_yaw = self.getTag('yaw', str(starting_yaw_deg))
+        self.attachTagToNodeTree(t_yaw, n)
+        # add vehicle initial state tag 
+        # with the format of [vx, vy, ax, ay] in m/s and m/s^2
+        init_state_str = str(starting_vx)+','+str(starting_vy)+','+str(starting_ax)+','+str(starting_ay)
+        t_start_cartesian = self.getTag('start_cartesian', init_state_str)
+        self.attachTagToNodeTree(t_start_cartesian, n)
+        # add some extra tags
+        t_gs = self.getTag('gs', 'vehicle')
+        self.attachTagToNodeTree(t_gs, n)
+        t_cycles = self.getTag('cycles', '1')
+        self.attachTagToNodeTree(t_cycles, n)
+        
+        # add vehicle object to osm tree
+        self.addNodeToTree(n)
+        
+        # record vehicle node id into the object
+        self.ways.append(node_id)
+        
+        # return vehicle node object
+        return n
+
+    def getTV(self,
+              vehicle_name: str,
+              trajectory_name: str,
+              starting_yaw_deg: float,
+              trajectory_lat: List[float],
+              trajectory_lon: List[float],
+              trajectory_yaw: List[float],
+              trajectory_timestamp: List[float],
+              trajectory_speed: List[float],
+              icon_lat: float,
+              icon_lon: float,
+              vehicle_id: int,
+              node_id: int,
+              vehicle_model: str='light_vehicle',
+              start: bool = True,
+              uses_speed_profile: bool = False
+              ):
+        # prepare id for objects
+        node_id = self.getId()
+        way_id = self.getId()
+        # add vehicle's route object to osm tree
+        w = self.getWay(trajectory_lat, trajectory_lon, trajectory_name, way_id, 
+                        interpolate=True, speed_arr=trajectory_speed, 
+                        timestamp_arr=trajectory_timestamp, yaw_arr=trajectory_yaw)
+        self.addWayToTree(w)
+        
+        # Vehicle representation is based on the definition of node.
+        n = self.getNode(icon_lat, icon_lon, node_id)
+        # add behavior type tag
+        t_btype = self.getTag('btype', 'TV')
+        self.attachTagToNodeTree(t_btype, n)
+        # add car model tag
+        t_model = self.getTag('model', vehicle_model)
+        self.attachTagToNodeTree(t_model, n)
+        # add vehicle name tag
+        t_name = self.getTag('name', vehicle_name)
+        self.attachTagToNodeTree(t_name, n)
+        # add route name tag, so the vehicle node can link with way.
+        t_trajectory = self.getTag('trajectory', trajectory_name)
+        self.attachTagToNodeTree(t_trajectory, n)
+        # add start tag
+        t_start = self.getTag('start', self.__python2xml__(start))
+        self.attachTagToNodeTree(t_start, n)
+        # add uses_speed_profile tag
+        t_usespeedprofile = self.getTag('usespeedprofile', self.__python2xml__(uses_speed_profile))
+        self.attachTagToNodeTree(t_usespeedprofile, n)
+        # add vehicle id tag
+        t_vid = self.getTag('vid', str(vehicle_id))
+        self.attachTagToNodeTree(t_vid, n)
+        # add yaw tag
+        t_yaw = self.getTag('yaw', str(starting_yaw_deg))
+        self.attachTagToNodeTree(t_yaw, n)
+        # add some extra tags
+        t_gs = self.getTag('gs', 'vehicle')
+        self.attachTagToNodeTree(t_gs, n)
+        t_cycles = self.getTag('cycles', '1')
+        self.attachTagToNodeTree(t_cycles, n)
+        
+        # add vehicle object to osm tree
+        self.addNodeToTree(n)
+        
+        # record vehicle node id into the object
+        self.ways.append(node_id)
+        
+        # return vehicle node object
+        return n
+
+
+    def addSDV(self,
+               vehicle_name: str,
+               route_name: str,
+               starting_yaw_deg: float,
+               starting_vx: float,
+               starting_vy: float,
+               starting_ax: float,
+               starting_ay: float,
+               trajectory_lat: List[float],
+               trajectory_lon: List[float],
+               icon_lat: float,
+               icon_lon: float,
+               vehicle_id: int,
+               behavior_tree_dir: str or None=None,
+               vehicle_model: str='light_vehicle',
+               start: bool = True,
+               uses_speed_profile: bool = False
+               ):
+        node_id = self.getId()
+        v = self.getSDV(vehicle_name, 
+                        route_name, 
+                        starting_yaw_deg, 
+                        starting_vx, starting_vy, 
+                        starting_ax, starting_ay,
+                        trajectory_lat, trajectory_lon, 
+                        icon_lat, icon_lon, 
+                        vehicle_id, 
+                        node_id, 
+                        behavior_tree_dir, 
+                        vehicle_model, 
+                        start, 
+                        uses_speed_profile)
         self.addNodeToTree(v)
 
-class Tester():
-    def __init__(self):
-        pass
 
-    def main_function_test(self):
-        # Build a GSWriter class
-        gsw_tester = GSWriter()
-        gsw_tester.addOrigin(lat=0.0000001, lon=0.0000001, altitude=300, area=100)
-        # global configuration that specifies:
-        gsw_tester.addGlobalConfig(lat=0.00835508172, # global configuration icon position
-                                lon=0.00940985911, 
-                                scenario_name='Simply drive straight in the merging scenario', # scenario name
-                                lanelet_map_dir='maps/interaction_maps/DR_CHN_Merging_ZS.osm',   # lanelet map directory
-                                collision=True,
-                                timeout=20)
-        # Add first vehicle, going straight and driven by the normal behavior tree.
-        gsw_tester.addVehicle(vehicle_name = 'v1', 
-                      route_name = 'example_route', 
-                      behavior_type = 'SDV', 
-                      starting_yaw_deg = '17',
-                      starting_vx = 10.0,
-                      starting_vy = 0.0,
-                      starting_ax = 0.0,
-                      starting_ay = 0.0,
-                      trajectory_lat = [0.00861226435, 0.00855672357], 
-                      trajectory_lon = [0.00907512695, 0.00989771443], 
-                      icon_lat = 0.00861980361, 
-                      icon_lon = 0.00904596863, 
-                      vehicle_id = 1, 
-                      behavior_tree_dir = 'drive.btree')
-        # Add second vehicle, changing lane from right to the left
-        gsw_tester.addVehicle('v2', 'merging_route', 'SDV', '5', 10, 0, 0, 0, [0.00853697793, 0.00859905216], [0.00931834926, 0.01019423044], 0.00854213191, 0.00928599957, 2, 'st_lanechange_driver.btree')
-        # Write down the GS configuration file
-        gsw_tester.writeOSM('gsw_tester.osm')
-
-    def erroneous_origin_test(self):
-        gsw_exception_tester = GSWriter(auto_origin=False)
-        gsw_exception_tester.origin = [0,0]
-        # inject an empty origin
-        gsw_exception_tester.addProjector()
-        return None
-
-    def erroneous_projector_test(self):
-        gsw_exception_tester_2 = GSWriter()
-        # inject an erroneous projector 
-        gsw_exception_tester_2.projector = [0, 0, 0]
-        gsw_exception_tester_2.m2ll(1000, 1000, 100)
-        gsw_exception_tester_2.ll2m(0.1, 0.1, 100)
-        return None
-
-# Testers
-if __name__ == '__main__':
-
-    #############################
-    ### Main function testing ###
-    #############################
-    t = Tester()
-    t.main_function_test()
-
-    ##################################
-    ### Exception Handling Testing ###
-    ##################################
-    t.erroneous_origin_test()
-    t.erroneous_projector_test()
+    def addTV(self,
+              vehicle_name: str,
+              trajectory_name: str,
+              starting_yaw_deg: float,
+              trajectory_lat: List[float],
+              trajectory_lon: List[float],
+              trajectory_yaw: List[float],
+              trajectory_timestamp: List[float],
+              trajectory_speed: List[float],
+              icon_lat: float,
+              icon_lon: float,
+              vehicle_id: int,
+              vehicle_model: str='light_vehicle',
+              start: bool = True,
+              uses_speed_profile: bool = False
+              ):
+        node_id = self.getId()
+        v = self.getTV(vehicle_name, 
+                       trajectory_name, 
+                       starting_yaw_deg, 
+                       trajectory_lat, trajectory_lon, 
+                       trajectory_yaw, trajectory_timestamp, trajectory_speed,
+                       icon_lat, icon_lon, 
+                       vehicle_id, 
+                       node_id, 
+                       vehicle_model, 
+                       start, 
+                       uses_speed_profile)
+        self.addNodeToTree(v)
