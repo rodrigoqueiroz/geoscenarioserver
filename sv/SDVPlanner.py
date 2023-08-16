@@ -59,6 +59,8 @@ class SVPlanner(object):
             self._mplan_sharr, 
             self._debug_shdata), daemon=True)
         self._process.start()
+        # TODO: Uncomment the following line to run planner in multiprocessing manner.
+        # self.run_planner_process(self.traffic_state_sharr, self._mplan_sharr, self._debug_shdata)
 
     def stop(self):
         if self._process:
@@ -102,6 +104,7 @@ class SVPlanner(object):
         
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
+        #TODO: replace behavior moule
         self.behavior_layer = BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         
         # target time for planning task. Can be fixed or variable up to max planner tick time
@@ -135,6 +138,7 @@ class SVPlanner(object):
                 )
 
             # Get traffic, lane config and regulatory elements in current frenet frame
+            # At this point, the planner does note introduce behavior tree.
             project_dynamic_objects(self.last_plan, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
             traffic_state = get_traffic_state(self.sync_planner, self.vid, self.laneletmap, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
             if not traffic_state:
@@ -142,6 +146,10 @@ class SVPlanner(object):
                 continue
             
             #BTree Tick - using frenet state and lane config based on old ref path
+            # This is the one that decides whether to change the vehicle behavior (in mconfig);
+            # So the state machine should take
+            # 1. the current state of all the vehicles, and 2. state machine iteself
+            # to decide whether to change the behavior.
             mconfig, ref_path_changed, snapshot_tree = self.behavior_layer.tick(traffic_state)
             
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
