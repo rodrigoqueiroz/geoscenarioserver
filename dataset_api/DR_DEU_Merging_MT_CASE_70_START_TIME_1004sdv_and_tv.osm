@@ -1,0 +1,558 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-138921' action='modify' visible='true' lat='0.0' lon='0.0'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-138922' action='modify' visible='true' lat='0.00009034832' lon='0.00009034832'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='/mnt/Data/Research_Dataset/interaction_dataset/INTERACTION-Dataset-DR-multi-v1_2/maps/DR_DEU_Merging_MT_EXT.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='default scenario name' />
+    <tag k='timeout' v='2.5' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-138923' action='modify' visible='true' lat='0.0090935356' lon='0.00819115944'>
+    <tag k='speed' v='7.764269766050121' />
+    <tag k='time' v='0.0' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138924' action='modify' visible='true' lat='0.00909418605' lon='0.00818421324'>
+    <tag k='speed' v='7.829731285299643' />
+    <tag k='time' v='0.1' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138925' action='modify' visible='true' lat='0.00909484554' lon='0.00817722216'>
+    <tag k='speed' v='7.886232307001868' />
+    <tag k='time' v='0.2' />
+    <tag k='yaw' v='-174.6375359558749' />
+  </node>
+  <node id='-138926' action='modify' visible='true' lat='0.00909551406' lon='0.00817017724'>
+    <tag k='speed' v='7.934675859794148' />
+    <tag k='time' v='0.3' />
+    <tag k='yaw' v='-174.6375359558749' />
+  </node>
+  <node id='-138927' action='modify' visible='true' lat='0.00909619162' lon='0.00816308744'>
+    <tag k='speed' v='7.9771466076536415' />
+    <tag k='time' v='0.4' />
+    <tag k='yaw' v='-174.6375359558749' />
+  </node>
+  <node id='-138928' action='modify' visible='true' lat='0.00909686918' lon='0.00815596175'>
+    <tag k='speed' v='8.012649624187993' />
+    <tag k='time' v='0.5' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138929' action='modify' visible='true' lat='0.00909755577' lon='0.00814880016'>
+    <tag k='speed' v='8.043983092970795' />
+    <tag k='time' v='0.6' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138930' action='modify' visible='true' lat='0.00909824237' lon='0.00814161165'>
+    <tag k='speed' v='8.072330580445772' />
+    <tag k='time' v='0.7' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138931' action='modify' visible='true' lat='0.00909893799' lon='0.00813440519'>
+    <tag k='speed' v='8.098497885410602' />
+    <tag k='time' v='0.8' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138932' action='modify' visible='true' lat='0.00909963362' lon='0.00812716283'>
+    <tag k='speed' v='8.124665223872304' />
+    <tag k='time' v='0.9' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138933' action='modify' visible='true' lat='0.00910032925' lon='0.0081199115'>
+    <tag k='speed' v='8.152728684311775' />
+    <tag k='time' v='1.0' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138934' action='modify' visible='true' lat='0.00910102487' lon='0.00811262426'>
+    <tag k='speed' v='8.180602972886534' />
+    <tag k='time' v='1.1' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138935' action='modify' visible='true' lat='0.00910171146' lon='0.00810531908'>
+    <tag k='speed' v='8.210469231414242' />
+    <tag k='time' v='1.2' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138936' action='modify' visible='true' lat='0.00910240709' lon='0.00809797801'>
+    <tag k='speed' v='8.241238317146276' />
+    <tag k='time' v='1.3' />
+    <tag k='yaw' v='-174.6375359558749' />
+  </node>
+  <node id='-138937' action='modify' visible='true' lat='0.00910310271' lon='0.00809061898'>
+    <tag k='speed' v='8.271916102089044' />
+    <tag k='time' v='1.4' />
+    <tag k='yaw' v='-174.6375359558749' />
+  </node>
+  <node id='-138938' action='modify' visible='true' lat='0.0091037893' lon='0.00808322406'>
+    <tag k='speed' v='8.301601050399857' />
+    <tag k='time' v='1.5' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138939' action='modify' visible='true' lat='0.0091044759' lon='0.00807580221'>
+    <tag k='speed' v='8.330109303004372' />
+    <tag k='time' v='1.6' />
+    <tag k='yaw' v='-174.75212751490108' />
+  </node>
+  <node id='-138940' action='modify' visible='true' lat='0.00910515345' lon='0.00806836241'>
+    <tag k='speed' v='8.356722144477462' />
+    <tag k='time' v='1.7' />
+    <tag k='yaw' v='-174.75212751490108' />
+  </node>
+  <node id='-138941' action='modify' visible='true' lat='0.00910583101' lon='0.00806088672'>
+    <tag k='speed' v='8.38017016533674' />
+    <tag k='time' v='1.8' />
+    <tag k='yaw' v='-174.8094232944142' />
+  </node>
+  <node id='-138942' action='modify' visible='true' lat='0.00910650856' lon='0.00805340205'>
+    <tag k='speed' v='8.398733773611353' />
+    <tag k='time' v='1.9' />
+    <tag k='yaw' v='-174.86671907392724' />
+  </node>
+  <node id='-138943' action='modify' visible='true' lat='0.00910717708' lon='0.00804589046'>
+    <tag k='speed' v='8.414224266086565' />
+    <tag k='time' v='2.0' />
+    <tag k='yaw' v='-174.92401485344033' />
+  </node>
+  <node id='-138944' action='modify' visible='true' lat='0.0091078456' lon='0.0080383699'>
+    <tag k='speed' v='8.42465103134842' />
+    <tag k='time' v='2.1' />
+    <tag k='yaw' v='-174.92401485344033' />
+  </node>
+  <node id='-138945' action='modify' visible='true' lat='0.00910850508' lon='0.00803084036'>
+    <tag k='speed' v='8.431185978259522' />
+    <tag k='time' v='2.2' />
+    <tag k='yaw' v='-174.9813106329534' />
+  </node>
+  <node id='-138946' action='modify' visible='true' lat='0.00910916457' lon='0.00802330184'>
+    <tag k='speed' v='8.434649311026511' />
+    <tag k='time' v='2.3' />
+    <tag k='yaw' v='-175.0386064124665' />
+  </node>
+  <node id='-138947' action='modify' visible='true' lat='0.00910981502' lon='0.00801575436'>
+    <tag k='speed' v='8.436124761998247' />
+    <tag k='time' v='2.4' />
+    <tag k='yaw' v='-175.09590219197958' />
+  </node>
+  <node id='-138948' action='modify' visible='true' lat='0.00911045643' lon='0.00800821584'>
+    <tag k='speed' v='8.435526895221185' />
+    <tag k='time' v='2.5' />
+    <tag k='yaw' v='-175.09590219197958' />
+  </node>
+  <node id='-138949' action='modify' visible='true' lat='0.0090935356' lon='0.00819115944'>
+    <tag k='btype' v='TV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='start' v='yes' />
+    <tag k='trajectory' v='v1_trajectory' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138950' action='modify' visible='true' lat='0.00907834938' lon='0.00836468889'>
+    <tag k='speed' v='5.343823537505706' />
+    <tag k='time' v='0.0' />
+    <tag k='yaw' v='-177.55962071104213' />
+  </node>
+  <node id='-138951' action='modify' visible='true' lat='0.00907861135' lon='0.00835989655'>
+    <tag k='speed' v='5.40920419285499' />
+    <tag k='time' v='0.1' />
+    <tag k='yaw' v='-177.2731418134767' />
+  </node>
+  <node id='-138952' action='modify' visible='true' lat='0.00907890946' lon='0.00835505036'>
+    <tag k='speed' v='5.478840205736977' />
+    <tag k='time' v='0.2' />
+    <tag k='yaw' v='-176.9293671363982' />
+  </node>
+  <node id='-138953' action='modify' visible='true' lat='0.00907923468' lon='0.00835015033'>
+    <tag k='speed' v='5.553694265981878' />
+    <tag k='time' v='0.3' />
+    <tag k='yaw' v='-176.64288823883282' />
+  </node>
+  <node id='-138954' action='modify' visible='true' lat='0.009079587' lon='0.0083451785'>
+    <tag k='speed' v='5.631775563709904' />
+    <tag k='time' v='0.4' />
+    <tag k='yaw' v='-176.2991135617543' />
+  </node>
+  <node id='-138955' action='modify' visible='true' lat='0.00907997546' lon='0.00834013487'>
+    <tag k='speed' v='5.712022759058301' />
+    <tag k='time' v='0.5' />
+    <tag k='yaw' v='-176.0126346641889' />
+  </node>
+  <node id='-138956' action='modify' visible='true' lat='0.00908040005' lon='0.00833502842'>
+    <tag k='speed' v='5.792357119515336' />
+    <tag k='time' v='0.6' />
+    <tag k='yaw' v='-175.66885998711038' />
+  </node>
+  <node id='-138957' action='modify' visible='true' lat='0.00908084272' lon='0.00832985018'>
+    <tag k='speed' v='5.872837133788064' />
+    <tag k='time' v='0.7' />
+    <tag k='yaw' v='-175.382381089545' />
+  </node>
+  <node id='-138958' action='modify' visible='true' lat='0.00908132153' lon='0.00832460014'>
+    <tag k='speed' v='5.95137933591869' />
+    <tag k='time' v='0.8' />
+    <tag k='yaw' v='-175.15319797149266' />
+  </node>
+  <node id='-138959' action='modify' visible='true' lat='0.00908182744' lon='0.00831927831'>
+    <tag k='speed' v='6.026793011212514' />
+    <tag k='time' v='0.9' />
+    <tag k='yaw' v='-174.92401485344033' />
+  </node>
+  <node id='-138960' action='modify' visible='true' lat='0.00908235142' lon='0.00831389365'>
+    <tag k='speed' v='6.098045014592792' />
+    <tag k='time' v='1.0' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138961' action='modify' visible='true' lat='0.00908289346' lon='0.00830844618'>
+    <tag k='speed' v='6.164109019152728' />
+    <tag k='time' v='1.1' />
+    <tag k='yaw' v='-174.52294439684874' />
+  </node>
+  <node id='-138962' action='modify' visible='true' lat='0.00908345358' lon='0.00830294486'>
+    <tag k='speed' v='6.223866724151474' />
+    <tag k='time' v='1.2' />
+    <tag k='yaw' v='-174.4083528378226' />
+  </node>
+  <node id='-138963' action='modify' visible='true' lat='0.00908402273' lon='0.00829738969'>
+    <tag k='speed' v='6.279182191973729' />
+    <tag k='time' v='1.3' />
+    <tag k='yaw' v='-174.2937612787964' />
+  </node>
+  <node id='-138964' action='modify' visible='true' lat='0.00908460092' lon='0.00829178067'>
+    <tag k='speed' v='6.328142302445482' />
+    <tag k='time' v='1.4' />
+    <tag k='yaw' v='-174.23646549928333' />
+  </node>
+  <node id='-138965' action='modify' visible='true' lat='0.00908518814' lon='0.00828612678'>
+    <tag k='speed' v='6.374714817150646' />
+    <tag k='time' v='1.5' />
+    <tag k='yaw' v='-174.17916971977027' />
+  </node>
+  <node id='-138966' action='modify' visible='true' lat='0.00908576633' lon='0.008280437'>
+    <tag k='speed' v='6.417898877358539' />
+    <tag k='time' v='1.6' />
+    <tag k='yaw' v='-174.17916971977027' />
+  </node>
+  <node id='-138967' action='modify' visible='true' lat='0.00908635355' lon='0.00827470234'>
+    <tag k='speed' v='6.460679917779553' />
+    <tag k='time' v='1.7' />
+    <tag k='yaw' v='-174.23646549928333' />
+  </node>
+  <node id='-138968' action='modify' visible='true' lat='0.0090869227' lon='0.00826893179'>
+    <tag k='speed' v='6.505155263327694' />
+    <tag k='time' v='1.8' />
+    <tag k='yaw' v='-174.2937612787964' />
+  </node>
+  <node id='-138969' action='modify' visible='true' lat='0.00908749185' lon='0.00826312533'>
+    <tag k='speed' v='6.55252661192612' />
+    <tag k='time' v='1.9' />
+    <tag k='yaw' v='-174.4083528378226' />
+  </node>
+  <node id='-138970' action='modify' visible='true' lat='0.00908805196' lon='0.00825726504'>
+    <tag k='speed' v='6.6036015930702545' />
+    <tag k='time' v='2.0' />
+    <tag k='yaw' v='-174.46564861733566' />
+  </node>
+  <node id='-138971' action='modify' visible='true' lat='0.00908861208' lon='0.00825136884'>
+    <tag k='speed' v='6.659675968093342' />
+    <tag k='time' v='2.1' />
+    <tag k='yaw' v='-174.58024017636185' />
+  </node>
+  <node id='-138972' action='modify' visible='true' lat='0.00908915412' lon='0.0082454188'>
+    <tag k='speed' v='6.720659491448737' />
+    <tag k='time' v='2.2' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138973' action='modify' visible='true' lat='0.00908969617' lon='0.00823940593'>
+    <tag k='speed' v='6.786650499325865' />
+    <tag k='time' v='2.3' />
+    <tag k='yaw' v='-174.8094232944142' />
+  </node>
+  <node id='-138974' action='modify' visible='true' lat='0.00909022014' lon='0.00823333922'>
+    <tag k='speed' v='6.854750834275452' />
+    <tag k='time' v='2.4' />
+    <tag k='yaw' v='-174.92401485344033' />
+  </node>
+  <node id='-138975' action='modify' visible='true' lat='0.00909075315' lon='0.00822720969'>
+    <tag k='speed' v='6.924955017904448' />
+    <tag k='time' v='2.5' />
+    <tag k='yaw' v='-175.0386064124665' />
+  </node>
+  <node id='-138976' action='modify' visible='true' lat='0.00907834938' lon='0.00836468889'>
+    <tag k='btype' v='TV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='start' v='yes' />
+    <tag k='trajectory' v='v2_trajectory' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='-177.55962071104213' />
+  </node>
+  <node id='-138977' action='modify' visible='true' lat='0.0090846297' lon='0.00849231404'>
+    <tag k='speed' v='4.2615725970585085' />
+    <tag k='time' v='0.0' />
+    <tag k='yaw' v='175.95533888467583' />
+  </node>
+  <node id='-138978' action='modify' visible='true' lat='0.00908440379' lon='0.00848849094'>
+    <tag k='speed' v='4.2995893990007925' />
+    <tag k='time' v='0.1' />
+    <tag k='yaw' v='176.18452200272816' />
+  </node>
+  <node id='-138979' action='modify' visible='true' lat='0.00908418692' lon='0.00848464091'>
+    <tag k='speed' v='4.334668614784756' />
+    <tag k='time' v='0.2' />
+    <tag k='yaw' v='176.35640934126738' />
+  </node>
+  <node id='-138980' action='modify' visible='true' lat='0.00908397005' lon='0.00848075499'>
+    <tag k='speed' v='4.365748962091154' />
+    <tag k='time' v='0.3' />
+    <tag k='yaw' v='176.5855924593197' />
+  </node>
+  <node id='-138981' action='modify' visible='true' lat='0.00908377125' lon='0.00847684215'>
+    <tag k='speed' v='4.393005804685443' />
+    <tag k='time' v='0.4' />
+    <tag k='yaw' v='176.75747979785896' />
+  </node>
+  <node id='-138982' action='modify' visible='true' lat='0.00908359052' lon='0.00847291135'>
+    <tag k='speed' v='4.416256899230388' />
+    <tag k='time' v='0.5' />
+    <tag k='yaw' v='176.9293671363982' />
+  </node>
+  <node id='-138983' action='modify' visible='true' lat='0.00908340979' lon='0.00846894466'>
+    <tag k='speed' v='4.435659590184981' />
+    <tag k='time' v='0.6' />
+    <tag k='yaw' v='177.10125447493746' />
+  </node>
+  <node id='-138984' action='modify' visible='true' lat='0.00908322906' lon='0.008464969'>
+    <tag k='speed' v='4.451099302419572' />
+    <tag k='time' v='0.7' />
+    <tag k='yaw' v='177.2731418134767' />
+  </node>
+  <node id='-138985' action='modify' visible='true' lat='0.0090830664' lon='0.00846097538'>
+    <tag k='speed' v='4.46166616859666' />
+    <tag k='time' v='0.8' />
+    <tag k='yaw' v='177.38773337250288' />
+  </node>
+  <node id='-138986' action='modify' visible='true' lat='0.00908290374' lon='0.00845698177'>
+    <tag k='speed' v='4.470255138132498' />
+    <tag k='time' v='0.9' />
+    <tag k='yaw' v='177.50232493152902' />
+  </node>
+  <node id='-138987' action='modify' visible='true' lat='0.00908275011' lon='0.0084529702'>
+    <tag k='speed' v='4.475949955037478' />
+    <tag k='time' v='1.0' />
+    <tag k='yaw' v='177.6169164905552' />
+  </node>
+  <node id='-138988' action='modify' visible='true' lat='0.00908259648' lon='0.00844894966'>
+    <tag k='speed' v='4.478658951070063' />
+    <tag k='time' v='1.1' />
+    <tag k='yaw' v='177.6742122700683' />
+  </node>
+  <node id='-138989' action='modify' visible='true' lat='0.00908244286' lon='0.0084449381'>
+    <tag k='speed' v='4.4814181907070445' />
+    <tag k='time' v='1.2' />
+    <tag k='yaw' v='177.78880382909446' />
+  </node>
+  <node id='-138990' action='modify' visible='true' lat='0.0090823073' lon='0.00844091756'>
+    <tag k='speed' v='4.4821871893083625' />
+    <tag k='time' v='1.3' />
+    <tag k='yaw' v='177.84609960860755' />
+  </node>
+  <node id='-138991' action='modify' visible='true' lat='0.00908216271' lon='0.00843689702'>
+    <tag k='speed' v='4.482001450245192' />
+    <tag k='time' v='1.4' />
+    <tag k='yaw' v='177.9033953881206' />
+  </node>
+  <node id='-138992' action='modify' visible='true' lat='0.00908202715' lon='0.00843287649'>
+    <tag k='speed' v='4.48282065222333' />
+    <tag k='time' v='1.5' />
+    <tag k='yaw' v='177.96069116763368' />
+  </node>
+  <node id='-138993' action='modify' visible='true' lat='0.00908190063' lon='0.00842885595'>
+    <tag k='speed' v='4.482611850249808' />
+    <tag k='time' v='1.6' />
+    <tag k='yaw' v='178.0179869471468' />
+  </node>
+  <node id='-138994' action='modify' visible='true' lat='0.00908177411' lon='0.00842483541'>
+    <tag k='speed' v='4.484442886245738' />
+    <tag k='time' v='1.7' />
+    <tag k='yaw' v='178.13257850617293' />
+  </node>
+  <node id='-138995' action='modify' visible='true' lat='0.00908165662' lon='0.00842081487'>
+    <tag k='speed' v='4.487215840585341' />
+    <tag k='time' v='1.8' />
+    <tag k='yaw' v='178.18987428568602' />
+  </node>
+  <node id='-138996' action='modify' visible='true' lat='0.00908154817' lon='0.00841678536'>
+    <tag k='speed' v='4.49202905155343' />
+    <tag k='time' v='1.9' />
+    <tag k='yaw' v='178.30446584471218' />
+  </node>
+  <node id='-138997' action='modify' visible='true' lat='0.00908144875' lon='0.00841275585'>
+    <tag k='speed' v='4.499792550773869' />
+    <tag k='time' v='2.0' />
+    <tag k='yaw' v='178.36176162422527' />
+  </node>
+  <node id='-138998' action='modify' visible='true' lat='0.00908134933' lon='0.00840871736'>
+    <tag k='speed' v='4.50857072695993' />
+    <tag k='time' v='2.1' />
+    <tag k='yaw' v='178.47635318325146' />
+  </node>
+  <node id='-138999' action='modify' visible='true' lat='0.00908126798' lon='0.0084046699'>
+    <tag k='speed' v='4.520338593512658' />
+    <tag k='time' v='2.2' />
+    <tag k='yaw' v='178.5909447422776' />
+  </node>
+  <node id='-139000' action='modify' visible='true' lat='0.00908119567' lon='0.00840061346'>
+    <tag k='speed' v='4.5341028881135905' />
+    <tag k='time' v='2.3' />
+    <tag k='yaw' v='178.76283208081685' />
+  </node>
+  <node id='-139001' action='modify' visible='true' lat='0.00908113239' lon='0.00839654805'>
+    <tag k='speed' v='4.548870738985666' />
+    <tag k='time' v='2.4' />
+    <tag k='yaw' v='178.87742363984302' />
+  </node>
+  <node id='-139002' action='modify' visible='true' lat='0.00908107815' lon='0.00839246469'>
+    <tag k='speed' v='4.565666325959444' />
+    <tag k='time' v='2.5' />
+    <tag k='yaw' v='179.04931097838227' />
+  </node>
+  <node id='-139003' action='modify' visible='true' lat='0.0090846297' lon='0.00849231404'>
+    <tag k='btype' v='TV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v3' />
+    <tag k='start' v='yes' />
+    <tag k='trajectory' v='v3_trajectory' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='175.95533888467583' />
+  </node>
+  <node id='-139004' action='modify' visible='true' lat='0.00908638518' lon='0.00881695469' />
+  <node id='-139005' action='modify' visible='true' lat='0.0091495266' lon='0.00757501339' />
+  <node id='-139006' action='modify' visible='true' lat='0.00908638518' lon='0.00881695469'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v4' />
+    <tag k='route' v='v4_route' />
+    <tag k='start' v='yes' />
+    <tag k='start_cartesian' v='-7.796,-0.027,0,0' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='4' />
+    <tag k='yaw' v='179.79415611205232' />
+  </node>
+  <way id='-105608' action='modify' visible='true'>
+    <nd ref='-138923' />
+    <nd ref='-138924' />
+    <nd ref='-138925' />
+    <nd ref='-138926' />
+    <nd ref='-138927' />
+    <nd ref='-138928' />
+    <nd ref='-138929' />
+    <nd ref='-138930' />
+    <nd ref='-138931' />
+    <nd ref='-138932' />
+    <nd ref='-138933' />
+    <nd ref='-138934' />
+    <nd ref='-138935' />
+    <nd ref='-138936' />
+    <nd ref='-138937' />
+    <nd ref='-138938' />
+    <nd ref='-138939' />
+    <nd ref='-138940' />
+    <nd ref='-138941' />
+    <nd ref='-138942' />
+    <nd ref='-138943' />
+    <nd ref='-138944' />
+    <nd ref='-138945' />
+    <nd ref='-138946' />
+    <nd ref='-138947' />
+    <nd ref='-138948' />
+    <tag k='gs' v='trajectory' />
+    <tag k='interpolate' v='yes' />
+    <tag k='name' v='v1_trajectory' />
+  </way>
+  <way id='-105609' action='modify' visible='true'>
+    <nd ref='-138950' />
+    <nd ref='-138951' />
+    <nd ref='-138952' />
+    <nd ref='-138953' />
+    <nd ref='-138954' />
+    <nd ref='-138955' />
+    <nd ref='-138956' />
+    <nd ref='-138957' />
+    <nd ref='-138958' />
+    <nd ref='-138959' />
+    <nd ref='-138960' />
+    <nd ref='-138961' />
+    <nd ref='-138962' />
+    <nd ref='-138963' />
+    <nd ref='-138964' />
+    <nd ref='-138965' />
+    <nd ref='-138966' />
+    <nd ref='-138967' />
+    <nd ref='-138968' />
+    <nd ref='-138969' />
+    <nd ref='-138970' />
+    <nd ref='-138971' />
+    <nd ref='-138972' />
+    <nd ref='-138973' />
+    <nd ref='-138974' />
+    <nd ref='-138975' />
+    <tag k='gs' v='trajectory' />
+    <tag k='interpolate' v='yes' />
+    <tag k='name' v='v2_trajectory' />
+  </way>
+  <way id='-105610' action='modify' visible='true'>
+    <nd ref='-138977' />
+    <nd ref='-138978' />
+    <nd ref='-138979' />
+    <nd ref='-138980' />
+    <nd ref='-138981' />
+    <nd ref='-138982' />
+    <nd ref='-138983' />
+    <nd ref='-138984' />
+    <nd ref='-138985' />
+    <nd ref='-138986' />
+    <nd ref='-138987' />
+    <nd ref='-138988' />
+    <nd ref='-138989' />
+    <nd ref='-138990' />
+    <nd ref='-138991' />
+    <nd ref='-138992' />
+    <nd ref='-138993' />
+    <nd ref='-138994' />
+    <nd ref='-138995' />
+    <nd ref='-138996' />
+    <nd ref='-138997' />
+    <nd ref='-138998' />
+    <nd ref='-138999' />
+    <nd ref='-139000' />
+    <nd ref='-139001' />
+    <nd ref='-139002' />
+    <tag k='gs' v='trajectory' />
+    <tag k='interpolate' v='yes' />
+    <tag k='name' v='v3_trajectory' />
+  </way>
+  <way id='-105611' action='modify' visible='true'>
+    <nd ref='-139004' />
+    <nd ref='-139005' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='v4_route' />
+  </way>
+</osm>

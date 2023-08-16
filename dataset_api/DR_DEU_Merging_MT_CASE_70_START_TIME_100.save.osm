@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-138464' action='modify' visible='true' lat='0.0' lon='0.0'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-138465' action='modify' visible='true' lat='0.00009034832' lon='0.00009034832'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='/mnt/Data/Research_Dataset/interaction_dataset/INTERACTION-Dataset-DR-multi-v1_2/maps/DR_DEU_Merging_MT_EXT.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='default scenario name' />
+    <tag k='timeout' v='25' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-138466' action='modify' visible='true' lat='0.0090935356' lon='0.00819115944' />
+  <node id='-138467' action='modify' visible='true' lat='0.00940256207' lon='0.00494298974' />
+  <node id='-138468' action='modify' visible='true' lat='0.0090935356' lon='0.00819115944'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='v1_route' />
+    <tag k='start_cartesian' v='-7.731,0.718,0,0' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='-174.694831735388' />
+  </node>
+  <node id='-138469' action='modify' visible='true' lat='0.00907834938' lon='0.00836468889' />
+  <node id='-138470' action='modify' visible='true' lat='0.00939653739' lon='0.00494352894' />
+  <node id='-138471' action='modify' visible='true' lat='0.00907834938' lon='0.00836468889'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='route' v='v2_route' />
+    <tag k='start_cartesian' v='-5.339,0.227,0,0' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='-177.55962071104213' />
+  </node>
+  <node id='-138472' action='modify' visible='true' lat='0.0090846297' lon='0.00849231404' />
+  <node id='-138473' action='modify' visible='true' lat='0.00941025253' lon='0.00494459912' />
+  <node id='-138474' action='modify' visible='true' lat='0.0090846297' lon='0.00849231404'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v3' />
+    <tag k='route' v='v3_route' />
+    <tag k='start_cartesian' v='-4.251,-0.3,0,0' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='175.95533888467583' />
+  </node>
+  <node id='-138475' action='modify' visible='true' lat='0.00908638518' lon='0.00881695469' />
+  <node id='-138476' action='modify' visible='true' lat='0.00940681593' lon='0.00492954902' />
+  <node id='-138477' action='modify' visible='true' lat='0.00908638518' lon='0.00881695469'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v4' />
+    <tag k='route' v='v4_route' />
+    <tag k='start_cartesian' v='-7.796,-0.027,0,0' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='vid' v='4' />
+    <tag k='yaw' v='179.79415611205232' />
+  </node>
+  <way id='-105446' action='modify' visible='true'>
+    <nd ref='-138466' />
+    <nd ref='-138467' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='v1_route' />
+  </way>
+  <way id='-105447' action='modify' visible='true'>
+    <nd ref='-138469' />
+    <nd ref='-138470' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='v2_route' />
+  </way>
+  <way id='-105448' action='modify' visible='true'>
+    <nd ref='-138472' />
+    <nd ref='-138473' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='v3_route' />
+  </way>
+  <way id='-105449' action='modify' visible='true'>
+    <nd ref='-138475' />
+    <nd ref='-138476' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='v4_route' />
+  </way>
+</osm>
