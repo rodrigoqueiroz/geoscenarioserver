@@ -74,7 +74,7 @@ PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle
 LOG_PERFORMANCE = False
 MAX_NVEHICLES = math.inf              #Limit max number of active vehicles (math.inf if no limit)
 EVALUATION_MODE = False
-WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
+WRITE_TRAJECTORIES = True     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
 CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm], Carla uses [m])

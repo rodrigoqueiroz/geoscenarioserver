@@ -95,7 +95,7 @@ class SimTraffic(object):
             while(True):
                 header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:
-                    break;
+                    break
                 time.sleep(0.5)
 
         #Start SDV Planners
