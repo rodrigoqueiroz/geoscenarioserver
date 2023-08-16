@@ -34,6 +34,7 @@ class Vehicle(Actor):
     SDV_TYPE = 1
     EV_TYPE = 2
     TV_TYPE = 3
+    MTV_TYPE = 4
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
@@ -341,3 +342,28 @@ class TV(Vehicle):
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         self.follow_trajectory(sim_time, self.trajectory)
+
+class MTV(Vehicle):
+    """
+    A trajectory vehicle that is controlled by a joint planner
+    """
+    def __init__(self, vid, name, start_state, yaw, keep_active = True):
+        super().__init__(vid, name, start_state, yaw=yaw)
+        self.type = Vehicle.MTV_TYPE
+        self.keep_active = keep_active
+        self.current_phase = 0
+        self.current_behavior = None
+        if not keep_active:
+            #starts as inactive until trajectory begins
+            self.sim_state = ActorSimState.INACTIVE
+            self.state.set_X([9999, 0, 0])
+            self.state.set_Y([9999,0,0])
+
+    def set_phase(self, phase):
+        self.current_phase = phase
+    
+    def set_behavior(self, behavior):
+        self.current_behavior = behavior
+
+    def tick(self, tick_count, delta_time, sim_time):
+        pass
