@@ -48,7 +48,7 @@ SHOW_MCONFIG = True         #whether to show the last selected maneuver config t
 GENERATE_GRAPH_TREE = True  #whether to generate a behavior tree graph plot inside /log
 
 # trajectory plots
-SHOW_TRAJ = False``
+SHOW_TRAJ = False
 
 #Collision
 COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collision math and lane boundary checks
