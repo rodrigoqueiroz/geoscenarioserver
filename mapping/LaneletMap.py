@@ -378,14 +378,12 @@ class LaneletMap(object):
 
     def get_route_via(self, lanelets: List[Lanelet]):
         assert len(lanelets) >= 2
-
-        #for i in range(len(lanelets)):
         if len(lanelets) > 2:
             route = self.routing_graph.getRouteVia(
                 lanelets[0], lanelets[1:-1], lanelets[-1])
         else:
             route = self.routing_graph.getRoute(lanelets[0], lanelets[1])
-        assert route
+        # assert route
         return route
 
     def get_shortest_path(self, from_lanelet_id: int, to_lanelet_id: int):

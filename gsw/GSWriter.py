@@ -395,8 +395,8 @@ class GSWriter():
         t_yaw = self.getTag('yaw', str(starting_yaw_deg))
         self.attachTagToNodeTree(t_yaw, n)
         # add vehicle initial state tag 
-        # with the format of [vx, vy, ax, ay] in m/s and m/s^2
-        init_state_str = str(starting_vx)+','+str(starting_vy)+','+str(starting_ax)+','+str(starting_ay)
+        # with the format of [vx, ax, vy, ay] in m/s and m/s^2, respectively
+        init_state_str = str(starting_vx)+','+str(starting_ax)+','+str(starting_vy)+','+str(starting_ay)
         t_start_cartesian = self.getTag('start_cartesian', init_state_str)
         self.attachTagToNodeTree(t_start_cartesian, n)
         # add some extra tags
