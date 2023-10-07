@@ -160,8 +160,12 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("SDV {} requires a route .".format(vid))
                 continue
             gs_route = vnode.tags['route']
-            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]   
-            route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
+            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes]   
+            # bug fix: this helps the x_vel, y_vel in state_state actually valid:
+            if 'start_cartesian' in vnode.tags:
+                route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y, x_vel=start_state[1], y_vel=start_state[4]))
+            else:
+                route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
             #btree
             #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
             root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree" 
