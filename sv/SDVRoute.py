@@ -2,7 +2,7 @@ from Actor import TrajNode
 from math import floor
 from typing import List
 import glog as log
-from lanelet2.core import ConstLineString3d, Lanelet, Point3d
+from lanelet2.core import ConstLineString3d, Lanelet, Point3d, BasicPoint3d
 from lanelet2.routing import Route
 from matplotlib import pyplot as plt
 import numpy as np
@@ -25,8 +25,25 @@ class SDVRoute(object):
             SDVRoute.lanelet_map = lanelet_map
 
         try:
-            lanelets_in_route = [ lanelet_map.get_occupying_lanelet(node.x, node.y) for node in route_nodes ]   #a valid lanelet route
-            self._lanelet_route:Route = lanelet_map.get_route_via(lanelets_in_route)
+            # how to get a valid route:
+            # list all the occupied lanelet for each node in the route
+            # use greedy search to find the combination of lanelets that make up the route
+            occupied_index_of_route = []
+            occupied_lanelets_of_route = []
+            for node in route_nodes:
+                occupied_lanelets = self.lanelet_map.get_all_occupying_lanelets(node.x, node.y)
+                occupied_lanelets_of_route.append(occupied_lanelets)
+                occupied_index_of_route.append([i for i in range(len(occupied_lanelets))])
+            idx_conbinations = np.array(np.meshgrid(*occupied_index_of_route)).T.reshape(-1, len(occupied_index_of_route))
+            for x in idx_conbinations:
+                lanelets_in_route = []
+                for i in range(len(route_nodes)):
+                    lanelets_in_route.append(occupied_lanelets_of_route[i][x[i]])
+                self._lanelet_route:Route = lanelet_map.get_route_via(lanelets_in_route)
+                if self._lanelet_route is not None:
+                    break 
+            if self._lanelet_route is None:
+                ValueError("Failed to find route in any way.")
             self.goal_points = (route_nodes[-1].x, route_nodes[-1].y)
         except Exception as e:
             log.error("Failed to initialize route")
