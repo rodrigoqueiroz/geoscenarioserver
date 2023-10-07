@@ -159,6 +159,7 @@ def generate_graph_tree(tree, vid, current_mconfig = None, show_status = False, 
 
     #Output File
     filename = "btreegraph_vid"+ str(vid) + ".png"
-    pathname = os.path.join(os.getcwd() + "/log/", filename)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+    pathname = os.path.join(base_dir, "log", filename)
     graph.write_png(pathname)
     log.info("Writing graph tree in {}".format(pathname))
