@@ -35,7 +35,7 @@ void AGSClient::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	framestat.tick_count++;
-    framestat.delta_time = DeltaTime;
+	framestat.delta_time = DeltaTime;
 	//UE_LOG(GeoScenarioModule, Log, TEXT("GSClient TICK=%d DeltaTime=%f"), framestat.tick_count, framestat.delta_time);
 	// Update vehicles coming from the server
 	ReadServerState(DeltaTime);

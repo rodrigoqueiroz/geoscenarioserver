@@ -87,6 +87,9 @@ python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.
 - Use the shared memory keys inside SimConfig to read/write the server shared memory blocks.
 - We provide a GeoScenario Client for Unreal in */unreal*.
 
+## Documentation
+
+GeoScenario documentation can be found [here](https://geoscenario2.readthedocs.io/en/latest/).
 
 rqueiroz@gsd.uwaterloo.ca
 d43sharm@uwaterloo.ca

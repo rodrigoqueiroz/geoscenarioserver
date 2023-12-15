@@ -8,8 +8,10 @@ import glog as log
 class SimSharedMemory(object):
 
     def __init__(self, ss_shm_key=SHM_KEY, ss_sem_key=SEM_KEY, cs_shm_key=CS_SHM_KEY, cs_sem_key=CS_SEM_KEY):
+        # Server state shared memory
         self.ss_shm_key = ss_shm_key
         self.ss_sem_key = ss_sem_key
+        # Client state shared memory
         self.cs_shm_key = cs_shm_key
         self.cs_sem_key = cs_sem_key
         try:
@@ -72,8 +74,8 @@ class SimSharedMemory(object):
             @param npedestrians:      number of pedestrians
             Shared memory format:
                 tick_count delta_time n_vehicles n_pedestrians
-                vid x y z x_vel y_vel is_active
-                pid x y z x_vel y_vel is_active
+                vid x y z vx vy is_active
+                pid x y z vx vy is_active
                 ...
         """
         # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
@@ -133,7 +135,7 @@ class SimSharedMemory(object):
                     vs.y_vel = -float(y_vel) / CLIENT_METER_UNIT
                     #Estimating yaw because is not being published by client.
                     #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
-                    if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01): 
+                    if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01):
                         vs.yaw = math.degrees(math.atan2(vs.y_vel,vs.x_vel))
                     vstates[vid] = vs
                     if not int(is_active):
