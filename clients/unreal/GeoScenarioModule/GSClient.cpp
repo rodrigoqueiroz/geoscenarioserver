@@ -6,6 +6,7 @@
 #include "Misc/DateTime.h"
 #include <sstream>
 #include <string>
+#include <cmath>
 
 const key_t  SHM_KEY = 123456;
 const key_t  SEM_KEY = 346565;
@@ -148,9 +149,10 @@ void AGSClient::ReadServerState(float deltaTime)
 		return;
 	}
 	//parse frame stats
+	float server_simulation_time;
 	float server_delta_time;
 	int server_tick_count, nvehicles{0}, npedestrians{0}, vid{0}, pid{0};
-	iss >> server_tick_count >> server_delta_time >> nvehicles >> npedestrians;
+	iss >> server_tick_count >> server_simulation_time >> server_delta_time >> nvehicles >> npedestrians;
 
 	// parse vehicles
 	int vehicles_read{0};
@@ -163,11 +165,18 @@ void AGSClient::ReadServerState(float deltaTime)
 		int v_type;
 		float x, y, z, x_vel, y_vel, yaw, steer;
 		iss >> v_type >> x >> y >> z >> x_vel >> y_vel >> yaw >> steer;
+		// Unreal uses cm instead of m, and y is flipped
+		x *= 100.0f;
+		y *= -100.0f;
+		z *= 100.0f;
+		x_vel *= 100.0f;
+		y_vel *= -100.0f;
+		// Unreal uses degrees instead of radians
+		yaw = yaw * 180.0f / M_PI;
+
 		// Unreal's y axis is inverted from GS server's.
-		y *= -1;
-		y_vel *= -1;
 		yaw -= 90;
-	    // GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
+		// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
 
 		FVector loc = {x, y, z};
 		FRotator rot = {0.0f, yaw, 0.0f};
@@ -219,11 +228,17 @@ void AGSClient::ReadServerState(float deltaTime)
 		int p_type;
 		float x, y, z, x_vel, y_vel, yaw;
 		iss >> p_type >> x >> y >> z >> x_vel >> y_vel >> yaw;
-		// Unreal's y axis is inverted from GS server's.
-		y *= -1;
-		y_vel *= -1;
+		// Unreal uses cm instead of m, and y is flipped
+		x *= 100.0f;
+		y *= -100.0f;
+		z *= 100.0f;
+		x_vel *= 100.0f;
+		y_vel *= -100.0f;
+		// Unreal uses degrees instead of radians
+		yaw = yaw * 180.0f / M_PI;
+
 		yaw -= 90;
-			// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
+		// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
 
 		FVector loc = {x, y, z};
 		FRotator rot = {0.0f, yaw, 0.0f};
@@ -495,9 +510,10 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			loc[2] = 0.0f;
 			ASimVehicle *sv = Cast<ASimVehicle>(gsv.actor);
 			int active = sv != nullptr ? (int)(sv->GetActive()) : 1;
+			// Unreal uses cm instead of m, and y is flipped
 			oss << Elem.Key << " "
-				<< gsv.vehicle_state.x << " " << gsv.vehicle_state.y << " " << gsv.vehicle_state.z << " "
-				<< gsv.vehicle_state.x_vel << " " << gsv.vehicle_state.y_vel << " " /* TODO: gsv.vehicle_state.yaw << " " */
+				<< gsv.vehicle_state.x / 100.0f << " " << -gsv.vehicle_state.y / 100.0f << " " << gsv.vehicle_state.z / 100.0f << " "
+				<< gsv.vehicle_state.x_vel / 100.0f << " " << -gsv.vehicle_state.y_vel / 100.0f << " " /* TODO: gsv.vehicle_state.yaw << " " */
 				<< active << '\n';
 		}
 		else
@@ -517,9 +533,10 @@ void AGSClient::WriteClientState(int tickCount, float deltaTime)
 			loc[2] = 0.0f;
 			ASimPedestrian *sp = Cast<ASimPedestrian>(gsp.actor);
 			int active = sp != nullptr ? (int)(sp->GetActive()) : 1;
+			// Unreal uses cm instead of m, and y is flipped
 			oss << Elem.Key << " "
-				<< gsp.pedestrian_state.x << " " << gsp.pedestrian_state.y << " " << gsp.pedestrian_state.z << " "
-				<< gsp.pedestrian_state.x_vel << " " << gsp.pedestrian_state.y_vel << " " /* TODO: gsp.pedestrian_state.yaw << " " */
+				<< gsp.pedestrian_state.x / 100.0f << " " << -gsp.pedestrian_state.y / 100.0f << " " << gsp.pedestrian_state.z / 100.0f << " "
+				<< gsp.pedestrian_state.x_vel / 100.0f << " " << -gsp.pedestrian_state.y_vel / 100.0f << " " /* TODO: gsp.pedestrian_state.yaw << " " */
 				<< active << '\n';
 		}
 		else

@@ -12,7 +12,7 @@ from util.Utils import *
 from Actor import *
 from sp.SPPlanner import *
 from sp.SPPlannerState import *
-from shm.SimSharedMemory import *
+from shm.SimSharedMemoryServer import *
 from util.Utils import kalman, distance_point_to_border
 from util.Transformations import normalize
 from SimTraffic import *
@@ -45,10 +45,7 @@ class Pedestrian(Actor):
 
 
     def get_sim_state(self):
-        x = round((self.state.x * CLIENT_METER_UNIT))
-        y = round((self.state.y * CLIENT_METER_UNIT))
-        z = 0.0
-        position = [x, y, z]
+        position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, position, velocity, self.state.yaw
 

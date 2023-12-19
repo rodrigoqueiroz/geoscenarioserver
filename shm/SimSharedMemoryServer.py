@@ -5,7 +5,7 @@ import glog as log
 
 # Class defining shared memory structure used to sync with
 # an external simulator (client)
-class SimSharedMemory(object):
+class SimSharedMemoryServer(object):
 
     def __init__(self, ss_shm_key=SHM_KEY, ss_sem_key=SEM_KEY, cs_shm_key=CS_SHM_KEY, cs_sem_key=CS_SEM_KEY):
         # Server state shared memory
@@ -30,12 +30,12 @@ class SimSharedMemory(object):
             log.error("Error creating Shared Memory")
             self.is_connected = False
 
-    def write_server_state(self, tick_count, delta_time, vehicles, pedestrians):
+    def write_server_state(self, tick_count, sim_time, delta_time, vehicles, pedestrians):
         """ Writes to shared memory pose data for each agent.
             @param vehicles:      dictionary of type <int, Vehicle>
             @param pedestrians:      dictionary of type <int, Pedestrian>
             Shared memory format:
-                tick_count delta_time n_vehicles n_pedestrians
+                tick_count simulation_time delta_time n_vehicles n_pedestrians
                 vid v_type x y z vx vy yaw steering_angle
                 pid p_type x y z vx vy yaw
                 ...
@@ -44,19 +44,33 @@ class SimSharedMemory(object):
             return
 
         # write tick count, deltatime, numbers of vehicles and pedestrians
-        write_str = "{} {} {} {}\n".format(int(tick_count), delta_time, len(vehicles), len(pedestrians))
-        # write vehicle states
+        write_str = "{} {} {} {} {}\n".format(int(tick_count), sim_time, delta_time, len(vehicles), len(pedestrians))
+        # write vehicle states, rounding the numerical data to reasonable significant figures
         for svid in vehicles:
-            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_full_state_for_client()
+            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
-                vid, v_type, position[0], position[1], position[2],
-                velocity[0], velocity[1], yaw, steering_angle)
+                vid, v_type,
+                round(position[0], 4),
+                round(position[1], 4),
+                round(position[2], 4),
+                round(velocity[0], 4),
+                round(velocity[1], 4),
+                round(yaw * math.pi / 180, 6),
+                round(steering_angle, 6)
+            )
 
+        # write pedestrian states, rounding the numerical data to reasonable significant figures
         for spid in pedestrians:
             pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
             write_str += "{} {} {} {} {} {} {} {}\n".format(
-                pid, p_type, position[0], position[1], position[2],
-                velocity[0], velocity[1], yaw)
+                pid, p_type,
+                round(position[0], 4),
+                round(position[1], 4),
+                round(position[2], 4),
+                round(velocity[0], 4),
+                round(velocity[1], 4),
+                round(yaw * math.pi / 180, 6)
+            )
 
         # sysv_ipc.BusyError needs to be caught
         try:
@@ -128,11 +142,11 @@ class SimSharedMemory(object):
                     vid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
                     vs = VehicleState()
                     vid = int(vid)
-                    vs.x = float(x) / CLIENT_METER_UNIT
-                    vs.y = -float(y) / CLIENT_METER_UNIT
-                    vs.z = float(z) / CLIENT_METER_UNIT
-                    vs.x_vel = float(x_vel) / CLIENT_METER_UNIT
-                    vs.y_vel = -float(y_vel) / CLIENT_METER_UNIT
+                    vs.x = float(x)
+                    vs.y = float(y)
+                    vs.z = float(z)
+                    vs.x_vel = float(x_vel)
+                    vs.y_vel = float(y_vel)
                     #Estimating yaw because is not being published by client.
                     #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
                     if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01):
@@ -157,11 +171,11 @@ class SimSharedMemory(object):
                     pid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
                     ps = PedestrianState()
                     pid = int(pid)
-                    ps.x = float(x) / CLIENT_METER_UNIT
-                    ps.y = -float(y) / CLIENT_METER_UNIT
-                    ps.z = float(z) / CLIENT_METER_UNIT
-                    ps.x_vel = float(x_vel) / CLIENT_METER_UNIT
-                    ps.y_vel = -float(y_vel) / CLIENT_METER_UNIT
+                    ps.x = float(x)
+                    ps.y = float(y)
+                    ps.z = float(z)
+                    ps.x_vel = float(x_vel)
+                    ps.y_vel = float(y_vel)
                     pstates[pid] = ps
                     if not int(is_active):
                         disabled_pedestrians.append(pid)

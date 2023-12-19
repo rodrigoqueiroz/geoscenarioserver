@@ -54,12 +54,12 @@ class SimSharedMemoryClient(object):
     def read_server_state(self):
         """ Reads from shared memory pose data for each agent.
             Shared memory format:
-                tick_count delta_time n_vehicles n_pedestrians
+                tick_count simulation_time delta_time n_vehicles n_pedestrians
                 vid v_type x y z vx vy yaw steering_angle
                 pid p_type x y z vx vy yaw
                 ...
         """
-        header = None
+        header = {}
         vehicles = []
         pedestrians = []
 
@@ -92,16 +92,18 @@ class SimSharedMemoryClient(object):
 
         try:
             header_str = data_arr[0].split(' ')
-            header = [int(header_str[0]), float(header_str[1]), int(header_str[2]), int(header_str[3])]
-            num_vehicles = header[2]
-            num_pedestrians = header[3]
+            header["tick_count"] = int(header_str[0])
+            header["simulation_time"] = float(header_str[1])
+            header["delta_time"] = float(header_str[2])
+            header["n_vehicles"] = int(header_str[3])
+            header["n_pedestrians"] = int(header_str[4])
         except Exception as e:
             print("Header parsing exception")
             print("data_arr[0]: %s ", data_arr[0])
             print(e)
 
         try:
-            for ri in range(1, num_vehicles + 1):
+            for ri in range(1, header["n_vehicles"] + 1):
                 vehicle = {}
                 id, type, x, y, z, vx, vy, yaw, str_angle = data_arr[ri].split()
                 vehicle["id"] = int(id)
@@ -114,13 +116,12 @@ class SimSharedMemoryClient(object):
                 vehicle["yaw"] = float(yaw)
                 vehicle["steering_angle"] = float(str_angle)
                 vehicles.append(vehicle)
-
         except Exception as e:
             print("VehicleState parsing exception")
             print(e)
 
         try:
-            for ri in range(num_vehicles + 1, num_vehicles + 1 + num_pedestrians):
+            for ri in range(header["n_vehicles"] + 1, header["n_vehicles"] + 1 + header["n_pedestrians"]):
                 pedestrian = {}
                 id, x, y, z, vx, vy, yaw = data_arr[ri].split()
                 pedestrian["id"] = int(id)
@@ -131,7 +132,6 @@ class SimSharedMemoryClient(object):
                 pedestrian["vy"] = float(vy)
                 pedestrian["yaw"] = float(yaw)
                 pedestrians.append(pedestrian)
-
         except Exception as e:
             print("PedestrianState parsing exception")
             print(e)

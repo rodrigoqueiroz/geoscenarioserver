@@ -77,7 +77,6 @@ EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
-CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm], Carla uses [m])
 
 #Carla
 CARLA_COSIMULATION = False

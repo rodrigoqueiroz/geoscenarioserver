@@ -24,7 +24,7 @@ class GSClient(Node):
             self.get_logger().warn('Waiting for geoscenario server', throttle_duration_sec=2)
             return
 
-        tick_count = header[0]
+        tick_count = header["tick_count"]
 
         # TODO: Consider a better way to keep the client synchronized with the server. Should be possible with semaphores
         if tick_count > self.previous_tick_count + 1:
@@ -34,8 +34,9 @@ class GSClient(Node):
 
 
         tick_msg = Tick()
-        tick_msg.tick_count = header[0]
-        tick_msg.delta_time = header[1]
+        tick_msg.tick_count = tick_count
+        tick_msg.simulation_time = header["simulation_time"]
+        tick_msg.delta_time = header["delta_time"]
 
         for vehicle in vehicles:
             msg = Vehicle()
@@ -46,7 +47,7 @@ class GSClient(Node):
             msg.position.z = vehicle["z"]
             msg.velocity.x = vehicle["vx"]
             msg.velocity.y = vehicle["vy"]
-            msg.yaw = vehicle["yaw"] * math.pi / 180
+            msg.yaw = vehicle["yaw"]
             msg.steering_angle = vehicle["steering_angle"]
             tick_msg.vehicles.append(msg)
 
@@ -59,7 +60,7 @@ class GSClient(Node):
             msg.position.z = pedestrian["z"]
             msg.velocity.x = pedestrian["vx"]
             msg.velocity.y = pedestrian["vy"]
-            msg.yaw = pedestrian["yaw"] * math.pi / 180
+            msg.yaw = pedestrian["yaw"]
             tick_msg.pedestrians.append(msg)
 
         self.tick_pub.publish(tick_msg)

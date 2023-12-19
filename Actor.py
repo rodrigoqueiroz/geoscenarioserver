@@ -224,7 +224,6 @@ class ActorState:
 
     #the direction the actor is facing
     yaw:float = 0.0
-    yaw_unreal:float = 0.0
 
     #For easy shared memory parsing
     def get_cart_state_vector(self):
