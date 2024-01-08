@@ -20,7 +20,7 @@ class GSClient(Node):
     def timer_callback(self):
         header, vehicles, pedestrians = self.sim_client_shm.read_server_state()
 
-        if header is None:
+        if not header:
             self.get_logger().warn('Waiting for geoscenario server', throttle_duration_sec=2)
             return
 
