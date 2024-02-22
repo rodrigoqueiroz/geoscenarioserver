@@ -1,4 +1,5 @@
 uint16 id
+string type
 
 # State
 geometry_msgs/Point position   # (m)

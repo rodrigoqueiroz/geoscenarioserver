@@ -123,8 +123,9 @@ class SimSharedMemoryClient(object):
         try:
             for ri in range(header["n_vehicles"] + 1, header["n_vehicles"] + 1 + header["n_pedestrians"]):
                 pedestrian = {}
-                id, x, y, z, vx, vy, yaw = data_arr[ri].split()
+                id, type, x, y, z, vx, vy, yaw = data_arr[ri].split()
                 pedestrian["id"] = int(id)
+                pedestrian["type"] = type
                 pedestrian["x"] = float(x)
                 pedestrian["y"] = float(y)
                 pedestrian["z"] = float(z)
