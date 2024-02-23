@@ -95,25 +95,31 @@ class Actor(object):
 
                 #find closest pair of nodes
                 for i in range(len(trajectory)-1):
-                    node = trajectory[i]
-                    next = trajectory[i+1]
-                    if (node.time <= sim_time <= next.time):
-                        #print("node.time <= {} sim_time {} <= next.time {} ".format(node.time,sim_time, next.time))
-                        #interpolate
-                        pdiff = (sim_time - node.time)/(next.time - node.time) #always positive
-                        x = node.x + ((next.x - node.x) * pdiff)
-                        x_vel = node.x_vel + ((next.x_vel - node.x_vel) * pdiff)
-                        y = node.y + ((next.y - node.y) * pdiff)
-                        y_vel = node.y_vel + ((next.y_vel - node.y_vel) * pdiff)
-                        self.state.set_X([x, x_vel, 0])
-                        self.state.set_Y([y, y_vel, 0])
-                        #print("t{} x{} -> nt{} nx{}. Interp pdiff{} ix{}".format(node.time, node.x, next.time, next.x,pdiff,x))
+                    n1 = trajectory[i]
+                    n2 = trajectory[i+1]
+                    if (n1.time <= sim_time <= n2.time):
+                        # Interpolate
+                        pdiff = (sim_time - n1.time)/(n2.time - n1.time) #always positive
+                        dx = n2.x - n1.x
+                        dy = n2.y - n1.y
+                        d = math.hypot(dx, dy)
+
+                        # Position
+                        self.state.x = n1.x + ((n2.x - n1.x) * pdiff)
+                        self.state.y = n1.y + ((n2.y - n1.y) * pdiff)
+
+                        # Velocity
+                        speed = n1.speed + ((n2.speed - n1.speed) * pdiff)
+                        self.state.x_vel = speed * dx/d
+                        self.state.y_vel = speed * dy/d
+
                         break
+
             #After trajectory, stay in last position or get removed
             if sim_time > end_time:
                 if not self.keep_active:
                     self.state.set_X([-9999, 0, 0])
-                    self.state.set_Y([-9999,0,0])
+                    self.state.set_Y([-9999, 0, 0])
                     if self.sim_state is ActorSimState.ACTIVE:
                         self.remove()
                 else:
@@ -180,8 +186,6 @@ class Actor(object):
 class TrajNode:
     x:float = 0.0
     y:float = 0.0
-    x_vel:float = 0.0
-    y_vel:float = 0.0
     time:float = 0.0
     speed:float = 0.0
     yaw:float = 0.0
