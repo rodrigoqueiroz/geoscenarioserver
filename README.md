@@ -101,13 +101,12 @@ rqueiroz@uwaterloo.ca
 
 # Using a .devcontainer
 
-GeoScenario server can be used and developed on Linux, Windows, and Mac with Visual Studio Code and Docker via the Dev Container.
+GeoScenario server can be used and developed on Linux, Windows, and MacOS with Visual Studio Code and Docker via the Dev Container.
 
 1. Clone the repository and open in VS Code
-2. Click on "Reopen in Container" button as shown in the screenshot below:
+2. Click on "Reopen in Container" button as shown in the screenshot below (alternatively, execute the command "Dev Containers: Reopen in Container" from command palette):
 ![Reopen in Container dialog](.devcontainer/reopen-in-container.png)
-Alternatively, execute the command "Dev Containers: Reopen in Container" from command palette.
-3. After the docker image is built and the dev container is started, open a new terminal and execute `./GSServer.py --help`.
+3. After the docker image is built and the dev container is started, open a new terminal ("Terminal: Create New Terminal" from command palette) and execute `./GSServer.py --help`.
 
 # Contributors
 
