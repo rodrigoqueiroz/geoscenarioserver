@@ -99,6 +99,16 @@ GeoScenario Server running in High Fidelity Simulation with UE5 and Carla
 ## Questions?
 rqueiroz@uwaterloo.ca
 
+# Using a .devcontainer
+
+GeoScenario server can be used and developed on Linux, Windows, and Mac with Visual Studio Code and Docker via the Dev Container.
+
+1. Clone the repository and open in VS Code
+2. Click on "Reopen in Container" button as shown in the screenshot below:
+![Reopen in Container dialog](.devcontainer/reopen-in-container.png)
+Alternatively, execute the command "Dev Containers: Reopen in Container" from command palette.
+3. After the docker image is built and the dev container is started, open a new terminal and execute `./GSServer.py --help`.
+
 # Contributors
 
 1. Rodrigo Queiroz rqueiroz@uwaterloo.ca
