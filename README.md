@@ -103,6 +103,16 @@ rqueiroz@uwaterloo.ca
 
 GeoScenario server can be used and developed on Linux, Windows, and MacOS with Visual Studio Code and Docker via the Dev Container.
 
+## Setting up Docker and Visual Studio Code
+
+1. Install Docker Desktop for your operating system from https://docs.docker.com/desktop/
+  - on Windows, ensure that you have Windows Subsystem for Linux (WSL) version 2 enabled:
+    1. enable WSL in "Turn Windows features on and off" (alternatively, in elevated cmd execute `dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart`),
+    2. execute `wsl --set-default-version 2` in cmd
+2. Install Visual Studio Code
+  - Install the `Dev Containers` VS Code extension
+  - on Windows, set LF default line endings (change `files.eol` to `\n` in Settings)
+
 1. Clone the repository and open in VS Code
 2. Click on "Reopen in Container" button as shown in the screenshot below (alternatively, execute the command "Dev Containers: Reopen in Container" from command palette):
 ![Reopen in Container dialog](.devcontainer/reopen-in-container.png)
