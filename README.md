@@ -111,9 +111,9 @@ GeoScenario server can be used and developed on Linux, Windows, and MacOS with V
     2. execute `wsl --set-default-version 2` in cmd
 2. Install Visual Studio Code
   - Install the `Dev Containers` VS Code extension
-  - on Windows, set LF default line endings (change `files.eol` to `\n` in Settings)
 
 1. Clone the repository and open in VS Code
+  - on Windows, prevent `git` from switching line endings back and forth: execute `git config --global core.autocrlf false` before cloning
 2. Click on "Reopen in Container" button as shown in the screenshot below (alternatively, execute the command "Dev Containers: Reopen in Container" from command palette):
 ![Reopen in Container dialog](.devcontainer/reopen-in-container.png)
 3. After the docker image is built and the dev container is started, open a new terminal ("Terminal: Create New Terminal" from command palette) and execute `./GSServer.py --help`.
