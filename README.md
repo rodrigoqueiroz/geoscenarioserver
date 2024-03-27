@@ -9,6 +9,8 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ### Deb packages
 
+Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
+
 - python3
 - python3-dev
 - python3-tk
