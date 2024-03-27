@@ -4,13 +4,13 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ## Dependencies
 
-- Ubuntu 20.04
+- Linux, macOS, or Windows 10/11 + WSL2
+- Python 3 >= 3.8
 
-### Apt packages
+### Deb packages
 
-- python3.8
-- python3.8-dev
-- python3.8-venv
+- python3
+- python3-dev
 - python3-tk
 - python3-pip
 - python3-pil
@@ -18,15 +18,16 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ### Python packages
 
-- numpy
-- glog
-- matplotlib
-- scipy
-- [py_trees](https://github.com/splintered-reality/py_trees)
-- tk
-- sysv-ipc
 - antlr4-python3-runtime==4.9.3 (later versions cause a parsing error `Exception: Could not deserialize ATN with version (expected 4).`)
 - antlr-denter
+- glog
+- lanelet2
+- matplotlib
+- numpy
+- scipy
+- [py_trees==0.7.6](https://github.com/splintered-reality/py_trees)
+- sysv-ipc
+- tk
 
 To automatically install the dependencies, execute
 
@@ -36,7 +37,7 @@ bash scripts/install_dependencies.bash
 
 ## Running
 
-- run `python3.8 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
+- run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 
 ```
 optional arguments:
@@ -63,7 +64,7 @@ optional arguments:
 - The `--scenario` option can take more than one `.osm` file as its arguments
 - For example,
 ```
-python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
+python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
 ```
 - With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
 - The `globalconfig` and `origin` are used from the first `.osm` file that is specified (which is `gs_straight_obstacles.osm` in the example)
