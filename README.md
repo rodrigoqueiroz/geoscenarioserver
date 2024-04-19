@@ -7,7 +7,9 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - Linux, macOS, or Windows 10/11 + WSL2
 - Python 3 >= 3.8
 
-### Deb packages
+GeoScenario Server can run natively on Linux, within a [conda-forge](https://conda-forge.org/) environment, or on WSL2.
+
+### Deb packages for Linux native
 
 Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 
@@ -31,10 +33,15 @@ Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 - sysv-ipc
 - tk
 
-To automatically install the dependencies, execute
+To automatically install the dependencies for linux native, execute
 
 ```
 bash scripts/install_dependencies.bash
+```
+
+Alternatively, to automatically create a conda-forge environment called `gss` with the required packages, execute
+```
+bash scripts/setup_conda-forge_env.bash
 ```
 
 ## Running
