@@ -1,0 +1,17 @@
+name: gss
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - antlr4-python3-runtime==4.9.3
+  - glog
+  - matplotlib
+  - numpy
+  - scipy
+  - tk 
+  - pip:
+    - antlr-denter
+    - lanelet2
+    - py_trees==0.7.6
+    - sysv-ipc

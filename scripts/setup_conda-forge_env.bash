@@ -5,12 +5,9 @@ REPO_DIR=$(dirname "$SCRIPT_DIR")
 
 if [[ `which mamba` ]]; then
     if ! mamba env list | grep -q gss; then
-        mamba create -n gss python=3.10
+        mamba env create --file ${SCRIPT_DIR}/conda-environment.yml
     fi
     mamba activate gss
-    mamba install antlr4-python3-runtime==4.9.3 glog matplotlib numpy scipy tk 
-    pip install antlr-denter lanelet2 py_trees==0.7.6 sysv-ipc
-
     cd $REPO_DIR
     (set -x; ./GSServer.py -s scenarios/coretest_scenarios/straightdrive.gs.osm)
 
