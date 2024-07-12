@@ -1,0 +1,10 @@
+antlr4-python3-runtime==4.9.3
+antlr-denter
+glog
+lanelet2
+matplotlib
+numpy
+scipy
+py_trees==0.7.6
+sysv-ipc
+tk

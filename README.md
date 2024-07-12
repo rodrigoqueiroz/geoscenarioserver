@@ -4,13 +4,17 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ## Dependencies
 
-- Ubuntu 20.04
+- Linux, macOS, or Windows 10/11 + WSL2
+- Python 3 >= 3.8
 
-### Apt packages
+GeoScenario Server can run natively on Linux, within a [conda-forge](https://conda-forge.org/) environment, or on WSL2.
 
-- python3.8
-- python3.8-dev
-- python3.8-venv
+### Deb packages for Linux native
+
+Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
+
+- python3
+- python3-dev
 - python3-tk
 - python3-pip
 - python3-pil
@@ -18,25 +22,31 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ### Python packages
 
-- numpy
-- glog
-- matplotlib
-- scipy
-- [py_trees](https://github.com/splintered-reality/py_trees)
-- tk
-- sysv-ipc
 - antlr4-python3-runtime==4.9.3 (later versions cause a parsing error `Exception: Could not deserialize ATN with version (expected 4).`)
 - antlr-denter
+- glog
+- lanelet2
+- matplotlib
+- numpy
+- scipy
+- [py_trees==0.7.6](https://github.com/splintered-reality/py_trees)
+- sysv-ipc
+- tk
 
-To automatically install the dependencies, execute
+To automatically install the dependencies for linux native, execute
 
 ```
 bash scripts/install_dependencies.bash
 ```
 
+Alternatively, to automatically create a conda-forge environment called `gss` with the required packages, execute
+```
+bash scripts/setup_conda-forge_env.bash
+```
+
 ## Running
 
-- run `python3.8 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
+- run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 
 ```
 optional arguments:
@@ -63,7 +73,7 @@ optional arguments:
 - The `--scenario` option can take more than one `.osm` file as its arguments
 - For example,
 ```
-python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
+python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
 ```
 - With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
 - The `globalconfig` and `origin` are used from the first `.osm` file that is specified (which is `gs_straight_obstacles.osm` in the example)
@@ -87,9 +97,14 @@ python3.8 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.
 - Use the shared memory keys inside SimConfig to read/write the server shared memory blocks.
 - We provide a GeoScenario Client for Unreal in */unreal*.
 
-## Documentation
+## Documentation:
 
 GeoScenario documentation can be found [here](https://geoscenario2.readthedocs.io/en/latest/).
 
-rqueiroz@gsd.uwaterloo.ca
-d43sharm@uwaterloo.ca
+## Demo
+GeoScenario Server running in High Fidelity Simulation with UE5 and Carla
+
+[Youtube Video](https://youtu.be/Fk890JvgwWk?feature=shared)
+
+## Questions?
+rqueiroz@uwaterloo.ca
