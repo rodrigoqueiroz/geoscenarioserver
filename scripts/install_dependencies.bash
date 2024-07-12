@@ -4,10 +4,7 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
-echo ""
-echo "Upgrading packages"
-echo ""
-sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get update -qq
 
 echo ""
 echo "Installing Python3 packages"
