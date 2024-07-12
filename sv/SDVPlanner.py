@@ -55,8 +55,8 @@ class SVPlanner(object):
         self._mplan_sharr = Array('f', c)
         #Process based
         self._process = Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr, 
-            self._mplan_sharr, 
+            self.traffic_state_sharr,
+            self._mplan_sharr,
             self._debug_shdata), daemon=True)
         self._process.start()
 
@@ -85,7 +85,7 @@ class SVPlanner(object):
         # New plan
         self.last_plan = plan
         return plan
-        
+
 
     #==SUB PROCESS=============================================
     def before_exit(self,*args):
@@ -98,12 +98,12 @@ class SVPlanner(object):
         signal(SIGTERM, self.before_exit)
 
         self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
-        
-        
+
+
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         self.behavior_layer = BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-        
+
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
         if USE_FIXED_PLANNING_TIME:
@@ -124,13 +124,13 @@ class SVPlanner(object):
             else:
                 #vehicle state not available. Vehicle can be inactive.
                 continue
-            
+
             if self.sdv_route is None:
                 self.sdv_route = SDVRoute(
-                    #self.sim_config.lanelet_routes[self.vid], 
+                    #self.sim_config.lanelet_routes[self.vid],
                     self.laneletmap,
-                    vehicle_state.x, vehicle_state.y, 
-                    self.route_nodes, 
+                    vehicle_state.x, vehicle_state.y,
+                    self.route_nodes,
                     #self.sim_config.goal_points[self.vid]
                 )
 
@@ -140,10 +140,10 @@ class SVPlanner(object):
             if not traffic_state:
                 log.warn("Invalid planner state, skipping planning step...")
                 continue
-            
+
             #BTree Tick - using frenet state and lane config based on old ref path
             mconfig, ref_path_changed, snapshot_tree = self.behavior_layer.tick(traffic_state)
-            
+
             # when ref path changes, must recalculate the path, lane config and relative state of other vehicles
             if ref_path_changed:
                 log.info("PATH CHANGED")
@@ -156,7 +156,7 @@ class SVPlanner(object):
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
                 mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
-            
+
             # new maneuver
             if self.mconfig and self.mconfig.mkey != mconfig.mkey:
                 log.info("VID {} started maneuver {}".format(self.vid, mconfig.mkey.name))
@@ -216,7 +216,7 @@ class SVPlanner(object):
                         self.last_plan = plan
             else:
                 frenet_traj, cand = None, None
-            
+
             #Debug info (for Dahsboard and Log)
             if self.sim_config.show_dashboard:
                 # change ref path format for pickling (maybe always keep it like this?)
@@ -225,7 +225,7 @@ class SVPlanner(object):
                 if (self.last_plan is not None) and (frenet_traj is None):
                     # shift the trajectories to the old frenet frame they are positioned in
                     traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
-                
+
                 #For pickling
                 traffic_state.intersections = [ intersection.to_primitives() for intersection in traffic_state.intersections]
 
@@ -240,7 +240,7 @@ class SVPlanner(object):
                 )
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
 
-    def write_motion_plan(self, mplan_sharr, plan:MotionPlan): 
+    def write_motion_plan(self, mplan_sharr, plan:MotionPlan):
         if not plan:
             return
         #write motion plan
@@ -249,4 +249,4 @@ class SVPlanner(object):
         #print('Writting Sh Data VP')
         #print(mplan_sharr)
         mplan_sharr.release() #<=========RELEASE
-        
+

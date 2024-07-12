@@ -16,24 +16,19 @@
   <node id='-5149179' action='modify' visible='true' lat='49.00729972481' lon='8.45710179305' />
   <node id='-5149180' action='modify' visible='true' lat='49.00818215891' lon='8.45824935668' />
   <node id='-5149181' action='modify' visible='true' lat='49.00726589979' lon='8.45704525575'>
-    <tag k='btree' v='st_fast_driver.btree' />
-    <tag k='btype' v='SDV' />
+    <tag k='btype' v='PV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
     <tag k='name' v='v1' />
-    <tag k='route' v='left_route' />
+    <tag k='path' v='straight_path' />
+    <tag k='speed' v='40' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
-  </node>
-  <node id='-5149184' action='modify' visible='true' lat='49.0081535901' lon='8.45830837123'>
-    <tag k='area' v='no' />
-    <tag k='gs' v='staticobject' />
-    <tag k='name' v='myobject' />
   </node>
   <way id='-1948238' action='modify' visible='true'>
     <nd ref='-5149179' />
     <nd ref='-5149180' />
-    <tag k='gs' v='route' />
-    <tag k='name' v='left_route' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='straight_path' />
   </way>
 </osm>
