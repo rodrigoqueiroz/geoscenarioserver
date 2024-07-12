@@ -47,17 +47,17 @@ scenarios="$test_scenarios $pedestrian_scenarios"
 
 source "${REPO_DIR}/catkin_ws/install/opt/ros/lanelet2/setup.bash" --extend
 
-kill_python38()
+kill_python3()
 {
-    killall python3.8
+    killall python3
 }
 
 for scenario in $scenarios; do
     echo "CTRL + C to exit the script."
     read -p "ENTER to run ${scenario#$REPO_DIR/}:"
 
-    trap kill_python38 SIGINT
+    trap kill_python3 SIGINT
     echo "CTRL + C to quit the scenario."
-    python3.8 GSServer.py -s $scenario
+    python3 GSServer.py -s $scenario
     trap - SIGINT
 done
