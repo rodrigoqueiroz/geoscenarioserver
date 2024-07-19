@@ -4,8 +4,9 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
 print_usage() {
-    echo "  $ bash setup_conda-forge_env.bash [--test-run] [-h|--help]"
-    echo "    -t|--test-run   start GeoScenarioServer within the environment"
+    echo "Usage:"
+    echo "  $ bash setup_conda-forge_env.bash [-t|--test-run] [-h|--help]"
+    echo "    -t|--test-run   start GeoScenarioServer within the environment 'gss'"
     echo "    -h|--help       show these instructions"
     echo ""
 }
