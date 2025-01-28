@@ -66,5 +66,5 @@ fi
 
 echo ""
 echo "To run GeoScenarioServer, execute"
-echo "  $ [micromamba|mamba] -n gss run python3 geoscenarioserver/GSServer.py -s <scenario path>"
+echo "  $ $(basename $MAMBA_EXE) -n gss run python3 ./GSServer.py -s scenarios/<scenario>.osm"
 echo ""
