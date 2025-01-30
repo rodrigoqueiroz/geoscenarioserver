@@ -69,7 +69,7 @@ class LaneConfig:
         if l_id < 0: #RIGHT
             if (self._right_lane):
                 if include_opposite or self._right_relationship is not "opposite":
-                    return self._left_lane
+                    return self._right_lane
         return None
     
     def get_central_d(self):
