@@ -1,11 +1,11 @@
 behaviortree routing:
     ?
         ->
-            condition c_goal ( reached_goal )
-            maneuver m_stop_goal ( MStopConfig(target=GOAL_POINT) )
+            condition c_goal(reached_goal)
+            maneuver m_stop_goal(MStopConfig(target=GOAL_POINT))
         ->
-            condition c_lc_seg ( at_lane_change_segment )
+            condition c_lc_seg(at_lane_change_segment)
             subtree lanechange()
         ->
-            condition c_out ( out_of_route ) 
-            condition c_rr ( reroute )
+            condition c_out(out_of_route)
+            condition c_rr(reroute)
