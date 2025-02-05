@@ -784,7 +784,7 @@ class Dashboard(object):
         # map
         if SHOW_MPLOT:
             fig_map = plt.figure(Dashboard.MAP_FIG_ID)
-            #fig_map.set_size_inches(6,6,forward=True)
+            fig_map.set_size_inches(5, 5, forward=True)
             self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
             self.map_canvas.get_tk_widget().pack()
 
@@ -812,7 +812,9 @@ class Dashboard(object):
         # vehicle cart
         fig_cart = plt.figure(Dashboard.CART_FIG_ID)
         if not SHOW_MPLOT:
-            fig_cart.set_size_inches(8, 8, forward=True)
+            fig_cart.set_size_inches(7, 7, forward=True)
+        else:
+            fig_cart.set_size_inches(6, 6, forward=True)
         self.cart_canvas = FigureCanvasTkAgg(fig_cart, cart_frame)
         self.cart_canvas.get_tk_widget().pack()
 

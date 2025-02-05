@@ -1,16 +1,13 @@
 behaviortree lanechange:
     ?
         ->
-            condition c_minspeed ( vehicle_moving( vel=1.0 ) )
-            ? 
+            condition c_minspeed(vehicle_moving(vel=1.0))
+            ?
                 ->
-                    condition c_target_left( target_lane(lid=LEFT) )
-                    condition c_can_left( can_lane_change(gap=20, lid=LEFT) )
-                    maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=LEFT) )
+                    condition c_target_left(target_lane(lid=LEFT))
+                    condition c_can_left(can_lane_change(gap=20, lid=LEFT))
+                    maneuver m_lane_swerve(MLaneSwerveConfig(target_lid=LEFT))
                 ->
-                    condition c_target_right( target_lane(lid=RIGHT) )
-                    condition c_can_right( can_lane_change(gap=20, lid=RIGHT) )
-                    maneuver m_lane_swerve( MLaneSwerveConfig(target_lid=RIGHT) )
-                
-        
-        
+                    condition c_target_right(target_lane(lid=RIGHT))
+                    condition c_can_right(can_lane_change(gap=20, lid=RIGHT))
+                    maneuver m_lane_swerve(MLaneSwerveConfig(target_lid=RIGHT))
