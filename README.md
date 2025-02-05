@@ -57,16 +57,17 @@ optional arguments:
                         don't print messages to stdout
   -m, --map-path
                         Set the prefix to append to the value of the attribute `globalconfig->lanelet`
-                        e.g. --map-path $HOME/anm_unreal_test_suite/maps
+                        e.g. --map-path $HOME/wise-sim-test-suite/maps
   -b, --btree-locations
                         Add higher priority locations to search for btrees by agent btypes
-                        e.g. --btree-locations $HOME/anm_unreal_test_suite/btrees
+                        e.g. --btree-locations $HOME/wise-sim-test-suite/btrees
+  --verify_map          Lanelet map file
 ```
 
 - GeoScenario files (2.0 required) must be placed inside *scenarios/*
 - If a file is not given, you must provide a manual problem startup from code.
 - LaneletMap files must be placed inside *scenarios/maps* (a map file is mandatory).
-- Co-Simulator (Unreal or other) is optional.
+- Co-Simulator ([WISE Sim](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/wise-sim),  [Carla](https://carla.org/), or other) is optional.
 
 ## Loading multiple scenario files
 
@@ -108,3 +109,29 @@ GeoScenario Server running in High Fidelity Simulation with UE5 and Carla
 
 ## Questions?
 rqueiroz@uwaterloo.ca
+
+# Using a .devcontainer
+
+GeoScenario server can be used and developed on Linux, Windows, and MacOS with Visual Studio Code and Docker via the Dev Container.
+
+## Setting up Docker and Visual Studio Code
+
+1. Install Docker Desktop for your operating system from https://docs.docker.com/desktop/
+  - on Windows, ensure that you have Windows Subsystem for Linux (WSL) version 2 enabled:
+    1. enable WSL in "Turn Windows features on and off" (alternatively, in elevated cmd execute `dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart`),
+    2. execute `wsl --set-default-version 2` in cmd
+2. Install Visual Studio Code
+  - Install the `Dev Containers` VS Code extension
+
+1. Clone the repository and open in VS Code
+  - on Windows, prevent `git` from switching line endings back and forth: execute `git config --global core.autocrlf false` before cloning
+2. Click on "Reopen in Container" button as shown in the screenshot below (alternatively, execute the command "Dev Containers: Reopen in Container" from command palette):
+![Reopen in Container dialog](.devcontainer/reopen-in-container.png)
+3. After the docker image is built and the dev container is started, open a new terminal ("Terminal: Create New Terminal" from command palette) and execute `./GSServer.py --help`.
+
+# Contributors
+
+1. Rodrigo Queiroz rqueiroz@uwaterloo.ca
+2. Scott Larter scott.larter@uwaterloo.ca
+3. Divit Sharma d43sharm@uwaterloo.ca
+4. Michał Antkiewicz michal.antkiewicz@uwaterloo.ca
