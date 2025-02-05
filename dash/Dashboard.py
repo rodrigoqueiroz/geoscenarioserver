@@ -410,7 +410,7 @@ class Dashboard(object):
         static_objects = traffic_state.static_objects
         regulatory_elements = traffic_state.regulatory_elements
         goal_point_frenet = traffic_state.goal_point_frenet
-        
+
         #layout
         #plt.rc('axes', axisbelow=True) #plt.axis.set_axisbelow(True) #keep grid below data
         plt.grid(True, zorder=1)
@@ -425,8 +425,10 @@ class Dashboard(object):
         fig.tight_layout(pad=0.05)
 
         #road
-        plt.axhline(lane_config.left_bound, color="k", linestyle='-', zorder=0)
-        plt.axhline(lane_config.right_bound, color="k", linestyle='-', zorder=0)
+        if lane_config.left_bound is not None:
+            plt.axhline(lane_config.left_bound, color="k", linestyle='-', zorder=0)
+        if lane_config.right_bound is not None:
+            plt.axhline(lane_config.right_bound, color="k", linestyle='-', zorder=0)
         plt.title("Frenet Frame. Vehicle {}:".format(center_id))
         plt.xlabel('S')
         plt.ylabel('D')
@@ -436,9 +438,9 @@ class Dashboard(object):
             x, y = lane_config.stopline_pos
             plt.axvline(x, color= 'r', linestyle='-', zorder=1)
 
-        
+
         #road_occupancy
-        if SHOW_OCCUPANCY:
+        if SHOW_OCCUPANCY and traffic_state.road_occupancy is not None:
             road_occupancy:RoadOccupancy = traffic_state.road_occupancy
             cellsize = 1
             size = cellsize*3
@@ -464,14 +466,14 @@ class Dashboard(object):
             plt.gca().add_patch(rect)
             rect = plt.Rectangle( (anchorx,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.back else 'none') #back
             plt.gca().add_patch(rect)
-            
+
             anchorx = anchorx + size + 1
             y_label = "y: " + str(road_occupancy.yielding_zone)
             i_label = "i: " + str(road_occupancy.intersecting_zone)
             gca.text(anchorx, anchory, y_label)
             gca.text(anchorx, anchory + cellsize, i_label)
-        
-        
+
+
             #junction
             #size = 3
             #intersections = traffic_state.intersections
@@ -482,52 +484,56 @@ class Dashboard(object):
             #        intersection.
 
 
-        #re
-        for re in regulatory_elements:
-            if isinstance(re, sv.SDVTrafficState.TrafficLightState):
-                colorcode,_ = self.get_color_by_type('trafficlight',re.color)
-                x, y = re.stop_position
-                plt.axvline(x, color= colorcode, linestyle='-', zorder=1)
-            elif isinstance(re, sv.SDVTrafficState.RightOfWayState):
-                pass
-                #for ll_id in re.row_lanelets:
-                    #colorfillcode = 'r' if re.row_lanelets[ll_id] > 0 else 'g'
-                    #ll = self.lanelet_map.laneletLayer[ll_id]
-            elif isinstance(re, sv.SDVTrafficState.AllWayStopState):
-                pass
+        # Regulatory Elements
+        if (regulatory_elements is not None):
+            for re in regulatory_elements:
+                if isinstance(re, sv.SDVTrafficState.TrafficLightState):
+                    colorcode,_ = self.get_color_by_type('trafficlight',re.color)
+                    x, y = re.stop_position
+                    plt.axvline(x, color= colorcode, linestyle='-', zorder=1)
+                elif isinstance(re, sv.SDVTrafficState.RightOfWayState):
+                    pass
+                    #for ll_id in re.row_lanelets:
+                        #colorfillcode = 'r' if re.row_lanelets[ll_id] > 0 else 'g'
+                        #ll = self.lanelet_map.laneletLayer[ll_id]
+                elif isinstance(re, sv.SDVTrafficState.AllWayStopState):
+                    pass
 
         #other vehicles, from main vehicle POV:
-        for vid,vehicle in vehicles.items():
-            colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state,vehicle.name)
-            vs = vehicle.state
-            plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
-            circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
-            gca.add_artist(circle1)
-            label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
-            gca.text(vs.s, vs.d+1.5, label)
+        if vehicles is not None:
+            for vid,vehicle in vehicles.items():
+                colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state,vehicle.name)
+                vs = vehicle.state
+                plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
+                circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
+                gca.add_artist(circle1)
+                label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
+                gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
-        for pid, pedestrian in pedestrians.items():
-            if pedestrian.sim_state is ActorSimState.INACTIVE:
-                continue
-            colorcode,alpha = self.get_color_by_type('pedestrian',pedestrian.type, pedestrian.sim_state)
-            x = pedestrian.state.s
-            y = pedestrian.state.d
-            #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-            plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
-            circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
-            plt.gca().add_artist(circle1)
-            label = "p{}".format(pid)
-            plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
+        if pedestrians is not None:
+            for pid, pedestrian in pedestrians.items():
+                if pedestrian.sim_state is ActorSimState.INACTIVE:
+                    continue
+                colorcode,alpha = self.get_color_by_type('pedestrian',pedestrian.type, pedestrian.sim_state)
+                x = pedestrian.state.s
+                y = pedestrian.state.d
+                #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
+                plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
+                circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                plt.gca().add_artist(circle1)
+                label = "p{}".format(pid)
+                plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
         #objects
-        for oid, obj in static_objects.items():
-            x = obj.s
-            y = obj.d
-            #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-            plt.plot(x, y, 'kx',markersize=6, zorder=10)
-            label = "{}".format(oid)
-            plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
+        if static_objects is not None:
+            for oid, obj in static_objects.items():
+                x = obj.s
+                y = obj.d
+                #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
+                plt.plot(x, y, 'kx',markersize=6, zorder=10)
+                label = "{}".format(oid)
+                plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
         #main vehicle
         if goal_point_frenet is not None:
@@ -554,7 +560,7 @@ class Dashboard(object):
         # update lane config based on current (possibly outdated) reference frame
         #lane_config = self.read_map(vehicle_state, self.reference_path)
 
-        
+
 
 
     def get_color_by_type(self,actor,a_type,sim_state = None, name = ''):
@@ -569,11 +575,13 @@ class Dashboard(object):
                 colorcode = 'c' #cyan
             elif a_type == Vehicle.TV_TYPE:
                 colorcode = 'k' #black
+            elif a_type == Vehicle.PV_TYPE:
+                colorcode = 'k' #black
         elif actor== 'pedestrian':
             if a_type == Pedestrian.EP_TYPE:
                 colorcode = 'r' #red
             elif a_type == Pedestrian.TP_TYPE:
-                colorcode = 'r' #bred
+                colorcode = 'r' #red
             elif a_type == Pedestrian.PP_TYPE:
                 colorcode = 'r' #red
         elif actor== 'trafficlight':
@@ -784,7 +792,7 @@ class Dashboard(object):
         # map
         if SHOW_MPLOT:
             fig_map = plt.figure(Dashboard.MAP_FIG_ID)
-            #fig_map.set_size_inches(6,6,forward=True)
+            fig_map.set_size_inches(5, 5, forward=True)
             self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
             self.map_canvas.get_tk_widget().pack()
 
@@ -812,7 +820,9 @@ class Dashboard(object):
         # vehicle cart
         fig_cart = plt.figure(Dashboard.CART_FIG_ID)
         if not SHOW_MPLOT:
-            fig_cart.set_size_inches(8, 8, forward=True)
+            fig_cart.set_size_inches(7, 7, forward=True)
+        else:
+            fig_cart.set_size_inches(6, 6, forward=True)
         self.cart_canvas = FigureCanvasTkAgg(fig_cart, cart_frame)
         self.cart_canvas.get_tk_widget().pack()
 
