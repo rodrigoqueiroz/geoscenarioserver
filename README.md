@@ -5,7 +5,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 ## Dependencies
 
 - Linux, macOS, or Windows 10/11 + WSL2
-- Python 3 >= 3.8
+- Python >= 3.8
 
 GeoScenario Server can run natively on Linux, within a [conda-forge](https://conda-forge.org/) environment, or on WSL2.
 
