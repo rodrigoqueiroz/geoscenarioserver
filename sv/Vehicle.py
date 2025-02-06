@@ -19,7 +19,7 @@ from sv.SDVPlanner import *
 from sv.SDVRoute import SDVRoute
 from Actor import *
 from mapping.LaneletMap import LaneletMap
-from shm.SimSharedMemory import *
+from shm.SimSharedMemoryServer import *
 from util.Utils import kalman
 from typing import List
 from lanelet2.routing import Route
@@ -42,21 +42,18 @@ class Vehicle(Actor):
         self.radius = VEHICLE_RADIUS
         self.model = ''
 
+
     def update_sim_state(self, new_state, delta_time):
         # NOTE: this may desync the sim and frenet vehicle state, so this should
         # only be done for external vehicles (which don't have a frenet state)
         if self.type is not Vehicle.EV_TYPE:
             log.warn("Cannot update sim state for gs vehicles directly.")
 
-    def get_full_state_for_client(self):
-        x = round((self.state.x * CLIENT_METER_UNIT))
-        y = round((self.state.y * CLIENT_METER_UNIT))
-        z = 0.0
-        position = [x, y, z]
-        velocity = [self.state.x_vel, self.state.y_vel]
 
-        #remote = 1 if self.is_remote else 0
-        return self.id, self.type, position, velocity, self.state.yaw_unreal, self.state.steer
+    def get_sim_state(self):
+        position = [self.state.x, self.state.y, 0.0]
+        velocity = [self.state.x_vel, self.state.y_vel]
+        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
 
 
 class SDV(Vehicle):
@@ -210,15 +207,11 @@ class SDV(Vehicle):
             self.state.y = y_vector[0]
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
-            #GSServer and Unreal transformations
             heading = np.array([self.state.x_vel, self.state.y_vel])
-            heading_unreal = np.array([self.state.y_vel,self.state.x_vel])
             if self.motion_plan:
                 if self.motion_plan.reversing:
                     heading *= -1
-                    heading_unreal *=1
             self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
-            self.state.yaw_unreal = math.degrees(math.atan2(heading_unreal[1], heading_unreal[0]))
 
             #DEBUG:
             #Note: use this log to evaluate if the "jump back" issue returns

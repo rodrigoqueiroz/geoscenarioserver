@@ -36,7 +36,7 @@ FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified vers
 SHOW_CPLOT = True           #whether to show the cartesian plot
 CPLOT_SIZE = 100			    #cartesian plot: road length in meters (shorter=better performance)
 REFERENCE_PATH = True       #reference path indicating the frenet frame for the vehicle
-SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape. 
+SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
 SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
 
 #Vehicle trajectory
@@ -77,7 +77,6 @@ EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
 #Client (Unreal or similar)
-CLIENT_METER_UNIT = 100    	#Client unit (Server uses [m], Unreal client uses [cm], Carla uses [m])
 
 #Carla
 CARLA_COSIMULATION = False
@@ -86,7 +85,7 @@ CARLA_PORT = 2000
 
 #Shared Memory
 WAIT_FOR_CLIENT = False     #Hold Simulation start until a valid state is sent from client
-CLIENT_SHM = False          #If True, server will create shared memory space to exchange data with client.
+CLIENT_SHM = True           #If True, server will create shared memory space to exchange data with client.
 SHM_KEY = 123456
 SEM_KEY = 346565
 CS_SHM_KEY = 333943

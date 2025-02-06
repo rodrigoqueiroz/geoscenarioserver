@@ -99,7 +99,7 @@ python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.os
 
 ## Documentation:
 
-https://geoscenario2.readthedocs.io/
+GeoScenario documentation can be found [here](https://geoscenario2.readthedocs.io/en/latest/).
 
 ## Demo
 GeoScenario Server running in High Fidelity Simulation with UE5 and Carla

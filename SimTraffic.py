@@ -12,7 +12,7 @@ import numpy as np
 import glog as log
 from copy import copy
 import csv
-from shm.SimSharedMemory import *
+from shm.SimSharedMemoryServer import *
 from Actor import *
 from sv.Vehicle import Vehicle
 from sp.Pedestrian import *
@@ -84,7 +84,7 @@ class SimTraffic(object):
         if CARLA_COSIMULATION:
             self.carla_sync = CarlaSync()
             self.carla_sync.create_gs_actors(self.vehicles)
-    
+
         #Creates Shared Memory Blocks to publish all vehicles'state.
         self.create_traffic_state_shm()
         self.write_traffic_state(0 , 0.0, 0.0)
@@ -153,7 +153,7 @@ class SimTraffic(object):
                 if self.vehicles[vid].type is Vehicle.EV_TYPE and vid in vstates:
                     if new_client_state:
                         self.vehicles[vid].update_sim_state(vstates[vid], client_delta_time)
-        
+
         #Read Carla socket
         if self.carla_sync:
             vstates, disabled_vehicles = self.carla_sync.read_carla_state(nv)
@@ -192,7 +192,7 @@ class SimTraffic(object):
     def create_traffic_state_shm(self):
         #External Sim (Unreal) ShM
         if CLIENT_SHM:
-            self.sim_client_shm = SimSharedMemory()
+            self.sim_client_shm = SimSharedMemoryServer()
 
         #Internal ShM
         nv = len(self.vehicles)
@@ -250,12 +250,12 @@ class SimTraffic(object):
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
-            self.sim_client_shm.write_server_state(tick_count, delta_time, self.vehicles, self.pedestrians)
-        
+            self.sim_client_shm.write_server_state(tick_count, sim_time, delta_time, self.vehicles, self.pedestrians)
+
         #Carla socket
         if self.carla_sync:
             self.carla_sync.write_server_state(tick_count, delta_time, self.vehicles)
-     
+
 
 
     def detect_collisions(self,tick_count, delta_time, sim_time):

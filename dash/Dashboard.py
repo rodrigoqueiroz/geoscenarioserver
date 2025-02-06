@@ -378,12 +378,6 @@ class Dashboard(object):
                 x = pedestrian.state.x
                 y = pedestrian.state.y
 
-                # show pedestrians' goals on map
-                x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
-                y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
-                plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
-                plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
-
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
                     circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
@@ -396,6 +390,14 @@ class Dashboard(object):
                         vx = pedestrian.state.x_vel
                         vy = pedestrian.state.y_vel
                         plt.arrow(x, y, vx/2, vy/2, head_width=0.5, head_length=0.5, color=colorcode, zorder=10)
+
+                if pedestrian.type == Pedestrian.SP_TYPE:
+                    # show pedestrians' goals on map
+                    x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
+                    y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
+                    plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
+                    plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
+
 
     def plot_frenet_chart(self, center_id, traffic_state:TrafficState, debug_ref_path, traj, cand, unf, traj_s_shift):
         #Frenet Frame plot

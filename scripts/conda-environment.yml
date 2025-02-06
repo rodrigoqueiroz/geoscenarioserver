@@ -9,7 +9,7 @@ dependencies:
   - matplotlib
   - numpy
   - scipy
-  - tk 
+  - tk
   - pip:
     - antlr-denter
     - glog
