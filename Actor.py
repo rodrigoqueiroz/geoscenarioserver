@@ -97,7 +97,7 @@ class Actor(object):
                 for i in range(len(trajectory)-1):
                     n1 = trajectory[i]
                     n2 = trajectory[i+1]
-                    if (n1.time <= sim_time <= n2.time):
+                    if (n1.time <= sim_time < n2.time): # n2 must be strictly after n1
                         dx = n2.x - n1.x
                         dx_vel = n2.x_vel - n1.x_vel
                         dy = n2.y - n1.y
@@ -183,8 +183,8 @@ class Actor(object):
 class TrajNode:
     x:float = 0.0
     y:float = 0.0
-    x_vel:float = 0.0  # calculated as dx/dt
-    y_vel:float = 0.0  # calculated as dy/dt
+    x_vel:float = None  # calculated as dx/dt, the first node same as the second
+    y_vel:float = None  # calculated as dy/dt, the first node same as the second
     time:float = 0.0
     yaw:float = 0.0
 
