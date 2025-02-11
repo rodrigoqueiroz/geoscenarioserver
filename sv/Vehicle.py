@@ -327,7 +327,7 @@ class TV(Vehicle):
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
             self.state.set_X([9999, 0, 0])
-            self.state.set_Y([9999,0,0])
+            self.state.set_Y([9999, 0, 0])
 
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
@@ -349,7 +349,7 @@ class PV(Vehicle):
     """
     def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True):
         super().__init__(vid, name, start_state, frenet_state, yaw=yaw)
-        self.type = Vehicle.TV_TYPE
+        self.type = Vehicle.PV_TYPE
         self.path = path
         self._debug_shdata = debug_shdata
         self.keep_active = keep_active

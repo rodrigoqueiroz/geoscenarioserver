@@ -97,22 +97,19 @@ class Actor(object):
                 for i in range(len(trajectory)-1):
                     n1 = trajectory[i]
                     n2 = trajectory[i+1]
-                    if (n1.time <= sim_time <= n2.time):
-                        # Interpolate
-                        pdiff = (sim_time - n1.time)/(n2.time - n1.time) #always positive
+                    if (n1.time <= sim_time < n2.time): # n2 must be strictly after n1
                         dx = n2.x - n1.x
+                        dx_vel = n2.x_vel - n1.x_vel
                         dy = n2.y - n1.y
-                        d = math.hypot(dx, dy)
-
-                        # Position
-                        self.state.x = n1.x + ((n2.x - n1.x) * pdiff)
-                        self.state.y = n1.y + ((n2.y - n1.y) * pdiff)
-
-                        # Velocity
-                        speed = n1.speed + ((n2.speed - n1.speed) * pdiff)
-                        self.state.x_vel = speed * dx/d
-                        self.state.y_vel = speed * dy/d
-
+                        dy_vel = n2.y_vel - n1.y_vel
+                        dt = n2.time - n1.time
+                        x_acc = dx_vel/dt
+                        y_acc = dy_vel/dt
+                        pdiff = (sim_time - n1.time)/dt #always positive
+                        # Interpolate
+                        self.state.set_X([n1.x + (dx * pdiff), n2.x_vel, x_acc])
+                        self.state.set_Y([n1.y + (dy * pdiff), n2.y_vel, y_acc])
+                        self.state.yaw = n1.yaw
                         break
 
             #After trajectory, stay in last position or get removed
@@ -186,8 +183,9 @@ class Actor(object):
 class TrajNode:
     x:float = 0.0
     y:float = 0.0
+    x_vel:float = None  # calculated as dx/dt, the first node same as the second
+    y_vel:float = None  # calculated as dy/dt, the first node same as the second
     time:float = 0.0
-    speed:float = 0.0
     yaw:float = 0.0
 
 @dataclass

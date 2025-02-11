@@ -199,14 +199,23 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 t_name = vnode.tags['trajectory']
                 t_nodes = parser.trajectories[t_name].nodes
                 trajectory = []
+                prev_node = None
                 for node in t_nodes:
                     nd = TrajNode()
                     nd.x = float(node.x)
                     nd.y = float(node.y)
                     nd.time = float(node.tags['time'])
-                    nd.speed = float(node.tags['speed']) if ('speed' in node.tags) else None
+                    if prev_node is not None:
+                        dt = nd.time - prev_node.time
+                        nd.x_vel = (nd.x - prev_node.x) / dt
+                        nd.y_vel = (nd.y - prev_node.y) / dt
+                        # the first node has unknown velocity, assume the same as the second node's
+                        if prev_node.x_vel is None or prev_node.y_vel is None:
+                            prev_node.x_vel = nd.x_vel
+                            prev_node.y_vel = nd.y_vel
                     nd.yaw = float(node.tags['yaw']) if ('yaw' in node.tags) else None
                     trajectory.append(nd)
+                    prev_node = nd
                 vehicle = TV(vid = vid,                                     #<= must ne integer
                             name = name,                                    #vehicle name
                             start_state = start_state,                      #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
