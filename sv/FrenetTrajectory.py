@@ -5,7 +5,7 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from util.Utils import *
 
 @dataclass
@@ -123,7 +123,7 @@ class FrenetTrajectory:
 
 @dataclass
 class MotionPlan:
-    trajectory:FrenetTrajectory = FrenetTrajectory()
+    trajectory:FrenetTrajectory = field(default_factory=lambda:FrenetTrajectory())
     start_time:float = 0            #sim start time [s]
     new_frenet_frame = False        #if a new frenet frame was generated
     reversing = False               #if the plan is reversed
