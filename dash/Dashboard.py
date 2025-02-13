@@ -4,28 +4,43 @@
 # ---------------------------------------------
 # Simulation Dashboard and Trajectory Plots
 # --------------------------------------------
-import numpy as np
-from math import sqrt, exp
+import datetime
+import glog as log
 import matplotlib
+import numpy as np
+import tkinter as tk
+
+from math import sqrt, exp
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from multiprocessing import Process
+from PIL import Image, ImageTk
 from TickSync import TickSync
-import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-import datetime
-from PIL import Image, ImageTk
-import glog as log
-from SimTraffic import *
-from SimConfig import *
-from util.Utils import *
+
+
 import sv.SDVTrafficState
-from sv.Vehicle import *
-from Actor import *
-from TrafficLight import *
+from Actor         import *
+from dash.DashboardSharedMemory import get_center_id, get_vehicles, set_center_id
+from mapping.LaneletMap         import get_line_format
+from SimTraffic    import *
+from SimConfig     import *
 from sp.Pedestrian import *
-from mapping.LaneletMap import get_line_format
+from sv.Vehicle    import *
+from TrafficLight  import *
+from util.Utils    import *
+
+def get_perceived_vehicles(vehicles):
+    try:
+        perceived_vehicles = get_vehicles()
+    except Exception as error:
+        perceived_vehicles = {}
+
+        for vid in vehicles:
+            perceived_vehicles[vid] = vehicles[vid].__dict__
+
+    return perceived_vehicles
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -35,11 +50,12 @@ class Dashboard(object):
 
     def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig):
         self.sim_traffic:SimTraffic = sim_traffic
-        self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
+
+        set_center_id(int(sim_config.plot_vid))
 
     def start(self):
         """ Start dashboard in subprocess.
@@ -97,17 +113,11 @@ class Dashboard(object):
             #find valid vehicle to focus plots and btree (if available)
             vid = None
 
+            center_id = get_center_id()
 
-            if (type(self.center_id) == str):
-                if self.center_id[0] == 'p':
-                    self.center_pedestrian = True
-                else:
-                    self.center_pedestrian = False
-                self.center_id = int(self.center_id[1:]) #remove first letter
-
-            if self.center_pedestrian == False and self.center_id in vehicles:
-                if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
-                    vid = int(self.center_id)
+            if self.center_pedestrian == False and center_id in vehicles:
+                if vehicles[center_id].sim_state is not ActorSimState.INACTIVE:
+                    vid = int(center_id)
                     #vehicles with planner: cartesian, frenet chart and behavior tree
                     if vid in debug_shdata:
                         #read vehicle planning data from debug_shdata
@@ -123,9 +133,9 @@ class Dashboard(object):
                     else:
                         #vehicles without planner:
                         self.plot_cartesian_chart(vid, vehicles, pedestrians)
-            elif self.center_pedestrian and self.center_id in pedestrians:
-                if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
-                    pid = int(self.center_id)
+            elif self.center_pedestrian and center_id in pedestrians:
+                if pedestrians[center_id].sim_state is not ActorSimState.INACTIVE:
+                    pid = int(center_id)
                     if SHOW_CPLOT: #cartesian plot with lanelet map
                         self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, traffic_lights, static_objects)
 
@@ -142,22 +152,37 @@ class Dashboard(object):
     def change_tab_focus(self, event):
         focus = self.tab.focus()
         if (focus):
-            self.center_id = focus #sets center_id to an int or string
-            #log.info("Changed focus to {}".format(self.center_id))
+            set_center_id(int(focus[1:])) #sets center_id to an int
+            #log.info("Changed focus to {}".format(get_center_id()))
 
     def update_table(self, vehicles):
+        def parse_vehicle(vehicle):
+            sim_state = vehicle['sim_state']
+            sv = vehicle['state'].get_state_vector()
+            truncate_vector(sv, 2)
+            return [sim_state] + sv
+
+        center_id = get_center_id()
         current_set = self.tab.get_children()
+        perceived_vehicles = get_perceived_vehicles(vehicles)
+
         if current_set:
             self.tab.delete(*current_set)
+
         for vid in vehicles:
-            vehicle = vehicles[vid]
-            sim_state = vehicles[vid].sim_state
-            sv = vehicle.state.get_state_vector()
-            truncate_vector(sv,2)
-            sv = ['v'+ str(vid)] + [sim_state] + sv
+            if vid == center_id:
+                sv = parse_vehicle(vehicles[vid].__dict__)
+            elif vid in perceived_vehicles:
+                sv = parse_vehicle(perceived_vehicles[vid])
+            else:
+                sv = [ '???' ] * 14
+
+            sv = ['v'+ str(vid)] + sv
+
             self.tab.insert('', 'end', 'v' + str(vid), values=(sv))
-        if self.tab.exists(self.center_id):
-            self.tab.selection_set(self.center_id)
+
+        if self.tab.exists(center_id):
+            self.tab.selection_set(center_id)
 
     def update_pedestrian_table(self, pedestrians):
         if len(pedestrians) == 0:
@@ -333,12 +358,22 @@ class Dashboard(object):
     def plot_vehicles(self,vehicles,x_min,x_max,y_min,y_max, show_arrow = False):
         ax = plt.gca()
         if vehicles:
+            perceived_vehicles = get_perceived_vehicles(vehicles)
+
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
                     continue
-                colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state, vehicle.name)
-                x = vehicle.state.x
-                y = vehicle.state.y
+
+                colorcode,alpha = self.get_color_by_type('vehicle', vehicle.type, vehicle.sim_state, vehicle.name, actor_id=vid)
+
+                # Show the perceived vehicle instead of the ground truth
+                if vid in perceived_vehicles:
+                    vehicle = perceived_vehicles[vid]
+                else:
+                    vehicle = vehicle.__dict__
+
+                x = vehicle['state'].x
+                y = vehicle['state'].y
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     #centre
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
@@ -346,7 +381,7 @@ class Dashboard(object):
                         #rectangle origin
                         rect_x = x -(VEHICLE_LENGTH/2)
                         rect_y = y -(VEHICLE_WIDTH/2)
-                        t = matplotlib.transforms.Affine2D().rotate_deg_around(x,y,vehicle.state.yaw) + ax.transData #transform rotation around centre
+                        t = matplotlib.transforms.Affine2D().rotate_deg_around(x,y,vehicle['state'].yaw) + ax.transData #transform rotation around centre
                         rect = matplotlib.patches.Rectangle( (rect_x,rect_y),VEHICLE_LENGTH, VEHICLE_WIDTH, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
                         rect.set_transform(t)
                         ax.add_patch(rect)
@@ -355,14 +390,14 @@ class Dashboard(object):
                         circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                         ax.add_artist(circle1)
                     #label
-                    label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
+                    label = "ego ({})".format(int(vid)) if vehicle['name'].lower() == 'ego' else "v{}".format(int(vid))
                     label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
                     ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
                     #arrow
                     if (show_arrow):
-                        vx = vehicle.state.x_vel
-                        vy = vehicle.state.y_vel
-                        if vehicle.state.s_vel < 0:
+                        vx = vehicle['state'].x_vel
+                        vy = vehicle['state'].y_vel
+                        if vehicle['state'].s_vel < 0:
                             vx = -vx
                             vy = -vy
                         plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
@@ -374,7 +409,7 @@ class Dashboard(object):
             for pid, pedestrian in pedestrians.items():
                 if pedestrian.sim_state is ActorSimState.INACTIVE:
                     continue
-                colorcode,alpha = self.get_color_by_type('pedestrian',pedestrian.type, pedestrian.sim_state)
+                colorcode,alpha = self.get_color_by_type('pedestrian', pedestrian.type, pedestrian.sim_state, actor_id=pid)
                 x = pedestrian.state.x
                 y = pedestrian.state.y
 
@@ -498,7 +533,7 @@ class Dashboard(object):
 
         #other vehicles, from main vehicle POV:
         for vid,vehicle in vehicles.items():
-            colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state,vehicle.name)
+            colorcode,alpha = self.get_color_by_type('vehicle', vehicle.type, vehicle.sim_state, vehicle.name, actor_id=vid)
             vs = vehicle.state
             plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
             circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
@@ -510,7 +545,7 @@ class Dashboard(object):
         for pid, pedestrian in pedestrians.items():
             if pedestrian.sim_state is ActorSimState.INACTIVE:
                 continue
-            colorcode,alpha = self.get_color_by_type('pedestrian',pedestrian.type, pedestrian.sim_state)
+            colorcode,alpha = self.get_color_by_type('pedestrian', pedestrian.type, pedestrian.sim_state, actor_id=pid)
             x = pedestrian.state.s
             y = pedestrian.state.d
             #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
@@ -557,7 +592,7 @@ class Dashboard(object):
         
 
 
-    def get_color_by_type(self,actor,a_type,sim_state = None, name = ''):
+    def get_color_by_type(self, actor, a_type, sim_state = None, name = '', actor_id = None):
         #color
         colorcode = 'k' #black
         if actor== 'vehicle':
@@ -586,8 +621,14 @@ class Dashboard(object):
         #alpha
         alpha = 1.0
         if sim_state:
-            if sim_state== ActorSimState.ACTIVE:
-                alpha = 1.0
+            if sim_state == ActorSimState.ACTIVE:
+                if actor == 'vehicle' and actor_id != None and actor_id != get_center_id():
+                    try:
+                        if actor_id not in get_vehicles():
+                            alpha = 0.5
+                    except Exception as error:
+                        pass # Ignore
+
             elif sim_state== ActorSimState.INACTIVE:
                 alpha = 0
             elif sim_state== ActorSimState.INVISIBLE:

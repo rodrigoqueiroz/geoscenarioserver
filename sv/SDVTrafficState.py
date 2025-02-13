@@ -262,7 +262,8 @@ def get_traffic_state(
         except OutsideRefPathException:
             del static_objects[soid]
 
-    road_occupancy = fill_occupancy(my_vid,vehicle_state,lane_config,traffic_vehicles,traffic_vehicles_orp ,lanelet_map, intersections)
+    road_occupancy = fill_occupancy(my_vid, vehicle_state, lane_config, traffic_vehicles, traffic_vehicles_orp, 
+                                    lanelet_map, intersections)
 
     # Goal
     try:
@@ -290,7 +291,7 @@ def get_traffic_state(
         road_occupancy = road_occupancy
     )
 
-def fill_occupancy(my_vid: int, vehicle_state:VehicleState,lane_config:LaneConfig,traffic_vehicles,traffic_vehicles_orp,lanelet_map:LaneletMap, intersections):
+def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections):
     '''
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id. 
         Road Occupancy contains only one vehicle per zone (closest to SDV)

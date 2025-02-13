@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 #rqueiroz@uwaterloo.ca
+#fbouchar@uwaterloo.ca
 # ---------------------------------------------
 # TickSync
 # Syncronize simulation loop based on a given frequency (frame-rate).
@@ -7,13 +8,15 @@
 # but requires more processing capabilities. Can't avoid drift if hardware is slow.
 # --------------------------------------------
 
-import datetime
-import time
-import math
 import csv
-from SimConfig import *
-from util.Utils import truncate
+import datetime
 import glog as log
+import math
+import time
+
+from requirements.RequirementViolationEvents import GlobalTick, ScenarioTimeout
+from SimConfig  import *
+from util.Utils import truncate
 
 class TickSync():
 
@@ -28,9 +31,9 @@ class TickSync():
         self.label = label
         self.sim_start_time = sim_start_time
         #global
-        self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
-        self.tick_count = 0
-        self.sim_time = 0          #Total simulation time since start() [s]
+        self._sim_start_clock = None        #clock time when sim started (first tick) [clock]
+        self.tick_count       = 0
+        self.sim_time         = 0           #Total simulation time since start() [s]
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
@@ -46,7 +49,7 @@ class TickSync():
     def get_sim_time(self):
         return self.sim_time
 
-    def set_timeout(self,timeout):
+    def set_timeout(self, timeout):
         self.timeout = timeout
     
     def print(self,msg):
@@ -88,13 +91,17 @@ class TickSync():
         passed_time = (now - self._sim_start_clock).total_seconds()
         self.sim_time =  self.sim_start_time + passed_time
         self.tick_count+=1
+        GlobalTick()
         #stats
         self.update_stats()
+
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
-                log.info('{} TIMEOUT: {:.3}s'.format(self.label,self.sim_time))
+                ScenarioTimeout(self.timeout)
+                log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False
+
         return True
     
     def update_stats(self):

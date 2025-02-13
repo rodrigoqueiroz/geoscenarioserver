@@ -14,13 +14,14 @@ import glog as log
 class Actor(object):
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None):
         self.id = id
-        self.name = name
-        self.sim_state = ActorSimState.ACTIVE
-        self.radius = 0.0
-        self.type = None
-        self.model = None
-        self.ghost_mode = False
+        self.is_detected = True
+        self.ghost_mode  = False
+        self.model       = None
+        self.name        = name
+        self.radius      = 0.0
+        self.sim_state   = ActorSimState.ACTIVE
         self.sim_traffic = None
+        self.type        = None
 
         #state
         #start state in sim frame

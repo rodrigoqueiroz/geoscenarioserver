@@ -23,6 +23,10 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
+def extract_tag(vnode, name, default_value, parser_fn):
+    return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
+
+
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
@@ -103,7 +107,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             break
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
-        model = vnode.tags['model'] if 'model' in vnode.tags else ''
+        model = extract_tag(vnode, 'model', '', str)
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
         #yaw = 90.0
@@ -114,9 +118,25 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #        yaw += 360.0
         #    elif yaw >= 180.0:
         #        yaw -= 360.0
-        yaw = float(vnode.tags['yaw'])*-1 if 'yaw' in vnode.tags else 0.0
         #print(yaw)
-        btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
+
+        btype = extract_tag(vnode, 'btype', '', str).lower()
+        goal_ends_simulation = False 
+
+        if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
+            goal_ends_simulation = True
+
+        detection_range_in_meters = extract_tag(vnode, 'detection_range_in_meters', None, float)
+        misdetection_weight       = extract_tag(vnode, 'misdetection_weight',       None, float)
+        noise_position_mixture    = [
+            extract_tag(vnode, 'noise_mean_position', 0.0,  float),
+            extract_tag(vnode, 'noise_std_position',  0.0,  float)
+        ]
+        noise_yaw_mostly_reliable     = extract_tag(vnode, 'noise_yaw_mostly_reliable',     0.0,  float)
+        noise_yaw_strongly_innacurate = extract_tag(vnode, 'noise_yaw_strongly_innacurate', 0.0,  float)
+        rule_engine_port              = extract_tag(vnode, 'rule_engine_port',              None, int)
+        yaw = -extract_tag(vnode, 'yaw', 0.0, float)
+
         log.info("Vehicle {}, behavior type {}".format(vid,btype))    
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
@@ -170,7 +190,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
-                                btype=btype
+                                btype=btype, detection_range_in_meters=detection_range_in_meters, 
+                                goal_ends_simulation=goal_ends_simulation, misdetection_weight=misdetection_weight,
+                                noise_position_mixture=noise_position_mixture, noise_yaw_mostly_reliable=noise_yaw_mostly_reliable,
+                                noise_yaw_strongly_innacurate=noise_yaw_strongly_innacurate, rule_engine_port=rule_engine_port
                             )
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],

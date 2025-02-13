@@ -5,27 +5,27 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
-from os import stat_result
-from matplotlib import pyplot as plt
-import math
-import sys
+import datetime
 import glog as log
+import math
 import numpy as np
-from TickSync import TickSync
+import sys
+
+from matplotlib import pyplot as plt
+from os import stat_result
+from typing import List
+
+from Actor import *
+from gsc.GSParser import Node
+from lanelet2.routing import Route
+from mapping.LaneletMap import LaneletMap
+from requirements.RequirementViolationEvents import ScenarioCompletion
+from shm.SimSharedMemory import *
 from SimConfig import *
-from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
-from util.Utils import *
 from sv.SDVPlanner import *
 from sv.SDVRoute import SDVRoute
-from Actor import *
-from mapping.LaneletMap import LaneletMap
-from shm.SimSharedMemory import *
-from util.Utils import kalman
-from typing import List
-from lanelet2.routing import Route
-from gsc.GSParser import Node
-
-import datetime
+from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
+from util.Utils import *
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(Actor):
@@ -65,10 +65,18 @@ class SDV(Vehicle):
     def __init__(
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
-            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
+            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="", 
+            detection_range_in_meters:float=None, goal_ends_simulation:bool=False,
+            misdetection_weight:float=None, noise_position_mixture:List[float]=[0,0], 
+            noise_yaw_mostly_reliable:float=0, noise_yaw_strongly_innacurate:float=0,
+            rule_engine_port:int=None):
         self.btype = btype
-        self.btree_locations = btree_locations
-        self.route_nodes = route_nodes
+        self.btree_locations         = btree_locations
+        self.goal_ends_simulation    = goal_ends_simulation
+        self.perception              = Perception(vid, detection_range_in_meters, misdetection_weight, 
+                                                  noise_position_mixture, noise_yaw_mostly_reliable, 
+                                                  noise_yaw_strongly_innacurate)
+        self.route_nodes             = route_nodes
 
         if start_state_in_frenet:
             # assume frenet start_state is relative to the starting global path
@@ -93,6 +101,7 @@ class SDV(Vehicle):
 
         #Planning
         self.sv_planner = None
+        self.rule_engine_port = rule_engine_port
 
         #Behavior
         self.root_btree_name = root_btree_name
@@ -109,7 +118,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes)
+        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes, self.goal_ends_simulation, self.perception, self.rule_engine_port)
         self.sv_planner.start()
 
     def stop(self):
@@ -117,6 +126,9 @@ class SDV(Vehicle):
             self.sv_planner.stop()
 
     def tick(self, tick_count:int, delta_time:float, sim_time:float):
+        if self.goal_ends_simulation and self.sv_planner.completion.value:
+            raise ScenarioCompletion("Vehicle under test reached its target")
+
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
