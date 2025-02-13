@@ -118,7 +118,7 @@ class Dashboard(object):
                             self.plot_vehicle_sd(traj, cand)
                         #behavior tree
                         self.tree_msg.delete("1.0", "end")
-                        self.tree_msg.insert("1.0", "==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))                    
+                        self.tree_msg.insert("1.0", btree_snapshot)                    
                     else:
                         #vehicles without planner:
                         self.plot_cartesian_chart(vid, vehicles, pedestrians)
@@ -711,10 +711,7 @@ class Dashboard(object):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
-        screen_width = window.winfo_screenwidth()
-        screen_height = window.winfo_screenheight()
-
-        window.geometry(f"{screen_width}x{screen_height}")  
+        window.configure("-fullscreen", True) 
 
         # Main containers:
         # title frame
