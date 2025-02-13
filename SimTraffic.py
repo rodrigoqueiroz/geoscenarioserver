@@ -7,6 +7,7 @@
 # dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
 # --------------------------------------------
 
+import multiprocessing
 from multiprocessing import  Manager, Array
 import numpy as np
 import glog as log
@@ -27,6 +28,7 @@ except:
 class SimTraffic(object):
 
     def __init__(self, laneletmap, sim_config):
+        #multiprocessing.set_start_method('forkserver', force=True)
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
 
@@ -51,6 +53,8 @@ class SimTraffic(object):
         #Traffic Log
         self.log_file = ''
         self.vehicles_log = {}
+
+        self.flag = None
 
     def add_vehicle(self, v:Vehicle):
         self.vehicles[v.id] = v
@@ -80,6 +84,7 @@ class SimTraffic(object):
 
 
     def start(self):
+        self.flag = True
         #Optional CARLA co-sim
         if CARLA_COSIMULATION:
             self.carla_sync = CarlaSync()
@@ -90,12 +95,12 @@ class SimTraffic(object):
         self.write_traffic_state(0 , 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
-        if self.cosimulation == True and self.simconfig.wait_for_client:
+        if self.cosimulation == True and self.sim_config.wait_for_client:
             log.warn("GSServer is running in co-simulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
             while(True):
                 header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:
-                    break;
+                    break
                 time.sleep(0.5)
 
         #Start SDV Planners
@@ -109,6 +114,7 @@ class SimTraffic(object):
                 pedestrian.start_planner()
 
     def stop_all(self):
+        self.flag = False
         if self.carla_sync:
             self.carla_sync.quit()
 
@@ -208,7 +214,7 @@ class SimTraffic(object):
     def write_traffic_state(self, tick_count, delta_time, sim_time):
         if not self.traffic_state_sharr:
             return
-
+            
         nv = len(self.vehicles)
         np = len(self.pedestrians)
 
