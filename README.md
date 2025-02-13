@@ -49,18 +49,24 @@ bash scripts/setup_conda-forge_env.bash
 - run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 
 ```
-optional arguments:
+usage: GSServer.py [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc]
+
+options:
   -h, --help            show this help message and exit
-  -s [FILE [FILE ...]], --scenario [FILE [FILE ...]]
+  -s [FILE ...], --scenario [FILE ...]
                         GeoScenario file. If no file is provided, the GSServer will load a scenario from code
+  --verify_map FILE     Lanelet map file
   -q VERBOSE, --quiet VERBOSE
                         don't print messages to stdout
-  -m, --map-path
+  -n, --no-dash         run without the dashboard
+  -m MAP_PATH, --map-path MAP_PATH
                         Set the prefix to append to the value of the attribute `globalconfig->lanelet`
-                        e.g. --map-path $HOME/anm_unreal_test_suite/maps
-  -b, --btree-locations
+  -b BTREE_LOCATIONS, --btree-locations BTREE_LOCATIONS
                         Add higher priority locations to search for btrees by agent btypes
-                        e.g. --btree-locations $HOME/anm_unreal_test_suite/btrees
+  -wi, --wait-for-input
+                        Wait for the user to press [ENTER] to start the simulation
+  -wc, --wait-for-client
+                        Wait for a valid client state to start the simulation
 ```
 
 - GeoScenario files (2.0 required) must be placed inside *scenarios/*
