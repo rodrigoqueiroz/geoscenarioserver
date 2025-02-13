@@ -72,7 +72,6 @@ class Dashboard(object):
 
             #clear
             self.clear_vehicle_charts()
-            self.tree_msg.configure(text= "")
 
             #get new data
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
@@ -96,7 +95,6 @@ class Dashboard(object):
 
             #find valid vehicle to focus plots and btree (if available)
             vid = None
-
 
             if (type(self.center_id) == str):
                 if self.center_id[0] == 'p':
@@ -368,8 +366,6 @@ class Dashboard(object):
                             vy = -vy
                         plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
 
-
-
     def plot_pedestrians(self, pedestrians, x_min, x_max, y_min, y_max, show_arrow=True):
         if pedestrians:
             for pid, pedestrian in pedestrians.items():
@@ -398,7 +394,6 @@ class Dashboard(object):
                     y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
                     plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
                     plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
-
 
     def plot_frenet_chart(self, center_id, traffic_state:TrafficState, debug_ref_path, traj, cand, unf, traj_s_shift):
         #Frenet Frame plot
@@ -441,7 +436,6 @@ class Dashboard(object):
             x, y = lane_config.stopline_pos
             plt.axvline(x, color= 'r', linestyle='-', zorder=1)
 
-
         #road_occupancy
         if SHOW_OCCUPANCY and traffic_state.road_occupancy is not None:
             road_occupancy:RoadOccupancy = traffic_state.road_occupancy
@@ -476,7 +470,6 @@ class Dashboard(object):
             gca.text(anchorx, anchory, y_label)
             gca.text(anchorx, anchory + cellsize, i_label)
 
-
             #junction
             #size = 3
             #intersections = traffic_state.intersections
@@ -485,7 +478,6 @@ class Dashboard(object):
             #for intersection in intersections:
             #    if isinstance(intersection, sv.SDVTrafficState.AllWayStopIntersection):
             #        intersection.
-
 
         # Regulatory Elements
         if (regulatory_elements is not None):
@@ -563,9 +555,6 @@ class Dashboard(object):
         # update lane config based on current (possibly outdated) reference frame
         #lane_config = self.read_map(vehicle_state, self.reference_path)
 
-
-
-
     def get_color_by_type(self,actor,a_type,sim_state = None, name = ''):
         #color
         colorcode = 'k' #black
@@ -613,7 +602,6 @@ class Dashboard(object):
         plt.cla()
         fig = plt.figure(Dashboard.TRAJ_FIG_ID)
         plt.cla()
-
 
     @staticmethod
     def plot_trajectory(s_coef, d_coef, T, traj_s_shift, tcolor='grey'):
@@ -742,9 +730,9 @@ class Dashboard(object):
         stats_frame.place(relx=0, rely=0.05, relwidth=1.0, relheight=0.05)
         
         #map and cartesian
-        map_frame = tk.Frame(window, bg = "white")
-        map_frame.place(relx=0, rely=0.1, relwidth=0.35, relheight=0.4)
-        #tk.ttk.Separator(window,orient=tk.HORIZONTAL).grid(row=6, column=0, sticky='ew' )
+        if SHOW_MPLOT:
+            map_frame = tk.Frame(window, bg = "white")
+            map_frame.place(relx=0, rely=0.1, relwidth=0.35, relheight=0.4)
 
         cart_frame = tk.Frame(window, bg = "white")
         cart_frame.place(relx=0.35, rely=0.1, relwidth=0.35, relheight=0.4)

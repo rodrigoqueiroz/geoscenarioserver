@@ -7,7 +7,6 @@
 # dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
 # --------------------------------------------
 
-import multiprocessing
 from multiprocessing import  Manager, Array
 import numpy as np
 import glog as log
@@ -28,7 +27,6 @@ except:
 class SimTraffic(object):
 
     def __init__(self, laneletmap, sim_config):
-        #multiprocessing.set_start_method('forkserver', force=True)
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
 
@@ -53,8 +51,6 @@ class SimTraffic(object):
         #Traffic Log
         self.log_file = ''
         self.vehicles_log = {}
-
-        self.flag = None
 
     def add_vehicle(self, v:Vehicle):
         self.vehicles[v.id] = v
@@ -262,8 +258,6 @@ class SimTraffic(object):
         if self.carla_sync:
             self.carla_sync.write_server_state(tick_count, delta_time, self.vehicles)
 
-
-
     def detect_collisions(self,tick_count, delta_time, sim_time):
         for id_va, va in self.vehicles.items():
             if va.sim_state is not ActorSimState.ACTIVE:
@@ -284,8 +278,6 @@ class SimTraffic(object):
                             return True
         return False
 
-
-
     def log_sim_state(self, client_vehicle_states, disabled_vehicles):
         log.info("Collision between vehicles {}".format(disabled_vehicles))
         state_str = "GSS crash report:\n"
@@ -305,7 +297,6 @@ class SimTraffic(object):
                 np.linalg.norm([state.x_vel, state.y_vel])
             )
         log.info(state_str)
-
 
     def log_trajectories(self,tick_count,delta_time,sim_time):
         if WRITE_TRAJECTORIES:
@@ -332,7 +323,6 @@ class SimTraffic(object):
                     csv_writer.writerow(titleline)
                     for line in vlog:
                         csv_writer.writerow(line)
-
 
     #For independent processes:
     def read_traffic_state(self, traffic_state_sharr, actives_only = True):
