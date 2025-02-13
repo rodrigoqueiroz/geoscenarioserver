@@ -90,8 +90,8 @@ class SimTraffic(object):
         self.write_traffic_state(0 , 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
-        if self.cosimulation == True and WAIT_FOR_CLIENT:
-            log.warn("GSServer is running in Cosimulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
+        if self.cosimulation == True and self.simconfig.wait_for_client:
+            log.warn("GSServer is running in co-simulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
             while(True):
                 header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:

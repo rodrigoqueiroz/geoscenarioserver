@@ -15,12 +15,12 @@ ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 #Sim Config
 TIMEOUT = 30                #default timeout in [s] if not defined by scenario
-TRAFFIC_RATE = 30           #global tick rate
+TRAFFIC_RATE = 40           #global tick rate
 WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
 SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
-DASH_RATE = 10              #dash tick rate. Max is traffic rate.
+DASH_RATE = 20              #dash tick rate. Max is traffic rate.
 PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by the scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
@@ -106,3 +106,5 @@ class SimConfig:
     traffic_rate:int = TRAFFIC_RATE
     plot_vid:int = PLOT_VID
     show_dashboard:bool = SHOW_DASHBOARD
+    wait_for_input:bool = WAIT_FOR_INPUT
+    wait_for_client:bool = WAIT_FOR_CLIENT
