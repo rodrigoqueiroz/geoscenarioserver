@@ -19,9 +19,9 @@ TRAFFIC_RATE = 40           #global tick rate
 WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
-SHOW_DASHBOARD = True      	#show dash with plots, vehicles and trajectories. Optional.
+SHOW_DASHBOARD = True       #show dash with plots, vehicles and trajectories. Optional.
 DASH_RATE = 20              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1               	#vehicle to center the main plot around, if not defined by the scenario.
+PLOT_VID = 1                #vehicle to center the main plot around, if not defined by the scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
@@ -34,7 +34,7 @@ FFPLOT_LENGTH = 60			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
 #Cartesian
 SHOW_CPLOT = True           #whether to show the cartesian plot
-CPLOT_SIZE = 100			    #cartesian plot: road length in meters (shorter=better performance)
+CPLOT_SIZE = 100            #cartesian plot: road length in meters (shorter=better performance)
 REFERENCE_PATH = True       #reference path indicating the frenet frame for the vehicle
 SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
 SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
