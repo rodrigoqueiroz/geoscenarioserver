@@ -59,11 +59,11 @@ VEHICLE_LENGTH = 4.5        #vehicle length in [m]
 VEHICLE_WIDTH = 1.8         #vehicle width in [m]
 
 #Planning
-PLANNER_RATE = 3                    #Planner tick rate
-PLANNING_TIME = 0.33                #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
-USE_FIXED_PLANNING_TIME = True      #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
-POINTS_PER_METER = 3.0               #The number of points per meter to be used along the vehicle's reference path
-                                     #Note that the value that is used may be slightly different
+PLANNER_RATE = 5                 #Planner tick rate
+PLANNING_TIME = 0.2              #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
+USE_FIXED_PLANNING_TIME = True   #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
+POINTS_PER_METER = 3.0           #The number of points per meter to be used along the vehicle's reference path
+                                 #Note that the value that is used may be slightly different
 
 #Debugging and Log
 PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths
@@ -72,7 +72,7 @@ PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle
                                #This should only be set when you want to see these figures
                                #The program will crash after showing figures for all vehicles (an XIO error)
 LOG_PERFORMANCE = False
-MAX_NVEHICLES = math.inf              #Limit max number of active vehicles (math.inf if no limit)
+MAX_NVEHICLES = math.inf       #Limit max number of active vehicles (math.inf if no limit)
 EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
 
