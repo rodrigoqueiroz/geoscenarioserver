@@ -9,7 +9,7 @@ from math import sqrt, exp
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from multiprocessing import Process, set_start_method
+from multiprocessing import Process
 from TickSync import TickSync
 import tkinter as tk
 from tkinter import ttk
@@ -26,7 +26,6 @@ from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
-from threading import Thread
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -41,10 +40,8 @@ class Dashboard(object):
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
-        self.thread = None
-        self.maneuver = None 
 
-    def start(self, traffic):
+    def start(self):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
@@ -59,18 +56,24 @@ class Dashboard(object):
             return
 
         self.lanelet_map = self.sim_traffic.lanelet_map
-        self.run_dash_process(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata, traffic)
+        self._process = Process(target=self.run_dash_process,
+                                args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata),
+                                daemon=True)
+        self._process.start()
 
-    def run_dash_process(self, traffic_state_sharr, debug_shdata, traffic):
-        
+    def run_dash_process(self, traffic_state_sharr, debug_shdata):
+
         self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, realtime=False, block=True, verbose=False, label="DP")
+        sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
-            if not self.window or not traffic.flag:
+            if not self.window:
                 return
-             
+
+            #clear
             self.clear_vehicle_charts()
+            self.tree_msg.configure(text= "")
+
             #get new data
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
@@ -94,6 +97,7 @@ class Dashboard(object):
             #find valid vehicle to focus plots and btree (if available)
             vid = None
 
+
             if (type(self.center_id) == str):
                 if self.center_id[0] == 'p':
                     self.center_pedestrian = True
@@ -114,9 +118,9 @@ class Dashboard(object):
                             self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
                         if VEH_TRAJ_CHART: #vehicle traj plot
                             self.plot_vehicle_sd(traj, cand)
-                        #behavior tree update 
+                        #behavior tree
                         self.tree_msg.delete("1.0", "end")
-                        self.tree_msg.insert("1.0", "==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))
+                        self.tree_msg.insert("1.0", "==== Behavior Tree. Vehicle {} ====\n\n {} ".format(vid, btree_snapshot))                    
                     else:
                         #vehicles without planner:
                         self.plot_cartesian_chart(vid, vehicles, pedestrians)
@@ -132,10 +136,9 @@ class Dashboard(object):
             if SHOW_MPLOT:
                 self.map_canvas.draw()
             self.window.update()
-            
+
     def quit(self):
-        self.window.destroy()
-        # self._process.terminate()
+        self._process.terminate()
 
     def change_tab_focus(self, event):
         focus = self.tab.focus()
@@ -168,6 +171,7 @@ class Dashboard(object):
 
             sp = ['p' + str(pid)] + [sim_state] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
+
 
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
         #-Global Map cartesian plot
