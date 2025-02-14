@@ -170,7 +170,6 @@ class Dashboard(object):
             sp = ['p' + str(pid)] + [sim_state] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
-
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
         #-Global Map cartesian plot
         fig = plt.figure(Dashboard.MAP_FIG_ID, frameon=False)
@@ -209,7 +208,6 @@ class Dashboard(object):
         y_min = pedestrians[center_id].state.y - (CPLOT_SIZE/2)
         y_max = pedestrians[center_id].state.y + (CPLOT_SIZE/2)
 
-
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
 
@@ -237,7 +235,6 @@ class Dashboard(object):
         y_min = vehicles[center_id].state.y - (CPLOT_SIZE/2)
         y_max = vehicles[center_id].state.y + (CPLOT_SIZE/2)
 
-
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
         if REFERENCE_PATH and reference_path is not None:
@@ -257,7 +254,6 @@ class Dashboard(object):
         plt.gca().yaxis.set_visible(True)
         plt.margins(0,0)
         plt.subplots_adjust(bottom=0.05,top=0.95,left=0.05,right=0.95,hspace=0,wspace=0)
-
 
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
 
@@ -291,7 +287,6 @@ class Dashboard(object):
             #plt.plot(point[0], point[1], 'rH', markersize=10)
         #for stop_line in stop_lines:
             #plt.plot([pt.x for pt in stop_line], [pt.y for pt in stop_line], 'r-') #red
-
 
         #lights (must be drawn after other stop lines)
         if traffic_light_states:
@@ -761,7 +756,7 @@ class Dashboard(object):
         bt_frame = tk.Frame(canvas, bg="white")
 
         # Add the bt_frame to the canvas
-        canvas.create_window((0, 0), window=bt_frame, anchor="nw", width=screen_width*0.3)
+        canvas.create_window((0, 0), window=bt_frame, anchor="nw", width=screen_width*0.3, height=screen_height)
 
         # Update the scrollregion whenever bt_frame is resize
 
