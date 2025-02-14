@@ -646,7 +646,7 @@ class Dashboard(object):
         s_vel_coef = differentiate(s_coef)
         Dashboard.plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
 
-        # #   S Acc(t) curve
+        #S Acc(t) curve
         i+=1
         s_acc_coef = differentiate(s_vel_coef)
         plt.subplot(nrows,ncols,i)
@@ -711,8 +711,10 @@ class Dashboard(object):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
-        window.configure("-fullscreen", True) 
+        screen_height = window.winfo_screenheight()
+        screen_width = window.winfo_screenwidth() 
 
+        window.geometry(f"{screen_width}x{screen_height}")
         # Main containers:
         # title frame
         # stats frame
@@ -753,7 +755,7 @@ class Dashboard(object):
         bt_frame = tk.Frame(canvas, bg="white")
 
         # Add the bt_frame to the canvas
-        canvas.create_window((0, 0), window=bt_frame, anchor="nw", width=500)
+        canvas.create_window((0, 0), window=bt_frame, anchor="nw", width=screen_width*0.3)
 
         # Update the scrollregion whenever bt_frame is resize
 
@@ -767,7 +769,7 @@ class Dashboard(object):
         #vehicle sub containers
         traj_frame = tk.Frame(bt_frame, bg = "white")
 
-        # Content:
+        #Content:
         window.title = 'GeoScenario Server'
         str_title = ' GeoScenario Server '
         img_logos = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/logos.png").resize((380, 50)))

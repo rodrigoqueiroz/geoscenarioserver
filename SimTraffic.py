@@ -51,6 +51,7 @@ class SimTraffic(object):
         #Traffic Log
         self.log_file = ''
         self.vehicles_log = {}
+        self.traffic_running = False
 
     def add_vehicle(self, v:Vehicle):
         self.vehicles[v.id] = v
@@ -78,9 +79,8 @@ class SimTraffic(object):
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
 
-
     def start(self):
-        self.flag = True
+        self.traffic_running = True
         #Optional CARLA co-sim
         if CARLA_COSIMULATION:
             self.carla_sync = CarlaSync()
@@ -110,7 +110,7 @@ class SimTraffic(object):
                 pedestrian.start_planner()
 
     def stop_all(self):
-        self.flag = False
+        self.traffic_running = False
         if self.carla_sync:
             self.carla_sync.quit()
 
@@ -164,7 +164,6 @@ class SimTraffic(object):
                 #update carla remote agents if new state is available
                 if self.vehicles[vid].type is Vehicle.EV_TYPE and vid in vstates:
                     self.vehicles[vid].update_sim_state(vstates[vid], delta_time) #client_delta_time
-
 
         #tick vehicles (all types)
         for vid in self.vehicles:
