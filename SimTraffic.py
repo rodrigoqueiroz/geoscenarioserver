@@ -23,7 +23,6 @@ try:
 except:
     log.warning("Carla API not found")
 
-
 class SimTraffic(object):
 
     def __init__(self, laneletmap, sim_config):

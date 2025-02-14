@@ -714,7 +714,11 @@ class Dashboard(object):
         screen_height = window.winfo_screenheight()
         screen_width = window.winfo_screenwidth() 
 
-        window.geometry(f"{screen_width}x{screen_height}")
+        try:
+            window.attributes("-zoomed", True)
+        except:
+            window.state("zoomed")
+
         # Main containers:
         # title frame
         # stats frame
