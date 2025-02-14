@@ -715,8 +715,10 @@ class Dashboard(object):
         screen_width = window.winfo_screenwidth() 
 
         try:
+            #linux
             window.attributes("-zoomed", True)
         except:
+            #mac
             window.state("zoomed")
 
         # Main containers:
