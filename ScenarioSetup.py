@@ -63,7 +63,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
-    
+
     if use_local_cartesian:
         projector = LocalCartesianProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
         log.info("Using LocalCartesianProjector")
@@ -167,11 +167,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("SDV {} requires a route .".format(vid))
                 continue
             gs_route = vnode.tags['route']
-            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]   
+            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]
             route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
             #btree
             #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
-            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree" 
+            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree"
             try:
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, route_nodes,
@@ -229,7 +229,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                             start_state = start_state,                      #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
                             yaw = yaw,
                             trajectory = trajectory)                        #a valid trajectory with at least x,y,time per node
-                            
+
                 sim_traffic.add_vehicle(vehicle)
                 log.info("Vehicle {} initialized with TV behavior".format(vid))
 
@@ -281,7 +281,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         # External Vehicle (EV)
         elif btype == 'ev':
             bsource = vnode.tags['bsource']
-            vehicle = EV(vid, name, start_state, yaw, bsource) 
+            vehicle = EV(vid, name, start_state, yaw, bsource)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info("Vehicle {} initialized as an external vehicle".format(vid))
