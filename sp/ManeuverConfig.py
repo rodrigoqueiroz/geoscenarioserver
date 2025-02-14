@@ -5,7 +5,7 @@
 # CONFIG Data Classes and Constants for Maneuvers
 # --------------------------------------------
 from __future__ import annotations  #Must be first Include. Will be standard in Python4
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from SimConfig import *
 from util.Utils import *
 from enum import Enum, IntEnum
@@ -135,8 +135,8 @@ class MConfig:
 
 @dataclass
 class MKeepInLaneConfig(MConfig):
-    vel:MP = MP(1.0,10,3)              #velocity in [m/s] as MP
-    time:MP = MP(3.0,20,3)              #duration in [s] as MP
+    vel:MP = field(default_factory=lambda:MP(1.0,10,3))  #velocity in [m/s] as MP
+    time:MP = field(default_factory=lambda:MP(3.0,20,3))  #duration in [s] as MP
     #time_lowvel:MP = MP(6.0,10,3)      #duration in [s] as MP when starting
     #vel_threshold:float = 7            #upper bound for lowvel in [m/s]
     max_diff:float = 1.5               #max vel diff (current to target).

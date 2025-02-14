@@ -63,7 +63,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
-    
+
     if use_local_cartesian:
         projector = LocalCartesianProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
         log.info("Using LocalCartesianProjector")
@@ -101,7 +101,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
-    log.info("Scenario Setup: initializing vehicles.")
+    log.info("Scenario Setup, initializing vehicles:")
     for vid, vnode in parser.vehicles.items():
         if len(sim_traffic.vehicles) >= MAX_NVEHICLES:
             break
@@ -180,11 +180,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("SDV {} requires a route .".format(vid))
                 continue
             gs_route = vnode.tags['route']
-            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]   
+            route_nodes = [ TrajNode(x = node.x, y = node.y) for node in parser.routes[gs_route].nodes ]
             route_nodes.insert(0, TrajNode(x=vnode.x,y=vnode.y)) #insert vehicle location as start of route
             #btree
             #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
-            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree" 
+            root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree"
             try:
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, route_nodes,
@@ -207,6 +207,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     vehicle.btree_reconfig = vnode.tags['btconfig']
                 vehicle.model = model
                 sim_traffic.add_vehicle(vehicle)
+                log.info("Vehicle {} initialized with SDV behavior".format(vid))
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
                 raise e
@@ -221,48 +222,95 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 t_name = vnode.tags['trajectory']
                 t_nodes = parser.trajectories[t_name].nodes
                 trajectory = []
+                prev_node = None
                 for node in t_nodes:
                     nd = TrajNode()
                     nd.x = float(node.x)
                     nd.y = float(node.y)
                     nd.time = float(node.tags['time'])
-                    nd.speed = float(node.tags['speed']) if ('speed' in node.tags) else None
+                    if prev_node is not None:
+                        dt = nd.time - prev_node.time
+                        nd.x_vel = (nd.x - prev_node.x) / dt
+                        nd.y_vel = (nd.y - prev_node.y) / dt
+                        # the first node has unknown velocity, assume the same as the second node's
+                        if prev_node.x_vel is None or prev_node.y_vel is None:
+                            prev_node.x_vel = nd.x_vel
+                            prev_node.y_vel = nd.y_vel
                     nd.yaw = float(node.tags['yaw']) if ('yaw' in node.tags) else None
                     trajectory.append(nd)
+                    prev_node = nd
                 vehicle = TV(vid = vid,                                     #<= must ne integer
                             name = name,                                    #vehicle name
-                            start_state =  start_state,                     #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
+                            start_state = start_state,                      #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
                             yaw = yaw,
                             trajectory = trajectory)                        #a valid trajectory with at least x,y,time per node
-                            
+
                 sim_traffic.add_vehicle(vehicle)
+                log.info("Vehicle {} initialized with TV behavior".format(vid))
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
                 raise e
 
         # Path Vehicle (PV)
         elif btype == 'pv':
-            vehicle = Vehicle(vid, name, start_state, yaw=yaw)
+            if 'path' not in vnode.tags:
+                log.error("PV {} requires a path".format(vid))
+                continue
+
+            p_name = vnode.tags['path']
+            p_nodes = parser.paths[p_name].nodes
+            path = []
+            path_length = 0.0
+
+            for i in range(len(p_nodes)):
+            # for node in p_nodes:
+                if (i > 0):
+                    path_length += math.hypot(p_nodes[i].x - p_nodes[i-1].x, p_nodes[i].y - p_nodes[i-1].y)
+                nd = PathNode()
+                nd.x = float(p_nodes[i].x)
+                nd.y = float(p_nodes[i].y)
+                nd.s = path_length
+                # Convert from km/h to m/s
+                nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
+                path.append(nd)
+
+
+            # Set initial longitudinal velocity, path always takes precedence
+            frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
+            if path[0].speed is not None:
+                frenet_state[1] = path[0].speed / 3.6
+            elif 'speed' in vnode.tags:
+                frenet_state[1] = float(vnode.tags['speed']) / 3.6
+            else:
+                log.error("PV {} has no initial speed".format(vid))
+                continue
+
+            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
-            log.warning("Path-based vehicles are still not supported in GeoScenario Server {}".format(vid))
+            log.info("Vehicle {} initialized with PV behavior".format(vid))
+            log.warning("Path-based vehicles are only partially supported in GeoScenario Server {}".format(vid))
             continue
 
         # External Vehicle (EV)
         elif btype == 'ev':
             bsource = vnode.tags['bsource']
-            vehicle = EV(vid, name, start_state, yaw, bsource) 
+            vehicle = EV(vid, name, start_state, yaw, bsource)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
+            log.info("Vehicle {} initialized as an external vehicle".format(vid))
 
         # Neutral Vehicle
         else:
             vehicle = Vehicle(vid, name, start_state, yaw=yaw)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
+            log.info("Vehicle {} initialized as a motionless vehicle".format(vid))
         #=========
 
     #========= Pedestrians
+    if len(parser.pedestrians.items()) > 0:
+        log.info("Scenario Setup, initializing pedestrians:")
     for pid, pnode in parser.pedestrians.items():
         pid = int(pid)
         name = pnode.tags['name']
@@ -300,6 +348,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     trajectory.append(nd)
                 pedestrian = TP(pid, name, start_state, yaw, trajectory)
                 sim_traffic.add_pedestrian(pedestrian)
+                log.info("Pedestrian {} initialized with TP behavior".format(pid))
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
@@ -333,12 +382,14 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 btype=btype)
 
                 sim_traffic.add_pedestrian(pedestrian)
+                log.info("Pedestrian {} initialized with SP behavior".format(pid))
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
         else:
             pedestrian = Pedestrian(pid, name, start_state, yaw)
             sim_traffic.add_pedestrian(pedestrian)
+            log.info("Pedestrian {} initialized as a motionless pedestrian".format(pid))
 
     #========= Static Objects
     #Area based objetics are not supported yet.

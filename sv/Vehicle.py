@@ -20,12 +20,12 @@ from gsc.GSParser import Node
 from lanelet2.routing import Route
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementViolationEvents import ScenarioCompletion
-from shm.SimSharedMemory import *
+from shm.SimSharedMemoryServer import *
 from SimConfig import *
 from sv.SDVPlanner import *
 from sv.SDVRoute import SDVRoute
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
-from util.Utils import *
+from util.Utils import kalman
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(Actor):
@@ -34,6 +34,7 @@ class Vehicle(Actor):
     SDV_TYPE = 1
     EV_TYPE = 2
     TV_TYPE = 3
+    PV_TYPE = 4
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
@@ -41,21 +42,18 @@ class Vehicle(Actor):
         self.radius = VEHICLE_RADIUS
         self.model = ''
 
+
     def update_sim_state(self, new_state, delta_time):
         # NOTE: this may desync the sim and frenet vehicle state, so this should
         # only be done for external vehicles (which don't have a frenet state)
         if self.type is not Vehicle.EV_TYPE:
             log.warn("Cannot update sim state for gs vehicles directly.")
 
-    def get_full_state_for_client(self):
-        x = round((self.state.x * CLIENT_METER_UNIT))
-        y = round((self.state.y * CLIENT_METER_UNIT))
-        z = 0.0
-        position = [x, y, z]
-        velocity = [self.state.x_vel, self.state.y_vel]
 
-        #remote = 1 if self.is_remote else 0
-        return self.id, self.type, position, velocity, self.state.yaw_unreal, self.state.steer
+    def get_sim_state(self):
+        position = [self.state.x, self.state.y, 0.0]
+        velocity = [self.state.x_vel, self.state.y_vel]
+        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
 
 
 class SDV(Vehicle):
@@ -221,16 +219,12 @@ class SDV(Vehicle):
             self.state.y = y_vector[0]
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
-            #GSServer and Unreal transformations
             heading = np.array([self.state.x_vel, self.state.y_vel])
-            heading_unreal = np.array([self.state.y_vel,self.state.x_vel])
             if self.motion_plan:
                 if self.motion_plan.reversing:
                     heading *= -1
-                    heading_unreal *=1
             self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
-            self.state.yaw_unreal = math.degrees(math.atan2(heading_unreal[1], heading_unreal[0]))
-            
+
             #DEBUG:
             #Note: use this log to evaluate if the "jump back" issue returns
             #log.info("===VID: %d, Plan Tick: %d, Timestamp: %f, Delta Time: %f, Diff: %f, Start Time: %f, S Coef: (%f, %f, %f, %f, %f, %f)===" % (
@@ -265,9 +259,6 @@ class SDV(Vehicle):
             self.next_motion_plan = None
         else:
             self.next_motion_plan = plan
-
-
-
 
 
 class EV(Vehicle):
@@ -337,7 +328,7 @@ class EV(Vehicle):
 class TV(Vehicle):
     """
     A trajectory following vehicle.
-    @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
+    @param keep_active: If True, vehicle stays in simulation even when is not following a trajectory
     """
     def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True):
         super().__init__(vid, name, start_state, yaw=yaw)
@@ -348,8 +339,56 @@ class TV(Vehicle):
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
             self.state.set_X([9999, 0, 0])
-            self.state.set_Y([9999,0,0])
+            self.state.set_Y([9999, 0, 0])
 
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         self.follow_trajectory(sim_time, self.trajectory)
+
+
+class PV(Vehicle):
+    """
+    A path following vehicle.
+    @param keep_active: If True, vehicle stays in simulation even when is not following a trajectory
+
+    Not yet supported:
+    Vehicle parameters:
+    - cycles
+    - usespeedprofile
+    Path parameters:
+    - agentacceleration
+    - timetoacceleration
+    """
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True):
+        super().__init__(vid, name, start_state, frenet_state, yaw=yaw)
+        self.type = Vehicle.PV_TYPE
+        self.path = path
+        self._debug_shdata = debug_shdata
+        self.keep_active = keep_active
+
+        self.current_path_node = 0
+
+
+    def tick(self, tick_count, delta_time, sim_time):
+        Vehicle.tick(self, tick_count, delta_time, sim_time)
+        self.follow_path(delta_time, sim_time, self.path)
+
+        # Fill in some applicable debug data
+        traffic_state = TrafficState(
+            vid = self.id,
+            sim_time = sim_time,
+            vehicle_state = self.state,
+            lane_config = LaneConfig(left_bound=None, right_bound=None),
+            traffic_vehicles = {},
+            traffic_vehicles_orp = {},
+        )
+        vehicle_path = [(n.x, n.y) for n in self.path]
+        self.sim_traffic.debug_shdata[int(self.id)] = (
+            traffic_state,
+            None,
+            vehicle_path,
+            None,
+            None,
+            None,
+            0
+        )

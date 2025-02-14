@@ -35,11 +35,11 @@ class AllWayStopIntersection:
     stop_position: tuple = None                             #my long stop position in frenet frame
     my_stop_line:ConstLineString2d =  None                  #lanelet stop line (ConstLineString2D)
     yield_lanelets:List = field(default_factory=list)                              #[ll,sl] List with Lanelets and stoplines [ll,sl]
-    #stop_lines:List =  field(default_factory=list)  
+    #stop_lines:List =  field(default_factory=list)
     intersecting_lanelets:List = field(default_factory=list)                       #[ll,s] List with lanelets and place along S of the intersection
     appr_intersecting_lanelets:List = field(default_factory=list)                  #[] List of lanelets approaching intersection
 
-    def to_primitives(self): 
+    def to_primitives(self):
         #Creates a copy replacing Lanelet objects to IDs for pickling (for Debug)
         my_copy = copy(self)
         my_copy.my_stop_line = 0
@@ -53,12 +53,12 @@ class RightOfWayIntersection:
     stop_position:tuple = None                              #my long stop position in frenet frame
     my_stop_line:ConstLineString2d =  None                  #lanelet stop line (ConstLineString2D)
     yield_lanelets:List =  field(default_factory=list)                             #[ll,sl] List with Lanelets and stoplines
-    #stop_lines:List =  field(default_factory=list)  
+    #stop_lines:List =  field(default_factory=list)
     intersecting_lanelets:List = field(default_factory=list)                       #[ll,s] List with lanelets and place along S of the intersection
     appr_intersecting_lanelets:List = field(default_factory=list)                  #[] List of lanelets approaching intersection
     row_lanelets:List = field(default_factory=list)                                #[] List of lanelets with right of way
 
-    def to_primitives(self): 
+    def to_primitives(self):
         #Creates a copy replacing Lanelet objects to IDs for pickling (for Debug)
         my_copy = copy(self)
         my_copy.my_stop_line = 0
@@ -76,7 +76,7 @@ class TrafficLightIntersection:
     intersecting_lanelets:List = field(default_factory=list) #[ll,s] List with lanelets and place along S of the intersection
     color:TrafficLightState = None
 
-    def to_primitives(self): 
+    def to_primitives(self):
         #Creates a copy replacing Lanelet objects to IDs for pickling (for Debug)
         my_copy = copy(self)
         my_copy.my_stop_line = 0
@@ -90,7 +90,7 @@ class PedestrianIntersection:
     my_stop_line:ConstLineString2d =  None                  #lanelet stop line (ConstLineString2D)
     intersecting_lanelets:List = field(default_factory=list)                       #[ll,s] List with lanelets and place along S of the intersection
 
-    def to_primitives(self): 
+    def to_primitives(self):
         #Creates a copy replacing Lanelet objects to IDs for pickling (for Debug)
         my_copy = copy(self)
         my_copy.my_stop_line = 0
@@ -103,7 +103,7 @@ class PedestrianIntersection:
 class RoadOccupancy:
     front:int = None            #Zone 1: same lane, closest vehicle ahead, up to 50m
     left_front:int = None       #Zone 2: lateral, ahead (gap > 0), closest vehicle
-    left:int = None             #Zone 3: lateral, gap == 0, 
+    left:int = None             #Zone 3: lateral, gap == 0,
     left_back:int = None        #Zone 4: lateral, behind (gap < 0), closest vehicle
     back:int = None             #Zone 5: same lane, closest vehicle behind, up to 50m
     right_back:int = None       #Zone 6
@@ -126,8 +126,8 @@ class TrafficState:
     lane_config: LaneConfig
     traffic_vehicles: Dict
     traffic_vehicles_orp: Dict                  #vehicles outside of Reference Path, can't be transformed to current Frenet Frame
-    pedestrians: List
-    static_objects: List
+    pedestrians: List = None
+    static_objects: List = None
     road_occupancy:RoadOccupancy = None
     #road zone
     regulatory_elements: List = None
@@ -146,14 +146,14 @@ def project_dynamic_objects(
     traffic_pedestrians:dict,
     state_time:float,
     expected_planner_time:float):
-    '''Project dynamic objects based on expected planning time (if > 0) 
+    '''Project dynamic objects based on expected planning time (if > 0)
     and their current state"
     '''
 
     if last_plan and expected_planner_time > 0:
         sim_time_ahead = state_time + expected_planner_time
         delta_time = sim_time_ahead - last_plan.start_time
-        if (delta_time > last_plan.trajectory.T): 
+        if (delta_time > last_plan.trajectory.T):
             delta_time = last_plan.trajectory.T
         new_state = last_plan.trajectory.get_state_at(delta_time)
         vehicle_state.set_S(new_state[:3])
@@ -241,7 +241,7 @@ def get_traffic_state(
         except OutsideRefPathException:
             traffic_vehicles_orp[vid] = traffic_vehicles[vid]
             del traffic_vehicles[vid]
-    
+
     for pid, pedestrian in list(traffic_pedestrians.items()):
         try:
             s_vector, d_vector = sim_to_frenet_frame(
@@ -252,7 +252,7 @@ def get_traffic_state(
             pedestrian.state.set_D(d_vector)
         except OutsideRefPathException:
             del traffic_pedestrians[pid]
-    
+
     for soid, so in list(static_objects.items()):
         try:
             so.s, so.d = sim_to_frenet_position(
@@ -293,7 +293,7 @@ def get_traffic_state(
 
 def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections):
     '''
-        Identify vehicles in strategic zones using the (Frénet Frame) and assign their id. 
+        Identify vehicles in strategic zones using the (Frénet Frame) and assign their id.
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
     half_length = VEHICLE_LENGTH/2
@@ -335,19 +335,19 @@ def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConf
                             right_back.append(vehicle)
                         else:
                             right.append(vehicle)
-                
+
     occupancy = RoadOccupancy()
     occupancy.front = min(front, key=lambda v: v.state.s).id if len(front) > 0 else None
     occupancy.back = max(back, key=lambda v: v.state.s).id if len(back) > 0 else None
-    
+
     occupancy.left = min(left, key=lambda v: v.state.d).id if len(left) > 0 else None
     occupancy.left_back = max(left_back, key=lambda v: v.state.s).id if len(left_back) > 0 else None
     occupancy.left_front = min(left_front, key=lambda v: v.state.s).id if len(left_front) > 0 else None
-    
+
     occupancy.right = max(right, key=lambda v: v.state.d).id if len(right) > 0 else None
     occupancy.right_back = max(right_back, key=lambda v: v.state.s).id if len(right_back) > 0 else None
     occupancy.right_front = min(right_front, key=lambda v: v.state.s).id if len(right_front) > 0 else None
-    
+
     # vehicle and lanelets mapping [vehicle, [ll1,ll2]]
     vehicle_lanelet_map = {}
     for vid,vehicle in traffic_vehicles.items():
@@ -358,11 +358,11 @@ def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConf
         lls = lanelet_map.get_all_occupying_lanelets(vehicle.state.x, vehicle.state.y)
         if lls is not None:
             vehicle_lanelet_map[vehicle] = lls
-    
+
     #print("Vehicle lanelet map")
     #for vehicle,vlls in vehicle_lanelet_map.items():
     #    print (vehicle.id)
-    
+
     def lanelet_overlap(a_list, b_list):
         for a in a_list:
             for b in b_list:
@@ -378,28 +378,28 @@ def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConf
             for vehicle,vlls in vehicle_lanelet_map.items():
                 if lanelet_overlap( vlls, [ inter_ll[0] for inter_ll in intersection.intersecting_lanelets]):
                     occupancy.intersecting_zone.append(vehicle.id)
-            
+
             for vehicle,vlls in vehicle_lanelet_map.items():
                 if lanelet_overlap( vlls, [ inter_ll for inter_ll in intersection.row_lanelets]):
                     occupancy.row_zone.append(vehicle.id)
-            
+
             for yll, stop_line in intersection.yield_lanelets: #list of tuples
                 for vehicle,vlls in vehicle_lanelet_map.items():
                     for vll in vlls:
                         if vll.id == yll.id: #vehicle lanelet in the yielding lanelet set
                             dist = distance(BasicPoint2d(vehicle.state.x,  vehicle.state.y),to2D(stop_line))
-                            if dist < 3: 
+                            if dist < 3:
                                 #print("{} close to stop line, vehicle is in yielding area {}".format(vehicle.id,dist))
                                 occupancy.yielding_zone.append(vehicle.id)
                             else:
                                 #vehicle is still approaching yielding zone
                                 occupancy.appr_yielding_zone.append(vehicle.id)
-            
+
         if isinstance(intersection, AllWayStopIntersection):
 
             for vehicle,vlls in vehicle_lanelet_map.items():
                 if lanelet_overlap( vlls, [ inter_ll[0] for inter_ll in intersection.intersecting_lanelets]):
-                    occupancy.intersecting_zone.append(vehicle.id)      
+                    occupancy.intersecting_zone.append(vehicle.id)
 
             #for cll, s_pos in intersection.intersecting_lanelets:
             #    for vehicle,vlls in vehicle_lanelet_map.items():
@@ -415,18 +415,18 @@ def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConf
                     for vll in vlls:
                         if vll.id == yll.id: #vehicle lanelet in the yielding lanelet set
                             dist = distance(BasicPoint2d(vehicle.state.x,  vehicle.state.y),to2D(stop_line))
-                            if dist < 3: 
+                            if dist < 3:
                                 #print("{} close to stop line, vehicle is in yielding area {}".format(vehicle.id,dist))
                                 occupancy.yielding_zone.append(vehicle.id)
                             else:
                                 #vehicle is still approaching yielding zone
                                 occupancy.appr_yielding_zone.append(vehicle.id)
-        
+
         if isinstance(intersection, TrafficLightIntersection):
             continue
         if isinstance(intersection, PedestrianIntersection):
             continue
-        
+
         #DEBUG:
         #print("Vehicle {} Lanelet Map".format(my_vid))
         #for v,lls in vehicle_lanelet_map.items():
@@ -457,7 +457,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
     # LaneConfig(id, velocity, leftbound, rightbound).
     # /2 to center it on its centerline
     middle_lane_config = LaneConfig(0, 30, middle_lane_width / 2, middle_lane_width / -2)
-    
+
     left_ll, relationship = lanelet_map.get_left(cur_ll)
     if left_ll:
         upper_lane_width = LaneletMap.get_lane_width(left_ll, vehicle_state.x, vehicle_state.y)
@@ -478,7 +478,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
         conflicting_next.extend( lanelet_map.get_conflicting_by_route(sdv_route._lanelet_route,next_ll) )
     #lanelets approaching a conflicting lanelet
     appr_conflicting_next = []
-    for conf_ll in conflicting_next:     
+    for conf_ll in conflicting_next:
         appr_conflicting_next.extend( lanelet_map.get_previous_by_route(sdv_route._lanelet_route, conf_ll) )
 
     # Regulatory Elements
@@ -493,7 +493,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
     intersections = []      #GeoScenario and LL objects
     reg_elem_states = []    #simple data types for pickling
     for re in reg_elems:
-    
+
         # === TRAFFIC LIGHT ===
         if isinstance(re, lanelet2.core.TrafficLight):
             # lanelet2 traffic lights must have a corresponding state from the main process
@@ -514,7 +514,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
                                 color = traffic_light_states[re.id]
                                 )
             intersections.append(intersection)
-        
+
         # === RIGHT OF WAY ===
         elif isinstance(re, lanelet2.core.RightOfWay):
             #Maneuvers: ("Yield", ManeuverType::Yield) ("RightOfWay", ManeuverType::RightOfWay) ("Unknown", ManeuverType::Unknown)
@@ -526,7 +526,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
                 #traffic_signs = re.trafficSigns() # not available on RoW
                 #stop_line = re.stopLine #can be used only when one ref_line exists (one yielding lanelet)
                 my_stop_line = lanelet_map.get_my_ref_line( cur_ll, yield_lanelets, stop_lines )
-                
+
                 #Could be a stop line from a following lanelet
                 if my_stop_line is None and re_added_count > 0:
                     for next_ll in next_lanelets_sequence:
@@ -545,7 +545,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
                 #        row_lanelets.append(ll)
                 #reg_elem_states.append( RightOfWayState(stop_position=stop_pos, row_lanelets= []))
                 intersection = RightOfWayIntersection(
-                                    stop_position=stop_pos, 
+                                    stop_position=stop_pos,
                                     my_stop_line = my_stop_line,
                                     yield_lanelets = list(zip(yield_lanelets, stop_lines)),
                                     intersecting_lanelets = list(zip(conflicting_next, itertools.repeat(0))), #TODO, get s position
@@ -580,21 +580,21 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
             middle_lane_config.stopline_pos = stop_pos
             #reg_elem_states.append(AllWayStopState( stop_position=stop_pos ))
             intersection = AllWayStopIntersection(
-                                stop_position=stop_pos, 
+                                stop_position=stop_pos,
                                 my_stop_line = my_stop_line,
                                 yield_lanelets = list(zip(yield_lanelets, stop_lines)),
                                 intersecting_lanelets = list(zip(conflicting_next, itertools.repeat(0))), #TODO, get s position
                                 appr_intersecting_lanelets = appr_conflicting_next
                                 )
             intersections.append(intersection)
-              
+
         # === PEDESTRIAN CROSS ===
         #TODO
 
     return middle_lane_config, intersections, reg_elem_states
 
 def get_closest_point_to_line_on_route(sdv_route,x,y,x2,y2):
-    ''' Find closest point from a cartesian 2D line 
+    ''' Find closest point from a cartesian 2D line
         in current frenet (used for stop lines)
     '''
     try:
@@ -659,8 +659,8 @@ def get_closest_point_to_line_on_route(sdv_route,x,y,x2,y2):
                     #            count = count+1
                     #        int_lanelets[ll.id] = count
                     #        log.warning("row ll {} conflict with my next ll {}".format( row_ll.attributes['name'], next_lls[0].attributes['name']) )
-                
-                #reg_elem_states.append(AllWayStopState(stop_position=stop_pos, 
+
+                #reg_elem_states.append(AllWayStopState(stop_position=stop_pos,
                                                         #yield_lanelets=aws_lanelets,#for pickling
                                                         #intersecting_lanelets=int_lanelets))
     #OTHER CROSSING LANELETS:
@@ -685,7 +685,7 @@ def get_closest_point_to_line_on_route(sdv_route,x,y,x2,y2):
     #                 #    for v_ll_id in v_lanelet_ids:
     #                 #        if v_ll_id == cll.id:
     #                 #            int_lanelets[cll.id] = 1
-        
+
     #             print(int_lanelets)
 
 
@@ -693,6 +693,6 @@ def get_closest_point_to_line_on_route(sdv_route,x,y,x2,y2):
     #returns the closest point from a lanelet in current frenet (conflicting lanelets)
     #distance(cur_ll.centerline, ll.centerline)
     #for p in ll.centerline:
-    #    p.x 
+    #    p.x
     #sim_to_frenet_position(sdv_route.get_reference_path(),x,y,sdv_route.get_reference_path_s_start())
  #   pass

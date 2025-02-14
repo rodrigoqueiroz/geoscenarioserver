@@ -42,19 +42,19 @@ class Actor(object):
 
         self.state.yaw = yaw
 
-    def future_state(self, t):
+    def future_state(self, dt):
         """ Predicts a new state based on time and vel.
             Used for collision prediction and charts
-            Note: Acc can rapidly change. Using the current acc to predict future 
+            Note: Acc can rapidly change. Using the current acc to predict future
             can lead to overshooting forward or backwards when vehicle is breaking
             TODO: predict using history + kalman filter
         """
         state = [
-            self.state.s + (self.state.s_vel * t), #+ (self.state.s_acc * t * t),
-            self.state.s_vel, #+ (self.state.s_acc * t),
+            self.state.s + (self.state.s_vel * dt), #+ (self.state.s_acc * dt * dt),
+            self.state.s_vel, #+ (self.state.s_acc * dt),
             self.state.s_acc,
-            self.state.d + (self.state.d_vel * t), #+ (self.state.d_acc * t * t),
-            self.state.d_vel, #+ (self.state.d_acc * t),
+            self.state.d + (self.state.d_vel * dt), #+ (self.state.d_acc * dt * dt),
+            self.state.d_vel, #+ (self.state.d_acc * dt),
             self.state.d_acc
         ]
         return state
@@ -65,9 +65,9 @@ class Actor(object):
 
     def force_stop(self):
         #keep current position while forcing vel and acc to 0.0
-        self.state.x_vel = self.state.x_acc = self.state.y_vel  = self.state.y_acc = 0.0
-        self.state.s_vel = self.state.s_acc = self.state.d_vel  = self.state.d_acc = 0.0
-        pass    
+        self.state.x_vel = self.state.x_acc = self.state.y_vel = self.state.y_acc = 0.0
+        self.state.s_vel = self.state.s_acc = self.state.d_vel = self.state.d_acc = 0.0
+        pass
 
     def remove(self):
         self.sim_state = ActorSimState.INACTIVE
@@ -76,7 +76,7 @@ class Actor(object):
     def tick(self, tick_count, delta_time, sim_time):
         pass
 
-    def follow_trajectory(self,sim_time, trajectory):
+    def follow_trajectory(self, sim_time, trajectory):
         if trajectory:
             start_time = float(trajectory[0].time) #first node
             end_time = float(trajectory[-1].time) #last node
@@ -91,46 +91,110 @@ class Actor(object):
                         log.warn("vid {} is now INVISIBLE".format(self.id))
                     if EVALUATION_MODE:
                         if -self.id in self.sim_traffic.vehicles:
-                            self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE 
+                            self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE
                             log.warn("vid {} is now ACTIVE".format(-self.id))
-                
+
                 #find closest pair of nodes
                 for i in range(len(trajectory)-1):
-                    node = trajectory[i]
-                    next = trajectory[i+1]
-                    if (node.time <= sim_time <= next.time):
-                        #print("node.time <= {} sim_time {} <= next.time {} ".format(node.time,sim_time, next.time))
-                        #interpolate
-                        pdiff = (sim_time - node.time)/(next.time - node.time) #always positive
-                        x = node.x + ((next.x - node.x) * pdiff)
-                        x_vel = node.x_vel + ((next.x_vel - node.x_vel) * pdiff)
-                        y = node.y + ((next.y - node.y) * pdiff)
-                        y_vel = node.y_vel + ((next.y_vel - node.y_vel) * pdiff)
-                        self.state.set_X([x, x_vel, 0])
-                        self.state.set_Y([y, y_vel, 0])
-                        #print("t{} x{} -> nt{} nx{}. Interp pdiff{} ix{}".format(node.time, node.x, next.time, next.x,pdiff,x))
+                    n1 = trajectory[i]
+                    n2 = trajectory[i+1]
+                    if (n1.time <= sim_time < n2.time): # n2 must be strictly after n1
+                        dx = n2.x - n1.x
+                        dx_vel = n2.x_vel - n1.x_vel
+                        dy = n2.y - n1.y
+                        dy_vel = n2.y_vel - n1.y_vel
+                        dt = n2.time - n1.time
+                        x_acc = dx_vel/dt
+                        y_acc = dy_vel/dt
+                        pdiff = (sim_time - n1.time)/dt #always positive
+                        # Interpolate
+                        self.state.set_X([n1.x + (dx * pdiff), n2.x_vel, x_acc])
+                        self.state.set_Y([n1.y + (dy * pdiff), n2.y_vel, y_acc])
+                        self.state.yaw = n1.yaw
                         break
+
             #After trajectory, stay in last position or get removed
             if sim_time > end_time:
                 if not self.keep_active:
                     self.state.set_X([-9999, 0, 0])
-                    self.state.set_Y([-9999,0,0])
+                    self.state.set_Y([-9999, 0, 0])
                     if self.sim_state is ActorSimState.ACTIVE:
                         self.remove()
                 else:
                     self.force_stop()
 
+    def follow_path(self, delta_time, sim_time, path):
+        if path:
+            # Which path node have we most recently passed
+            node_checkpoint = 0
 
+            # Ideally we should first calculate acceleration, then velocity, then position (euler integration)
+            # For now, we'll ignore acceleration
+            # TODO: This could be improved by saving the current path node instead of having to find it again every tick
+
+            # Calculate velocity
+            for i in range(len(path)-1):
+                n1 = path[i]
+                n2 = path[i+1]
+                if (n1.s <= self.state.s <= n2.s):
+                    # For now we assume that the velocity is specified at each path point or none of them
+                    # Later we could instead interpolate between points with speed specified
+                    if n1.speed is not None and n2.speed is not None:
+                        # Interpolate the velocity
+                        ratio = (self.state.s - n1.s)/(n2.s - n1.s)
+                        self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
+
+                    node_checkpoint = i
+                    break
+
+            # Calculate frenet position
+            self.state.s += (self.state.s_vel * delta_time)
+
+            # Now calculate the cartesian state from the frenet state
+            for i in range(node_checkpoint, len(path)-1):
+                n1 = path[i]
+                n2 = path[i+1]
+                if (n1.s <= self.state.s <= n2.s):
+                    dx = n2.x - n1.x
+                    dy = n2.y - n1.y
+                    d = n2.s - n1.s
+                    # Calculate position
+                    ratio = (self.state.s - n1.s)/(d)
+                    self.state.x = n1.x + (dx) * ratio
+                    self.state.y = n1.y + (dy) * ratio
+
+                    # Calculate velocity vector
+                    self.state.x_vel = self.state.s_vel * dx/d
+                    self.state.y_vel = self.state.s_vel * dy/d
+
+                    # Calculate yaw
+                    self.state.yaw = math.degrees(math.atan2(dy, dx))
+                    break
+
+            # Reached the end of the path
+            if self.state.s > path[-1].s:
+                self.force_stop()
+                if not self.keep_active:
+                    self.state.set_X([-9999, 0, 0])
+                    self.state.set_Y([-9999,0,0])
+                    if self.sim_state is ActorSimState.ACTIVE:
+                        self.remove()
 
 @dataclass
 class TrajNode:
     x:float = 0.0
     y:float = 0.0
-    x_vel:float = 0.0
-    y_vel:float = 0.0
+    x_vel:float = None  # calculated as dx/dt, the first node same as the second
+    y_vel:float = None  # calculated as dy/dt, the first node same as the second
     time:float = 0.0
-    speed:float = 0.0
     yaw:float = 0.0
+
+@dataclass
+class PathNode:
+    x:float = 0.0      # [m]
+    y:float = 0.0      # [m]
+    s:float = 0.0      # [m]
+    speed:float = 0.0  # [m/s]
 
 @dataclass
 class ActorSimState(IntEnum):
@@ -140,7 +204,7 @@ class ActorSimState(IntEnum):
 
 @dataclass
 class ActorState:
-     #sim frame
+    #sim frame
     x:float = 0.0
     x_vel:float = 0.0
     x_acc:float = 0.0
@@ -152,7 +216,7 @@ class ActorState:
     z:float = 0.0
     z_vel:float = 0.0
     z_acc:float = 0.0
-  
+
     #frenet state
     s:float = 0.0
     s_vel:float = 0.0
@@ -160,19 +224,17 @@ class ActorState:
     d:float = 0.0
     d_vel:float = 0.0
     d_acc:float = 0.0
-    
+
     #the direction the actor is facing
     yaw:float = 0.0
-    yaw_unreal:float = 0.0
 
-    
     #For easy shared memory parsing
     def get_cart_state_vector(self):
         return [self.x, self.x_vel, self.x_acc,
                 self.y,  self.y_vel, self.y_acc]
 
     def get_frenet_state_vector(self):
-        return [self.s, self.s_vel, self.s_acc, 
+        return [self.s, self.s_vel, self.s_acc,
                 self.d, self.d_vel, self.d_acc]
 
     def set_state_vector(self, arr):

@@ -2,14 +2,14 @@ name: gss
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.11
   - pip
   - antlr4-python3-runtime==4.9.3
   - graphviz
   - matplotlib
   - numpy
   - scipy
-  - tk 
+  - tk
   - pip:
     - antlr-denter
     - glog

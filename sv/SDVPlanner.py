@@ -65,8 +65,8 @@ class SVPlanner(object):
         self._mplan_sharr = Array('f', c)
         #Process based
         self._process = Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr, 
-            self._mplan_sharr, 
+            self.traffic_state_sharr,
+            self._mplan_sharr,
             self._debug_shdata), daemon=True)
         self._process.start()
 
@@ -95,7 +95,7 @@ class SVPlanner(object):
         # New plan
         self.last_plan = plan
         return plan
-        
+
 
     #==SUB PROCESS=============================================
     def before_exit(self,*args):
@@ -108,8 +108,8 @@ class SVPlanner(object):
         signal(SIGTERM, self.before_exit)
 
         self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
-        
-        
+
+
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
         if self._rule_engine_port != None:
@@ -117,6 +117,7 @@ class SVPlanner(object):
         else:
             self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
         
+
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
         if USE_FIXED_PLANNING_TIME:
@@ -265,10 +266,9 @@ class SVPlanner(object):
             with self.completion.get_lock():
                 self.completion.value = True
 
-
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
 
-    def write_motion_plan(self, mplan_sharr, plan:MotionPlan): 
+    def write_motion_plan(self, mplan_sharr, plan:MotionPlan):
         if not plan:
             return
         #write motion plan
@@ -277,4 +277,4 @@ class SVPlanner(object):
         #print('Writting Sh Data VP')
         #print(mplan_sharr)
         mplan_sharr.release() #<=========RELEASE
-        
+
