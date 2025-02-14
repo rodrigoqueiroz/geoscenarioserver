@@ -711,7 +711,7 @@ class Dashboard(object):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
-        window.configure("-fullscreen", True) 
+        window.attributes("-zoomed", True)
 
         # Main containers:
         # title frame
