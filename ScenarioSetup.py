@@ -117,6 +117,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         yaw = float(vnode.tags['yaw'])*-1 if 'yaw' in vnode.tags else 0.0
         #print(yaw)
         btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
+        goal_ends_simulation = False 
+
+        if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
+            goal_ends_simulation = True
+
         # log.info("Vehicle {}, behavior type {}".format(vid,btype))
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
@@ -170,7 +175,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
-                                btype=btype
+                                btype=btype, goal_ends_simulation=goal_ends_simulation
                             )
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],

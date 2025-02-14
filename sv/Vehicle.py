@@ -19,6 +19,7 @@ from sv.SDVPlanner import *
 from sv.SDVRoute import SDVRoute
 from Actor import *
 from mapping.LaneletMap import LaneletMap
+from requirements.RequirementViolationEvents import ScenarioCompletion
 from shm.SimSharedMemoryServer import *
 from util.Utils import kalman
 from typing import List
@@ -63,9 +64,11 @@ class SDV(Vehicle):
     def __init__(
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
-            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
+            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="",
+            goal_ends_simulation:bool=False):
         self.btype = btype
         self.btree_locations = btree_locations
+        self.goal_ends_simulation    = goal_ends_simulation
         self.route_nodes = route_nodes
 
         if start_state_in_frenet:
@@ -107,7 +110,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes)
+        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes, self.goal_ends_simulation)
         self.sv_planner.start()
 
     def stop(self):
@@ -115,6 +118,9 @@ class SDV(Vehicle):
             self.sv_planner.stop()
 
     def tick(self, tick_count:int, delta_time:float, sim_time:float):
+        if self.goal_ends_simulation and self.sv_planner.completion.value:
+            raise ScenarioCompletion("Vehicle under test reached its target")
+            
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
