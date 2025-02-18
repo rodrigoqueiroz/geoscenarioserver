@@ -706,81 +706,82 @@ class Dashboard(object):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
+
+        screen_width = window.winfo_screenwidth()
         screen_height = window.winfo_screenheight()
-        screen_width = window.winfo_screenwidth() 
-
-        try:
-            #linux
-            window.attributes("-zoomed", True)
-        except:
-            #mac
-            window.state("zoomed")
-
-        # Main containers:
-        # title frame
-        # stats frame
-        # global frame  [  map  | table  ]
-        # vehicle frame [  cart | frenet | btree ]
-
-        #title and stats
-        title_frame = tk.Frame(window, bg = "black")
-        title_frame.place(relx=0, rely=0, relwidth=1.0, relheight=0.05)
-
-        stats_frame = tk.Frame(window, bg = "white")
-        stats_frame.place(relx=0, rely=0.05, relwidth=1.0, relheight=0.05)
+        window.geometry(f"{screen_width}x{screen_height}")
         
-        #map and cartesian
-        if SHOW_MPLOT:
-            map_frame = tk.Frame(window, bg = "white")
-            map_frame.place(relx=0, rely=0.1, relwidth=0.35, relheight=0.4)
+        vis_scaling = 1
+        txt_scaling = 1
 
-        cart_frame = tk.Frame(window, bg = "white")
-        cart_frame.place(relx=0.35, rely=0.1, relwidth=0.35, relheight=0.4)
+        if screen_height >= 1440 and screen_width >= 2560:
+            vis_scaling = 3
+            txt_scaling = 1.5
+        elif screen_height >= 1080 and screen_width >= 1920:
+            vis_scaling = 2
+            txt_scaling = 1.2
+        
+        window.minsize("1512x982")
+
+        # Configure row and column weights for dynamic resizing
+        window.columnconfigure(0, weight=1)  # Left section (70% width)
+        window.columnconfigure(1, weight=1)  # Right section (30% width)
+        window.columnconfigure(2, weight=1)  # Scrollable content
+        window.rowconfigure(0, weight=1)  # Title row
+        window.rowconfigure(1, weight=1)  # Stats row
+        window.rowconfigure(2, weight=3)  # Map/cartesian row
+        window.rowconfigure(3, weight=3)  # Fren frame
+        window.rowconfigure(4, weight=3)  # Tab frame
+        #window.rowconfigure(5, weight=4)  # Scrollable content
+
+        # # Frames
+        title_frame = tk.Frame(window, bg="black")
+        title_frame.grid(row=1, column=0, columnspan=3, sticky="nsew")
+
+        stats_frame = tk.Frame(window, bg="white")
+        stats_frame.grid(row=2, column=0, columnspan=3, sticky="nsew")
+
+        map_frame = tk.Frame(window, bg="white")
+        map_frame.grid(row=3, column=0, sticky="nsew")
+
+        cart_frame = tk.Frame(window, bg="white")
+        cart_frame.grid(row=3, column=1, sticky="nsew")
 
         fren_frame = tk.Frame(window, bg="white")
-        fren_frame.place(relx=0.01, rely=0.51, relwidth=0.69, relheight=0.29)
+        fren_frame.grid(row=4, column=0, columnspan=2, sticky="nsew")
 
         tab_frame = tk.Frame(window, bg="white")
-        tab_frame.place(relx=0, rely=0.8, relwidth=0.7, relheight=0.2)
+        tab_frame.grid(row=5, column=0, columnspan=2, sticky="nsew")
 
-        canvas = tk.Canvas(window)
-        canvas.place(relx=0.7, rely=0.1, relwidth=0.3, relheight=0.9)
+        # Scrollable Right Section
+        canvas = tk.Canvas(window, bg="white")
+        canvas.grid(row=2, column=2, rowspan=4, sticky="nsew")
 
-        # Add a vertical scrollbar
         scrollbar = tk.Scrollbar(window, orient="vertical", command=canvas.yview)
-        scrollbar.place(relx=0.99, rely=0.1, relwidth=0.01, relheight=0.9)
+        scrollbar.grid(row=2, column=2, rowspan=4, sticky="nse")  # Align right edge of the column
 
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        # Create the bt_frame inside the canvas
         bt_frame = tk.Frame(canvas, bg="white")
+        canvas.create_window((0, 0), window=bt_frame, anchor="nw")
 
-        # Add the bt_frame to the canvas
-        canvas.create_window((0, 0), window=bt_frame, anchor="nw", width=screen_width*0.3, height=screen_height)
+        # Make widgets inside bt_frame expand
+        bt_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
-        # Update the scrollregion whenever bt_frame is resize
-
-        bt_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")  # Adjust scroll region based on content size
-            )
-        )
-
-        #vehicle sub containers
+        # #vehicle sub containers
         traj_frame = tk.Frame(bt_frame, bg = "white")
 
-        #Content:
+        # Content:
         window.title = 'GeoScenario Server'
         str_title = ' GeoScenario Server '
-        img_logos = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/logos.png").resize((380, 50)))
+        img_logos = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/logos.png").resize((int(380*vis_scaling), int(50*vis_scaling))))
         img_gs = pimg = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/gs.png").resize((40, 40)))
         img_veh = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle.png").resize((100, 47)))
         img_ego = ImageTk.PhotoImage(Image.open(ROOT_DIR + "/dash/img/icons/vehicle_ego.png").resize((80, 30)))
 
         # Widgets
         # title
-        lb = tk.Label(title_frame, text=str_title, bg = "black", fg="white",font=('OpenSans', 30))
+        lb = tk.Label(title_frame, text=str_title, bg = "black", fg="white",font=('OpenSans', int(30*txt_scaling))) # needs scaling
         lb.pack(side = 'left')
 
         lb_logos = tk.Label(title_frame, image=img_logos)
@@ -788,16 +789,16 @@ class Dashboard(object):
         lb_logos.pack(side='right')
 
         # stats container:
-        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', 10), anchor="w", justify=tk.LEFT)
+        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', int(12*txt_scaling)), anchor="w", justify=tk.LEFT)
         scenario_config_lb.pack(side = 'left')
         self.scenario_config_lb = scenario_config_lb
 
         # map
         if SHOW_MPLOT:
             fig_map = plt.figure(Dashboard.MAP_FIG_ID)
-            fig_map.set_size_inches(5, 5, forward=True)
+            fig_map.set_size_inches(2*vis_scaling, 2*vis_scaling, forward=True) # needs to be scaled
             self.map_canvas = FigureCanvasTkAgg(fig_map, map_frame)
-            self.map_canvas.get_tk_widget().pack()
+            self.map_canvas.get_tk_widget().pack(expand=True, fill="both")
 
         # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
@@ -811,7 +812,7 @@ class Dashboard(object):
         )
         for col in tab['columns']:
             tab.heading(col, text=col, anchor='center')
-            tab.column(col, anchor='center', width=65, minwidth=65)
+            tab.column(col, anchor='center', width=1, minwidth=1)
         tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
@@ -820,35 +821,36 @@ class Dashboard(object):
         # vehicle cart
         fig_cart = plt.figure(Dashboard.CART_FIG_ID)
         if not SHOW_MPLOT:
-            fig_cart.set_size_inches(7, 7, forward=True)
+            fig_cart.set_size_inches(4, 4, forward=True) # needs to be scaled
         else:
-            fig_cart.set_size_inches(6, 6, forward=True)
+            fig_cart.set_size_inches(2*vis_scaling, 2*vis_scaling, forward=True) # needs to be scaled
         self.cart_canvas = FigureCanvasTkAgg(fig_cart, cart_frame)
-        self.cart_canvas.get_tk_widget().pack()
+        self.cart_canvas.get_tk_widget().pack(expand=True, fill="both")
 
         # vehicle frenet
         fig_fren = plt.figure(Dashboard.FRE_FIG_ID)
-        #fig_fren.set_size_inches(6,4,forward=True)
+        fig_fren.set_size_inches(1*vis_scaling,1*vis_scaling,forward=True) # needs to be scaled
         self.fren_canvas = FigureCanvasTkAgg(fig_fren, fren_frame)
-        self.fren_canvas.get_tk_widget().pack()
+        self.fren_canvas.get_tk_widget().pack(expand=True, fill="both", padx=5*vis_scaling, pady=5*vis_scaling)
 
         # vehicle traj
         fig_traj = plt.figure(Dashboard.TRAJ_FIG_ID)
-        fig_traj.set_size_inches(4,4,forward=True)
+        fig_traj.set_size_inches(2*vis_scaling,2*vis_scaling,forward=True) # needs to be scaled
         self.traj_canvas = FigureCanvasTkAgg(fig_traj, traj_frame)
-        self.traj_canvas.get_tk_widget().pack()
-
-        tree_msg = tk.Text(bt_frame, height=65, spacing2=1, bg="white", fg="black", wrap="word")
+        self.traj_canvas.get_tk_widget().pack(expand=True, fill="both")
+        
+        tree_msg = tk.Text(bt_frame, height=int(65*txt_scaling), width=int(60*txt_scaling), spacing2=1, bg="white", fg="black", wrap="word", font=("Arial", int(12*txt_scaling)))
         self.tree_msg = tree_msg
         tree_msg.grid(row=0,column=0, sticky='nsew')
         
         #General plot Layout
-        matplotlib.rc('font', size=8)
-        matplotlib.rc('axes', titlesize=8)
-        matplotlib.rc('axes', labelsize=8)
-        matplotlib.rc('xtick', labelsize=6)
-        matplotlib.rc('ytick', labelsize=6)
-        matplotlib.rc('legend', fontsize=8)
-        matplotlib.rc('figure', titlesize=8)
-
+        matplotlib.rc('font', size=int(8*txt_scaling)) # needs to be scaled
+        matplotlib.rc('lines', linewidth=2*vis_scaling) #needs to be scaled
+        matplotlib.rc('axes', titlesize=8*vis_scaling)
+        matplotlib.rc('axes', labelsize=8*vis_scaling)
+        matplotlib.rc('xtick', labelsize=6*vis_scaling)
+        matplotlib.rc('ytick', labelsize=6*vis_scaling)
+        matplotlib.rc('legend', fontsize=8*vis_scaling)
+        matplotlib.rc('figure', titlesize=8*vis_scaling)
+        
         return window
