@@ -816,6 +816,8 @@ class Dashboard(object):
         tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
+        style = ttk.Style()
+        style.configure("Treeview", font=("Arial", int(12*txt_scaling))) # needs to be scaled
         self.tab = tab
 
         # vehicle cart
