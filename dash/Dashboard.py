@@ -789,7 +789,7 @@ class Dashboard(object):
         lb_logos.pack(side='right')
 
         # stats container:
-        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', int(12*txt_scaling)), anchor="w", justify=tk.LEFT)
+        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', int(10*txt_scaling)), anchor="w", justify=tk.LEFT)
         scenario_config_lb.pack(side = 'left')
         self.scenario_config_lb = scenario_config_lb
 
