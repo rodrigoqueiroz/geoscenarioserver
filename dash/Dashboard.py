@@ -721,7 +721,7 @@ class Dashboard(object):
             vis_scaling = 2
             txt_scaling = 1.2
         
-        window.minsize("1512x982")
+        window.minsize(1512, 982)
 
         # Configure row and column weights for dynamic resizing
         window.columnconfigure(0, weight=1)  # Left section (70% width)
