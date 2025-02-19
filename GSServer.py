@@ -132,7 +132,7 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--btree-locations", dest="btree_locations", default="", help="Add higher priority locations to search for btrees by agent btypes")
     parser.add_argument("-wi", "--wait-for-input", dest="wait_for_input", action="store_true", help="Wait for the user to press [ENTER] to start the simulation")
     parser.add_argument("-wc", "--wait-for-client", dest="wait_for_client", action="store_true", help="Wait for a valid client state to start the simulation")
-    parser.add_argument("--dash-pos", default=[0,0,0,0], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
+    parser.add_argument("--dash-pos", default=[], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
 
     args = parser.parse_args()
     start_server(args)
