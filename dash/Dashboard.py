@@ -710,11 +710,10 @@ class Dashboard(object):
         screen_width = window.winfo_screenwidth()
         screen_height = window.winfo_screenheight()
 
-        x, y, w, h = dash_pos
-        if set(dash_pos) == {0}:
-            x, y, w, h = 0, 0, screen_width, screen_height
-        else:
+        if dash_pos:
             x, y, w, h = dash_pos
+        else:
+            x, y, w, h = 0, 0, screen_width, screen_height
 
         window.geometry("%dx%d+%d+%d" % (w, h, x, y))
         
