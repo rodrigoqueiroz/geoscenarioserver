@@ -45,7 +45,8 @@ fi
 if ! $MAMBA_EXE env list | grep -q gss; then
     echo "Creating conda forge 'gss' environment..."
     $MAMBA_EXE env create --yes --quiet --file ${SCRIPT_DIR}/conda-environment.yml
-    if [[ $? == 0 ]]; then 
+    if [[ $? == 0 ]]; then
+        $MAMBA_EXE -n gss remove --force --yes --quiet tk
         echo "The environment created successfully."
     else 
         echo "Environment not created. Exiting..."
