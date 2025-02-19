@@ -63,7 +63,8 @@ class SDV(Vehicle):
     def __init__(
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
-            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str=""):
+            start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="",
+            rule_engine_port:int=None):
         self.btype = btype
         self.btree_locations = btree_locations
         self.route_nodes = route_nodes
@@ -91,6 +92,7 @@ class SDV(Vehicle):
 
         #Planning
         self.sv_planner = None
+        self.rule_engine_port = rule_engine_port
 
         #Behavior
         self.root_btree_name = root_btree_name
@@ -107,7 +109,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes)
+        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes, self.rule_engine_port)
         self.sv_planner.start()
 
     def stop(self):

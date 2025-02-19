@@ -6,30 +6,34 @@
 # --------------------------------------------
 
 from copy import copy
-from multiprocessing import Array, Process
-import sys
 import glog as log
+from multiprocessing import Array, Process
+from signal import signal, SIGTERM
+import sys
+
 from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from SimTraffic import *
-from TickSync import TickSync
-from sv.btree.BehaviorLayer import BehaviorLayer
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
-from signal import signal, SIGTERM
+from TickSync import TickSync
+
+import sv.btree.BehaviorLayer       as btree
+import sv.ruleEngine.BehaviorLayer  as rules
 
 class SVPlanner(object):
-    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes):
+    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, rule_engine_port = None):
         #MainProcess space:
         self._process = None
-        self.traffic_state_sharr = sim_traffic.traffic_state_sharr
+        self.traffic_state_sharr  = sim_traffic.traffic_state_sharr
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
-        self._debug_shdata = sim_traffic.debug_shdata
-        self._mplan_sharr = None
+        self._debug_shdata        = sim_traffic.debug_shdata
+        self._mplan_sharr         = None
+        self._rule_engine_port    = rule_engine_port
 
         #Shared space
         self.vid = int(sdv.id)
@@ -102,7 +106,10 @@ class SVPlanner(object):
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
-        self.behavior_layer = BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
+        if self._rule_engine_port != None:
+            self.behavior_layer = rules.BehaviorLayer(self.vid, self.btype, self._rule_engine_port)
+        else:
+            self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)

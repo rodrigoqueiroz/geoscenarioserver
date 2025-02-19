@@ -1,9 +1,10 @@
-catkin_ws
-.venv
-scenarios/plots/*
-scenarios/logs/*
+*.DS_Store
 *__pycache__/
 **/build/
+.venv
 .vscode/
-*.DS_Store
+catkin_ws
+results
+scenarios/plots/*
+scenarios/logs/*
 test_btree_parser
