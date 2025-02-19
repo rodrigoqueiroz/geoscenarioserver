@@ -784,7 +784,7 @@ class Dashboard(object):
 
         # Widgets
         # title
-        lb = tk.Label(title_frame, text=str_title, bg = "black", fg="white",font=('OpenSans', int(30*txt_scaling))) # needs scaling
+        lb = tk.Label(title_frame, text=str_title, bg = "black", fg="white",font=('TkHeadingFont', int(30*txt_scaling))) # needs scaling
         lb.pack(side = 'left')
 
         lb_logos = tk.Label(title_frame, image=img_logos)
@@ -792,7 +792,7 @@ class Dashboard(object):
         lb_logos.pack(side='right')
 
         # stats container:
-        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('OpenSans', int(10*txt_scaling)), anchor="w", justify=tk.LEFT)
+        scenario_config_lb = tk.Label(stats_frame, bg='white', text='Loading \n scenario...', font=('TkHeadingFont', int(10*txt_scaling)), anchor="w", justify=tk.LEFT)
         scenario_config_lb.pack(side = 'left')
         self.scenario_config_lb = scenario_config_lb
 
@@ -847,7 +847,7 @@ class Dashboard(object):
         tree_msg = tk.Text(bt_frame, height=int(65*txt_scaling), width=int(60*txt_scaling), spacing2=1, bg="white", fg="black", wrap="word", font=("TkDefaultFont", int(12*txt_scaling)))
         self.tree_msg = tree_msg
         tree_msg.grid(row=0,column=0, sticky='nsew')
-        
+
         #General plot Layout
         matplotlib.rc('font', size=int(8*txt_scaling)) # needs to be scaled
         matplotlib.rc('lines', linewidth=2*vis_scaling) #needs to be scaled

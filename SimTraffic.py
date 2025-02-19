@@ -208,7 +208,7 @@ class SimTraffic(object):
     def write_traffic_state(self, tick_count, delta_time, sim_time):
         if not self.traffic_state_sharr:
             return
-            
+
         nv = len(self.vehicles)
         np = len(self.pedestrians)
 
@@ -387,3 +387,4 @@ class SimTraffic(object):
         static_objects = copy(self.static_objects)
 
         return header, vehicles, pedestrians, traffic_light_states, static_objects
+    

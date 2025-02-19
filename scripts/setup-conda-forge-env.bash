@@ -46,6 +46,8 @@ if ! $MAMBA_EXE env list | grep -q gss; then
     echo "Creating conda forge 'gss' environment..."
     $MAMBA_EXE env create --yes --quiet --file ${SCRIPT_DIR}/conda-environment.yml
     if [[ $? == 0 ]]; then
+        # conda-forge tk does not support TrueType fonts
+        # remove it so that we can use the one from pip
         $MAMBA_EXE -n gss remove --force --yes --quiet tk
         echo "The environment created successfully."
     else 

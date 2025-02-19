@@ -75,7 +75,7 @@ def start_server(args, m=MVelKeepConfig()):
     sync_global.set_timeout(sim_config.timeout)
 
     if sim_config.wait_for_input:
-            input("Press [ENTER] to start...")
+        input("Press [ENTER] to start...")
 
     #SIM EXECUTION START
     log.info('SIMULATION START')
