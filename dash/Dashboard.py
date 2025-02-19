@@ -9,7 +9,7 @@ from math import sqrt, exp
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from multiprocessing import Process
+from multiprocessing import Process, set_start_method
 from TickSync import TickSync
 import tkinter as tk
 from tkinter import ttk
@@ -26,6 +26,7 @@ from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
+from threading import Thread
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -40,8 +41,10 @@ class Dashboard(object):
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
+        self.thread = None
+        self.maneuver = None 
 
-    def start(self):
+    def start(self, traffic, pos):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
@@ -56,23 +59,17 @@ class Dashboard(object):
             return
 
         self.lanelet_map = self.sim_traffic.lanelet_map
-        self._process = Process(target=self.run_dash_process,
-                                args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata),
-                                daemon=True)
-        self._process.start()
+        self.run_dash_process(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata, traffic, pos)
 
-    def run_dash_process(self, traffic_state_sharr, debug_shdata):
-
-        self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
+    def run_dash_process(self, traffic_state_sharr, debug_shdata, traffic, pos):
+        self.window = self.create_gui(pos)
+        sync_dash = TickSync(DASH_RATE, realtime=False, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
-            if not self.window:
+            if not self.window or not traffic.traffic_running:
                 return
-
-            #clear
+             
             self.clear_vehicle_charts()
-
             #get new data
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
@@ -116,9 +113,9 @@ class Dashboard(object):
                             self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
                         if VEH_TRAJ_CHART: #vehicle traj plot
                             self.plot_vehicle_sd(traj, cand)
-                        #behavior tree
+                        #behavior tree update 
                         self.tree_msg.delete("1.0", "end")
-                        self.tree_msg.insert("1.0", btree_snapshot)                    
+                        self.tree_msg.insert("1.0", btree_snapshot)
                     else:
                         #vehicles without planner:
                         self.plot_cartesian_chart(vid, vehicles, pedestrians)
@@ -134,9 +131,10 @@ class Dashboard(object):
             if SHOW_MPLOT:
                 self.map_canvas.draw()
             self.window.update()
-
+            
     def quit(self):
-        self._process.terminate()
+        self.window.destroy()
+        # self._process.terminate()
 
     def change_tab_focus(self, event):
         focus = self.tab.focus()
@@ -234,6 +232,7 @@ class Dashboard(object):
         x_max = vehicles[center_id].state.x + (CPLOT_SIZE/2)
         y_min = vehicles[center_id].state.y - (CPLOT_SIZE/2)
         y_max = vehicles[center_id].state.y + (CPLOT_SIZE/2)
+
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
@@ -641,7 +640,7 @@ class Dashboard(object):
         s_vel_coef = differentiate(s_coef)
         Dashboard.plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
 
-        #S Acc(t) curve
+        # #   S Acc(t) curve
         i+=1
         s_acc_coef = differentiate(s_vel_coef)
         plt.subplot(nrows,ncols,i)
@@ -702,14 +701,21 @@ class Dashboard(object):
             t += 0.25
         plt.plot(X,Y,color=color)
 
-    def create_gui(self):
+    def create_gui(self, pos):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
 
         screen_width = window.winfo_screenwidth()
         screen_height = window.winfo_screenheight()
-        window.geometry(f"{screen_width}x{screen_height}")
+
+        x, y, w, h = pos
+        if set(pos) == {0}:
+            x, y, w, h = 0, 0, screen_width, screen_height
+        else:
+            x, y, w, h = pos
+
+        window.geometry("%dx%d+%d+%d" % (w, h, x, y))
         
         vis_scaling = 1
         txt_scaling = 1
@@ -720,8 +726,6 @@ class Dashboard(object):
         elif screen_height >= 1080 and screen_width >= 1920:
             vis_scaling = 2
             txt_scaling = 1.2
-        
-        window.minsize(1512, 982)
 
         # Configure row and column weights for dynamic resizing
         window.columnconfigure(0, weight=1)  # Left section (70% width)
@@ -817,7 +821,7 @@ class Dashboard(object):
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
         style = ttk.Style()
-        style.configure("Treeview", font=("Arial", int(12*txt_scaling))) # needs to be scaled
+        style.configure("Treeview", font=("Arial", int(12*txt_scaling)))
         self.tab = tab
 
         # vehicle cart
@@ -833,7 +837,7 @@ class Dashboard(object):
         fig_fren = plt.figure(Dashboard.FRE_FIG_ID)
         fig_fren.set_size_inches(1*vis_scaling,1*vis_scaling,forward=True) # needs to be scaled
         self.fren_canvas = FigureCanvasTkAgg(fig_fren, fren_frame)
-        self.fren_canvas.get_tk_widget().pack(expand=True, fill="both", padx=5*vis_scaling, pady=5*vis_scaling)
+        self.fren_canvas.get_tk_widget().pack(expand=True, fill="both", padx=3*vis_scaling, pady=3*vis_scaling)
 
         # vehicle traj
         fig_traj = plt.figure(Dashboard.TRAJ_FIG_ID)
@@ -846,8 +850,8 @@ class Dashboard(object):
         tree_msg.grid(row=0,column=0, sticky='nsew')
         
         #General plot Layout
+        matplotlib.rcParams['lines.linewidth'] = 2*vis_scaling
         matplotlib.rc('font', size=int(8*txt_scaling)) # needs to be scaled
-        matplotlib.rc('lines', linewidth=2*vis_scaling) #needs to be scaled
         matplotlib.rc('axes', titlesize=8*vis_scaling)
         matplotlib.rc('axes', labelsize=8*vis_scaling)
         matplotlib.rc('xtick', labelsize=6*vis_scaling)
