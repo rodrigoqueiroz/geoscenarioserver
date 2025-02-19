@@ -821,7 +821,7 @@ class Dashboard(object):
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
         style = ttk.Style()
-        style.configure("Treeview", font=("Arial", int(12*txt_scaling))) # needs to be scaled
+        style.configure("Treeview", font=("TkDefaultFont", int(12*txt_scaling))) # needs to be scaled
         self.tab = tab
 
         # vehicle cart
@@ -845,7 +845,7 @@ class Dashboard(object):
         self.traj_canvas = FigureCanvasTkAgg(fig_traj, traj_frame)
         self.traj_canvas.get_tk_widget().pack(expand=True, fill="both")
         
-        tree_msg = tk.Text(bt_frame, height=int(65*txt_scaling), width=int(60*txt_scaling), spacing2=1, bg="white", fg="black", wrap="word", font=("Arial", int(12*txt_scaling)))
+        tree_msg = tk.Text(bt_frame, height=int(65*txt_scaling), width=int(60*txt_scaling), spacing2=1, bg="white", fg="black", wrap="word", font=("TkDefaultFont", int(12*txt_scaling)))
         self.tree_msg = tree_msg
         tree_msg.grid(row=0,column=0, sticky='nsew')
         

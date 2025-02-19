@@ -37,14 +37,21 @@ def start_server(args, m=MVelKeepConfig()):
         btree_locations = [base_btree_location]
     log.info ("Btree search locations set (in order) as: " + str(btree_locations))
 
-    traffic = SimTraffic(lanelet_map, sim_config)
-
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
         return
 
     if args.no_dash:
         sim_config.show_dashboard = False
+
+    if args.wait_for_input:
+        sim_config.wait_for_input = True
+
+    if args.wait_for_client:
+        sim_config.wait_for_client = True
+
+    # use sim_config after all modifications
+    traffic = SimTraffic(lanelet_map, sim_config)
 
     # SCENARIO SETUP
     if args.gsfiles:
@@ -67,6 +74,9 @@ def start_server(args, m=MVelKeepConfig()):
     sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(sim_config.timeout)
 
+    if sim_config.wait_for_input:
+            input("Press [ENTER] to start...")
+
     #SIM EXECUTION START
     log.info('SIMULATION START')
     traffic.start()
@@ -77,9 +87,6 @@ def start_server(args, m=MVelKeepConfig()):
         dashboard.start(args.dash_pos)
     else:
         log.warn("Dashboard will not start")
-
-    if WAIT_FOR_INPUT:
-        input("waiting for [ENTER]...")
 
     while sync_global.tick():
         if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
@@ -120,9 +127,11 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--scenario", dest="gsfiles", nargs='*', metavar="FILE", default="", help="GeoScenario file. If no file is provided, the GSServer will load a scenario from code")
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
     parser.add_argument("-q", "--quiet", dest="verbose", default=True, help="don't print messages to stdout")
-    parser.add_argument("-n", "--no_dash", dest="no_dash", action="store_true", help="run without the dashboard")
+    parser.add_argument("-n", "--no-dash", dest="no_dash", action="store_true", help="run without the dashboard")
     parser.add_argument("-m", "--map-path", dest="map_path", default="", help="Set the prefix to append to the value of the attribute `globalconfig->lanelet`")
     parser.add_argument("-b", "--btree-locations", dest="btree_locations", default="", help="Add higher priority locations to search for btrees by agent btypes")
+    parser.add_argument("-wi", "--wait-for-input", dest="wait_for_input", action="store_true", help="Wait for the user to press [ENTER] to start the simulation")
+    parser.add_argument("-wc", "--wait-for-client", dest="wait_for_client", action="store_true", help="Wait for a valid client state to start the simulation")
     parser.add_argument("--dash-pos", default=[0,0,0,0], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
 
     args = parser.parse_args()
