@@ -23,6 +23,10 @@ from sp.Pedestrian import *
 from gsc.GSParser import GSParser
 from Actor import *
 
+def extract_tag(vnode, name, default_value, parser_fn):
+    return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
+
+
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
@@ -103,7 +107,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             break
         vid = int(vid)   #<= must ne integer
         name = vnode.tags['name']   #vehicle name
-        model = vnode.tags['model'] if 'model' in vnode.tags else ''
+        model = extract_tag(vnode, 'model', '', str)
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
         #yaw = 90.0
@@ -114,15 +118,18 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #        yaw += 360.0
         #    elif yaw >= 180.0:
         #        yaw -= 360.0
-        yaw = float(vnode.tags['yaw'])*-1 if 'yaw' in vnode.tags else 0.0
         #print(yaw)
-        btype = vnode.tags['btype'].lower() if 'btype' in vnode.tags else ''
+
+        btype = extract_tag(vnode, 'btype', '', str).lower()
         goal_ends_simulation = False 
 
         if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
             goal_ends_simulation = True
+        rule_engine_port = extract_tag(vnode, 'rule_engine_port', None, int)
+        yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
-        # log.info("Vehicle {}, behavior type {}".format(vid,btype))
+        log.info("Vehicle {}, behavior type {}".format(vid,btype))    
+
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
             #start state
@@ -175,7 +182,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
-                                btype=btype, goal_ends_simulation=goal_ends_simulation
+                                btype=btype, goal_ends_simulation=goal_ends_simulation,
+                                rule_engine_port=rule_engine_port
                             )
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],
@@ -218,6 +226,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                         if prev_node.x_vel is None or prev_node.y_vel is None:
                             prev_node.x_vel = nd.x_vel
                             prev_node.y_vel = nd.y_vel
+                    nd.speed = float(node.tags['speed']) if ('speed' in node.tags) else None
                     nd.yaw = float(node.tags['yaw']) if ('yaw' in node.tags) else None
                     trajectory.append(nd)
                     prev_node = nd
@@ -229,6 +238,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
                 sim_traffic.add_vehicle(vehicle)
                 log.info("Vehicle {} initialized with TV behavior".format(vid))
+
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
                 raise e

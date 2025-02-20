@@ -9,10 +9,11 @@ dependencies:
   - matplotlib
   - numpy
   - scipy
-  - tk
+  - requests
   - pip:
     - antlr-denter
     - glog
     - lanelet2
     - py_trees==0.7.6
     - sysv-ipc
+    - tk
