@@ -6,10 +6,11 @@ from multiprocessing import Manager, Value
 manager = Manager()
 
 # Singleton
-agent_ticks  = manager.dict()
-file_name    = os.getenv('VIOLATION_REPORT_FOLDER', './results') + '/violations.json'
-global_tick  = Value('i', -1)
-violations   = manager.dict()
+agent_collisions = manager.dict()
+agent_ticks      = manager.dict()
+file_name        = os.getenv('VIOLATION_REPORT_FOLDER', './results') + '/violations.json'
+global_tick      = Value('i', -1)
+violations       = manager.dict()
 
 # Generic
 class ScenarioEnd:
@@ -36,8 +37,9 @@ class UnmetRequirement:
 class AgentTick:
 	def __init__(self, agent_id):
 		if agent_id not in agent_ticks:
-			agent_ticks[agent_id] = -1
-			violations[agent_id]  = {}
+			agent_collisions[agent_id] = {}
+			agent_ticks[agent_id]      = -1
+			violations[agent_id]       = {}
 
 		agent_ticks[agent_id] += 1
 
@@ -67,9 +69,18 @@ class ScenarioTimeout(UnmetRequirement):
 
 class VehicleCollision(UnmetRequirement):
 	def __init__(self, agent_id, vid):
-		self.raise_it(agent_id,
-			'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
-		)
+		collision_state = agent_collisions[agent_id]
+
+		# There must be a gap of 5 ticks without collision between collision with the same agent
+		if vid not in collision_state or agent_ticks[agent_id] - 5 > collision_state[vid]:
+			self.raise_it(agent_id,
+				'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
+			)
+
+		collision_state[vid] = agent_ticks[agent_id]
+
+		# That reassignment is necessary for the update to work in multiprocessing
+		agent_collisions[agent_id] = collision_state
 
 # Autoclean
 if os.path.exists(file_name):

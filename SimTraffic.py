@@ -7,17 +7,20 @@
 # dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
 # --------------------------------------------
 
-from multiprocessing import  Manager, Array
-import numpy as np
-import glog as log
-from copy import copy
 import csv
-from shm.SimSharedMemoryServer import *
-from Actor import *
-from sv.Vehicle import Vehicle
-from sp.Pedestrian import *
-from TrafficLight import TrafficLight
+import glog as log
+import numpy as np
 import time
+
+from copy import copy
+from multiprocessing import  Manager, Array
+
+from Actor import *
+from shm.SimSharedMemoryServer import *
+from sp.Pedestrian import *
+from sv.Vehicle import Vehicle
+from TrafficLight import TrafficLight
+
 try:
     from shm.CarlaSync import *
 except:
@@ -182,10 +185,6 @@ class SimTraffic(object):
         #log.info(self.debug_shdata)
         self.log_trajectories(tick_count, delta_time, sim_time)
 
-        #Collisions at Server Side
-        if self.detect_collisions(tick_count, delta_time, sim_time):
-            return -1
-
         return 0
 
     #Shared Memory:
@@ -255,28 +254,6 @@ class SimTraffic(object):
         #Carla socket
         if self.carla_sync:
             self.carla_sync.write_server_state(tick_count, delta_time, self.vehicles)
-
-
-
-    def detect_collisions(self,tick_count, delta_time, sim_time):
-        for id_va, va in self.vehicles.items():
-            if va.sim_state is not ActorSimState.ACTIVE:
-                continue
-            min_x = (va.state.x - VEHICLE_RADIUS)
-            max_x = (va.state.x + VEHICLE_RADIUS)
-            min_y = (va.state.y - VEHICLE_RADIUS)
-            max_y = (va.state.y + VEHICLE_RADIUS)
-            for id_vb, vb in self.vehicles.items():
-                if vb.sim_state is not ActorSimState.ACTIVE:
-                    continue
-                if id_va != id_vb:
-                    #this filter will be important when we use alternative (and more expensive) collision checking methods
-                    if  (min_x <= vb.state.x <= max_x) and (min_y <= vb.state.y <= max_y):
-                        dist = distance_2p(va.state.x,va.state.y, vb.state.x, vb.state.y)
-                        if  dist < (2*VEHICLE_RADIUS):
-                            log.error("Collision between vehicles {} {}".format(id_va,id_vb))
-                            return True
-        return False
 
 
 

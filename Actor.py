@@ -13,6 +13,8 @@ import glog as log
 
 class Actor(object):
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None):
+        self.bounding_box_length = 0.0
+        self.bounding_box_width  = 0.0
         self.id = id
         self.is_detected = True
         self.ghost_mode  = False

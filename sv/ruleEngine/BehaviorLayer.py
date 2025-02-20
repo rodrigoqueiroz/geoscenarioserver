@@ -10,6 +10,7 @@ from copy      import deepcopy
 from decimal   import Decimal
 from functools import partial
 
+from dash.DashboardSharedMemory import get_center_id
 from sv.ManeuverConfig import *
 from sv.ruleEngine.constants import *
 
@@ -171,7 +172,7 @@ class BehaviorLayer(object):
         #parameters['situation']['last_behaviour'] = self.last_behaviour
         self.last_behaviour = self.post_behaviour(convert_to_dict(situation))
 
-        if self.debug:
+        if self.debug and traffic_state.vid == get_center_id():
             print('Behaviour', self.last_behaviour)
 
         # Default Behaviour

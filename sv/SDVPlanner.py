@@ -31,14 +31,14 @@ import sv.ruleEngine.BehaviorLayer  as rules
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, perception = None, rule_engine_port = None):
         #MainProcess space:
-        self.completion = Value('b', False)
+        self.completion           = Value('b', False)
         self._process             = None
         self.traffic_state_sharr  = sim_traffic.traffic_state_sharr
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
         self._debug_shdata        = sim_traffic.debug_shdata
         self._mplan_sharr         = None
         self._perception          = perception
-        self._requirementsChecker = RequirementsChecker(goal_ends_simulation)
+        self._requirementsChecker = RequirementsChecker(sdv, goal_ends_simulation)
         self._rule_engine_port    = rule_engine_port
 
         #Shared space
@@ -48,16 +48,16 @@ class SVPlanner(object):
         self.sim_traffic:SimTraffic = sim_traffic
 
         #Subprocess space
-        self.sync_planner = None
-        self.root_btree_name = sdv.root_btree_name
-        self.btree_reconfig = sdv.btree_reconfig
-        self.behavior_model = None
-        self.mconfig = None
-        self.last_plan = None
+        self.behavior_model  = None
         self.btree_locations = btree_locations
-        self.btype = sdv.btype
-        self.sdv_route = None
-        self.route_nodes = route_nodes
+        self.btree_reconfig  = sdv.btree_reconfig
+        self.btype           = sdv.btype
+        self.last_plan       = None
+        self.mconfig         = None
+        self.root_btree_name = sdv.root_btree_name
+        self.route_nodes     = route_nodes
+        self.sdv_route       = None
+        self.sync_planner    = None
 
     def start(self):
         #Create shared arrray for Motion Plan

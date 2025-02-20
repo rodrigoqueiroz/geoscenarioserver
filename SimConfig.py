@@ -37,7 +37,7 @@ SHOW_CPLOT = True           #whether to show the cartesian plot
 CPLOT_SIZE = 100            #cartesian plot: road length in meters (shorter=better performance)
 REFERENCE_PATH = True       #reference path indicating the frenet frame for the vehicle
 SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
-SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
+SHOW_VEHICLE_RADIUS = True #vehicle plot with radius.
 
 #Vehicle trajectory
 VEH_TRAJ_CHART = False      #(!HEAVY, not stable) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
@@ -56,7 +56,7 @@ COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collisi
 #Standard vehicle dimensions
 VEHICLE_RADIUS = 1.0        #vehicle radius
 VEHICLE_LENGTH = 4.5        #vehicle length in [m]
-VEHICLE_WIDTH = 1.8         #vehicle width in [m]
+VEHICLE_WIDTH  = 1.8        #vehicle width in [m]
 
 #Planning
 PLANNER_RATE = 5                 #Planner tick rate

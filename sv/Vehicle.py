@@ -24,37 +24,9 @@ from shm.SimSharedMemoryServer import *
 from SimConfig import *
 from sv.SDVPlanner import *
 from sv.SDVRoute import SDVRoute
+from sv.VehicleBase import Vehicle
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
 from util.Utils import kalman
-
-# Vehicle base class for remote control or simulation.
-class Vehicle(Actor):
-    #vehicle types
-    N_TYPE = 0      #neutral
-    SDV_TYPE = 1
-    EV_TYPE = 2
-    TV_TYPE = 3
-    PV_TYPE = 4
-
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
-        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
-        self.type = Vehicle.N_TYPE
-        self.radius = VEHICLE_RADIUS
-        self.model = ''
-
-
-    def update_sim_state(self, new_state, delta_time):
-        # NOTE: this may desync the sim and frenet vehicle state, so this should
-        # only be done for external vehicles (which don't have a frenet state)
-        if self.type is not Vehicle.EV_TYPE:
-            log.warn("Cannot update sim state for gs vehicles directly.")
-
-
-    def get_sim_state(self):
-        position = [self.state.x, self.state.y, 0.0]
-        velocity = [self.state.x_vel, self.state.y_vel]
-        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
-
 
 class SDV(Vehicle):
     ''''
@@ -65,15 +37,16 @@ class SDV(Vehicle):
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="", 
             detection_range_in_meters:float=None, goal_ends_simulation:bool=False,
-            misdetection_weight:float=None, noise_position_mixture:List[float]=[0,0], 
-            noise_yaw_mostly_reliable:float=0, noise_yaw_strongly_innacurate:float=0,
+            hallucination_retention:float=None, hallucination_weight:float=None, 
+            missed_detection_weight:float=None, noise_position_mixture:List[float]=[0,0], 
+            noise_yaw_mostly_reliable:float=0, noise_yaw_strongly_inaccurate:float=0, 
             rule_engine_port:int=None):
         self.btype = btype
         self.btree_locations         = btree_locations
         self.goal_ends_simulation    = goal_ends_simulation
-        self.perception              = Perception(vid, detection_range_in_meters, misdetection_weight, 
-                                                  noise_position_mixture, noise_yaw_mostly_reliable, 
-                                                  noise_yaw_strongly_innacurate)
+        self.perception              = Perception(vid, detection_range_in_meters, hallucination_retention, 
+                                                  hallucination_weight, missed_detection_weight, noise_position_mixture, 
+                                                  noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate)
         self.route_nodes             = route_nodes
 
         if start_state_in_frenet:
@@ -98,8 +71,8 @@ class SDV(Vehicle):
         self.type = Vehicle.SDV_TYPE
 
         #Planning
-        self.sv_planner = None
         self.rule_engine_port = rule_engine_port
+        self.sv_planner = None
 
         #Behavior
         self.root_btree_name = root_btree_name

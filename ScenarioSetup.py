@@ -5,23 +5,25 @@
 # Build directly from code (instead of GeoScenario (.osm) file)
 # --------------------------------------------
 
+from lanelet2.core import GPSPoint
 from types import LambdaType
+
 try:
     from lanelet2.projection import LocalCartesianProjector
     use_local_cartesian=True
 except ImportError:
     from lanelet2.projection import UtmProjector
     use_local_cartesian=False
-from lanelet2.core import GPSPoint
-from mapping.LaneletMap import *
-from SimConfig import SimConfig
-from SimTraffic import SimTraffic
-from TrafficLight import TrafficLight as TL
-from TrafficLight import TrafficLightType, TrafficLightColor
-from sv.Vehicle import *
-from sp.Pedestrian import *
-from gsc.GSParser import GSParser
+
 from Actor import *
+from gsc.GSParser  import GSParser
+from mapping.LaneletMap import *
+from SimConfig  import SimConfig
+from SimTraffic import SimTraffic
+from sp.Pedestrian import *
+from sv.Vehicle    import *
+from TrafficLight  import TrafficLight as TL
+from TrafficLight  import TrafficLightType, TrafficLightColor
 
 def extract_tag(vnode, name, default_value, parser_fn):
     return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
@@ -127,13 +129,15 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             goal_ends_simulation = True
 
         detection_range_in_meters = extract_tag(vnode, 'detection_range_in_meters', None, float)
-        misdetection_weight       = extract_tag(vnode, 'misdetection_weight',       None, float)
+        hallucination_retention   = extract_tag(vnode, 'hallucination_retention',   None, float)
+        hallucination_weight      = extract_tag(vnode, 'hallucination_weight',      None, float)
+        missed_detection_weight   = extract_tag(vnode, 'missed_detection_weight',   None, float)
         noise_position_mixture    = [
             extract_tag(vnode, 'noise_mean_position', 0.0,  float),
             extract_tag(vnode, 'noise_std_position',  0.0,  float)
         ]
         noise_yaw_mostly_reliable     = extract_tag(vnode, 'noise_yaw_mostly_reliable',     0.0,  float)
-        noise_yaw_strongly_innacurate = extract_tag(vnode, 'noise_yaw_strongly_innacurate', 0.0,  float)
+        noise_yaw_strongly_inaccurate = extract_tag(vnode, 'noise_yaw_strongly_inaccurate', 0.0,  float)
         rule_engine_port              = extract_tag(vnode, 'rule_engine_port',              None, int)
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
@@ -191,9 +195,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
                                 btype=btype, detection_range_in_meters=detection_range_in_meters, 
-                                goal_ends_simulation=goal_ends_simulation, misdetection_weight=misdetection_weight,
-                                noise_position_mixture=noise_position_mixture, noise_yaw_mostly_reliable=noise_yaw_mostly_reliable,
-                                noise_yaw_strongly_innacurate=noise_yaw_strongly_innacurate, rule_engine_port=rule_engine_port
+                                goal_ends_simulation=goal_ends_simulation, hallucination_retention=hallucination_retention, 
+                                hallucination_weight=hallucination_weight, missed_detection_weight=missed_detection_weight, 
+                                noise_position_mixture=noise_position_mixture, noise_yaw_mostly_reliable=noise_yaw_mostly_reliable, 
+                                noise_yaw_strongly_inaccurate=noise_yaw_strongly_inaccurate, rule_engine_port=rule_engine_port
                             )
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],

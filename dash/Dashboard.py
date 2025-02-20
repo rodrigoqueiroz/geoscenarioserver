@@ -355,11 +355,42 @@ class Dashboard(object):
                     label = "{}".format(oid)
                     plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
 
-    def plot_vehicles(self,vehicles,x_min,x_max,y_min,y_max, show_arrow = False):
+    def plot_vehicle(self, alpha, colorcode, vid, vehicle, x_min, x_max, y_min, y_max, show_arrow):
         ax = plt.gca()
-        if vehicles:
-            perceived_vehicles = get_perceived_vehicles(vehicles)
+        x  = vehicle['state'].x
+        y  = vehicle['state'].y
+        if (x_min <= x <= x_max) and (y_min <= y <= y_max):
+            #centre
+            plt.plot(x, y, colorcode, marker='.', markersize=1, zorder=10)
+            if SHOW_VEHICLE_SHAPE:
+                #rectangle origin
+                rect_x = x -(vehicle['bounding_box_length'] / 2)
+                rect_y = y -(vehicle['bounding_box_width'] / 2)
+                t = matplotlib.transforms.Affine2D().rotate_deg_around(x, y, vehicle['state'].yaw) + ax.transData #transform rotation around centre
+                rect = matplotlib.patches.Rectangle( (rect_x,rect_y), vehicle['bounding_box_length'], vehicle['bounding_box_width'], edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
+                rect.set_transform(t)
+                ax.add_patch(rect)
+            if (SHOW_VEHICLE_RADIUS):
+                #radius circle
+                circle1 = plt.Circle((x, y), vehicle['radius'], color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                ax.add_artist(circle1)
+            #label
+            label = "ego ({})".format(int(vid)) if vehicle['name'].lower() == 'ego' else "v{}".format(int(vid))
+            label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
+            ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
+            #arrow
+            if (show_arrow):
+                vx = vehicle['state'].x_vel
+                vy = vehicle['state'].y_vel
+                if vehicle['state'].s_vel < 0:
+                    vx = -vx
+                    vy = -vy
+                plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
 
+    def plot_vehicles(self,vehicles,x_min,x_max,y_min,y_max, show_arrow = False):
+        perceived_vehicles = get_perceived_vehicles(vehicles)
+
+        if vehicles:
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
                     continue
@@ -372,35 +403,15 @@ class Dashboard(object):
                 else:
                     vehicle = vehicle.__dict__
 
-                x = vehicle['state'].x
-                y = vehicle['state'].y
-                if (x_min <= x <= x_max) and (y_min <= y <= y_max):
-                    #centre
-                    plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
-                    if SHOW_VEHICLE_SHAPE:
-                        #rectangle origin
-                        rect_x = x -(VEHICLE_LENGTH/2)
-                        rect_y = y -(VEHICLE_WIDTH/2)
-                        t = matplotlib.transforms.Affine2D().rotate_deg_around(x,y,vehicle['state'].yaw) + ax.transData #transform rotation around centre
-                        rect = matplotlib.patches.Rectangle( (rect_x,rect_y),VEHICLE_LENGTH, VEHICLE_WIDTH, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
-                        rect.set_transform(t)
-                        ax.add_patch(rect)
-                    if (SHOW_VEHICLE_RADIUS):
-                        #radius circle
-                        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
-                        ax.add_artist(circle1)
-                    #label
-                    label = "ego ({})".format(int(vid)) if vehicle['name'].lower() == 'ego' else "v{}".format(int(vid))
-                    label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
-                    ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
-                    #arrow
-                    if (show_arrow):
-                        vx = vehicle['state'].x_vel
-                        vy = vehicle['state'].y_vel
-                        if vehicle['state'].s_vel < 0:
-                            vx = -vx
-                            vy = -vy
-                        plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
+                self.plot_vehicle(alpha, colorcode, vid, vehicle, x_min, x_max, y_min, y_max, show_arrow)
+
+        if perceived_vehicles:
+            for vid, vehicle in perceived_vehicles.items():
+                if vid not in vehicles:
+                    colorcode = '#4b4237'
+                    alpha     = 1.0
+
+                    self.plot_vehicle(alpha, colorcode, vid, vehicle, x_min, x_max, y_min, y_max, show_arrow)
 
 
 
@@ -538,13 +549,22 @@ class Dashboard(object):
 
         #other vehicles, from main vehicle POV:
         if vehicles is not None:
+            perceived_vehicles = get_perceived_vehicles(vehicles)
+
             for vid,vehicle in vehicles.items():
                 colorcode,alpha = self.get_color_by_type('vehicle', vehicle.type, vehicle.sim_state, vehicle.name, actor_id=vid)
-                vs = vehicle.state
+
+                # Show the perceived vehicle instead of the ground truth
+                if vid in perceived_vehicles:
+                    vehicle = perceived_vehicles[vid]
+                else:
+                    vehicle = vehicle.__dict__
+
+                vs = vehicle['state']
                 plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
-                circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
+                circle1 = plt.Circle((vs.s, vs.d), vehicle['radius'], color=colorcode, fill=False, zorder=5, alpha=alpha)
                 gca.add_artist(circle1)
-                label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
+                label = label = "ego ({})".format(int(vid)) if vehicle['name'].lower() == 'ego' else "v{}".format(int(vid))
                 gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
