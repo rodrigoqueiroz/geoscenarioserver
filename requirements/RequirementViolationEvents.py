@@ -41,6 +41,12 @@ class AgentTick:
 
 		agent_ticks[agent_id] += 1
 
+class CollisionWithVehicle(UnmetRequirement):
+	def __init__(self, agent_id, vid):
+		self.raise_it(agent_id,
+			'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
+		)
+
 class GlobalTick:
 	def __init__(self):
 		global global_tick
@@ -64,12 +70,6 @@ class ScenarioTimeout(UnmetRequirement):
 				    + str(timeout) + ' seconds allowed by this scenario.'
 			)
 		ScenarioEnd()
-
-class VehicleCollision(UnmetRequirement):
-	def __init__(self, agent_id, vid):
-		self.raise_it(agent_id,
-			'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
-		)
 
 # Autoclean
 if os.path.exists(file_name):
