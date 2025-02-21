@@ -50,7 +50,7 @@ class GlobalTick:
 class GoalOvershot(UnmetRequirement):
 	def __init__(self, agent_id):
 		self.raise_it(agent_id,
-			'v' + str(agent_id) + ' drove passed its target location'
+			'v' + str(agent_id) + ' drove past its target location'
 		)
 
 class ScenarioCompletion(Exception):
@@ -60,7 +60,7 @@ class ScenarioTimeout(UnmetRequirement):
 	def __init__(self, timeout):
 		for agent_id in agent_ticks:
 			self.raise_it(agent_id,
-				'v' + str(agent_id) + ' did not reached its target location during the ' 
+				'v' + str(agent_id) + ' did not reach its target location during the ' 
 				    + str(timeout) + ' seconds allowed by this scenario.'
 			)
 		ScenarioEnd()
