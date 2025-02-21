@@ -7,13 +7,15 @@
 # but requires more processing capabilities. Can't avoid drift if hardware is slow.
 # --------------------------------------------
 
-import datetime
-import time
-import math
 import csv
-from SimConfig import *
-from util.Utils import truncate
+import datetime
 import glog as log
+import math
+import time
+
+from requirements.RequirementViolationEvents import GlobalTick, ScenarioTimeout
+from SimConfig  import *
+from util.Utils import truncate
 
 class TickSync():
 
@@ -88,13 +90,17 @@ class TickSync():
         passed_time = (now - self._sim_start_clock).total_seconds()
         self.sim_time =  self.sim_start_time + passed_time
         self.tick_count+=1
+        GlobalTick()
         #stats
         self.update_stats()
+
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
-                log.info('{} TIMEOUT: {:.3}s'.format(self.label,self.sim_time))
+                ScenarioTimeout(self.timeout)
+                log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False
+                
         return True
     
     def update_stats(self):
