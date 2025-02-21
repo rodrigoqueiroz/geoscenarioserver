@@ -76,6 +76,7 @@ class BTreeInterpreter(object):
     def find_btree(self, btree_name):
         for btree_path in self.bmodel.btree_locations:
             if os.path.isfile(os.path.join(btree_path, self.bmodel.btype, btree_name)):
+                log.info(btree_name)
                 log.info ("Using " + os.path.join(btree_path, self.bmodel.btype, btree_name + " for VID " + str(self.vid)))
                 path,file = os.path.split(os.path.abspath(os.path.join(btree_path, self.bmodel.btype, btree_name)))
                 return path,file

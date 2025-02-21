@@ -21,9 +21,11 @@ except ImportError:
     use_local_cartesian=False
 
 import glog as log
+from threading import Thread
+import time
 
 def start_server(args, m=MVelKeepConfig()):
-    # log.setLevel("INFO")
+    #log.setLevel("INFO")
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
@@ -71,26 +73,38 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
-    sync_global.set_timeout(sim_config.timeout)
-
     if sim_config.wait_for_input:
-        input("Press [ENTER] to start...")
+        paused = True
+
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", usr_input=paused)
+    sync_global.set_timeout(sim_config.timeout)
 
     #SIM EXECUTION START
     log.info('SIMULATION START')
-    traffic.start()
-
+    
     #GUI / Debug screen
     dashboard = Dashboard(traffic, sim_config)
+    traffic.start()
+
+    thread = Thread(target=run_traffic, args=(traffic, sync_global, sim_config, dashboard, paused), daemon=True)
+    thread.start()
+
     if sim_config.show_dashboard:
-        dashboard.start(args.dash_pos)
+        dashboard.start(traffic, args.dash_pos)
     else:
         log.warn("Dashboard will not start")
 
+    if sim_config.show_dashboard:
+        dashboard.quit()
+
+    #stop traffic
+    thread.join()
+
+def run_traffic(traffic, sync_global, sim_config, dashboard, paused=False):
+
     while sync_global.tick():
-        if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
-            break
+        # if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+        #     break
         try:
             #Update Traffic
             sim_status = traffic.tick(
@@ -103,10 +117,10 @@ def start_server(args, m=MVelKeepConfig()):
         except Exception as e:
             log.error(e)
             break
+
     sync_global.write_peformance_log()
     traffic.stop_all()
-    dashboard.quit()
-
+    
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario server shutdown')
