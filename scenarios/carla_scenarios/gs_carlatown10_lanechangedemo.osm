@@ -41,7 +41,7 @@
     <tag k='vid' v='4' />
   </node>
   <node id='-2766488' action='modify' visible='true' lat='0.00043414892' lon='-0.00088025701'>
-    <tag k='btree' v='drive_observer.btree' />
+    <tag k='btree' v='st_observer_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v2' />

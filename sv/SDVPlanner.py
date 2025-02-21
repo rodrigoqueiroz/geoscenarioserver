@@ -6,34 +6,31 @@
 # --------------------------------------------
 
 from copy import copy
-import glog as log
+import multiprocessing
 from multiprocessing import Array, Process
-from signal import signal, SIGTERM
 import sys
-
+import glog as log
 from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from SimTraffic import *
+from TickSync import TickSync
+from sv.btree.BehaviorLayer import BehaviorLayer
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
-from TickSync import TickSync
-
-import sv.btree.BehaviorLayer       as btree
-import sv.ruleEngine.BehaviorLayer  as rules
+from signal import signal, SIGTERM
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, rule_engine_port = None):
         #MainProcess space:
         self._process = None
-        self.traffic_state_sharr  = sim_traffic.traffic_state_sharr
+        self.traffic_state_sharr = sim_traffic.traffic_state_sharr
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
-        self._debug_shdata        = sim_traffic.debug_shdata
-        self._mplan_sharr         = None
-        self._rule_engine_port    = rule_engine_port
+        self._debug_shdata = sim_traffic.debug_shdata
+        self._mplan_sharr = None
 
         #Shared space
         self.vid = int(sdv.id)
@@ -55,12 +52,13 @@ class SVPlanner(object):
 
     def start(self):
         #Create shared arrray for Motion Plan
-        c = MotionPlan().get_vector_length()
+        c = MotionPlan().get_vector_length()  
         self._mplan_sharr = Array('f', c)
         #Process based
-        self._process = Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr,
-            self._mplan_sharr,
+        fork_context = multiprocessing.get_context("fork")
+        self._process = fork_context.Process(target=self.run_planner_process, args=(
+            self.traffic_state_sharr, 
+            self._mplan_sharr, 
             self._debug_shdata), daemon=True)
         self._process.start()
 
@@ -68,6 +66,7 @@ class SVPlanner(object):
         if self._process:
             log.info("Terminate Planner Process - vehicle {}".format(self.vid))
             self._process.terminate()
+            self._process.join()
 
     def get_plan(self):
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
@@ -89,8 +88,7 @@ class SVPlanner(object):
         # New plan
         self.last_plan = plan
         return plan
-
-
+        
     #==SUB PROCESS=============================================
     def before_exit(self,*args):
         if self.sync_planner:
@@ -103,13 +101,9 @@ class SVPlanner(object):
 
         self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
 
-
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
-        if self._rule_engine_port != None:
-            self.behavior_layer = rules.BehaviorLayer(self.vid, self.btype, self._rule_engine_port)
-        else:
-            self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
+        self.behavior_layer = BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
@@ -120,7 +114,7 @@ class SVPlanner(object):
 
         while self.sync_planner.tick():
             self.sync_planner.start_task()
-
+    
             # Get sim state from main process
             # All objects are copies and can be changed
             header, traffic_vehicles, traffic_pedestrians,traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
