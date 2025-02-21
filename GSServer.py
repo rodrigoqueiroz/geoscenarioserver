@@ -73,6 +73,7 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
+    #if config is set to wait for input, pause the simulation
     paused = False
     if sim_config.wait_for_input:
         paused = True
