@@ -101,7 +101,7 @@ class TickSync():
                 ScenarioTimeout(self.timeout)
                 log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False
-
+                
         return True
     
     def update_stats(self):

@@ -3,7 +3,7 @@ import numpy as np
 from math import cos, radians, sin
 
 from Actor import ActorSimState
-from requirements.RequirementViolationEvents import GoalOvershot, ScenarioCompletion, ScenarioEnd, VehicleCollision
+from requirements.RequirementViolationEvents import CollisionWithVehicle, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
 
 class RequirementsChecker:
@@ -63,7 +63,8 @@ class RequirementsChecker:
 			if  (min_x <= vehicle.state.x <= max_x) and (min_y <= vehicle.state.y <= max_y):
 				vehicle_box = self.calculate_rectangular_bounding_box(vehicle)
 				if self.do_polygons_intersect(ego_box, vehicle_box):
-					VehicleCollision(traffic_state.vid, vid)
+					CollisionWithVehicle(traffic_state.vid, vid)
+
 
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.

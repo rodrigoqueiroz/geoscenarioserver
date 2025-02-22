@@ -19,6 +19,7 @@ class ScenarioEnd:
 		with open(file_name, "w+") as file:
 			file.write(json.dumps(violations.copy()))
 
+
 class UnmetRequirement:
 	def raise_it(self, agent_id, message):
 		agent_logs = violations[agent_id]
@@ -43,31 +44,8 @@ class AgentTick:
 
 		agent_ticks[agent_id] += 1
 
-class GlobalTick:
-	def __init__(self):
-		global global_tick
-		with global_tick.get_lock():
-			global_tick.value += 1
 
-class GoalOvershot(UnmetRequirement):
-	def __init__(self, agent_id):
-		self.raise_it(agent_id,
-			'v' + str(agent_id) + ' drove passed its target location'
-		)
-
-class ScenarioCompletion(Exception):
-    pass
-
-class ScenarioTimeout(UnmetRequirement):
-	def __init__(self, timeout):
-		for agent_id in agent_ticks:
-			self.raise_it(agent_id,
-				'v' + str(agent_id) + ' did not reached its target location during the ' 
-				    + str(timeout) + ' seconds allowed by this scenario.'
-			)
-		ScenarioEnd()
-
-class VehicleCollision(UnmetRequirement):
+class CollisionWithVehicle(UnmetRequirement):
 	def __init__(self, agent_id, vid):
 		collision_state = agent_collisions[agent_id]
 
@@ -81,6 +59,33 @@ class VehicleCollision(UnmetRequirement):
 
 		# That reassignment is necessary for the update to work in multiprocessing
 		agent_collisions[agent_id] = collision_state
+
+class GlobalTick:
+	def __init__(self):
+		global global_tick
+		with global_tick.get_lock():
+			global_tick.value += 1
+
+
+class GoalOvershot(UnmetRequirement):
+	def __init__(self, agent_id):
+		self.raise_it(agent_id,
+			'v' + str(agent_id) + ' drove past its target location'
+		)
+
+
+class ScenarioCompletion(Exception):
+    pass
+
+
+class ScenarioTimeout(UnmetRequirement):
+	def __init__(self, timeout):
+		for agent_id in agent_ticks:
+			self.raise_it(agent_id,
+				'v' + str(agent_id) + ' did not reach its target location during the ' 
+				    + str(timeout) + ' seconds allowed by this scenario.'
+			)
+		ScenarioEnd()
 
 # Autoclean
 if os.path.exists(file_name):

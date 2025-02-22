@@ -146,6 +146,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
         log.info("Vehicle {}, behavior type {}".format(vid,btype))    
+
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
             #start state

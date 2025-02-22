@@ -125,7 +125,7 @@ class SVPlanner(object):
         else:
             self.sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
 
-        try:        
+        try:
             while self.sync_planner.tick():
                 self.sync_planner.start_task()
 
@@ -139,15 +139,17 @@ class SVPlanner(object):
                 else:
                     #vehicle state not available. Vehicle can be inactive.
                     continue
-                
+
+
                 if self.sdv_route is None:
                     self.sdv_route = SDVRoute(
-                        #self.sim_config.lanelet_routes[self.vid], 
+                        #self.sim_config.lanelet_routes[self.vid],
                         self.laneletmap,
-                        vehicle_state.x, vehicle_state.y, 
-                        self.route_nodes, 
+                        vehicle_state.x, vehicle_state.y,
+                        self.route_nodes,
                         #self.sim_config.goal_points[self.vid]
                     )
+
 
                 # Get traffic, lane config and regulatory elements in current frenet frame
                 project_dynamic_objects(self.last_plan, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
@@ -162,7 +164,7 @@ class SVPlanner(object):
                 AgentTick(traffic_state.vid)
 
                 if self._perception != None:
-                    traffic_state = self._perception.apply_noise(traffic_state, self.laneletmap, self.sdv_route,)
+                    traffic_state = self._perception.apply_noise(traffic_state, self.laneletmap, self.sdv_route)
                 
                 #BTree Tick - using frenet state and lane config based on old ref path
                 mconfig, ref_path_changed, snapshot_tree = self.behavior_layer.tick(traffic_state)
@@ -179,7 +181,8 @@ class SVPlanner(object):
                         log.warn("Invalid planner state, skipping planning step...")
                         continue
                     mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
-                
+
+
                 # new maneuver
                 if self.mconfig and self.mconfig.mkey != mconfig.mkey:
                     log.info("VID {} started maneuver {}".format(self.vid, mconfig.mkey.name))
@@ -239,7 +242,7 @@ class SVPlanner(object):
                             self.last_plan = plan
                 else:
                     frenet_traj, cand = None, None
-                
+
                 #Debug info (for Dahsboard and Log)
                 if self.sim_config.show_dashboard:
                     # change ref path format for pickling (maybe always keep it like this?)
@@ -248,7 +251,7 @@ class SVPlanner(object):
                     if (self.last_plan is not None) and (frenet_traj is None):
                         # shift the trajectories to the old frenet frame they are positioned in
                         traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
-                    
+
                     #For pickling
                     traffic_state.intersections = [ intersection.to_primitives() for intersection in traffic_state.intersections]
 
@@ -261,7 +264,7 @@ class SVPlanner(object):
                         [traj.array_format() for traj in cand if not traj.feasible] if cand else None,
                         traj_s_shift
                     )
-
+                    
         except ScenarioCompletion as e:
             with self.completion.get_lock():
                 self.completion.value = True
