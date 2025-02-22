@@ -26,7 +26,6 @@ try:
 except:
     log.warning("Carla API not found")
 
-
 class SimTraffic(object):
 
     def __init__(self, laneletmap, sim_config):
@@ -54,6 +53,7 @@ class SimTraffic(object):
         #Traffic Log
         self.log_file = ''
         self.vehicles_log = {}
+        self.traffic_running = False
 
     def add_vehicle(self, v:Vehicle):
         self.vehicles[v.id] = v
@@ -81,8 +81,8 @@ class SimTraffic(object):
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
 
-
     def start(self):
+        self.traffic_running = True
         #Optional CARLA co-sim
         if CARLA_COSIMULATION:
             self.carla_sync = CarlaSync()
@@ -93,12 +93,12 @@ class SimTraffic(object):
         self.write_traffic_state(0 , 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
-        if self.cosimulation == True and self.simconfig.wait_for_client:
+        if self.cosimulation == True and self.sim_config.wait_for_client:
             log.warn("GSServer is running in co-simulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
             while(True):
                 header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:
-                    break;
+                    break
                 time.sleep(0.5)
 
         #Start SDV Planners
@@ -112,6 +112,7 @@ class SimTraffic(object):
                 pedestrian.start_planner()
 
     def stop_all(self):
+        self.traffic_running = False
         if self.carla_sync:
             self.carla_sync.quit()
 
@@ -165,7 +166,6 @@ class SimTraffic(object):
                 #update carla remote agents if new state is available
                 if self.vehicles[vid].type is Vehicle.EV_TYPE and vid in vstates:
                     self.vehicles[vid].update_sim_state(vstates[vid], delta_time) #client_delta_time
-
 
         #tick vehicles (all types)
         for vid in self.vehicles:
@@ -256,7 +256,6 @@ class SimTraffic(object):
             self.carla_sync.write_server_state(tick_count, delta_time, self.vehicles)
 
 
-
     def log_sim_state(self, client_vehicle_states, disabled_vehicles):
         log.info("Collision between vehicles {}".format(disabled_vehicles))
         state_str = "GSS crash report:\n"
@@ -276,7 +275,6 @@ class SimTraffic(object):
                 np.linalg.norm([state.x_vel, state.y_vel])
             )
         log.info(state_str)
-
 
     def log_trajectories(self,tick_count,delta_time,sim_time):
         if WRITE_TRAJECTORIES:
@@ -303,7 +301,6 @@ class SimTraffic(object):
                     csv_writer.writerow(titleline)
                     for line in vlog:
                         csv_writer.writerow(line)
-
 
     #For independent processes:
     def read_traffic_state(self, traffic_state_sharr, actives_only = True):
@@ -370,3 +367,4 @@ class SimTraffic(object):
         static_objects = copy(self.static_objects)
 
         return header, vehicles, pedestrians, traffic_light_states, static_objects
+    

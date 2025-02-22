@@ -116,7 +116,7 @@ class SVPlanner(object):
             self.behavior_layer = rules.BehaviorLayer(self.vid, self.btype, self._rule_engine_port)
         else:
             self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
-        
+
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)

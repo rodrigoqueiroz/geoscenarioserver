@@ -73,6 +73,7 @@ class SDV(Vehicle):
         #Planning
         self.rule_engine_port = rule_engine_port
         self.sv_planner = None
+        self.rule_engine_port = rule_engine_port
 
         #Behavior
         self.root_btree_name = root_btree_name

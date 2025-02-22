@@ -29,6 +29,10 @@ def extract_tag(vnode, name, default_value, parser_fn):
     return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
 
 
+def extract_tag(vnode, name, default_value, parser_fn):
+    return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
+
+
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
@@ -193,8 +197,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
-                                btree_locations=btree_locations,
-                                btype=btype, detection_range_in_meters=detection_range_in_meters, 
+                                btree_locations=btree_locations, btype=btype, detection_range_in_meters=detection_range_in_meters, 
                                 goal_ends_simulation=goal_ends_simulation, hallucination_retention=hallucination_retention, 
                                 hallucination_weight=hallucination_weight, missed_detection_weight=missed_detection_weight, 
                                 noise_position_mixture=noise_position_mixture, noise_yaw_mostly_reliable=noise_yaw_mostly_reliable, 
@@ -241,6 +244,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                         if prev_node.x_vel is None or prev_node.y_vel is None:
                             prev_node.x_vel = nd.x_vel
                             prev_node.y_vel = nd.y_vel
+                    nd.speed = float(node.tags['speed']) if ('speed' in node.tags) else None
                     nd.yaw = float(node.tags['yaw']) if ('yaw' in node.tags) else None
                     trajectory.append(nd)
                     prev_node = nd
@@ -252,6 +256,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
                 sim_traffic.add_vehicle(vehicle)
                 log.info("Vehicle {} initialized with TV behavior".format(vid))
+
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
                 raise e

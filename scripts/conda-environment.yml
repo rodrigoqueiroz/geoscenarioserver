@@ -9,7 +9,6 @@ dependencies:
   - matplotlib
   - numpy
   - scipy
-  - tk
   - requests
   - pip:
     - antlr-denter
@@ -17,3 +16,4 @@ dependencies:
     - lanelet2
     - py_trees==0.7.6
     - sysv-ipc
+    - tk
