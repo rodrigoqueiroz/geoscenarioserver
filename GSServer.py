@@ -71,11 +71,8 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", usr_input=sim_config.wait_for_input)
     sync_global.set_timeout(sim_config.timeout)
-
-    if sim_config.wait_for_input:
-        input("Press [ENTER] to start...")
 
     #SIM EXECUTION START
     log.info('SIMULATION START')
