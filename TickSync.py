@@ -58,7 +58,8 @@ class TickSync():
     def tick(self):
         if self.wait_for_input:
             def on_press(key):
-                return False
+                if key == keyboard.Key.enter:
+                    return False
             
             with keyboard.Listener(on_press=on_press) as listener:
                 listener.join()
