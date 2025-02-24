@@ -726,6 +726,29 @@ class Dashboard(object):
         elif screen_height >= 1080 and screen_width >= 1920:
             vis_scaling = 2
             txt_scaling = 1.2
+    
+        #new window for --wait-for-input
+        if self.sim_config.wait_for_input:
+            start_window = tk.Toplevel(window)
+            set_width = 300
+            set_height = 200
+
+            #window position 
+            pos_x = (screen_width - set_width) // 2
+            pos_y = (screen_height - set_height) // 2
+
+            # Apply position
+            start_window.geometry(f"{set_width}x{set_height}+{pos_x}+{pos_y}")
+
+            #set sub window attributes
+            start_window.lift()
+            start_window.attributes('-topmost', True)
+            start_window.focus_force()
+            start_window.bind("<Return>", lambda event: start_window.destroy())
+
+            #set window text
+            instructions = tk.Label(start_window, text="Press [ENTER] to start...")
+            instructions.pack(expand=True)
 
         # Configure row and column weights for dynamic resizing
         window.columnconfigure(0, weight=1)  # Left section (70% width)

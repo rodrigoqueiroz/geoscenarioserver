@@ -9,3 +9,4 @@ py_trees==0.7.6
 sysv-ipc
 tk
 requests
+pynput
