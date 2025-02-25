@@ -28,6 +28,7 @@ class SimTraffic(object):
     def __init__(self, laneletmap, sim_config):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
+        self.origin = None
 
         #Dyn agents
         self.vehicles = {}  #dictionary for direct access using vid
@@ -51,6 +52,9 @@ class SimTraffic(object):
         self.log_file = ''
         self.vehicles_log = {}
         self.traffic_running = False
+
+    def set_origin(self, lat, lon, alt):
+        self.origin = (lat, lon, alt)
 
     def add_vehicle(self, v:Vehicle):
         self.vehicles[v.id] = v
@@ -250,7 +254,7 @@ class SimTraffic(object):
         #Shm for external Simulator (Unreal)
         #Write out simulator state
         if (self.sim_client_shm):
-            self.sim_client_shm.write_server_state(tick_count, sim_time, delta_time, self.vehicles, self.pedestrians)
+            self.sim_client_shm.write_server_state(tick_count, sim_time, delta_time, self.origin, self.vehicles, self.pedestrians)
 
         #Carla socket
         if self.carla_sync:

@@ -30,12 +30,13 @@ class SimSharedMemoryServer(object):
             log.error("Error creating Shared Memory")
             self.is_connected = False
 
-    def write_server_state(self, tick_count, sim_time, delta_time, vehicles, pedestrians):
+    def write_server_state(self, tick_count, sim_time, delta_time, origin, vehicles, pedestrians):
         """ Writes to shared memory pose data for each agent.
             @param vehicles:      dictionary of type <int, Vehicle>
             @param pedestrians:      dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
+                origin_lat origin_lon origin_alt
                 vid v_type x y z vx vy yaw steering_angle
                 pid p_type x y z vx vy yaw
                 ...
@@ -45,6 +46,9 @@ class SimSharedMemoryServer(object):
 
         # write tick count, deltatime, numbers of vehicles and pedestrians
         write_str = "{} {} {} {} {}\n".format(int(tick_count), sim_time, delta_time, len(vehicles), len(pedestrians))
+        # write origin
+        (lat, lon, alt) = origin
+        write_str += "{} {} {}\n".format(lat, lon, alt)
         # write vehicle states, rounding the numerical data to reasonable significant figures
         for svid in vehicles:
             vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()

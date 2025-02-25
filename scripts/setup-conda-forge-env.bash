@@ -66,6 +66,9 @@ fi
 if [[ ${ARG_ROS2} == "true" ]]; then
     echo "Installing ROS2 into the environment 'gss'..."
     $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-staging ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
+    # conda-forge tk gets reinstalled
+    # remove it again
+    $MAMBA_EXE -n gss remove --force --yes --quiet tk
     if [[ $? == 0 ]]; then
         echo "ROS2 installed successfully. Building the GSS ROS2 client..."
         echo ""

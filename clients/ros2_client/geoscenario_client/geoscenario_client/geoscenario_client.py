@@ -3,6 +3,7 @@ import math
 from rclpy.node import Node
 
 from geoscenario_msgs.msg import Tick, Pedestrian, Vehicle
+from geographic_msgs.msg import GeoPoint
 
 from .SimSharedMemoryClient import *
 
@@ -11,14 +12,15 @@ class GSClient(Node):
     def __init__(self):
         super().__init__('geoscenario_client')
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
-        timer_period = 0.033333  # seconds
+        # TODO: use correct value from GSServer SimTraffic
+        timer_period = 0.025  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.sim_client_shm = SimSharedMemoryClient()
         self.previous_tick_count = 0
 
 
     def timer_callback(self):
-        header, vehicles, pedestrians = self.sim_client_shm.read_server_state()
+        header, origin, vehicles, pedestrians = self.sim_client_shm.read_server_state()
 
         if not header:
             self.get_logger().warn('Waiting for geoscenario server', throttle_duration_sec=2)
@@ -32,11 +34,14 @@ class GSClient(Node):
         elif tick_count == self.previous_tick_count:
             self.get_logger().warn('Same tick as last time, the same data will be published again')
 
-
         tick_msg = Tick()
         tick_msg.tick_count = tick_count
         tick_msg.simulation_time = header["simulation_time"]
         tick_msg.delta_time = header["delta_time"]
+        tick_msg.origin = GeoPoint()
+        tick_msg.origin.latitude = origin["origin_lat"]
+        tick_msg.origin.longitude = origin["origin_lon"]
+        tick_msg.origin.altitude = origin["origin_alt"]
 
         for vehicle in vehicles:
             msg = Vehicle()
