@@ -65,7 +65,7 @@ fi
 
 if [[ ${ARG_ROS2} == "true" ]]; then
     echo "Installing ROS2 into the environment 'gss'..."
-    $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-staging ros-humble-desktop compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
+    $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-staging ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
     if [[ $? == 0 ]]; then
         echo "ROS2 installed successfully. Building the GSS ROS2 client..."
         echo ""
