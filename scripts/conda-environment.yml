@@ -10,10 +10,10 @@ dependencies:
   - numpy
   - scipy
   - requests
+  - glog
   - pip:
     - antlr-denter
-    - glog
     - lanelet2
     - py_trees==0.7.6
     - sysv-ipc
-    - tk
+    - tk # Need to install from pip to support TrueType fonts
