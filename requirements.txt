@@ -10,3 +10,4 @@ sysv-ipc
 tk
 requests
 pynput
+screeninfo

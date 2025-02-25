@@ -56,15 +56,6 @@ class TickSync():
             print(msg)
 
     def tick(self):
-        if self.wait_for_input:
-            def on_press(key):
-                if key == keyboard.Key.enter:
-                    return False
-            
-            with keyboard.Listener(on_press=on_press) as listener:
-                listener.join()
-            self.wait_for_input = False
-
         now = datetime.datetime.now()
         #First Tick
         if (self.tick_count==0): 
@@ -173,7 +164,7 @@ class TickSync():
         #returns actual time 
         return delta_time
 
-    
+
     #For Debug only:
     _last_log = None
     def clock_log(label):

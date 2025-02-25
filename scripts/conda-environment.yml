@@ -10,6 +10,8 @@ dependencies:
   - numpy
   - scipy
   - requests
+  - pynput
+  - screeninfo
   - pip:
     - antlr-denter
     - glog
@@ -17,4 +19,3 @@ dependencies:
     - py_trees==0.7.6
     - sysv-ipc
     - tk
-    - pynput

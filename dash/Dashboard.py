@@ -26,6 +26,7 @@ from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
+import screeninfo
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -33,13 +34,14 @@ class Dashboard(object):
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
 
-    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig):
+    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, primary_screen):
         self.sim_traffic:SimTraffic = sim_traffic
         self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
+        self.primary_screen = primary_screen
 
     def start(self, dash_pos):
         """ Start dashboard in subprocess.
@@ -707,49 +709,23 @@ class Dashboard(object):
         window = tk.Tk()
         window.configure(bg="white")
 
-        screen_width = window.winfo_screenwidth()
-        screen_height = window.winfo_screenheight()
+        x, y, w, h = self.primary_screen.x, self.primary_screen.y, self.primary_screen.width, self.primary_screen.height
 
         if dash_pos:
             x, y, w, h = dash_pos
-        else:
-            x, y, w, h = 0, 0, screen_width, screen_height
 
         window.geometry("%dx%d+%d+%d" % (w, h, x, y))
         
         vis_scaling = 1
         txt_scaling = 1
 
-        if screen_height >= 1440 and screen_width >= 2560:
+        if h >= 1440 and w >= 2560:
             vis_scaling = 3
             txt_scaling = 1.5
-        elif screen_height >= 1080 and screen_width >= 1920:
+        elif h >= 1080 and w >= 1920:
             vis_scaling = 2
             txt_scaling = 1.2
     
-        #new window for --wait-for-input
-        if self.sim_config.wait_for_input:
-            start_window = tk.Toplevel(window)
-            set_width = 300
-            set_height = 200
-
-            #window position 
-            pos_x = (screen_width - set_width) // 2
-            pos_y = (screen_height - set_height) // 2
-
-            # Apply position
-            start_window.geometry(f"{set_width}x{set_height}+{pos_x}+{pos_y}")
-
-            #set sub window attributes
-            start_window.lift()
-            start_window.attributes('-topmost', True)
-            start_window.focus_force()
-            start_window.bind("<Return>", lambda event: start_window.destroy())
-
-            #set window text
-            instructions = tk.Label(start_window, text="Press [ENTER] to start...")
-            instructions.pack(expand=True)
-
         # Configure row and column weights for dynamic resizing
         window.columnconfigure(0, weight=1)  # Left section (70% width)
         window.columnconfigure(1, weight=1)  # Right section (30% width)
