@@ -8,31 +8,35 @@ from geographic_msgs.msg import GeoPoint
 from .SimSharedMemoryClient import *
 
 class GSClient(Node):
-
     def __init__(self):
         super().__init__('geoscenario_client')
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
-        # TODO: use correct value from GSServer SimTraffic
-        timer_period = 0.025  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        # poll frequently at the beginning
+        self.short_timer_period = 0.005  # 5 miliseconds
+        self.timer = self.create_timer(self.short_timer_period, self.timer_callback)
         self.sim_client_shm = SimSharedMemoryClient()
         self.previous_tick_count = 0
-
 
     def timer_callback(self):
         header, origin, vehicles, pedestrians = self.sim_client_shm.read_server_state()
 
         if not header:
-            self.get_logger().warn('Waiting for geoscenario server', throttle_duration_sec=2)
+            self.get_logger().info('Waiting for GeoScenario server', throttle_duration_sec=2)
             return
 
         tick_count = header["tick_count"]
+        # update the timer with the current server frequency
+        self.timer.timer_period_ns = header["delta_time"] * 1e9 # convert seconds to nanoseconds
 
-        # TODO: Consider a better way to keep the client synchronized with the server. Should be possible with semaphores
+        # ensure nothing is skipped
         if tick_count > self.previous_tick_count + 1:
-            self.get_logger().error('Tick %d was skipped!' % (self.previous_tick_count + 1))
+            for i in range(self.previous_tick_count + 1, tick_count):
+                self.get_logger().error('Tick %d was skipped!' % i)
         elif tick_count == self.previous_tick_count:
-            self.get_logger().warn('Same tick as last time, the same data will be published again')
+            # nothing new yet, delta_time must have increased
+            # switch back to a more frequent polling than the delta_time
+            self.timer.timer_period_ns == self.short_timer_period * 1e9
+            return
 
         tick_msg = Tick()
         tick_msg.tick_count = tick_count
