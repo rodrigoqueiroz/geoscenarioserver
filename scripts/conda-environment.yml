@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
+  - tk[build=xft_*] # use the TrueType variant
   - pip
   - antlr4-python3-runtime==4.9.3
   - graphviz
@@ -18,4 +19,3 @@ dependencies:
     - lanelet2
     - py_trees==0.7.6
     - sysv-ipc
-    - tk # Need to install from pip to support TrueType fonts
