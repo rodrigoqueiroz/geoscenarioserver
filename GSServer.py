@@ -71,15 +71,15 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", usr_input=sim_config.wait_for_input)
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(sim_config.timeout)
 
     #find screen info 
-    screens = screeninfo.get_monitors()
-    primary_screen = None
-    for monitor in screens:
+    monitors = screeninfo.get_monitors()
+    primary_monitor = None
+    for monitor in monitors:
         if monitor.is_primary:
-            primary_screen = monitor
+            primary_monitor = monitor
             break
 
     if sim_config.wait_for_input:
@@ -91,8 +91,8 @@ def start_server(args, m=MVelKeepConfig()):
                 if key == keyboard.Key.enter:
                     start_window.after(0, start_window.quit())
             
-            pos_x = primary_screen.x
-            pos_y = primary_screen.y
+            pos_x = primary_monitor.x
+            pos_y = primary_monitor.y
             
             start_window = tk.Tk()
             set_width = 300
@@ -103,8 +103,8 @@ def start_server(args, m=MVelKeepConfig()):
                 pos_x = args.dash_pos[0] + args.dash_pos[2] // 2 - set_width // 2
                 pos_y = args.dash_pos[1] + args.dash_pos[3] // 2 - set_height // 2
             else:
-                pos_x += (primary_screen.width - set_width) // 2
-                pos_y += (primary_screen.height - set_height) // 2
+                pos_x += (primary_monitor.width - set_width) // 2
+                pos_y += (primary_monitor.height - set_height) // 2
             
             # Apply position
             start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")

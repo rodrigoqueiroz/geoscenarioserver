@@ -14,11 +14,10 @@ import csv
 from SimConfig import *
 from util.Utils import truncate
 import glog as log
-from pynput import keyboard
 
 class TickSync():
 
-    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0, usr_input = False):
+    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
         self.tick_rate = rate
@@ -28,7 +27,6 @@ class TickSync():
         self.verbose = verbose
         self.label = label
         self.sim_start_time = sim_start_time
-        self.wait_for_input = usr_input
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
         self.tick_count = 0
@@ -164,7 +162,7 @@ class TickSync():
         #returns actual time 
         return delta_time
 
-
+    
     #For Debug only:
     _last_log = None
     def clock_log(label):
