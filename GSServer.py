@@ -21,6 +21,8 @@ except ImportError:
     use_local_cartesian=False
 
 import glog as log
+import screeninfo
+from pynput import keyboard
 
 def start_server(args, m=MVelKeepConfig()):
     # log.setLevel("INFO")
@@ -81,6 +83,12 @@ def start_server(args, m=MVelKeepConfig()):
         if monitor.is_primary:
             primary_monitor = monitor
             break
+    
+    x, y, width, height = primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height
+    screen_param = (x, y, width, height)
+    
+    if args.dash_pos:
+        screen_param = args.dash_pos
 
     if sim_config.wait_for_input:
         if not sim_config.show_dashboard:
@@ -91,8 +99,8 @@ def start_server(args, m=MVelKeepConfig()):
                 if key == keyboard.Key.enter:
                     start_window.after(0, start_window.quit())
             
-            pos_x = primary_monitor.x
-            pos_y = primary_monitor.y
+            pos_x = x
+            pos_y = y
             
             start_window = tk.Tk()
             set_width = 300
@@ -103,8 +111,8 @@ def start_server(args, m=MVelKeepConfig()):
                 pos_x = args.dash_pos[0] + args.dash_pos[2] // 2 - set_width // 2
                 pos_y = args.dash_pos[1] + args.dash_pos[3] // 2 - set_height // 2
             else:
-                pos_x += (primary_monitor.width - set_width) // 2
-                pos_y += (primary_monitor.height - set_height) // 2
+                pos_x += (width - set_width) // 2
+                pos_y += (height - set_height) // 2
             
             # Apply position
             start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")
@@ -128,9 +136,10 @@ def start_server(args, m=MVelKeepConfig()):
     traffic.start()
 
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config, primary_monitor)
+    dashboard = Dashboard(traffic, sim_config, screen_param)
+
     if sim_config.show_dashboard:
-        dashboard.start(args.dash_pos)
+        dashboard.start()
     else:
         log.warn("Dashboard will not start")
 

@@ -26,8 +26,6 @@ from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
-import screeninfo
-from pynput import keyboard
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -35,16 +33,16 @@ class Dashboard(object):
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
 
-    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, primary_monitor):
+    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
         self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
-        self.primary_monitor = primary_monitor
+        self.screen_param = screen_param
 
-    def start(self, dash_pos):
+    def start(self):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
@@ -60,13 +58,13 @@ class Dashboard(object):
 
         self.lanelet_map = self.sim_traffic.lanelet_map
         self._process = Process(target=self.run_dash_process,
-                                args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata, dash_pos),
+                                args=(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata),
                                 daemon=True)
         self._process.start()
 
-    def run_dash_process(self, traffic_state_sharr, debug_shdata, dash_pos):
+    def run_dash_process(self, traffic_state_sharr, debug_shdata):
 
-        self.window = self.create_gui(dash_pos)
+        self.window = self.create_gui(self.screen_param)
         sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
@@ -710,10 +708,7 @@ class Dashboard(object):
         window = tk.Tk()
         window.configure(bg="white")
 
-        x, y, w, h = self.primary_monitor.x, self.primary_monitor.y, self.primary_monitor.width, self.primary_monitor.height
-
-        if dash_pos:
-            x, y, w, h = dash_pos
+        x, y, w, h = self.screen_param[0], self.screen_param[1], self.screen_param[2], self.screen_param[3]
 
         window.geometry("%dx%d+%d+%d" % (w, h, x, y))
         
