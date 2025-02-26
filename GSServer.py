@@ -84,8 +84,7 @@ def start_server(args, m=MVelKeepConfig()):
             primary_monitor = monitor
             break
     
-    x, y, width, height = primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height
-    screen_param = [x, y, width, height]
+    screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
     
     if args.dash_pos:
         screen_param = args.dash_pos
@@ -99,8 +98,8 @@ def start_server(args, m=MVelKeepConfig()):
                 if key == keyboard.Key.enter:
                     start_window.after(0, start_window.quit())
             
-            pos_x = x
-            pos_y = y
+            pos_x = screen_param[0]
+            pos_y = screen_param[1]
             
             start_window = tk.Tk()
             set_width = 300
@@ -111,8 +110,8 @@ def start_server(args, m=MVelKeepConfig()):
                 pos_x = args.dash_pos[0] + args.dash_pos[2] // 2 - set_width // 2
                 pos_y = args.dash_pos[1] + args.dash_pos[3] // 2 - set_height // 2
             else:
-                pos_x += (width - set_width) // 2
-                pos_y += (height - set_height) // 2
+                pos_x += (screen_param[2] - set_width) // 2
+                pos_y += (screen_param[3] - set_height) // 2
             
             # Apply position
             start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")
