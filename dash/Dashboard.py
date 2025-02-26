@@ -63,8 +63,7 @@ class Dashboard(object):
         self._process.start()
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
-
-        self.window = self.create_gui(self.screen_param)
+        self.window = self.create_gui()
         sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
@@ -703,7 +702,7 @@ class Dashboard(object):
             t += 0.25
         plt.plot(X,Y,color=color)
 
-    def create_gui(self, dash_pos):
+    def create_gui(self):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
