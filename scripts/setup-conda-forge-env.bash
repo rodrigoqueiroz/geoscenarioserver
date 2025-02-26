@@ -51,9 +51,6 @@ if ! $MAMBA_EXE env list | grep -q gss; then
     echo "Creating conda environment 'gss'..."
     $MAMBA_EXE env create --yes --quiet --file ${SCRIPT_DIR}/conda-environment.yml
     if [[ $? == 0 ]]; then
-        # conda-forge tk does not support TrueType fonts
-        # remove it so that we can use the one from pip
-        $MAMBA_EXE -n gss remove --force --yes --quiet tk
         echo "The environment created successfully."
     else 
         echo "Environment not created. Exiting..."
@@ -66,9 +63,6 @@ fi
 if [[ ${ARG_ROS2} == "true" ]]; then
     echo "Installing ROS2 into the environment 'gss'..."
     $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-staging ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
-    # conda-forge tk gets reinstalled
-    # remove it again
-    $MAMBA_EXE -n gss remove --force --yes --quiet tk
     if [[ $? == 0 ]]; then
         echo "ROS2 installed successfully. Building the GSS ROS2 client..."
         echo ""
