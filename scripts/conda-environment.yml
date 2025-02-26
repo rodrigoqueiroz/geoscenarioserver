@@ -10,6 +10,8 @@ dependencies:
   - numpy
   - scipy
   - requests
+  - pynput
+  - screeninfo
   - pip:
     - antlr-denter
     - glog
