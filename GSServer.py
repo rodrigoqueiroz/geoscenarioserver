@@ -85,7 +85,7 @@ def start_server(args, m=MVelKeepConfig()):
             break
     
     x, y, width, height = primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height
-    screen_param = (x, y, width, height)
+    screen_param = [x, y, width, height]
     
     if args.dash_pos:
         screen_param = args.dash_pos
