@@ -128,7 +128,7 @@ def start_server(args, m=MVelKeepConfig()):
     traffic.start()
 
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config, primary_screen)
+    dashboard = Dashboard(traffic, sim_config, primary_monitor)
     if sim_config.show_dashboard:
         dashboard.start(args.dash_pos)
     else:

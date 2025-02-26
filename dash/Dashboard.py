@@ -27,6 +27,7 @@ from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
 import screeninfo
+from pynput import keyboard
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -34,14 +35,14 @@ class Dashboard(object):
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
 
-    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, primary_screen):
+    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, primary_monitor):
         self.sim_traffic:SimTraffic = sim_traffic
         self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
-        self.primary_screen = primary_screen
+        self.primary_monitor = primary_monitor
 
     def start(self, dash_pos):
         """ Start dashboard in subprocess.
@@ -709,7 +710,7 @@ class Dashboard(object):
         window = tk.Tk()
         window.configure(bg="white")
 
-        x, y, w, h = self.primary_screen.x, self.primary_screen.y, self.primary_screen.width, self.primary_screen.height
+        x, y, w, h = self.primary_monitor.x, self.primary_monitor.y, self.primary_monitor.width, self.primary_monitor.height
 
         if dash_pos:
             x, y, w, h = dash_pos
