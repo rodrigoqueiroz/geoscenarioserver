@@ -153,7 +153,9 @@ void AGSClient::ReadServerState(float deltaTime)
 	float server_delta_time;
 	int server_tick_count, nvehicles{0}, npedestrians{0}, vid{0}, pid{0};
 	iss >> server_tick_count >> server_simulation_time >> server_delta_time >> nvehicles >> npedestrians;
-
+	// parse origin
+	float origin_lat, origin_lon, origin_alt;
+	iss >> origin_lat >> origin_lon >> origin_alt;
 	// parse vehicles
 	int vehicles_read{0};
 	while (vehicles_read < nvehicles)

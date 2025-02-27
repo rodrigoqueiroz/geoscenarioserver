@@ -4,7 +4,7 @@ package_name = 'geoscenario_client'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.0.1',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -13,11 +13,15 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='Ian',
+    maintainer='Ian Colwell',
     maintainer_email='ian.colwell@hexagon.com',
     description='Python client for GeoScenarioServer',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
+    license='MIT',
+    extras_require={
+        'testing': [
+            'pytest'
+        ]
+    },
     entry_points={
         'console_scripts': [
             'geoscenario_client = geoscenario_client.geoscenario_client:main'

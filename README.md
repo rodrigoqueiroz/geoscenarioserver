@@ -39,9 +39,17 @@ To automatically install the dependencies for linux native, execute
 bash scripts/install_dependencies.bash
 ```
 
-Alternatively, to automatically create a conda-forge environment called `gss` with the required packages, execute
+Alternatively, to automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
 ```
-bash scripts/setup_conda-forge_env.bash
+$ bash setup-conda-forge-env.bash --help
+
+Create a conda-forge environment called gss for running GeoScenarioServer
+
+Usage:
+  $ bash setup_conda-forge_env.bash [-r|--ros2] [-t|--test-run] [-h|--help]
+    -r|--ros2       install ROS2 humble and build tools into the environment 'gss'; build the ROS2 client
+    -t|--test-run   start GeoScenarioServer within the environment 'gss'
+    -h|--help       display usage instructions and exit
 ```
 
 ## Running
