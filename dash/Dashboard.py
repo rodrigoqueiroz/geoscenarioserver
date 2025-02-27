@@ -45,7 +45,7 @@ class Dashboard(object):
         self.maneuver = None 
         self.screen_param = screen_param
 
-    def start(self, traffic, pos):
+    def start(self, traffic):
         """ Start dashboard in subprocess.
             global constant SHOW_DASHBOARD must be true
             Traffic must have started, otherwise the shared array is not ready
@@ -60,10 +60,10 @@ class Dashboard(object):
             return
 
         self.lanelet_map = self.sim_traffic.lanelet_map
-        self.run_dash_process(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata, traffic, pos)
+        self.run_dash_process(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata, traffic)
 
-    def run_dash_process(self, traffic_state_sharr, debug_shdata, traffic, dash_pos):
-        self.window = self.create_gui(dash_pos)
+    def run_dash_process(self, traffic_state_sharr, debug_shdata, traffic):
+        self.window = self.create_gui()
         sync_dash = TickSync(DASH_RATE, realtime=False, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():

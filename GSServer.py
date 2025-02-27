@@ -142,11 +142,11 @@ def start_server(args, m=MVelKeepConfig()):
     dashboard = Dashboard(traffic, sim_config, screen_param)
     traffic.start()
 
-    thread = Thread(target=run_traffic, args=(traffic, sync_global, sim_config, dashboard, paused), daemon=True)
+    thread = Thread(target=run_traffic, args=(traffic, sync_global, sim_config, dashboard), daemon=True)
     thread.start()
 
     if sim_config.show_dashboard:
-        dashboard.start(traffic, args.dash_pos)
+        dashboard.start(traffic)
     else:
         log.warn("Dashboard will not start")
 
