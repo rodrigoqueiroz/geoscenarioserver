@@ -5,57 +5,28 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
-from os import stat_result
-from matplotlib import pyplot as plt
-import math
-import sys
+import datetime
 import glog as log
+import math
 import numpy as np
-from TickSync import TickSync
-from SimConfig import *
-from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
-from util.Utils import *
-from sv.SDVPlanner import *
-from sv.SDVRoute import SDVRoute
+import sys
+
+from matplotlib import pyplot as plt
+from os import stat_result
+from typing import List
+
 from Actor import *
+from gsc.GSParser import Node
+from lanelet2.routing import Route
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementViolationEvents import ScenarioCompletion
 from shm.SimSharedMemoryServer import *
+from SimConfig import *
+from sv.SDVPlanner import *
+from sv.SDVRoute import SDVRoute
+from sv.VehicleBase import Vehicle
+from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
 from util.Utils import kalman
-from typing import List
-from lanelet2.routing import Route
-from gsc.GSParser import Node
-
-import datetime
-
-# Vehicle base class for remote control or simulation.
-class Vehicle(Actor):
-    #vehicle types
-    N_TYPE = 0      #neutral
-    SDV_TYPE = 1
-    EV_TYPE = 2
-    TV_TYPE = 3
-    PV_TYPE = 4
-
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
-        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
-        self.type = Vehicle.N_TYPE
-        self.radius = VEHICLE_RADIUS
-        self.model = ''
-
-
-    def update_sim_state(self, new_state, delta_time):
-        # NOTE: this may desync the sim and frenet vehicle state, so this should
-        # only be done for external vehicles (which don't have a frenet state)
-        if self.type is not Vehicle.EV_TYPE:
-            log.warn("Cannot update sim state for gs vehicles directly.")
-
-
-    def get_sim_state(self):
-        position = [self.state.x, self.state.y, 0.0]
-        velocity = [self.state.x_vel, self.state.y_vel]
-        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
-
 
 class SDV(Vehicle):
     ''''
