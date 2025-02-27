@@ -252,8 +252,8 @@ class BTreeConditions:
 
     # lead
     def lv_stopped(self,traffic_state:TrafficState, kwargs):
-        if traffic_state.road_occupancy.front:
-            lead = traffic_state.road_occupancy.front
+        if traffic_state.road_occupancy.front_center.closest():
+            lead = traffic_state.road_occupancy.front_center.closest()
             kwargs["vid"] = lead.id
             return self.vehicle_stopped(traffic_state,kwargs)
         else:
@@ -261,8 +261,8 @@ class BTreeConditions:
             return False
 
     def lv_moving(self,traffic_state:TrafficState, kwargs):
-        if traffic_state.road_occupancy.front:
-            lead = traffic_state.road_occupancy.front
+        if traffic_state.road_occupancy.front_center.closest():
+            lead = traffic_state.road_occupancy.front_center.closest()
             kwargs["vid"] = lead.id
             return self.vehicle_moving(traffic_state,kwargs)
         else:
@@ -270,8 +270,8 @@ class BTreeConditions:
             return False
 
     def lv_parked(self,traffic_state:TrafficState, kwargs):
-        if traffic_state.road_occupancy.front:
-            lead = traffic_state.road_occupancy.front
+        if traffic_state.road_occupancy.front_center.closest():
+            lead = traffic_state.road_occupancy.front_center.closest()
             kwargs["vid"] = lead.id
             return self.vehicle_parket(traffic_state,kwargs)
         else:
@@ -541,26 +541,26 @@ def get_vehicle_by_ids(traffic_state:TrafficState, kwargs):
             zid = get_node_param(kwargs,'zid', None)
             if lid:
                 if lid < 0: 
-                    vid = traffic_state.road_occupancy.left
+                    vid = traffic_state.road_occupancy.left_center.closest()
                 else:
-                    vid = traffic_state.road_occupancy.right
+                    vid = traffic_state.road_occupancy.right_center.closest()
             if zid:
                 if zid == 1: 
-                    vid = traffic_state.road_occupancy.front
+                    vid = traffic_state.road_occupancy.front_center.closest()
                 elif zid == 2: 
-                    vid = traffic_state.road_occupancy.left_front
+                    vid = traffic_state.road_occupancy.front_left.closest()
                 elif zid == 3: 
-                    vid = traffic_state.road_occupancy.left
+                    vid = traffic_state.road_occupancy.left_center.closest()
                 elif zid == 4: 
-                    vid = traffic_state.road_occupancy.left_back
+                    vid = traffic_state.road_occupancy.back_left.closest()
                 elif zid == 5: 
-                    vid = traffic_state.road_occupancy.back
+                    vid = traffic_state.road_occupancy.back_center.closest()
                 elif zid == 6: 
-                    vid = traffic_state.road_occupancy.right_back
+                    vid = traffic_state.road_occupancy.back_right.closest()
                 elif zid == 7: 
-                    vid = traffic_state.road_occupancy.right
+                    vid = traffic_state.road_occupancy.right_center.closest()
                 elif zid == 8: 
-                    vid = traffic_state.road_occupancy.right_front
+                    vid = traffic_state.road_occupancy.front_right.closest()
         
         #get actual vehicle object
         if vid:

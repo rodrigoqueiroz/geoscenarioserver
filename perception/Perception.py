@@ -8,7 +8,7 @@ from sv.VehicleBase    			import Vehicle
 from util.Transformations       import (frenet_to_sim_position, OutsideRefPathException, sim_to_frenet_frame)
 
 class Perception:
-	def __init__(self, vid, detection_range_in_meters, hallucination_retention, hallucination_weight, missed_detection_weight, 
+	def __init__(self, vehicle, vid, detection_range_in_meters, hallucination_retention, hallucination_weight, missed_detection_weight, 
 				 noise_position_mixture, noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate, seed=1):
 		self.all_vehicles              = {}
 		self.detection_range_in_meters = detection_range_in_meters
@@ -22,15 +22,16 @@ class Perception:
 		self.position_std              = noise_position_mixture[1]
 		self.random                    = np.random
 		self.rng_tick                  = 0
-		self.vehicles                  = {}
 		self.seed                      = seed
+		self.vehicle                   = vehicle
+		self.vehicles                  = {}
 		self.yaw_mostly_reliable       = noise_yaw_mostly_reliable
 		self.yaw_strongly_inaccurate   = noise_yaw_strongly_inaccurate
 
 	def apply_noise(self, traffic_state, lanelet_map, sdv_route):
 		# For reproducible pseudo generation of random numbers
 		self.rng_tick += 1
-		self.random.seed(self.my_vid + self.seed + self.rng_tick)
+		self.random.seed(self.my_vid * self.seed * self.rng_tick) # With additions changing the seed result in simulation that are similar
 
 		if self.detection_range_in_meters == None:
 			return traffic_state
@@ -43,23 +44,22 @@ class Perception:
 		traffic_state.traffic_vehicles_orp = {}
 
 		self.update_hallucination(ego_vehicle_state, traffic_state, sdv_route)
-		#self.hallucinate_its_own_reflection(ego_vehicle_state, traffic_state)
+		self.hallucinate_its_own_reflection(ego_vehicle_state, traffic_state, sdv_route)
 
 		for vid, vehicle in list(self.all_vehicles.items()):
 			if self.is_detecting_that_vehicle(ego_vehicle_state, vehicle):
 				vehicle = self.apply_yaw_noise(ego_vehicle_state, vehicle)
 				vehicle, has_frenet_location = self.apply_positional_noise(ego_vehicle_state, vid, vehicle, sdv_route)
 
-				#self.hallucinate_splitting_bounding_box(ego_vehicle_state, vid, vehicle, traffic_state, sdv_route)
+				self.hallucinate_splitting_bounding_box(ego_vehicle_state, vid, vehicle, traffic_state, sdv_route)
 
 				if has_frenet_location:
 					traffic_state.traffic_vehicles[vid]     = vehicle
 				else:
 					traffic_state.traffic_vehicles_orp[vid] = vehicle
 
-		traffic_state.road_occupancy = fill_occupancy(self.my_vid, traffic_state.vehicle_state, traffic_state.lane_config, 
-													  traffic_state.traffic_vehicles, traffic_state.traffic_vehicles_orp, 
-                                                      lanelet_map, traffic_state.intersections)
+		traffic_state.road_occupancy = fill_occupancy(self.vehicle, traffic_state.lane_config, traffic_state.traffic_vehicles, 
+													  traffic_state.traffic_vehicles_orp, lanelet_map, traffic_state.intersections)
 
 		# For data visualization
 		if get_center_id() == traffic_state.vid:
@@ -85,9 +85,11 @@ class Perception:
 		mixture   = [ self.position_mean, self.position_std ]
 		has_frenet_location = True
 
-		other_vehicle.state.x = self.apply_gaussian_noise(intensity, other_vehicle.state.x, mixture)
-		other_vehicle.state.y = self.apply_gaussian_noise(intensity, other_vehicle.state.y, mixture)
-		other_vehicle.state.z = self.apply_gaussian_noise(intensity, other_vehicle.state.z, mixture)
+		# Already affected by the gaussian mixture of the reference vehicle
+		if not tracked_hallucination:
+			other_vehicle.state.x = self.apply_gaussian_noise(intensity, other_vehicle.state.x, mixture)
+			other_vehicle.state.y = self.apply_gaussian_noise(intensity, other_vehicle.state.y, mixture)
+			other_vehicle.state.z = self.apply_gaussian_noise(intensity, other_vehicle.state.z, mixture)
 
 		if vid in self.vehicles:
 			other_vehicle.state.x_vel = other_vehicle.state.x     - self.vehicles[vid].state.x
@@ -117,8 +119,8 @@ class Perception:
 			other_vehicle.state.d_acc = 0
 
 		try:
-			s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_global_path(), other_vehicle.state.get_X(), 
-													 other_vehicle.state.get_Y(), 0)
+			s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_reference_path(), other_vehicle.state.get_X(), 
+													 other_vehicle.state.get_Y(), sdv_route.get_reference_path_s_start())
 			other_vehicle.state.set_S(s_vector)
 			other_vehicle.state.set_D(d_vector)
 		except OutsideRefPathException:
@@ -161,34 +163,43 @@ class Perception:
 			pow(ego_vehicle_state.z - other_vehicle.state.z, 2)
 		)
 
-	def hallucinate_its_own_reflection(self, ego_vehicle_state, traffic_state):
+	def hallucinate_its_own_reflection(self, ego_vehicle_state, traffic_state, sdv_route):
 		detection_value = self.random.random()
 		likelihood      = sqrt(100.0 * self.hallucination_weight) / 100.0
-		retention       = 0.8
+		retention       = 1.3 # Such allucination requires long time to fade
 
 		if detection_value < likelihood:
-			bias            = self.random.random() * self.detection_range_in_meters
+			min_distance    = 10.0
+			bias            = self.random.random() * (self.detection_range_in_meters - min_distance) + min_distance
 			detection_value = self.random.random()
+			yaw_factor      = 1 if self.random.random() < 0.5 else -1
 			occupancy_size  = 1.0 / 8 # The 9 grid minus the center center square which is occupied by ego
+			occupancy = ""
 
 			s = ego_vehicle_state.s
 			# Front of Ego
 			if   detection_value < 3 * occupancy_size:
+				occupancy += "Front"
 				s += bias
 
 			# Back of Ego
 			elif detection_value >= 5 * occupancy_size:
+				occupancy += "Back"
 				s -= bias
+
+			else:
+				occupancy = "Center"
 
 			d = ego_vehicle_state.d
 			# Left of Ego
 			if   detection_value <  1 * occupancy_size or \
 			     detection_value >= 3 * occupancy_size and detection_value < 4 * occupancy_size or \
 			     detection_value >= 5 * occupancy_size and detection_value < 6 * occupancy_size:
+				occupancy += " Left"
 				if traffic_state.lane_config._left_lane is None:
 					left_lane_d = traffic_state.lane_config.left_bound
 				else:
-					left_lane_d = -traffic_state.lane_config._left_lane.right_bound
+					left_lane_d = traffic_state.lane_config._left_lane.right_bound
 				
 				d += traffic_state.lane_config.left_bound + left_lane_d
 
@@ -196,6 +207,7 @@ class Perception:
 			elif detection_value >= 2 * occupancy_size and detection_value < 3 * occupancy_size or \
 				 detection_value >= 4 * occupancy_size and detection_value < 5 * occupancy_size or \
 				 detection_value >= 7 * occupancy_size:
+				occupancy += " Right"
 				if traffic_state.lane_config._right_lane is None:
 					right_lane_d = traffic_state.lane_config.right_bound
 				else:
@@ -203,17 +215,33 @@ class Perception:
 
 				d += traffic_state.lane_config.right_bound + right_lane_d
 
-			s_start = 0
-			x, y = frenet_to_sim_position(reference_line, s, d, s_start)
+			else:
+				occupancy += " Center"
+
+			x, y = frenet_to_sim_position(sdv_route.get_reference_path(), s, d, sdv_route.get_reference_path_s_start())
 
 			# The rest of the values are just cloning the ego vehicle
-			hallucinated_vehicle = SDV()
-			# Add Position Noise
-			# Add Heading  Noise
+			hallucinated_vehicle = Vehicle(self.hallucination_index)
+			hallucinated_vehicle.state.set_state_vector(ego_vehicle_state.get_state_vector())
+			hallucinated_vehicle.state.x    = x
+			hallucinated_vehicle.state.y    = y
+			hallucinated_vehicle.state.yaw *= yaw_factor
+
+			hallucinated_vehicle, has_frenet_location = self.apply_positional_noise(
+				ego_vehicle_state, self.hallucination_index, hallucinated_vehicle, sdv_route
+			)
+			hallucinated_vehicle = self.apply_yaw_noise(ego_vehicle_state, hallucinated_vehicle, intensities=[1, 15, 25])
+
+			if has_frenet_location:
+				traffic_state.traffic_vehicles[self.hallucination_index]     = hallucinated_vehicle
+			else:
+				traffic_state.traffic_vehicles_orp[self.hallucination_index] = hallucinated_vehicle
+
 			self.hallucination_status[self.hallucination_index] = {
 				"offsets": {
 					"s": s,
-					"d": d
+					"d": d,
+					"yaw_factor": yaw_factor
 				},
 				"retention": retention,
 				"vehicle":   hallucinated_vehicle
@@ -237,9 +265,9 @@ class Perception:
 			hallucinated_vehicle = self.apply_yaw_noise(ego_vehicle_state, hallucinated_vehicle)
 
 			if has_frenet_location:
-				traffic_state.traffic_vehicles[vid]     = hallucinated_vehicle
+				traffic_state.traffic_vehicles[self.hallucination_index]     = hallucinated_vehicle
 			else:
-				traffic_state.traffic_vehicles_orp[vid] = hallucinated_vehicle
+				traffic_state.traffic_vehicles_orp[self.hallucination_index] = hallucinated_vehicle
 
 
 			self.hallucination_status[self.hallucination_index] = {
@@ -306,7 +334,23 @@ class Perception:
 
 				# Imitate Ego	
 				else:
-					pass
+					has_frenet_location = True
+					hallucinated_vehicle = hallucination['vehicle']
+					hallucinated_vehicle.state.set_state_vector(ego_vehicle_state.get_state_vector())
+
+					s          = hallucination['offsets']['s']
+					d          = hallucination['offsets']['d']
+					yaw_factor = hallucination['offsets']['yaw_factor']
+
+					x, y = frenet_to_sim_position(sdv_route.get_reference_path(), s, d, sdv_route.get_reference_path_s_start())
+
+					hallucinated_vehicle.state.x    = x
+					hallucinated_vehicle.state.y    = y
+					hallucinated_vehicle.state.yaw *= yaw_factor
+					hallucinated_vehicle, has_frenet_location = self.apply_positional_noise(
+						ego_vehicle_state, vid, hallucinated_vehicle, sdv_route, tracked_hallucination=True
+					)
+					hallucinated_vehicle = self.apply_yaw_noise(ego_vehicle_state, hallucinated_vehicle, intensities=[1, 15, 25])
 
 				if has_frenet_location:
 					traffic_state.traffic_vehicles[vid]     = hallucinated_vehicle

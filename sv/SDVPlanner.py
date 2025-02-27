@@ -16,7 +16,6 @@ from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
 from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion
-from perception.Perception import Perception
 from SimTraffic import *
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
@@ -56,6 +55,7 @@ class SVPlanner(object):
         self.mconfig         = None
         self.root_btree_name = sdv.root_btree_name
         self.route_nodes     = route_nodes
+        self.sdv             = sdv
         self.sdv_route       = None
         self.sync_planner    = None
 
@@ -135,7 +135,7 @@ class SVPlanner(object):
                 state_time = header[2]
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:
-                    vehicle_state = traffic_vehicles.pop(self.vid, None).state #removes self state
+                    self.sdv.state = traffic_vehicles.pop(self.vid, None).state #removes self state
                 else:
                     #vehicle state not available. Vehicle can be inactive.
                     continue
@@ -145,15 +145,15 @@ class SVPlanner(object):
                     self.sdv_route = SDVRoute(
                         #self.sim_config.lanelet_routes[self.vid],
                         self.laneletmap,
-                        vehicle_state.x, vehicle_state.y,
+                        self.sdv.state.x, self.sdv.state.y,
                         self.route_nodes,
                         #self.sim_config.goal_points[self.vid]
                     )
 
 
                 # Get traffic, lane config and regulatory elements in current frenet frame
-                project_dynamic_objects(self.last_plan, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
-                traffic_state = get_traffic_state(self.sync_planner, self.vid, self.laneletmap, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+                project_dynamic_objects(self.last_plan, self.sdv_route, self.sdv.state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
+                traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                 if not traffic_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
@@ -173,13 +173,17 @@ class SVPlanner(object):
                 if ref_path_changed:
                     log.info("PATH CHANGED")
 
-                    self.sdv_route.update_global_path(vehicle_state.x, vehicle_state.y)
+                    self.sdv_route.update_global_path(self.sdv.state.x, self.sdv.state.y)
 
                     # Regenerate planner state and tick btree again. Discard whether ref path changed again.
-                    traffic_state = get_traffic_state(self.sync_planner,self.vid, self.laneletmap, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+                    traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                     if not traffic_state:
                         log.warn("Invalid planner state, skipping planning step...")
                         continue
+
+                    if self._perception != None:
+                        traffic_state = self._perception.apply_noise(traffic_state, self.laneletmap, self.sdv_route)
+
                     mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
 
 
@@ -193,9 +197,9 @@ class SVPlanner(object):
                         "   speed       {:.3f}\n"
                     ).format(
                         self.vid,
-                        vehicle_state.s,
-                        vehicle_state.x, vehicle_state.y,
-                        vehicle_state.s_vel
+                        self.sdv.state.s,
+                        self.sdv.state.x, self.sdv.state.y,
+                        self.sdv.state.s_vel
                     )
                     for vid, tvehicle in traffic_vehicles.items():
                         state_str += (
@@ -208,11 +212,12 @@ class SVPlanner(object):
                             vid,
                             tvehicle.state.s,
                             tvehicle.state.s_vel,
-                            vehicle_state.s - tvehicle.state.s - 2*VEHICLE_RADIUS,
-                            vehicle_state.s_vel - tvehicle.state.s_vel
+                            self.sdv.state.s - tvehicle.state.s - self.sdv.radius - tvehicle.radius,
+                            self.sdv.state.s_vel - tvehicle.state.s_vel
                         )
                     #log.info(state_str)
                 self.mconfig = mconfig
+
                 #Maneuver Tick
                 if mconfig and traffic_state.lane_config:
                     #replan maneuver
@@ -253,7 +258,8 @@ class SVPlanner(object):
                         traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
 
                     #For pickling
-                    traffic_state.intersections = [ intersection.to_primitives() for intersection in traffic_state.intersections]
+                    traffic_state.intersections  = [ intersection.to_primitives() for intersection in traffic_state.intersections]
+                    traffic_state.road_occupancy = traffic_state.road_occupancy.to_primitives()
 
                     debug_shdata[int(self.vid)] = (
                         traffic_state,

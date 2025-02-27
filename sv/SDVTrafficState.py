@@ -7,24 +7,29 @@
 # and cartesian for intersections
 # --------------------------------------------
 from __future__ import annotations  #Must be first Include. Will be standard in Python4
-from dataclasses import dataclass, field
-from collections import namedtuple
-from turtle import color
-from sv.SDVRoute import SDVRoute
-from mapping.LaneletMap import *
-import lanelet2.core
-from lanelet2.geometry import *
-from typing import Tuple, Dict, List
+
 import glog as log
+import itertools
+import lanelet2.core
+
+from copy import copy, deepcopy
+from collections import namedtuple
+from dataclasses import dataclass, field
+from enum import Enum, IntEnum
+from functools import partial
+from lanelet2.geometry import *
+from math import sqrt
+from turtle import color
+from typing import Tuple, Dict, List
+
 from Actor import VehicleState
+from mapping.LaneletMap import *
+from SimConfig import *
+from sv.VehicleBase import Vehicle
 from sv.ManeuverConfig import LaneConfig
+from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
 from util.Transformations import (OutsideRefPathException, frenet_to_sim_frame,frenet_to_sim_position, sim_to_frenet_frame,sim_to_frenet_position)
-from enum import Enum, IntEnum
-import itertools
-from copy import copy, deepcopy
-from math import sqrt
-from SimConfig import *
 
 #Reg Elements State (for pickling)
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
@@ -84,6 +89,30 @@ class TrafficLightIntersection:
         my_copy.intersecting_lanelets = [ [ll.id, 0 ] for ll, sl in self.intersecting_lanelets ]
         return my_copy
 
+class OccupancyZone:
+    def __init__(self, proximity_func, search_func):
+        self.closest  = partial(self.find_id, proximity_func, search_func)
+        self.vehicles = []
+
+    def find_id(self, proximity_func, search_func, attribute = 'vehicles'):
+        collection = getattr(self, attribute)
+        
+        if len(collection) == 0:
+            return None
+
+        return proximity_func(collection, key=search_func).id
+
+    def is_empty(self):
+        return len(self.vehicles) == 0
+
+    def to_primitives(self):
+        #Creates a copy replacing collection objects to IDs for pickling (for Debug)
+        my_copy = copy(self)
+        del my_copy.closest
+
+        my_copy.vehicles = [ vehicle.id for vehicle in self.vehicles ]
+        return my_copy
+
 @dataclass
 class PedestrianIntersection:
     stop_position:tuple = None
@@ -101,14 +130,28 @@ class PedestrianIntersection:
 #Holds vehicle IDs if zone is occupied
 @dataclass
 class RoadOccupancy:
-    front:int = None            #Zone 1: same lane, closest vehicle ahead, up to 50m
-    left_front:int = None       #Zone 2: lateral, ahead (gap > 0), closest vehicle
-    left:int = None             #Zone 3: lateral, gap == 0,
-    left_back:int = None        #Zone 4: lateral, behind (gap < 0), closest vehicle
-    back:int = None             #Zone 5: same lane, closest vehicle behind, up to 50m
-    right_back:int = None       #Zone 6
-    right:int = None            #Zone 7
-    right_front:int = None      #Zone 8
+    '''
+        Frédéric's 9-Grid System
+        Note that the ego zone is not listed, since it would imply that something collided with it.
+
+        ---------------------------------------------
+        | Front Left  | Front Center | Front Right  |
+        ---------------------------------------------
+        | Left Center |     EGO      | Right Center |
+        ---------------------------------------------
+        | Back Left   |  Back Center |  Back Right  |
+        ---------------------------------------------
+    '''
+    back_center:OccupancyZone  = OccupancyZone(max, lambda v: v.state.s)
+    back_left:OccupancyZone    = OccupancyZone(max, lambda v: v.state.s)
+    back_right:OccupancyZone   = OccupancyZone(max, lambda v: v.state.s)
+
+    front_center:OccupancyZone = OccupancyZone(min, lambda v: v.state.s)
+    front_left:OccupancyZone   = OccupancyZone(min, lambda v: v.state.s)
+    front_right:OccupancyZone  = OccupancyZone(min, lambda v: v.state.s)
+
+    left_center:OccupancyZone  = OccupancyZone(min, lambda v: v.state.d)
+    right_center:OccupancyZone = OccupancyZone(max, lambda v: v.state.d)
 
     lead:int = None
     #trailing_vid:int = None
@@ -117,6 +160,24 @@ class RoadOccupancy:
     intersecting_zone:List =  field(default_factory=list)           #Intersection, vehicles in one of conflicting lanelets
     appr_intersecting_zone:List =  field(default_factory=list)      #Intersection, vehicles approaching conflicting lanelets
     row_zone:List =  field(default_factory=list)                    #Intersection, vehicles in lanelets with right of way
+
+    def to_primitives(self):
+        #Creates a copy replacing occupancy zones by their primitives for pickling (for Debug)
+        my_copy = copy(self)
+
+        my_copy.back_center  = my_copy.back_center.to_primitives()
+        my_copy.back_left    = my_copy.back_left.to_primitives()
+        my_copy.back_right   = my_copy.back_right.to_primitives()
+
+        my_copy.front_center = my_copy.front_center.to_primitives()
+        my_copy.front_left   = my_copy.front_left.to_primitives()
+        my_copy.front_right  = my_copy.front_right.to_primitives()
+
+        my_copy.left_center  = my_copy.left_center.to_primitives()
+        my_copy.right_center = my_copy.right_center.to_primitives()
+
+        return my_copy
+
 
 @dataclass
 class TrafficState:
@@ -196,32 +257,33 @@ def project_dynamic_objects(
 
 def get_traffic_state(
         planner_tick:TickSync,
-        my_vid:int,
+        my_vehicle:Vehicle,
         lanelet_map:LaneletMap,
         sdv_route:SDVRoute,
-        vehicle_state:VehicleState,
         traffic_vehicles:dict,
         traffic_pedestrians:dict,
         traffic_light_states:dict,
         static_objects:dict):
-    """ Transforms vehicle_state and all traffic vehicles to the current frenet frame, and generates other
+    """ Transforms my_vehicle.state and all traffic vehicles to the current frenet frame, and generates other
         frame-dependent planning data like current lane config and goal.
     """
+    my_vid = my_vehicle.id
 
-    s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_global_path(), vehicle_state.get_X(), vehicle_state.get_Y(), 0)
-    vehicle_state.set_S(s_vector)
-    vehicle_state.set_D(d_vector)
 
-    # the next plan's ref_path_origin is vehicle_state.s
-    sdv_route.update_reference_path(vehicle_state.s, plan_lane_swerve=True, update_route_progress=True)
-    vehicle_state.s = 0.0
+    s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_global_path(), my_vehicle.state.get_X(), my_vehicle.state.get_Y(), 0)
+    my_vehicle.state.set_S(s_vector)
+    my_vehicle.state.set_D(d_vector)
+
+    # the next plan's ref_path_origin is my_vehicle.state.s
+    sdv_route.update_reference_path(my_vehicle.state.s, plan_lane_swerve=True, update_route_progress=True)
+    my_vehicle.state.s = 0.0
 
     route_complete = sdv_route.route_complete()
 
-    lane_swerve_target = sdv_route.get_lane_swerve_direction(vehicle_state.s)
+    lane_swerve_target = sdv_route.get_lane_swerve_direction(my_vehicle.state.s)
 
     # update lane config based on current (possibly outdated) reference frame
-    lane_config, intersections, reg_elems = read_map(my_vid, lanelet_map, sdv_route, vehicle_state, traffic_light_states,traffic_vehicles)
+    lane_config, intersections, reg_elems = read_map(my_vid, lanelet_map, sdv_route, my_vehicle.state, traffic_light_states,traffic_vehicles)
     if not lane_config:
         # No map data for current position
         log.warn("no lane config")
@@ -262,7 +324,7 @@ def get_traffic_state(
         except OutsideRefPathException:
             del static_objects[soid]
 
-    road_occupancy = fill_occupancy(my_vid, vehicle_state, lane_config, traffic_vehicles, traffic_vehicles_orp, 
+    road_occupancy = fill_occupancy(my_vehicle, lane_config, traffic_vehicles, traffic_vehicles_orp, 
                                     lanelet_map, intersections)
 
     # Goal
@@ -277,7 +339,7 @@ def get_traffic_state(
     return TrafficState(
         vid = my_vid,
         sim_time=planner_tick.sim_time,
-        vehicle_state=vehicle_state,
+        vehicle_state=my_vehicle.state,
         lane_config=lane_config,
         goal_point_frenet=goal_point_frenet,
         route_complete=route_complete,
@@ -291,62 +353,53 @@ def get_traffic_state(
         road_occupancy = road_occupancy
     )
 
-def fill_occupancy(my_vid: int, vehicle_state:VehicleState, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections):
+def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections):
     '''
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id.
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
-    half_length = VEHICLE_LENGTH/2
+    half_length = my_vehicle.bounding_box_length / 2
+    detection_range_in_meters = 50 # Rodrigo's base assumption to limit the detection range
+
+    if my_vehicle.detection_range_in_meters:
+        detection_range_in_meters = my_vehicle.detection_range_in_meters
 
     #Lane zones
-    front = []
-    back = []
-    right = []
-    right_front = []
-    right_back = []
-    left = []
-    left_front = []
-    left_back = []
-    left_lane = lane_config._left_lane
-    right_lane = lane_config._right_lane
+    left_lane    = lane_config._left_lane
+    right_lane   = lane_config._right_lane
+
+    occupancy = RoadOccupancy()
+
+    # Using Frénet Frames
     for vid, vehicle in traffic_vehicles.items():
             their_lane = lane_config.get_current_lane(vehicle.state.d)
-            if abs(vehicle.state.s-vehicle_state.s) < 50: #limit to vehicles within 50 range
+            if abs(vehicle.state.s-my_vehicle.state.s) < detection_range_in_meters:
                 if their_lane:
                     #same lane
                     if their_lane.id == lane_config.id:
-                        if vehicle.state.s > vehicle_state.s:
-                            front.append(vehicle)
+                        if vehicle.state.s > my_vehicle.state.s:
+                            occupancy.front_center.vehicles.append(vehicle)
                         else:
-                            back.append(vehicle)
+                            occupancy.back_center.vehicles.append(vehicle)
                     #left lane
                     elif left_lane and their_lane.id == left_lane.id:
-                        if (vehicle.state.s - half_length) >= (vehicle_state.s + half_length):
-                            left_front.append(vehicle)
-                        elif (vehicle.state.s + half_length) <= (vehicle_state.s - half_length):
-                            left_back.append(vehicle)
+                        if (vehicle.state.s - half_length) >= (my_vehicle.state.s + half_length):
+                            occupancy.front_left.vehicles.append(vehicle)
+                        elif (vehicle.state.s + half_length) <= (my_vehicle.state.s - half_length):
+                            occupancy.back_left.vehicles.append(vehicle)
                         else:
-                            left.append(vehicle)
+                            occupancy.left_center.vehicles.append(vehicle)
                     #right lane
                     elif right_lane and their_lane.id == right_lane.id:
-                        if (vehicle.state.s - half_length) > (vehicle_state.s + half_length):
-                            right_front.append(vehicle)
-                        elif (vehicle.state.s + half_length) < (vehicle_state.s - half_length):
-                            right_back.append(vehicle)
+                        if (vehicle.state.s - half_length) > (my_vehicle.state.s + half_length):
+                            occupancy.front_right.vehicles.append(vehicle)
+                        elif (vehicle.state.s + half_length) < (my_vehicle.state.s - half_length):
+                            occupancy.back_right.vehicles.append(vehicle)
                         else:
-                            right.append(vehicle)
+                            occupancy.right_center.vehicles.append(vehicle)
 
-    occupancy = RoadOccupancy()
-    occupancy.front = min(front, key=lambda v: v.state.s).id if len(front) > 0 else None
-    occupancy.back = max(back, key=lambda v: v.state.s).id if len(back) > 0 else None
-
-    occupancy.left = min(left, key=lambda v: v.state.d).id if len(left) > 0 else None
-    occupancy.left_back = max(left_back, key=lambda v: v.state.s).id if len(left_back) > 0 else None
-    occupancy.left_front = min(left_front, key=lambda v: v.state.s).id if len(left_front) > 0 else None
-
-    occupancy.right = max(right, key=lambda v: v.state.d).id if len(right) > 0 else None
-    occupancy.right_back = max(right_back, key=lambda v: v.state.s).id if len(right_back) > 0 else None
-    occupancy.right_front = min(right_front, key=lambda v: v.state.s).id if len(right_front) > 0 else None
+    # Using Euclidian Space
+    # TODO
 
     # vehicle and lanelets mapping [vehicle, [ll1,ll2]]
     vehicle_lanelet_map = {}

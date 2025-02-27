@@ -120,7 +120,7 @@ def tangent_of_path_at(path:ConstLineString3d, i:int):
     return normalize(op + pq)
 
 
-def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List[float], y_vector:List[float], s_start:float):
+def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List[float], y_vector:List[float], s_start:float, max_dist_from_path:float=5):
     """ Transforms position and speed from cartesian to frenet frame based of ref_path
 
         @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?
@@ -131,7 +131,7 @@ def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List[float], y_vect
     acc = np.array([x_acc, y_acc])
 
     # position
-    s, d = sim_to_frenet_position(ref_path, x, y, s_start)
+    s, d = sim_to_frenet_position(ref_path, x, y, s_start, max_dist_from_path)
 
     unit_tangent, unit_normal, kappa = path_frame_at_arclength(ref_path, s, s_start)
 

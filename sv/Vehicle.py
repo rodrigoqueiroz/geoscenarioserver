@@ -19,6 +19,7 @@ from Actor import *
 from gsc.GSParser import Node
 from lanelet2.routing import Route
 from mapping.LaneletMap import LaneletMap
+from perception.Perception import Perception
 from requirements.RequirementViolationEvents import ScenarioCompletion
 from shm.SimSharedMemoryServer import *
 from SimConfig import *
@@ -42,12 +43,13 @@ class SDV(Vehicle):
             noise_yaw_mostly_reliable:float=0, noise_yaw_strongly_inaccurate:float=0, 
             rule_engine_port:int=None):
         self.btype = btype
-        self.btree_locations         = btree_locations
-        self.goal_ends_simulation    = goal_ends_simulation
-        self.perception              = Perception(vid, detection_range_in_meters, hallucination_retention, 
-                                                  hallucination_weight, missed_detection_weight, noise_position_mixture, 
-                                                  noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate)
-        self.route_nodes             = route_nodes
+        self.btree_locations           = btree_locations
+        self.detection_range_in_meters = detection_range_in_meters
+        self.goal_ends_simulation      = goal_ends_simulation
+        self.perception                = Perception(self, vid, detection_range_in_meters, hallucination_retention, 
+                                                    hallucination_weight, missed_detection_weight, noise_position_mixture, 
+                                                    noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate)
+        self.route_nodes               = route_nodes
 
         if start_state_in_frenet:
             # assume frenet start_state is relative to the starting global path
@@ -62,7 +64,8 @@ class SDV(Vehicle):
         else:
             self.sdv_route = SDVRoute(lanelet_map, start_state[0], start_state[3], route_nodes = route_nodes)
             s_vector, d_vector = sim_to_frenet_frame(
-                self.sdv_route.get_global_path(), start_state[0:3], start_state[3:], 0
+                self.sdv_route.get_global_path(), start_state[0:3], start_state[3:],
+                s_start=0
             )
             self.sdv_route.update_reference_path(s_vector[0])
             s_vector[0] = 0.0

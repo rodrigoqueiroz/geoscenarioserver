@@ -168,6 +168,7 @@ class BehaviorLayer(object):
         # Temporary overrides
         situation.traffic_vehicles = {}
         situation.traffic_vehicles_orp = {}
+        situation.road_occupancy = {}
 
         #parameters['situation']['last_behaviour'] = self.last_behaviour
         self.last_behaviour = self.post_behaviour(convert_to_dict(situation))
