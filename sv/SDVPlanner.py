@@ -28,27 +28,16 @@ import sv.btree.BehaviorLayer       as btree
 import sv.ruleEngine.BehaviorLayer  as rules
 
 class SVPlanner(object):
-<<<<<<< HEAD
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, perception = None, rule_engine_port = None):
         #MainProcess space:
         self.completion           = Value('b', False)
         self._process             = None
-=======
-    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, rule_engine_port = None):
-        #MainProcess space:
-        self.completion = Value('b', False)
-        self._process = None
->>>>>>> origin/master
         self.traffic_state_sharr  = sim_traffic.traffic_state_sharr
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
         self._debug_shdata        = sim_traffic.debug_shdata
         self._mplan_sharr         = None
-<<<<<<< HEAD
         self._perception          = perception
         self._requirementsChecker = RequirementsChecker(sdv, goal_ends_simulation)
-=======
-        self._requirementsChecker = RequirementsChecker(goal_ends_simulation)
->>>>>>> origin/master
         self._rule_engine_port    = rule_engine_port
 
         #Shared space
@@ -146,16 +135,10 @@ class SVPlanner(object):
                 state_time = header[2]
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:
-<<<<<<< HEAD
                     self.sdv.state = traffic_vehicles.pop(self.vid, None).state #removes self state
-=======
-                    vehicle_state = traffic_vehicles.pop(self.vid, None).state #removes self state
->>>>>>> origin/master
                 else:
                     #vehicle state not available. Vehicle can be inactive.
                     continue
-
-<<<<<<< HEAD
 
                 if self.sdv_route is None:
                     self.sdv_route = SDVRoute(
@@ -166,24 +149,10 @@ class SVPlanner(object):
                         #self.sim_config.goal_points[self.vid]
                     )
 
-
                 # Get traffic, lane config and regulatory elements in current frenet frame
                 project_dynamic_objects(self.last_plan, self.sdv_route, self.sdv.state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
                 traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
-=======
-                if self.sdv_route is None:
-                    self.sdv_route = SDVRoute(
-                        #self.sim_config.lanelet_routes[self.vid],
-                        self.laneletmap,
-                        vehicle_state.x, vehicle_state.y,
-                        self.route_nodes,
-                        #self.sim_config.goal_points[self.vid]
-                    )
 
-                # Get traffic, lane config and regulatory elements in current frenet frame
-                project_dynamic_objects(self.last_plan, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
-                traffic_state = get_traffic_state(self.sync_planner, self.vid, self.laneletmap, self.sdv_route, vehicle_state, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
->>>>>>> origin/master
                 if not traffic_state:
                     log.warn("Invalid planner state, skipping planning step...")
                     continue
