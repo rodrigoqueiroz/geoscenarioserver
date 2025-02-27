@@ -146,7 +146,7 @@ def start_server(args, m=MVelKeepConfig()):
     thread.start()
 
     if sim_config.show_dashboard:
-        dashboard.start(traffic)
+        dashboard.start()
     else:
         log.warn("Dashboard will not start")
 
