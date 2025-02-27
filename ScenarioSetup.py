@@ -102,7 +102,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
-    log.info("Scenario Setup: initializing vehicles.")
+    log.info("Scenario Setup, initializing vehicles:")
     for vid, vnode in parser.vehicles.items():
         if len(sim_traffic.vehicles) >= MAX_NVEHICLES:
             break
@@ -198,6 +198,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     vehicle.btree_reconfig = vnode.tags['btconfig']
                 vehicle.model = model
                 sim_traffic.add_vehicle(vehicle)
+                log.info("Vehicle {} initialized with SDV behavior".format(vid))
             except Exception as e:
                 log.error("Failed to initialize vehicle {}".format(vid))
                 raise e
@@ -340,6 +341,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     trajectory.append(nd)
                 pedestrian = TP(pid, name, start_state, yaw, trajectory)
                 sim_traffic.add_pedestrian(pedestrian)
+                log.info("Pedestrian {} initialized with TP behavior".format(pid))
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
@@ -373,12 +375,14 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 btype=btype)
 
                 sim_traffic.add_pedestrian(pedestrian)
+                log.info("Pedestrian {} initialized with SP behavior".format(pid))
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
         else:
             pedestrian = Pedestrian(pid, name, start_state, yaw)
             sim_traffic.add_pedestrian(pedestrian)
+            log.info("Pedestrian {} initialized as a motionless pedestrian".format(pid))
 
     #========= Static Objects
     #Area based objetics are not supported yet.
