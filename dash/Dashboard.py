@@ -40,7 +40,6 @@ class Dashboard(object):
         self.window = None
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
-        self.thread = None
         self.screen_param = screen_param
 
     def start(self):
@@ -58,9 +57,6 @@ class Dashboard(object):
             return
 
         self.lanelet_map = self.sim_traffic.lanelet_map
-        self.run_dash_process(self.sim_traffic.traffic_state_sharr, self.sim_traffic.debug_shdata)
-
-    def run_dash_process(self, traffic_state_sharr, debug_shdata):
         self.window = self.create_gui()
         sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
 
@@ -72,7 +68,7 @@ class Dashboard(object):
             self.clear_vehicle_charts()
 
             #get new data
-            header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
+            header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(self.sim_traffic.traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
@@ -105,9 +101,9 @@ class Dashboard(object):
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
                     #vehicles with planner: cartesian, frenet chart and behavior tree
-                    if vid in debug_shdata:
+                    if vid in self.sim_traffic.debug_shdata:
                         #read vehicle planning data from debug_shdata
-                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = self.sim_traffic.debug_shdata[vid]
                         if SHOW_CPLOT: #cartesian plot with lanelet map
                             self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
                         if SHOW_FFPLOT: #frenet frame plot

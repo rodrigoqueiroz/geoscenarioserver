@@ -140,11 +140,11 @@ def start_server(args, m=MVelKeepConfig()):
     
     #GUI / Debug screen
     dashboard = Dashboard(traffic, sim_config, screen_param)
-    traffic.start()
 
     thread = Thread(target=run_traffic, args=(traffic, sync_global, sim_config, dashboard), daemon=True)
     thread.start()
 
+    traffic.start()
     if sim_config.show_dashboard:
         dashboard.start()
     else:
@@ -179,9 +179,6 @@ def run_traffic(traffic, sync_global, sim_config, dashboard, paused=False):
 
     sync_global.write_peformance_log()
     traffic.stop_all()
-
-    if sim_config.show_dashboard:
-        dashboard.quit()
 
     #SIM END
     log.info('SIMULATION END')
