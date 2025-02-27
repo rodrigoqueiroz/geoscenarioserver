@@ -6,13 +6,12 @@
 # Starts the Server and controls the traffic simulation loop
 # --------------------------------------------
 
+import glog as log
+import screeninfo
+
 from argparse import ArgumentParser
-from TickSync import TickSync
-from SimTraffic import SimTraffic
-from SimConfig import SimConfig
-from dash.Dashboard import *
-from mapping.LaneletMap import *
-from ScenarioSetup import *
+from pynput import keyboard
+
 try:
     from lanelet2.projection import LocalCartesianProjector
     use_local_cartesian=True
@@ -20,9 +19,13 @@ except ImportError:
     from lanelet2.projection import UtmProjector
     use_local_cartesian=False
 
-import glog as log
-import screeninfo
-from pynput import keyboard
+from dash.Dashboard import *
+from mapping.LaneletMap import *
+from requirements.RequirementViolationEvents import GlobalTick
+from ScenarioSetup import *
+from SimConfig import SimConfig
+from SimTraffic import SimTraffic
+from TickSync import TickSync
 
 def start_server(args, m=MVelKeepConfig()):
     # log.setLevel("INFO")
@@ -152,6 +155,9 @@ def start_server(args, m=MVelKeepConfig()):
                 sync_global.delta_time,
                 sync_global.sim_time
             )
+
+            GlobalTick()
+
             if sim_status < 0:
                 break
         except Exception as e:
