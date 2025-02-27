@@ -63,8 +63,8 @@ class SVPlanner(object):
         self._mplan_sharr = Array('f', c)
         #Process based
         self._process = get_context("fork").Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr, 
-            self._mplan_sharr, 
+            self.traffic_state_sharr,
+            self._mplan_sharr,
             self._debug_shdata), daemon=True)
         self._process.start()
 
