@@ -34,7 +34,7 @@ class Dashboard(object):
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
 
-    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig):
+    def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
         self.center_id = int(sim_config.plot_vid)
         self.sim_config = sim_config
@@ -43,6 +43,7 @@ class Dashboard(object):
         self.lanelet_map:LaneletMap = None
         self.thread = None
         self.maneuver = None 
+        self.screen_param = screen_param
 
     def start(self, traffic, pos):
         """ Start dashboard in subprocess.
@@ -64,7 +65,6 @@ class Dashboard(object):
     def run_dash_process(self, traffic_state_sharr, debug_shdata, traffic, dash_pos):
         self.window = self.create_gui(dash_pos)
         sync_dash = TickSync(DASH_RATE, realtime=False, block=True, verbose=False, label="DP")
-        paused = False
 
         while sync_dash.tick():
             if not self.window or not traffic.traffic_running:
@@ -702,31 +702,25 @@ class Dashboard(object):
             t += 0.25
         plt.plot(X,Y,color=color)
 
-    def create_gui(self, dash_pos):
+    def create_gui(self):
         #Window
         window = tk.Tk()
         window.configure(bg="white")
 
-        screen_width = window.winfo_screenwidth()
-        screen_height = window.winfo_screenheight()
-
-        if dash_pos:
-            x, y, w, h = dash_pos
-        else:
-            x, y, w, h = 0, 0, screen_width, screen_height
+        x, y, w, h = self.screen_param[0], self.screen_param[1], self.screen_param[2], self.screen_param[3]
 
         window.geometry("%dx%d+%d+%d" % (w, h, x, y))
         
         vis_scaling = 1
         txt_scaling = 1
 
-        if screen_height >= 1440 and screen_width >= 2560:
+        if h >= 1440 and w >= 2560:
             vis_scaling = 3
             txt_scaling = 1.5
-        elif screen_height >= 1080 and screen_width >= 1920:
+        elif h >= 1080 and w >= 1920:
             vis_scaling = 2
             txt_scaling = 1.2
-
+    
         # Configure row and column weights for dynamic resizing
         window.columnconfigure(0, weight=1)  # Left section (70% width)
         window.columnconfigure(1, weight=1)  # Right section (30% width)

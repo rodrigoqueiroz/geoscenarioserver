@@ -6,13 +6,12 @@
 # Starts the Server and controls the traffic simulation loop
 # --------------------------------------------
 
+import glog as log
+import screeninfo
+
 from argparse import ArgumentParser
-from TickSync import TickSync
-from SimTraffic import SimTraffic
-from SimConfig import SimConfig
-from dash.Dashboard import *
-from mapping.LaneletMap import *
-from ScenarioSetup import *
+from pynput import keyboard
+
 try:
     from lanelet2.projection import LocalCartesianProjector
     use_local_cartesian=True
@@ -22,7 +21,13 @@ except ImportError:
 
 import glog as log
 from threading import Thread
-import time
+from dash.Dashboard import *
+from mapping.LaneletMap import *
+from requirements.RequirementViolationEvents import GlobalTick
+from ScenarioSetup import *
+from SimConfig import SimConfig
+from SimTraffic import SimTraffic
+from TickSync import TickSync
 
 def start_server(args, m=MVelKeepConfig()):
     #log.setLevel("INFO")
@@ -73,19 +78,68 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
-    #if config is set to wait for input, pause the simulation
-    paused = False
-    if sim_config.wait_for_input:
-        paused = True
-
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX", usr_input=paused)
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
     sync_global.set_timeout(sim_config.timeout)
+
+    #find screen info 
+    monitors = screeninfo.get_monitors()
+    primary_monitor = None
+    for monitor in monitors:
+        if monitor.is_primary:
+            primary_monitor = monitor
+            break
+    
+    screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
+    
+    if args.dash_pos:
+        screen_param = args.dash_pos
+
+    if sim_config.wait_for_input:
+        if not sim_config.show_dashboard:
+            input("Press [ENTER] to start...")
+        else:
+            #create a small window
+            def on_enter(key):
+                if key == keyboard.Key.enter:
+                    start_window.after(0, start_window.quit())
+            
+            pos_x = screen_param[0]
+            pos_y = screen_param[1]
+            
+            start_window = tk.Tk()
+            set_width = 300
+            set_height = 200
+
+            if args.dash_pos:
+                #place in the middle of the dashboard
+                pos_x = args.dash_pos[0] + args.dash_pos[2] // 2 - set_width // 2
+                pos_y = args.dash_pos[1] + args.dash_pos[3] // 2 - set_height // 2
+            else:
+                pos_x += (screen_param[2] - set_width) // 2
+                pos_y += (screen_param[3] - set_height) // 2
+            
+            # Apply position
+            start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")
+
+            #set window text
+            instructions = tk.Label(start_window, text="Press [ENTER] to start...")
+            instructions.pack(expand=True)
+
+            start_window.lift()
+            start_window.attributes('-topmost', True)
+            start_window.focus_force()
+
+            listener = keyboard.Listener(on_press=on_enter)
+            listener.start()
+
+            start_window.mainloop()
+            start_window.destroy()
 
     #SIM EXECUTION START
     log.info('SIMULATION START')
     
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config)
+    dashboard = Dashboard(traffic, sim_config, screen_param)
     traffic.start()
 
     thread = Thread(target=run_traffic, args=(traffic, sync_global, sim_config, dashboard, paused), daemon=True)
@@ -114,6 +168,9 @@ def run_traffic(traffic, sync_global, sim_config, dashboard, paused=False):
                 sync_global.delta_time,
                 sync_global.sim_time
             )
+
+            GlobalTick()
+
             if sim_status < 0:
                 break
         except Exception as e:
@@ -122,7 +179,10 @@ def run_traffic(traffic, sync_global, sim_config, dashboard, paused=False):
 
     sync_global.write_peformance_log()
     traffic.stop_all()
-    
+
+    if sim_config.show_dashboard:
+        dashboard.quit()
+
     #SIM END
     log.info('SIMULATION END')
     log.info('GeoScenario server shutdown')

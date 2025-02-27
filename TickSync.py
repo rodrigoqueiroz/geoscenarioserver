@@ -7,14 +7,16 @@
 # but requires more processing capabilities. Can't avoid drift if hardware is slow.
 # --------------------------------------------
 
-import datetime
-import time
-import math
 import csv
-from SimConfig import *
-from util.Utils import truncate
+import datetime
 import glog as log
 from pynput import keyboard
+import math
+import time
+
+from requirements.RequirementViolationEvents import ScenarioTimeout
+from SimConfig  import *
+from util.Utils import truncate
 
 class TickSync():
 
@@ -101,11 +103,14 @@ class TickSync():
         self.tick_count+=1
         #stats
         self.update_stats()
+
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
-                log.info('{} TIMEOUT: {:.3}s'.format(self.label,self.sim_time))
+                ScenarioTimeout(self.timeout)
+                log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False
+                
         return True
     
     def update_stats(self):

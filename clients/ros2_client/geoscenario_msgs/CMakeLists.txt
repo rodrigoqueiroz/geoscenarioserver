@@ -15,6 +15,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(geographic_msgs REQUIRED)
 
 set (MSGS
   msg/Pedestrian.msg
@@ -24,7 +25,7 @@ set (MSGS
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSGS}
-  DEPENDENCIES std_msgs geometry_msgs
+  DEPENDENCIES std_msgs geometry_msgs geographic_msgs
 )
 
 ament_export_dependencies(rosidl_default_runtime)

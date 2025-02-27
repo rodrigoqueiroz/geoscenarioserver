@@ -63,7 +63,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
-
+    # preserve the origin
+    sim_traffic.set_origin(parser.origin.lat, parser.origin.lon, altitude)
     if use_local_cartesian:
         projector = LocalCartesianProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
         log.info("Using LocalCartesianProjector")
@@ -121,10 +122,15 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #print(yaw)
 
         btype = extract_tag(vnode, 'btype', '', str).lower()
+        goal_ends_simulation = False 
+
+        if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
+            goal_ends_simulation = True
         rule_engine_port = extract_tag(vnode, 'rule_engine_port', None, int)
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
         log.info("Vehicle {}, behavior type {}".format(vid,btype))    
+
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
             #start state
@@ -177,7 +183,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
                                 btree_locations=btree_locations,
-                                btype=btype, rule_engine_port=rule_engine_port
+                                btype=btype, goal_ends_simulation=goal_ends_simulation,
+                                rule_engine_port=rule_engine_port
                             )
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],
