@@ -8,3 +8,4 @@ results
 scenarios/plots/*
 scenarios/logs/*
 test_btree_parser
+colcon_ws/

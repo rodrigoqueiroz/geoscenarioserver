@@ -14,7 +14,7 @@ import glog as log
 import math
 import time
 
-from requirements.RequirementViolationEvents import GlobalTick, ScenarioTimeout
+from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *
 from util.Utils import truncate
 
@@ -91,7 +91,6 @@ class TickSync():
         passed_time = (now - self._sim_start_clock).total_seconds()
         self.sim_time =  self.sim_start_time + passed_time
         self.tick_count+=1
-        GlobalTick()
         #stats
         self.update_stats()
 
