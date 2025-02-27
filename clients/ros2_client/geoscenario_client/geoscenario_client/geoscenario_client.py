@@ -1,5 +1,4 @@
 import rclpy
-import math
 from rclpy.node import Node
 
 from geoscenario_msgs.msg import Tick, Pedestrian, Vehicle
@@ -10,19 +9,37 @@ from .SimSharedMemoryClient import *
 class GSClient(Node):
     def __init__(self):
         super().__init__('geoscenario_client')
+        self.initialize_state()
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
+        self.timer = self.create_timer(self.short_timer_period, self.timer_callback)
+
+    def initialize_state(self):
         # poll frequently at the beginning
         self.short_timer_period = 0.005  # 5 miliseconds
-        self.timer = self.create_timer(self.short_timer_period, self.timer_callback)
-        self.sim_client_shm = SimSharedMemoryClient()
         self.previous_tick_count = 0
+        # remember that the connection was established to be able to detect that it was lost when the server shut down
+        self.previously_connected = False
+        self.frequent_polling_switch_count = 0
+        self.sim_client_shm = SimSharedMemoryClient()
 
     def timer_callback(self):
         header, origin, vehicles, pedestrians = self.sim_client_shm.read_server_state()
 
         if not header:
-            self.get_logger().info('Waiting for GeoScenario server', throttle_duration_sec=2)
+            if self.previously_connected:
+                self.get_logger().info('Disconnected from GeoScenario server')
+                self.get_logger().info(f"Switched to frequent polling {self.frequent_polling_switch_count} times out of {self.previous_tick_count} ticks")
+                # recreate the client to try to reconnect
+                self.initialize_state()
+            else:
+                # not previously connected, keep trying
+                self.get_logger().info('Waiting for GeoScenario server', throttle_duration_sec=10)
             return
+
+        # record that we have a connection
+        if not self.previously_connected:
+            self.get_logger().info('Connected to GeoScenario server')
+            self.previously_connected = True
 
         tick_count = header["tick_count"]
         # update the timer with the current server frequency
@@ -36,6 +53,7 @@ class GSClient(Node):
             # nothing new yet, delta_time must have increased
             # switch back to a more frequent polling than the delta_time
             self.timer.timer_period_ns == self.short_timer_period * 1e9
+            self.frequent_polling_switch_count += 1
             return
 
         tick_msg = Tick()
