@@ -10,7 +10,6 @@
 import csv
 import datetime
 import glog as log
-from pynput import keyboard
 import math
 import time
 
@@ -20,7 +19,7 @@ from util.Utils import truncate
 
 class TickSync():
 
-    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0, usr_input = False):
+    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
         self.tick_rate = rate
@@ -30,7 +29,6 @@ class TickSync():
         self.verbose = verbose
         self.label = label
         self.sim_start_time = sim_start_time
-        self.wait_for_input = usr_input
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
         self.tick_count = 0
@@ -46,7 +44,7 @@ class TickSync():
             self.timeout,
             self.tick_rate,
             self.expected_tick_duration]
-
+    
     def get_sim_time(self):
         return self.sim_time
 
@@ -58,15 +56,6 @@ class TickSync():
             print(msg)
 
     def tick(self):
-        #wait for input
-        def on_press(key):
-            return False
-
-        if self.wait_for_input:
-            print('Press [ENTER] to start...')
-            with keyboard.Listener(on_press=on_press) as listener:
-                listener.join()
-            self.wait_for_input = False
         now = datetime.datetime.now()
         #First Tick
         if (self.tick_count==0): 
