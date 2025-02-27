@@ -6,32 +6,33 @@
 # --------------------------------------------
 
 from copy import copy
-import multiprocessing
-from multiprocessing import Array, Process, Value
+import glog as log
+from multiprocessing import Array, Process, Value, get_context
 from signal import signal, SIGTERM
 import sys
-import glog as log
+
 from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
 from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion
 from SimTraffic import *
-from TickSync import TickSync
-from sv.btree.BehaviorLayer import BehaviorLayer
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
 from sv.ManeuverModels import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
-from signal import signal, SIGTERM
+from TickSync import TickSync
+
+import sv.btree.BehaviorLayer       as btree
+import sv.ruleEngine.BehaviorLayer  as rules
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, rule_engine_port = None):
         #MainProcess space:
         self.completion = Value('b', False)
         self._process = None
-        self.traffic_state_sharr = sim_traffic.traffic_state_sharr
+        self.traffic_state_sharr  = sim_traffic.traffic_state_sharr
         self._traffic_light_sharr = sim_traffic.traffic_light_sharr
         self._debug_shdata        = sim_traffic.debug_shdata
         self._mplan_sharr         = None
@@ -58,11 +59,10 @@ class SVPlanner(object):
 
     def start(self):
         #Create shared arrray for Motion Plan
-        c = MotionPlan().get_vector_length()  
+        c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
         #Process based
-        fork_context = multiprocessing.get_context("fork")
-        self._process = fork_context.Process(target=self.run_planner_process, args=(
+        self._process = get_context("fork").Process(target=self.run_planner_process, args=(
             self.traffic_state_sharr, 
             self._mplan_sharr, 
             self._debug_shdata), daemon=True)
@@ -94,7 +94,8 @@ class SVPlanner(object):
         # New plan
         self.last_plan = plan
         return plan
-        
+
+
     #==SUB PROCESS=============================================
     def before_exit(self,*args):
         if self.sync_planner:
@@ -107,9 +108,13 @@ class SVPlanner(object):
 
         self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
 
+
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
-        self.behavior_layer = BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
+        if self._rule_engine_port != None:
+            self.behavior_layer = rules.BehaviorLayer(self.vid, self.btype, self._rule_engine_port)
+        else:
+            self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
