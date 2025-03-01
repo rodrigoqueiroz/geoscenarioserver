@@ -40,30 +40,32 @@ class RequirementsChecker:
 
 		return np.array([top_left, top_right, bottom_right, bottom_left])
 
-	def detect_collisions(self, traffic_state):
+
+	def detect_collisions(self, traffic_state:TrafficState):
 		ego_vehicle       = self.ego_vehicle
 
 		if ego_vehicle.sim_state is not ActorSimState.ACTIVE:
 			return
 
-		# The reference above is on another thread and has not been updated
-		ego_vehicle.state = traffic_state.vehicle_state
 		ego_box           = self.calculate_rectangular_bounding_box(ego_vehicle)
 
-		min_x = (ego_vehicle.state.x - ego_vehicle.radius)
-		max_x = (ego_vehicle.state.x + ego_vehicle.radius)
-		min_y = (ego_vehicle.state.y - ego_vehicle.radius)
-		max_y = (ego_vehicle.state.y + ego_vehicle.radius)
+		ego_min_x, ego_min_y = np.min(ego_box, axis=0)
+		ego_max_x, ego_max_y = np.max(ego_box, axis=0)
 
 		for vid, vehicle in self.vehicles.items():
 			if vehicle.sim_state not in [ ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
 				continue
 
-			# To avoid O(v²) comparisons and favor O(v) comparisons whenever possible
-			if  (min_x <= vehicle.state.x <= max_x) and (min_y <= vehicle.state.y <= max_y):
+			max_offset = max(vehicle.bounding_box_width / 2, vehicle.bounding_box_length / 2)
+
+			# To avoid O(v²) comparisons and favor O(v) comparisons whenever possible.
+			# Suppose big rectangles were overshoting the real dimension of the vehicles,
+			# Would they overlap? If yes, then go over the polygons and make the true comparison.
+			if (ego_min_x - max_offset <= vehicle.state.x <= ego_max_x + max_offset) and \
+			   (ego_min_y - max_offset <= vehicle.state.y <= ego_max_y + max_offset):
 				vehicle_box = self.calculate_rectangular_bounding_box(vehicle)
 				if self.do_polygons_intersect(ego_box, vehicle_box):
-					CollisionWithVehicle(traffic_state.vid, vid)
+					CollisionWithVehicle(ego_vehicle.id, vid)
 
 
 	def detect_goal_overshot(self, traffic_state:TrafficState):

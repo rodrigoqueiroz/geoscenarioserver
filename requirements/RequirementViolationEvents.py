@@ -21,14 +21,14 @@ class ScenarioEnd:
 
 
 class UnmetRequirement:
-	def raise_it(self, agent_id, message):
+	def raise_it(self, agent_id, payload):
 		agent_logs = violations[agent_id]
 		agent_tick = agent_ticks[agent_id]
 
 		if agent_tick not in agent_logs:
 			agent_logs[agent_tick] = {}
 
-		agent_logs[agent_tick][self.__class__.__name__] = message
+		agent_logs[agent_tick][self.__class__.__name__] = payload
 		
 		# That reassignment is necessary for the update to work in multiprocessing
 		violations[agent_id] = agent_logs
@@ -51,9 +51,10 @@ class CollisionWithVehicle(UnmetRequirement):
 
 		# There must be a gap of 5 ticks without collision between collision with the same agent
 		if vid not in collision_state or agent_ticks[agent_id] - 5 > collision_state[vid]:
-			self.raise_it(agent_id,
-				'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
-			)
+			self.raise_it(agent_id, {
+				'colliderId': vid,
+				'message': 'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
+			})
 
 		collision_state[vid] = agent_ticks[agent_id]
 
@@ -69,9 +70,9 @@ class GlobalTick:
 
 class GoalOvershot(UnmetRequirement):
 	def __init__(self, agent_id):
-		self.raise_it(agent_id,
-			'v' + str(agent_id) + ' drove past its target location'
-		)
+		self.raise_it(agent_id, {
+			'message': 'v' + str(agent_id) + ' drove past its target location'
+		})
 
 
 class ScenarioCompletion(Exception):
@@ -81,10 +82,10 @@ class ScenarioCompletion(Exception):
 class ScenarioTimeout(UnmetRequirement):
 	def __init__(self, timeout):
 		for agent_id in agent_ticks:
-			self.raise_it(agent_id,
-				'v' + str(agent_id) + ' did not reach its target location during the ' 
-				    + str(timeout) + ' seconds allowed by this scenario.'
-			)
+			self.raise_it(agent_id, {
+				'message': 'v' + str(agent_id) + ' did not reach its target location during the ' 
+				    		   + str(timeout) + ' seconds allowed by this scenario.'
+			})
 		ScenarioEnd()
 
 # Autoclean
