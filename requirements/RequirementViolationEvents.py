@@ -51,7 +51,7 @@ class CollisionWithVehicle(UnmetRequirement):
 		# There must be a gap of 5 ticks without collision between collision with the same agent
 		if vid not in collision_state or agent_ticks[agent_id] - 5 > collision_state[vid]:
 			self.raise_it(agent_id, {
-				'collider_id': vid,
+				'colliderId': vid,
 				'message': 'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
 			})
 
