@@ -11,6 +11,7 @@ class GSClient(Node):
         super().__init__('geoscenario_client')
         self.initialize_state()
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
+        self.tick_sub = self.create_subscription(Tick, '/gs/tick-in', self.tick_in, 10)
         self.timer = self.create_timer(self.short_timer_period, self.timer_callback)
 
     def initialize_state(self):
@@ -93,6 +94,8 @@ class GSClient(Node):
         self.tick_pub.publish(tick_msg)
         self.previous_tick_count = tick_count
 
+    def tick_in(self, msg):
+        self.sim_client_shm.write_client_state(self, msg.tick_count, msg.sim_time, msg.delta_time, None, msg.vehicles, msg.pedestrians)
 
 def main(args=None):
     rclpy.init(args=args)

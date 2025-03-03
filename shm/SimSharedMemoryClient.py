@@ -154,6 +154,61 @@ class SimSharedMemoryClient(object):
 
         return header, origin, vehicles, pedestrians
 
+    def write_client_state(self, tick_count, sim_time, delta_time, origin, vehicles, pedestrians):
+        """ Writes to shared memory of the client pose data for each agent.
+            @param vehicles:      dictionary of type <int, Vehicle>
+            @param pedestrians:   dictionary of type <int, Pedestrian>
+            Shared memory format:
+                tick_count simulation_time delta_time n_vehicles n_pedestrians
+                origin_lat origin_lon origin_alt
+                vid v_type x y z vx vy yaw steering_angle
+                pid p_type x y z vx vy yaw
+                ...
+        """
+        if not self.is_connected:
+            return
+
+        # write tick count, deltatime, numbers of vehicles and pedestrians
+        write_str = "{} {} {} {} {}\n".format(int(tick_count), sim_time, delta_time, len(vehicles), len(pedestrians))
+        # write origin
+        (lat, lon, alt) = origin
+        write_str += "{} {} {}\n".format(lat, lon, alt)
+        # write vehicle states, rounding the numerical data to reasonable significant figures
+        for svid in vehicles:
+            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
+            write_str += "{} {} {} {} {} {} {} {} {}\n".format(
+                vid, v_type,
+                round(position[0], 4),
+                round(position[1], 4),
+                round(position[2], 4),
+                round(velocity[0], 4),
+                round(velocity[1], 4),
+                round(yaw * math.pi / 180, 6),
+                round(steering_angle, 6)
+            )
+
+        # write pedestrian states, rounding the numerical data to reasonable significant figures
+        for spid in pedestrians:
+            pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
+            write_str += "{} {} {} {} {} {} {} {}\n".format(
+                pid, p_type,
+                round(position[0], 4),
+                round(position[1], 4),
+                round(position[2], 4),
+                round(velocity[0], 4),
+                round(velocity[1], 4),
+                round(yaw * math.pi / 180, 6)
+            )
+
+        # sysv_ipc.BusyError needs to be caught
+        try:
+            self.ss_sem.acquire(timeout=0)
+            self.ss_shm.write(write_str.encode('utf-8'))
+            self.ss_sem.release()
+        except sysv_ipc.BusyError:
+            log.warn("server state semaphore locked...")
+            return
+        # log.info("Shared Memory write\n{}".format(write_str))
 
     def __del__(self):
         if self.is_connected:
