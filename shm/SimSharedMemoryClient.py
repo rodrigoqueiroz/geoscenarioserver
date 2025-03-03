@@ -1,4 +1,5 @@
 import sysv_ipc
+import math
 import time
 
 SHM_KEY = 123456
