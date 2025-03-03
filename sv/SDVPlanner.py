@@ -7,7 +7,7 @@
 
 from copy import copy
 import glog as log
-from multiprocessing import Array, Process, Value
+from multiprocessing import Array, Process, Value, get_context
 from signal import signal, SIGTERM
 import sys
 
@@ -63,7 +63,7 @@ class SVPlanner(object):
         c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
         #Process based
-        self._process = Process(target=self.run_planner_process, args=(
+        self._process = get_context("fork").Process(target=self.run_planner_process, args=(
             self.traffic_state_sharr,
             self._mplan_sharr,
             self._debug_shdata), daemon=True)
@@ -73,6 +73,7 @@ class SVPlanner(object):
         if self._process:
             log.info("Terminate Planner Process - vehicle {}".format(self.vid))
             self._process.terminate()
+            self._process.join()
 
     def get_plan(self):
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
