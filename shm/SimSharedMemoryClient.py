@@ -12,6 +12,7 @@ SHM_SIZE = 2048
 class SimSharedMemoryClient(object):
 
     def __init__(self, ss_shm_key=SHM_KEY, ss_sem_key=SEM_KEY, cs_shm_key=CS_SHM_KEY, cs_sem_key=CS_SEM_KEY):
+        self.is_connected = False
         # Server state shared memory
         self.ss_shm_key = ss_shm_key
         self.ss_sem_key = ss_sem_key
@@ -22,28 +23,24 @@ class SimSharedMemoryClient(object):
         # Semaphore initialization according to: https://semanchuk.com/philip/sysv_ipc/#sem_init
         try:
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key, sysv_ipc.IPC_CREX)
+            self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, sysv_ipc.IPC_CREX)
         except sysv_ipc.ExistentialError:
             # One of my peers created the semaphore already
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key)
+            self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key)
             # Waiting for that peer to do the first acquire or release
-            while not self.ss_sem.o_time:
+            while (not self.ss_sem.o_time or not self.cs_sem.o_time):
                 time.sleep(.1)
         else:
             # Initializing sem.o_time to nonzero value
             self.ss_sem.release()
-
-        print("ShM SS semaphore created")
-
-        if self.connect_to_shared_memory():
-            print("Connected to server state shared memory")
-        else:
-            print("Could not connect to server state shared memory")
-
+            self.cs_sem.release()
 
     def connect_to_shared_memory(self):
         # Shared memory initialization
         try:
             self.ss_shm = sysv_ipc.SharedMemory(self.ss_shm_key, mode=int(str(666), 8), size=SHM_SIZE)
+            self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, mode=int(str(666), 8), size=SHM_SIZE)
             self.is_connected = True
         except sysv_ipc.Error:
             self.is_connected = False
@@ -157,8 +154,9 @@ class SimSharedMemoryClient(object):
 
     def write_client_state(self, tick_count, sim_time, delta_time, origin, vehicles, pedestrians):
         """ Writes to shared memory of the client pose data for each agent.
-            @param vehicles:      dictionary of type <int, Vehicle>
-            @param pedestrians:   dictionary of type <int, Pedestrian>
+            @param origin:        {"origin_lat", "origin_lon", "origin_alt"}
+            @param vehicles:      [{"vid", "type", "x", "y", "z", "vx", "vy", "yaw", "steering_angle"}]
+            @param pedestrians:   [{"pid", "type", "x", "y", "z", "vx", "vy", "yaw"}]
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
                 origin_lat origin_lon origin_alt
@@ -175,39 +173,39 @@ class SimSharedMemoryClient(object):
         (lat, lon, alt) = origin
         write_str += "{} {} {}\n".format(lat, lon, alt)
         # write vehicle states, rounding the numerical data to reasonable significant figures
-        for svid in vehicles:
-            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
+        for vehicle in vehicles:
             write_str += "{} {} {} {} {} {} {} {} {}\n".format(
-                vid, v_type,
-                round(position[0], 4),
-                round(position[1], 4),
-                round(position[2], 4),
-                round(velocity[0], 4),
-                round(velocity[1], 4),
-                round(yaw * math.pi / 180, 6),
-                round(steering_angle, 6)
+                vehicle["id"], 
+                vehicle["type"],
+                round(vehicle["x"], 4),
+                round(vehicle["y"], 4),
+                round(vehicle["z"], 4),
+                round(vehicle["vx"], 4),
+                round(vehicle["vy"], 4),
+                round(vehicle["yaw"] * math.pi / 180, 6),
+                round(vehicle["steering_angle"], 6)
             )
 
         # write pedestrian states, rounding the numerical data to reasonable significant figures
-        for spid in pedestrians:
-            pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
+        for pedestrian in pedestrians:
             write_str += "{} {} {} {} {} {} {} {}\n".format(
-                pid, p_type,
-                round(position[0], 4),
-                round(position[1], 4),
-                round(position[2], 4),
-                round(velocity[0], 4),
-                round(velocity[1], 4),
-                round(yaw * math.pi / 180, 6)
+                pedestrian["id"], 
+                pedestrian["type"],
+                round(pedestrian["x"], 4),
+                round(pedestrian["y"], 4),
+                round(pedestrian["z"], 4),
+                round(pedestrian["vx"], 4),
+                round(pedestrian["vy"], 4),
+                round(pedestrian["yaw"] * math.pi / 180, 6)
             )
 
         # sysv_ipc.BusyError needs to be caught
         try:
-            self.ss_sem.acquire(timeout=0)
-            self.ss_shm.write(write_str.encode('utf-8'))
-            self.ss_sem.release()
+            self.cs_sem.acquire(timeout=0)
+            self.cs_shm.write(write_str.encode('utf-8'))
+            self.cs_sem.release()
         except sysv_ipc.BusyError:
-            log.warn("server state semaphore locked...")
+            print("server state semaphore locked...")
             return
         # log.info("Shared Memory write\n{}".format(write_str))
 

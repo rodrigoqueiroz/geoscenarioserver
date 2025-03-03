@@ -10,13 +10,13 @@ class MockCoSimulator(Node):
         
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
+        self.get_logger().info('Mock co-simulator started...')
 
     def tick_from_server(self, msg):
-        self.tick_pub(msg)
+        self.tick_pub.publish(msg)
 
-
-if __name__ == '__main__':
-    rclpy.init(args=None)
+def main(args=None):
+    rclpy.init(args=args)
 
     co_simulator = MockCoSimulator()
 
@@ -29,3 +29,6 @@ if __name__ == '__main__':
     finally:
         co_simulator.destroy_node()
         rclpy.try_shutdown()
+
+if __name__ == '__main__':
+    main()

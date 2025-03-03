@@ -1,4 +1,3 @@
-import sys
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
@@ -115,7 +114,7 @@ class GSClient(Node):
             vehicle["vx"] = msg_vehicle.velocity.x
             vehicle["vy"] = msg_vehicle.velocity.y
             vehicle["yaw"] = msg_vehicle.yaw
-            vehicle["steering_angle"] = msg.steering_angle
+            vehicle["steering_angle"] = msg_vehicle.steering_angle
             vehicles.append(vehicle)
 
         pedestrians = []
@@ -131,7 +130,7 @@ class GSClient(Node):
             pedestrian["yaw"] = msg_pedestrian.yaw
             pedestrians.append(pedestrian)
 
-        self.sim_client_shm.write_client_state(self, msg.tick_count, msg.simulation_time, msg.delta_time, origin, vehicles, pedestrians)
+        self.sim_client_shm.write_client_state(msg.tick_count, msg.simulation_time, msg.delta_time, origin, vehicles, pedestrians)
 
 def main(args=None):
     rclpy.init(args=args)
