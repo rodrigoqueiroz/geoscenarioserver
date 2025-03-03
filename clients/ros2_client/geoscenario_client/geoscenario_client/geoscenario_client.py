@@ -140,11 +140,10 @@ def main(args=None):
 
     try:
         rclpy.spin(gs_client)
-    except KeyboardInterrupt: # SIGINT <ctrl>+c
-        gs_client.get_logger().info('Shutdown keyboard interrupt')
+    except KeyboardInterrupt: # <ctrl>+c
+        gs_client.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
     except ExternalShutdownException:
-        gs_client.get_logger().info('External shutdown') # SIGTERM
-        sys.exit(0)
+        gs_client.get_logger().info('External shutdown (SIGTERM)')
     finally:
         gs_client.destroy_node()
         rclpy.try_shutdown()
