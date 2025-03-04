@@ -264,6 +264,9 @@ class SVPlanner(object):
         except ScenarioCompletion as e:
             with self.completion.get_lock():
                 self.completion.value = True
+        #upon forced exit/before scenario auto exits
+        except KeyboardInterrupt as e: 
+            self._requirementsChecker.forced_exit()
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
 
