@@ -69,14 +69,14 @@ class RequirementsChecker:
 				if self.do_polygons_intersect(ego_box, vehicle_box):
 					CollisionWithVehicle(ego_vehicle.id, vid)
 		
-		for vid, pedestrian in self.pedestrians.items():
+		for pid, pedestrian in self.pedestrians.items():
 			if pedestrian.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
 				continue
 			
 			pedestrian_pos = [pedestrian.state.x, pedestrian.state.y]
 
 			if self.check_circle_rectangle_collision(pedestrian_pos, ego_box, pedestrian.PEDESTRIAN_RADIUS):
-				CollisionWithPedestrian(ego_vehicle.id, vid)
+				CollisionWithPedestrian(ego_vehicle.id, pid)
 				
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.
@@ -113,6 +113,11 @@ class RequirementsChecker:
 			if self.goal_ends_simulation:
 				ScenarioEnd()
 				raise ScenarioCompletion()
+	
+	def forced_exit(self):
+		#store data upon forced exit
+		ScenarioEnd()
+		raise ScenarioCompletion
 
 	def do_polygons_intersect(self, polygon_a, polygon_b):
 		"""
