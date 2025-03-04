@@ -30,7 +30,9 @@ class Pedestrian(Actor):
     EP_TYPE = 3
     SP_TYPE = 4
 
-    PEDESTRIAN_RADIUS = 0.2
+    # Source NCAP: https://cdn.euroncap.com/media/58226/euro-ncap-aeb-vru-test-protocol-v303.pdf
+    # Pedestrian dimensions (width: 0.5 m, length: 0.6 m) approximated by a circle with radius 0.27 m
+    PEDESTRIAN_RADIUS = 0.27
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, yaw=yaw)
