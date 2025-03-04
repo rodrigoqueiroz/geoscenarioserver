@@ -60,6 +60,21 @@ class CollisionWithVehicle(UnmetRequirement):
 		# That reassignment is necessary for the update to work in multiprocessing
 		agent_collisions[agent_id] = collision_state
 
+class CollisionWithPedestrian(UnmetRequirement):
+	def __init__(self, agent_id, vid):
+		collision_state = agent_collisions[agent_id]
+
+		if vid not in collision_state or agent_ticks[agent_id] - 5 > collision_state[vid]:
+			self.raise_it(agent_id, {
+				'colliderId': vid,
+				'message': 'v' + str(agent_id) + ' bounding box overlapped with the pedestrian agent v' + str(vid),
+			})
+
+		collision_state[vid] = agent_ticks[agent_id]
+
+		# That reassignment is necessary for the update to work in multiprocessing
+		agent_collisions[agent_id] = collision_state
+
 class GlobalTick:
 	def __init__(self):
 		global global_tick

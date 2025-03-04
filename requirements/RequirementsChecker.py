@@ -3,7 +3,7 @@ import numpy as np
 from math import cos, radians, sin
 
 from Actor import ActorSimState
-from requirements.RequirementViolationEvents import CollisionWithVehicle, GoalOvershot, ScenarioCompletion, ScenarioEnd
+from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
 
 class RequirementsChecker:
@@ -22,6 +22,9 @@ class RequirementsChecker:
 		self.vehicles = {}
 		self.vehicles.update(traffic_state.traffic_vehicles)
 		self.vehicles.update(traffic_state.traffic_vehicles_orp)
+
+		self.pedestrians = {}
+		self.pedestrians.update(traffic_state.pedestrians)
 
 		for condition in self.conditions:
 			condition(traffic_state)
@@ -65,8 +68,16 @@ class RequirementsChecker:
 				vehicle_box = self.calculate_rectangular_bounding_box(vehicle)
 				if self.do_polygons_intersect(ego_box, vehicle_box):
 					CollisionWithVehicle(ego_vehicle.id, vid)
+		
+		for vid, pedestrian in self.pedestrians.items():
+			if pedestrian.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
+				continue
+			
+			pedestrian_pos = [pedestrian.state.x, pedestrian.state.y]
 
-
+			if self.check_circle_rectangle_collision(pedestrian_pos, ego_box, pedestrian.PEDESTRIAN_RADIUS):
+				CollisionWithPedestrian(ego_vehicle.id, vid)
+				
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.
 		"""
@@ -159,6 +170,19 @@ class RequirementsChecker:
 					return False;
 
 		return True
+	
+	def check_circle_rectangle_collision(self, centre, rectangle, radius):
+		"""
+		checks if the circular bounding box of a pedestrian intersects with the bounding box of a vehicle
+		"""
+		centre_x, centre_y = centre
+
+		closest_x = np.clip(centre_x, np.min(rectangle[:, 0]), np.max(rectangle[:, 0]))
+		closest_y = np.clip(centre_y, np.min(rectangle[:, 1]), np.max(rectangle[:, 1]))
+
+		distance = np.sqrt((centre_x - closest_x)**2 + (centre_y - closest_y)**2)
+
+		return distance < radius
 
 	def rotate(self, center_x, center_y, x, y, degree_theta):
 		radian_theta = radians(degree_theta)
