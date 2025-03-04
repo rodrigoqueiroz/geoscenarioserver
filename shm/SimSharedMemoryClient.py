@@ -21,20 +21,31 @@ class SimSharedMemoryClient(object):
         self.cs_sem_key = cs_sem_key
 
         # Semaphore initialization according to: https://semanchuk.com/philip/sysv_ipc/#sem_init
+        # Server
         try:
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key, sysv_ipc.IPC_CREX)
-            self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, sysv_ipc.IPC_CREX)
         except sysv_ipc.ExistentialError:
             # One of my peers created the semaphore already
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key)
-            self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key)
             # Waiting for that peer to do the first acquire or release
-            while (not self.ss_sem.o_time or not self.cs_sem.o_time):
+            while not self.ss_sem.o_time:
                 time.sleep(.1)
         else:
             # Initializing sem.o_time to nonzero value
             self.ss_sem.release()
+        # Client
+        try:
+            self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, sysv_ipc.IPC_CREX)
+        except sysv_ipc.ExistentialError:
+            # One of my peers created the semaphore already
+            self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key)
+            # Waiting for that peer to do the first acquire or release
+            while not self.cs_sem.o_time:
+                time.sleep(.1)
+        else:
+            # Initializing sem.o_time to nonzero value
             self.cs_sem.release()
+
 
     def connect_to_shared_memory(self):
         # Shared memory initialization
@@ -152,51 +163,43 @@ class SimSharedMemoryClient(object):
 
         return header, origin, vehicles, pedestrians
 
-    def write_client_state(self, tick_count, sim_time, delta_time, origin, vehicles, pedestrians):
+    def write_client_state(self, tick_count, delta_time, vehicles, pedestrians):
         """ Writes to shared memory of the client pose data for each agent.
-            @param origin:        {"origin_lat", "origin_lon", "origin_alt"}
-            @param vehicles:      [{"vid", "type", "x", "y", "z", "vx", "vy", "yaw", "steering_angle"}]
-            @param pedestrians:   [{"pid", "type", "x", "y", "z", "vx", "vy", "yaw"}]
-            Shared memory format:
-                tick_count simulation_time delta_time n_vehicles n_pedestrians
-                origin_lat origin_lon origin_alt
-                vid v_type x y z vx vy yaw steering_angle
-                pid p_type x y z vx vy yaw
+            @param vehicles:      [{"id", "x", "y", "z", "vx", "vy", "active"}]
+            @param pedestrians:   [{"id", "x", "y", "z", "vx", "vy", "active"}]
+            Shared memory format (no origin, sim_time, type, yaw but extra active compared to server state):
+                tick_count delta_time n_vehicles n_pedestrians
+                vid x y z vx vy active
+                pid x y z vx vy active
                 ...
         """
         if not self.is_connected:
             return
 
         # write tick count, deltatime, numbers of vehicles and pedestrians
-        write_str = "{} {} {} {} {}\n".format(int(tick_count), sim_time, delta_time, len(vehicles), len(pedestrians))
-        # write origin
-        (lat, lon, alt) = origin
-        write_str += "{} {} {}\n".format(lat, lon, alt)
+        write_str = f"{int(tick_count)} {delta_time} {len(vehicles)} {len(pedestrians)}\n"
         # write vehicle states, rounding the numerical data to reasonable significant figures
         for vehicle in vehicles:
-            write_str += "{} {} {} {} {} {} {} {} {}\n".format(
+            write_str += "{} {} {} {} {} {} {}\n".format(
                 vehicle["id"], 
-                vehicle["type"],
                 round(vehicle["x"], 4),
                 round(vehicle["y"], 4),
                 round(vehicle["z"], 4),
                 round(vehicle["vx"], 4),
                 round(vehicle["vy"], 4),
-                round(vehicle["yaw"] * math.pi / 180, 6),
-                round(vehicle["steering_angle"], 6)
+                vehicle["active"]
             )
 
         # write pedestrian states, rounding the numerical data to reasonable significant figures
         for pedestrian in pedestrians:
-            write_str += "{} {} {} {} {} {} {} {}\n".format(
+            write_str += "{} {} {} {} {} {} {}\n".format(
                 pedestrian["id"], 
-                pedestrian["type"],
                 round(pedestrian["x"], 4),
                 round(pedestrian["y"], 4),
                 round(pedestrian["z"], 4),
                 round(pedestrian["vx"], 4),
                 round(pedestrian["vy"], 4),
-                round(pedestrian["yaw"] * math.pi / 180, 6)
+                vehicle["active"]
             )
 
         # sysv_ipc.BusyError needs to be caught

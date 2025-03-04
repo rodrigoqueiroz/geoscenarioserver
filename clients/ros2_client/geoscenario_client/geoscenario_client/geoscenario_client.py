@@ -98,39 +98,32 @@ class GSClient(Node):
 
     def tick_from_client(self, msg):
         # convert the msg into dictionaries
-        origin = {}
-        origin["origin_lat"] = msg.origin.latitude
-        origin["origin_lon"] = msg.origin.longitude
-        origin["origin_alt"] = msg.origin.altitude
-
+        # ignore origin, simulation_time, type, yaw, steering angle not used in the client
         vehicles = []
         for msg_vehicle in msg.vehicles:
             vehicle = {}
             vehicle["id"] = msg_vehicle.id
-            vehicle["type"] = msg_vehicle.type
             vehicle["x"] = msg_vehicle.position.x
             vehicle["y"] = msg_vehicle.position.y
             vehicle["z"] = msg_vehicle.position.z
             vehicle["vx"] = msg_vehicle.velocity.x
             vehicle["vy"] = msg_vehicle.velocity.y
-            vehicle["yaw"] = msg_vehicle.yaw
-            vehicle["steering_angle"] = msg_vehicle.steering_angle
+            vehicle["active"] = 1
             vehicles.append(vehicle)
 
         pedestrians = []
         for msg_pedestrian in msg.pedestrians:
             pedestrian = {}
             pedestrian["id"] = msg_pedestrian.id
-            pedestrian["type"] = msg_pedestrian.type
             pedestrian["x"] = msg_pedestrian.position.x
             pedestrian["y"] = msg_pedestrian.position.y
             pedestrian["z"] = msg_pedestrian.position.z
             pedestrian["vx"] = msg_pedestrian.velocity.x
             pedestrian["vy"] = msg_pedestrian.velocity.y
-            pedestrian["yaw"] = msg_pedestrian.yaw
+            pedestrian["active"] = 1
             pedestrians.append(pedestrian)
 
-        self.sim_client_shm.write_client_state(msg.tick_count, msg.simulation_time, msg.delta_time, origin, vehicles, pedestrians)
+        self.sim_client_shm.write_client_state(msg.tick_count, msg.delta_time, vehicles, pedestrians)
 
 def main(args=None):
     rclpy.init(args=args)
