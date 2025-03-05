@@ -75,8 +75,9 @@ class RequirementsChecker:
 			
 			pedestrian_pos = [pedestrian.state.x, pedestrian.state.y]
 
-			if self.check_circle_rectangle_collision(pedestrian_pos, ego_box, pedestrian.PEDESTRIAN_RADIUS):
-				CollisionWithPedestrian(ego_vehicle.id, pid)
+			if self.front_collision_check(pedestrian_pos, ego_vehicle, pedestrian.PEDESTRIAN_RADIUS):
+				CollisionWithPedestrian(ego_vehicle.id, vid)
+				print("hit")
 				
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.
@@ -175,19 +176,34 @@ class RequirementsChecker:
 					return False;
 
 		return True
+
+	def front_collision_check(self, centre, vehicle, radius):
+		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
+		#the front of the car can be determined by the yaw
+		center_x     = vehicle.state.x
+		center_y     = vehicle.state.y
+		arc_radius  = vehicle.bounding_box_length / 2
+		half_width   = vehicle.bounding_box_width  / 2
+		yaw          = np.radians(vehicle.state.yaw)
+		
+		ped_x, ped_y = centre
+		ped_rad = radius
+		theta_max = np.arcsin((half_width)/arc_radius)
+
+		theta_1 = yaw - theta_max
+		theta_2 = yaw + theta_max
+
+		#generates 10 points given the angle of the arc
+		theta_arc = np.linspace(theta_1, theta_2, 10)
+		x_arc = center_x + arc_radius * np.cos(theta_arc)
+		y_arc = center_y + arc_radius * np.sin(theta_arc)
+
+		#check if the arc collides with pedestrian
+		distances = np.sqrt((x_arc - ped_x) ** 2 + (y_arc - ped_y) ** 2)
+		min_dist = np.min(distances)
 	
-	def check_circle_rectangle_collision(self, centre, rectangle, radius):
-		"""
-		checks if the circular bounding box of a pedestrian intersects with the bounding box of a vehicle
-		"""
-		centre_x, centre_y = centre
+		return min_dist <= ped_rad
 
-		closest_x = np.clip(centre_x, np.min(rectangle[:, 0]), np.max(rectangle[:, 0]))
-		closest_y = np.clip(centre_y, np.min(rectangle[:, 1]), np.max(rectangle[:, 1]))
-
-		distance = np.sqrt((centre_x - closest_x)**2 + (centre_y - closest_y)**2)
-
-		return distance < radius
 
 	def rotate(self, center_x, center_y, x, y, degree_theta):
 		radian_theta = radians(degree_theta)
