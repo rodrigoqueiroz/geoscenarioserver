@@ -13,6 +13,10 @@ class MockCoSimulator(Node):
         self.get_logger().info('Mock co-simulator started...')
 
     def tick_from_server(self, msg):
+        for v in msg.vehicles:
+            v.active = True
+        for p in msg.pedestrians:
+            p.active = True
         self.tick_pub.publish(msg)
 
 def main(args=None):

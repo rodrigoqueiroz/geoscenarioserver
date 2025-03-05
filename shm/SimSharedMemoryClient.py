@@ -187,7 +187,7 @@ class SimSharedMemoryClient(object):
                 round(vehicle["z"], 4),
                 round(vehicle["vx"], 4),
                 round(vehicle["vy"], 4),
-                vehicle["active"]
+                int(vehicle["active"])
             )
 
         # write pedestrian states, rounding the numerical data to reasonable significant figures
@@ -199,7 +199,7 @@ class SimSharedMemoryClient(object):
                 round(pedestrian["z"], 4),
                 round(pedestrian["vx"], 4),
                 round(pedestrian["vy"], 4),
-                vehicle["active"]
+                int(vehicle["active"])
             )
 
         # sysv_ipc.BusyError needs to be caught

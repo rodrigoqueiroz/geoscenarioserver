@@ -111,7 +111,7 @@ class GSClient(Node):
             vehicle["vy"] = msg_vehicle.velocity.y
             vehicle["yaw"] = msg_vehicle.yaw # not used
             vehicle["steering_angle"] = msg_vehicle.steering_angle # not used
-            vehicle["active"] = 1
+            vehicle["active"] = msg_vehicle.active
             vehicles.append(vehicle)
 
         pedestrians = []
@@ -125,7 +125,7 @@ class GSClient(Node):
             pedestrian["vx"] = msg_pedestrian.velocity.x
             pedestrian["vy"] = msg_pedestrian.velocity.y
             pedestrian["yaw"] = msg_pedestrian.yaw # not used
-            pedestrian["active"] = 1
+            pedestrian["active"] = msg_vehicle.active
             pedestrians.append(pedestrian)
 
         self.sim_client_shm.write_client_state(msg.tick_count, msg.delta_time, vehicles, pedestrians)
