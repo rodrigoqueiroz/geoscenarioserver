@@ -103,7 +103,7 @@ class SimSharedMemoryServer(object):
         disabled_vehicles = []
         disabled_pedestrians = []
 
-        if not self.is_connected or nvehicles == 0:
+        if not self.is_connected or (nvehicles == 0 and npedestrians == 0):
             return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
         # Read client shared memory

@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.executors import ExternalShutdownException
 
 from geoscenario_msgs.msg import Tick, Pedestrian, Vehicle
 from geographic_msgs.msg import GeoPoint
@@ -11,6 +12,8 @@ class GSClient(Node):
         super().__init__('geoscenario_client')
         self.initialize_state()
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
+        self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
+
         self.timer = self.create_timer(self.short_timer_period, self.timer_callback)
 
     def initialize_state(self):
@@ -93,6 +96,39 @@ class GSClient(Node):
         self.tick_pub.publish(tick_msg)
         self.previous_tick_count = tick_count
 
+    def tick_from_client(self, msg):
+        # convert the msg into dictionaries
+        # ignore origin, simulation_time, type, yaw, steering angle not used in the client
+        vehicles = []
+        for msg_vehicle in msg.vehicles:
+            vehicle = {}
+            vehicle["id"] = msg_vehicle.id
+            vehicle["type"] = msg_vehicle.type # not used
+            vehicle["x"] = msg_vehicle.position.x
+            vehicle["y"] = msg_vehicle.position.y
+            vehicle["z"] = msg_vehicle.position.z
+            vehicle["vx"] = msg_vehicle.velocity.x
+            vehicle["vy"] = msg_vehicle.velocity.y
+            vehicle["yaw"] = msg_vehicle.yaw # not used
+            vehicle["steering_angle"] = msg_vehicle.steering_angle # not used
+            vehicle["active"] = msg_vehicle.active
+            vehicles.append(vehicle)
+
+        pedestrians = []
+        for msg_pedestrian in msg.pedestrians:
+            pedestrian = {}
+            pedestrian["id"] = msg_pedestrian.id
+            pedestrian["type"] = msg_pedestrian.type # not used
+            pedestrian["x"] = msg_pedestrian.position.x
+            pedestrian["y"] = msg_pedestrian.position.y
+            pedestrian["z"] = msg_pedestrian.position.z
+            pedestrian["vx"] = msg_pedestrian.velocity.x
+            pedestrian["vy"] = msg_pedestrian.velocity.y
+            pedestrian["yaw"] = msg_pedestrian.yaw # not used
+            pedestrian["active"] = msg_vehicle.active
+            pedestrians.append(pedestrian)
+
+        self.sim_client_shm.write_client_state(msg.tick_count, msg.delta_time, vehicles, pedestrians)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -101,12 +137,13 @@ def main(args=None):
 
     try:
         rclpy.spin(gs_client)
-    except KeyboardInterrupt: # Exit (Ctrl-C)
-        gs_client.get_logger().info('Shutdown')
-
-    gs_client.destroy_node()
-
-    rclpy.shutdown()
+    except KeyboardInterrupt: # <ctrl>+c
+        gs_client.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
+    except ExternalShutdownException:
+        gs_client.get_logger().info('External shutdown (SIGTERM)')
+    finally:
+        gs_client.destroy_node()
+        rclpy.try_shutdown()
 
 
 if __name__ == '__main__':

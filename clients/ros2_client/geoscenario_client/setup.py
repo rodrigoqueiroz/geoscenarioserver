@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'geoscenario_client = geoscenario_client.geoscenario_client:main'
+            'geoscenario_client = geoscenario_client.geoscenario_client:main',
+            'mock_co_simulator = geoscenario_client.mock_co_simulator:main'
         ],
     },
 )
