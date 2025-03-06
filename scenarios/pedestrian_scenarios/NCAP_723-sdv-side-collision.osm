@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5365109' action='modify' lat='43.47137479428' lon='-80.53871827084'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Guarantee Collision Scenario' />
+    <tag k='timeout' v='30' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5365110' action='modify' lat='43.47110803016' lon='-80.53879884742'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='500' />
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5365111' action='modify' lat='43.47110819216' lon='-80.53874439166'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='goal_ends_simulation' v='yes' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='route' v='left_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5365112' action='modify' lat='43.47138354455' lon='-80.53922970612' />
+  <node id='-5365113' action='modify' lat='43.47109977309' lon='-80.53872991929' />
+  <node id='-5365114' action='modify' lat='43.47109538645' lon='-80.53866514073'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='path' v='v2_path' />
+    <tag k='speed' v='1' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5365115' action='modify' lat='43.4711259851' lon='-80.53871866741'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v3' />
+    <tag k='path' v='v3_path' />
+    <tag k='speed' v='1' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5365116' action='modify' lat='43.47110784401' lon='-80.53874390036' />
+  <node id='-5365117' action='modify' lat='43.47107848372' lon='-80.53869351361' />
+  <node id='-5365118' action='modify' lat='43.47112594629' lon='-80.53877703091' />
+  <node id='-5365119' action='modify' lat='43.47110507931' lon='-80.53880052933'>
+    <tag k='area' v='no' />
+    <tag k='continuous' v='no' />
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_2_dest' />
+  </node>
+  <node id='-5365120' action='modify' lat='43.47115290051' lon='-80.53874398667' />
+  <node id='-5365121' action='modify' lat='43.47112691911' lon='-80.53872032203' />
+  <node id='-5365122' action='modify' lat='43.47112712927' lon='-80.53872064886' />
+  <node id='-5365123' action='modify' lat='43.47115364934' lon='-80.53874290283'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_2_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='ped_1' />
+    <tag k='pid' v='4' />
+    <tag k='route' v='ped_2_route' />
+    <tag k='speed' v='5' />
+  </node>
+  <node id='-5365124' action='modify' lat='43.47109546318' lon='-80.5386652908' />
+  <node id='-5365125' action='modify' lat='43.47109555401' lon='-80.53866545114' />
+  <node id='-5365126' action='modify' lat='43.47136827917' lon='-80.53920406045'>
+    <tag k='gs' v='egogoal' />
+    <tag k='name' v='g1' />
+  </node>
+  <way id='-1954774' action='modify'>
+    <nd ref='-5365117' />
+    <nd ref='-5365113' />
+    <nd ref='-5365116' />
+    <nd ref='-5365118' />
+    <nd ref='-5365112' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route' />
+  </way>
+  <way id='-1954775' action='modify'>
+    <nd ref='-5365120' />
+    <nd ref='-5365118' />
+    <nd ref='-5365119' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ped_2_route' />
+  </way>
+  <way id='-1954776' action='modify'>
+    <nd ref='-5365121' />
+    <nd ref='-5365122' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='v3_path' />
+  </way>
+  <way id='-1954777' action='modify'>
+    <nd ref='-5365124' />
+    <nd ref='-5365125' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='v2_path' />
+  </way>
+</osm>
