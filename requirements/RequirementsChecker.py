@@ -204,7 +204,6 @@ class RequirementsChecker:
 	
 		return min_dist <= ped_rad
 
-
 	def rotate(self, center_x, center_y, x, y, degree_theta):
 		radian_theta = radians(degree_theta)
 		x2 = center_x + (x - center_x) * cos(radian_theta) + (y - center_y) * sin(radian_theta)
