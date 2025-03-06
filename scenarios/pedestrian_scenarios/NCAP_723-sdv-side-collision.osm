@@ -3,7 +3,7 @@
   <node id='-5365109' action='modify' lat='43.47137479428' lon='-80.53871827084'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='lanelet2_ringroad_pedestrians.osm' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Guarantee Collision Scenario' />
     <tag k='timeout' v='30' />

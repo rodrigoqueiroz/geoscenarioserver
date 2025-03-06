@@ -3,7 +3,7 @@
   <node id='-5368539' action='modify' lat='43.47137479428' lon='-80.53871827084'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='lanelet2_ringroad_pedestrians.osm' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Guarantee Collision Scenario' />
     <tag k='timeout' v='30' />
@@ -15,7 +15,7 @@
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5368541' action='modify' lat='43.47107569225' lon='-80.53868698915'>
+  <node id='-5368541' action='modify' lat='43.47107634062' lon='-80.53868877599'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='goal_ends_simulation' v='yes' />
