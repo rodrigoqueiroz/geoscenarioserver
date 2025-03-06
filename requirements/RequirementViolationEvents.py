@@ -11,6 +11,7 @@ agent_ticks      = manager.dict()
 file_name        = os.getenv('VIOLATION_REPORT_FOLDER', './results') + '/violations.json'
 global_tick      = Value('i', -1)
 violations       = manager.dict()
+TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 5
 
 # Generic
 class ScenarioEnd:
@@ -49,13 +50,28 @@ class CollisionWithVehicle(UnmetRequirement):
 		collision_state = agent_collisions[agent_id]
 
 		# There must be a gap of 5 ticks without collision between collision with the same agent
-		if vid not in collision_state or agent_ticks[agent_id] - 5 > collision_state[vid]:
+		if vid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[vid]:
 			self.raise_it(agent_id, {
 				'colliderId': vid,
 				'message': 'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
 			})
 
 		collision_state[vid] = agent_ticks[agent_id]
+
+		# That reassignment is necessary for the update to work in multiprocessing
+		agent_collisions[agent_id] = collision_state
+
+class CollisionWithPedestrian(UnmetRequirement):
+	def __init__(self, agent_id, pid):
+		collision_state = agent_collisions[agent_id]
+
+		if pid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[pid]:
+			self.raise_it(agent_id, {
+				'colliderId': pid,
+				'message': 'v' + str(agent_id) + ' bounding box overlapped with the pedestrian agent p' + str(pid),
+			})
+
+		collision_state[pid] = agent_ticks[agent_id]
 
 		# That reassignment is necessary for the update to work in multiprocessing
 		agent_collisions[agent_id] = collision_state

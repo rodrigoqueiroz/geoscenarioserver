@@ -3,7 +3,7 @@ import numpy as np
 from math import cos, radians, sin
 
 from Actor import ActorSimState
-from requirements.RequirementViolationEvents import CollisionWithVehicle, GoalOvershot, ScenarioCompletion, ScenarioEnd
+from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
 
 class RequirementsChecker:
@@ -22,6 +22,9 @@ class RequirementsChecker:
 		self.vehicles = {}
 		self.vehicles.update(traffic_state.traffic_vehicles)
 		self.vehicles.update(traffic_state.traffic_vehicles_orp)
+
+		self.pedestrians = {}
+		self.pedestrians.update(traffic_state.pedestrians)
 
 		for condition in self.conditions:
 			condition(traffic_state)
@@ -65,8 +68,17 @@ class RequirementsChecker:
 				vehicle_box = self.calculate_rectangular_bounding_box(vehicle)
 				if self.do_polygons_intersect(ego_box, vehicle_box):
 					CollisionWithVehicle(ego_vehicle.id, vid)
+		
+		for pid, pedestrian in self.pedestrians.items():
+			if pedestrian.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
+				continue
+			
+			pedestrian_pos = [pedestrian.state.x, pedestrian.state.y]
 
-
+			if self.front_collision_check(pedestrian_pos, ego_vehicle, pedestrian.PEDESTRIAN_RADIUS):
+				CollisionWithPedestrian(ego_vehicle.id, vid)
+				print("hit")
+				
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.
 		"""
@@ -102,6 +114,11 @@ class RequirementsChecker:
 			if self.goal_ends_simulation:
 				ScenarioEnd()
 				raise ScenarioCompletion()
+	
+	def forced_exit(self):
+		#store data upon forced exit
+		ScenarioEnd()
+		raise ScenarioCompletion
 
 	def do_polygons_intersect(self, polygon_a, polygon_b):
 		"""
@@ -159,6 +176,33 @@ class RequirementsChecker:
 					return False;
 
 		return True
+
+	def front_collision_check(self, centre, vehicle, radius):
+		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
+		#the front of the car can be determined by the yaw
+		center_x     = vehicle.state.x
+		center_y     = vehicle.state.y
+		arc_radius  = vehicle.bounding_box_length / 2
+		half_width   = vehicle.bounding_box_width  / 2
+		yaw          = np.radians(vehicle.state.yaw)
+		
+		ped_x, ped_y = centre
+		ped_rad = radius
+		theta_max = np.arcsin((half_width)/arc_radius)
+
+		theta_1 = yaw - theta_max
+		theta_2 = yaw + theta_max
+
+		#generates 10 points given the angle of the arc
+		theta_arc = np.linspace(theta_1, theta_2, 10)
+		x_arc = center_x + arc_radius * np.cos(theta_arc)
+		y_arc = center_y + arc_radius * np.sin(theta_arc)
+
+		#check if the arc collides with pedestrian
+		distances = np.sqrt((x_arc - ped_x) ** 2 + (y_arc - ped_y) ** 2)
+		min_dist = np.min(distances)
+	
+		return min_dist <= ped_rad
 
 	def rotate(self, center_x, center_y, x, y, degree_theta):
 		radian_theta = radians(degree_theta)
