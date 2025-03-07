@@ -77,7 +77,6 @@ class RequirementsChecker:
 
 			if self.front_collision_check(pedestrian_pos, ego_vehicle, pedestrian.PEDESTRIAN_RADIUS):
 				CollisionWithPedestrian(ego_vehicle.id, vid)
-				print("hit")
 				
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.
@@ -176,7 +175,7 @@ class RequirementsChecker:
 					return False;
 
 		return True
-
+	
 	def front_collision_check(self, centre, vehicle, radius):
 		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
 		#the front of the car can be determined by the yaw
