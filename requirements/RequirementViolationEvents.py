@@ -8,7 +8,8 @@ manager = Manager()
 # Singleton
 agent_collisions = manager.dict()
 agent_ticks      = manager.dict()
-file_name        = os.getenv('VIOLATION_REPORT_FOLDER', './results') + '/violations.json'
+file_name        = os.path.join(os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")), 
+                                "violations.json")
 global_tick      = Value('i', -1)
 violations       = manager.dict()
 

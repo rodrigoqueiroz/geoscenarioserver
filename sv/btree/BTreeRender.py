@@ -159,6 +159,7 @@ def generate_graph_tree(tree, vid, current_mconfig = None, show_status = False, 
 
     #Output File
     filename = "btreegraph_vid"+ str(vid) + ".png"
-    pathname = os.path.join(os.getcwd() + "/log/", filename)
+    location = os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs"))
+    pathname = os.path.join(location, filename)
     graph.write_png(pathname)
     log.info("Writing graph tree in {}".format(pathname))
