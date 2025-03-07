@@ -46,9 +46,6 @@ class SDV(Vehicle):
         self.btree_locations           = btree_locations
         self.detection_range_in_meters = detection_range_in_meters
         self.goal_ends_simulation      = goal_ends_simulation
-        self.perception                = Perception(self, vid, detection_range_in_meters, hallucination_retention, 
-                                                    hallucination_weight, missed_detection_weight, noise_position_mixture, 
-                                                    noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate)
         self.route_nodes               = route_nodes
 
         if start_state_in_frenet:
@@ -72,6 +69,11 @@ class SDV(Vehicle):
             Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw)
 
         self.type = Vehicle.SDV_TYPE
+
+        # Perception
+        self.perception = Perception(self, detection_range_in_meters, hallucination_retention, 
+                                     hallucination_weight, missed_detection_weight, noise_position_mixture, 
+                                     noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate)
 
         #Planning
         self.rule_engine_port = rule_engine_port

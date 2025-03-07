@@ -1,10 +1,9 @@
 import numpy as np
 
-from math import cos, radians, sin
-
 from Actor import ActorSimState
 from requirements.RequirementViolationEvents import CollisionWithVehicle, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
+from util.BoundingBoxes import calculate_rectangular_bounding_box
 
 class RequirementsChecker:
 	def __init__(self, ego_vehicle, goal_ends_simulation):
@@ -26,31 +25,15 @@ class RequirementsChecker:
 		for condition in self.conditions:
 			condition(traffic_state)
 
-	def calculate_rectangular_bounding_box(self, vehicle):
-		center_x     = vehicle.state.x
-		center_y     = vehicle.state.y
-		half_length  = vehicle.bounding_box_length / 2
-		half_width   = vehicle.bounding_box_width  / 2
-		yaw          = -vehicle.state.yaw
-
-		bottom_left  = self.rotate(center_x, center_y, center_x - half_length, center_y - half_width, yaw)
-		bottom_right = self.rotate(center_x, center_y, center_x + half_length, center_y - half_width, yaw)
-		top_left     = self.rotate(center_x, center_y, center_x - half_length, center_y + half_width, yaw)
-		top_right    = self.rotate(center_x, center_y, center_x + half_length, center_y + half_width, yaw)
-
-		return np.array([top_left, top_right, bottom_right, bottom_left])
-
 
 	def detect_collisions(self, traffic_state:TrafficState):
-		ego_vehicle       = self.ego_vehicle
+		ego_vehicle = self.ego_vehicle
 
 		if ego_vehicle.sim_state is not ActorSimState.ACTIVE:
 			return
 
-		ego_box           = self.calculate_rectangular_bounding_box(ego_vehicle)
-
-		ego_min_x, ego_min_y = np.min(ego_box, axis=0)
-		ego_max_x, ego_max_y = np.max(ego_box, axis=0)
+		ego_min_x, ego_min_y = np.min(ego_vehicle.bounding_box, axis=0)
+		ego_max_x, ego_max_y = np.max(ego_vehicle.bounding_box, axis=0)
 
 		for vid, vehicle in self.vehicles.items():
 			if vehicle.sim_state not in [ ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
@@ -63,8 +46,10 @@ class RequirementsChecker:
 			# Would they overlap? If yes, then go over the polygons and make the true comparison.
 			if (ego_min_x - max_offset <= vehicle.state.x <= ego_max_x + max_offset) and \
 			   (ego_min_y - max_offset <= vehicle.state.y <= ego_max_y + max_offset):
-				vehicle_box = self.calculate_rectangular_bounding_box(vehicle)
-				if self.do_polygons_intersect(ego_box, vehicle_box):
+			   
+				vehicle_box = calculate_rectangular_bounding_box(vehicle)
+
+				if self.do_polygons_intersect(ego_vehicle.bounding_box, vehicle_box):
 					CollisionWithVehicle(ego_vehicle.id, vid)
 
 
@@ -160,10 +145,3 @@ class RequirementsChecker:
 					return False;
 
 		return True
-
-	def rotate(self, center_x, center_y, x, y, degree_theta):
-		radian_theta = radians(degree_theta)
-		x2 = center_x + (x - center_x) * cos(radian_theta) + (y - center_y) * sin(radian_theta)
-		y2 = center_y - (x - center_x) * sin(radian_theta) + (y - center_y) * cos(radian_theta)
-
-		return np.array([ x2, y2 ])

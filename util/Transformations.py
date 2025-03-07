@@ -50,7 +50,7 @@ def frenet_to_sim_position(ref_path:ConstLineString3d, s:float, d:float, s_start
     return sim_position
 
 
-def sim_to_frenet_position(ref_path:ConstLineString3d, x:float, y:float, s_start:float, max_dist_from_path:float=5.0):
+def sim_to_frenet_position(ref_path:ConstLineString3d, x:float, y:float, s_start:float, max_dist_from_path:float=15.0):
     # TODO: find a better way of checking if the point is on ref_path
     point_is_on_path = False
     for point in ref_path:
@@ -120,7 +120,7 @@ def tangent_of_path_at(path:ConstLineString3d, i:int):
     return normalize(op + pq)
 
 
-def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List[float], y_vector:List[float], s_start:float, max_dist_from_path:float=5):
+def sim_to_frenet_frame(ref_path:ConstLineString3d, x_vector:List[float], y_vector:List[float], s_start:float, max_dist_from_path:float=15.0):
     """ Transforms position and speed from cartesian to frenet frame based of ref_path
 
         @param ref_path:    ConstLineString3d. Change to something general? Enforce types in python?

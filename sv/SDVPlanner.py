@@ -23,6 +23,7 @@ from sv.ManeuverModels import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
+from util.BoundingBoxes import calculate_rectangular_bounding_box
 
 import sv.btree.BehaviorLayer       as btree
 import sv.ruleEngine.BehaviorLayer  as rules
@@ -103,6 +104,7 @@ class SVPlanner(object):
             self.sync_planner.write_peformance_log()
         sys.exit(0)
 
+
     def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata):
         log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         signal(SIGTERM, self.before_exit)
@@ -136,6 +138,7 @@ class SVPlanner(object):
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:
                     self.sdv.state = traffic_vehicles.pop(self.vid, None).state #removes self state
+                    self.sdv.bounding_box = calculate_rectangular_bounding_box(self.sdv)
                 else:
                     #vehicle state not available. Vehicle can be inactive.
                     continue
@@ -161,9 +164,7 @@ class SVPlanner(object):
 
                 # Must be after requirementChecker.analyze, since we are not yet sure if the next tick is required
                 AgentTick(traffic_state.vid)
-
-                if self._perception != None:
-                    traffic_state = self._perception.apply_noise(traffic_state, self.laneletmap, self.sdv_route)
+                traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
                 
                 #BTree Tick - using frenet state and lane config based on old ref path
                 mconfig, ref_path_changed, snapshot_tree = self.behavior_layer.tick(traffic_state)
@@ -180,9 +181,7 @@ class SVPlanner(object):
                         log.warn("Invalid planner state, skipping planning step...")
                         continue
 
-                    if self._perception != None:
-                        traffic_state = self._perception.apply_noise(traffic_state, self.laneletmap, self.sdv_route)
-
+                    traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
                     mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
 
 

@@ -41,10 +41,7 @@ def get_perceived_vehicles(vehicles):
     try:
         perceived_vehicles = get_vehicles()
     except Exception as error:
-        perceived_vehicles = {}
-
-        for vid in vehicles:
-            perceived_vehicles[vid] = vehicles[vid].__dict__
+        perceived_vehicles = vehicles
 
     return perceived_vehicles
 
@@ -164,8 +161,8 @@ class Dashboard(object):
 
     def update_table(self, vehicles):
         def parse_vehicle(vehicle):
-            sim_state = vehicle['sim_state']
-            vector = vehicle['state'].get_state_vector()
+            sim_state = vehicle.sim_state
+            vector = vehicle.state.get_state_vector()
             truncate_vector(vector, 2)
             return [sim_state] + vector
 
@@ -178,7 +175,7 @@ class Dashboard(object):
 
         for vid in vehicles:
             if vid == center_id:
-                sv = parse_vehicle(vehicles[vid].__dict__)
+                sv = parse_vehicle(vehicles[vid])
             elif vid in perceived_vehicles:
                 sv = parse_vehicle(perceived_vehicles[vid])
             else:
@@ -359,32 +356,32 @@ class Dashboard(object):
 
     def plot_vehicle(self, alpha, colorcode, vid, vehicle, x_min, x_max, y_min, y_max, show_arrow):
         ax = plt.gca()
-        x  = vehicle['state'].x
-        y  = vehicle['state'].y
+        x  = vehicle.state.x
+        y  = vehicle.state.y
         if (x_min <= x <= x_max) and (y_min <= y <= y_max):
             #centre
             plt.plot(x, y, colorcode, marker='.', markersize=1, zorder=10)
             if SHOW_VEHICLE_SHAPE:
                 #rectangle origin
-                rect_x = x -(vehicle['bounding_box_length'] / 2)
-                rect_y = y -(vehicle['bounding_box_width'] / 2)
-                t = matplotlib.transforms.Affine2D().rotate_deg_around(x, y, vehicle['state'].yaw) + ax.transData #transform rotation around centre
-                rect = matplotlib.patches.Rectangle( (rect_x,rect_y), vehicle['bounding_box_length'], vehicle['bounding_box_width'], edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
+                rect_x = x -(vehicle.bounding_box_length / 2)
+                rect_y = y -(vehicle.bounding_box_width / 2)
+                t = matplotlib.transforms.Affine2D().rotate_deg_around(x, y, vehicle.state.yaw) + ax.transData #transform rotation around centre
+                rect = matplotlib.patches.Rectangle( (rect_x,rect_y), vehicle.bounding_box_length, vehicle.bounding_box_width, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
                 rect.set_transform(t)
                 ax.add_patch(rect)
             if (SHOW_VEHICLE_RADIUS):
                 #radius circle
-                circle1 = plt.Circle((x, y), vehicle['radius'], color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                circle1 = plt.Circle((x, y), vehicle.radius, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                 ax.add_artist(circle1)
             #label
-            label = "ego ({})".format(int(vid)) if vehicle['name'].lower() == 'ego' else "v{}".format(int(vid))
+            label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
             label_shift = 2 if SHOW_VEHICLE_SHAPE else 1
             ax.text(x+label_shift, y+label_shift, label, style='italic', zorder=10)
             #arrow
             if (show_arrow):
-                vx = vehicle['state'].x_vel
-                vy = vehicle['state'].y_vel
-                if vehicle['state'].s_vel < 0:
+                vx = vehicle.state.x_vel
+                vy = vehicle.state.y_vel
+                if vehicle.state.s_vel < 0:
                     vx = -vx
                     vy = -vy
                 plt.arrow(x, y, vx/2, vy/2, head_width=1, head_length=1, color=colorcode, zorder=10)
@@ -402,8 +399,6 @@ class Dashboard(object):
                 # Show the perceived vehicle instead of the ground truth
                 if vid in perceived_vehicles:
                     vehicle = perceived_vehicles[vid]
-                else:
-                    vehicle = vehicle.__dict__
 
                 self.plot_vehicle(alpha, colorcode, vid, vehicle, x_min, x_max, y_min, y_max, show_arrow)
 
@@ -544,14 +539,12 @@ class Dashboard(object):
                 # Show the perceived vehicle instead of the ground truth
                 if vid in perceived_vehicles:
                     vehicle = perceived_vehicles[vid]
-                else:
-                    vehicle = vehicle.__dict__
 
-                vs = vehicle['state']
+                vs = vehicle.state
                 plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
-                circle1 = plt.Circle((vs.s, vs.d), vehicle['radius'], color=colorcode, fill=False, zorder=5, alpha=alpha)
+                circle1 = plt.Circle((vs.s, vs.d), vehicle.radius, color=colorcode, fill=False, zorder=5, alpha=alpha)
                 gca.add_artist(circle1)
-                label = label = "ego ({})".format(int(vid)) if vehicle['name'].lower() == 'ego' else "v{}".format(int(vid))
+                label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
                 gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
