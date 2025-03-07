@@ -176,19 +176,6 @@ class RequirementsChecker:
 
 		return True
 	
-	def check_circle_rectangle_collision(self, centre, rectangle, radius):
-		"""
-		checks if the circular bounding box of a pedestrian intersects with the bounding box of a vehicle
-		"""
-		centre_x, centre_y = centre
-
-		closest_x = np.clip(centre_x, np.min(rectangle[:, 0]), np.max(rectangle[:, 0]))
-		closest_y = np.clip(centre_y, np.min(rectangle[:, 1]), np.max(rectangle[:, 1]))
-
-		distance = np.sqrt((centre_x - closest_x)**2 + (centre_y - closest_y)**2)
-
-		return distance < radius
-
 	def front_collision_check(self, centre, vehicle, radius):
 		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
 		#the front of the car can be determined by the yaw
