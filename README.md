@@ -77,6 +77,8 @@ options:
                         Wait for a valid client state to start the simulation
 ```
 
+GSServer creates various files on the folder `./outputs`, which can also be overridden using the environment variable `GSS_OUTPUTS`.
+
 - GeoScenario files (2.0 required) must be placed inside *scenarios/*
 - If a file is not given, you must provide a manual problem startup from code.
 - LaneletMap files must be placed inside *scenarios/maps* (a map file is mandatory).
