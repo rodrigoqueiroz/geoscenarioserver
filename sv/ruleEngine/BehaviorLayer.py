@@ -6,30 +6,13 @@ import numpy as np
 import requests
 import sys
 
-from copy      import deepcopy
 from decimal   import Decimal
 from functools import partial
 
 from dash.DashboardSharedMemory import get_center_id
 from sv.ManeuverConfig import *
 from sv.ruleEngine.constants import *
-
-def flatten(props, keys):
-    if props == None or len(props) != len(keys):
-        return None
-
-    my_props = {}
-
-    for index, key in enumerate(keys):
-        my_props[key] = props[index]
-
-    return my_props
-
-def to_cartesian_space(props):
-    return flatten(props, keys=['x', 'y'])
-
-def to_frenet_frame(props):
-    return flatten(props, keys=['s', 'd'])
+from sv.ruleEngine.FeatureGenerator import FeatureGenerator
 
 class NanConverter(json.JSONEncoder):
     def encode(self, obj, *args, **kwargs):
@@ -50,7 +33,7 @@ class NanConverter(json.JSONEncoder):
 
         return obj
 
-class BehaviorLayer(object):
+class BehaviorLayer(FeatureGenerator):
     ''''
         Behavior Layer using external rule engine 3.0 as core implementation.
         This module communicates with an external rule-based system at every tick.
@@ -59,13 +42,15 @@ class BehaviorLayer(object):
     '''
 
     def __init__(self, vid, btype, port):
+        super().__init__()
+
         self.btype = btype
         self.vid = vid
 
-        #Runtime status:
+        # Runtime status:
         self._traffic_state    = None
 
-        #decision
+        # Decision
         self._current_mconfig  = None
         self._ref_path_changed = False
 
@@ -81,7 +66,6 @@ class BehaviorLayer(object):
             'Content-Type': 'application/json'
         }
 
-        self.iteration = 0
         self.last_behaviour = {
             "maneuver": "EMERGENCY_STOP"
         }
@@ -124,54 +108,13 @@ class BehaviorLayer(object):
         self._ref_path_changed = val
 
     def tick(self, traffic_state):
-        self.iteration += 1 
         self._ref_path_changed = False
         self._traffic_state = traffic_state
 
-        situation = deepcopy(traffic_state)
-        situation.simulation = {
-            "sim_time": traffic_state.sim_time,
-            "tick": self.iteration
-        }
-
-        del situation.sim_time
-
-        if situation.route_complete:
-            situation.goal_point        = to_cartesian_space(traffic_state.goal_point)
-            situation.goal_point_frenet = to_frenet_frame(traffic_state.goal_point_frenet)
-        else:
-            situation.goal_point        = None
-            situation.goal_point_frenet = None
-
-        def convert_to_dict(data_class, banned_keys = []):
-            dto    = data_class.__dict__
-            to_ban = np.array(banned_keys).view().tolist()
-
-            for key in list(dto):
-                if key == '_left_lane':
-                    to_ban.append('_right_lane')
-                elif key == '_right_lane':
-                    to_ban.append('_left_lane')
-
-                if key in banned_keys:
-                    del dto[key]
-                elif dataclasses.is_dataclass(dto[key]):
-                    dto[key] = convert_to_dict(dto[key], to_ban)
-                elif isinstance(dto[key], list):
-                    dto[key] = {}
-
-                    for index in range(len(dto[key])):
-                        dto[key]['i_' + index] = convert_to_dict(dto[key], to_ban)
-
-            return dto
-
-        # Temporary overrides
-        situation.traffic_vehicles = {}
-        situation.traffic_vehicles_orp = {}
-        situation.road_occupancy = {}
+        situation = self.parse(traffic_state)
 
         #parameters['situation']['last_behaviour'] = self.last_behaviour
-        self.last_behaviour = self.post_behaviour(convert_to_dict(situation))
+        self.last_behaviour = self.post_behaviour(situation)
 
         if self.debug and traffic_state.vid == get_center_id():
             print('Behaviour', self.last_behaviour)
@@ -184,7 +127,7 @@ class BehaviorLayer(object):
             # Track-Speed behaviour
             if self.last_behaviour['maneuver']['type'] == 'TRACK_SPEED' and \
                'speed' in self.last_behaviour['parameters']:
-                desired_speed = self.last_behaviour['parameters']['speed'] / KMH_TO_MS
+                desired_speed = max(0.0, self.last_behaviour['parameters']['speed'] / KMH_TO_MS)
                 self._current_mconfig = MVelKeepConfig(vel=MP(desired_speed, 10, 6))
 
             # Stop-At behaviour
