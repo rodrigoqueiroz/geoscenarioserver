@@ -133,7 +133,8 @@ class Dashboard(object):
                             self.plot_vehicle_sd(traj, cand)
                         #behavior tree
                         self.tree_msg.delete("1.0", "end")
-                        self.tree_msg.insert("1.0", btree_snapshot)                    
+                        if btree_snapshot:
+                            self.tree_msg.insert("1.0", btree_snapshot)                    
                     else:
                         #vehicles without planner:
                         self.plot_cartesian_chart(vid, vehicles, pedestrians)

@@ -11,7 +11,6 @@ from __future__ import annotations  #Must be first Include. Will be standard in 
 import glog as log
 import itertools
 import lanelet2.core
-import pprint
 
 from copy import copy, deepcopy
 from collections import namedtuple

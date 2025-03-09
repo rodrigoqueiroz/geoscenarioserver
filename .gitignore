@@ -3,9 +3,5 @@
 **/build/
 .venv
 .vscode/
-catkin_ws
-results
-scenarios/plots/*
-scenarios/logs/*
-test_btree_parser
+outputs/*
 colcon_ws/

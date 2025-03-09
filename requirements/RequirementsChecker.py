@@ -1,7 +1,7 @@
 import numpy as np
 
 from Actor import ActorSimState
-from requirements.RequirementViolationEvents import CollisionWithVehicle, GoalOvershot, ScenarioCompletion, ScenarioEnd
+from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
 from util.BoundingBoxes import calculate_rectangular_bounding_box
 
@@ -18,6 +18,9 @@ class RequirementsChecker:
 		self.vehicles = {}
 
 	def analyze(self, traffic_state:TrafficState):
+		self.pedestrians = {}
+		self.pedestrians.update(traffic_state.pedestrians)
+
 		self.vehicles = {}
 		self.vehicles.update(traffic_state.traffic_vehicles)
 		self.vehicles.update(traffic_state.traffic_vehicles_orp)
@@ -25,9 +28,8 @@ class RequirementsChecker:
 		for condition in self.conditions:
 			condition(traffic_state)
 
-
 	def detect_collisions(self, traffic_state:TrafficState):
-		ego_vehicle = self.ego_vehicle
+		ego_vehicle       = self.ego_vehicle
 
 		if ego_vehicle.sim_state is not ActorSimState.ACTIVE:
 			return
@@ -45,13 +47,22 @@ class RequirementsChecker:
 			# Suppose big rectangles were overshoting the real dimension of the vehicles,
 			# Would they overlap? If yes, then go over the polygons and make the true comparison.
 			if (ego_min_x - max_offset <= vehicle.state.x <= ego_max_x + max_offset) and \
-			   (ego_min_y - max_offset <= vehicle.state.y <= ego_max_y + max_offset):
-			   
+			   (ego_min_y - max_offset <= vehicle.state.y <= ego_max_y + max_offset):			   
 				vehicle_box = calculate_rectangular_bounding_box(vehicle)
 
 				if self.do_polygons_intersect(ego_vehicle.bounding_box, vehicle_box):
 					CollisionWithVehicle(ego_vehicle.id, vid)
 
+		
+		for pid, pedestrian in self.pedestrians.items():
+			if pedestrian.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
+				continue
+			
+			pedestrian_pos = [pedestrian.state.x, pedestrian.state.y]
+
+			if self.front_collision_check(pedestrian_pos, ego_vehicle, pedestrian.PEDESTRIAN_RADIUS):
+				CollisionWithPedestrian(ego_vehicle.id, vid)
+				
 
 	def detect_goal_overshot(self, traffic_state:TrafficState):
 		""" Checks if the vehicle has reached or passed the goal point in the frenet frame.
@@ -145,3 +156,35 @@ class RequirementsChecker:
 					return False;
 
 		return True
+
+	def forced_exit(self):
+		#store data upon forced exit
+		ScenarioEnd()
+		raise ScenarioCompletion
+	
+	def front_collision_check(self, centre, vehicle, radius):
+		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
+		#the front of the car can be determined by the yaw
+		center_x     = vehicle.state.x
+		center_y     = vehicle.state.y
+		arc_radius  = vehicle.bounding_box_length / 2
+		half_width   = vehicle.bounding_box_width  / 2
+		yaw          = np.radians(vehicle.state.yaw)
+		
+		ped_x, ped_y = centre
+		ped_rad = radius
+		theta_max = np.arcsin((half_width)/arc_radius)
+
+		theta_1 = yaw - theta_max
+		theta_2 = yaw + theta_max
+
+		#generates 10 points given the angle of the arc
+		theta_arc = np.linspace(theta_1, theta_2, 10)
+		x_arc = center_x + arc_radius * np.cos(theta_arc)
+		y_arc = center_y + arc_radius * np.sin(theta_arc)
+
+		#check if the arc collides with pedestrian
+		distances = np.sqrt((x_arc - ped_x) ** 2 + (y_arc - ped_y) ** 2)
+		min_dist = np.min(distances)
+	
+		return min_dist <= ped_rad
