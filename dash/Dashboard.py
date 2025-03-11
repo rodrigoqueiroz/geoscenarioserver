@@ -188,7 +188,7 @@ class Dashboard(object):
                 status = "active"
             else:
                 status = "inactive"
-            sp = [(sp[0], "|", sp[1], "|", sp[2]), (sp[3], "|", sp[4], "|", sp[5]), (sp[6], "|", sp[7], "|", sp[8]), (sp[9], "|", sp[10], "|", sp[11]), sp[12]]
+            sp = [(sp[0], "|", sp[1], "|", sp[2]), (sp[3], "|", sp[4], "|", sp[5]), (sp[6], "|", sp[7], "|", sp[8]), (sp[9], "|", sp[10], "|", sp[11]), int(sp[12])]
             sp = ['p' + str(pid)] + [agent_type] + [status] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
