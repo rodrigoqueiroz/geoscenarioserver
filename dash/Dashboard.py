@@ -146,7 +146,7 @@ class Dashboard(object):
             #log.info("Changed focus to {}".format(self.center_id))
     
     def get_maneuver(self, id):
-        maneuver_list = {"M_VELKEEP":"keeping velocity", "M_FOLLOW":"following", "M_LANESWERVE":"lane swerve", "M_CUTIN":"cutting in", "M_STOP":"stopping", "M_REVERSE":"reversing"}
+        maneuver_list = {"M_VELKEEP":"VELKEEP", "M_FOLLOW":"FOLLOW", "M_LANESWERVE":"LANE_SWERVE", "M_CUTIN":"CUTIN", "M_STOP":"STOP", "M_REVERSE":"REVERSE"}
         if id in self.sim_traffic.debug_shdata:
             btree_snapshot = self.sim_traffic.debug_shdata[id][1]
             if btree_snapshot:
