@@ -144,31 +144,52 @@ class Dashboard(object):
         if (focus):
             self.center_id = focus #sets center_id to an int or string
             #log.info("Changed focus to {}".format(self.center_id))
+    
+    def get_maneuver(self, id):
+        maneuver_list = {"M_VELKEEP":"keeping velocity", "M_FOLLOW":"following", "M_LANESWERVE":"lane swerve", "M_CUTIN":"cutting in", "M_STOP":"stopping", "M_REVERSE":"reversing"}
+        if id in self.sim_traffic.debug_shdata:
+            btree_snapshot = self.sim_traffic.debug_shdata[id][1]
+            if btree_snapshot:
+                maneuver = maneuver_list[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
+                return maneuver
+            else:
+                return "active"
+        else:
+            return "Inactive"
 
     def update_table(self, vehicles):
+        vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
         current_set = self.tab.get_children()
         if current_set:
             self.tab.delete(*current_set)
         for vid in vehicles:
             vehicle = vehicles[vid]
-            sim_state = vehicles[vid].sim_state
+            status = self.get_maneuver(vid)
+            agent_type = vehicle_types[vehicle.type]
             sv = vehicle.state.get_state_vector()
-            truncate_vector(sv,2)
-            sv = ['v'+ str(vid)] + [sim_state] + sv
+            truncate_vector(sv,1)
+            sv = [(sv[0], "|", sv[1], "|", sv[2]), (sv[3], "|", sv[4], "|", sv[5]), (sv[6], "|", sv[7], "|", sv[8]), (sv[9], "|", sv[10], "|", sv[11]), int(sv[12])]
+            sv = ['v'+ str(vid)] + [agent_type] + [status] + sv
             self.tab.insert('', 'end', 'v' + str(vid), values=(sv))
         if self.tab.exists(self.center_id):
             self.tab.selection_set(self.center_id)
 
     def update_pedestrian_table(self, pedestrians):
+        ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
         if len(pedestrians) == 0:
             return
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
+            agent_type = ped_types[pedestrian.type]
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
-            truncate_vector(sp,2)
-
-            sp = ['p' + str(pid)] + [sim_state] + sp
+            truncate_vector(sp,1)
+            if sim_state == 1:
+                status = "active"
+            else:
+                status = "inactive"
+            sp = [(sp[0], "|", sp[1], "|", sp[2]), (sp[3], "|", sp[4], "|", sp[5]), (sp[6], "|", sp[7], "|", sp[8]), (sp[9], "|", sp[10], "|", sp[11]), sp[12]]
+            sp = ['p' + str(pid)] + [agent_type] + [status] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
@@ -752,19 +773,19 @@ class Dashboard(object):
         tab_frame.grid(row=5, column=0, columnspan=2, sticky="nsew")
 
         # Scrollable Right Section
-        canvas = tk.Canvas(window, bg="white")
-        canvas.grid(row=2, column=2, rowspan=4, sticky="nsew")
+        btree_canvas = tk.Canvas(window, bg="white")
+        btree_canvas.grid(row=2, column=2, rowspan=4, sticky="nsew")
 
-        scrollbar = tk.Scrollbar(window, orient="vertical", command=canvas.yview)
-        scrollbar.grid(row=2, column=2, rowspan=4, sticky="nse")  # Align right edge of the column
+        btree_scrollbar = tk.Scrollbar(window, orient="vertical", command=btree_canvas.yview)
+        btree_scrollbar.grid(row=2, column=2, rowspan=4, sticky="nse")  # Align right edge of the column
 
-        canvas.configure(yscrollcommand=scrollbar.set)
+        btree_canvas.configure(yscrollcommand=btree_scrollbar.set)
 
-        bt_frame = tk.Frame(canvas, bg="white")
-        canvas.create_window((0, 0), window=bt_frame, anchor="nw")
+        bt_frame = tk.Frame(btree_canvas, bg="white")
+        btree_canvas.create_window((0, 0), window=bt_frame, anchor="nw")
 
         # Make widgets inside bt_frame expand
-        bt_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        bt_frame.bind("<Configure>", lambda e: btree_canvas.configure(scrollregion=btree_canvas.bbox("all")))
 
         # #vehicle sub containers
         traj_frame = tk.Frame(bt_frame, bg = "white")
@@ -801,21 +822,24 @@ class Dashboard(object):
         # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
         tab['columns'] = (
-            'id', 'sim_st',
-            'x', 'x_vel', 'x_acc',
-            'y', 'y_vel', 'y_acc',
-            's', 's_vel', 's_acc',
-            'd', 'd_vel', 'd_acc',
+            'id', 'type', 'state',
+            'x | x_vel | x_acc', 'y | y_vel | y_acc',
+            's | s_vel | s_acc', 'd | d_vel | d_acc',
             'yaw'
         )
+        width_scaling = int(vis_scaling * 0.6)
         for col in tab['columns']:
             tab.heading(col, text=col, anchor='center')
-            tab.column(col, anchor='center', width=1, minwidth=1)
+            tab.column(col, anchor='center', width=200*width_scaling, minwidth=1, stretch=False)
+        tab.column("id", width=100*width_scaling)
+        tab.column("type", width=100*width_scaling)
+        tab.column("state", width=150*width_scaling)
+        tab.column("yaw", width=100*width_scaling)
         tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
         style = ttk.Style()
-        style.configure("Treeview", font=("TkDefaultFont", int(12*txt_scaling))) # needs to be scaled
+        style.configure("Treeview", font=("TkDefaultFont", int(11*txt_scaling))) # needs to be scaled
         self.tab = tab
 
         # vehicle cart
