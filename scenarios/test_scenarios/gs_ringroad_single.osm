@@ -5,9 +5,9 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_ringroad_modified.osm' />
     <tag k='mutate' v='no' />
-    <tag k='name' v='Campus ring road stress test' />
+    <tag k='name' v='Campus ring road loop test' />
     <tag k='plotvid' v='1' />
-    <tag k='timeout' v='200' />
+    <tag k='timeout' v='240' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5145818' action='modify' visible='true' lat='43.47107113614' lon='-80.54268926448'>
@@ -19,7 +19,7 @@
   <node id='-5145822' action='modify' visible='true' lat='43.47196635823' lon='-80.54020786767' />
   <node id='-5145824' action='modify' visible='true' lat='43.47254328162' lon='-80.54094230983' />
   <node id='-5145847' action='modify' visible='true' lat='43.47199816899' lon='-80.54025113851'>
-    <tag k='btree' v='drive.btree' />
+    <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='2' />
     <tag k='gs' v='vehicle' />
@@ -28,6 +28,7 @@
     <tag k='route' v='inner_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='45' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-5149167' action='modify' visible='true' lat='43.47089789545' lon='-80.53897172481' />
   <way id='-1948234' action='modify' visible='true'>
