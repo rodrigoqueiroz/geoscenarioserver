@@ -18,7 +18,7 @@ if [[ "$#" -eq 0 ]]; then
 else
     for arg in "$@"; do
         case $arg in
-            "-op")  # Only pedestrians
+            "-op")
                 ARG_VEHICLES="false"
                 ;;
             "-ov")
@@ -44,8 +44,6 @@ if [[ "$ARG_PEDESTRIANS" == "true" ]]; then
     pedestrian_scenarios=$(find "${REPO_DIR}/scenarios/pedestrian_scenarios" -name "*.osm" | sort)
 fi
 scenarios="$test_scenarios $pedestrian_scenarios"
-
-source "${REPO_DIR}/catkin_ws/install/opt/ros/lanelet2/setup.bash" --extend
 
 kill_python3()
 {
