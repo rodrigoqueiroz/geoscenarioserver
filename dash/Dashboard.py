@@ -41,6 +41,9 @@ class Dashboard(object):
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
         self.screen_param = screen_param
+        self.maneuver_map = {"M_VELKEEP":"VelKeep", "M_FOLLOW":"Follow", "M_LANESWERVE":"LaneSwerve", "M_CUTIN":"CutIn", "M_STOP":"Stop", "M_REVERSE":"Reverse"}
+        self.vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
+        self.ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
 
     def start(self):
         """ Start dashboard in subprocess.
@@ -146,26 +149,24 @@ class Dashboard(object):
             #log.info("Changed focus to {}".format(self.center_id))
     
     def get_maneuver(self, id):
-        maneuver_list = {"M_VELKEEP":"VELKEEP", "M_FOLLOW":"FOLLOW", "M_LANESWERVE":"LANE_SWERVE", "M_CUTIN":"CUTIN", "M_STOP":"STOP", "M_REVERSE":"REVERSE"}
         if id in self.sim_traffic.debug_shdata:
             btree_snapshot = self.sim_traffic.debug_shdata[id][1]
             if btree_snapshot:
-                maneuver = maneuver_list[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
+                maneuver = self.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
                 return maneuver
             else:
-                return "active"
+                return "Active"
         else:
             return "Inactive"
 
     def update_table(self, vehicles):
-        vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
         current_set = self.tab.get_children()
         if current_set:
             self.tab.delete(*current_set)
         for vid in vehicles:
             vehicle = vehicles[vid]
             status = self.get_maneuver(vid)
-            agent_type = vehicle_types[vehicle.type]
+            agent_type = self.vehicle_types[vehicle.type]
             sv = vehicle.state.get_state_vector()
             truncate_vector(sv,1)
             sv = [(sv[0], "|", sv[1], "|", sv[2]), (sv[3], "|", sv[4], "|", sv[5]), (sv[6], "|", sv[7], "|", sv[8]), (sv[9], "|", sv[10], "|", sv[11]), int(sv[12])]
@@ -175,19 +176,18 @@ class Dashboard(object):
             self.tab.selection_set(self.center_id)
 
     def update_pedestrian_table(self, pedestrians):
-        ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
         if len(pedestrians) == 0:
             return
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
-            agent_type = ped_types[pedestrian.type]
+            agent_type = self.ped_types[pedestrian.type]
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
             truncate_vector(sp,1)
             if sim_state == 1:
-                status = "active"
+                status = "Active"
             else:
-                status = "inactive"
+                status = "Inactive"
             sp = [(sp[0], "|", sp[1], "|", sp[2]), (sp[3], "|", sp[4], "|", sp[5]), (sp[6], "|", sp[7], "|", sp[8]), (sp[9], "|", sp[10], "|", sp[11]), int(sp[12])]
             sp = ['p' + str(pid)] + [agent_type] + [status] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
