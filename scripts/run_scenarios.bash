@@ -63,7 +63,7 @@ for scenario in $scenarios; do
     trap kill_python3 SIGINT
     echo "CTRL + C to quit the scenario."
     ${MAMBA_EXE} -n gss run python3 GSServer.py ${ARG_NO_DASH} --scenario ${scenario}
-    echo "=== ${REPO_DIR}/results/violations.json ==="
+    echo "=== violations.json for \"$(basename ${scenario})\" ==="
     cat ${REPO_DIR}/outputs/violations.json
     echo ""
     echo "==="
