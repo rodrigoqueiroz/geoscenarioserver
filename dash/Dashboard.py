@@ -173,7 +173,7 @@ class Dashboard(object):
             agent_type = Dashboard.vehicle_types[vehicle.type]
             sv = vehicle.state.get_state_vector()
             truncate_vector(sv,1)
-            sv = [(sv[0], "|", sv[1], "|", sv[2]), (sv[3], "|", sv[4], "|", sv[5]), (sv[6], "|", sv[7], "|", sv[8]), (sv[9], "|", sv[10], "|", sv[11]), int(sv[12])]
+            sv = [f"{sv[0]} | {sv[1]} | {sv[2]}", f"{sv[3]} | {sv[4]} | {sv[5]}", f"{sv[6]} | {sv[7]} | {sv[8]}", f"{sv[9]} | {sv[10]} | {sv[11]}", int(sv[12])]
             sv = ['v'+ str(vid)] + [agent_type] + [status] + sv
             self.tab.insert('', 'end', 'v' + str(vid), values=(sv))
         if self.tab.exists(self.center_id):
@@ -192,7 +192,7 @@ class Dashboard(object):
                 status = "Active"
             else:
                 status = "Inactive"
-            sp = [(sp[0], "|", sp[1], "|", sp[2]), (sp[3], "|", sp[4], "|", sp[5]), (sp[6], "|", sp[7], "|", sp[8]), (sp[9], "|", sp[10], "|", sp[11]), int(sp[12])]
+            sp = [f"{sp[0]} | {sp[1]} | {sp[2]}", f"{sp[3]} | {sp[4]} | {sp[5]}", f"{sp[6]} | {sp[7]} | {sp[8]}", f"{sp[9]} | {sp[10]} | {sp[11]}", int(sp[12])]
             sp = ['p' + str(pid)] + [agent_type] + [status] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
