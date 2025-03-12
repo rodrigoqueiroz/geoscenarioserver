@@ -5,11 +5,13 @@ REPO_DIR=$(dirname "$SCRIPT_DIR")
 
 ARG_VEHICLES="true"
 ARG_PEDESTRIANS="true"
+ARG_NO_DASH=
 
 print_help() {
     echo "Running all vehicle and pedestrian scenarios by default."
-    echo "  Use -op to run only pedestrian scenarios."
-    echo "  Use -ov to run only vehicle scenarios."
+    echo "  -op         run only pedestrian scenarios"
+    echo "  -ov         run only vehicle scenarios"
+    echo "  --no-dash   run without the dashboard."
     echo ""
 }
 
@@ -23,6 +25,9 @@ else
                 ;;
             "-ov")
                 ARG_PEDESTRIANS="false"
+                ;;
+            "--no-dash")
+                ARG_NO_DASH="--no-dash"
                 ;;
             *)
                 echo "Invalid argument $arg"
@@ -50,12 +55,17 @@ kill_python3()
     killall python3
 }
 
+cd ${REPO_DIR}
 for scenario in $scenarios; do
     echo "CTRL + C to exit the script."
     read -p "ENTER to run ${scenario#$REPO_DIR/}:"
 
     trap kill_python3 SIGINT
     echo "CTRL + C to quit the scenario."
-    python3 GSServer.py -s $scenario
+    ${MAMBA_EXE} -n gss run python3 GSServer.py ${ARG_NO_DASH} --scenario ${scenario}
+    echo "=== ${REPO_DIR}/results/violations.json ==="
+    cat ${REPO_DIR}/outputs/violations.json
+    echo ""
+    echo "==="
     trap - SIGINT
 done
