@@ -17,13 +17,14 @@
   <node id='-5145334' action='modify' visible='true' lat='43.47790730383' lon='-80.52029198388' />
   <node id='-5145338' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
   <node id='-5145340' action='modify' visible='true' lat='43.47823992752' lon='-80.51933527822'>
-    <tag k='btree' v='drive.btree' />
+    <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='red_light_runner' />
     <tag k='route' v='east_west_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='155' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-5145341' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
     <tag k='duration' v='2,0.5,10,10' />
