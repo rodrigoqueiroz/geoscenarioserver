@@ -32,6 +32,10 @@ class Dashboard(object):
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
+    
+    maneuver_map = {"M_VELKEEP":"VelKeep", "M_FOLLOW":"Follow", "M_LANESWERVE":"LaneSwerve", "M_CUTIN":"CutIn", "M_STOP":"Stop", "M_REVERSE":"Reverse"}
+    vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
+    ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
 
     def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
@@ -41,9 +45,7 @@ class Dashboard(object):
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
         self.screen_param = screen_param
-        self.maneuver_map = {"M_VELKEEP":"VelKeep", "M_FOLLOW":"Follow", "M_LANESWERVE":"LaneSwerve", "M_CUTIN":"CutIn", "M_STOP":"Stop", "M_REVERSE":"Reverse"}
-        self.vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
-        self.ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
+        
 
     def start(self):
         """ Start dashboard in subprocess.
@@ -152,7 +154,7 @@ class Dashboard(object):
         if id in self.sim_traffic.debug_shdata:
             btree_snapshot = self.sim_traffic.debug_shdata[id][1]
             if btree_snapshot:
-                maneuver = self.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
+                maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
                 return maneuver
             else:
                 return "Active"
@@ -166,7 +168,7 @@ class Dashboard(object):
         for vid in vehicles:
             vehicle = vehicles[vid]
             status = self.get_maneuver(vid)
-            agent_type = self.vehicle_types[vehicle.type]
+            agent_type = Dashboard.vehicle_types[vehicle.type]
             sv = vehicle.state.get_state_vector()
             truncate_vector(sv,1)
             sv = [(sv[0], "|", sv[1], "|", sv[2]), (sv[3], "|", sv[4], "|", sv[5]), (sv[6], "|", sv[7], "|", sv[8]), (sv[9], "|", sv[10], "|", sv[11]), int(sv[12])]
@@ -180,7 +182,7 @@ class Dashboard(object):
             return
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
-            agent_type = self.ped_types[pedestrian.type]
+            agent_type = Dashboard.ped_types[pedestrian.type]
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
             truncate_vector(sp,1)
