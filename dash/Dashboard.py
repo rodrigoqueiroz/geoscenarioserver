@@ -161,7 +161,7 @@ class Dashboard(object):
                     return "Active"
             except:
                 return "Inactive"
-        return "inactive"
+        return "Inactive"
 
     def update_table(self, vehicles):
         current_set = self.tab.get_children()
