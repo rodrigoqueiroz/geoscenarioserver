@@ -52,6 +52,7 @@ fi
 
 test_scenarios=""
 if [[ "$ARG_VEHICLES" == "true" ]]; then
+    coretest_scenarios=$(find "${REPO_DIR}/scenarios/coretest_scenarios" -name "*.osm" | sort)
     test_scenarios=$(find "${REPO_DIR}/scenarios/test_scenarios" -name "*.osm" | sort)
 fi
 pedestrian_scenarios=""
@@ -62,7 +63,7 @@ long_test_scenarios=
 if [[ "$ARG_LONG" == "true" ]]; then
     long_test_scenarios=$(find "${REPO_DIR}/scenarios/long_test_scenarios" -name "*.osm" | sort)
 fi
-all_scenarios="$test_scenarios $pedestrian_scenarios $long_test_scenarios"
+all_scenarios="$coretest_scenarios $test_scenarios $pedestrian_scenarios $long_test_scenarios"
 
 kill_python3()
 {
