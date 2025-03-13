@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' generator='JOSM'>
+<osm version='0.6' upload='false' generator='JOSM'>
   <node id='-133084' action='modify' visible='true' lat='43.5101706399' lon='-80.5377494511'>
-    <tag k='btree' v='drive.btree' />
+    <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
@@ -9,6 +9,7 @@
     <tag k='route' v='cul_de_sac' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='160' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-133105' action='modify' visible='true' lat='43.50984896879' lon='-80.53828513943'>
     <tag k='altitude' v='300' />
