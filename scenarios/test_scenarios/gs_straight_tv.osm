@@ -5,7 +5,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
     <tag k='name' v='Straight road zigzag trajectory vehicle' />
-    <tag k='timeout' v='12' />
+    <tag k='timeout' v='11' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5149176' action='modify' lat='49.00769375801' lon='8.45755581371'>

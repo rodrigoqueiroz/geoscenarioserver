@@ -19,6 +19,7 @@
     <tag k='route' v='right_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-5145122' action='modify' visible='true' lat='49.00788844556' lon='8.45773201685'>
     <tag k='gs' v='origin' />
