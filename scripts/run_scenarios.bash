@@ -4,16 +4,18 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
 ARG_VEHICLES="true"
-ARG_LONG="false"
 ARG_PEDESTRIANS="true"
+ARG_LONG="false"
 ARG_NO_DASH=
+ARG_INTERACTIVE="true"
 
 print_help() {
     echo "Running all vehicle and pedestrian scenarios except long scenarios by default."
-    echo "  --op        run only pedestrian scenarios"
-    echo "  --ov        run only vehicle scenarios"
-    echo "  --long      include long vehicle scenarios (not included by default)"
-    echo "  --no-dash   run without the dashboard."
+    echo "  --op                run only pedestrian scenarios"
+    echo "  --ov                run only vehicle scenarios"
+    echo "  --long              include long vehicle scenarios (not included by default)"
+    echo "  --no-dash           run without the dashboard."
+    echo "  --non-interactive   do not prompt for <enter> (prompt by default)"
     echo ""
 }
 
@@ -33,6 +35,9 @@ else
                 ;;
             "--no-dash")
                 ARG_NO_DASH="--no-dash"
+                ;;
+            "--non-interactive")
+                ARG_INTERACTIVE="false"
                 ;;
             *)
                 echo "Invalid argument $arg"
@@ -67,8 +72,9 @@ kill_python3()
 cd ${REPO_DIR}
 for scenario in $all_scenarios; do
     echo "CTRL + C to exit the script."
-    read -p "ENTER to run ${scenario#$REPO_DIR/}:"
-
+    if [[ "$ARG_INTERACTIVE" == "true" ]]; then
+        read -p "ENTER to run ${scenario#$REPO_DIR/}:"
+    fi
     trap kill_python3 SIGINT
     echo "CTRL + C to quit the scenario."
     ${MAMBA_EXE} -n gss run python3 GSServer.py ${ARG_NO_DASH} --scenario ${scenario}
