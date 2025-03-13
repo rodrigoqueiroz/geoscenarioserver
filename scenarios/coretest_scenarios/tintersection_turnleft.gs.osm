@@ -1,54 +1,55 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='false' generator='JOSM'>
-  <node id='-5009667' action='modify' visible='true' lat='43.43636135998' lon='-80.5797781031' />
-  <node id='-5009668' action='modify' visible='true' lat='43.43543371156' lon='-80.57979051079'>
+  <node id='-2766140' action='modify' lat='43.4364463685' lon='-80.57979148246' />
+  <node id='-2766141' action='modify' lat='43.43543371156' lon='-80.57979051079'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_firetower_4waystop.osm' />
     <tag k='name' v='2 Way Stop Intersection Scenario' />
-    <tag k='timeout' v='25' />
+    <tag k='timeout' v='30' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5009669' action='modify' visible='true' lat='43.43537306152' lon='-80.57978848592'>
+  <node id='-2766142' action='modify' lat='43.43537306152' lon='-80.57978848592'>
     <tag k='altitude' v='329' />
     <tag k='area' v='100' />
     <tag k='gs' v='origin' />
   </node>
-  <node id='-5009670' action='modify' visible='true' lat='43.43528472732' lon='-80.57990521852' />
-  <node id='-5009671' action='modify' visible='true' lat='43.43526860371' lon='-80.58015765097'>
+  <node id='-2766143' action='modify' lat='43.43527379745' lon='-80.58007915017' />
+  <node id='-2766144' action='modify' lat='43.43526860371' lon='-80.58015765097'>
     <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
+    <tag k='goal_ends_simulation' v='yes' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
-    <tag k='name' v='v2' />
+    <tag k='name' v='vleftturn' />
     <tag k='notgs' v='vehicle' />
     <tag k='route' v='north_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
   </node>
-  <node id='-5009672' action='modify' visible='true' lat='43.43589206171' lon='-80.57976166653'>
+  <node id='-2766145' action='modify' lat='43.43603083306' lon='-80.57977910089'>
     <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
     <tag k='model' v='light_vehicle' />
-    <tag k='name' v='v2' />
+    <tag k='name' v='vsouth' />
     <tag k='route' v='south_route' />
     <tag k='vid' v='2' />
     <tag k='yaw' v='310' />
   </node>
-  <node id='-5009673' action='modify' visible='true' lat='43.43561847214' lon='-80.57972248793' />
-  <node id='-5009674' action='modify' visible='true' lat='43.43507285902' lon='-80.57967200128' />
-  <node id='-5009675' action='modify' visible='true' lat='43.43551677988' lon='-80.57971307811' />
-  <way id='-1949892' action='modify' visible='true'>
-    <nd ref='-5009670' />
-    <nd ref='-5009667' />
+  <node id='-2766146' action='modify' lat='43.43599797821' lon='-80.57976931568' />
+  <node id='-2766147' action='modify' lat='43.43507285902' lon='-80.57967200128' />
+  <node id='-2766148' action='modify' lat='43.43551677988' lon='-80.57971307811' />
+  <way id='-1949889' action='modify'>
+    <nd ref='-2766143' />
+    <nd ref='-2766140' />
     <tag k='gs' v='route' />
     <tag k='name' v='north_route' />
   </way>
-  <way id='-1949893' action='modify' visible='true'>
-    <nd ref='-5009673' />
-    <nd ref='-5009675' />
-    <nd ref='-5009674' />
+  <way id='-1949890' action='modify'>
+    <nd ref='-2766146' />
+    <nd ref='-2766148' />
+    <nd ref='-2766147' />
     <tag k='gs' v='route' />
     <tag k='name' v='south_route' />
   </way>
