@@ -26,6 +26,7 @@
     <tag k='route' v='north_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-2766145' action='modify' lat='43.43603083306' lon='-80.57977910089'>
     <tag k='btree' v='st_standard_driver.btree' />
