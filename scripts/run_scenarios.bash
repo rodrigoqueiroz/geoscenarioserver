@@ -71,6 +71,8 @@ kill_python3()
 }
 
 cd ${REPO_DIR}
+regression_failures=0
+gss_failures=0
 for scenario in $all_scenarios; do
     echo "CTRL + C to exit the script."
     if [[ "$ARG_INTERACTIVE" == "true" ]]; then
@@ -79,9 +81,42 @@ for scenario in $all_scenarios; do
     trap kill_python3 SIGINT
     echo "CTRL + C to quit the scenario."
     ${MAMBA_EXE} -n gss run python3 GSServer.py ${ARG_NO_DASH} --scenario ${scenario}
-    echo "=== violations.json for \"$(basename ${scenario})\" ==="
-    cat ${REPO_DIR}/outputs/violations.json
-    echo ""
-    echo "==="
+    # save and compare with regression
+    scenario_relative=${scenario#$REPO_DIR/scenarios/}
+    regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/
+    if [[ -f "${regression_folder}violations.json" ]]; then
+        echo ""
+        echo "=== diff violations.json for \"$(basename ${scenario})\" ==="
+        diff <(jq --sort-keys . ${REPO_DIR}/outputs/violations.json) <(jq --sort-keys . ${regression_folder}violations.json) 
+        ((regression_failures+=$?))
+        echo ""
+        echo "==="
+    else
+        echo ""
+        echo "No regression file found for \"$(basename ${scenario})\""
+        mkdir -p ${regression_folder}
+        echo "=== violations.json for \"$(basename ${scenario})\" ==="
+        cat ${REPO_DIR}/outputs/violations.json
+        echo ""
+        echo "==="
+    fi
+    # save the output for regression testing
+    # missing output indicates a problem with the scenario or GSS failure
+    mv -f ${REPO_DIR}/outputs/violations.json ${regression_folder}
+    ((gss_failures+=$?))
+    echo "Regression failures so far: ${regression_failures}"
+    echo "GSS failures so far: ${gss_failures}"
+    rm ${REPO_DIR}/outputs/*.png
     trap - SIGINT
 done
+
+exitcode=0
+if [[ ${regression_failures} -gt 0 ]]; then
+    echo "Regression failures: ${regression_failures}"
+    exitcode=1
+fi
+if [[ ${gss_failures} -gt 0 ]]; then
+    echo "GSS failures: ${gss_failures}"
+    exitcode=1
+fi
+exit ${exitcode}
