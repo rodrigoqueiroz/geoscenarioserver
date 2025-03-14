@@ -4,8 +4,8 @@
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
-    <tag k='name' v='Straight Road Drive and Follow Scenario' />
-    <tag k='timeout' v='20' />
+    <tag k='name' v='Straight road path vehicle' />
+    <tag k='timeout' v='15' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5149176' action='modify' visible='true' lat='49.00769375801' lon='8.45755581371'>
@@ -24,6 +24,7 @@
     <tag k='speed' v='40' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <way id='-1948238' action='modify' visible='true'>
     <nd ref='-5149179' />

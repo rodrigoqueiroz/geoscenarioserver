@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Single Pedestrian Scenario' />
-    <tag k='timeout' v='200' />
+    <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347316' action='modify' visible='true' lat='43.47110803016' lon='-80.53879884742'>

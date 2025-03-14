@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Guarantee Collision Scenario' />
-    <tag k='timeout' v='200' />
+    <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347460' action='modify' visible='true' lat='43.47110803016' lon='-80.53879884742'>
@@ -34,6 +34,7 @@
     <tag k='route' v='left_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-5350838' action='modify' visible='true' lat='43.47105679197' lon='-80.53866056048' />
   <node id='-5350839' action='modify' visible='true' lat='43.47120580056' lon='-80.5389250283' />

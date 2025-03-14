@@ -1,38 +1,39 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='false' generator='JOSM'>
-  <node id='-5145401' action='modify' visible='true' lat='43.47822413504' lon='-80.5193980465' />
-  <node id='-5145402' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
+  <node id='-5145604' action='modify' lat='43.47822413504' lon='-80.5193980465' />
+  <node id='-5145605' action='modify' lat='43.47826194033' lon='-80.51976044018'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt.osm' />
     <tag k='mutate' v='no' />
-    <tag k='name' v='green to red light scenario while following vehicle that does not stop' />
-    <tag k='timeout' v='30' />
+    <tag k='name' v='red to green light scenario while following' />
+    <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5145403' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
+  <node id='-5145606' action='modify' lat='43.47800705624' lon='-80.51976589147'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5145404' action='modify' visible='true' lat='43.47790730383' lon='-80.52029198388' />
-  <node id='-5145405' action='modify' visible='true' lat='43.47860769581' lon='-80.52572103261' />
-  <node id='-5145406' action='modify' visible='true' lat='43.47823992752' lon='-80.51933527822'>
+  <node id='-5145607' action='modify' lat='43.47782833646' lon='-80.52050754995' />
+  <node id='-5145608' action='modify' lat='43.47860769581' lon='-80.52572103261' />
+  <node id='-5145609' action='modify' lat='43.47823992752' lon='-80.51933527822'>
     <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
+    <tag k='goal_ends_simulation' v='yes' />
     <tag k='gs' v='vehicle' />
-    <tag k='name' v='red_light_follower' />
-    <tag k='route' v='east_west_route' />
+    <tag k='name' v='follower' />
+    <tag k='route' v='east_west_shorter_route' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='155' />
   </node>
-  <node id='-5145407' action='modify' visible='true' lat='43.47804042874' lon='-80.52000462027'>
+  <node id='-5145610' action='modify' lat='43.47804042874' lon='-80.52000462027'>
     <tag k='duration' v='2,0.5,10,10' />
     <tag k='gs' v='trafficlight' />
     <tag k='name' v='tl_e_w' />
     <tag k='states' v='G,Y,R,G' />
     <tag k='type' v='default' />
   </node>
-  <node id='-5145409' action='modify' visible='true' lat='43.47820088433' lon='-80.51945731312'>
+  <node id='-5145611' action='modify' lat='43.47820088433' lon='-80.51945731312'>
     <tag k='btree' v='drive.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
@@ -41,10 +42,18 @@
     <tag k='vid' v='2' />
     <tag k='yaw' v='155' />
   </node>
-  <way id='-1947938' action='modify' visible='true'>
-    <nd ref='-5145401' />
-    <nd ref='-5145404' />
+  <node id='-5145615' action='modify' lat='43.47829166619' lon='-80.5192078016' />
+  <node id='-5145616' action='modify' lat='43.47789586804' lon='-80.52031730505' />
+  <way id='-1948044' action='modify'>
+    <nd ref='-5145604' />
+    <nd ref='-5145607' />
     <tag k='gs' v='route' />
     <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1948046' action='modify'>
+    <nd ref='-5145615' />
+    <nd ref='-5145616' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_shorter_route' />
   </way>
 </osm>
