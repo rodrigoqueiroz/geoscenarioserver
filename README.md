@@ -49,14 +49,14 @@ curl -fsSL https://pixi.sh/install.sh | bash
 ```
 Re-open the terminal or source your `.bashrc` to make `pixi` available.
 
-To install the pixi project, execute
+All pixi commands must be executed in geoscenarioserver as the working directory.
 ```
 cd geoscenarioserver
-pixi install
 ```
 
 Pixi project provides the following four tasks:
 ```
+cd geoscenarioserver
 pixi start_gss <scenario_path>
 pixi run -e humble start_rqt
 pixi run -e humble start_ros_client
@@ -68,11 +68,22 @@ To run automated test of ROS2 client using the mock co-simulator, execute:
 bash geoscenarioserver/scripts/pixi_test_ros2_client.bash
 ```
 
+Finally, to activate the environment and execute arbitary commands without ROS2, execute
+```
+cd geoscenarioserver
+pixi shell
+```
+or with ROS2, execute
+```
+cd geoscenarioserver
+pixi shell -e humble
+```
+
 #### Conda-forge using micromamba
 
 To automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
 ```
-$ bash setup-conda-forge-env.bash --help
+bash setup-conda-forge-env.bash --help
 
 Create a conda-forge environment called gss for running GeoScenarioServer
 
