@@ -33,13 +33,44 @@ Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 - sysv-ipc
 - tk
 
+#### Ubuntu native or Windows WSL2 installation
+
 To automatically install the dependencies for linux native, execute
 
 ```
 bash scripts/install_dependencies.bash
 ```
 
-Alternatively, to automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
+#### Conda-forge using pixi (recommended)
+
+To install [pixi](https://pixi.sh/), execute
+```
+curl -fsSL https://pixi.sh/install.sh | bash
+```
+Re-open the terminal or source your `.bashrc` to make `pixi` available.
+
+To install the pixi project, execute
+```
+cd geoscenarioserver
+pixi install
+```
+
+Pixi project provides the following four tasks:
+```
+pixi start_gss <scenario_path>
+pixi run -e humble start_rqt
+pixi run -e humble start_ros_client
+pixi run -e humble start_ros_mock_co_simulator
+```
+
+To run automated test of ROS2 client using the mock co-simulator, execute:
+```
+bash geoscenarioserver/scripts/pixi_test_ros2_client.bash
+```
+
+#### Conda-forge using micromamba
+
+To automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
 ```
 $ bash setup-conda-forge-env.bash --help
 
@@ -51,6 +82,7 @@ Usage:
     -t|--test-run   start GeoScenarioServer within the environment 'gss'
     -h|--help       display usage instructions and exit
 ```
+
 
 ## Running
 

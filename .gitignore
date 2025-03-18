@@ -5,3 +5,7 @@
 .vscode/
 outputs/*
 colcon_ws/
+
+# pixi environments
+.pixi/
+*.egg-info
