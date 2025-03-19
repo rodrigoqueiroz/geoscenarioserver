@@ -10,6 +10,20 @@ cd geoscenarioserver
 bash scripts/run_scenarios.bash --no-dash --non-interactive
 ```
 
+General usage:
+```
+bash scripts/run_scenarios.bash --help
+Usage: 
+
+Running all vehicle and pedestrian scenarios except long scenarios by default.
+  --op                run only pedestrian scenarios
+  --ov                run only vehicle scenarios
+  --long              include long vehicle scenarios (not included by default)
+  --no-dash           run without the dashboard.
+  --non-interactive   do not prompt for <enter> (prompt by default)
+```
+
+
 2. Inspect the console output after each scenario.
 
 a) A difference detected, for example
