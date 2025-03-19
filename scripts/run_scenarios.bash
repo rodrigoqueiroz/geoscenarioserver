@@ -84,11 +84,15 @@ for scenario in $all_scenarios; do
     # save and compare with regression
     scenario_relative=${scenario#$REPO_DIR/scenarios/}
     regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/
+    save="no"
     if [[ -f "${regression_folder}violations.json" ]]; then
         echo ""
         echo "=== diff violations.json for \"$(basename ${scenario})\" ==="
         diff <(jq --sort-keys . ${REPO_DIR}/outputs/violations.json) <(jq --sort-keys . ${regression_folder}violations.json) 
-        ((regression_failures+=$?))
+        if [[ $? -gt 0 ]]; then
+            ((regression_failures++))
+            save="yes"
+        fi
         echo ""
         echo "==="
     else
@@ -99,11 +103,14 @@ for scenario in $all_scenarios; do
         cat ${REPO_DIR}/outputs/violations.json
         echo ""
         echo "==="
+        save="yes"
     fi
     # save the output for regression testing
     # missing output indicates a problem with the scenario or GSS failure
-    mv -f ${REPO_DIR}/outputs/violations.json ${regression_folder}
-    ((gss_failures+=$?))
+    if [[ "${save}" == "yes" ]]; then
+        mv -f ${REPO_DIR}/outputs/violations.json ${regression_folder}
+        ((gss_failures+=$?))  # in case there was no violations.json at all
+    fi
     echo "Regression failures so far: ${regression_failures}"
     echo "GSS failures so far: ${gss_failures}"
     rm ${REPO_DIR}/outputs/*.png
