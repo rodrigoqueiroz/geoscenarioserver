@@ -41,7 +41,7 @@ To automatically install the dependencies, execute
 bash scripts/install_dependencies.bash
 ```
 
-#### Conda-forge using pixi (recommended)
+#### Conda-forge and robostack (ROS) using pixi (recommended)
 
 To install [pixi](https://pixi.sh/), execute
 ```
@@ -54,13 +54,15 @@ All pixi commands must be executed in geoscenarioserver as the working directory
 cd geoscenarioserver
 ```
 
-Pixi project provides the following four tasks:
+Pixi project provides the following tasks:
 ```
 cd geoscenarioserver
-pixi run start_gss <parameters>
-pixi run -e humble start_rqt
-pixi run -e humble start_ros_client
-pixi run -e humble start_ros_mock_co_simulator
+pixi run gss <parameters>
+pixi run test_scenarios_ci
+pixi run -e humble rqt
+pixi run -e humble ros_client_build
+pixi run -e humble ros_client
+pixi run -e humble ros_mock_co_simulator
 ```
 
 To run automated test of ROS2 client using the mock co-simulator, execute:
@@ -79,7 +81,7 @@ cd geoscenarioserver
 pixi shell -e humble
 ```
 
-#### Conda-forge using micromamba
+#### Conda-forge and robostack (ROS) using micromamba
 
 To automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
 ```
