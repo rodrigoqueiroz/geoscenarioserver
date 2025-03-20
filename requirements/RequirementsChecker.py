@@ -5,7 +5,6 @@ from math import cos, radians, sin
 from Actor import ActorSimState
 from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
-import matplotlib.pyplot as plt
 
 class RequirementsChecker:
 	def __init__(self, ego_vehicle, goal_ends_simulation):
