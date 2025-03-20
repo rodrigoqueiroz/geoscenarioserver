@@ -292,6 +292,7 @@ class RequirementsChecker:
 					if 0 > relative_angle:
 						collision_zone = "right"
 					else:
+						print("collision")
 						collision_zone = "left"
 
 					return collision_zone, relative_angle

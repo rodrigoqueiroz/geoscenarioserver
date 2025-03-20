@@ -264,7 +264,7 @@ class SP(Pedestrian):
 
     def vehicle_interaction(self, curr_pos, curr_vel, vehicle):
         A = 20
-        B = 0.08
+        B = 0.065
         lambda_i = 0.5
 
         l = VEHICLE_LENGTH / 2
