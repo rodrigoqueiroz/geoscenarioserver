@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' generator='JOSM'>
+<osm version='0.6' upload='false' generator='JOSM'>
   <node id='-5347315' action='modify' visible='true' lat='43.47159354918' lon='-80.53893793201'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Single Pedestrian Scenario' />
-    <tag k='timeout' v='200' />
+    <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347316' action='modify' visible='true' lat='43.47110803016' lon='-80.53879884742'>

@@ -4,10 +4,10 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 
 ## Dependencies
 
-- Linux, macOS, or Windows 10/11 + WSL2
+- Linux or Windows 10/11 + WSL2
 - Python >= 3.8
 
-GeoScenario Server can run natively on Linux, within a [conda-forge](https://conda-forge.org/) environment, or on WSL2.
+GeoScenario Server can run natively on Linux, within a [conda](https://conda-forge.org/) environment, or on WSL2.
 
 ### Deb packages for Linux native
 
@@ -33,15 +33,59 @@ Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 - sysv-ipc
 - tk
 
-To automatically install the dependencies for linux native, execute
+#### Ubuntu native or Windows WSL2 installation
+
+To automatically install the dependencies, execute
 
 ```
 bash scripts/install_dependencies.bash
 ```
 
-Alternatively, to automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
+#### Conda-forge and robostack (ROS) using pixi (recommended)
+
+To install [pixi](https://pixi.sh/), execute
 ```
-$ bash setup-conda-forge-env.bash --help
+curl -fsSL https://pixi.sh/install.sh | bash
+```
+Re-open the terminal or source your `.bashrc` to make `pixi` available.
+
+All pixi commands must be executed in geoscenarioserver as the working directory.
+```
+cd geoscenarioserver
+```
+
+Pixi project provides the following tasks:
+```
+cd geoscenarioserver
+pixi run gss <parameters>
+pixi run test_scenarios_ci
+pixi run -e humble rqt
+pixi run -e humble ros_client_build
+pixi run -e humble ros_client
+pixi run -e humble ros_mock_co_simulator
+```
+
+To run automated test of ROS2 client using the mock co-simulator, execute:
+```
+bash geoscenarioserver/scripts/pixi_test_ros2_client.bash
+```
+
+Finally, to activate the environment and execute arbitary commands without ROS2, execute
+```
+cd geoscenarioserver
+pixi shell
+```
+or with ROS2, execute
+```
+cd geoscenarioserver
+pixi shell -e humble
+```
+
+#### Conda-forge and robostack (ROS) using micromamba
+
+To automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
+```
+bash setup-conda-forge-env.bash --help
 
 Create a conda-forge environment called gss for running GeoScenarioServer
 
@@ -51,6 +95,7 @@ Usage:
     -t|--test-run   start GeoScenarioServer within the environment 'gss'
     -h|--help       display usage instructions and exit
 ```
+
 
 ## Running
 

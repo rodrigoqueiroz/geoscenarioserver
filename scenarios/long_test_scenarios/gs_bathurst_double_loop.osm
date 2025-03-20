@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-138107' action='modify' visible='true' lat='43.5108308051' lon='-80.53585191166'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='outer_loop_driver' />
+    <tag k='route' v='outer_double_loop' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='150' />
+    <tag k='goal_ends_simulation' v='yes' />
+  </node>
+  <node id='-138115' action='modify' visible='true' lat='43.51009840203' lon='-80.53746673545'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-143131' action='modify' visible='true' lat='43.50989926156' lon='-80.53515960547'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/experimental_maps/lanelet2_bathurst.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='gs_bathurst_double_loop' />
+    <tag k='timeout' v='175' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-1145799' action='modify' visible='true' lat='43.50936347065' lon='-80.53637387889'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='inner_loop_driver' />
+    <tag k='route' v='inner_double_loop' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='150' />
+  </node>
+  <node id='-1150939' action='modify' visible='true' lat='43.5108081581' lon='-80.53591706655' />
+  <node id='-1150940' action='modify' visible='true' lat='43.50980169932' lon='-80.53876737068' />
+  <node id='-1150941' action='modify' visible='true' lat='43.50973288635' lon='-80.53702556178' />
+  <node id='-1150942' action='modify' visible='true' lat='43.50980897397' lon='-80.53491965527' />
+  <node id='-1150943' action='modify' visible='true' lat='43.51095249768' lon='-80.53385204473' />
+  <node id='-1150944' action='modify' visible='true' lat='43.5108171093' lon='-80.53589315331' />
+  <node id='-1150945' action='modify' visible='true' lat='43.50978323772' lon='-80.53875502913' />
+  <node id='-1150946' action='modify' visible='true' lat='43.50971498363' lon='-80.53701939062' />
+  <node id='-1150947' action='modify' visible='true' lat='43.50979442691' lon='-80.53494588115' />
+  <node id='-1150948' action='modify' visible='true' lat='43.51096928002' lon='-80.53386747109' />
+  <node id='-1150949' action='modify' visible='true' lat='43.51084843904' lon='-80.53579595832' />
+  <node id='-1155993' action='modify' visible='true' lat='43.50940643979' lon='-80.53673821603' />
+  <node id='-1156014' action='modify' visible='true' lat='43.50934070315' lon='-80.5364377581' />
+  <node id='-1156015' action='modify' visible='true' lat='43.51034493152' lon='-80.53713278451' />
+  <node id='-1156016' action='modify' visible='true' lat='43.51129375923' lon='-80.53449075816' />
+  <node id='-1156017' action='modify' visible='true' lat='43.51025877635' lon='-80.53380421671' />
+  <node id='-1156018' action='modify' visible='true' lat='43.50934657723' lon='-80.53641615866' />
+  <node id='-1156019' action='modify' visible='true' lat='43.51034660988' lon='-80.53711234255' />
+  <node id='-1156020' action='modify' visible='true' lat='43.5112828492' lon='-80.53450039944' />
+  <node id='-1156021' action='modify' visible='true' lat='43.51025485918' lon='-80.53382967139' />
+  <node id='-1156022' action='modify' visible='true' lat='43.50936923536' lon='-80.5363648607' />
+  <way id='-1145683' action='modify' visible='true'>
+    <nd ref='-1150939' />
+    <nd ref='-1150940' />
+    <nd ref='-1150941' />
+    <nd ref='-1150942' />
+    <nd ref='-1150943' />
+    <nd ref='-1150944' />
+    <nd ref='-1150945' />
+    <nd ref='-1150946' />
+    <nd ref='-1150947' />
+    <nd ref='-1150948' />
+    <nd ref='-1150949' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='outer_double_loop' />
+  </way>
+  <way id='-1145720' action='modify' visible='true'>
+    <nd ref='-1156014' />
+    <nd ref='-1156015' />
+    <nd ref='-1156016' />
+    <nd ref='-1156017' />
+    <nd ref='-1156018' />
+    <nd ref='-1156019' />
+    <nd ref='-1156020' />
+    <nd ref='-1156021' />
+    <nd ref='-1156022' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='inner_double_loop' />
+  </way>
+</osm>

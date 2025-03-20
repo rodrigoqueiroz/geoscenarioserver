@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5145444' action='modify' visible='true' lat='49.00755397299' lon='8.45783876538'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='name' v='Straight Road Drive and Follow Scenario' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5145447' action='modify' visible='true' lat='49.0072780524' lon='8.45705576755'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='route' v='left_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='310' />
+  </node>
+  <node id='-5145448' action='modify' visible='true' lat='49.00751517701' lon='8.45783878676'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5145450' action='modify' visible='true' lat='49.00730542934' lon='8.45709215544' />
+  <node id='-5145451' action='modify' visible='true' lat='49.00800286229' lon='8.45800134479' />
+  <node id='-5145452' action='modify' visible='true' lat='49.00755482368' lon='8.45740003019'>
+    <tag k='gs' v='tnode' />
+    <tag k='yaw' v='320' />
+    <tag k='speed' v='5' />
+    <tag k='time' v='0' />
+  </node>
+  <node id='-5145453' action='modify' visible='true' lat='49.00757986515' lon='8.45742899844'>
+    <tag k='gs' v='tnode' />
+    <tag k='yaw' v='320' />
+    <tag k='speed' v='5' />
+    <tag k='time' v='1' />
+  </node>
+  <node id='-5145454' action='modify' visible='true' lat='49.00762692639' lon='8.45749141185'>
+    <tag k='gs' v='tnode' />
+    <tag k='yaw' v='320' />
+    <tag k='speed' v='5' />
+    <tag k='time' v='3' />
+  </node>
+  <node id='-5145455' action='modify' visible='true' lat='49.00754747816' lon='8.45738030534'>
+    <tag k='btype' v='TP' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='model' v='adult' />
+    <tag k='name' v='pedestrian' />
+    <tag k='pid' v='1' />
+    <tag k='trajectory' v='traj_side' />
+  </node>
+  <node id='-5145595' action='modify' visible='true' lat='49.0076037089' lon='8.45745898716'>
+    <tag k='gs' v='tnode' />
+    <tag k='yaw' v='320' />
+    <tag k='speed' v='5' />
+    <tag k='time' v='2' />
+  </node>
+  <way id='-1947940' action='modify' visible='true'>
+    <nd ref='-5145450' />
+    <nd ref='-5145451' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route' />
+  </way>
+  <way id='-1947941' action='modify' visible='true'>
+    <nd ref='-5145452' />
+    <nd ref='-5145453' />
+    <nd ref='-5145595' />
+    <nd ref='-5145454' />
+    <tag k='gs' v='trajectory' />
+    <tag k='name' v='traj_side' />
+  </way>
+</osm>
