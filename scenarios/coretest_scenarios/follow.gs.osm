@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' upload='false' generator='JOSM'>
-  <node id='-5005161' action='modify' visible='true' lat='49.00788284423' lon='8.45758707152'>
+  <node id='-5005161' action='modify' lat='49.00788284423' lon='8.45758707152'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
@@ -8,20 +8,21 @@
     <tag k='timeout' v='25' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5005164' action='modify' visible='true' lat='49.00735513175' lon='8.45722601405'>
+  <node id='-5005164' action='modify' lat='49.00735513175' lon='8.45722601405'>
     <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
+    <tag k='goal_ends_simulation' v='yes' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='v1' />
-    <tag k='route' v='left_route' />
+    <tag k='route' v='left_route_short' />
     <tag k='vid' v='1' />
     <tag k='yaw' v='310' />
   </node>
-  <node id='-5005165' action='modify' visible='true' lat='49.00782334739' lon='8.45758985977'>
+  <node id='-5005165' action='modify' lat='49.00834704942' lon='8.45852130783'>
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5005166' action='modify' visible='true' lat='49.00744051074' lon='8.45734409999'>
+  <node id='-5005166' action='modify' lat='49.00744051074' lon='8.45734409999'>
     <tag k='btree' v='st_standard_driver.btree' />
     <tag k='btype' v='SDV' />
     <tag k='gs' v='vehicle' />
@@ -30,12 +31,20 @@
     <tag k='vid' v='2' />
     <tag k='yaw' v='310' />
   </node>
-  <node id='-5005167' action='modify' visible='true' lat='49.00749865154' lon='8.45743320175' />
-  <node id='-5005168' action='modify' visible='true' lat='49.00842350452' lon='8.45862057094' />
-  <way id='-1947885' action='modify' visible='true'>
+  <node id='-5005167' action='modify' lat='49.00749865154' lon='8.45743320175' />
+  <node id='-5005168' action='modify' lat='49.00842350452' lon='8.45862057094' />
+  <node id='-5005172' action='modify' lat='49.00750679574' lon='8.45742039506' />
+  <node id='-5005173' action='modify' lat='49.00838527942' lon='8.45855786524' />
+  <way id='-1947885' action='modify'>
     <nd ref='-5005167' />
     <nd ref='-5005168' />
     <tag k='gs' v='route' />
     <tag k='name' v='left_route' />
+  </way>
+  <way id='-1948213' action='modify'>
+    <nd ref='-5005172' />
+    <nd ref='-5005173' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='left_route_short' />
   </way>
 </osm>
