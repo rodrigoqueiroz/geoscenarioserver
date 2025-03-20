@@ -4,16 +4,18 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
 ARG_VEHICLES="true"
-ARG_LONG="false"
 ARG_PEDESTRIANS="true"
+ARG_LONG="false"
 ARG_NO_DASH=
+ARG_INTERACTIVE="true"
 
 print_help() {
     echo "Running all vehicle and pedestrian scenarios except long scenarios by default."
-    echo "  --op        run only pedestrian scenarios"
-    echo "  --ov        run only vehicle scenarios"
-    echo "  --long      include long vehicle scenarios (not included by default)"
-    echo "  --no-dash   run without the dashboard."
+    echo "  --op                run only pedestrian scenarios"
+    echo "  --ov                run only vehicle scenarios"
+    echo "  --long              include long vehicle scenarios (not included by default)"
+    echo "  --no-dash           run without the dashboard."
+    echo "  --non-interactive   do not prompt for <enter> (prompt by default)"
     echo ""
 }
 
@@ -34,6 +36,9 @@ else
             "--no-dash")
                 ARG_NO_DASH="--no-dash"
                 ;;
+            "--non-interactive")
+                ARG_INTERACTIVE="false"
+                ;;
             *)
                 echo "Invalid argument $arg"
                 echo ""
@@ -47,6 +52,7 @@ fi
 
 test_scenarios=""
 if [[ "$ARG_VEHICLES" == "true" ]]; then
+    coretest_scenarios=$(find "${REPO_DIR}/scenarios/coretest_scenarios" -name "*.osm" | sort)
     test_scenarios=$(find "${REPO_DIR}/scenarios/test_scenarios" -name "*.osm" | sort)
 fi
 pedestrian_scenarios=""
@@ -57,7 +63,7 @@ long_test_scenarios=
 if [[ "$ARG_LONG" == "true" ]]; then
     long_test_scenarios=$(find "${REPO_DIR}/scenarios/long_test_scenarios" -name "*.osm" | sort)
 fi
-all_scenarios="$test_scenarios $pedestrian_scenarios $long_test_scenarios"
+all_scenarios="$coretest_scenarios $test_scenarios $pedestrian_scenarios $long_test_scenarios"
 
 kill_python3()
 {
@@ -65,16 +71,59 @@ kill_python3()
 }
 
 cd ${REPO_DIR}
+regression_failures=0
+gss_failures=0
 for scenario in $all_scenarios; do
     echo "CTRL + C to exit the script."
-    read -p "ENTER to run ${scenario#$REPO_DIR/}:"
-
+    if [[ "$ARG_INTERACTIVE" == "true" ]]; then
+        read -p "ENTER to run ${scenario#$REPO_DIR/}:"
+    fi
     trap kill_python3 SIGINT
     echo "CTRL + C to quit the scenario."
     ${MAMBA_EXE} -n gss run python3 GSServer.py ${ARG_NO_DASH} --scenario ${scenario}
-    echo "=== violations.json for \"$(basename ${scenario})\" ==="
-    cat ${REPO_DIR}/outputs/violations.json
-    echo ""
-    echo "==="
+    # save and compare with regression
+    scenario_relative=${scenario#$REPO_DIR/scenarios/}
+    regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/
+    save="no"
+    if [[ -f "${regression_folder}violations.json" ]]; then
+        echo ""
+        echo "=== diff violations.json for \"$(basename ${scenario})\" ==="
+        diff <(jq --sort-keys . ${REPO_DIR}/outputs/violations.json) <(jq --sort-keys . ${regression_folder}violations.json) 
+        if [[ $? -gt 0 ]]; then
+            ((regression_failures++))
+            save="yes"
+        fi
+        echo ""
+        echo "==="
+    else
+        echo ""
+        echo "No regression file found for \"$(basename ${scenario})\""
+        mkdir -p ${regression_folder}
+        echo "=== violations.json for \"$(basename ${scenario})\" ==="
+        cat ${REPO_DIR}/outputs/violations.json
+        echo ""
+        echo "==="
+        save="yes"
+    fi
+    # save the output for regression testing
+    # missing output indicates a problem with the scenario or GSS failure
+    if [[ "${save}" == "yes" ]]; then
+        mv -f ${REPO_DIR}/outputs/violations.json ${regression_folder}
+        ((gss_failures+=$?))  # in case there was no violations.json at all
+    fi
+    echo "Regression failures so far: ${regression_failures}"
+    echo "GSS failures so far: ${gss_failures}"
+    rm ${REPO_DIR}/outputs/*.png
     trap - SIGINT
 done
+
+exitcode=0
+if [[ ${regression_failures} -gt 0 ]]; then
+    echo "Regression failures: ${regression_failures}"
+    exitcode=1
+fi
+if [[ ${gss_failures} -gt 0 ]]; then
+    echo "GSS failures: ${gss_failures}"
+    exitcode=1
+fi
+exit ${exitcode}

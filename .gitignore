@@ -3,7 +3,8 @@
 **/build/
 .venv
 .vscode/
-outputs/*
+outputs/*.json
+outputs/*.png
 colcon_ws/
 
 # pixi environments
