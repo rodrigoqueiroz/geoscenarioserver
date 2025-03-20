@@ -63,13 +63,13 @@ class CollisionWithVehicle(UnmetRequirement):
 		agent_collisions[agent_id] = collision_state
 
 class CollisionWithPedestrian(UnmetRequirement):
-	def __init__(self, agent_id, pid):
+	def __init__(self, agent_id, pid, collision_zone, relative_angle):
 		collision_state = agent_collisions[agent_id]
 
 		if pid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[pid]:
 			self.raise_it(agent_id, {
 				'colliderId': pid,
-				'message': 'v' + str(agent_id) + ' bounding box overlapped with the pedestrian agent p' + str(pid),
+				'message': f'v{str(agent_id)} bounding box overlapped with the pedestrian agent p{str(pid)} on the vehicles {collision_zone} side at {relative_angle} degrees',
 			})
 
 		collision_state[pid] = agent_ticks[agent_id]
