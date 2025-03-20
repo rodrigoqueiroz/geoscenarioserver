@@ -6,3 +6,7 @@
 outputs/*.json
 outputs/*.png
 colcon_ws/
+
+# pixi environments
+.pixi/
+*.egg-info
