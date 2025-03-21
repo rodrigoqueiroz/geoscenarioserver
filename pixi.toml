@@ -59,6 +59,6 @@ scripts = ["colcon_ws/install/setup.bash"]
 
 [feature.humble.tasks]
 ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs = ["colcon_ws/install/setup.bash"] }
-ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["build_ros_client"] }
-ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["build_ros_client"] }
+ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build"] }
+ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_client_build"] }
 rqt = "rqt"
