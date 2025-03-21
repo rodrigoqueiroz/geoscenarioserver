@@ -34,6 +34,8 @@ class Pedestrian(Actor):
     # Pedestrian dimensions (width: 0.5 m, length: 0.6 m) approximated by a circle with radius 0.27 m
     PEDESTRIAN_RADIUS = 0.27
 
+    VEHICLES_POS = {}
+
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, yaw=yaw)
         self.type = Pedestrian.N_TYPE
@@ -159,7 +161,6 @@ class SP(Pedestrian):
         for vehicle in {veh for (vid,veh) in self.sim_traffic.vehicles.items()}:
             f_vehicle += self.vehicle_interaction(curr_pos, curr_vel, vehicle)
 
-
         # repulsive forces from borders
         for border in borders:
             f_borders += self.border_interaction(curr_pos, curr_vel, border)
@@ -244,7 +245,6 @@ class SP(Pedestrian):
         body_factor_weight = 1 # phi*max(0, rij-dij)
         friction_factor_weight = omega*max(0, rij-dij)
 
-
         fij = (A*np.exp((rij-dij)/B) * body_factor_weight)*nij + friction_factor_weight*delta_vij*tij + evasive_effect
 
         return fij
@@ -264,7 +264,7 @@ class SP(Pedestrian):
 
     def vehicle_interaction(self, curr_pos, curr_vel, vehicle):
         A = 20
-        B = 0.08
+        B = 0.05
         lambda_i = 0.5
 
         l = VEHICLE_LENGTH / 2
@@ -273,15 +273,74 @@ class SP(Pedestrian):
         veh_pos = np.array([vehicle.state.x, vehicle.state.y])
         veh_yaw_rad = np.radians(vehicle.state.yaw)
         veh_heading = np.array([np.cos(veh_yaw_rad), np.sin(veh_yaw_rad)])
-
+       
         # angle btw ped's position and vehicle's velocity vector
-        dot_product = max(min(np.dot(curr_pos-veh_pos, veh_heading), 1.0), -1.0) # stay within [-1,1] domain for arccos
-        theta = np.arccos(dot_product) / (np.linalg.norm(curr_pos-veh_pos)*np.linalg.norm(veh_heading))
-        epsilon = np.sqrt(l**2 - w**2) / l
+        dot_product = max(min(np.dot(veh_pos-curr_pos, veh_heading), 1.0), -1.0) # stay within [-1,1] domain for arccos
+        theta = np.arccos(dot_product) #/ (np.linalg.norm(curr_pos-veh_pos)*np.linalg.norm(veh_heading))
+        #epsilon = np.sqrt(l**2 - w**2) / l
+        ped_rad = self.radius
+
+        if vehicle.id not in Pedestrian.VEHICLES_POS.keys():
+            #print(Pedestrian.VEHICLES_POS.keys())        
+            #calculating the bounding box of the vehicle
+            theta_max = np.arcsin(w/l)
+
+            theta_front_left = veh_yaw_rad - theta_max
+            theta_front_right = veh_yaw_rad + theta_max
+
+            #find arc length and number of sample points
+            arc_length = 2*theta_max * l
+            num_of_samples = math.ceil(arc_length / (2*ped_rad))
+
+            #generates 10 points at the front given the angle of the arc
+            theta_arc_front = np.linspace(theta_front_left, theta_front_right, num_of_samples)
+            x_arc_front = veh_pos[0] + l * np.cos(theta_arc_front)
+            y_arc_front = veh_pos[1] + l * np.sin(theta_arc_front)
+
+            #generate 10 points at the back given the angle of the arc
+            theta_back_left = veh_yaw_rad + np.pi - theta_max
+            theta_back_right = veh_yaw_rad + np.pi + theta_max
+
+            theta_arc_back = np.linspace(theta_back_left, theta_back_right, num_of_samples)
+            x_arc_back = veh_pos[0] + l * np.cos(theta_arc_back)
+            y_arc_back = veh_pos[1] + l * np.sin(theta_arc_back)
+
+            #side boundaries 
+            side_length = np.sqrt((x_arc_front[0] - x_arc_back[-1]) ** 2 + (y_arc_front[0] - y_arc_back[-1]) ** 2)
+            num_of_samples = math.ceil(side_length / (2*ped_rad))
+
+            x_right = np.linspace(x_arc_front[0], x_arc_back[-1], num_of_samples)
+            y_right = np.linspace(y_arc_front[0], y_arc_back[-1], num_of_samples)
+
+            x_left = np.linspace(x_arc_front[-1], x_arc_back[0], num_of_samples)
+            y_left = np.linspace(y_arc_front[-1], y_arc_back[0], num_of_samples)
+
+            #do not include points from the arc
+            x_right = x_right[1:-1]
+            y_right = y_right[1:-1]
+            x_left = x_left[1:-1]
+            y_left = y_left[1:-1]
+
+            #left and right
+            all_x_coord = np.concatenate((x_arc_front, x_right, x_left, x_arc_back))
+            all_y_coord = np.concatenate((y_arc_front, y_right, y_left, y_arc_back))
+
+            Pedestrian.VEHICLES_POS[vehicle.id] = [all_x_coord, all_y_coord]
+        else:
+            all_x_coord = Pedestrian.VEHICLES_POS[vehicle.id][0]
+            all_y_coord = Pedestrian.VEHICLES_POS[vehicle.id][1]
+
+        distances = np.sqrt((all_x_coord - curr_pos[0]) ** 2 + (all_y_coord - curr_pos[1]) ** 2)
+        #min_dist = np.min(distances)
+        min_dist_index = np.argmin(distances)
 
         ri = self.radius
-        rv = w / np.sqrt(1 - (epsilon**2 * np.cos(theta)**2))
+
+        #bounding box of the vehicle
+        #rv should be the distance to the closest point on the vehicle.
+        rv = np.sqrt((veh_pos[0] - all_x_coord[min_dist_index]) ** 2 + (veh_pos[1] - all_y_coord[min_dist_index]) ** 2)
         riv = ri + rv
+        
         div = np.linalg.norm(curr_pos - veh_pos)
         niv = normalize(curr_pos - veh_pos)
 

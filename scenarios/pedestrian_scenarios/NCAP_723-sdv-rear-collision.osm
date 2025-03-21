@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5382544' action='modify' lat='43.47137479428' lon='-80.53871827084'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Guarantee Collision Scenario' />
+    <tag k='timeout' v='10' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5382545' action='modify' lat='43.47110803016' lon='-80.53879884742'>
+    <tag k='altitude' v='320' />
+    <tag k='area' v='500' />
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5382546' action='modify' lat='43.4711689678' lon='-80.53879600229'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v2' />
+    <tag k='path' v='v2_path' />
+    <tag k='speed' v='1' />
+    <tag k='vid' v='3' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5382547' action='modify' lat='43.47119956641' lon='-80.53884952897'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v3' />
+    <tag k='path' v='v3_path' />
+    <tag k='speed' v='1' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5382548' action='modify' lat='43.47112594629' lon='-80.53877703091' />
+  <node id='-5382549' action='modify' lat='43.47110507931' lon='-80.53880052933'>
+    <tag k='area' v='no' />
+    <tag k='continuous' v='no' />
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_2_dest' />
+  </node>
+  <node id='-5382550' action='modify' lat='43.47116616378' lon='-80.53871352668' />
+  <node id='-5382551' action='modify' lat='43.47120050042' lon='-80.53885118359' />
+  <node id='-5382552' action='modify' lat='43.47120071058' lon='-80.53885151042' />
+  <node id='-5382553' action='modify' lat='43.47116455469' lon='-80.53870797538'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_2_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='ped_1' />
+    <tag k='pid' v='4' />
+    <tag k='route' v='ped_2_route' />
+    <tag k='speed' v='5' />
+  </node>
+  <node id='-5382554' action='modify' lat='43.47116904453' lon='-80.53879615236' />
+  <node id='-5382555' action='modify' lat='43.47116913536' lon='-80.5387963127' />
+  <node id='-5382556' action='modify' lat='43.47104834979' lon='-80.53865610473'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-5382557' action='modify' lat='43.47214744126' lon='-80.54036889684'>
+    <tag k='agentspeed' v='0' />
+  </node>
+  <node id='-5382558' action='modify' lat='43.47118269075' lon='-80.53887358072'>
+    <tag k='btree' v='st_reverse.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='route' v='right_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='217' />
+  </node>
+  <way id='-1956971' action='modify'>
+    <nd ref='-5382550' />
+    <nd ref='-5382548' />
+    <nd ref='-5382549' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ped_2_route' />
+  </way>
+  <way id='-1956972' action='modify'>
+    <nd ref='-5382551' />
+    <nd ref='-5382552' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='v3_path' />
+  </way>
+  <way id='-1956973' action='modify'>
+    <nd ref='-5382554' />
+    <nd ref='-5382555' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='v2_path' />
+  </way>
+  <way id='-1956974' action='modify'>
+    <nd ref='-5382556' />
+    <nd ref='-5382557' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='right_route' />
+  </way>
+</osm>

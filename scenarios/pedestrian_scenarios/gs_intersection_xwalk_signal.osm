@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='crossing light scenario' />
-    <tag k='timeout' v='90' />
+    <tag k='timeout' v='75' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347408' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
