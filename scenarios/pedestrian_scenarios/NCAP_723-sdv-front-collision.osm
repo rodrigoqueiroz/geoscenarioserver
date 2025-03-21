@@ -9,7 +9,7 @@
     <tag k='timeout' v='30' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5396097' action='modify' lat='43.47110803016' lon='-80.53879884742'>
+  <node id='-5396097' action='modify' lat='43.47112525835' lon='-80.53877832692'>
     <tag k='altitude' v='320' />
     <tag k='area' v='500' />
     <tag k='gs' v='origin' />

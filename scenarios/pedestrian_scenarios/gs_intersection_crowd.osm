@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='pedestrian crowd scenario' />
-    <tag k='timeout' v='120' />
+    <tag k='timeout' v='70' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5338036' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>

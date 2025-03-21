@@ -15,7 +15,7 @@
     <tag k='gs' v='origin' />
     <tag k='name' v='origin' />
   </node>
-  <node id='-5382546' action='modify' lat='43.47109538645' lon='-80.53866514073'>
+  <node id='-5382546' action='modify' lat='43.4711689678' lon='-80.53879600229'>
     <tag k='btype' v='PV' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
@@ -25,7 +25,7 @@
     <tag k='vid' v='3' />
     <tag k='yaw' v='217' />
   </node>
-  <node id='-5382547' action='modify' lat='43.4711259851' lon='-80.53871866741'>
+  <node id='-5382547' action='modify' lat='43.47119956641' lon='-80.53884952897'>
     <tag k='btype' v='PV' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='vehicle' />
@@ -43,8 +43,8 @@
     <tag k='name' v='ped_2_dest' />
   </node>
   <node id='-5382550' action='modify' lat='43.47116616378' lon='-80.53871352668' />
-  <node id='-5382551' action='modify' lat='43.47112691911' lon='-80.53872032203' />
-  <node id='-5382552' action='modify' lat='43.47112712927' lon='-80.53872064886' />
+  <node id='-5382551' action='modify' lat='43.47120050042' lon='-80.53885118359' />
+  <node id='-5382552' action='modify' lat='43.47120071058' lon='-80.53885151042' />
   <node id='-5382553' action='modify' lat='43.47116455469' lon='-80.53870797538'>
     <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
@@ -55,8 +55,8 @@
     <tag k='route' v='ped_2_route' />
     <tag k='speed' v='5' />
   </node>
-  <node id='-5382554' action='modify' lat='43.47109546318' lon='-80.5386652908' />
-  <node id='-5382555' action='modify' lat='43.47109555401' lon='-80.53866545114' />
+  <node id='-5382554' action='modify' lat='43.47116904453' lon='-80.53879615236' />
+  <node id='-5382555' action='modify' lat='43.47116913536' lon='-80.5387963127' />
   <node id='-5382556' action='modify' lat='43.47104834979' lon='-80.53865610473'>
     <tag k='agentspeed' v='5' />
   </node>
