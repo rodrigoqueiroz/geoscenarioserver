@@ -75,6 +75,16 @@
     <tag k='gs' v='egogoal' />
     <tag k='name' v='g1' />
   </node>
+  <node id='-5396045' action='modify' lat='43.4711713468' lon='-80.53870481405'>
+    <tag k='btree' v='walk.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='cycles' v='1' />
+    <tag k='destination' v='ped_2_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='ped_2' />
+    <tag k='pid' v='5' />
+    <tag k='route' v='ped_2_route' />
+  </node>
   <way id='-1956991' action='modify'>
     <nd ref='-5382624' />
     <nd ref='-5382620' />

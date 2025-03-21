@@ -178,6 +178,7 @@ class SimTraffic(object):
         #tick pedestrians:
         for pid in self.pedestrians:
             self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
+        Pedestrian.VEHICLES_POS = {}
 
         #Update traffic light states
         for tlid in self.traffic_lights:

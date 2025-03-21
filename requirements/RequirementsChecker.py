@@ -6,6 +6,7 @@ from Actor import ActorSimState
 from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
 
+
 class RequirementsChecker:
 	def __init__(self, ego_vehicle, goal_ends_simulation):
 		self.conditions = [
@@ -192,111 +193,50 @@ class RequirementsChecker:
 		ped_rad = radius
 		theta_max = np.arcsin((half_width)/arc_radius)
 
-		theta_front_left = yaw - theta_max
-		theta_front_right = yaw + theta_max
+		#first check if position of pedestrian is even close to the vehicle
+		outer_rad = arc_radius/np.cos(theta_max)
+		car_to_ped_dist = np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2)
 
-		#find arc length and number of sample points
-		arc_length = 2*theta_max * arc_radius
-		num_of_samples = math.ceil(arc_length / (2*ped_rad))
+		if car_to_ped_dist < outer_rad:
+			#first do circle check
+			distance = np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2)
 
-		#generates 10 points at the front given the angle of the arc
-		theta_arc_front = np.linspace(theta_front_left, theta_front_right, num_of_samples)
-		x_arc_front = center_x + arc_radius * np.cos(theta_arc_front)
-		y_arc_front = center_y + arc_radius * np.sin(theta_arc_front)
+			if distance <= arc_radius + ped_rad:
+				#we know there is a possible collision. check if its front
+				collision_vector = np.array([ped_x - center_x, ped_y - center_y])
+				vehicle_direction = np.array([np.cos(yaw), np.sin(yaw)])
 
-		#generate 10 points at the back given the angle of the arc
-		theta_back_left = yaw + np.pi - theta_max
-		theta_back_right = yaw + np.pi + theta_max
+				dot_product = np.dot(vehicle_direction, collision_vector)
+				denom = np.sqrt(((collision_vector[0])**2 + (collision_vector[1])**2))*np.sqrt((vehicle_direction[0])**2 + (vehicle_direction[1])**2)
 
-		theta_arc_back = np.linspace(theta_back_left, theta_back_right, num_of_samples)
-		x_arc_back = center_x + arc_radius * np.cos(theta_arc_back)
-		y_arc_back = center_y + arc_radius * np.sin(theta_arc_back)
+				relative_angle = np.arccos(dot_product/denom)
+				cross_product = vehicle_direction[0] * collision_vector[1] - vehicle_direction[1] * collision_vector[0]
 
-		#first do circle check
-		distance = np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2)
+				#check circle for front or back
+				if cross_product < 0:
+					relative_angle = -relative_angle
+				
+				theta_max = np.degrees(theta_max)
+				collision_zone = None
+				relative_angle = round(np.degrees(relative_angle),2)
 
-		if distance <= arc_radius + ped_rad:
-			#we know there is a possible collision. check if its front
-			collision_vector = np.array([ped_x - center_x, ped_y - center_y])
-			vehicle_direction = np.array([np.cos(yaw), np.sin(yaw)])
-
-			dot_product = np.dot(vehicle_direction, collision_vector)
-			denom = np.sqrt(((collision_vector[0])**2 + (collision_vector[1])**2))*np.sqrt((vehicle_direction[0])**2 + (vehicle_direction[1])**2)
-
-			relative_angle = np.arccos(dot_product/denom)
-			cross_product = vehicle_direction[0] * collision_vector[1] - vehicle_direction[1] * collision_vector[0]
-
-			#check circle for front or back
-			if cross_product < 0:
-				relative_angle = -relative_angle
-			
-			theta_max = np.degrees(theta_max)
-			collision_zone = None
-			relative_angle = round(np.degrees(relative_angle),2)
-
-			#assign a collision zone
-			if (-theta_max <= relative_angle <= theta_max):
-				collision_zone = "front"
-				return collision_zone, relative_angle
-			elif 180 - theta_max <= relative_angle or relative_angle <= -180 + theta_max:
-				collision_zone = "rear"
-				return collision_zone, relative_angle
-			else:
-				#side points 
-				side_length = np.sqrt((x_arc_front[0] - x_arc_back[-1]) ** 2 + (y_arc_front[0] - y_arc_back[-1]) ** 2)
-				num_of_samples = math.ceil(side_length / (2*ped_rad))
-
-				x_right = np.linspace(x_arc_front[0], x_arc_back[-1], num_of_samples)
-				y_right = np.linspace(y_arc_front[0], y_arc_back[-1], num_of_samples)
-
-				x_left = np.linspace(x_arc_front[-1], x_arc_back[0], num_of_samples)
-				y_left = np.linspace(y_arc_front[-1], y_arc_back[0], num_of_samples)
-
-				#do not include points from the arc
-				x_right = x_right[1:-1]
-				y_right = y_right[1:-1]
-				x_left = x_left[1:-1]
-				y_left = y_left[1:-1]
-
-				#left and right
-				all_x_coord = np.concatenate((x_right, x_left))
-				all_y_coord = np.concatenate((y_right, y_left))
-
-				distances = np.sqrt((all_x_coord - ped_x) ** 2 + (all_y_coord - ped_y) ** 2)
-				min_dist = np.min(distances)
-				min_dist_index = np.argmin(distances)
-
-				x_collided = all_x_coord[min_dist_index]
-				y_collided = all_y_coord[min_dist_index]
-			
-				if min_dist <= ped_rad:
-					#find the vector of the point of collision with the center of the vehicle
-					collision_vector = np.array([x_collided - center_x, y_collided - center_y])
-
-					#finding angle between vector between collision vector and vehicle direction
-					vehicle_direction = np.array([np.cos(yaw), np.sin(yaw)])
-					dot_product = np.dot(vehicle_direction, collision_vector)
-					denom = np.sqrt(((collision_vector[0])**2 + (collision_vector[1])**2))*np.sqrt((vehicle_direction[0])**2 + (vehicle_direction[1])**2)
-
-					relative_angle = np.arccos(dot_product/denom)
-					cross_product = vehicle_direction[0] * collision_vector[1] - vehicle_direction[1] * collision_vector[0]
-
-					if cross_product < 0:
-						relative_angle = -relative_angle
-					
-					theta_max = np.degrees(theta_max)
-					relative_angle = round(np.degrees(relative_angle), 2)
-
-					#assign a collision zone
-					if 0 > relative_angle:
-						collision_zone = "right"
-					else:
-						print("collision")
-						collision_zone = "left"
-
+				#assign a collision zone
+				if (-theta_max <= relative_angle <= theta_max):
+					collision_zone = "front"
 					return collision_zone, relative_angle
-	
-		return False, None
+				elif 180 - theta_max <= relative_angle or relative_angle <= -180 + theta_max:
+					collision_zone = "rear"
+					return collision_zone, relative_angle
+				else:
+					boundary_length = half_width/sin(abs(relative_angle))
+					if distance <= boundary_length:
+						if 0 > relative_angle:
+							collision_zone = "right"
+						else:
+							collision_zone = "left"
+
+						return collision_zone, relative_angle
+		return None, None
 
 	def rotate(self, center_x, center_y, x, y, degree_theta):
 		radian_theta = radians(degree_theta)
