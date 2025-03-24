@@ -230,6 +230,7 @@ class SVPlanner(object):
                         task_delta_time = self.sync_planner.get_task_time()
 
                     if frenet_traj is None:
+                        print('ego speed', traffic_state.vehicle_state.s_vel)
                         log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
                         #BrokenScenario(self.vid)
                         #raise ScenarioCompletion()
