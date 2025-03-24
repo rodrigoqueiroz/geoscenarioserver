@@ -13,6 +13,7 @@ from dash.DashboardSharedMemory import get_center_id
 from sv.ManeuverConfig import *
 from sv.ruleEngine.constants import *
 from sv.ruleEngine.FeatureGenerator import FeatureGenerator
+from SimConfig import PLANNER_RATE
 
 class NanConverter(json.JSONEncoder):
     def encode(self, obj, *args, **kwargs):
@@ -49,6 +50,7 @@ class BehaviorLayer(FeatureGenerator):
 
         # Runtime status:
         self._traffic_state    = None
+        self.iteration         = 0
 
         # Decision
         self._current_mconfig  = None
@@ -110,15 +112,22 @@ class BehaviorLayer(FeatureGenerator):
     def tick(self, traffic_state):
         self._ref_path_changed = False
         self._traffic_state = traffic_state
+        self.iteration += 1
 
         situation = self.parse(traffic_state)
 
         #parameters['situation']['last_behaviour'] = self.last_behaviour
         self.last_behaviour = self.post_behaviour(situation)
 
-        if self.debug and traffic_state.vid == get_center_id():
-            print('Behaviour', self.last_behaviour)
+        #if self.debug:
+        #    print('Behaviour', traffic_state.vid, self.last_behaviour)
 
+        if self.iteration < 30:
+            self._current_mconfig = MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(8.0, 0, 1)))
+        else:
+            self._current_mconfig = MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(0.0, 0, 1)))
+
+        '''
         # Default Behaviour
         self._current_mconfig = MStopConfig( target=MStopConfig.StopTarget.NOW )
 
@@ -128,16 +137,22 @@ class BehaviorLayer(FeatureGenerator):
             if self.last_behaviour['maneuver']['type'] == 'TRACK_SPEED' and \
                'speed' in self.last_behaviour['parameters']:
                 desired_speed = max(0.0, self.last_behaviour['parameters']['speed'] / KMH_TO_MS)
-                self._current_mconfig = MVelKeepConfig(vel=MP(desired_speed, 10, 6))
+                self._current_mconfig = MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(desired_speed, 10, 6)))
 
             # Stop-At behaviour
             elif self.last_behaviour['maneuver']['type'] == 'STOP_AT':
                 # Stop-At Goal
                 if 'location' in self.last_behaviour['parameters'] and\
                    's' in self.last_behaviour['parameters']['location']:
-                    self._current_mconfig = MStopConfig( 
-                        target=MStopConfig.StopTarget.S_POS, 
-                        pos=self.last_behaviour['parameters']['location']['s']
+
+                    desired_speed = None
+                    if 'speed' in self.last_behaviour['parameters']:
+                        desired_speed = max(0.0, self.last_behaviour['parameters']['speed'] / KMH_TO_MS)
+
+                    self._current_mconfig = MStopAtConfig(
+                        stop_s_offset=self.last_behaviour['parameters']['location']['s'],
+                        track_speed=MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(desired_speed, 10, 6)))
                     )
+        '''
 
         return self._current_mconfig, self._ref_path_changed, ""

@@ -76,6 +76,7 @@ class Perception:
 		try:
 			s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_reference_path(), other_vehicle.state.get_X(), 
 													 other_vehicle.state.get_Y(), sdv_route.get_reference_path_s_start())
+
 			other_vehicle.state.set_S(s_vector)
 			other_vehicle.state.set_D(d_vector)
 		except OutsideRefPathException:
@@ -119,8 +120,11 @@ class Perception:
 		)
 
 	def hallucinate_its_own_reflection(self, ego_vehicle_state, traffic_state, sdv_route):
+		if self.hallucination_weight == None:
+			return
+
 		detection_value = self.random.random()
-		likelihood      = sqrt(100.0 * self.hallucination_weight) / 100.0
+		likelihood      = self.hallucination_weight
 		retention       = 1.3 # Such allucination requires long time to fade
 
 		if detection_value < likelihood:
@@ -205,6 +209,9 @@ class Perception:
 				
 
 	def hallucinate_splitting_bounding_box(self, ego_vehicle_state, vid, other_vehicle, traffic_state, sdv_route):
+		if self.hallucination_weight == None:
+			return
+
 		detection_value = self.random.random()
 		likelihood      = self.hallucination_weight
 		retention       = 1.0
@@ -302,6 +309,9 @@ class Perception:
 		return traffic_state
 
 	def update_hallucination(self, ego_vehicle_state, traffic_state, sdv_route):
+		if self.hallucination_retention == None:
+			return
+
 		for vid, hallucination in list(self.hallucination_status.items()):
 			detection_value = self.random.random()
 
@@ -318,7 +328,7 @@ class Perception:
 						del self.hallucination_status[vid]
 					
 					reference_vehicle    = self.all_vehicles[hallucination['reference_vehicle']]
-					hallucinated_vehicle = hallucination['vehicle']
+					hallucinated_vehicle = Vehicle(vid)
 					hallucinated_vehicle.state.set_state_vector(reference_vehicle.state.get_state_vector())
 					hallucinated_vehicle.state.x += hallucination['offsets']['x']
 					hallucinated_vehicle.state.y += hallucination['offsets']['y']
@@ -337,7 +347,7 @@ class Perception:
 				# Imitate Ego	
 				else:
 					has_frenet_location = True
-					hallucinated_vehicle = hallucination['vehicle']
+					hallucinated_vehicle = Vehicle(vid)
 					hallucinated_vehicle.state.set_state_vector(ego_vehicle_state.get_state_vector())
 
 					s          = hallucination['offsets']['s']
@@ -346,9 +356,9 @@ class Perception:
 
 					x, y = frenet_to_sim_position(sdv_route.get_reference_path(), s, d, sdv_route.get_reference_path_s_start())
 
-					hallucinated_vehicle.state.x    = x
-					hallucinated_vehicle.state.y    = y
-					hallucinated_vehicle.state.yaw *= yaw_factor
+					hallucinated_vehicle.state.x     = x
+					hallucinated_vehicle.state.y     = y
+					hallucinated_vehicle.state.yaw  *= yaw_factor
 					hallucinated_vehicle, has_frenet_location = self.apply_positional_noise(
 						ego_vehicle_state, vid, hallucinated_vehicle, sdv_route, tracked_hallucination=True
 					)

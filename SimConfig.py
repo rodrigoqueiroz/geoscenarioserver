@@ -60,7 +60,7 @@ VEHICLE_WIDTH  = 1.8        #vehicle width in [m]
 
 #Planning
 PLANNER_RATE = 5                 #Planner tick rate
-PLANNING_TIME = 0.2              #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
+PLANNING_TIME = 0.2              #[s] Must be <= 1/PLANNER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
 USE_FIXED_PLANNING_TIME = True   #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
 POINTS_PER_METER = 3.0           #The number of points per meter to be used along the vehicle's reference path
                                  #Note that the value that is used may be slightly different

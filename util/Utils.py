@@ -36,7 +36,12 @@ def truncate(num, digits):
 
 #logistic: returns a value between 0 and 1 within the range 0 to infinity
 def logistic(x):
-    return 2.0 / (1 + exp(-x)) - 1.0
+    try:
+        return 2.0 / (1 + exp(-x)) - 1.0
+
+    # Overflow
+    except:
+        return float('inf')
 
 #Returns a function of time f with given coefficients for a polynomial
 def to_equation(coefficients):

@@ -15,7 +15,7 @@ from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
-from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion
+from requirements.RequirementViolationEvents import AgentTick, BrokenScenario, ScenarioCompletion
 from SimTraffic import *
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
@@ -220,7 +220,7 @@ class SVPlanner(object):
                 if mconfig and traffic_state.lane_config:
                     #replan maneuver
                     #traj, cand, unf = plan_maneuver( mconfig.mkey,
-                    frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
+                    frenet_traj, cand = plan_maneuver(self.sdv, mconfig,traffic_state)
 
                     if EVALUATION_MODE and not self.last_plan:
                         self.sync_planner.end_task(False) #blocks if < target
@@ -231,8 +231,10 @@ class SVPlanner(object):
 
                     if frenet_traj is None:
                         log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
-                        pass
+                        #BrokenScenario(self.vid)
+                        #raise ScenarioCompletion()
                     else:
+                    
                         plan = MotionPlan()
                         plan.trajectory = frenet_traj
                         plan.start_time = state_time + task_delta_time

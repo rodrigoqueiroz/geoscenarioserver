@@ -126,9 +126,15 @@ def effic_cost(frenet_traj:FrenetTrajectory,target_vel):
     '''Penalizes low average velocity'''
     total = 0
     ptrajectory = frenet_traj.projected_trajectory
+
     for i in range(len(ptrajectory)):
         total += ptrajectory[i][1][1] #1=s_state, 1=s_vel
+    
     avg_vel = float(total) / len(ptrajectory)
+
+    if avg_vel == 0:
+        return 0
+
     return logistic( 2*(target_vel-avg_vel) / avg_vel)
 
 def time_cost(frenet_traj:FrenetTrajectory, target_t):

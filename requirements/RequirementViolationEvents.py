@@ -48,6 +48,14 @@ class AgentTick:
 
 		agent_ticks[agent_id] += 1
 
+class BrokenScenario(UnmetRequirement):
+	def __init__(self, agent_id):
+		self.raise_it(agent_id, {
+			'agentId': agent_id,
+			'message': 'v' + str(agent_id) + ' produced an invalid trajectory.'
+		})
+		ScenarioEnd()
+
 class CollisionWithPedestrian(UnmetRequirement):
 	def __init__(self, agent_id, pid):
 		collision_state = agent_collisions[agent_id]

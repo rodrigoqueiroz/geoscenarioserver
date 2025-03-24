@@ -9,10 +9,10 @@ import datetime
 import glog as log
 import math
 import numpy as np
+import os
 import sys
 
 from matplotlib import pyplot as plt
-from os import stat_result
 from typing import List
 
 from Actor import *
@@ -73,7 +73,8 @@ class SDV(Vehicle):
         # Perception
         self.perception = Perception(self, detection_range_in_meters, hallucination_retention, 
                                      hallucination_weight, missed_detection_weight, noise_position_mixture, 
-                                     noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate)
+                                     noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate, 
+                                     seed=int(os.getenv("GSS_PERCEPTION_SEED", 1)))
 
         #Planning
         self.rule_engine_port = rule_engine_port

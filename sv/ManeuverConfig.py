@@ -14,17 +14,20 @@ from typing import Dict
 
 
 class Maneuver(Enum):
-    M_VELKEEP = 1
-    M_FOLLOW = 2
-    M_LANESWERVE = 3
-    M_CUTIN = 4
-    M_STOP = 5
-    M_REVERSE = 6
+    M_VELKEEP     = 1
+    M_FOLLOW      = 2
+    M_LANESWERVE  = 3
+    M_CUTIN       = 4
+    M_STOP        = 5
+    M_REVERSE     = 6
+
+    M_TRACK_SPEED = 100
+    M_STOP_AT     = 101
 
 class SamplingMethod(IntEnum):
-    LINEAR = 1      #linear space
+    LINEAR  = 1     #linear space
     UNIFORM = 2     #random from uniform distribution
-    NORMAL = 3      #random from gaussian
+    NORMAL  = 3     #random from gaussian
 
 
 @dataclass
@@ -210,6 +213,20 @@ class MConfig:
         self.feasibility_constraints['collision'] = self.fc_collision
         self.feasibility_constraints['off_lane'] = self.fc_off_lane
         self.cost_weight['lane_offset_cost'] = self.lane_offset_cost
+
+@dataclass
+class MStopAtConfig(MConfig):
+    frequency:float = PLANNER_RATE                      # hertz
+    min_distance_from_stop_position:float = 3.0         # meters
+    stop_s_offset:float = 0.0                           # meters
+    track_speed:MTrackSpeedConfig = field(default_factory=lambda:MTrackSpeedConfig())
+    mkey:int = Maneuver.M_STOP_AT
+
+@dataclass
+class MTrackSpeedConfig(MConfig):
+    frequency:float = PLANNER_RATE                      # hertz
+    velocity:MVelKeepConfig = field(default_factory=lambda:MVelKeepConfig())
+    mkey:int = Maneuver.M_TRACK_SPEED
 
 @dataclass
 class MVelKeepConfig(MConfig):

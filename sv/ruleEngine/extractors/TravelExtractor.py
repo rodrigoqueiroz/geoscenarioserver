@@ -4,9 +4,7 @@ class TravelExtractor(Extractor):
 	def __init__(self):
 		self.name = "travel"
 
-	def extract_goal(self, traffic_state):
-		print('Route complete', traffic_state.route_complete)
-		
+	def extract_goal(self, traffic_state):		
 		if not traffic_state.route_complete:
 			return None
 

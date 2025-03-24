@@ -18,4 +18,6 @@ class FeatureGenerator:
 		for extractor in self.extractors:
 			situation[extractor.name] = extractor.generate_features(traffic_state)
 
+		#print('\nsituation', situation, '\n')
+
 		return situation
