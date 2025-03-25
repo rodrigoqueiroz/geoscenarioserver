@@ -8,6 +8,7 @@
 
 from dataclasses import dataclass, field
 from typing import Dict
+from enum import Enum
 import os
 import math
 
@@ -96,6 +97,12 @@ SHM_SIZE = 2048
 # list of gs tags that must be unique per scenario
 UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
 
+class ExecutionMode(Enum):
+    realtime = 0
+    fastest = 1
+    synchronized = 2
+    paused = 3
+
 @dataclass
 class SimConfig:
     pedestrian_lanelet_routes:Dict = field(default_factory=dict)
@@ -108,3 +115,4 @@ class SimConfig:
     show_dashboard:bool = SHOW_DASHBOARD
     wait_for_input:bool = WAIT_FOR_INPUT
     wait_for_client:bool = WAIT_FOR_CLIENT
+    execution_mode:ExecutionMode = ExecutionMode.realtime
