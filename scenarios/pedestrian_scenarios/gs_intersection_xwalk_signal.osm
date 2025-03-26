@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' generator='JOSM'>
+<osm version='0.6' upload='false' generator='JOSM'>
   <node id='-5347407' action='modify' visible='true' lat='43.47826194033' lon='-80.51976044018'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_university_weber_alt_walkways.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='crossing light scenario' />
-    <tag k='timeout' v='90' />
+    <tag k='timeout' v='75' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347408' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>

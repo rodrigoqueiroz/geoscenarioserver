@@ -54,7 +54,7 @@ SHOW_TRAJ = False
 COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collision math and lane boundary checks
 
 #Standard vehicle dimensions
-VEHICLE_RADIUS = 1.0        #vehicle radius
+VEHICLE_RADIUS = 0.9        #vehicle radius
 VEHICLE_LENGTH = 4.5        #vehicle length in [m]
 VEHICLE_WIDTH  = 1.8        #vehicle width in [m]
 

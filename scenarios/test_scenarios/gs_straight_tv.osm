@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5149175' action='modify' lat='49.00776334359' lon='8.45755981564'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
+    <tag k='name' v='Straight road zigzag trajectory vehicle' />
+    <tag k='timeout' v='11' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5149176' action='modify' lat='49.00769375801' lon='8.45755581371'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5149179' action='modify' lat='49.00729972481' lon='8.45710179305'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='0' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149180' action='modify' lat='49.0081835503' lon='8.45824511432'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='7' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149181' action='modify' lat='49.00726589979' lon='8.45704525575'>
+    <tag k='btype' v='TV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='v1' />
+    <tag k='trajectory' v='straight_traj' />
+    <tag k='vid' v='1' />
+    <tag k='goal_ends_simulation' v='yes' />
+  </node>
+  <node id='-5149208' action='modify' lat='49.00745514695' lon='8.45727258538'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='1' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149227' action='modify' lat='49.00765411833' lon='8.45757697474'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='2' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149243' action='modify' lat='49.00792126748' lon='8.45787500055'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='3' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149263' action='modify' lat='49.00799779431' lon='8.45801711962'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='4' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149284' action='modify' lat='49.00808336509' lon='8.4580839368'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='5' />
+    <tag k='yaw' v='45' />
+  </node>
+  <node id='-5149298' action='modify' lat='49.00814389067' lon='8.45819423817'>
+    <tag k='gs' v='tnode' />
+    <tag k='time' v='6' />
+    <tag k='yaw' v='45' />
+  </node>
+  <way id='-1948238' action='modify'>
+    <nd ref='-5149179' />
+    <nd ref='-5149208' />
+    <nd ref='-5149227' />
+    <nd ref='-5149243' />
+    <nd ref='-5149263' />
+    <nd ref='-5149284' />
+    <nd ref='-5149298' />
+    <nd ref='-5149180' />
+    <tag k='gs' v='trajectory' />
+    <tag k='name' v='straight_traj' />
+  </way>
+</osm>

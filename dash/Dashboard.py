@@ -50,6 +50,10 @@ class Dashboard(object):
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
+    
+    maneuver_map = {"M_VELKEEP":"VelKeep", "M_FOLLOW":"Follow", "M_LANESWERVE":"LaneSwerve", "M_CUTIN":"CutIn", "M_STOP":"Stop", "M_REVERSE":"Reverse"}
+    vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
+    ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
 
     def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
@@ -58,6 +62,7 @@ class Dashboard(object):
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
         self.screen_param = screen_param
+        
 
         set_center_id(int(sim_config.plot_vid))
 
@@ -159,13 +164,28 @@ class Dashboard(object):
         if (focus):
             set_center_id(int(focus[1:])) #sets center_id to an int
             #log.info("Changed focus to {}".format(get_center_id()))
+    
+    def get_maneuver(self, id):
+        if id in self.sim_traffic.debug_shdata:
+            btree_snapshot = self.sim_traffic.debug_shdata[id][1]
+            try:
+                if btree_snapshot:
+                    maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
+                    return maneuver
+                else:
+                    return "Active"
+            except:
+                return "Inactive"
+        return "Inactive"
 
     def update_table(self, vehicles):
         def parse_vehicle(vehicle):
-            sim_state = vehicle.sim_state
-            vector = vehicle.state.get_state_vector()
-            truncate_vector(vector, 2)
-            return [sim_state] + vector
+            agent_type = Dashboard.vehicle_types[vehicle.type]
+            status = self.get_maneuver(vid)
+            sv = vehicle.state.get_state_vector()
+            truncate_vector(sv, 1)
+            sv = [f"{sv[0]} | {sv[1]} | {sv[2]}", f"{sv[3]} | {sv[4]} | {sv[5]}", f"{sv[6]} | {sv[7]} | {sv[8]}", f"{sv[9]} | {sv[10]} | {sv[11]}", int(sv[12])]
+            return [agent_type] + [status] + sv
 
         center_id = get_center_id()
         current_set = self.tab.get_children()
@@ -180,7 +200,7 @@ class Dashboard(object):
             elif vid in perceived_vehicles:
                 sv = parse_vehicle(perceived_vehicles[vid])
             else:
-                sv = [ '???' ] * 14
+                sv = [ '???' ] * 15
 
             sv = ['v'+ str(vid)] + sv
 
@@ -194,11 +214,16 @@ class Dashboard(object):
             return
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
+            agent_type = Dashboard.ped_types[pedestrian.type]
             sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
-            truncate_vector(sp,2)
-
-            sp = ['p' + str(pid)] + [sim_state] + sp
+            truncate_vector(sp,1)
+            if sim_state == 1:
+                status = "Active"
+            else:
+                status = "Inactive"
+            sp = [f"{sp[0]} | {sp[1]} | {sp[2]}", f"{sp[3]} | {sp[4]} | {sp[5]}", f"{sp[6]} | {sp[7]} | {sp[8]}", f"{sp[9]} | {sp[10]} | {sp[11]}", int(sp[12])]
+            sp = ['p' + str(pid)] + [agent_type] + [status] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))
 
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
@@ -807,19 +832,19 @@ class Dashboard(object):
         tab_frame.grid(row=5, column=0, columnspan=2, sticky="nsew")
 
         # Scrollable Right Section
-        canvas = tk.Canvas(window, bg="white")
-        canvas.grid(row=2, column=2, rowspan=4, sticky="nsew")
+        btree_canvas = tk.Canvas(window, bg="white")
+        btree_canvas.grid(row=2, column=2, rowspan=4, sticky="nsew")
 
-        scrollbar = tk.Scrollbar(window, orient="vertical", command=canvas.yview)
-        scrollbar.grid(row=2, column=2, rowspan=4, sticky="nse")  # Align right edge of the column
+        btree_scrollbar = tk.Scrollbar(window, orient="vertical", command=btree_canvas.yview)
+        btree_scrollbar.grid(row=2, column=2, rowspan=4, sticky="nse")  # Align right edge of the column
 
-        canvas.configure(yscrollcommand=scrollbar.set)
+        btree_canvas.configure(yscrollcommand=btree_scrollbar.set)
 
-        bt_frame = tk.Frame(canvas, bg="white")
-        canvas.create_window((0, 0), window=bt_frame, anchor="nw")
+        bt_frame = tk.Frame(btree_canvas, bg="white")
+        btree_canvas.create_window((0, 0), window=bt_frame, anchor="nw")
 
         # Make widgets inside bt_frame expand
-        bt_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        bt_frame.bind("<Configure>", lambda e: btree_canvas.configure(scrollregion=btree_canvas.bbox("all")))
 
         # #vehicle sub containers
         traj_frame = tk.Frame(bt_frame, bg = "white")
@@ -856,21 +881,24 @@ class Dashboard(object):
         # vehicle table
         tab = ttk.Treeview(tab_frame, show=['headings'])
         tab['columns'] = (
-            'id', 'sim_st',
-            'x', 'x_vel', 'x_acc',
-            'y', 'y_vel', 'y_acc',
-            's', 's_vel', 's_acc',
-            'd', 'd_vel', 'd_acc',
+            'id', 'type', 'state',
+            'x | x_vel | x_acc', 'y | y_vel | y_acc',
+            's | s_vel | s_acc', 'd | d_vel | d_acc',
             'yaw'
         )
+        width_scaling = int(vis_scaling * 0.6)
         for col in tab['columns']:
             tab.heading(col, text=col, anchor='center')
-            tab.column(col, anchor='center', width=1, minwidth=1)
+            tab.column(col, anchor='center', width=200*width_scaling, minwidth=1, stretch=False)
+        tab.column("id", width=100*width_scaling)
+        tab.column("type", width=100*width_scaling)
+        tab.column("state", width=150*width_scaling)
+        tab.column("yaw", width=100*width_scaling)
         tab.bind('<<TreeviewSelect>>', self.change_tab_focus)
         #tab.grid(row=0,column=0, sticky='nsew')
         tab.pack(fill='both', expand=True) #x and y
         style = ttk.Style()
-        style.configure("Treeview", font=("TkDefaultFont", int(12*txt_scaling))) # needs to be scaled
+        style.configure("Treeview", font=("TkDefaultFont", int(11*txt_scaling))) # needs to be scaled
         self.tab = tab
 
         # vehicle cart

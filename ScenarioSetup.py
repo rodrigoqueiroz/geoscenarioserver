@@ -346,8 +346,6 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 continue
             try:
                 t_name = pnode.tags['trajectory']
-                print(t_name)
-                print(parser.trajectories)
                 t_nodes = parser.trajectories[t_name].nodes
                 trajectory = []     #a valid trajectory with at least x,y,time per node
                 for node in t_nodes:

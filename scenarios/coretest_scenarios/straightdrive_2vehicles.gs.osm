@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<osm version='0.6' generator='JOSM'>
+<osm version='0.6' upload='false' generator='JOSM'>
   <node id='-2610798' action='modify' visible='true' lat='49.00776334359' lon='8.45755981564'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
@@ -17,6 +17,7 @@
     <tag k='route' v='central_route' />
     <tag k='vid' v='2' />
     <tag k='yaw' v='310' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-2610802' action='modify' visible='true' lat='49.00769375801' lon='8.45755581371'>
     <tag k='altitude' v='329' />

@@ -1,0 +1,64 @@
+[project]
+authors = [ "See CONTRIBUTORS" ]
+channels = ["https://fast.prefix.dev/conda-forge"]
+name = "gss"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+gss = "python3 GSServer.py"
+test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive"
+
+[system-requirements]
+libc = { family = "glibc", version = "2.31" }
+
+[dependencies]
+python = "3.11.*"
+pip = "*"
+tk = { build = "xft_*" }
+antlr4-python3-runtime = "==4.9.3"
+graphviz = "*"
+matplotlib = "*"
+numpy = "*"
+scipy = "*"
+requests = "*"
+pynput = "*"
+screeninfo = "*"
+
+[pypi-dependencies]
+antlr-denter = "*"
+glog = "*"
+lanelet2 = "*"
+py-trees = "==0.7.6"
+sysv-ipc = "*"
+
+[target.linux.dependencies]
+libgl-devel = "*"
+
+[environments]
+humble = { features = ["humble"] }
+
+[feature.humble]
+channels = ["https://prefix.dev/robostack-humble"]
+
+[feature.humble.dependencies]
+compilers = "*"
+cmake = "*"
+pkg-config = "*"
+make = "*"
+ninja = "*"
+ros-humble-desktop = "*"
+ros-humble-geographic-msgs = "*"
+catkin_tools = "*"
+rosdep = "*"
+colcon-common-extensions = ">=0.3.0,<0.4"
+setuptools = "<=58.2.0"
+
+[feature.humble.activation]
+scripts = ["colcon_ws/install/setup.bash"]
+
+[feature.humble.tasks]
+ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs = ["colcon_ws/install/setup.bash"] }
+ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build"] }
+ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_client_build"] }
+rqt = "rqt"
