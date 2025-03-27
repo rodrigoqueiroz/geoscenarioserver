@@ -69,7 +69,7 @@ class Dashboard(object):
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
         self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="DP")
+        sync_dash = TickSync(DASH_RATE, block=True, verbose=False, label="DP")
 
         while sync_dash.tick():
             if not self.window:

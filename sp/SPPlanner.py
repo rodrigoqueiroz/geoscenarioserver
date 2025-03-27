@@ -12,7 +12,6 @@ from multiprocessing import shared_memory, Process, Lock, Array, Manager
 from typing import Dict, List
 import glog as log
 from copy import copy
-from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
 from sp.ManeuverConfig import *
 from sp.ConditionConfig import *

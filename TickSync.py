@@ -18,13 +18,16 @@ from SimConfig  import *
 from util.Utils import truncate
 
 class TickSync():
-
-    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
+    '''
+    rate: tick rate (Hz) used to calculate tick duration (1.0/rate)
+    block: True: sleep until end of period; False: proceed immediately
+    verbose: print debug info
+    '''
+    def __init__(self, rate = TRAFFIC_RATE, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
         self.tick_rate = rate
         self.expected_tick_duration = 1.0/rate
-        self.realtime = realtime
         self.block = block
         self.verbose = verbose
         self.label = label

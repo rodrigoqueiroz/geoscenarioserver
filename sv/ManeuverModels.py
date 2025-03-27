@@ -7,7 +7,7 @@ from sv.SDVTrafficState import *
 import numpy as np
 from copy import copy
 import itertools
-from TickSync import *
+#from TickSync import *
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
 import glog as log

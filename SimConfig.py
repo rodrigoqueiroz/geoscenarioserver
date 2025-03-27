@@ -16,7 +16,7 @@ ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 #Sim Config
 TIMEOUT = 30                #default timeout in [s] if not defined by scenario
-TRAFFIC_RATE = 40           #global tick rate
+TRAFFIC_RATE = 20           #global tick rate
 WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
