@@ -43,7 +43,7 @@ class SVPlanner(object):
         self.vid = int(sdv.id)
         self.laneletmap:LaneletMap = sim_traffic.lanelet_map
         self.sim_config = sim_traffic.sim_config
-        self.sim_traffic:SimTraffic = sim_traffic
+        self.sim_traffic = sim_traffic
 
         #Subprocess space
         self.behavior_model  = None
@@ -59,14 +59,17 @@ class SVPlanner(object):
         self.sync_planner    = None
 
     def start(self):
-        #Create shared arrray for Motion Plan
+        #Create shared arrray for the motion plan
         c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
         #Process based
-        self._process = Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr,
-            self._mplan_sharr,
-            self._debug_shdata), daemon=True)
+        self._process = Process(target=self.run_planner_process,
+                                args=(
+                                    self.traffic_state_sharr,
+                                    self._mplan_sharr,
+                                    self._debug_shdata
+                                ),
+                                daemon=True)
         self._process.start()
 
     def stop(self):
@@ -106,7 +109,7 @@ class SVPlanner(object):
         log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         signal(SIGTERM, self.before_exit)
 
-        self.sync_planner = TickSync(rate=PLANNER_RATE, block=True, verbose=False, label="PP{}".format(self.vid))
+        self.sync_planner = TickSync(rate=self.sim_config.planner_rate, block=True, verbose=False, label="PP{}".format(self.vid))
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -117,10 +120,10 @@ class SVPlanner(object):
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
         task_label = "V{} plan".format(self.vid)
-        if USE_FIXED_PLANNING_TIME:
-            self.sync_planner.set_task(task_label,PLANNING_TIME)
+        if self.sim_config.use_fixed_planning_time:
+            self.sync_planner.set_task(task_label, self.sim_config.planning_time)
         else:
-            self.sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
+            self.sync_planner.set_task(task_label, self.sim_config.planning_time, 1/self.sim_config.planner_rate)
 
         try:
             while self.sync_planner.tick():
@@ -212,7 +215,7 @@ class SVPlanner(object):
                 if mconfig and traffic_state.lane_config:
                     #replan maneuver
                     #traj, cand, unf = plan_maneuver( mconfig.mkey,
-                    frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
+                    frenet_traj, cand = plan_maneuver(self.vid, mconfig, traffic_state)
 
                     if EVALUATION_MODE and not self.last_plan:
                         self.sync_planner.end_task(False) #blocks if < target

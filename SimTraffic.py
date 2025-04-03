@@ -2,9 +2,9 @@
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
-# SIMULATED TRAFFIC - Coordinate all vehicle Simulation, Ego interface,
+# SIMULATED TRAFFIC - Coordinate all agent simulation, ego interface,
 # and ShM for shared state between vehicles (perception ground truth),
-# dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
+# dashboard (debug), and external Simulator (Unreal or alternative graphics engine)
 # --------------------------------------------
 
 import csv
@@ -13,7 +13,7 @@ import numpy as np
 import time
 
 from copy import copy
-from multiprocessing import  Manager, Array
+from multiprocessing import Manager, Array
 
 from Actor import *
 from shm.SimSharedMemoryServer import *
@@ -32,6 +32,9 @@ class SimTraffic(object):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
         self.origin = None
+        # initialize with the starting mode
+        # later, read the current mode from the shared memory
+        self.execution_mode:ExecutionMode = sim_config.execution_mode
 
         #Dyn agents
         self.vehicles = {}  #dictionary for direct access using vid
@@ -92,9 +95,9 @@ class SimTraffic(object):
             self.carla_sync = CarlaSync()
             self.carla_sync.create_gs_actors(self.vehicles)
 
-        #Creates Shared Memory Blocks to publish all vehicles'state.
+        #Creates shared memory blocks to publish the state of all agents.
         self.create_traffic_state_shm()
-        self.write_traffic_state(0 , 0.0, 0.0)
+        self.write_traffic_state(0, 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
         if self.cosimulation == True and self.sim_config.wait_for_client:
@@ -106,12 +109,12 @@ class SimTraffic(object):
                 time.sleep(0.5)
 
         #Start SDV Planners
-        for vid, vehicle in self.vehicles.items():
+        for vehicle in self.vehicles.values():
             if vehicle.type == Vehicle.SDV_TYPE:
                 vehicle.start_planner()
 
         #Start SP Planners
-        for pid, pedestrian in self.pedestrians.items():
+        for pedestrian in self.pedestrians.values():
             if pedestrian.type == Pedestrian.SP_TYPE:
                 pedestrian.start_planner()
 
@@ -121,18 +124,18 @@ class SimTraffic(object):
             self.carla_sync.quit()
 
         self.write_log_trajectories()
-        for vid in self.vehicles:
-            self.vehicles[vid].stop()
-        for pid in self.pedestrians:
-            self.pedestrians[pid].stop()
+        for v in self.vehicles.values():
+            v.stop()
+        for p in self.pedestrians.values():
+            p.stop()
 
-        for vid in self.vehicles:
-            if self.vehicles[vid].type == Vehicle.SDV_TYPE:
+        for vid, vehicle in self.vehicles.items():
+            if vehicle.type == Vehicle.SDV_TYPE:
                 log.info(
                     "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
                         int(vid),
-                        int(self.vehicles[vid].jump_back_count),
-                        float(self.vehicles[vid].max_jump_back_dist)
+                        int(vehicle.jump_back_count),
+                        float(vehicle.max_jump_back_dist)
                     )
                 )
 
@@ -172,17 +175,17 @@ class SimTraffic(object):
                     self.vehicles[vid].update_sim_state(vstates[vid], delta_time) #client_delta_time
 
         #tick vehicles (all types)
-        for vid in self.vehicles:
-            self.vehicles[vid].tick(tick_count, delta_time, sim_time)
+        for v in self.vehicles.values():
+            v.tick(tick_count, delta_time, sim_time)
 
         #tick pedestrians:
-        for pid in self.pedestrians:
-            self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
+        for p in self.pedestrians.values():
+            p.tick(tick_count, delta_time, sim_time)
         Pedestrian.VEHICLES_POS = {}
 
         #Update traffic light states
-        for tlid in self.traffic_lights:
-            self.traffic_lights[tlid].tick(tick_count, delta_time, sim_time)
+        for tl in self.traffic_lights.values():
+            tl.tick(tick_count, delta_time, sim_time)
 
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
@@ -192,8 +195,14 @@ class SimTraffic(object):
 
         return 0
 
-    #Shared Memory:
+    #Shared memory for agents
     def create_traffic_state_shm(self):
+        """
+        Format:
+        header: tick_count, delta_time, sim_time, nv, np
+        nv*vehicle: vid, type, sim_state, state_vector
+        vp*pedestrians: pid, type, sim_state, state_vector
+        """
         #External Sim (Unreal) ShM
         if CLIENT_SHM:
             self.sim_client_shm = SimSharedMemoryServer()
@@ -216,7 +225,7 @@ class SimTraffic(object):
         nv = len(self.vehicles)
         np = len(self.pedestrians)
 
-        r = 1 + nv + np #1 for header
+        r = 1 + nv + np #1 for the header
         c = int(len(self.traffic_state_sharr) / r)
 
         #header

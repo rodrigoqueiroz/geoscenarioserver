@@ -2,7 +2,7 @@
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TickSync
-# Syncronize simulation loop based on a given frequency (frame-rate).
+# Synchronize simulation loop based on a given frequency (frame-rate).
 # Higher rate allows smoother trajectories and more precise metrics and collisions,
 # but requires more processing capabilities. Can't avoid drift if hardware is slow.
 # --------------------------------------------
@@ -18,12 +18,13 @@ from SimConfig  import *
 from util.Utils import truncate
 
 class TickSync():
-    '''
-    rate: tick rate (Hz) used to calculate tick duration (1.0/rate)
-    block: True: sleep until end of period; False: proceed immediately
-    verbose: print debug info
-    '''
     def __init__(self, rate = TRAFFIC_RATE, block = False, verbose = False, label = "", sim_start_time = 0.0):
+        """
+        rate: tick rate (Hz) used to calculate tick duration (1.0/rate)
+        block: True: sleep until end of tick duration; False: proceed immediately
+        verbose: print debug info
+        """
+
         #config
         self.timeout = None
         self.tick_rate = rate
@@ -35,7 +36,7 @@ class TickSync():
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
         self.tick_count = 0
-        self.sim_time = 0          #Total simulation time since start() [s]
+        self.sim_time = 0.0                 #total simulation time since start() [s]
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
@@ -47,14 +48,14 @@ class TickSync():
             self.timeout,
             self.tick_rate,
             self.expected_tick_duration]
-    
+
     def get_sim_time(self):
         return self.sim_time
 
-    def set_timeout(self,timeout):
+    def set_timeout(self, timeout):
         self.timeout = timeout
-    
-    def print(self,msg):
+
+    def print(self, msg):
         if (self.verbose):
             print(msg)
 
@@ -129,7 +130,7 @@ class TickSync():
                 for line in self.performance_log:
                     csv_writer.writerow(line)
 
-    def set_task(self,label,target_t,max_t = None):
+    def set_task(self, label, target_t, max_t = None):
         #Note: a single task per object. 
         #Todo: alllow tracking of multiple tasks in the same object
         self.task_label = label
@@ -155,7 +156,7 @@ class TickSync():
         else:
             log.error("Task {} took longer than expected. Plan Tick: {}, Expected: {}, Actual: {}".format
                             (self.task_label, self.tick_count, self.target_t, delta_time))
-            #if variable taks time, target will be adjusted for next cycle
+            #if variable task time, target will be adjusted for the next cycle
             if self.max_t:
                 #increase target and cap by max t
                 new_t = math.ceil((abs(diff)+self.target_t )*100)/100
