@@ -9,6 +9,7 @@
 
 import csv
 import datetime
+from datetime import timedelta
 import glog as log
 import math
 import time
@@ -60,6 +61,12 @@ class TickSync():
             print(msg)
 
     def tick(self):
+        """
+        Returns True until the timeout is reached
+        block = True - wait until end of tick
+        block = False - don't wait, just return False to skip
+        block = None - don't wait, assume the tick duration elapsed
+        """
         now = datetime.datetime.now()
         #First Tick
         if (self.tick_count==0): 
@@ -68,31 +75,34 @@ class TickSync():
             self.delta_time = 0.0
             self._tick_start_clock = now
             #Update globals
-            self.tick_count+=1
             self.sim_time = self.sim_start_time #starting time by config
-            self.print('{:05.2f}s {} Tick {:3}# START'.
-                    format(self.sim_time,self.label,self.tick_count))
-            return True
+            self.print(f"sim_time {self.sim_time:05.2f} s, tick {self.label}, sim_start_clock {self._sim_start_clock:3} # START")
         else:
-            #Can tick? Preliminary numbers:
-            diff_tick = (now - self._tick_start_clock).total_seconds()                #diff from previous tick
-            drift =  diff_tick - self.expected_tick_duration                        #diff from expected time
-            if (drift<0):
-                #Too fast. Need to chill.
-                if (self.block):
-                    time.sleep(-drift)      #blocks diff if negative drift
-                    #self.print('sleep {:.3}'.format(drift))
-                else:
-                    #self.print('skip {:.3}'.format(drift))
-                    return False            #return false to skip
-        #Can proceed tick: on time or late (drift):
-        now = datetime.datetime.now()    #update after wake up
-        self.delta_time = (now - self._tick_start_clock).total_seconds()         #diff from previous tick
-        self.drift = self.delta_time - self.expected_tick_duration        #diff from expected time
-        self._tick_start_clock = now
-        #Update globals
-        passed_time = (now - self._sim_start_clock).total_seconds()
-        self.sim_time =  self.sim_start_time + passed_time
+            #Can tick?
+            if (self.block):
+                elapsed = (now - self._tick_start_clock).total_seconds()  #time elapsed from the previous tick
+                time_left = self.expected_tick_duration - elapsed         #diff from expected time
+                if (time_left>0):
+                    #Too fast. Need to chill.
+                    time.sleep(time_left)      #blocks diff if negative time_left
+                    self.print('sleep {:.3}'.format(time_left))
+                    #Can proceed tick: on time or late (time_left):
+                    now = datetime.datetime.now()    #update after wake up
+                    self.delta_time = (now - self._tick_start_clock).total_seconds()  #elapsed from the previous tick
+                    self.drift = self.delta_time - self.expected_tick_duration        #diff from expected time
+                    self._tick_start_clock = now
+                    #Update globals
+                    passed_time = (now - self._sim_start_clock).total_seconds()
+                    self.sim_time = self.sim_start_time + passed_time
+            elif (self.block == None):
+                return False            #return false to skip
+            else:
+                #assume that the expected tick duration has passed
+                self.delta_time = self.expected_tick_duration
+                self.drift = 0.0
+                self._tick_start_clock += timedelta(seconds=self.expected_tick_duration)
+                #Update globals
+                self.sim_time += self.expected_tick_duration
         self.tick_count+=1
         #stats
         self.update_stats()
