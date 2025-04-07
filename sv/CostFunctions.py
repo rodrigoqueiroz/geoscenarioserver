@@ -17,8 +17,9 @@ from sv.FrenetTrajectory import *
 
 def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
     
-    for c in mconfig.feasibility_constraints:
-        if mconfig.feasibility_constraints[c] > 0:
+    for c, k in mconfig.feasibility_constraints.items():
+        # if mconfig.feasibility_constraints[c] > 0:
+        if k > 0:
             
             #direction
             if c == 'direction':
@@ -73,8 +74,8 @@ def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, v
 
 def maneuver_cost(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
     
-    for cost in mconfig.cost_weight:
-        k = mconfig.cost_weight[cost]
+    for cost, k in mconfig.cost_weight.items():
+        # k = mconfig.cost_weight[cost]
         if k > 0:
             #basic cost
             if (cost == 'time_cost'):
@@ -124,11 +125,21 @@ def maneuver_cost(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles
 
 def effic_cost(frenet_traj:FrenetTrajectory,target_vel):
     '''Penalizes low average velocity'''
+    """
+    ## sean: approximation deprecated in favour of analytical approach
     total = 0
     ptrajectory = frenet_traj.projected_trajectory
     for i in range(len(ptrajectory)):
         total += ptrajectory[i][1][1] #1=s_state, 1=s_vel
     avg_vel = float(total) / len(ptrajectory)
+    return logistic( 2*(target_vel-avg_vel) / avg_vel)
+    """
+    
+    ## sean: analytical approach integrates velocity (= position) over time
+    T = frenet_traj.T
+    fs = frenet_traj.fs
+    avg_vel = (fs(T) - fs(0)) / T
+    # np.testing.assert_approx_equal(avg_vel, total/len(ptrajectory), significant=2)
     return logistic( 2*(target_vel-avg_vel) / avg_vel)
 
 def time_cost(frenet_traj:FrenetTrajectory, target_t):
@@ -176,6 +187,9 @@ def progress_cost(frenet_traj:FrenetTrajectory):
 
 def lane_offset_cost(frenet_traj:FrenetTrajectory,lane_config:LaneConfig, expected_offset_per_sec):
     '''Penalizes distance from lane center during the entire trajectory'''
+    """
+    ## sean: deprecated in favour of numpy-based approach
+    ## sean: just calculates average offset; dt and T have no effect, so "_per_sec" is incorrect
     total_offset = 0
     ptrajectory = frenet_traj.projected_trajectory
     T = frenet_traj.T
@@ -187,6 +201,13 @@ def lane_offset_cost(frenet_traj:FrenetTrajectory,lane_config:LaneConfig, expect
     offset_per_second = total_offset / T
     #print("total offset is per second {:.2f} ".format(offset_per_second))
     cost = logistic(offset_per_second/expected_offset_per_sec)
+    return cost
+    """
+
+    offsets = np.array([pt[2][0] for pt in frenet_traj.projected_trajectory])-lane_config.get_central_d()
+    mean_abs_offset = np.mean(np.abs(offsets))
+    # np.testing.assert_approx_equal(offset_per_second, mean_abs_offset, significant=3)
+    cost = logistic(mean_abs_offset/expected_offset_per_sec)
     return cost
 
     '''
@@ -242,6 +263,8 @@ def off_lane_cost(frenet_traj:FrenetTrajectory,lane_config:LaneConfig):
 
 def max_long_jerk_cost(frenet_traj:FrenetTrajectory, expected_max_jerk):
     '''Penalizes high longitudinal jerk (binary function)'''
+    """
+    ## sean: iterative approach deprecated in favour of analytical
     ptrajectory = frenet_traj.projected_trajectory
     all_jerks = [ptrajectory[i][1][3] for i in range(len(ptrajectory))] #1=s_state, 3=s_jerk
     max_jerk = max(all_jerks, key=abs)
@@ -249,6 +272,22 @@ def max_long_jerk_cost(frenet_traj:FrenetTrajectory, expected_max_jerk):
         return 1 , max_jerk
     else:
         return 0 , max_jerk
+    """
+
+    ## sean: analytical approach uses the fact that jerk is a quadratic or linear function of time
+    fs_jerk = frenet_traj.fs_jerk
+    T = frenet_traj.T
+    jerks = [fs_jerk(0),fs_jerk(T)]
+    roots = fs_jerk.deriv().roots() # time of min / max jerk, if it exists
+    if len(roots) and roots[0] > 0 and roots[0] < T:    # min / max must also lie in (0,T)
+        jerks.append(fs_jerk(roots[0]))
+    max_jerk = max(jerks, key=abs)
+    # np.testing.assert_approx_equal(max(all_jerks, key=abs), max_jerk, significant=3)
+    if abs(max_jerk) > expected_max_jerk:
+        return 1 , max_jerk
+    else:
+        return 0 , max_jerk
+
     '''
     #old Implementation:
     s_coef, _, T = trajectory
@@ -263,6 +302,8 @@ def max_long_jerk_cost(frenet_traj:FrenetTrajectory, expected_max_jerk):
 
 def max_lat_jerk_cost(frenet_traj:FrenetTrajectory, expected_max_jerk):
     '''Penalizes high lateral jerk (binary function)'''
+    """
+    ## sean: iterative approach deprecated in favour of analytical
     ptrajectory = frenet_traj.projected_trajectory
     all_jerks = [ptrajectory[i][2][3] for i in range(len(ptrajectory))] #2=d_state, 3=d_jerk
     max_jerk = max(all_jerks, key=abs)
@@ -270,6 +311,22 @@ def max_lat_jerk_cost(frenet_traj:FrenetTrajectory, expected_max_jerk):
         return 1 , max_jerk
     else:
         return 0 , max_jerk
+    """
+    
+    ## sean: analytical approach uses the fact that jerk is a quadratic or linear function of time
+    fd_jerk = frenet_traj.fd_jerk
+    T = frenet_traj.T
+    all_jerks = [fd_jerk(0), fd_jerk(T)]
+    roots = fd_jerk.deriv().roots()
+    if len(roots) and roots[0] > 0 and roots[0] < T:
+        all_jerks.append(fd_jerk(roots[0]))
+    max_jerk = max(all_jerks, key=abs)
+    # np.testing.assert_approx_equal(max_jerk, max(all_jerks, key=abs), significant=3)
+    if abs(max_jerk) > expected_max_jerk:
+        return 1 , max_jerk
+    else:
+        return 0 , max_jerk
+    
     ''' 
     #old Implementation:
     _, d_coef, T = trajectory
@@ -284,6 +341,10 @@ def max_lat_jerk_cost(frenet_traj:FrenetTrajectory, expected_max_jerk):
 
 def total_long_jerk_cost(frenet_traj:FrenetTrajectory, expected_jerk_per_sec):
     '''Penalizes high longitudinal jerk '''
+    ## sean: this method actually estimates mean absolute jerk, rather than total absolute jerk
+    ## sean: dt and T have no effect, so "_per_sec" is incorrect
+    """
+    ## sean: deprecated in favour of numpy functions to estimate mean absolute jerk
     #s_coef, _, T = trajectory
     #jerk = to_equation(differentiate(differentiate(differentiate(s_coef))))
     T = frenet_traj.T
@@ -292,6 +353,13 @@ def total_long_jerk_cost(frenet_traj:FrenetTrajectory, expected_jerk_per_sec):
     all_jerk = [ abs( ptrajectory[i][1][3] * dt ) for i in range(len(ptrajectory))] #1-s_state 3-d_jerk
     acc_per_sec = sum(all_jerk) / T
     return logistic(acc_per_sec / expected_jerk_per_sec )
+    """
+    
+    s_jerk = [pt[1][3] for pt in frenet_traj.projected_trajectory]
+    mean_abs_jerk = np.mean(np.abs(s_jerk))
+    # np.testing.assert_approx_equal(mean_abs_jerk, acc_per_sec, significant=5)
+    return logistic(mean_abs_jerk / expected_jerk_per_sec )
+
     '''
     T = frenet_traj.T
     total_jerk = 0
@@ -307,6 +375,10 @@ def total_long_jerk_cost(frenet_traj:FrenetTrajectory, expected_jerk_per_sec):
 
 def total_lat_jerk_cost(frenet_traj:FrenetTrajectory, expected_jerk_per_sec):
     '''Penalizes high lateral jerk '''
+    ## sean: this method actually estimates mean absolute jerk, rather than total absolute jerk
+    ## sean: dt and T have no effect, so "per_sec" is incorrect
+    """
+    ## sean: deprecated in favour of numpy functions that estimate mean absolute jerk
     #_, d_coef, T = trajectory
     #jerk = to_equation(differentiate(differentiate(differentiate(d_coef))))
     T = frenet_traj.T
@@ -315,6 +387,12 @@ def total_lat_jerk_cost(frenet_traj:FrenetTrajectory, expected_jerk_per_sec):
     all_jerk = [ abs( ptrajectory[i][2][3] * dt ) for i in range(len(ptrajectory))] #2-d_state 3-d_jerk
     acc_per_sec = sum(all_jerk) / T
     return logistic(acc_per_sec / expected_jerk_per_sec )
+    """
+
+    d_jerk = [pt[2][3] for pt in frenet_traj.projected_trajectory]
+    mean_abs_jerk = np.mean(np.abs(d_jerk))
+    # np.testing.assert_approx_equal(mean_abs_jerk, acc_per_sec, significant=5)
+    return logistic(mean_abs_jerk / expected_jerk_per_sec )
 
     '''
     T = frenet_traj.T
@@ -335,7 +413,7 @@ def max_long_acc_cost(frenet_traj:FrenetTrajectory, expected_max_acc):
     #s_coef, _, T = trajectory
     #return max_acc_cost(s_coef, T, expected_max_acc)
     ptrajectory = frenet_traj.projected_trajectory
-    all_acc = [ptrajectory[i][1][2] for i in range(len(ptrajectory))] #1=s_state, 2=s_acc
+    all_acc = [pt[1][2] for pt in ptrajectory] #1=s_state, 2=s_acc
     max_acc = max(all_acc, key=abs)
     if abs(max_acc) > expected_max_acc:
         return 1 , max_acc
@@ -347,7 +425,7 @@ def max_lat_acc_cost(frenet_traj:FrenetTrajectory, expected_max_acc):
     #_, d_coef, T = trajectory
     #return max_acc_cost(d_coef, T, expected_max_acc)
     ptrajectory = frenet_traj.projected_trajectory
-    all_acc = [ptrajectory[i][2][2] for i in range(len(ptrajectory))] #2=d_state, 2=s_acc
+    all_acc = [pt[2][2] for pt in ptrajectory] #2=d_state, 2=d_acc
     max_acc = max(all_acc, key=abs)
     if abs(max_acc) > expected_max_acc:
         return 1 , max_acc
@@ -370,6 +448,10 @@ def max_lat_acc_cost(frenet_traj:FrenetTrajectory, expected_max_acc):
 
 def total_long_acc_cost(frenet_traj:FrenetTrajectory, expected_long_acc_per_sec):
     '''Penalizes high longitudinal acceleration'''
+    ## sean: this method actually estimates mean absolute acc, rather than total absolute acc
+    ## sean: dt and T have no effect, so "per_sec" is incorrect
+    """
+    ## sean: deprecated in favour of numpy functions to estimate mean absolute acc
     #s_coef, _, T = trajectory
     #return total_acc_cost(s_coef, T, expected_long_acc_per_sec)
     T = frenet_traj.T
@@ -378,6 +460,13 @@ def total_long_acc_cost(frenet_traj:FrenetTrajectory, expected_long_acc_per_sec)
     all_acc = [ abs( ptrajectory[i][1][2] * dt ) for i in range(len(ptrajectory))] #1-sstate 2-s_acc
     acc_per_sec = sum(all_acc) / T
     return logistic(acc_per_sec / expected_long_acc_per_sec )
+    """
+
+    s_acc = [pt[1][2] for pt in frenet_traj.projected_trajectory]
+    mean_abs_acc = np.mean(np.abs(s_acc))
+    # np.testing.assert_approx_equal(mean_abs_acc, acc_per_sec, significant=5)
+    return logistic(mean_abs_acc / expected_long_acc_per_sec )
+
     '''
     T = frenet_traj.T
     total_acc = 0
@@ -392,6 +481,10 @@ def total_long_acc_cost(frenet_traj:FrenetTrajectory, expected_long_acc_per_sec)
 
 def total_lat_acc_cost(frenet_traj:FrenetTrajectory, expected_lat_acc_per_sec):
     '''Penalizes high lateral acceleration'''
+    ## sean: this method actually estimates mean absolute acc, rather than total absolute acc
+    ## sean: dt and T have no effect, so "per_sec" is incorrect
+    """
+    ## sean: deprecated in favour of numpy fiunctions to estimate mean absolute acc
     #_, d_coef, T = trajectory
     #return total_acc_cost(d_coef, T, expected_lat_acc_per_sec)
     T = frenet_traj.T
@@ -400,6 +493,13 @@ def total_lat_acc_cost(frenet_traj:FrenetTrajectory, expected_lat_acc_per_sec):
     all_acc = [ abs( ptrajectory[i][2][2] * dt ) for i in range(len(ptrajectory))] #2-d_state 2-d_acc
     acc_per_sec = sum(all_acc) / T
     return logistic(acc_per_sec / expected_lat_acc_per_sec )
+    """
+
+    d_acc = [pt[2][2] for pt in frenet_traj.projected_trajectory]
+    mean_abs_acc = np.mean(np.abs(d_acc))
+    # np.testing.assert_approx_equal(mean_abs_acc, acc_per_sec, significant=5)
+    return logistic(mean_abs_acc / expected_lat_acc_per_sec )
+
     '''
     T = frenet_traj.T
     total_acc = 0

@@ -626,6 +626,9 @@ class Dashboard(object):
 
     @staticmethod
     def plot_trajectory(s_coef, d_coef, T, traj_s_shift, tcolor='grey'):
+        """
+        ## sean: to_equation is deprecated in favour of numpy Polynomial()
+        ## sean: explicit loop deprecated in favour of numpy functions
         s_eq = to_equation(s_coef)
         d_eq = to_equation(d_coef)
         X = []
@@ -635,6 +638,13 @@ class Dashboard(object):
             X.append(s_eq(t) + traj_s_shift)
             Y.append(d_eq(t))
             t += 0.25
+        """
+
+        t = np.arange(0,T+0.01,0.25)
+        s_coef[0] += traj_s_shift
+        X = Polynomial(s_coef)(t)
+        Y = Polynomial(d_coef)(t)
+
         #plot trajectory curve
         plt.plot(X,Y,color=tcolor)
 
@@ -657,19 +667,25 @@ class Dashboard(object):
         #S(t) curve
         plt.subplot(nrows,ncols,i)
         plt.cla()
-        Dashboard.plot_curve(s_coef,T, 'S', 'T', 'T (s)')
+        ## sean: plot_curve now receives a Polynomial as first parameter
+        s_pos_poly = Polynomial(s_coef)
+        Dashboard.plot_curve(s_pos_poly,T, 'S', 'T', 'T (s)')
         #S Vel(t) curve
         i+=1
         plt.subplot(nrows,ncols,i)
         plt.cla()
         plt.xlim(0,int(round(T)))
         plt.ylim(-15,15)
-        s_vel_coef = differentiate(s_coef)
-        Dashboard.plot_curve(s_vel_coef,T,'Long Vel (m/s)', '', 'T (s)')
+        ## sean: differentiating coefficients deprecated in favour of Polynomial.deriv
+        # s_vel_coef = differentiate(s_coef)
+        s_vel_poly = s_pos_poly.deriv()
+        Dashboard.plot_curve(s_vel_poly,T,'Long Vel (m/s)', '', 'T (s)')
 
         #S Acc(t) curve
         i+=1
-        s_acc_coef = differentiate(s_vel_coef)
+        ## sean: differentiating coefficients deprecated in favour of Polynomial.deriv
+        # s_acc_coef = differentiate(s_vel_coef)
+        s_acc_poly = s_vel_poly.deriv()
         plt.subplot(nrows,ncols,i)
         plt.cla()
         plt.xlim(0,int(round(T)))
@@ -677,7 +693,8 @@ class Dashboard(object):
         # if cand:
         #     for t in cand:
         #         Dashboard.plot_curve(differentiate(differentiate(t[0])),t[2],'Long Vel (m/s)', '', 'T (s)', color='grey')
-        Dashboard.plot_curve(s_acc_coef,T,'Long Acc (m/ss)', '', 'T (s)', color='black')
+        ## sean: plot_curve takesPolynomial as first parameter
+        Dashboard.plot_curve(s_acc_poly,T,'Long Acc (m/ss)', '', 'T (s)', color='black')
         #   S Jerk(t) curve
         #i+=1
         #s_jerk_coef = differentiate(s_acc_coef)
@@ -710,7 +727,7 @@ class Dashboard(object):
         #Dashboard.plot_curve(d_jerk_coef,T,'Jerk', T )
 
     @staticmethod
-    def plot_curve(coef, T, title, ylabel, xlabel, color="black"):
+    def plot_curve(poly, T, title, ylabel, xlabel, color="black"):
         #layout
         plt.title(title)
         plt.ylabel(ylabel)
@@ -718,14 +735,22 @@ class Dashboard(object):
         plt.axhline(0, color="grey")
         plt.axvline(0, color="grey")
         #plot equation
-        eq = to_equation(coef)
-        X = []
-        Y = []
-        t = 0
-        while t <= T+0.01:
-            X.append(t)
-            Y.append(eq(t))
-            t += 0.25
+        """
+        ## sean: to_equation is deprecated in favour of Polynomial
+        ## sean: first parameter of method now Polynomial, instead of coefficients
+        ## sean: explicit iteration deprecated in favour of numpy functions
+        # eq = to_equation(coef)
+        # X = []
+        # Y = []
+        # t = 0
+        # while t <= T+0.01:
+        #     X.append(t)
+        #     Y.append(eq(t))
+        #     t += 0.25
+        """
+
+        X = np.arange(0,T+0.01,0.25)
+        Y = poly(X)
         plt.plot(X,Y,color=color)
 
     def create_gui(self):
