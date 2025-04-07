@@ -261,7 +261,7 @@ class SP(Pedestrian):
 
         return fiW
 
-    def vehicle_interaction(self, curr_pos, vehicle):
+    def vehicle_interaction(self, curr_pos, curr_vel, vehicle):
         A = 20
         B = 0.1
         lambda_i = 0.5
