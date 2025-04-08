@@ -9,6 +9,7 @@ import random
 from matplotlib import pyplot as plt
 import uuid
 import numpy as np
+from numpy.polynomial.polynomial import Polynomial
 from scipy.stats import truncnorm
 from itertools import tee
 
@@ -39,7 +40,8 @@ def logistic(x):
     return 2.0 / (1 + exp(-x)) - 1.0
 
 #Returns a function of time f with given coefficients for a polynomial
-def to_equation(coefficients):
+## sean: deprecated in favour of numpy Polynomial()
+def to_equation_deprecated(coefficients):
     def f(t):
         total = 0.0
         for i, coef in enumerate(coefficients):
@@ -48,7 +50,8 @@ def to_equation(coefficients):
     return f
 
 #Calculates derivative of a polynomial and returns coefficients.
-def differentiate(coefficients):
+## sean: deprecated in favour of numpy Polynomial.deriv()
+def differentiate_deprecated(coefficients):
     der_coef = []
     for deg, prev_coef in enumerate(coefficients[1:]):
         der_coef.append((deg+1) * prev_coef)

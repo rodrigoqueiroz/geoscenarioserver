@@ -6,7 +6,8 @@
 # --------------------------------------------
 from dataclasses import dataclass
 from enum import IntEnum
-from util.Utils import to_equation, differentiate
+## sean: to_equation and differentiate are deprecated
+# from util.Utils import to_equation, differentiate
 from SimConfig import *
 import numpy as np
 import glog as log

@@ -63,6 +63,9 @@ class FrenetTrajectory:
         self.s_coef = s_coef
         self.d_coef = d_coef
         self.T = duration
+        
+        """
+        ## sean: differentiate is deprecated in favour of numpy Polynomial.deriv()
         #derivatives
         s_vel_coef = differentiate(s_coef)
         s_acc_coef = differentiate(s_vel_coef)
@@ -70,6 +73,7 @@ class FrenetTrajectory:
         d_vel_coef = differentiate(d_coef)
         d_acc_coef = differentiate(d_vel_coef)
         d_jerk_coef = differentiate(d_acc_coef)
+        ## sean: to_equation is deprecated in favour of numpy Polynomial
         #store equations
         self.fs = to_equation(s_coef)
         self.fs_vel = to_equation(s_vel_coef)
@@ -78,7 +82,18 @@ class FrenetTrajectory:
         self.fd = to_equation(d_coef)
         self.fd_vel = to_equation(d_vel_coef)
         self.fd_acc = to_equation(d_acc_coef)
-        self.fd_jerk = to_equation(d_jerk_coef)
+        self.fd_jerk = to_equatio(d_jerk_coef)
+        """
+
+        self.fs = Polynomial(s_coef)
+        self.fs_vel = self.fs.deriv()
+        self.fs_acc = self.fs_vel.deriv()
+        self.fs_jerk = self.fs_acc.deriv()
+        self.fd = Polynomial(d_coef)
+        self.fd_vel = self.fd.deriv()
+        self.fd_acc = self.fd_vel.deriv()
+        self.fd_jerk = self.fd_acc.deriv()
+
         #projects
         if projection_precision is not None:
             self.projected_trajectory = self.project(projection_precision)
@@ -99,6 +114,9 @@ class FrenetTrajectory:
         '''Projects trajectory from start to goal and split in equally distributed parts.
             Higher precision returns more measures, but impacts performance.
         '''
+        """
+        ## sean: deprecated in favour of numpy-based method
+        ## sean: this method does not include last state, giving inaccurate cost estimates
         projected = []
         dt = float(self.T) / precision
         for i in range(precision):
@@ -107,6 +125,13 @@ class FrenetTrajectory:
             state_s = [self.fs(t), self.fs_vel(t), self.fs_acc(t), self.fs_jerk(t)]
             state_d = [self.fd(t), self.fd_vel(t), self.fd_acc(t), self.fd_jerk(t)]
             projected.append([t,state_s,state_d])
+        return projected
+        """
+
+        t = np.linspace(0, self.T, precision)
+        states_s = np.stack((self.fs(t), self.fs_vel(t), self.fs_acc(t), self.fs_jerk(t)),axis=1).tolist()
+        states_d = np.stack((self.fd(t), self.fd_vel(t), self.fd_acc(t), self.fd_jerk(t)),axis=1).tolist()
+        projected = list(zip(t.tolist(),states_s,states_d))
         return projected
 
     def get_total_cost(self):
