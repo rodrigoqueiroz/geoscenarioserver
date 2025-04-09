@@ -92,7 +92,6 @@ class SimTraffic(object):
             if vehicle.type == Vehicle.SDV_TYPE:
                 _requirementsChecker = RequirementsChecker(vehicle, False)
                 _requirementsChecker.collision_check(vid, pedestrian.id, [pedestrian.state.x, pedestrian.state.y], vehicle, pedestrian.PEDESTRIAN_RADIUS)
-                print(vid, vehicle)
 
     def start(self):
         self.traffic_running = True

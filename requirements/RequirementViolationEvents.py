@@ -23,7 +23,6 @@ class ScenarioEnd:
 
 class UnmetRequirement:
 	def raise_it(self, agent_id, payload):
-		print(payload)
 		agent_logs = violations[agent_id]
 		agent_tick = agent_ticks[agent_id]
 
