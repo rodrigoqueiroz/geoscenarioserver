@@ -12,7 +12,7 @@ file_name        = os.path.join(os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(
                                 "violations.json")
 global_tick      = Value('i', -1)
 violations       = manager.dict()
-TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 5
+TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 7
 
 # Generic
 class ScenarioEnd:
@@ -65,7 +65,6 @@ class CollisionWithVehicle(UnmetRequirement):
 class CollisionWithPedestrian(UnmetRequirement):
 	def __init__(self, agent_id, pid, collision_zone, relative_angle):
 		collision_state = agent_collisions[agent_id]
-	
 
 		if pid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[pid]:
 			self.raise_it(agent_id, {
