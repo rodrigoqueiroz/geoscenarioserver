@@ -99,7 +99,7 @@ class SVPlanner(object):
     #==SUB PROCESS=============================================
     def before_exit(self,*args):
         if self.sync_planner:
-            self.sync_planner.write_peformance_log()
+            self.sync_planner.write_performance_log()
         sys.exit(0)
 
     def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata):
@@ -268,10 +268,14 @@ class SVPlanner(object):
         except KeyboardInterrupt as e:
             self._requirementsChecker.forced_exit()
 
-        except SystemExit:
+        except SystemExit as e:
             self._requirementsChecker.forced_exit()
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
+        
+        #record the log after ending planner process
+        if self.sync_planner:
+            self.sync_planner.write_performance_log()
 
     def write_motion_plan(self, mplan_sharr, plan:MotionPlan):
         if not plan:

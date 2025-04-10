@@ -163,7 +163,7 @@ def start_server(args, m=MVelKeepConfig()):
         except Exception as e:
             log.error(e)
             break
-    sync_global.write_peformance_log()
+    sync_global.write_performance_log()
     traffic.stop_all()
 
     if sim_config.show_dashboard:
