@@ -76,7 +76,7 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
     sync_global.set_timeout(sim_config.timeout)
 
     #find screen info 

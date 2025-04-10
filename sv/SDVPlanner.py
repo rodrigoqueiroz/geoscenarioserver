@@ -106,7 +106,7 @@ class SVPlanner(object):
         log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
         signal(SIGTERM, self.before_exit)
 
-        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
+        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label=f"planner_v{self.vid}")
 
 
         #Behavior Layer
