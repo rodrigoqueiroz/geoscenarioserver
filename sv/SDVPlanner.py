@@ -15,7 +15,7 @@ from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
-from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted
+from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
 from SimTraffic import *
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
@@ -270,7 +270,7 @@ class SVPlanner(object):
             ScenarioInterrupted(self.vid)
 
         except SystemExit:
-            pass # just normal
+            ScenarioEnd()
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         
