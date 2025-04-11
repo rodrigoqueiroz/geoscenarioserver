@@ -8,7 +8,7 @@
 from copy import copy
 import glog as log
 from multiprocessing import Array, Process, Value
-from signal import signal, SIGTERM
+from signal import signal, SIGTERM, SIGINT
 import sys
 
 from Actor import *
@@ -69,10 +69,14 @@ class SVPlanner(object):
             self._debug_shdata), daemon=True)
         self._process.start()
 
-    def stop(self):
+    def stop(self, interrupted = False):
         if self._process:
-            log.info("Terminate Planner Process - vehicle {}".format(self.vid))
-            self._process.terminate()
+            if interrupted:
+                log.info(f"Interrupt planner process for VID: {self.vid}")
+                os.kill(self._process.pid, SIGINT)
+            else:
+                log.info(f"Terminate planner process for VID: {self.vid}")
+                self._process.terminate()
             self._process.join()
 
     def get_plan(self):
@@ -104,11 +108,10 @@ class SVPlanner(object):
         sys.exit(0)
 
     def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata):
-        log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
+        log.info(f"PLANNER PROCESS START for VID {self.vid}")
         signal(SIGTERM, self.before_exit)
 
         self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label=f"planner_v{self.vid}")
-
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -266,7 +269,7 @@ class SVPlanner(object):
             with self.completion.get_lock():
                 self.completion.value = True
 
-        except KeyboardInterrupt as e:
+        except KeyboardInterrupt:
             ScenarioInterrupted(self.vid)
 
         except SystemExit:
