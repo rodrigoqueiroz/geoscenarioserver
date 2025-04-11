@@ -284,7 +284,7 @@ class SVPlanner(object):
         #write motion plan
         mplan_sharr.acquire() #<=========LOCK
         mplan_sharr[:] = plan.get_plan_vector()
-        #print('Writting Sh Data VP')
+        #print('Writing Sh Data VP')
         #print(mplan_sharr)
         mplan_sharr.release() #<=========RELEASE
 

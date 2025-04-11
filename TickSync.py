@@ -118,7 +118,7 @@ class TickSync():
         if LOG_PERFORMANCE:
             logtime = time.strftime("%Y%m%d-%H%M%S")
             filename = f"outputs/{self.label}_performance_log.csv"
-            log.info('Writting performance log: {}'.format(filename))
+            log.info('Writing performance log: {}'.format(filename))
             with open(filename,mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 titleline =['tickcount', 'sim_time','delta_time', 'drift']
