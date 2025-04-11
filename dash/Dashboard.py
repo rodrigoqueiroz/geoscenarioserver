@@ -70,6 +70,7 @@ class Dashboard(object):
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
         self.window = self.create_gui()
         sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="dash")
+        self.window.protocol("WM_DELETE_WINDOW", lambda arg=self.window: (sync_dash.write_performance_log(), arg.destroy()))
 
         while sync_dash.tick():
             if not self.window:
