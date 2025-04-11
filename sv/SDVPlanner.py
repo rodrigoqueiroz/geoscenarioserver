@@ -15,7 +15,7 @@ from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
-from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion
+from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted
 from SimTraffic import *
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
@@ -73,6 +73,7 @@ class SVPlanner(object):
         if self._process:
             log.info("Terminate Planner Process - vehicle {}".format(self.vid))
             self._process.terminate()
+            self._process.join()
 
     def get_plan(self):
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
@@ -266,10 +267,10 @@ class SVPlanner(object):
                 self.completion.value = True
 
         except KeyboardInterrupt as e:
-            self._requirementsChecker.forced_exit()
+            ScenarioInterrupted(self.vid)
 
-        except SystemExit as e:
-            self._requirementsChecker.forced_exit()
+        except SystemExit:
+            pass # just normal
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         

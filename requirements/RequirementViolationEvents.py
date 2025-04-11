@@ -45,6 +45,13 @@ class AgentTick:
 
 		agent_ticks[agent_id] += 1
 
+class ScenarioInterrupted(UnmetRequirement):
+	def __init__(self, agent_id):
+		self.raise_it(agent_id, {
+			'agentId': agent_id,
+			'message': 'v' + str(agent_id) + ' scenario interrupted by the user'
+		})
+		ScenarioEnd()
 
 class CollisionWithVehicle(UnmetRequirement):
 	def __init__(self, agent_id, vid):

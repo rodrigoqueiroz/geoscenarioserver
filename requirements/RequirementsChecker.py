@@ -107,11 +107,6 @@ class RequirementsChecker:
 				ScenarioEnd()
 				raise ScenarioCompletion()
 	
-	def forced_exit(self):
-		#store data upon forced exit
-		ScenarioEnd()
-		raise ScenarioCompletion
-
 	def do_polygons_intersect(self, polygon_a, polygon_b):
 		"""
 		* Reference: https://stackoverflow.com/questions/10962379/how-to-check-intersection-between-2-rotated-rectangles
