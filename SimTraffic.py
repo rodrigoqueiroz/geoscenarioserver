@@ -133,7 +133,10 @@ class SimTraffic(object):
 
         self.write_log_trajectories()
         for v in self.vehicles.values():
-            v.stop(interrupted)
+            if v.type == Vehicle.SDV_TYPE:
+                v.stop(interrupted)
+            else:
+                v.stop()
         for p in self.pedestrians.values():
             p.stop()
 
