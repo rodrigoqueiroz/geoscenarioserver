@@ -19,7 +19,7 @@ from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletio
 from SimTraffic import *
 from sv.FrenetTrajectory import *
 from sv.ManeuverConfig import *
-from sv.ManeuverModels import plan_maneuver
+from sv.ManeuverModels import determine_skip_replanning, plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
@@ -215,6 +215,8 @@ class SVPlanner(object):
                     #traj, cand, unf = plan_maneuver( mconfig.mkey,
                     frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
 
+                    skip_replanning = determine_skip_replanning(mconfig)
+
                     if EVALUATION_MODE and not self.last_plan:
                         self.sync_planner.end_task(False) #blocks if < target
                         task_delta_time = 0
@@ -222,10 +224,7 @@ class SVPlanner(object):
                         self.sync_planner.end_task() #blocks if < target
                         task_delta_time = self.sync_planner.get_task_time()
 
-                    if frenet_traj is None:
-                        log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
-                        pass
-                    else:
+                    if frenet_traj:
                         plan = MotionPlan()
                         plan.trajectory = frenet_traj
                         plan.start_time = state_time + task_delta_time
@@ -236,10 +235,15 @@ class SVPlanner(object):
                         self.write_motion_plan(mplan_sharr, plan)
                         if plan.trajectory.T > 0.0: #only for non zero traj
                             self.last_plan = plan
+                    elif skip_replanning:
+                        pass                
+                    else:
+                        log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
+                        pass
                 else:
                     frenet_traj, cand = None, None
 
-                #Debug info (for Dahsboard and Log)
+                #Debug info (for Dashboard and Log)
                 if self.sim_config.show_dashboard:
                     # change ref path format for pickling (maybe always keep it like this?)
                     debug_ref_path = [(pt.x, pt.y) for pt in self.sdv_route.get_reference_path()]
