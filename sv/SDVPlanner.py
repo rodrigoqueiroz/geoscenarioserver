@@ -215,7 +215,7 @@ class SVPlanner(object):
                     #traj, cand, unf = plan_maneuver( mconfig.mkey,
                     frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
 
-                    skip_replanning = determine_skip_replanning(mconfig)
+                    skip_replanning_if_planning_fails = determine_skip_replanning(mconfig)
 
                     if EVALUATION_MODE and not self.last_plan:
                         self.sync_planner.end_task(False) #blocks if < target
@@ -235,7 +235,7 @@ class SVPlanner(object):
                         self.write_motion_plan(mplan_sharr, plan)
                         if plan.trajectory.T > 0.0: #only for non zero traj
                             self.last_plan = plan
-                    elif skip_replanning:
+                    elif skip_replanning_if_planning_fails:
                         pass                
                     else:
                         log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
