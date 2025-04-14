@@ -27,7 +27,7 @@ from SimConfig import SimConfig
 from SimTraffic import SimTraffic
 from TickSync import TickSync
 
-def start_server(args, m=MVelKeepConfig()):
+def start_server(args):
     # log.setLevel("INFO")
     log.info('GeoScenario server START')
     lanelet_map = LaneletMap()
@@ -76,7 +76,7 @@ def start_server(args, m=MVelKeepConfig()):
         log.error("Failed to load scenario")
         return
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="EX")
+    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
     sync_global.set_timeout(sim_config.timeout)
 
     #find screen info 
@@ -145,8 +145,10 @@ def start_server(args, m=MVelKeepConfig()):
     else:
         log.warn("Dashboard will not start")
 
+    dashboard_interrupted = False
     while sync_global.tick():
         if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+            dashboard_interrupted = True
             break
         try:
             #Update Traffic
@@ -163,10 +165,10 @@ def start_server(args, m=MVelKeepConfig()):
         except Exception as e:
             log.error(e)
             break
-    sync_global.write_peformance_log()
-    traffic.stop_all()
+    sync_global.write_performance_log()
+    traffic.stop_all(dashboard_interrupted)
 
-    if sim_config.show_dashboard:
+    if sim_config.show_dashboard and dashboard._process.is_alive():
         dashboard.quit()
 
     #SIM END

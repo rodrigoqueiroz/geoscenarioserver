@@ -123,14 +123,14 @@ class SimTraffic(object):
             if pedestrian.type == Pedestrian.SP_TYPE:
                 pedestrian.start_planner()
 
-    def stop_all(self):
+    def stop_all(self, interrupted = False):
         self.traffic_running = False
         if self.carla_sync:
             self.carla_sync.quit()
 
         self.write_log_trajectories()
         for vid in self.vehicles:
-            self.vehicles[vid].stop()
+            self.vehicles[vid].stop(interrupted)
         for pid in self.pedestrians:
             self.pedestrians[pid].stop()
 
