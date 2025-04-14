@@ -85,9 +85,9 @@ class SDV(Vehicle):
         self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes, self.goal_ends_simulation, self.rule_engine_port)
         self.sv_planner.start()
 
-    def stop(self):
+    def stop(self, interrupted = False):
         if self.sv_planner:
-            self.sv_planner.stop()
+            self.sv_planner.stop(interrupted)
 
     def tick(self, tick_count:int, delta_time:float, sim_time:float):
         if self.goal_ends_simulation and self.sv_planner.completion.value:

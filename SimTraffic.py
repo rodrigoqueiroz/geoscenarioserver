@@ -20,6 +20,8 @@ from shm.SimSharedMemoryServer import *
 from sp.Pedestrian import *
 from sv.Vehicle import Vehicle
 from TrafficLight import TrafficLight
+from requirements import RequirementsChecker
+from Actor import ActorSimState
 
 try:
     from shm.CarlaSync import *
@@ -88,6 +90,12 @@ class SimTraffic(object):
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
 
+    def collision_check(self, pedestrian):
+        for vid, vehicle in self.vehicles.items():
+            if vehicle.type == Vehicle.SDV_TYPE:
+                _requirementsChecker = RequirementsChecker(vehicle, False)
+                _requirementsChecker.collision_check(vid, pedestrian.id, [pedestrian.state.x, pedestrian.state.y], vehicle, pedestrian.PEDESTRIAN_RADIUS)
+
     def start(self):
         self.traffic_running = True
         #Optional CARLA co-sim
@@ -118,14 +126,14 @@ class SimTraffic(object):
             if pedestrian.type == Pedestrian.SP_TYPE:
                 pedestrian.start_planner()
 
-    def stop_all(self):
+    def stop_all(self, interrupted = False):
         self.traffic_running = False
         if self.carla_sync:
             self.carla_sync.quit()
 
         self.write_log_trajectories()
         for v in self.vehicles.values():
-            v.stop()
+            v.stop(interrupted)
         for p in self.pedestrians.values():
             p.stop()
 
@@ -181,6 +189,10 @@ class SimTraffic(object):
         #tick pedestrians:
         for p in self.pedestrians.values():
             p.tick(tick_count, delta_time, sim_time)
+            if p.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
+                continue
+            self.collision_check(p)
+
         Pedestrian.VEHICLES_POS = {}
 
         #Update traffic light states

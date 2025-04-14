@@ -15,6 +15,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 import datetime
+from signal import signal, SIGTERM, SIGINT
 from PIL import Image, ImageTk
 import glog as log
 from SimTraffic import *
@@ -68,8 +69,13 @@ class Dashboard(object):
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
         self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, block=True, verbose=False, label="DP")
-
+        sync_dash = TickSync(DASH_RATE, block=True, verbose=False, label="dash")
+        # handle user closing the window
+        self.window.protocol("WM_DELETE_WINDOW", lambda arg=self.window: (sync_dash.write_performance_log(), arg.destroy()))
+        # handle process termination sent from quit()
+        signal(SIGTERM, lambda s, f: sync_dash.write_performance_log())
+        # handle user's <CTRL>+C
+        signal(SIGINT, lambda s, f: sync_dash.write_performance_log())
         while sync_dash.tick():
             if not self.window:
                 return

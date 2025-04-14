@@ -128,10 +128,10 @@ class TickSync():
             log.info('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
                     format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         
-    def write_peformance_log(self):
+    def write_performance_log(self):
         if LOG_PERFORMANCE:
             logtime = time.strftime("%Y%m%d-%H%M%S")
-            filename = "outputs/{}_performance_log.csv".format(self.label)
+            filename = f"outputs/{self.label}_performance_log.csv"
             log.info('Writing performance log: {}'.format(filename))
             with open(filename,mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)

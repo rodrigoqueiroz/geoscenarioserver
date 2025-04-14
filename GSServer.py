@@ -157,8 +157,10 @@ def start_server(args):
     else:
         log.warn("Dashboard will not start")
 
+    dashboard_interrupted = False
     while sync_global.tick():
         if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+            dashboard_interrupted = True
             break
         try:
             #Update Traffic
@@ -175,10 +177,10 @@ def start_server(args):
         except Exception as e:
             log.error(e)
             break
-    sync_global.write_peformance_log()
-    traffic.stop_all()
+    sync_global.write_performance_log()
+    traffic.stop_all(dashboard_interrupted)
 
-    if sim_config.show_dashboard:
+    if sim_config.show_dashboard and dashboard._process.is_alive():
         dashboard.quit()
 
     #SIM END
