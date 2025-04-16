@@ -22,7 +22,7 @@ Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 
 ### Python packages
 
-- antlr4-python3-runtime==4.9.3 (later versions cause a parsing error `Exception: Could not deserialize ATN with version (expected 4).`)
+- antlr4-python3-runtime >= 4.13
 - antlr-denter
 - glog
 - lanelet2
@@ -63,6 +63,7 @@ pixi run -e humble rqt
 pixi run -e humble ros_client_build
 pixi run -e humble ros_client
 pixi run -e humble ros_mock_co_simulator
+pixi run -e antlr regenerate
 ```
 
 To run automated test of ROS2 client using the mock co-simulator, execute:
