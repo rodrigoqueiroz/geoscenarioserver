@@ -4,25 +4,25 @@ behaviortree handle_intersection:
             condition c_row ( intersection_type(type=RIGHT_OF_WAY) )
             ?
                 ->
-                    condition c_role ( yield_role )
+                    condition c_role ( yield_role() )
                     ?
                         ->
                             condition c_row_occ ( intersection_occupied(distance=50) )
                             maneuver m_yield ( MStopConfig(target=STOP_LINE) )
                         ->
-                            condition c_row_move ( vehicle_moving )
+                            condition c_row_move ( vehicle_moving() )
                             maneuver m_yield ( MStopConfig(target=STOP_LINE) )
         ->
             condition c_aws ( intersection_type(type=ALL_WAY_STOP) )
             ?
                 ->
-                    condition c_aws_move ( vehicle_moving )
+                    condition c_aws_move ( vehicle_moving() )
                     maneuver m_yield ( MStopConfig(target=STOP_LINE) )
                 ->
-                    condition c_aws_occ ( intersection_occupied )
+                    condition c_aws_occ ( intersection_occupied() )
                     maneuver m_yield ( MStopConfig(target=STOP_LINE) )
                 ->
-                    condition c_aws_yield (aws_yielding )
+                    condition c_aws_yield (aws_yielding() )
                     maneuver m_yield ( MStopConfig(target=STOP_LINE) )
                     
         ->
