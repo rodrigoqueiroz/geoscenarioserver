@@ -10,6 +10,7 @@
   <test_depend>python3-pytest</test_depend>
 
   <depend>geoscenario_msgs</depend>
+  <depend>geographic_msgs</depend>
 
   <export>
     <build_type>ament_python</build_type>
