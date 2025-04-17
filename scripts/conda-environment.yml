@@ -5,7 +5,7 @@ dependencies:
   - python=3.11
   - tk=*=xft_* # use the TrueType variant
   - pip
-  - antlr4-python3-runtime==4.9.3
+  - antlr4-python3-runtime>=4.13
   - graphviz
   - matplotlib
   - numpy

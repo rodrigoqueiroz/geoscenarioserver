@@ -16,7 +16,7 @@ libc = { family = "glibc", version = "2.31" }
 python = "3.11.*"
 pip = "*"
 tk = { build = "xft_*" }
-antlr4-python3-runtime = "==4.9.3"
+antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
 matplotlib = "*"
 numpy = "*"
@@ -37,6 +37,7 @@ libgl-devel = "*"
 
 [environments]
 humble = { features = ["humble"] }
+antlr = { features = ["antlr"] }
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
@@ -62,3 +63,9 @@ ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs =
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build"] }
 ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_client_build"] }
 rqt = "rqt"
+
+[feature.antlr.dependencies]
+antlr4-tools = "*"
+
+[feature.antlr.tasks]
+regenerate = "antlr4 -Dlanguage=Python3 sv/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 sp/btree/parser/BTreeDSL.g4"
