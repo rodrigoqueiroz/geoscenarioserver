@@ -102,7 +102,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
-    log.info("Scenario Setup, initializing vehicles:")
+    log.debug("Scenario Setup, initializing vehicles:")
     for vid, vnode in parser.vehicles.items():
         if len(sim_traffic.vehicles) >= MAX_NVEHICLES:
             break
@@ -129,7 +129,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         rule_engine_port = extract_tag(vnode, 'rule_engine_port', None, int)
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
-        log.info("Vehicle {}, behavior type {}".format(vid,btype))    
+        log.debug(f"Initializing vehicle VID:{vid} with behavior type: {btype}...")
 
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
@@ -303,7 +303,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
     #========= Pedestrians
     if len(parser.pedestrians.items()) > 0:
-        log.info("Scenario Setup, initializing pedestrians:")
+        log.debug("Scenario Setup, initializing pedestrians:")
     for pid, pnode in parser.pedestrians.items():
         pid = int(pid)
         name = pnode.tags['name']
