@@ -1,84 +1,77 @@
-# Generated from BTreeDSL.g4 by ANTLR 4.7.2
+# Generated from sv/btree/parser/BTreeDSL.g4 by ANTLR 4.13.2
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-from typing.io import TextIO
 import sys
+if sys.version_info[1] > 5:
+	from typing import TextIO
+else:
+	from typing.io import TextIO
 
 def serializedATN():
-    with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\23")
-        buf.write("\u00bc\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
-        buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
-        buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
-        buf.write("\3\2\3\2\3\2\3\2\3\2\3\2\5\2-\n\2\3\2\5\2\60\n\2\6\2\62")
-        buf.write("\n\2\r\2\16\2\63\3\2\3\2\3\3\3\3\3\4\3\4\5\4<\n\4\3\5")
-        buf.write("\3\5\5\5@\n\5\3\5\3\5\6\5D\n\5\r\5\16\5E\3\5\3\5\3\6\3")
-        buf.write("\6\3\6\5\6M\n\6\3\6\3\6\3\7\3\7\3\7\3\7\3\7\3\7\3\b\3")
-        buf.write("\b\3\b\3\b\3\b\3\b\3\t\3\t\3\t\3\t\3\t\3\t\7\tc\n\t\f")
-        buf.write("\t\16\tf\13\t\5\th\n\t\3\t\3\t\3\n\3\n\3\n\3\n\3\13\3")
-        buf.write("\13\3\13\7\13s\n\13\f\13\16\13v\13\13\3\13\3\13\3\f\3")
-        buf.write("\f\3\f\7\f}\n\f\f\f\16\f\u0080\13\f\3\f\3\f\3\r\3\r\3")
-        buf.write("\16\3\16\3\16\7\16\u0089\n\16\f\16\16\16\u008c\13\16\3")
-        buf.write("\17\3\17\3\17\3\17\3\20\3\20\3\20\3\20\5\20\u0096\n\20")
-        buf.write("\3\21\3\21\3\21\3\21\3\21\7\21\u009d\n\21\f\21\16\21\u00a0")
-        buf.write("\13\21\3\21\3\21\3\22\3\22\3\22\3\22\7\22\u00a8\n\22\f")
-        buf.write("\22\16\22\u00ab\13\22\3\22\3\22\3\23\7\23\u00b0\n\23\f")
-        buf.write("\23\16\23\u00b3\13\23\3\23\3\23\7\23\u00b7\n\23\f\23\16")
-        buf.write("\23\u00ba\13\23\3\23\2\2\24\2\4\6\b\n\f\16\20\22\24\26")
-        buf.write("\30\32\34\36 \"$\2\3\3\2\f\r\2\u00bd\2\61\3\2\2\2\4\67")
-        buf.write("\3\2\2\2\6;\3\2\2\2\b=\3\2\2\2\nL\3\2\2\2\fP\3\2\2\2\16")
-        buf.write("V\3\2\2\2\20\\\3\2\2\2\22k\3\2\2\2\24o\3\2\2\2\26y\3\2")
-        buf.write("\2\2\30\u0083\3\2\2\2\32\u0085\3\2\2\2\34\u008d\3\2\2")
-        buf.write("\2\36\u0095\3\2\2\2 \u0097\3\2\2\2\"\u00a3\3\2\2\2$\u00b1")
-        buf.write("\3\2\2\2&\'\7\3\2\2\'(\5$\23\2()\7\4\2\2)*\7\22\2\2*,")
-        buf.write("\5\4\3\2+-\7\21\2\2,+\3\2\2\2,-\3\2\2\2-/\3\2\2\2.\60")
-        buf.write("\7\23\2\2/.\3\2\2\2/\60\3\2\2\2\60\62\3\2\2\2\61&\3\2")
-        buf.write("\2\2\62\63\3\2\2\2\63\61\3\2\2\2\63\64\3\2\2\2\64\65\3")
-        buf.write("\2\2\2\65\66\7\2\2\3\66\3\3\2\2\2\678\5\6\4\28\5\3\2\2")
-        buf.write("\29<\5\n\6\2:<\5\b\5\2;9\3\2\2\2;:\3\2\2\2<\7\3\2\2\2")
-        buf.write("=?\7\13\2\2>@\5$\23\2?>\3\2\2\2?@\3\2\2\2@A\3\2\2\2AC")
-        buf.write("\7\22\2\2BD\5\6\4\2CB\3\2\2\2DE\3\2\2\2EC\3\2\2\2EF\3")
-        buf.write("\2\2\2FG\3\2\2\2GH\7\23\2\2H\t\3\2\2\2IM\5\16\b\2JM\5")
-        buf.write("\f\7\2KM\5\20\t\2LI\3\2\2\2LJ\3\2\2\2LK\3\2\2\2MN\3\2")
-        buf.write("\2\2NO\7\21\2\2O\13\3\2\2\2PQ\7\5\2\2QR\5$\23\2RS\7\6")
-        buf.write("\2\2ST\5\26\f\2TU\7\7\2\2U\r\3\2\2\2VW\7\b\2\2WX\5$\23")
-        buf.write("\2XY\7\6\2\2YZ\5\24\13\2Z[\7\7\2\2[\17\3\2\2\2\\]\7\t")
-        buf.write("\2\2]^\5$\23\2^g\7\6\2\2_d\5\22\n\2`a\7\n\2\2ac\5\22\n")
-        buf.write("\2b`\3\2\2\2cf\3\2\2\2db\3\2\2\2de\3\2\2\2eh\3\2\2\2f")
-        buf.write("d\3\2\2\2g_\3\2\2\2gh\3\2\2\2hi\3\2\2\2ij\7\7\2\2j\21")
-        buf.write("\3\2\2\2kl\5\30\r\2lm\7\r\2\2mn\5\24\13\2n\23\3\2\2\2")
-        buf.write("op\5$\23\2pt\7\6\2\2qs\5\32\16\2rq\3\2\2\2sv\3\2\2\2t")
-        buf.write("r\3\2\2\2tu\3\2\2\2uw\3\2\2\2vt\3\2\2\2wx\7\7\2\2x\25")
-        buf.write("\3\2\2\2yz\5$\23\2z~\7\6\2\2{}\5\32\16\2|{\3\2\2\2}\u0080")
-        buf.write("\3\2\2\2~|\3\2\2\2~\177\3\2\2\2\177\u0081\3\2\2\2\u0080")
-        buf.write("~\3\2\2\2\u0081\u0082\7\7\2\2\u0082\27\3\2\2\2\u0083\u0084")
-        buf.write("\5$\23\2\u0084\31\3\2\2\2\u0085\u008a\5\34\17\2\u0086")
-        buf.write("\u0087\7\n\2\2\u0087\u0089\5\34\17\2\u0088\u0086\3\2\2")
-        buf.write("\2\u0089\u008c\3\2\2\2\u008a\u0088\3\2\2\2\u008a\u008b")
-        buf.write("\3\2\2\2\u008b\33\3\2\2\2\u008c\u008a\3\2\2\2\u008d\u008e")
-        buf.write("\5$\23\2\u008e\u008f\t\2\2\2\u008f\u0090\5\36\20\2\u0090")
-        buf.write("\35\3\2\2\2\u0091\u0096\7\16\2\2\u0092\u0096\5$\23\2\u0093")
-        buf.write("\u0096\5 \21\2\u0094\u0096\5\"\22\2\u0095\u0091\3\2\2")
-        buf.write("\2\u0095\u0092\3\2\2\2\u0095\u0093\3\2\2\2\u0095\u0094")
-        buf.write("\3\2\2\2\u0096\37\3\2\2\2\u0097\u0098\5$\23\2\u0098\u0099")
-        buf.write("\7\6\2\2\u0099\u009e\7\16\2\2\u009a\u009b\7\n\2\2\u009b")
-        buf.write("\u009d\7\16\2\2\u009c\u009a\3\2\2\2\u009d\u00a0\3\2\2")
-        buf.write("\2\u009e\u009c\3\2\2\2\u009e\u009f\3\2\2\2\u009f\u00a1")
-        buf.write("\3\2\2\2\u00a0\u009e\3\2\2\2\u00a1\u00a2\7\7\2\2\u00a2")
-        buf.write("!\3\2\2\2\u00a3\u00a4\7\6\2\2\u00a4\u00a9\7\16\2\2\u00a5")
-        buf.write("\u00a6\7\n\2\2\u00a6\u00a8\7\16\2\2\u00a7\u00a5\3\2\2")
-        buf.write("\2\u00a8\u00ab\3\2\2\2\u00a9\u00a7\3\2\2\2\u00a9\u00aa")
-        buf.write("\3\2\2\2\u00aa\u00ac\3\2\2\2\u00ab\u00a9\3\2\2\2\u00ac")
-        buf.write("\u00ad\7\7\2\2\u00ad#\3\2\2\2\u00ae\u00b0\7\20\2\2\u00af")
-        buf.write("\u00ae\3\2\2\2\u00b0\u00b3\3\2\2\2\u00b1\u00af\3\2\2\2")
-        buf.write("\u00b1\u00b2\3\2\2\2\u00b2\u00b4\3\2\2\2\u00b3\u00b1\3")
-        buf.write("\2\2\2\u00b4\u00b8\7\17\2\2\u00b5\u00b7\7\20\2\2\u00b6")
-        buf.write("\u00b5\3\2\2\2\u00b7\u00ba\3\2\2\2\u00b8\u00b6\3\2\2\2")
-        buf.write("\u00b8\u00b9\3\2\2\2\u00b9%\3\2\2\2\u00ba\u00b8\3\2\2")
-        buf.write("\2\23,/\63;?ELdgt~\u008a\u0095\u009e\u00a9\u00b1\u00b8")
-        return buf.getvalue()
-
+    return [
+        4,1,17,186,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
+        2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,1,0,1,0,1,0,1,0,1,0,1,0,
+        3,0,43,8,0,1,0,3,0,46,8,0,4,0,48,8,0,11,0,12,0,49,1,0,1,0,1,1,1,
+        1,1,2,1,2,3,2,58,8,2,1,3,1,3,3,3,62,8,3,1,3,1,3,4,3,66,8,3,11,3,
+        12,3,67,1,3,1,3,1,4,1,4,1,4,3,4,75,8,4,1,4,1,4,1,5,1,5,1,5,1,5,1,
+        5,1,5,1,6,1,6,1,6,1,6,1,6,1,6,1,7,1,7,1,7,1,7,1,7,1,7,5,7,97,8,7,
+        10,7,12,7,100,9,7,3,7,102,8,7,1,7,1,7,1,8,1,8,1,8,1,8,1,9,1,9,1,
+        9,5,9,113,8,9,10,9,12,9,116,9,9,1,9,1,9,1,10,1,10,1,10,5,10,123,
+        8,10,10,10,12,10,126,9,10,1,10,1,10,1,11,1,11,1,12,1,12,1,12,5,12,
+        135,8,12,10,12,12,12,138,9,12,1,13,1,13,1,13,1,13,1,14,1,14,1,14,
+        1,14,3,14,148,8,14,1,15,1,15,1,15,1,15,1,15,5,15,155,8,15,10,15,
+        12,15,158,9,15,1,15,1,15,1,16,1,16,1,16,1,16,5,16,166,8,16,10,16,
+        12,16,169,9,16,1,16,1,16,1,17,5,17,174,8,17,10,17,12,17,177,9,17,
+        1,17,1,17,5,17,181,8,17,10,17,12,17,184,9,17,1,17,0,0,18,0,2,4,6,
+        8,10,12,14,16,18,20,22,24,26,28,30,32,34,0,1,1,0,10,11,187,0,47,
+        1,0,0,0,2,53,1,0,0,0,4,57,1,0,0,0,6,59,1,0,0,0,8,74,1,0,0,0,10,78,
+        1,0,0,0,12,84,1,0,0,0,14,90,1,0,0,0,16,105,1,0,0,0,18,109,1,0,0,
+        0,20,119,1,0,0,0,22,129,1,0,0,0,24,131,1,0,0,0,26,139,1,0,0,0,28,
+        147,1,0,0,0,30,149,1,0,0,0,32,161,1,0,0,0,34,175,1,0,0,0,36,37,5,
+        1,0,0,37,38,3,34,17,0,38,39,5,2,0,0,39,40,5,16,0,0,40,42,3,2,1,0,
+        41,43,5,15,0,0,42,41,1,0,0,0,42,43,1,0,0,0,43,45,1,0,0,0,44,46,5,
+        17,0,0,45,44,1,0,0,0,45,46,1,0,0,0,46,48,1,0,0,0,47,36,1,0,0,0,48,
+        49,1,0,0,0,49,47,1,0,0,0,49,50,1,0,0,0,50,51,1,0,0,0,51,52,5,0,0,
+        1,52,1,1,0,0,0,53,54,3,4,2,0,54,3,1,0,0,0,55,58,3,8,4,0,56,58,3,
+        6,3,0,57,55,1,0,0,0,57,56,1,0,0,0,58,5,1,0,0,0,59,61,5,9,0,0,60,
+        62,3,34,17,0,61,60,1,0,0,0,61,62,1,0,0,0,62,63,1,0,0,0,63,65,5,16,
+        0,0,64,66,3,4,2,0,65,64,1,0,0,0,66,67,1,0,0,0,67,65,1,0,0,0,67,68,
+        1,0,0,0,68,69,1,0,0,0,69,70,5,17,0,0,70,7,1,0,0,0,71,75,3,12,6,0,
+        72,75,3,10,5,0,73,75,3,14,7,0,74,71,1,0,0,0,74,72,1,0,0,0,74,73,
+        1,0,0,0,75,76,1,0,0,0,76,77,5,15,0,0,77,9,1,0,0,0,78,79,5,3,0,0,
+        79,80,3,34,17,0,80,81,5,4,0,0,81,82,3,20,10,0,82,83,5,5,0,0,83,11,
+        1,0,0,0,84,85,5,6,0,0,85,86,3,34,17,0,86,87,5,4,0,0,87,88,3,18,9,
+        0,88,89,5,5,0,0,89,13,1,0,0,0,90,91,5,7,0,0,91,92,3,34,17,0,92,101,
+        5,4,0,0,93,98,3,16,8,0,94,95,5,8,0,0,95,97,3,16,8,0,96,94,1,0,0,
+        0,97,100,1,0,0,0,98,96,1,0,0,0,98,99,1,0,0,0,99,102,1,0,0,0,100,
+        98,1,0,0,0,101,93,1,0,0,0,101,102,1,0,0,0,102,103,1,0,0,0,103,104,
+        5,5,0,0,104,15,1,0,0,0,105,106,3,22,11,0,106,107,5,11,0,0,107,108,
+        3,18,9,0,108,17,1,0,0,0,109,110,3,34,17,0,110,114,5,4,0,0,111,113,
+        3,24,12,0,112,111,1,0,0,0,113,116,1,0,0,0,114,112,1,0,0,0,114,115,
+        1,0,0,0,115,117,1,0,0,0,116,114,1,0,0,0,117,118,5,5,0,0,118,19,1,
+        0,0,0,119,120,3,34,17,0,120,124,5,4,0,0,121,123,3,24,12,0,122,121,
+        1,0,0,0,123,126,1,0,0,0,124,122,1,0,0,0,124,125,1,0,0,0,125,127,
+        1,0,0,0,126,124,1,0,0,0,127,128,5,5,0,0,128,21,1,0,0,0,129,130,3,
+        34,17,0,130,23,1,0,0,0,131,136,3,26,13,0,132,133,5,8,0,0,133,135,
+        3,26,13,0,134,132,1,0,0,0,135,138,1,0,0,0,136,134,1,0,0,0,136,137,
+        1,0,0,0,137,25,1,0,0,0,138,136,1,0,0,0,139,140,3,34,17,0,140,141,
+        7,0,0,0,141,142,3,28,14,0,142,27,1,0,0,0,143,148,5,12,0,0,144,148,
+        3,34,17,0,145,148,3,30,15,0,146,148,3,32,16,0,147,143,1,0,0,0,147,
+        144,1,0,0,0,147,145,1,0,0,0,147,146,1,0,0,0,148,29,1,0,0,0,149,150,
+        3,34,17,0,150,151,5,4,0,0,151,156,5,12,0,0,152,153,5,8,0,0,153,155,
+        5,12,0,0,154,152,1,0,0,0,155,158,1,0,0,0,156,154,1,0,0,0,156,157,
+        1,0,0,0,157,159,1,0,0,0,158,156,1,0,0,0,159,160,5,5,0,0,160,31,1,
+        0,0,0,161,162,5,4,0,0,162,167,5,12,0,0,163,164,5,8,0,0,164,166,5,
+        12,0,0,165,163,1,0,0,0,166,169,1,0,0,0,167,165,1,0,0,0,167,168,1,
+        0,0,0,168,170,1,0,0,0,169,167,1,0,0,0,170,171,5,5,0,0,171,33,1,0,
+        0,0,172,174,5,14,0,0,173,172,1,0,0,0,174,177,1,0,0,0,175,173,1,0,
+        0,0,175,176,1,0,0,0,176,178,1,0,0,0,177,175,1,0,0,0,178,182,5,13,
+        0,0,179,181,5,14,0,0,180,179,1,0,0,0,181,184,1,0,0,0,182,180,1,0,
+        0,0,182,183,1,0,0,0,183,35,1,0,0,0,184,182,1,0,0,0,17,42,45,49,57,
+        61,67,74,98,101,114,124,136,147,156,167,175,182
+    ]
 
 class BTreeDSLParser ( Parser ):
 
@@ -144,13 +137,15 @@ class BTreeDSLParser ( Parser ):
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        #self.checkVersion("4.7.2")
+        self.checkVersion("4.13.2")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
 
 
+
     class BehaviorTreeContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -229,7 +224,7 @@ class BTreeDSLParser ( Parser ):
                 self.state = 42
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if _la==BTreeDSLParser.NL:
+                if _la==15:
                     self.state = 41
                     self.match(BTreeDSLParser.NL)
 
@@ -237,7 +232,7 @@ class BTreeDSLParser ( Parser ):
                 self.state = 45
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if _la==BTreeDSLParser.DEDENT:
+                if _la==17:
                     self.state = 44
                     self.match(BTreeDSLParser.DEDENT)
 
@@ -245,7 +240,7 @@ class BTreeDSLParser ( Parser ):
                 self.state = 49 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not (_la==BTreeDSLParser.T__0):
+                if not (_la==1):
                     break
 
             self.state = 51
@@ -258,7 +253,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class RootNodeContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -298,7 +295,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class NodeContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -334,12 +333,12 @@ class BTreeDSLParser ( Parser ):
             self.state = 57
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [BTreeDSLParser.T__2, BTreeDSLParser.T__5, BTreeDSLParser.T__6]:
+            if token in [3, 6, 7]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 55
                 self.leafNode()
                 pass
-            elif token in [BTreeDSLParser.OPERATOR]:
+            elif token in [9]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 56
                 self.nodeComposition()
@@ -355,7 +354,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class NodeCompositionContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -407,7 +408,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 61
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==BTreeDSLParser.WORD or _la==BTreeDSLParser.WS:
+            if _la==13 or _la==14:
                 self.state = 60
                 self.name()
 
@@ -423,7 +424,7 @@ class BTreeDSLParser ( Parser ):
                 self.state = 67 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << BTreeDSLParser.T__2) | (1 << BTreeDSLParser.T__5) | (1 << BTreeDSLParser.T__6) | (1 << BTreeDSLParser.OPERATOR))) != 0)):
+                if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & 712) != 0)):
                     break
 
             self.state = 69
@@ -436,7 +437,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class LeafNodeContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -480,15 +483,15 @@ class BTreeDSLParser ( Parser ):
             self.state = 74
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [BTreeDSLParser.T__5]:
+            if token in [6]:
                 self.state = 71
                 self.maneuver()
                 pass
-            elif token in [BTreeDSLParser.T__2]:
+            elif token in [3]:
                 self.state = 72
                 self.condition()
                 pass
-            elif token in [BTreeDSLParser.T__6]:
+            elif token in [7]:
                 self.state = 73
                 self.subtree()
                 pass
@@ -505,7 +508,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class ConditionContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -557,7 +562,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class ManeuverContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -609,7 +616,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class SubtreeContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -656,13 +665,13 @@ class BTreeDSLParser ( Parser ):
             self.state = 101
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==BTreeDSLParser.WORD or _la==BTreeDSLParser.WS:
+            if _la==13 or _la==14:
                 self.state = 93
                 self.midconf()
                 self.state = 98
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==BTreeDSLParser.T__7:
+                while _la==8:
                     self.state = 94
                     self.match(BTreeDSLParser.T__7)
                     self.state = 95
@@ -683,7 +692,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class MidconfContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -734,7 +745,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class MconfigContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -779,7 +792,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 114
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.WORD or _la==BTreeDSLParser.WS:
+            while _la==13 or _la==14:
                 self.state = 111
                 self.params()
                 self.state = 116
@@ -796,7 +809,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class CconfigContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -841,7 +856,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 124
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.WORD or _la==BTreeDSLParser.WS:
+            while _la==13 or _la==14:
                 self.state = 121
                 self.params()
                 self.state = 126
@@ -858,7 +873,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class MidContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -898,7 +915,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class ParamsContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -937,7 +956,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 136
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.T__7:
+            while _la==8:
                 self.state = 132
                 self.match(BTreeDSLParser.T__7)
                 self.state = 133
@@ -954,7 +973,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class BexprContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -999,7 +1020,7 @@ class BTreeDSLParser ( Parser ):
             self.name()
             self.state = 140
             _la = self._input.LA(1)
-            if not(_la==BTreeDSLParser.BOP or _la==BTreeDSLParser.ATT):
+            if not(_la==10 or _la==11):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -1014,7 +1035,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class ValueContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -1090,7 +1113,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class FuncContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -1136,7 +1161,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 156
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.T__7:
+            while _la==8:
                 self.state = 152
                 self.match(BTreeDSLParser.T__7)
                 self.state = 153
@@ -1155,7 +1180,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class TuplContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -1195,7 +1222,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 167
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.T__7:
+            while _la==8:
                 self.state = 163
                 self.match(BTreeDSLParser.T__7)
                 self.state = 164
@@ -1214,7 +1241,9 @@ class BTreeDSLParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class NameContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -1253,7 +1282,7 @@ class BTreeDSLParser ( Parser ):
             self.state = 175
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while _la==BTreeDSLParser.WS:
+            while _la==14:
                 self.state = 172
                 self.match(BTreeDSLParser.WS)
                 self.state = 177
