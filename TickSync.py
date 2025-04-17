@@ -94,15 +94,19 @@ class TickSync():
                     #Update globals
                     passed_time = (now - self._sim_start_clock).total_seconds()
                     self.sim_time = self.sim_start_time + passed_time
-            elif (self.block == None):
-                return False            #return false to skip
+            elif (not self.block):
+                return False  #return False to skip
             else:
+                if (self.block != None):
+                    # wait on the blocker
+                    self.block.wait()
                 #assume that the expected tick duration has passed
                 self.delta_time = self.expected_tick_duration
                 self.drift = 0.0
                 self._tick_start_clock += timedelta(seconds=self.expected_tick_duration)
                 #Update globals
                 self.sim_time += self.expected_tick_duration
+
         self.tick_count+=1
         #stats
         self.update_stats()
@@ -164,8 +168,7 @@ class TickSync():
             if block:
                 time.sleep(diff) 
         else:
-            log.error("Task {} took longer than expected. Plan Tick: {}, Expected: {}, Actual: {}".format
-                            (self.task_label, self.tick_count, self.target_t, delta_time))
+            log.error(f"Task {self.task_label} at tick {self.tick_count} took {delta_time} instead of the expected {self.target_t}")
             #if variable task time, target will be adjusted for the next cycle
             if self.max_t:
                 #increase target and cap by max t
