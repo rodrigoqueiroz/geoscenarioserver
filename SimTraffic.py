@@ -187,7 +187,10 @@ class SimTraffic(object):
 
         #tick vehicles (all types)
         for v in self.vehicles.values():
-            v.tick(tick_count, delta_time, sim_time)
+            if v.type == Vehicle.SDV_TYPE:
+                v.tick(tick_count, delta_time, sim_time, self.execution_mode == ExecutionMode.fastest)
+            else:
+                v.tick(tick_count, delta_time, sim_time)
 
         #tick pedestrians:
         for p in self.pedestrians.values():
@@ -396,4 +399,3 @@ class SimTraffic(object):
         static_objects = copy(self.static_objects)
 
         return header, vehicles, pedestrians, traffic_light_states, static_objects
-    

@@ -97,9 +97,6 @@ class TickSync():
             elif (not self.block):
                 return False  #return False to skip
             else:
-                if (self.block != None):
-                    # wait on the blocker
-                    self.block.wait()
                 #assume that the expected tick duration has passed
                 self.delta_time = self.expected_tick_duration
                 self.drift = 0.0

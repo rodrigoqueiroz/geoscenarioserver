@@ -9,7 +9,7 @@ from copy import copy
 import glog as log
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
-import sys
+import sys, time
 
 from Actor import *
 from mapping.LaneletMap import *
@@ -82,26 +82,34 @@ class SVPlanner(object):
                 self._process.terminate()
             self._process.join()
 
-    def get_plan(self):
+    def get_plan(self, wait_for_plan = False):
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
         # because then NEXT tick planner will write trajectory based on new path while SV is following
         # the old path. This could be solved by adding a 'frame' variable to the shared array, like
         # a sim frame position that can be used to compute the reference path when the SV notices it's
         # changed. Unlike `new_frenet_frame` this won't be a per-tick variable.
-
         plan = MotionPlan()
-        self._mplan_sharr.acquire() #<=========LOCK
-        plan.set_plan_vector(copy(self._mplan_sharr[:]))
-        self._mplan_sharr.release() #<=========RELEASE
-        if (plan.trajectory.T == 0):
-            # Empty plan
-            return None
-        elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
-            # Same plan
-            return None
-        # New plan
-        self.last_plan = plan
-        return plan
+        while plan.trajectory.T == 0:
+            self._mplan_sharr.acquire() #<=========LOCK
+            plan.set_plan_vector(copy(self._mplan_sharr[:]))
+            self._mplan_sharr.release() #<=========RELEASE
+            if (plan.trajectory.T == 0):
+                # Empty plan
+                if wait_for_plan:
+                    time.sleep(0.01)
+                    continue
+                else:
+                    return None
+            elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
+                # Same plan
+                if wait_for_plan:
+                    time.sleep(0.01)
+                    continue
+                else:
+                    return None
+            # New plan
+            self.last_plan = plan
+            return plan
 
 
     #==SUB PROCESS=============================================
@@ -114,7 +122,13 @@ class SVPlanner(object):
         log.info(f"PLANNER PROCESS START for VID {self.vid}")
         signal(SIGTERM, self.before_exit)
 
-        self.sync_planner = TickSync(rate=self.sim_config.planner_rate, block=True, verbose=False, label=f"planner_v{self.vid}")
+        block = False
+        match self.sim_config.execution_mode:
+            case ExecutionMode.realtime:
+                block = True
+            case ExecutionMode.fastest:
+                block = None
+        self.sync_planner = TickSync(rate=self.sim_config.planner_rate, block=block, verbose=False, label=f"planner_v{self.vid}")
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -226,7 +240,7 @@ class SVPlanner(object):
                         self.sync_planner.end_task(False) #blocks if < target
                         task_delta_time = 0
                     else:
-                        self.sync_planner.end_task() #blocks if < target
+                        self.sync_planner.end_task(self.sim_config.execution_mode == ExecutionMode.realtime) #blocks if < target
                         task_delta_time = self.sync_planner.get_task_time()
 
                     if frenet_traj is None:
