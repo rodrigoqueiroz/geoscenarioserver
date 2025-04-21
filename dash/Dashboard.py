@@ -79,7 +79,6 @@ class Dashboard(object):
         while sync_dash.tick():
             if not self.window:
                 return
-
             #clear
             self.clear_vehicle_charts()
 
@@ -117,22 +116,25 @@ class Dashboard(object):
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
                     #vehicles with planner: cartesian, frenet chart and behavior tree
-                    if vid in debug_shdata:
-                        #read vehicle planning data from debug_shdata
-                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
-                        if SHOW_CPLOT: #cartesian plot with lanelet map
-                            self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-                        if SHOW_FFPLOT: #frenet frame plot
-                            self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
-                        if VEH_TRAJ_CHART: #vehicle traj plot
-                            self.plot_vehicle_sd(traj, cand)
-                        #behavior tree
-                        self.tree_msg.delete("1.0", "end")
-                        if btree_snapshot:
-                            self.tree_msg.insert("1.0", btree_snapshot)                    
-                    else:
-                        #vehicles without planner:
-                        self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                    try:
+                        if vid in debug_shdata:
+                            #read vehicle planning data from debug_shdata
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                            if SHOW_CPLOT: #cartesian plot with lanelet map
+                                self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                            if SHOW_FFPLOT: #frenet frame plot
+                                self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
+                            if VEH_TRAJ_CHART: #vehicle traj plot
+                                self.plot_vehicle_sd(traj, cand)
+                            #behavior tree
+                            self.tree_msg.delete("1.0", "end")
+                            if btree_snapshot:
+                                self.tree_msg.insert("1.0", btree_snapshot)
+                        else:
+                            #vehicles without planner:
+                            self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                    except BrokenPipeError:
+                        return
             elif self.center_pedestrian and self.center_id in pedestrians:
                 if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     pid = int(self.center_id)
@@ -156,17 +158,20 @@ class Dashboard(object):
             #log.info("Changed focus to {}".format(self.center_id))
     
     def get_maneuver(self, id):
-        if id in self.sim_traffic.debug_shdata:
-            btree_snapshot = self.sim_traffic.debug_shdata[id][1]
-            try:
-                if btree_snapshot:
-                    maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
-                    return maneuver
-                else:
-                    return "Active"
-            except:
-                return "Inactive"
-        return "Inactive"
+        try:
+            if id in self.sim_traffic.debug_shdata:
+                btree_snapshot = self.sim_traffic.debug_shdata[id][1]
+                try:
+                    if btree_snapshot:
+                        maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
+                        return maneuver
+                    else:
+                        return "Active"
+                except:
+                    return "Inactive"
+            return "Inactive"
+        except BrokenPipeError:
+            return "Inactive"
 
     def update_table(self, vehicles):
         current_set = self.tab.get_children()
