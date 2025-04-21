@@ -162,17 +162,14 @@ class Dashboard(object):
         try:
             if id in self.sim_traffic.debug_shdata:
                 btree_snapshot = self.sim_traffic.debug_shdata[id][1]
-                try:
-                    if btree_snapshot:
-                        maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
-                        return maneuver
-                    else:
-                        return "Active"
-                except:
-                    return "Inactive"
-            return "Inactive"
-        except BrokenPipeError:
-            return "Inactive"
+                if btree_snapshot:
+                    maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
+                    return maneuver
+                else:
+                    return "Active"
+        except:
+            pass
+        return "Inactive"
 
     def update_table(self, vehicles):
         current_set = self.tab.get_children()
