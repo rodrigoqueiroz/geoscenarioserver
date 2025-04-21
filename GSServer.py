@@ -79,12 +79,9 @@ def start_server(args):
         log.error("Failed to load scenario")
         return
 
-    block = False
-    match sim_config.execution_mode:
-        case ExecutionMode.realtime:
-            block = True
-        case ExecutionMode.fastest:
-            block = None
+    block = True
+    if sim_config.execution_mode == ExecutionMode.fastest:
+        block = None
 
     sync_global = TickSync(rate=sim_config.traffic_rate,
                            block=block,

@@ -22,7 +22,7 @@ class TickSync():
     def __init__(self, rate = TRAFFIC_RATE, block = False, verbose = False, label = "", sim_start_time = 0.0):
         """
         rate: tick rate (Hz) used to calculate tick duration (1.0/rate)
-        block: True: sleep until end of tick duration; False: proceed immediately
+        block: True: sleep until end of tick duration; False: proceed immediately; None: assume tick duration elapsed
         verbose: print debug info
         """
 
@@ -63,14 +63,14 @@ class TickSync():
     def tick(self):
         """
         Returns True until the timeout is reached
-        block = True - wait until end of tick
+        block = True - wait until the end of the period, return True
+        block = None - don't wait until the end of the period, assume the tick duration elapsed, return True
         block = False - don't wait, just return False to skip
-        block = None - don't wait, assume the tick duration elapsed
         """
         now = datetime.datetime.now()
         #First Tick
         if (self.tick_count==0): 
-            #First Tick is special:
+            #The first Tick is special:
             self._sim_start_clock = now
             self.delta_time = 0.0
             self._tick_start_clock = now
@@ -79,7 +79,7 @@ class TickSync():
             self.print(f"sim_time {self.sim_time:05.2f} s, tick {self.label}, sim_start_clock {self._sim_start_clock:3} # START")
         else:
             #Can tick?
-            if (self.block):
+            if self.block:
                 elapsed = (now - self._tick_start_clock).total_seconds()  #time elapsed from the previous tick
                 time_left = self.expected_tick_duration - elapsed         #diff from expected time
                 if (time_left>0):
@@ -94,15 +94,15 @@ class TickSync():
                     #Update globals
                     passed_time = (now - self._sim_start_clock).total_seconds()
                     self.sim_time = self.sim_start_time + passed_time
-            elif (not self.block):
-                return False  #return False to skip
-            else:
+            elif self.block is None:
                 #assume that the expected tick duration has passed
                 self.delta_time = self.expected_tick_duration
                 self.drift = 0.0
                 self._tick_start_clock += timedelta(seconds=self.expected_tick_duration)
                 #Update globals
                 self.sim_time += self.expected_tick_duration
+            else:
+                return False  #return False to skip
 
         self.tick_count+=1
         #stats
@@ -111,10 +111,10 @@ class TickSync():
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
+                # TODO: not always scenario timeout, could also be timeout of a condition or another task
                 ScenarioTimeout(self.timeout)
                 log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False
-                
         return True
     
     def update_stats(self):
@@ -131,7 +131,6 @@ class TickSync():
         
     def write_performance_log(self):
         if LOG_PERFORMANCE:
-            logtime = time.strftime("%Y%m%d-%H%M%S")
             filename = f"outputs/{self.label}_performance_log.csv"
             log.info('Writing performance log: {}'.format(filename))
             with open(filename,mode='w') as csv_file:

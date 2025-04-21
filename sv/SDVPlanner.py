@@ -237,10 +237,10 @@ class SVPlanner(object):
                     frenet_traj, cand = plan_maneuver(self.vid, mconfig, traffic_state)
 
                     if EVALUATION_MODE and not self.last_plan:
-                        self.sync_planner.end_task(False) #blocks if < target
+                        self.sync_planner.end_task(False) #otherwise blocks if < target
                         task_delta_time = 0
                     else:
-                        self.sync_planner.end_task(self.sim_config.execution_mode == ExecutionMode.realtime) #blocks if < target
+                        self.sync_planner.end_task(self.sim_config.execution_mode == ExecutionMode.realtime) #blocks if < target only in realtime
                         task_delta_time = self.sync_planner.get_task_time()
 
                     if frenet_traj is None:
