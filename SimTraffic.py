@@ -114,12 +114,12 @@ class SimTraffic(object):
                 time.sleep(0.5)
 
         #Start SDV Planners
-        for vid, vehicle in self.vehicles.items():
+        for vehicle in self.vehicles.values():
             if vehicle.type == Vehicle.SDV_TYPE:
                 vehicle.start_planner()
 
         #Start SP Planners
-        for pid, pedestrian in self.pedestrians.items():
+        for pedestrian in self.pedestrians.values():
             if pedestrian.type == Pedestrian.SP_TYPE:
                 pedestrian.start_planner()
 
@@ -129,10 +129,13 @@ class SimTraffic(object):
             self.carla_sync.quit()
 
         self.write_log_trajectories()
-        for vid in self.vehicles:
-            self.vehicles[vid].stop(interrupted)
-        for pid in self.pedestrians:
-            self.pedestrians[pid].stop()
+        for vehicle in self.vehicles.values():
+            if vehicle.type == Vehicle.SDV_TYPE:
+                vehicle.stop(interrupted)
+            else:
+                vehicle.stop()
+        for pedestrian in self.pedestrians.values():
+            pedestrian.stop()
 
         for vid in self.vehicles:
             if self.vehicles[vid].type == Vehicle.SDV_TYPE:
