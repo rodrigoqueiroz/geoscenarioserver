@@ -61,7 +61,7 @@ class SimTraffic(object):
     def set_origin(self, lat, lon, alt):
         self.origin = (lat, lon, alt)
 
-    def add_vehicle(self, v:Vehicle):
+    def add_vehicle(self, v):
         self.vehicles[v.id] = v
         v.sim_traffic = self
         v.sim_config = self.sim_config
@@ -243,7 +243,10 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i ] = vid
             self.traffic_state_sharr[ i+1 ] = vehicle.type
             self.traffic_state_sharr[ i+2 ] = vehicle.sim_state
-            self.traffic_state_sharr[ i+3 : i+3+len(sv) ] = sv
+            self.traffic_state_sharr[ i+3 ] = vehicle.bounding_box_length
+            self.traffic_state_sharr[ i+4 ] = vehicle.bounding_box_width
+            self.traffic_state_sharr[ i+5 : i+5+len(sv) ] = sv
+        
             ri += 1
 
         # pedestrians
@@ -327,7 +330,7 @@ class SimTraffic(object):
         reference to the shared array.
         This reference must be passed during the process creation.
         '''
-
+        
         #header
         header = traffic_state_sharr[0:5]
         nv = int(header[3])
@@ -343,14 +346,19 @@ class SimTraffic(object):
             vid = int(traffic_state_sharr[i])
             v_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
+            vehicle_length = float(traffic_state_sharr[i+3])
+            vehicle_width = float(traffic_state_sharr[i+4])
+
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                     continue
             vehicle = Vehicle(vid)
             vehicle.type = v_type
             vehicle.sim_state = sim_state
+            vehicle.bounding_box_length = vehicle_length
+            vehicle.bounding_box_width = vehicle_width
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[ i+3 : i+16 ]
+            state_vector = traffic_state_sharr[ i+5 : i+18 ]
             vehicle.state.set_state_vector(state_vector)
             vehicle.name = self.vehicles[vid].name  #thread safe. It does not change.
             vehicles[vid] = vehicle

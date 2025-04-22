@@ -111,6 +111,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         model = extract_tag(vnode, 'model', '', str)
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
+
+        bounding_box_width = extract_tag(vnode, 'width', VEHICLE_WIDTH, int)
+        bounding_box_length = extract_tag(vnode, 'length', VEHICLE_LENGTH, int)
+
         #yaw = 90.0
         #if 'yaw' in vnode.tags:
         #    yaw = (float(vnode.tags['yaw']) + 90.0) % 360.0
@@ -129,7 +133,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         rule_engine_port = extract_tag(vnode, 'rule_engine_port', None, int)
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
-        log.info("Vehicle {}, behavior type {}".format(vid,btype))    
+        log.info("Vehicle {}, behavior type {}".format(vid,btype))  
 
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
@@ -186,6 +190,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 btype=btype, goal_ends_simulation=goal_ends_simulation,
                                 rule_engine_port=rule_engine_port
                             )
+                vehicle.bounding_box_length = bounding_box_length
+                vehicle.bounding_box_width = bounding_box_width
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],
                 #                route_nodes,

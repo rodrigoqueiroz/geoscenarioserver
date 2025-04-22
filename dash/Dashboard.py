@@ -362,6 +362,7 @@ class Dashboard(object):
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
                     continue
+
                 colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state, vehicle.name)
                 x = vehicle.state.x
                 y = vehicle.state.y
@@ -370,15 +371,15 @@ class Dashboard(object):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
                     if SHOW_VEHICLE_SHAPE:
                         #rectangle origin
-                        rect_x = x -(VEHICLE_LENGTH/2)
-                        rect_y = y -(VEHICLE_WIDTH/2)
+                        rect_x = x -(vehicle.bounding_box_length/2)
+                        rect_y = y -(vehicle.bounding_box_width/2)
                         t = matplotlib.transforms.Affine2D().rotate_deg_around(x,y,vehicle.state.yaw) + ax.transData #transform rotation around centre
-                        rect = matplotlib.patches.Rectangle( (rect_x,rect_y),VEHICLE_LENGTH, VEHICLE_WIDTH, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
+                        rect = matplotlib.patches.Rectangle( (rect_x,rect_y),vehicle.bounding_box_length, vehicle.bounding_box_width, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
                         rect.set_transform(t)
                         ax.add_patch(rect)
                     if (SHOW_VEHICLE_RADIUS):
                         #radius circle
-                        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                        circle1 = plt.Circle((x, y), vehicle.radius, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                         ax.add_artist(circle1)
                     #label
                     label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
