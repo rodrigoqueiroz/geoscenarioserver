@@ -511,10 +511,12 @@ def nearest_to_vehicles_ahead(start_state, ptrajectory, lane_config, vehicles):
     closest = 999999
     s = start_state[0]
     d = start_state[3]
-    left = lane_config.left_bound + VEHICLE_WIDTH
-    right = lane_config.right_bound - VEHICLE_WIDTH
+
     for id, v in vehicles.items():
         #if close and ahead and same lane
+        width = v.bounding_box_width
+        left = lane_config.left_bound + width
+        right = lane_config.right_bound - width
         if ( abs(v.state.s - s) < 60) and (v.state.s > s) and (left > v.state.d > right):
             d = nearest_projected(ptrajectory,v)
             if d < closest:

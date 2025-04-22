@@ -112,8 +112,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         start_state = [vnode.x,0.0,0.0,vnode.y,0.0,0.0]
         start_in_frenet = False
 
-        bounding_box_width = extract_tag(vnode, 'width', VEHICLE_WIDTH, int)
-        bounding_box_length = extract_tag(vnode, 'length', VEHICLE_LENGTH, int)
+        bounding_box_width = extract_tag(vnode, 'width', VEHICLE_WIDTH, float)
+        bounding_box_length = extract_tag(vnode, 'length', VEHICLE_LENGTH, float)
 
         #yaw = 90.0
         #if 'yaw' in vnode.tags:

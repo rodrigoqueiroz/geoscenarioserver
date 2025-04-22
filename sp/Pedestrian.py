@@ -38,6 +38,8 @@ class Pedestrian(Actor):
 
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
         super().__init__(id, name, start_state, yaw=yaw)
+        self.length = 0.0
+        self.width = 0.0
         self.type = Pedestrian.N_TYPE
         self.radius = Pedestrian.PEDESTRIAN_RADIUS
 
@@ -266,8 +268,8 @@ class SP(Pedestrian):
         B = 0.1
         lambda_i = 0.5
 
-        l = VEHICLE_LENGTH / 2
-        w = VEHICLE_WIDTH / 2
+        l = vehicle.bounding_box_length / 2
+        w = vehicle.bounding_box_width / 2
 
         veh_pos = np.array([vehicle.state.x, vehicle.state.y])
         veh_yaw_rad = np.radians(vehicle.state.yaw)
