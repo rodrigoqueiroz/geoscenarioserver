@@ -243,6 +243,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                             yaw = yaw,
                             trajectory = trajectory)                        #a valid trajectory with at least x,y,time per node
 
+                vehicle.bounding_box_length = bounding_box_length
+                vehicle.bounding_box_width = bounding_box_width
                 sim_traffic.add_vehicle(vehicle)
                 log.info("Vehicle {} initialized with TV behavior".format(vid))
 
@@ -285,6 +287,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 continue
 
             vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata)
+            vehicle.bounding_box_length = bounding_box_length
+            vehicle.bounding_box_width = bounding_box_width
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info("Vehicle {} initialized with PV behavior".format(vid))
