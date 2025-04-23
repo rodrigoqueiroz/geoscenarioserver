@@ -89,26 +89,38 @@ class SVPlanner(object):
         # a sim frame position that can be used to compute the reference path when the SV notices it's
         # changed. Unlike `new_frenet_frame` this won't be a per-tick variable.
         plan = MotionPlan()
-        while plan.trajectory.T == 0:
+        checks_remaining = 100  # number of times to check for a new plan
+        while (checks_remaining > 0 and
+               (
+                (plan.trajectory.T is None) or                                                    # no plan yet
+                (plan.trajectory.T == 0) or                                                       # no plan yet
+                (plan.trajectory.T is not None and plan.tick_count == self.last_plan.tick_count)  # same plan
+               )
+        ):
             self._mplan_sharr.acquire() #<=========LOCK
             plan.set_plan_vector(copy(self._mplan_sharr[:]))
             self._mplan_sharr.release() #<=========RELEASE
             if (plan.trajectory.T == 0):
                 # Empty plan
                 if wait_for_plan:
-                    time.sleep(0.01)
+                    time.sleep(0.001)
+                    checks_remaining -= 1
                     continue
                 else:
+                    print(f"giving up with no plan checks remaining {checks_remaining}")
                     return None
             elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
                 # Same plan
                 if wait_for_plan:
-                    time.sleep(0.01)
+                    checks_remaining -= 1
+                    time.sleep(0.001)
                     continue
                 else:
+                    print(f"giving up with the same plan checks remaining {checks_remaining}")
                     return None
             # New plan
             self.last_plan = plan
+            print(f"checks remaining {checks_remaining}")
             return plan
 
 
@@ -128,7 +140,7 @@ class SVPlanner(object):
                 block = True
             case ExecutionMode.fastest:
                 block = None
-        self.sync_planner = TickSync(rate=self.sim_config.planner_rate, block=block, verbose=False, label=f"planner_v{self.vid}")
+        self.sync_planner = TickSync(rate=self.sim_config.planner_rate, block=block, verbose=False, label=f"planner_{self.sim_config.execution_mode.name}_v{self.vid}")
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -138,7 +150,7 @@ class SVPlanner(object):
             self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
-        task_label = "V{} plan".format(self.vid)
+        task_label = f"v{self.vid} plan"
         if self.sim_config.use_fixed_planning_time:
             self.sync_planner.set_task(task_label, self.sim_config.planning_time)
         else:
@@ -241,10 +253,13 @@ class SVPlanner(object):
                         task_delta_time = 0
                     else:
                         self.sync_planner.end_task(self.sim_config.execution_mode == ExecutionMode.realtime) #blocks if < target only in realtime
-                        task_delta_time = self.sync_planner.get_task_time()
+                        if self.sim_config.execution_mode == ExecutionMode.realtime:
+                            task_delta_time = self.sync_planner.get_task_time()
+                        else:
+                            task_delta_time = 0
 
                     if frenet_traj is None:
-                        log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
+                        log.warn(f"VID {self.vid} plan_maneuver return invalid trajectory.")
                         pass
                     else:
                         plan = MotionPlan()
@@ -260,7 +275,7 @@ class SVPlanner(object):
                 else:
                     frenet_traj, cand = None, None
 
-                #Debug info (for Dahsboard and Log)
+                #Debug info for dashboard and logs
                 if self.sim_config.show_dashboard:
                     # change ref path format for pickling (maybe always keep it like this?)
                     debug_ref_path = [(pt.x, pt.y) for pt in self.sdv_route.get_reference_path()]

@@ -131,7 +131,7 @@ class TickSync():
         
     def write_performance_log(self):
         if LOG_PERFORMANCE:
-            filename = f"outputs/{self.label}_performance_log.csv"
+            filename = f"outputs/{self.label}_performance.csv"
             log.info('Writing performance log: {}'.format(filename))
             with open(filename,mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -177,7 +177,7 @@ class TickSync():
                     log.warning("Task '{}' target adjusted to max time {:3}s (consider reducing the tick rate)".format(self.task_label, self.next_target_t))
                 #returns the last target used
                 
-        #returns actual time 
+        #returns actual task duration
         return delta_time
 
     

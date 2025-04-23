@@ -57,7 +57,6 @@ class SimTraffic(object):
         self.debug_shdata = None
 
         #Traffic Log
-        self.log_file = ''
         self.vehicles_log = {}
         self.traffic_running = False
 
@@ -322,9 +321,8 @@ class SimTraffic(object):
     def write_log_trajectories(self):
         if WRITE_TRAJECTORIES:
             print("Log all trajectories: ")
-            for vid,vlog in self.vehicles_log.items():
-                #Path(self.log_traj_folder).mkdir(parents=True, exist_ok=True)
-                filename = "eval/trajlog/{}_{}.csv".format(self.log_file,vid)
+            for vid, vlog in self.vehicles_log.items():
+                filename = f"outputs/trajectory_{self.execution_mode.name}_v{vid}.csv"
                 with open(filename,mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #vlog.sort()

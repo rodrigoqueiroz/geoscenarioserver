@@ -86,7 +86,7 @@ def start_server(args):
     sync_global = TickSync(rate=sim_config.traffic_rate,
                            block=block,
                            verbose=False,
-                           label="traffic")
+                           label=f"traffic_{sim_config.execution_mode.name}")
     sync_global.set_timeout(sim_config.timeout)
 
     if args.dash_pos:
