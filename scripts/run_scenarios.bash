@@ -9,6 +9,7 @@ ARG_PEDESTRIANS="true"
 ARG_LONG="false"
 ARG_NO_DASH=
 ARG_INTERACTIVE="true"
+ARG_FASTEST=
 SCENARIO_NAME=
 
 print_help() {
@@ -19,6 +20,7 @@ print_help() {
     echo "  --long              include long vehicle scenarios (not included by default)"
     echo "  --no-dash           run without the dashboard."
     echo "  --non-interactive   do not prompt for <enter> (prompt by default)"
+    echo "  --fastest           run with the fastest execution mode (default is realtime)"
     echo ""
 }
 
@@ -45,6 +47,9 @@ else
             "--single")
                 ARG_SINGLE="true"
                 ;;
+            "--fastest")
+                ARG_FASTEST="-em fastest"
+                ;;
             *)
                 if [[ $ARG_SINGLE == "true" && -v SCENARIO_NAME ]]; then
                     SCENARIO_NAME=$arg
@@ -69,7 +74,7 @@ kill_python3()
 run_scenario_save_regression()
 {
     scenario=$1
-    pixi run gss ${ARG_NO_DASH} --scenario ${scenario}
+    pixi run gss ${ARG_NO_DASH} ${ARG_FASTEST} --scenario ${scenario}
     # save and compare with regression
     scenario_relative=${scenario#$REPO_DIR/scenarios/}
     regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/
