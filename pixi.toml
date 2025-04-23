@@ -25,6 +25,7 @@ scipy = "*"
 requests = "*"
 pynput = "*"
 screeninfo = "*"
+jq = ">=1.7.1,<2"
 
 [pypi-dependencies]
 antlr-denter = "*"
