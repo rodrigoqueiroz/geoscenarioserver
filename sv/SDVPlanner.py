@@ -107,7 +107,10 @@ class SVPlanner(object):
                     checks_remaining -= 1
                     continue
                 else:
-                    print(f"giving up with no plan checks remaining {checks_remaining}")
+                    if self.last_plan != None and self.last_plan.tick_count > 0:
+                        log.warn(f"At tick {self.last_plan.tick_count+1} giving up with empty trajectory")
+                    else:
+                        log.warn(f"At unknown tick giving up with empty trajectory")
                     return None
             elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
                 # Same plan
@@ -116,11 +119,12 @@ class SVPlanner(object):
                     time.sleep(0.001)
                     continue
                 else:
-                    print(f"giving up with the same plan checks remaining {checks_remaining}")
+                    log.warn(f"At tick {plan.tick_count} giving up with the same plan as previous")
                     return None
             # New plan
             self.last_plan = plan
-            print(f"checks remaining {checks_remaining}")
+            if checks_remaining < 100:
+                log.warn(f"At tick {plan.tick_count} waited for a plan {100-checks_remaining} ms")
             return plan
 
 
