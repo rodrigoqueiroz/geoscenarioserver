@@ -147,12 +147,9 @@ def start_server(args):
     traffic.start()
 
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config, screen_param)
-
     if sim_config.show_dashboard:
+        dashboard = Dashboard(traffic, sim_config, screen_param)
         dashboard.start()
-    else:
-        log.warn("Dashboard will not start")
 
     dashboard_interrupted = False
     while sync_global.tick():

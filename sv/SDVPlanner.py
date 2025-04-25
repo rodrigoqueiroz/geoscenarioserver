@@ -108,9 +108,9 @@ class SVPlanner(object):
                     continue
                 else:
                     if self.last_plan != None and self.last_plan.tick_count > 0:
-                        log.warn(f"At tick {self.last_plan.tick_count+1} giving up with empty trajectory")
+                        log.warn(f"At tick {self.last_plan.tick_count+1} no plan received")
                     else:
-                        log.warn(f"At unknown tick giving up with empty trajectory")
+                        log.warn(f"At unknown tick no plan received")
                     return None
             elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
                 # Same plan
@@ -119,7 +119,7 @@ class SVPlanner(object):
                     time.sleep(0.001)
                     continue
                 else:
-                    log.warn(f"At tick {plan.tick_count} giving up with the same plan as previous")
+                    log.warn(f"At tick {plan.tick_count} no new plan: the same as the previous")
                     return None
             # New plan
             self.last_plan = plan
