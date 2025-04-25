@@ -96,6 +96,9 @@ class SDV(Vehicle):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
+            if tick_count == 0:
+                # always wait for the first plan at the first tick
+                wait_for_plan = True
             plan = self.sv_planner.get_plan(wait_for_plan)
             if plan is not None:
                 self.set_new_motion_plan(plan, sim_time)

@@ -23,7 +23,7 @@ from dash.Dashboard import *
 from mapping.LaneletMap import *
 from requirements.RequirementViolationEvents import GlobalTick
 from ScenarioSetup import *
-from SimConfig import SimConfig
+from SimConfig import SimConfig, ExecutionMode
 from SimTraffic import SimTraffic
 from TickSync import TickSync
 
