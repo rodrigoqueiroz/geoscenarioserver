@@ -20,7 +20,7 @@ print_help() {
     echo "  --long              include long vehicle scenarios (not included by default)"
     echo "  --no-dash           run without the dashboard."
     echo "  --non-interactive   do not prompt for <enter> (prompt by default)"
-    echo "  --fastest           run with the fastest execution mode (default is realtime)"
+    echo "  --fastest           use the execution mode 'fastest' (default is 'realtime')"
     echo ""
 }
 
