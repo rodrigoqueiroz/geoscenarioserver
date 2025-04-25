@@ -8,7 +8,7 @@ ARG_VEHICLES="true"
 ARG_PEDESTRIANS="true"
 ARG_LONG="false"
 ARG_NO_DASH=
-ARG_INTERACTIVE="true"
+ARG_INTERACTIVE="--wait-for-input"
 ARG_FASTEST=
 SCENARIO_NAME=
 
@@ -42,7 +42,7 @@ else
                 ARG_NO_DASH="--no-dash"
                 ;;
             "--non-interactive")
-                ARG_INTERACTIVE="false"
+                ARG_INTERACTIVE=
                 ;;
             "--single")
                 ARG_SINGLE="true"
@@ -74,7 +74,7 @@ kill_python3()
 run_scenario_save_regression()
 {
     scenario=$1
-    pixi run gss ${ARG_NO_DASH} ${ARG_FASTEST} --scenario ${scenario}
+    pixi run gss ${ARG_NO_DASH} ${ARG_FASTEST} ${ARG_INTERACTIVE} --scenario ${scenario}
     # save and compare with regression
     scenario_relative=${scenario#$REPO_DIR/scenarios/}
     regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/
@@ -130,9 +130,6 @@ else
     gss_failures=0
     for scenario in $all_scenarios; do
         echo "CTRL + C to exit the script."
-        if [[ "$ARG_INTERACTIVE" == "true" ]]; then
-            read -p "ENTER to run ${scenario#$REPO_DIR/}:"
-        fi
         trap kill_python3 SIGINT
         echo "CTRL + C to quit the scenario."
         run_scenario_save_regression $scenario
