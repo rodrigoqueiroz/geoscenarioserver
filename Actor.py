@@ -12,13 +12,13 @@ import numpy as np
 import glog as log
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None):
-        self.bounding_box_length = 0.0
-        self.bounding_box_width = 0.0
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
         self.id = id
         self.name = name
+        self.length = length
+        self.width = width
+        self.radius = min(length, width) / 2.0
         self.sim_state = ActorSimState.ACTIVE
-        self.radius = 0.0
         self.type = None
         self.model = None
         self.ghost_mode = False
@@ -59,7 +59,6 @@ class Actor(object):
             self.state.d_acc
         ]
         return state
-
 
     def stop(self):
         pass

@@ -9,15 +9,11 @@ import datetime
 import glog as log
 import math
 import numpy as np
-import sys
 
-from matplotlib import pyplot as plt
-from os import stat_result
 from typing import List
 
 from Actor import *
 from gsc.GSParser import Node
-from lanelet2.routing import Route
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementViolationEvents import ScenarioCompletion
 from shm.SimSharedMemoryServer import *
@@ -36,7 +32,8 @@ class SDV(Vehicle):
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="",
-            goal_ends_simulation:bool=False, rule_engine_port:int=None):
+            goal_ends_simulation:bool=False, rule_engine_port:int=None,
+            length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
         self.btype = btype
         self.btree_locations = btree_locations
         self.goal_ends_simulation    = goal_ends_simulation
@@ -51,7 +48,7 @@ class SDV(Vehicle):
             )
             self.sdv_route.update_reference_path(start_state[0])
             start_state[0] = 0.0
-            Vehicle.__init__(self, vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw)
+            super().__init__(vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw, length=length, width=width)
         else:
             self.sdv_route = SDVRoute(lanelet_map, start_state[0], start_state[3], route_nodes = route_nodes)
             s_vector, d_vector = sim_to_frenet_frame(
@@ -59,7 +56,7 @@ class SDV(Vehicle):
             )
             self.sdv_route.update_reference_path(s_vector[0])
             s_vector[0] = 0.0
-            Vehicle.__init__(self, vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw)
+            super().__init__(vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw, length=length, width=width)
 
         self.type = Vehicle.SDV_TYPE
 
@@ -231,8 +228,8 @@ class EV(Vehicle):
     """
     An external vehicle (remote simulation)
     """
-    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, bsource=''):
-        super().__init__(vid, name, start_state, yaw=yaw)
+    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, bsource='', length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+        super().__init__(vid, name, start_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.EV_TYPE
         self.P = np.identity(2) * 0.5 # some large error
         self.bsource = bsource
@@ -296,8 +293,8 @@ class TV(Vehicle):
     A trajectory following vehicle.
     @param keep_active: If True, vehicle stays in simulation even when is not following a trajectory
     """
-    def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True):
-        super().__init__(vid, name, start_state, yaw=yaw)
+    def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+        super().__init__(vid, name, start_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.TV_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -325,8 +322,8 @@ class PV(Vehicle):
     - agentacceleration
     - timetoacceleration
     """
-    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True):
-        super().__init__(vid, name, start_state, frenet_state, yaw=yaw)
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+        super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.PV_TYPE
         self.path = path
         self._debug_shdata = debug_shdata

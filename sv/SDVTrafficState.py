@@ -302,7 +302,7 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id.
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
-    half_length = my_vehicle.bounding_box_length/2
+    half_length = my_vehicle.length/2
 
     #Lane zones
     front = []

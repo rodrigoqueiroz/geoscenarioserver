@@ -146,7 +146,7 @@ def plan_following(vid, mconfig:MFollowConfig, traffic_state:TrafficState):
         if abs(leading_vehicle.state.s_vel) < 1.5:
             #log.info("lead stopped")
             #s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
-            s_target[0] = leading_vehicle.state.s - leading_vehicle.bounding_box_length - mconfig.stop_distance  #some meters behind stopped vehicle
+            s_target[0] = leading_vehicle.state.s - leading_vehicle.length - mconfig.stop_distance  #some meters behind stopped vehicle
             d_target = [d_start[0],0,0]                     #keep in same lateral position
             target_state_set.append((s_target,d_target,t))  #add target
         else:
@@ -245,7 +245,7 @@ def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
         delta_s_acc =    MP(delta[2], delt_s_sampling[2][0], delt_s_sampling[1][1])
         
         #+= 2 * VEHICLE_RADIUS
-        state_relative_to[0] += sdv.bounding_box_length*2
+        state_relative_to[0] += sdv.length*2
 
         dts_samples = delta_s_pos.get_samples()
         dts_vel_samples = delta_s_vel.get_samples()
@@ -336,7 +336,7 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     #log.info("PLAN STOP: can not find stop position in intersection")            
     
     #adjust target pos to vehicle length
-    target_pos = mconfig.pos - sdv.bounding_box_length/2 - mconfig.distance
+    target_pos = mconfig.pos - sdv.length/2 - mconfig.distance
 
     #Already stopped?
     if (abs(s_start[1]) <= 0.05):
@@ -355,7 +355,7 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
     if lv:
         #max_pos = lv.state.s - VEHICLE_RADIUS*3
-        max_pos = lv.state.s - sdv.bounding_box_length - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
+        max_pos = lv.state.s - sdv.length - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
         if target_pos > max_pos:
             #log.warn('Vehicle {} stop target {} adjusted to lead pos {}. New target {}'.format(vid,target_pos, lv.state.s, max_pos))
             target_pos = max_pos

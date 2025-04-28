@@ -91,7 +91,7 @@ class SimTraffic(object):
         for vid, vehicle in self.vehicles.items():
             if vehicle.type == Vehicle.SDV_TYPE:
                 _requirementsChecker = RequirementsChecker(vehicle, False)
-                _requirementsChecker.collision_check(vid, pedestrian.id, [pedestrian.state.x, pedestrian.state.y], vehicle, pedestrian.PEDESTRIAN_RADIUS)
+                _requirementsChecker.collision_check(vid, pedestrian.id, [pedestrian.state.x, pedestrian.state.y], vehicle, pedestrian.radius)
 
     def start(self):
         self.traffic_running = True
@@ -246,8 +246,8 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i ] = vid
             self.traffic_state_sharr[ i+1 ] = vehicle.type
             self.traffic_state_sharr[ i+2 ] = vehicle.sim_state
-            self.traffic_state_sharr[ i+3 ] = vehicle.bounding_box_length
-            self.traffic_state_sharr[ i+4 ] = vehicle.bounding_box_width
+            self.traffic_state_sharr[ i+3 ] = vehicle.length
+            self.traffic_state_sharr[ i+4 ] = vehicle.width
             self.traffic_state_sharr[ i+5 : i+5+len(sv) ] = sv
         
             ri += 1
@@ -358,8 +358,8 @@ class SimTraffic(object):
             vehicle = Vehicle(vid)
             vehicle.type = v_type
             vehicle.sim_state = sim_state
-            vehicle.bounding_box_length = vehicle_length
-            vehicle.bounding_box_width = vehicle_width
+            vehicle.length = vehicle_length
+            vehicle.width = vehicle_width
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[ i+5 : i+18 ]
             vehicle.state.set_state_vector(state_vector)
