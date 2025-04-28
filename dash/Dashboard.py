@@ -80,7 +80,6 @@ class Dashboard(object):
         while sync_dash.tick():
             if not self.window:
                 return
-
             #clear
             self.clear_vehicle_charts()
 
@@ -118,22 +117,25 @@ class Dashboard(object):
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
                     #vehicles with planner: cartesian, frenet chart and behavior tree
-                    if vid in debug_shdata:
-                        #read vehicle planning data from debug_shdata
-                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
-                        if SHOW_CPLOT: #cartesian plot with lanelet map
-                            self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-                        if SHOW_FFPLOT: #frenet frame plot
-                            self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
-                        if VEH_TRAJ_CHART: #vehicle traj plot
-                            self.plot_vehicle_sd(traj, cand)
-                        #behavior tree
-                        self.tree_msg.delete("1.0", "end")
-                        if btree_snapshot:
-                            self.tree_msg.insert("1.0", btree_snapshot)                    
-                    else:
-                        #vehicles without planner:
-                        self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                    try:
+                        if vid in debug_shdata:
+                            #read vehicle planning data from debug_shdata
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                            if SHOW_CPLOT: #cartesian plot with lanelet map
+                                self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                            if SHOW_FFPLOT: #frenet frame plot
+                                self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
+                            if VEH_TRAJ_CHART: #vehicle traj plot
+                                self.plot_vehicle_sd(traj, cand)
+                            #behavior tree
+                            self.tree_msg.delete("1.0", "end")
+                            if btree_snapshot:
+                                self.tree_msg.insert("1.0", btree_snapshot)
+                        else:
+                            #vehicles without planner:
+                            self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                    except BrokenPipeError:
+                        return
             elif self.center_pedestrian and self.center_id in pedestrians:
                 if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     pid = int(self.center_id)
@@ -157,16 +159,16 @@ class Dashboard(object):
             #log.info("Changed focus to {}".format(self.center_id))
     
     def get_maneuver(self, id):
-        if id in self.sim_traffic.debug_shdata:
-            btree_snapshot = self.sim_traffic.debug_shdata[id][1]
-            try:
+        try:
+            if id in self.sim_traffic.debug_shdata:
+                btree_snapshot = self.sim_traffic.debug_shdata[id][1]
                 if btree_snapshot:
                     maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
                     return maneuver
                 else:
                     return "Active"
-            except:
-                return "Inactive"
+        except:
+            pass
         return "Inactive"
 
     def update_table(self, vehicles):
@@ -362,6 +364,7 @@ class Dashboard(object):
             for vid, vehicle in vehicles.items():
                 if vehicle.sim_state is ActorSimState.INACTIVE:
                     continue
+
                 colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type, vehicle.sim_state, vehicle.name)
                 x = vehicle.state.x
                 y = vehicle.state.y
@@ -370,15 +373,15 @@ class Dashboard(object):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
                     if SHOW_VEHICLE_SHAPE:
                         #rectangle origin
-                        rect_x = x -(VEHICLE_LENGTH/2)
-                        rect_y = y -(VEHICLE_WIDTH/2)
+                        rect_x = x -(vehicle.length/2)
+                        rect_y = y -(vehicle.width/2)
                         t = matplotlib.transforms.Affine2D().rotate_deg_around(x,y,vehicle.state.yaw) + ax.transData #transform rotation around centre
-                        rect = matplotlib.patches.Rectangle( (rect_x,rect_y),VEHICLE_LENGTH, VEHICLE_WIDTH, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
+                        rect = matplotlib.patches.Rectangle( (rect_x,rect_y),vehicle.length, vehicle.width, edgecolor=colorcode,facecolor='grey',lw=1,alpha=alpha)
                         rect.set_transform(t)
                         ax.add_patch(rect)
                     if (SHOW_VEHICLE_RADIUS):
                         #radius circle
-                        circle1 = plt.Circle((x, y), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                        circle1 = plt.Circle((x, y), vehicle.radius, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                         ax.add_artist(circle1)
                     #label
                     label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
@@ -404,7 +407,7 @@ class Dashboard(object):
 
                 if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                     plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
-                    circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                    circle1 = plt.Circle((x, y), pedestrian.radius, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                     plt.gca().add_artist(circle1)
                     label = "p{}".format(pid)
                     plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
@@ -527,9 +530,9 @@ class Dashboard(object):
                 colorcode,alpha = self.get_color_by_type('vehicle',vehicle.type,vehicle.sim_state,vehicle.name)
                 vs = vehicle.state
                 plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
-                circle1 = plt.Circle((vs.s, vs.d), VEHICLE_RADIUS, color=colorcode, fill=False, zorder=5, alpha=alpha)
+                circle1 = plt.Circle((vs.s, vs.d), vehicle.radius, color=colorcode, fill=False, zorder=5, alpha=alpha)
                 gca.add_artist(circle1)
-                label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
+                label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
                 gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
@@ -542,10 +545,9 @@ class Dashboard(object):
                 y = pedestrian.state.d
                 #if (x_min <= x <= x_max) and (y_min <= y <= y_max):
                 plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
-                circle1 = plt.Circle((x, y), Pedestrian.PEDESTRIAN_RADIUS, color=colorcode, fill=False, zorder=10,  alpha=alpha)
+                circle1 = plt.Circle((x, y), pedestrian.radius, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                 plt.gca().add_artist(circle1)
-                label = "p{}".format(pid)
-                plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
+                plt.gca().text(x+1, y+1, f"p{pid}", style='italic', zorder=10)
 
         #objects
         if static_objects is not None:
@@ -603,6 +605,8 @@ class Dashboard(object):
                 colorcode = 'r' #red
             elif a_type == Pedestrian.PP_TYPE:
                 colorcode = 'r' #red
+            elif a_type == Pedestrian.SP_TYPE:
+                colorcode = 'k' #black
         elif actor== 'trafficlight':
             if a_type == TrafficLightColor.Red:
                     colorcode = 'r'

@@ -30,17 +30,11 @@ class Pedestrian(Actor):
     EP_TYPE = 3
     SP_TYPE = 4
 
-    # Source NCAP: https://cdn.euroncap.com/media/58226/euro-ncap-aeb-vru-test-protocol-v303.pdf
-    # Pedestrian dimensions (width: 0.5 m, length: 0.6 m) approximated by a circle with radius 0.27 m
-    PEDESTRIAN_RADIUS = 0.27
-
     VEHICLES_POS = {}
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
-        super().__init__(id, name, start_state, yaw=yaw)
+    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
+        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.N_TYPE
-        self.radius = Pedestrian.PEDESTRIAN_RADIUS
-
 
     def update_sim_state(self, new_state, delta_time):
         # only be done for remote pedestrians (which don't have a frenet state)
@@ -59,8 +53,8 @@ class TP(Pedestrian):
     A trajectory following pedestrian.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
-    def __init__(self, id, name, start_state, yaw, trajectory, keep_active = True):
-        super().__init__(id, name, start_state, yaw)
+    def __init__(self, id:int, name:str, start_state, yaw:float, trajectory, keep_active:bool = True, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
+        super().__init__(id, name, start_state, yaw, length=length, width=width)
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -81,8 +75,8 @@ class SP(Pedestrian):
     of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id, name, start_state, yaw, goal_points, root_btree_name, btree_locations=[], btype=""):
-        super().__init__(id, name, start_state, yaw)
+    def __init__(self, id:int, name:str, start_state, yaw:float, goal_points, root_btree_name, btree_locations=[], btype="", length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
+        super().__init__(id, name, start_state, yaw, length=length, width=width)
         self.btype = btype
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
@@ -266,8 +260,8 @@ class SP(Pedestrian):
         B = 0.1
         lambda_i = 0.5
 
-        l = VEHICLE_LENGTH / 2
-        w = VEHICLE_WIDTH / 2
+        l = vehicle.length / 2
+        w = vehicle.width / 2
 
         veh_pos = np.array([vehicle.state.x, vehicle.state.y])
         veh_yaw_rad = np.radians(vehicle.state.yaw)

@@ -35,7 +35,7 @@
 		<check key="mutate" text="Mutate on Start" default="off"/>
 		<item_separator />
 
-		<link href="https://git.uwaterloo.ca/wise-lab/geoscenario" text="https://git.uwaterloo.ca/wise-lab/geoscenario"/>
+		<link href="https://geoscenario2.readthedocs.io/" text="https://geoscenario2.readthedocs.io/"/>
 		<item_separator />
 
 	</item>
@@ -134,6 +134,8 @@
 		<text key="name" text="* Name " />
 		<text key="yaw" text="Yaw[](deg)" />
 		<text key="model" text="Model" />
+		<text key="length" text="(m)" />
+		<text key="width" text="(m)" />
 		<combo key="btype" text="Behavior Type:" values="TP,EP,PP,SP" default="" />
 		<item_separator />
 
@@ -180,13 +182,17 @@
 		<text key="name" text="* Name " />
 		<text key="yaw" text="Yaw[](deg)" />
 		<text key="model" text="Model" />
+		<text key="length" text="(m)" />
+		<text key="width" text="(m)" />
 		<combo key="btype" text="Behavior Type:" values="SDV,TV,EV,PV" default="" />
 		<item_separator />
 
 		<label text="SDV Model (GeoScenario Simulated Driver-Vehicle Model) "/>
 		<label text="Vehicles running SDV Models for dynamic behavior" />
 		<text key="btree" text="BehaviorTree (root)" />
+		<text key="rule_engine_port" text="Rule engine port (int 0-65535)" />
 		<text key="route" text="Route ID" />
+		<text key="goal_ends_simulation" text="(bool)" default="no" />
 		<label text="Start State: choose between cartesian or frenet format:" />
 		<text key="start_cartesian" text="Cartesian" />
 		<text key="start_frenet" text="Frenet" />
