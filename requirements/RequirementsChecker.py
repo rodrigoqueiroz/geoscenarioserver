@@ -33,8 +33,8 @@ class RequirementsChecker:
 	def calculate_rectangular_bounding_box(self, vehicle):
 		center_x     = vehicle.state.x
 		center_y     = vehicle.state.y
-		half_length  = vehicle.bounding_box_length / 2
-		half_width   = vehicle.bounding_box_width  / 2
+		half_length  = vehicle.length / 2
+		half_width   = vehicle.width  / 2
 		yaw          = -vehicle.state.yaw
 
 		bottom_left  = self.rotate(center_x, center_y, center_x - half_length, center_y - half_width, yaw)
@@ -59,7 +59,7 @@ class RequirementsChecker:
 			if vehicle.sim_state not in [ ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
 				continue
 
-			max_offset = max(vehicle.bounding_box_width / 2, vehicle.bounding_box_length / 2)
+			max_offset = max(vehicle.width / 2, vehicle.length / 2)
 
 			# To avoid O(v²) comparisons and favor O(v) comparisons whenever possible.
 			# Suppose big rectangles were overshoting the real dimension of the vehicles,
@@ -169,8 +169,8 @@ class RequirementsChecker:
 		#the front of the car can be determined by the yaw
 		center_x     = vehicle.state.x
 		center_y     = vehicle.state.y
-		arc_radius  = vehicle.bounding_box_length / 2 # vehicle half length
-		half_width   = vehicle.bounding_box_width  / 2
+		arc_radius  = vehicle.length / 2 # vehicle half length
+		half_width   = vehicle.width  / 2
 		yaw          = np.radians(vehicle.state.yaw)
 		
 		ped_x, ped_y = centre

@@ -59,6 +59,12 @@ VEHICLE_RADIUS = 0.9        #vehicle radius
 VEHICLE_LENGTH = 4.5       #vehicle length in [m]
 VEHICLE_WIDTH = 1.8         #vehicle width in [m]
 
+# Source NCAP: https://cdn.euroncap.com/media/58226/euro-ncap-aeb-vru-test-protocol-v303.pdf
+# Pedestrian dimensions (width: 0.5 m, length: 0.6 m) approximated by a circle with radius 0.27 m
+PEDESTRIAN_RADIUS = 0.27
+PEDESTRIAN_LENGTH = 0.6
+PEDESTRIAN_WIDTH = 0.5
+
 #Planning
 PLANNER_RATE = 5                 #Planner tick rate
 PLANNING_TIME = 0.1              #[s] Must be <= 1/PLANNER_RATE (we recommend 0.100 for scenarios with <4 vehicles)

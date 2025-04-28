@@ -230,11 +230,11 @@ def range_gap(vehicle_state, target_vehicle):
     #ahead, positive or zero
     if vehicle_state.s > target_vehicle.state.s:
         #back bump - target front bump
-        range = max((vehicle_state.s - half_length) - (target_vehicle.state.s + half_length), 0)
+        range = max((vehicle_state.s - half_length) - (target_vehicle.state.s + target_vehicle.length/2), 0)
     #behind, negative or zero        
     else:
         #front bump - target back bump
-        range = min((vehicle_state.s + half_length) - (target_vehicle.state.s - half_length), 0)
+        range = min((vehicle_state.s + half_length) - (target_vehicle.state.s - target_vehicle.length/2), 0)
     return range
 
 #Ricardo's implementation:
