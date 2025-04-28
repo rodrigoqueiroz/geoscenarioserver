@@ -216,8 +216,7 @@ class SVPlanner(object):
                 #Maneuver Tick
                 if mconfig and traffic_state.lane_config:
                     #replan maneuver
-                    #traj, cand, unf = plan_maneuver( mconfig.mkey,
-                    frenet_traj, cand = plan_maneuver(self.vid, mconfig,traffic_state)
+                    frenet_traj, cand = plan_maneuver(self.sdv, mconfig,traffic_state)
 
                     if EVALUATION_MODE and not self.last_plan:
                         self.sync_planner.end_task(False) #blocks if < target

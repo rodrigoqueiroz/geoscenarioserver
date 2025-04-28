@@ -21,24 +21,25 @@ from typing import Callable
 from sv.ManeuverUtils import *
 
 
-def plan_maneuver(vid, mconfig, traffic_state):
+def plan_maneuver(sdv, mconfig, traffic_state):
     #log.info('MANEUVER {}:  Vehicle {}'.format(mconfig.mkey,vid))
 
+    vid = int(sdv.id)
     #Micro maneuver layer
     if (mconfig.mkey == Maneuver.M_VELKEEP):
         return plan_velocity_keeping(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_REVERSE):
         return plan_reversing(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_STOP):
-        return plan_stop(vid, mconfig, traffic_state)
+        return plan_stop(sdv, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_FOLLOW):
         return plan_following(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_LANESWERVE):
         return plan_laneswerve(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_CUTIN):
-        return plan_cutin(vid, mconfig, traffic_state)
+        return plan_cutin(sdv, mconfig, traffic_state)
     
-    log.error("Vehicle {} trying to execute maneuver not implemented {}".format(vid,mconfig.mkey))
+    log.error(f"Vehicle {vid} trying to execute maneuver not implemented {mconfig.mkey}")
     return None, None
     
 
@@ -145,7 +146,7 @@ def plan_following(vid, mconfig:MFollowConfig, traffic_state:TrafficState):
         if abs(leading_vehicle.state.s_vel) < 1.5:
             #log.info("lead stopped")
             #s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
-            s_target[0] = leading_vehicle.state.s - VEHICLE_LENGTH - mconfig.stop_distance  #some meters behind stopped vehicle
+            s_target[0] = leading_vehicle.state.s - leading_vehicle.bounding_box_length - mconfig.stop_distance  #some meters behind stopped vehicle
             d_target = [d_start[0],0,0]                     #keep in same lateral position
             target_state_set.append((s_target,d_target,t))  #add target
         else:
@@ -208,10 +209,11 @@ def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:TrafficState):
     best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver=quartic_polynomial_solver)
     return best, candidates 
 
-def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:TrafficState):
+def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
     """
     CUT-IN LANE SWERVE
     """
+    vid = int(sdv.id)
     lane_config:LaneConfig = traffic_state.lane_config
     vehicles = traffic_state.traffic_vehicles
     target_id = mconfig.target_vid
@@ -243,7 +245,7 @@ def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:TrafficState):
         delta_s_acc =    MP(delta[2], delt_s_sampling[2][0], delt_s_sampling[1][1])
         
         #+= 2 * VEHICLE_RADIUS
-        state_relative_to[0] += VEHICLE_LENGTH*2
+        state_relative_to[0] += sdv.bounding_box_length*2
 
         dts_samples = delta_s_pos.get_samples()
         dts_vel_samples = delta_s_vel.get_samples()
@@ -308,12 +310,13 @@ def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:TrafficState):
     return best, candidates
 
 
-def plan_stop(vid, mconfig:MStopConfig, traffic_state:TrafficState):
+def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
+    vid = int(sdv.id)
     vehicle_state:VehicleState = traffic_state.vehicle_state
     lane_config:LaneConfig = traffic_state.lane_config
     vehicles = traffic_state.traffic_vehicles
@@ -333,7 +336,7 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:TrafficState):
     #log.info("PLAN STOP: can not find stop position in intersection")            
     
     #adjust target pos to vehicle length
-    target_pos = mconfig.pos - VEHICLE_LENGTH/2 - mconfig.distance 
+    target_pos = mconfig.pos - sdv.bounding_box_length/2 - mconfig.distance
 
     #Already stopped?
     if (abs(s_start[1]) <= 0.05):
@@ -352,7 +355,7 @@ def plan_stop(vid, mconfig:MStopConfig, traffic_state:TrafficState):
     lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
     if lv:
         #max_pos = lv.state.s - VEHICLE_RADIUS*3
-        max_pos = lv.state.s - VEHICLE_LENGTH - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
+        max_pos = lv.state.s - sdv.bounding_box_length - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
         if target_pos > max_pos:
             #log.warn('Vehicle {} stop target {} adjusted to lead pos {}. New target {}'.format(vid,target_pos, lv.state.s, max_pos))
             target_pos = max_pos
