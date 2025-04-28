@@ -5,7 +5,6 @@
 # --------------------------------------------
 
 import numpy as np
-from TickSync import TickSync
 from sv.ManeuverConfig import *
 from util.Utils import *
 from SimConfig import *

@@ -1,7 +1,7 @@
 # Synchronization with Carla in co-simulation
 from SimConfig import *
 from sv.Vehicle import *
-from TickSync import *
+#from TickSync import *
 from util.Utils import *
 import glog as log
 import xml.etree.ElementTree as ET

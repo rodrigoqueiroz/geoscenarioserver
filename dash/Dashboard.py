@@ -49,9 +49,8 @@ class Dashboard(object):
         
 
     def start(self):
-        """ Start dashboard in subprocess.
-            global constant SHOW_DASHBOARD must be true
-            Traffic must have started, otherwise the shared array is not ready
+        """ Start the dashboard in a subprocess when sim_config.show_dashboard=True
+            Traffic must have already started, otherwise the shared array is not ready
         """
 
         if not self.sim_traffic:
@@ -70,7 +69,7 @@ class Dashboard(object):
 
     def run_dash_process(self, traffic_state_sharr, debug_shdata):
         self.window = self.create_gui()
-        sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="dash")
+        sync_dash = TickSync(DASH_RATE, block=True, verbose=False, label="dash")
         # handle user closing the window
         self.window.protocol("WM_DELETE_WINDOW", lambda arg=self.window: (sync_dash.write_performance_log(), arg.destroy()))
         # handle process termination sent from quit()
