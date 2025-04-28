@@ -532,7 +532,7 @@ class Dashboard(object):
                 plt.plot( vs.s, vs.d, colorcode+".", zorder=5)
                 circle1 = plt.Circle((vs.s, vs.d), vehicle.radius, color=colorcode, fill=False, zorder=5, alpha=alpha)
                 gca.add_artist(circle1)
-                label = label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
+                label = "ego ({})".format(int(vid)) if vehicle.name.lower() == 'ego' else "v{}".format(int(vid))
                 gca.text(vs.s, vs.d+1.5, label)
 
         #pedestrian
@@ -547,8 +547,7 @@ class Dashboard(object):
                 plt.plot(x, y, colorcode+'.',markersize=1, zorder=10)
                 circle1 = plt.Circle((x, y), pedestrian.radius, color=colorcode, fill=False, zorder=10,  alpha=alpha)
                 plt.gca().add_artist(circle1)
-                label = "p{}".format(pid)
-                plt.gca().text(x+1, y+1, label, style='italic', zorder=10)
+                plt.gca().text(x+1, y+1, f"p{pid}", style='italic', zorder=10)
 
         #objects
         if static_objects is not None:
@@ -606,6 +605,8 @@ class Dashboard(object):
                 colorcode = 'r' #red
             elif a_type == Pedestrian.PP_TYPE:
                 colorcode = 'r' #red
+            elif a_type == Pedestrian.SP_TYPE:
+                colorcode = 'k' #black
         elif actor== 'trafficlight':
             if a_type == TrafficLightColor.Red:
                     colorcode = 'r'

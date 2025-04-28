@@ -133,7 +133,7 @@ class SVPlanner(object):
 
                 # Get sim state from main process
                 # All objects are copies and can be changed
-                header, traffic_vehicles, traffic_pedestrians,traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
+                header, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
                 state_time = header[2]
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:

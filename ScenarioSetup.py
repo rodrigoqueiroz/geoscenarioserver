@@ -322,8 +322,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 yaw -= 360.0
 
         btype = pnode.tags['btype'].lower() if 'btype' in pnode.tags else ''
-        length = extract_tag(vnode, 'length', PEDESTRIAN_LENGTH, float)
-        width = extract_tag(vnode, 'width', PEDESTRIAN_WIDTH, float)
+        length = extract_tag(pnode, 'length', PEDESTRIAN_LENGTH, float)
+        width = extract_tag(pnode, 'width', PEDESTRIAN_WIDTH, float)
 
         # Trajectory Pedestrian (TP)
         if btype == 'tp':

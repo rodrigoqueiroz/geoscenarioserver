@@ -249,7 +249,6 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i+3 ] = vehicle.length
             self.traffic_state_sharr[ i+4 ] = vehicle.width
             self.traffic_state_sharr[ i+5 : i+5+len(sv) ] = sv
-        
             ri += 1
 
         # pedestrians
@@ -259,7 +258,9 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i ] = pid
             self.traffic_state_sharr[ i+1 ] = pedestrian.type
             self.traffic_state_sharr[ i+2 ] = pedestrian.sim_state
-            self.traffic_state_sharr[ i+3 : i+3+len(sv) ] = sv
+            self.traffic_state_sharr[ i+3 ] = pedestrian.length
+            self.traffic_state_sharr[ i+4 ] = pedestrian.width
+            self.traffic_state_sharr[ i+5 : i+5+len(sv) ] = sv
             ri += 1
 
         # traffic light state
@@ -349,21 +350,18 @@ class SimTraffic(object):
             vid = int(traffic_state_sharr[i])
             v_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
-            vehicle_length = float(traffic_state_sharr[i+3])
-            vehicle_width = float(traffic_state_sharr[i+4])
+            length = float(traffic_state_sharr[i+3])
+            width = float(traffic_state_sharr[i+4])
 
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                     continue
-            vehicle = Vehicle(vid)
+            vehicle = Vehicle(vid, name=self.vehicles[vid].name, length=length, width=width)
             vehicle.type = v_type
             vehicle.sim_state = sim_state
-            vehicle.length = vehicle_length
-            vehicle.width = vehicle_width
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
             state_vector = traffic_state_sharr[ i+5 : i+18 ]
             vehicle.state.set_state_vector(state_vector)
-            vehicle.name = self.vehicles[vid].name  #thread safe. It does not change.
             vehicles[vid] = vehicle
 
         pedestrians = {}
@@ -374,14 +372,16 @@ class SimTraffic(object):
             pid = int(traffic_state_sharr[i])
             p_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
+            length = float(traffic_state_sharr[i+3])
+            width = float(traffic_state_sharr[i+4])
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                         continue
-            pedestrian = Pedestrian(pid)
+            pedestrian = Pedestrian(pid, length=length, width=width)
             pedestrian.type = p_type
             pedestrian.sim_state = sim_state
             # state vector contains the sim state
-            state_vector = traffic_state_sharr[ i+3 : i+16 ]
+            state_vector = traffic_state_sharr[ i+5 : i+18 ]
             pedestrian.state.set_state_vector(state_vector)
             pedestrians[pid] = pedestrian
 
