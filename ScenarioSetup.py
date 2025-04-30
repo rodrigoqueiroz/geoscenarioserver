@@ -125,14 +125,14 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #print(yaw)
 
         btype = extract_tag(vnode, 'btype', '', str).lower()
-        goal_ends_simulation = False 
+        goal_ends_simulation = False
 
         if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
             goal_ends_simulation = True
         rule_engine_port = extract_tag(vnode, 'rule_engine_port', None, int)
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
-        log.info("Vehicle {}, behavior type {}".format(vid,btype))  
+        log.info("Vehicle {}, behavior type {}".format(vid,btype))
 
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
@@ -334,14 +334,24 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 t_name = pnode.tags['trajectory']
                 t_nodes = parser.trajectories[t_name].nodes
                 trajectory = []     #a valid trajectory with at least x,y,time per node
+                prev_node = None
                 for node in t_nodes:
                     nd = TrajNode()
                     nd.time = float(node.tags['time'])
                     nd.x = float(node.x)
                     nd.y = float(node.y)
+                    if prev_node is not None:
+                        dt = nd.time - prev_node.time
+                        nd.x_vel = (nd.x - prev_node.x) / dt
+                        nd.y_vel = (nd.y - prev_node.y) / dt
+                        # the first node has unknown velocity, assume the same as the second node's
+                        if prev_node.x_vel is None or prev_node.y_vel is None:
+                            prev_node.x_vel = nd.x_vel
+                            prev_node.y_vel = nd.y_vel
                     nd.yaw = float(node.tags['yaw']) if 'yaw' in node.tags else None
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
+                    prev_node = nd
                 pedestrian = TP(pid, name, start_state, yaw, trajectory, length=length, width=width)
                 sim_traffic.add_pedestrian(pedestrian)
                 log.info("Pedestrian {} initialized with TP behavior".format(pid))
