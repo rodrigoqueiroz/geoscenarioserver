@@ -364,13 +364,6 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     expected_time = 2*stop_distance / (vehicle_state.s_vel) #assuming uniform acceleration
     target_time = MP(expected_time,40,6) #bound >40% recommended for safely finding a suitable stop time
     
-    # within a certain distance generating new trajectory doesn't make sense
-    if target_pos < 1: 
-        #or abs(target_pos - vehicle_state.s) < 1:
-        log.warn('PLAN STOP Vehicle {} target position {} is too close or behind'.format(vid,target_pos))
-        #mconfig.type = MStopConfig.Type.NOW
-        #s_solver = quartic_polynomial_solver
-        return None, None
 
     # when vehicle is past the target point, switch to STOP NOW
     #if (target_pos - vehicle_state.s) < 0:
@@ -515,3 +508,13 @@ def find_trajectory(traj_bounds,
     s_coef = s_solver(s_start, s_target, t)
     d_coef = d_solver(d_start, d_target, t)
     return tuple([s_coef, d_coef, t])
+
+def determine_skip_replanning(mconfig):
+
+    # within a certain distance generating new trajectory doesn't make sense
+    if (mconfig.mkey == Maneuver.M_STOP):
+        target_pos = mconfig.pos - VEHICLE_LENGTH/2 - mconfig.distance 
+        if target_pos < 1: 
+            return True
+
+    return False
