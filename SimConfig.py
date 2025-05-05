@@ -59,11 +59,16 @@ VEHICLE_LENGTH = 4.5        #vehicle length in [m]
 VEHICLE_WIDTH  = 1.8        #vehicle width in [m]
 
 #Planning
-PLANNER_RATE = 5                 #Planner tick rate
+PLANNER_RATE  = 5                #Planner tick rate
 PLANNING_TIME = 0.2              #[s] Must be <= 1/PLANNER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
 USE_FIXED_PLANNING_TIME = True   #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
 POINTS_PER_METER = 3.0           #The number of points per meter to be used along the vehicle's reference path
                                  #Note that the value that is used may be slightly different
+
+# Tracking
+TRACKER_RETENTION_TICK = 5      # Number of ticks of consecutive missed detection require to 
+                                # drop a dynamic obtacle from the tracker memory
+ALPHA_BETA_HISTORY_SIZE = 10    # Number of ticks kept in the tracker memory for an observation (e.g., speed, position) 
 
 #Debugging and Log
 PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths

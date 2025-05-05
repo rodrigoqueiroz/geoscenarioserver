@@ -10,9 +10,9 @@ from decimal   import Decimal
 from functools import partial
 
 from dash.DashboardSharedMemory import get_center_id
-from sv.ManeuverConfig import *
-from sv.ruleEngine.constants import *
-from sv.ruleEngine.FeatureGenerator import FeatureGenerator
+from sv.maneuvers.Config import *
+from sv.planners.ruleEngine.constants import *
+from sv.planners.ruleEngine.FeatureGenerator import FeatureGenerator
 from SimConfig import PLANNER_RATE
 
 class NanConverter(json.JSONEncoder):
@@ -119,15 +119,16 @@ class BehaviorLayer(FeatureGenerator):
         #parameters['situation']['last_behaviour'] = self.last_behaviour
         self.last_behaviour = self.post_behaviour(situation)
 
-        #if self.debug:
-        #    print('Behaviour', traffic_state.vid, self.last_behaviour)
+        if self.debug and get_center_id() == self.vid:
+            print('Behaviour', self.last_behaviour)
 
-        if self.iteration < 30:
-            self._current_mconfig = MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(8.0, 0, 1)))
+        """ Flickering tests
+        if self.iteration < 30 or self.iteration % 5 in [ 0, 3 ]:
+            self._current_mconfig = MVelKeepConfig(vel=MP(8.0, 10, 6), time=MP(6.0))
         else:
-            self._current_mconfig = MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(0.0, 0, 1)))
+            self._current_mconfig = MVelKeepConfig(vel=MP(0.0, 10, 6), time=MP(6.0))
+        """
 
-        '''
         # Default Behaviour
         self._current_mconfig = MStopConfig( target=MStopConfig.StopTarget.NOW )
 
@@ -137,7 +138,7 @@ class BehaviorLayer(FeatureGenerator):
             if self.last_behaviour['maneuver']['type'] == 'TRACK_SPEED' and \
                'speed' in self.last_behaviour['parameters']:
                 desired_speed = max(0.0, self.last_behaviour['parameters']['speed'] / KMH_TO_MS)
-                self._current_mconfig = MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(desired_speed, 10, 6)))
+                self._current_mconfig = MVelKeepConfig(vel=MP(desired_speed, 10, 6))
 
             # Stop-At behaviour
             elif self.last_behaviour['maneuver']['type'] == 'STOP_AT':
@@ -145,14 +146,14 @@ class BehaviorLayer(FeatureGenerator):
                 if 'location' in self.last_behaviour['parameters'] and\
                    's' in self.last_behaviour['parameters']['location']:
 
-                    desired_speed = None
+                    speed_upperbound = None
                     if 'speed' in self.last_behaviour['parameters']:
-                        desired_speed = max(0.0, self.last_behaviour['parameters']['speed'] / KMH_TO_MS)
+                        speed_upperbound = max(0.0, self.last_behaviour['parameters']['speed'] / KMH_TO_MS)
 
                     self._current_mconfig = MStopAtConfig(
-                        stop_s_offset=self.last_behaviour['parameters']['location']['s'],
-                        track_speed=MTrackSpeedConfig(velocity=MVelKeepConfig(vel=MP(desired_speed, 10, 6)))
+                        max_velocity = MVelKeepConfig(vel=MP(speed_upperbound, 10, 6)),
+                        target = MStopConfig( pos=self.last_behaviour['parameters']['location']['s'])
                     )
-        '''
 
+        self._current_mconfig.use_low_level_planner = False
         return self._current_mconfig, self._ref_path_changed, ""

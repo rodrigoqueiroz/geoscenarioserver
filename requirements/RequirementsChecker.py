@@ -1,5 +1,7 @@
 import numpy as np
 
+from math import sin
+
 from Actor import ActorSimState
 from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import *
@@ -160,11 +162,6 @@ class RequirementsChecker:
 					return False;
 
 		return True
-
-	def forced_exit(self):
-		#store data upon forced exit
-		ScenarioEnd()
-		raise ScenarioCompletion
 	
 	def collision_check(self, centre, vehicle, radius):
 		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car

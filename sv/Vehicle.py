@@ -19,8 +19,9 @@ from Actor import *
 from gsc.GSParser import Node
 from lanelet2.routing import Route
 from mapping.LaneletMap import LaneletMap
+from perception.DynamicObjectTracker import DynamicObjectTracker
 from perception.Perception import Perception
-from requirements.RequirementViolationEvents import ScenarioCompletion
+from requirements.RequirementViolationEvents import BrokenScenario, ScenarioCompletion
 from shm.SimSharedMemoryServer import *
 from SimConfig import *
 from sv.SDVPlanner import *
@@ -41,7 +42,7 @@ class SDV(Vehicle):
             hallucination_retention:float=None, hallucination_weight:float=None, 
             missed_detection_weight:float=None, noise_position_mixture:List[float]=[0,0], 
             noise_yaw_mostly_reliable:float=0, noise_yaw_strongly_inaccurate:float=0, 
-            rule_engine_port:int=None):
+            rule_engine_port:int=None, tracking_method:str=None):
         self.btype = btype
         self.btree_locations           = btree_locations
         self.detection_range_in_meters = detection_range_in_meters
@@ -76,6 +77,8 @@ class SDV(Vehicle):
                                      noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate, 
                                      seed=int(os.getenv("GSS_PERCEPTION_SEED", 1)))
 
+        self.tracker    = DynamicObjectTracker(self, tracking_method, ALPHA_BETA_HISTORY_SIZE, TRACKER_RETENTION_TICK)
+
         #Planning
         self.rule_engine_port = rule_engine_port
         self.sv_planner = None
@@ -96,7 +99,7 @@ class SDV(Vehicle):
         """For SDV models controlled by SVPlanner.
             If a planner is started, the vehicle can't be a remote.
         """
-        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes, self.goal_ends_simulation, self.perception, self.rule_engine_port)
+        self.sv_planner = SVPlanner(self, self.sim_traffic, self.btree_locations, self.route_nodes, self.goal_ends_simulation, self.perception, self.rule_engine_port, self.tracker)
         self.sv_planner.start()
 
     def stop(self):
@@ -147,7 +150,9 @@ class SDV(Vehicle):
             #note: add an emergency break /fallback as a backup plan
             if (time > self.motion_plan.trajectory.T):
                 if self.state.s_vel > 0.1:
-                    log.error("Vehicle {} finished last trajectory without stopping".format(self.id))
+                    errorMessage = "finished last trajectory without stopping."
+                    BrokenScenario(self.id, errorMessage)
+                    raise ScenarioCompletion("Vehicle {} {}".format(self.id, errorMessage))
                 return
 
             # new state

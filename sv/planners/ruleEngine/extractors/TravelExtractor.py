@@ -1,4 +1,4 @@
-from sv.ruleEngine.Extractor import Extractor
+from sv.planners.ruleEngine.Extractor import Extractor
 
 class TravelExtractor(Extractor):
 	def __init__(self):

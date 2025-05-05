@@ -6,11 +6,11 @@
 
 import numpy as np
 from TickSync import TickSync
-from sv.ManeuverConfig import *
+from sv.maneuvers.Config import *
 from util.Utils import *
 from SimConfig import *
 from sp.Pedestrian import *
-from sv.FrenetTrajectory import *
+from sv.maneuvers.FrenetTrajectory import *
 
 #=============================== FEASIBILITY
 

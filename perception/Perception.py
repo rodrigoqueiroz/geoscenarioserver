@@ -2,7 +2,8 @@ import numpy as np
 
 from math import sqrt
 
-from dash.DashboardSharedMemory import get_center_id, set_vehicles
+from dash.DashboardSharedMemory import get_center_id, set_vehicles_perceived
+from SimConfig                  import PLANNER_RATE
 from sv.SDVTrafficState         import fill_occupancy
 from sv.VehicleBase    			import Vehicle
 from util.Transformations       import (frenet_to_sim_position, OutsideRefPathException, sim_to_frenet_frame)
@@ -35,31 +36,31 @@ class Perception:
 		return ground_truth + intensity * gaussian_noise
 
 	def apply_positional_noise(self, ego_vehicle_state, vid, other_vehicle, sdv_route, tracked_hallucination=False, with_gaussian=True):
+		delta_t   = 1.0 / PLANNER_RATE
 		distance  = self.distance(ego_vehicle_state, other_vehicle)
 		intensity = distance / self.detection_range_in_meters
 		mixture   = [ self.position_mean, self.position_std ]
 		has_frenet_location = True
 
-		# Already affected by the gaussian mixture of the reference vehicle
 		if with_gaussian:
 			other_vehicle.state.x = self.apply_gaussian_noise(intensity, other_vehicle.state.x, mixture)
 			other_vehicle.state.y = self.apply_gaussian_noise(intensity, other_vehicle.state.y, mixture)
 			other_vehicle.state.z = self.apply_gaussian_noise(intensity, other_vehicle.state.z, mixture)
 
 		if vid in self.vehicles:
-			other_vehicle.state.x_vel = other_vehicle.state.x     - self.vehicles[vid].state.x
-			other_vehicle.state.y_vel = other_vehicle.state.y     - self.vehicles[vid].state.y
-			other_vehicle.state.z_vel = other_vehicle.state.z     - self.vehicles[vid].state.z
-			other_vehicle.state.x_acc = other_vehicle.state.x_vel - self.vehicles[vid].state.x_vel
-			other_vehicle.state.y_acc = other_vehicle.state.y_vel - self.vehicles[vid].state.y_vel
-			other_vehicle.state.z_acc = other_vehicle.state.z_vel - self.vehicles[vid].state.z_vel
+			other_vehicle.state.x_vel = (other_vehicle.state.x     - self.vehicles[vid].state.x)     / delta_t
+			other_vehicle.state.y_vel = (other_vehicle.state.y     - self.vehicles[vid].state.y)     / delta_t
+			other_vehicle.state.z_vel = (other_vehicle.state.z     - self.vehicles[vid].state.z)     / delta_t
+			other_vehicle.state.x_acc = (other_vehicle.state.x_vel - self.vehicles[vid].state.x_vel) / delta_t
+			other_vehicle.state.y_acc = (other_vehicle.state.y_vel - self.vehicles[vid].state.y_vel) / delta_t
+			other_vehicle.state.z_acc = (other_vehicle.state.z_vel - self.vehicles[vid].state.z_vel) / delta_t
 		elif tracked_hallucination:
-			other_vehicle.state.x_vel = other_vehicle.state.x     - self.hallucination_status[vid]['vehicle'].state.x
-			other_vehicle.state.y_vel = other_vehicle.state.y     - self.hallucination_status[vid]['vehicle'].state.y
-			other_vehicle.state.z_vel = other_vehicle.state.z     - self.hallucination_status[vid]['vehicle'].state.z
-			other_vehicle.state.x_acc = other_vehicle.state.x_vel - self.hallucination_status[vid]['vehicle'].state.x_vel
-			other_vehicle.state.y_acc = other_vehicle.state.y_vel - self.hallucination_status[vid]['vehicle'].state.y_vel
-			other_vehicle.state.z_acc = other_vehicle.state.z_vel - self.hallucination_status[vid]['vehicle'].state.z_vel
+			other_vehicle.state.x_vel = (other_vehicle.state.x     - self.hallucination_status[vid]['vehicle'].state.x)     / delta_t
+			other_vehicle.state.y_vel = (other_vehicle.state.y     - self.hallucination_status[vid]['vehicle'].state.y)     / delta_t
+			other_vehicle.state.z_vel = (other_vehicle.state.z     - self.hallucination_status[vid]['vehicle'].state.z)     / delta_t
+			other_vehicle.state.x_acc = (other_vehicle.state.x_vel - self.hallucination_status[vid]['vehicle'].state.x_vel) / delta_t
+			other_vehicle.state.y_acc = (other_vehicle.state.y_vel - self.hallucination_status[vid]['vehicle'].state.y_vel) / delta_t
+			other_vehicle.state.z_acc = (other_vehicle.state.z_vel - self.hallucination_status[vid]['vehicle'].state.z_vel) / delta_t
 		else:
 			other_vehicle.state.x_vel = 0
 			other_vehicle.state.y_vel = 0
@@ -302,7 +303,7 @@ class Perception:
 			vehicles.update(traffic_state.traffic_vehicles)
 			vehicles.update(traffic_state.traffic_vehicles_orp)
 
-			set_vehicles(vehicles)
+			set_vehicles_perceived(vehicles)
 			self.vehicles = vehicles
 
 		# Has mutated

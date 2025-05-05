@@ -62,6 +62,24 @@ class Actor(object):
         return state
 
 
+    def future_euclidian_state(self, dt):
+        """ Predicts a new state based on time and vel.
+            Used for collision prediction and charts
+            Note: Acc can rapidly change. Using the current acc to predict future
+            can lead to overshooting forward or backwards when vehicle is breaking
+            TODO: predict using history + kalman filter
+        """
+        state = [
+            self.state.x + (self.state.x_vel * dt),
+            self.state.x_vel,
+            self.state.x_acc,
+            self.state.y + (self.state.y_vel * dt),
+            self.state.y_vel,
+            self.state.y_acc
+        ]
+        return state
+
+
     def stop(self):
         pass
 

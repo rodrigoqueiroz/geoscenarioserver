@@ -17,19 +17,19 @@ from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
 from requirements.RequirementViolationEvents import AgentTick, BrokenScenario, ScenarioCompletion
 from SimTraffic import *
-from sv.FrenetTrajectory import *
-from sv.ManeuverConfig import *
-from sv.ManeuverModels import plan_maneuver
+from sv.maneuvers.FrenetTrajectory import *
+from sv.maneuvers.Config import *
+from sv.maneuvers.Models import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
 from util.BoundingBoxes import calculate_rectangular_bounding_box
 
-import sv.btree.BehaviorLayer       as btree
-import sv.ruleEngine.BehaviorLayer  as rules
+import sv.planners.btree.BehaviorLayer       as btree
+import sv.planners.ruleEngine.BehaviorLayer  as rules
 
 class SVPlanner(object):
-    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, perception = None, rule_engine_port = None):
+    def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, perception = None, rule_engine_port = None, tracker = None):
         #MainProcess space:
         self.completion           = Value('b', False)
         self._process             = None
@@ -38,6 +38,7 @@ class SVPlanner(object):
         self._debug_shdata        = sim_traffic.debug_shdata
         self._mplan_sharr         = None
         self._perception          = perception
+        self._tracker             = tracker
         self._requirementsChecker = RequirementsChecker(sdv, goal_ends_simulation)
         self._rule_engine_port    = rule_engine_port
 
@@ -165,6 +166,7 @@ class SVPlanner(object):
                 # Must be after requirementChecker.analyze, since we are not yet sure if the next tick is required
                 AgentTick(traffic_state.vid)
                 traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
+                traffic_state = self._tracker.track_dynamic_objects(    traffic_state, self.laneletmap, self.sdv_route)
                 
                 #BTree Tick - using frenet state and lane config based on old ref path
                 mconfig, ref_path_changed, snapshot_tree = self.behavior_layer.tick(traffic_state)
@@ -182,6 +184,7 @@ class SVPlanner(object):
                         continue
 
                     traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
+                    traffic_state = self._tracker.track_dynamic_objects(    traffic_state, self.laneletmap, self.sdv_route)
                     mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
 
 
@@ -229,13 +232,10 @@ class SVPlanner(object):
                         self.sync_planner.end_task() #blocks if < target
                         task_delta_time = self.sync_planner.get_task_time()
 
+                    # Invalid trajectory are apparently valid in Geoscenario.
                     if frenet_traj is None:
-                        print('ego speed', traffic_state.vehicle_state.s_vel)
                         log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
-                        #BrokenScenario(self.vid)
-                        #raise ScenarioCompletion()
                     else:
-                    
                         plan = MotionPlan()
                         plan.trajectory = frenet_traj
                         plan.start_time = state_time + task_delta_time
@@ -276,11 +276,9 @@ class SVPlanner(object):
             with self.completion.get_lock():
                 self.completion.value = True
 
-        except KeyboardInterrupt as e:
-            self._requirementsChecker.forced_exit()
-
-        except SystemExit:
-            self._requirementsChecker.forced_exit()
+        except (KeyboardInterrupt, SystemExit) as e:
+            BrokenScenario(self.vid, "terminated early from user interaction (e.g., closed program).")
+            raise e # bubble up
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
 

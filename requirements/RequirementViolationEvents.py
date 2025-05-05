@@ -3,6 +3,8 @@ import os
 
 from multiprocessing import Manager, Value
 
+from SimConfig import TRAFFIC_RATE
+
 manager = Manager()
 
 # Singleton
@@ -19,6 +21,8 @@ TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 5
 # Generic
 class ScenarioEnd:
 	def __init__(self):
+		print('Scenario Ended in {} seconds'.format(global_tick.value / TRAFFIC_RATE))
+
 		os.makedirs(os.path.dirname(file_name), exist_ok=True)
 		with open(file_name, "w+") as file:
 			file.write(json.dumps(violations.copy()))
@@ -49,10 +53,10 @@ class AgentTick:
 		agent_ticks[agent_id] += 1
 
 class BrokenScenario(UnmetRequirement):
-	def __init__(self, agent_id):
+	def __init__(self, agent_id, message):
 		self.raise_it(agent_id, {
 			'agentId': agent_id,
-			'message': 'v' + str(agent_id) + ' produced an invalid trajectory.'
+			'message': 'v' + str(agent_id) + ' ' + message
 		})
 		ScenarioEnd()
 

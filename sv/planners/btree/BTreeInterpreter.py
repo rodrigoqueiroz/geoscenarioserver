@@ -3,14 +3,14 @@
 #dinizr@chalmers.se
 
 from py_trees import *
-from sv.ManeuverConfig import MVelKeepConfig
-from sv.ManeuverUtils import *
-from sv.btree.BTreeLeaves import *
-from sv.btree.BTreeConstants import *
+from sv.maneuvers.Config import MVelKeepConfig
+from sv.maneuvers.Utils import *
+from sv.planners.btree.BTreeLeaves import *
+from sv.planners.btree.BTreeConstants import *
 from antlr4 import *
-from sv.btree.parser.BTreeDSLLexer import BTreeDSLLexer
-from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
-from sv.btree.parser.BTreeDSLListener import BTreeDSLListener
+from sv.planners.btree.parser.BTreeDSLLexer import BTreeDSLLexer
+from sv.planners.btree.parser.BTreeDSLParser import BTreeDSLParser
+from sv.planners.btree.parser.BTreeDSLListener import BTreeDSLListener
 
 import random
 import string

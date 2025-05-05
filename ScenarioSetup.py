@@ -141,10 +141,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             extract_tag(vnode, 'noise_mean_position', 0.0,  float),
             extract_tag(vnode, 'noise_std_position',  0.0,  float)
         ]
-        noise_yaw_mostly_reliable     = extract_tag(vnode, 'noise_yaw_mostly_reliable',     0.0,  float)
-        noise_yaw_strongly_inaccurate = extract_tag(vnode, 'noise_yaw_strongly_inaccurate', 0.0,  float)
-        rule_engine_port              = extract_tag(vnode, 'rule_engine_port',              None, int)
-        yaw = -extract_tag(vnode, 'yaw', 0.0, float)
+        noise_yaw_mostly_reliable     =  extract_tag(vnode, 'noise_yaw_mostly_reliable',     0.0,  float)
+        noise_yaw_strongly_inaccurate =  extract_tag(vnode, 'noise_yaw_strongly_inaccurate', 0.0,  float)
+        rule_engine_port              =  extract_tag(vnode, 'rule_engine_port',              None, int)
+        tracking_method               =  extract_tag(vnode, 'tracking_method',               None, str)
+        yaw                           = -extract_tag(vnode, 'yaw',                           0.0,  float)
 
         log.info("Vehicle {}, behavior type {}".format(vid,btype))    
 
@@ -203,7 +204,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                 goal_ends_simulation=goal_ends_simulation, hallucination_retention=hallucination_retention, 
                                 hallucination_weight=hallucination_weight, missed_detection_weight=missed_detection_weight, 
                                 noise_position_mixture=noise_position_mixture, noise_yaw_mostly_reliable=noise_yaw_mostly_reliable, 
-                                noise_yaw_strongly_inaccurate=noise_yaw_strongly_inaccurate, rule_engine_port=rule_engine_port
+                                noise_yaw_strongly_inaccurate=noise_yaw_strongly_inaccurate, rule_engine_port=rule_engine_port,
+                                tracking_method=tracking_method
                             )
                 #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                 #                lanelet_map, sim_config.lanelet_routes[vid],

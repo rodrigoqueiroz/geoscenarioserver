@@ -12,7 +12,6 @@ from enum import Enum, IntEnum
 import numpy as np
 from typing import Dict
 
-
 class Maneuver(Enum):
     M_VELKEEP     = 1
     M_FOLLOW      = 2
@@ -21,8 +20,8 @@ class Maneuver(Enum):
     M_STOP        = 5
     M_REVERSE     = 6
 
-    M_TRACK_SPEED = 100
-    M_STOP_AT     = 101
+    # Frédéric's maneuvers
+    M_STOP_AT     = 100
 
 class SamplingMethod(IntEnum):
     LINEAR  = 1     #linear space
@@ -204,6 +203,9 @@ class MConfig:
     #Use with caution when multiple vehicles are used in simulation
     cost_precision:float = 10             #from 10 to 100.
 
+    # Determine whether the actors in the traffic states are relevant
+    use_low_level_planner:bool = True
+
     #Temp solution for the problem of Btrees not parsing dictionary values
     #Allows to modify feasibility constraints and costs
     fc_collision:int = 1
@@ -214,32 +216,45 @@ class MConfig:
         self.feasibility_constraints['off_lane'] = self.fc_off_lane
         self.cost_weight['lane_offset_cost'] = self.lane_offset_cost
 
-@dataclass
-class MStopAtConfig(MConfig):
-    frequency:float = PLANNER_RATE                      # hertz
-    min_distance_from_stop_position:float = 3.0         # meters
-    stop_s_offset:float = 0.0                           # meters
-    track_speed:MTrackSpeedConfig = field(default_factory=lambda:MTrackSpeedConfig())
-    mkey:int = Maneuver.M_STOP_AT
+
 
 @dataclass
-class MTrackSpeedConfig(MConfig):
-    frequency:float = PLANNER_RATE                      # hertz
-    velocity:MVelKeepConfig = field(default_factory=lambda:MVelKeepConfig())
-    mkey:int = Maneuver.M_TRACK_SPEED
+class MCutInConfig(MConfig):
+    delta_d:tuple = (0,0,0)         #(d, vel, acc)
+    delta_s:tuple = (10,5,0)        #(s, vel, acc)
+    delta_s_sampling = [(10,5), (0,1), (0,1)]
+    mkey:int = Maneuver.M_CUTIN
+    target_lid:int = None           # Target lane id
+    target_vid:int = None           # Target vehicle id
+    time:MP = field(default_factory=lambda:MP(4.0,10,6))
+
+    def __post_init__(self):
+        self.cost_weight['lane_offset_cost'] = 0.5
+        self.feasibility_constraints['off_lane'] = 0
 
 @dataclass
-class MVelKeepConfig(MConfig):
-    vel:MP = field(default_factory=lambda:MP(14.0,10,3))  #velocity in [m/s] as MP
-    time:MP = field(default_factory=lambda:MP(3.0,20,6))  #duration in [s] as MP
-    max_diff:float = 8.0                 #max vel diff (current to target).
-    mkey:int = Maneuver.M_VELKEEP
+class MFollowConfig(MConfig):
+    mkey:int = Maneuver.M_FOLLOW
+    stop_distance:float = 3.0       # Target distance when lead vehicle stops
+    target_vid:int = None           # Target vehicle id
+    time:MP = field(default_factory=lambda:MP(4.0,50,10))  #duration in [s] as MP
+    time_gap:float = 3.0            # [s]
+
+@dataclass
+class MLaneSwerveConfig(MConfig):
+    mkey:int = Maneuver.M_LANESWERVE
+    target_lid:int = None           #target lane id
+    time:MP = field(default_factory=lambda:MP(4.2,10,6))  #target time in [s] as MP
+
+    def __post_init__(self):
+        self.cost_weight['lane_offset_cost'] = 0.5
+        self.feasibility_constraints['off_lane'] = 0
 
 @dataclass
 class MReverseConfig(MConfig):
-    vel:MP = field(default_factory=lambda:MP(5.0,10,6))   #velocity in [m/s] as MP
-    time:MP = field(default_factory=lambda:MP(3.0,20,3))  #duration in [s] as MP
     mkey:int = Maneuver.M_REVERSE
+    time:MP = field(default_factory=lambda:MP(3.0,20,3))  # Duration in [s] as MP
+    vel:MP = field(default_factory=lambda:MP(5.0,10,6))   #velocity in [m/s] as MP
 
     def __post_init__(self):
         self.feasibility_constraints['direction'] = 0
@@ -247,52 +262,31 @@ class MReverseConfig(MConfig):
 @dataclass
 class MStopConfig(MConfig):
     class StopTarget(IntEnum):
-        NOW = 0         #stop with no particular position. Use decel to adjust behavior.
-        S_POS = 1       #stop at a particular position in the frenet frame
-        GOAL = 2        #stop at the vehicle's goal point
+        NOW       = 0   #stop with no particular position. Use decel to adjust behavior.
+        S_POS     = 1   #stop at a particular position in the frenet frame
+        GOAL      = 2   #stop at the vehicle's goal point
         STOP_LINE = 3   #stop at the stop line of a regulatory element, if any applies
 
-    #target
-    target:int = StopTarget.GOAL #Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
-    pos:float = 0.0                 #pos in s [m]
-    distance:float = 0.0            #distance to target pos in [m]
-    #time:MP = MP(3.0,40,6)         #[s]
-    mkey:int = Maneuver.M_STOP
+    distance:float = 0.0                           # Distance to target pos in [m]
+    max_deceleration:float = 8.0 / PLANNER_RATE    # Maximum Deceleration in m/s
+    mkey:int   = Maneuver.M_STOP
+    pos:float  = 0.0                               # Position in s [m]
+    target:int = StopTarget.GOAL                   # Aim at a given position (GOAL, STOP_LINE, STOP_POS) or stop NOW.
 
     def __post_init__(self):
         self.max_long_acc = 30.0
 
 @dataclass
-class MFollowConfig(MConfig):
-    #target
-    target_vid:int = None           #target vehicle id
-    time:MP = field(default_factory=lambda:MP(4.0,50,10))  #duration in [s] as MP
-    time_gap:float = 3.0            #[s]
-    stop_distance:float = 3.0       #target distance when lead vehicle stops
-    mkey:int = Maneuver.M_FOLLOW
+class MStopAtConfig(MConfig):
+    max_velocity:MVelKeepConfig = field(default_factory=lambda:MVelKeepConfig()) # Velocity upperbound config
+    mkey:int                    = Maneuver.M_STOP_AT
+    progress_speed:float        = 3.0              # VelocityKeeping low crusing speed toward the goal m/s
+    stop_proximity_event:float  = 6.0              # Switch from VelocityKeeping to StopNow when X meters away from target
+    target:MStopConfig          = field(default_factory=lambda:MStopConfig())
 
 @dataclass
-class MLaneSwerveConfig(MConfig):
-    #target
-    target_lid:int = None           #target lane id
-    time:MP = field(default_factory=lambda:MP(4.2,10,6))  #target time in [s] as MP
-    mkey:int = Maneuver.M_LANESWERVE
-
-    def __post_init__(self):
-        self.cost_weight['lane_offset_cost'] = 0.5
-        self.feasibility_constraints['off_lane'] = 0
-
-@dataclass
-class MCutInConfig(MConfig):
-    #target
-    target_vid:int = None               #target vehicle id
-    target_lid:int = None
-    time:MP = field(default_factory=lambda:MP(4.0,10,6))
-    delta_s:tuple = (10,5,0)        #(s, vel, acc)
-    delta_s_sampling = [(10,5), (0,1), (0,1)]
-    delta_d:tuple = (0,0,0)         #(d, vel, acc)
-    mkey:int = Maneuver.M_CUTIN
-
-    def __post_init__(self):
-        self.cost_weight['lane_offset_cost'] = 0.5
-        self.feasibility_constraints['off_lane'] = 0
+class MVelKeepConfig(MConfig):
+    max_diff:float = 8.0                                  # Max vel diff (current to target wrt time).
+    mkey:int = Maneuver.M_VELKEEP
+    time:MP = field(default_factory=lambda:MP(3.0,20,6))  # Duration in [s] as MP
+    vel:MP = field(default_factory=lambda:MP(14.0,10,3))  # Velocity in [m/s] as MP

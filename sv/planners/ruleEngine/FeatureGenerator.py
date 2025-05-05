@@ -1,7 +1,7 @@
-from sv.ruleEngine.extractors.ActorExtractor      import ActorExtractor
-from sv.ruleEngine.extractors.EgoExtractor        import EgoExtractor
-from sv.ruleEngine.extractors.SimulationExtractor import SimulationExtractor
-from sv.ruleEngine.extractors.TravelExtractor     import TravelExtractor
+from sv.planners.ruleEngine.extractors.ActorExtractor      import ActorExtractor
+from sv.planners.ruleEngine.extractors.EgoExtractor        import EgoExtractor
+from sv.planners.ruleEngine.extractors.SimulationExtractor import SimulationExtractor
+from sv.planners.ruleEngine.extractors.TravelExtractor     import TravelExtractor
 
 class FeatureGenerator:
 	def __init__(self):

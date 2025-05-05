@@ -6,7 +6,7 @@ import sys
 
 
 from antlr_denter.DenterHelper import DenterHelper
-from sv.btree.parser.BTreeDSLParser import BTreeDSLParser
+from sv.planners.btree.parser.BTreeDSLParser import BTreeDSLParser
 
 
 def serializedATN():

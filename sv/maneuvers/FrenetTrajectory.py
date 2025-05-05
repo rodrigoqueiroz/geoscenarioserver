@@ -19,7 +19,6 @@ class FrenetTrajectory:
     projected_trajectory = None
 
     #Functions
-    functional_offsets = True
     fs = None
     fs_vel = None
     fs_acc = None
@@ -90,9 +89,6 @@ class FrenetTrajectory:
         '''
         Returns a predicted frenet state for a given time in the trajectory
         '''
-        if not self.functional_offsets:
-            return self.target_state
-
         #limit max time
         if time > self.T: 
             time = self.T

@@ -6,7 +6,7 @@
 # --------------------------------------------
 
 
-from sv.ManeuverConfig import *
+from sv.maneuvers.Config import *
 from SimConfig import *
 import numpy as np
 from Actor import *
