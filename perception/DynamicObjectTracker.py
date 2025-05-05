@@ -50,8 +50,6 @@ class DynamicObjectTracker:
 			[ pred_s, pred_s_vel, pred_s_acc ] = predicted_vector[:3]
 			[ pred_d, pred_d_vel, pred_d_acc ] = predicted_vector[3:]
 			pred_s -= ego_motion[0]
-
-			print(pred_s, obs_s)
 			
 			collection[collection_key].state.s     = step(pred_s,     obs_s)
 			collection[collection_key].state.s_vel = step(pred_s_vel, obs_s_vel)

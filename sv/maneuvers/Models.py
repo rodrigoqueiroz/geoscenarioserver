@@ -67,8 +67,8 @@ def plan_maneuver(vehicle, mconfig, traffic_state):
             for trajectory in candidates:
                 log.warn(trajectory.unfeasibility_cause)
 
-        #BrokenScenario(traffic_state.vid, errorMessage)
-        #raise ScenarioCompletion(logMessage)
+        BrokenScenario(traffic_state.vid, errorMessage)
+        raise ScenarioCompletion(logMessage)
     
     if not _use_low_level_planner:
         traffic_state.pedestrians      = pedestrians
@@ -309,93 +309,6 @@ def plan_reversing(vehicle, mconfig:MReverseConfig, traffic_state:TrafficState):
     best, candidates = optimized_trajectory(vehicle, mconfig, traffic_state, target_state_set, s_solver=quartic_polynomial_solver)
     return best, candidates
 
-def plan_stop_vanilla(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
-    """
-    STOP
-    Stop can be a stop request by time and/or distance from current pos.
-    Or optionally have a specific target position to stop (stop line, before an object, etc).
-    """
-    vid = int(sdv.id)
-    vehicle_state:VehicleState = traffic_state.vehicle_state
-    lane_config:LaneConfig = traffic_state.lane_config
-    vehicles = traffic_state.traffic_vehicles
-    
-    #start
-    s_start = vehicle_state.get_S()
-    d_start = vehicle_state.get_D()
-
-    # Find s position for dynamic target 
-    if mconfig.target == MStopConfig.StopTarget.GOAL:
-        mconfig.pos = traffic_state.goal_point_frenet[0]
-    elif mconfig.target == MStopConfig.StopTarget.STOP_LINE:
-       mconfig.pos = lane_config.stopline_pos
-       for intersection in traffic_state.intersections:
-            mconfig.pos = intersection.stop_position[0]
-            break
-    #log.info("PLAN STOP: can not find stop position in intersection")            
-    
-    #adjust target pos to vehicle length
-    target_pos = mconfig.pos - sdv.bounding_box_length/2 - mconfig.distance
-
-    #Already stopped?
-    if (abs(s_start[1]) <= 0.05):
-        #log.warn('Vehicle already stopped')
-        #TODO: Need another stop maneuver (yielding) for proper configuration
-        #if already stopped and not at stopping point, move to it
-        if target_pos > 1:
-            log.info("PLAN STOP: move to adjust target pos {}".format(target_pos))
-            return plan_velocity_keeping(vid, MVelKeepConfig(), traffic_state)
-        ft = FrenetTrajectory()
-        return ft, None
-    
-    #log.info('PLAN STOP at pos {} target {}'.format(mconfig.pos, mconfig.target))
-
-    #adjust target pos to possible dynamic elements:
-    lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
-    if lv:
-        #max_pos = lv.state.s - VEHICLE_RADIUS*3
-        max_pos = lv.state.s - sdv.length - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
-        if target_pos > max_pos:
-            #log.warn('Vehicle {} stop target {} adjusted to lead pos {}. New target {}'.format(vid,target_pos, lv.state.s, max_pos))
-            target_pos = max_pos
-    
-    stop_distance = target_pos - s_start[0]
-    expected_time = 2*stop_distance / (vehicle_state.s_vel) #assuming uniform acceleration
-    target_time = MP(expected_time,40,6) #bound >40% recommended for safely finding a suitable stop time
-    
-    # within a certain distance generating new trajectory doesn't make sense
-    if target_pos < 1: 
-        #or abs(target_pos - vehicle_state.s) < 1:
-        log.warn('PLAN STOP Vehicle {} target position {} is too close or behind'.format(vid,target_pos))
-        #mconfig.type = MStopConfig.Type.NOW
-        #s_solver = quartic_polynomial_solver
-        return None, None
-
-    # when vehicle is past the target point, switch to STOP NOW
-    #if (target_pos - vehicle_state.s) < 0:
-    #    log.warn('Vehicle {} stop target position behind. diff={}'.format(vid,target_pos - vehicle_state.s))
-    #    #mconfig.type = MStopConfig.Type.NOW    
-    #    #s_solver = quartic_polynomial_solver
-    #    return None, None
-    #else:
-
-    s_solver = quintic_polynomial_solver
-
-    #targets
-    target_state_set = []
-    #generates alternative targets
-    for t in target_time.get_samples():
-        #longitudinal movement: goal is to reach vel and acc 0
-        s_target = [target_pos, 0, 0]
-        #lateral movement
-        for di in mconfig.lat_target.get_samples(lane_config):
-            d_target = [di, 0, 0]
-            #add target
-            target_state_set.append((s_target, d_target, t))
-    
-    best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver = s_solver)
-    return best, candidates 
-
 
 def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
     """
@@ -502,9 +415,6 @@ def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
 
 
 def plan_stop_at(vehicle, mconfig:MStopAtConfig, traffic_state:TrafficState):
-    return plan_stop_vanilla(vehicle, mconfig.target, traffic_state)
-    #return plan_stop(vehicle, mconfig.target, traffic_state)
-
     # Determine whether we are close enough to enforce a deceleration
     stop_now_trajectory, stop_now_candidates = plan_stop(vehicle, MStopConfig(target = MStopConfig.StopTarget.NOW), traffic_state)
     stop_distance = stop_now_trajectory.target_state[0]
@@ -532,32 +442,6 @@ def plan_stop_at(vehicle, mconfig:MStopAtConfig, traffic_state:TrafficState):
         return velocity_keeping_trajectory, velocity_keeping_candidates
 
     return stop_trajectory, stop_candidates
-
-
-"""
-def plan_stop_at(vehicle, mconfig:MStopAtConfig, traffic_state:TrafficState):
-    def determine_desired_speed():
-        ego_state     = traffic_state.vehicle_state
-        stop_distance = mconfig.stop_s_offset - ego_state.s
-
-        # Overshot the stop region, needs to stop as soon as possible
-        if stop_distance < mconfig.min_distance_from_stop_position:
-            return 0.0
-
-        # Progressing toward the stop region, gradually reduce the speed to prevent overshots
-        expected_time  = 2.0 * stop_distance / max(1.0, ego_state.s_vel)
-        progress_speed = 2.0 if 6.0 < stop_distance else 1.5
-        target_speed   = max(ego_state.s_vel * (expected_time - mconfig.frequency) / expected_time, progress_speed)
-
-        # Shall we instead apply the speed upperbound?
-        if mconfig.track_speed.velocity.vel.value < target_speed:
-            return mconfig.track_speed.velocity.vel.value
-
-        return target_speed
-
-    mconfig.track_speed.velocity.vel.value = determine_desired_speed()
-    return plan_track_speed(vehicle, mconfig.track_speed, traffic_state)
-"""
 
 
 def plan_velocity_keeping(vehicle, mconfig:MVelKeepConfig, traffic_state:TrafficState):
