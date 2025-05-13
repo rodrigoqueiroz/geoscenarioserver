@@ -319,8 +319,8 @@ class PV(Vehicle):
     - cycles
     - usespeedprofile
     Path parameters:
-    - agentacceleration
-    - timetoacceleration
+    - agentacceleration (not implemented)
+    - timetoacceleration (not implemented)
     """
     def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
         super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
