@@ -37,44 +37,46 @@ class SimSharedMemoryServer(object):
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
                 origin_lat origin_lon origin_alt
-                vid v_type x y z vx vy yaw steering_angle
-                pid p_type x y z vx vy yaw
+                vid v_type l w h x y z vx vy yaw steering_angle
+                pid p_type l w h x y z vx vy yaw
                 ...
         """
         if not self.is_connected:
             return
 
         # write tick count, deltatime, numbers of vehicles and pedestrians
-        write_str = "{} {} {} {} {}\n".format(int(tick_count), sim_time, delta_time, len(vehicles), len(pedestrians))
+        write_str = f"{int(tick_count)} {sim_time} {delta_time} {len(vehicles)} {len(pedestrians)}\n"
         # write origin
         (lat, lon, alt) = origin
-        write_str += "{} {} {}\n".format(lat, lon, alt)
+        write_str += f"{lat} {lon} {alt}\n"
         # write vehicle states, rounding the numerical data to reasonable significant figures
         for svid in vehicles:
-            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
-            write_str += "{} {} {} {} {} {} {} {} {}\n".format(
-                vid, v_type,
-                round(position[0], 4),
-                round(position[1], 4),
-                round(position[2], 4),
-                round(velocity[0], 4),
-                round(velocity[1], 4),
-                round(yaw * math.pi / 180, 6),
-                round(steering_angle, 6)
-            )
+            vid, v_type, dimensions, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
+            l = round(dimensions[0], 4)
+            w = round(dimensions[1], 4)
+            h = round(dimensions[2], 4)
+            x = round(position[0], 4)
+            y = round(position[1], 4)
+            z = round(position[2], 4)
+            vx = round(velocity[0], 4)
+            vy = round(velocity[1], 4)
+            yaw = round(yaw * math.pi / 180, 6)
+            sa = round(steering_angle, 6)
+            write_str += f"{vid} {v_type} {l} {w} {h} {x} {y} {z} {vx} {vy} {yaw} {sa}\n"
 
         # write pedestrian states, rounding the numerical data to reasonable significant figures
         for spid in pedestrians:
-            pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
-            write_str += "{} {} {} {} {} {} {} {}\n".format(
-                pid, p_type,
-                round(position[0], 4),
-                round(position[1], 4),
-                round(position[2], 4),
-                round(velocity[0], 4),
-                round(velocity[1], 4),
-                round(yaw * math.pi / 180, 6)
-            )
+            pid, p_type, dimensions, position, velocity, yaw = pedestrians[spid].get_sim_state()
+            l = round(dimensions[0], 4)
+            w = round(dimensions[1], 4)
+            h = round(dimensions[2], 4)
+            x = round(position[0], 4)
+            y = round(position[1], 4)
+            z = round(position[2], 4)
+            vx = round(velocity[0], 4)
+            vy = round(velocity[1], 4)
+            yaw = round(yaw * math.pi / 180, 6)
+            write_str += f"{pid} {p_type} {l} {w} {h} {x} {y} {z} {vx} {vy} {yaw} {sa}\n"
 
         # sysv_ipc.BusyError needs to be caught
         try:

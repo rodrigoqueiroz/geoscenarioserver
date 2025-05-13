@@ -25,6 +25,7 @@ class Vehicle(Actor):
 
 
     def get_sim_state(self):
+        dimensions = [self.length, self.width, 0.0]
         position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
-        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
+        return self.id, self.type, dimensions, position, velocity, self.state.yaw, self.state.steer
