@@ -76,7 +76,7 @@ class SimSharedMemoryServer(object):
             vx = round(velocity[0], 4)
             vy = round(velocity[1], 4)
             yaw = round(yaw * math.pi / 180, 6)
-            write_str += f"{pid} {p_type} {l} {w} {h} {x} {y} {z} {vx} {vy} {yaw} {sa}\n"
+            write_str += f"{pid} {p_type} {l} {w} {h} {x} {y} {z} {vx} {vy} {yaw}\n"
 
         # sysv_ipc.BusyError needs to be caught
         try:
