@@ -33,7 +33,7 @@ class SimSharedMemoryServer(object):
     def write_server_state(self, tick_count, sim_time, delta_time, origin, vehicles, pedestrians):
         """ Writes to shared memory pose data for each agent.
             @param vehicles:      dictionary of type <int, Vehicle>
-            @param pedestrians:      dictionary of type <int, Pedestrian>
+            @param pedestrians:   dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
                 origin_lat origin_lon origin_alt
@@ -94,8 +94,8 @@ class SimSharedMemoryServer(object):
             @param npedestrians:      number of pedestrians
             Shared memory format:
                 tick_count delta_time n_vehicles n_pedestrians
-                vid x y z vx vy is_active
-                pid x y z vx vy is_active
+                vid x y z vx vy active
+                pid x y z vx vy active
                 ...
         """
         # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
@@ -145,7 +145,7 @@ class SimSharedMemoryServer(object):
             # the client must see the same number of vehicles as server
             if nclient_vehicles == nvehicles:
                 for ri in range(1, nvehicles + 1):
-                    vid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
+                    vid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
                     vs = VehicleState()
                     vid = int(vid)
                     vs.x = float(x)
@@ -153,12 +153,12 @@ class SimSharedMemoryServer(object):
                     vs.z = float(z)
                     vs.x_vel = float(x_vel)
                     vs.y_vel = float(y_vel)
-                    #Estimating yaw because is not being published by client.
+                    #Estimating yaw because it is not being published by client.
                     #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
                     if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01):
                         vs.yaw = math.degrees(math.atan2(vs.y_vel,vs.x_vel))
                     vstates[vid] = vs
-                    if not int(is_active):
+                    if not int(active):
                         disabled_vehicles.append(vid)
             else:
                 log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
@@ -174,7 +174,7 @@ class SimSharedMemoryServer(object):
         try:
             if nclient_pedestrians == npedestrians:
                 for ri in range(nvehicles + 1, nvehicles + 1 + npedestrians):
-                    pid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
+                    pid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
                     ps = PedestrianState()
                     pid = int(pid)
                     ps.x = float(x)
@@ -183,7 +183,7 @@ class SimSharedMemoryServer(object):
                     ps.x_vel = float(x_vel)
                     ps.y_vel = float(y_vel)
                     pstates[pid] = ps
-                    if not int(is_active):
+                    if not int(active):
                         disabled_pedestrians.append(pid)
             else:
                 log.warn("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(

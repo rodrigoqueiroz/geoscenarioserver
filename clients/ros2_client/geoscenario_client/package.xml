@@ -2,9 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>geoscenario_client</name>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <description>Python client for GeoScenarioServer</description>
-  <maintainer email="ian.colwell@hexagon.com">ian</maintainer>
+  <maintainer email="ian.colwell@hexagon.com">Ian Colwell</maintainer>
+  <maintainer email="michal.antkiewicz@uwaterloo.ca">Michal Antkiewicz</maintainer>
   <license>MIT</license>
 
   <test_depend>python3-pytest</test_depend>
