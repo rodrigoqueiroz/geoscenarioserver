@@ -69,7 +69,7 @@
   		
   	<item name="Ego Start" icon="ego.png" type="node" preset_name_label="true">
 		<key key="gs" value="egostart" />
-		<text key="yaw" text="* Yaw(deg)" />
+		<text key="yaw" text="*Yaw (deg)" />
 		<space/>
 		<label text="Ego's starting position" />
   	</item>
@@ -80,8 +80,8 @@
 		<label text="Goal position for Ego" />
 		<item_separator />
 
-		<text key="name" text="*Name " />
-		<text key="order" text="Order " />
+		<text key="name" text="*Name" />
+		<text key="order" text="Order" />
 		<item_separator />
 
   	</item>
@@ -95,12 +95,12 @@
 		<label text="GeoScenario Static Object" />
 		<item_separator />
 
-		<text key="name" text="* Name " />
+		<text key="name" text="*Name" />
 		<text key="model" text="Model" />
-		<text key="height" text="Height(in cm)" />
+		<text key="height" text="Height (cm)" />
 		<item_separator />
 
-		<text key="group" text="Group [] " />
+		<text key="group" text="Group []" />
 		<item_separator />
 
 	</item>
@@ -112,9 +112,9 @@
 		<label text="GeoScenario Static Object" />
 		<item_separator />
 
-		<text key="name" text="* Name " />
+		<text key="name" text="*Name" />
 		<text key="model" text="Model" />
-		<text key="height" text="Height(in cm)" />
+		<text key="height" text="Height (cm)" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
@@ -130,12 +130,12 @@
 		<label text="GeoScenario Pedestrian" />
 		<item_separator />
 
-		<text key="pid" text="* PID " />
-		<text key="name" text="* Name " />
-		<text key="yaw" text="Yaw[](deg)" />
+		<text key="pid" text="*PID" />
+		<text key="name" text="*Name" />
+		<text key="yaw" text="Yaw[] (deg)" />
 		<text key="model" text="Model" />
-		<text key="length" text="(m)" />
-		<text key="width" text="(m)" />
+		<text key="length" text="Length (m)" />
+		<text key="width" text="Width (m)" />
 		<combo key="btype" text="Behavior Type:" values="TP,EP,PP,SP" default="" />
 		<item_separator />
 
@@ -151,7 +151,7 @@
 		<item_separator />
 
 		<label text="PP (path-based pedestrian)" />
-		<text key="speed" text="Speed[](km/h)" />
+		<text key="speed" text="Speed[] (km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
 		<text key="usespeedprofile" text="Use Speed Profile (y/n)" />
@@ -178,26 +178,26 @@
 		<label text="GeoScenario Vehicle" />
 		<item_separator />
 
-		<text key="vid" text="* VID " />
-		<text key="name" text="* Name " />
-		<text key="yaw" text="Yaw[](deg)" />
+		<text key="vid" text="*VID" />
+		<text key="name" text="*Name" />
+		<text key="yaw" text="Yaw[] (deg)" />
 		<text key="model" text="Model" />
-		<text key="length" text="(m)" />
-		<text key="width" text="(m)" />
+		<text key="length" text="Length (m)" />
+		<text key="width" text="Width (m)" />
 		<combo key="btype" text="Behavior Type:" values="SDV,TV,EV,PV" default="" />
 		<item_separator />
 
-		<label text="SDV Model (GeoScenario Simulated Driver-Vehicle Model) "/>
+		<label text="SDV Model (GeoScenario Simulated Driver-Vehicle Model)"/>
 		<label text="Vehicles running SDV Models for dynamic behavior" />
 		<text key="btree" text="BehaviorTree (root)" />
 		<text key="rule_engine_port" text="Rule engine port (int 0-65535)" />
 		<text key="route" text="Route ID" />
-		<text key="goal_ends_simulation" text="(bool)" default="no" />
+		<text key="goal_ends_simulation" text="Goal ends simulation (yes/no)" default="no" />
 		<label text="Start State: choose between cartesian or frenet format:" />
 		<text key="start_cartesian" text="Cartesian" />
 		<text key="start_frenet" text="Frenet" />
-		<label text="cartesian [x_vel,y_vel,x_acc,y_acc] in  m/s and m/s/s" />
-		<label text="frenet [long_vel,long_acc,lat_vel,lat_acc] in  m/s and m/s/s" />
+		<label text="cartesian [x_vel,y_vel,x_acc,y_acc] vel (m/s), acc (m/s/s)" />
+		<label text="frenet [long_vel,long_acc,lat_vel,lat_acc] vel (m/s), acc (m/s/s)" />
 		<item_separator />
 
 		<label text="TV (trajectory-based vehicles)"/>
@@ -213,7 +213,7 @@
 
 		<label text="PV (path-based vehicles)"/>
 		<label text="Vehicles following a path with a constant speed, or following a speed profile" />
-		<text key="speed" text="Speed[](km/h)" />
+		<text key="speed" text="Speed[] (km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 for infinite)" default="1" />
 		<check key="usespeedprofile" text="Use Speed Profile" />
@@ -235,7 +235,7 @@
 		<label text="GeoScenario trajectory for dynamic agents" />
 		<item_separator />
 		
-		<text key="name" text="Name " />
+		<text key="name" text="Name" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
@@ -249,7 +249,7 @@
 		<label text="GeoScenario route for dynamic agents" />
 		<item_separator />
 		
-		<text key="name" text="Name " />
+		<text key="name" text="Name" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
@@ -263,7 +263,7 @@
 		<label text="GeoScenario path for dynamic agents" />
 		<item_separator />
 		
-		<text key="name" text="Name " />
+		<text key="name" text="Name" />
 		<check key="abstract" text="Abstract" default="off"/>
 		<item_separator />
 
@@ -277,18 +277,18 @@
   	<item name="Node speed profile" type="node"  preset_name_label="true">
 		<label text="Node speed profile for a path" />
 		<item_separator />
-		<text key="agentspeed" text="Node speed " />
-		<text key="agentacceleration" text="Node acceleration" />
-		<text key="timetoacceleration" text="Time to acceleration" />
+		<text key="agentspeed" text="Node speed (km/h)" />
+		<text key="agentacceleration" text="Node acceleration (m/s/s)" />
+		<text key="timetoacceleration" text="Time to acceleration (s)" />
   	</item>
 
 	<item name="Trajectory Node" type="node"  preset_name_label="true">
 		<label text="Trajectory node for a path" />
 		<key key="gs" value="tnode" />
 		<item_separator />
-		<text key="time" text="Time" />
-		<text key="yaw" text="Yaw" />
-		<text key="speed" text="Speed" />
+		<text key="time" text="Time (s)" />
+		<text key="yaw" text="Yaw (deg)" />
+		<text key="speed" text="Speed (km/h)" />
   	</item>
 
 	<!-- LOCATIONS -->
@@ -300,7 +300,7 @@
 		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers. Can be used to tag points of interest." />
 		<item_separator />
 
-		<text key="name" text="*Name " />
+		<text key="name" text="*Name" />
 		<item_separator />
 
 		<check key="continuous" text="Continuous" default="off" />
@@ -318,7 +318,7 @@
 		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers" />
 		<item_separator />
 
-		<text key="name" text="*Name " />
+		<text key="name" text="*Name" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
@@ -336,7 +336,7 @@
 		<space/>
 		<label text="GeoScenario Trigger" />
 		<item_separator />
-		<text key="name" text="*Name " />
+		<text key="name" text="*Name" />
 		<item_separator />
 
 		<multiselect key="activate" delimiter="," text="Activated by" values="location,time,condition" />

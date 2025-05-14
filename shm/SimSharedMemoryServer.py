@@ -33,48 +33,50 @@ class SimSharedMemoryServer(object):
     def write_server_state(self, tick_count, sim_time, delta_time, origin, vehicles, pedestrians):
         """ Writes to shared memory pose data for each agent.
             @param vehicles:      dictionary of type <int, Vehicle>
-            @param pedestrians:      dictionary of type <int, Pedestrian>
+            @param pedestrians:   dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
                 origin_lat origin_lon origin_alt
-                vid v_type x y z vx vy yaw steering_angle
-                pid p_type x y z vx vy yaw
+                vid v_type l w h x y z vx vy yaw steering_angle
+                pid p_type l w h x y z vx vy yaw
                 ...
         """
         if not self.is_connected:
             return
 
         # write tick count, deltatime, numbers of vehicles and pedestrians
-        write_str = "{} {} {} {} {}\n".format(int(tick_count), sim_time, delta_time, len(vehicles), len(pedestrians))
+        write_str = f"{int(tick_count)} {sim_time} {delta_time} {len(vehicles)} {len(pedestrians)}\n"
         # write origin
         (lat, lon, alt) = origin
-        write_str += "{} {} {}\n".format(lat, lon, alt)
+        write_str += f"{lat} {lon} {alt}\n"
         # write vehicle states, rounding the numerical data to reasonable significant figures
         for svid in vehicles:
-            vid, v_type, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
-            write_str += "{} {} {} {} {} {} {} {} {}\n".format(
-                vid, v_type,
-                round(position[0], 4),
-                round(position[1], 4),
-                round(position[2], 4),
-                round(velocity[0], 4),
-                round(velocity[1], 4),
-                round(yaw * math.pi / 180, 6),
-                round(steering_angle, 6)
-            )
+            vid, v_type, dimensions, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()
+            l = round(dimensions[0], 4)
+            w = round(dimensions[1], 4)
+            h = round(dimensions[2], 4)
+            x = round(position[0], 4)
+            y = round(position[1], 4)
+            z = round(position[2], 4)
+            vx = round(velocity[0], 4)
+            vy = round(velocity[1], 4)
+            yaw = round(yaw * math.pi / 180, 6)
+            sa = round(steering_angle, 6)
+            write_str += f"{vid} {v_type} {l} {w} {h} {x} {y} {z} {vx} {vy} {yaw} {sa}\n"
 
         # write pedestrian states, rounding the numerical data to reasonable significant figures
         for spid in pedestrians:
-            pid, p_type, position, velocity, yaw = pedestrians[spid].get_sim_state()
-            write_str += "{} {} {} {} {} {} {} {}\n".format(
-                pid, p_type,
-                round(position[0], 4),
-                round(position[1], 4),
-                round(position[2], 4),
-                round(velocity[0], 4),
-                round(velocity[1], 4),
-                round(yaw * math.pi / 180, 6)
-            )
+            pid, p_type, dimensions, position, velocity, yaw = pedestrians[spid].get_sim_state()
+            l = round(dimensions[0], 4)
+            w = round(dimensions[1], 4)
+            h = round(dimensions[2], 4)
+            x = round(position[0], 4)
+            y = round(position[1], 4)
+            z = round(position[2], 4)
+            vx = round(velocity[0], 4)
+            vy = round(velocity[1], 4)
+            yaw = round(yaw * math.pi / 180, 6)
+            write_str += f"{pid} {p_type} {l} {w} {h} {x} {y} {z} {vx} {vy} {yaw}\n"
 
         # sysv_ipc.BusyError needs to be caught
         try:
@@ -92,8 +94,8 @@ class SimSharedMemoryServer(object):
             @param npedestrians:      number of pedestrians
             Shared memory format:
                 tick_count delta_time n_vehicles n_pedestrians
-                vid x y z vx vy is_active
-                pid x y z vx vy is_active
+                vid x y z vx vy active
+                pid x y z vx vy active
                 ...
         """
         # header is [tick_count, delta_time, n_vehicles, n_pedestrians]
@@ -143,7 +145,7 @@ class SimSharedMemoryServer(object):
             # the client must see the same number of vehicles as server
             if nclient_vehicles == nvehicles:
                 for ri in range(1, nvehicles + 1):
-                    vid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
+                    vid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
                     vs = VehicleState()
                     vid = int(vid)
                     vs.x = float(x)
@@ -151,12 +153,12 @@ class SimSharedMemoryServer(object):
                     vs.z = float(z)
                     vs.x_vel = float(x_vel)
                     vs.y_vel = float(y_vel)
-                    #Estimating yaw because is not being published by client.
+                    #Estimating yaw because it is not being published by client.
                     #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
                     if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01):
                         vs.yaw = math.degrees(math.atan2(vs.y_vel,vs.x_vel))
                     vstates[vid] = vs
-                    if not int(is_active):
+                    if not int(active):
                         disabled_vehicles.append(vid)
             else:
                 log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
@@ -172,7 +174,7 @@ class SimSharedMemoryServer(object):
         try:
             if nclient_pedestrians == npedestrians:
                 for ri in range(nvehicles + 1, nvehicles + 1 + npedestrians):
-                    pid, x, y, z, x_vel, y_vel, is_active = data_arr[ri].split()
+                    pid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
                     ps = PedestrianState()
                     pid = int(pid)
                     ps.x = float(x)
@@ -181,7 +183,7 @@ class SimSharedMemoryServer(object):
                     ps.x_vel = float(x_vel)
                     ps.y_vel = float(y_vel)
                     pstates[pid] = ps
-                    if not int(is_active):
+                    if not int(active):
                         disabled_pedestrians.append(pid)
             else:
                 log.warn("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(

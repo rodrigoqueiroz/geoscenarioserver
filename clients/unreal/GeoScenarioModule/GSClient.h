@@ -83,8 +83,8 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	AActor* FindVehicleActor(int vid);
 	AActor* FindPedestrianActor(int pid);
-	void CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot);
-	void CreatePedestrian(int pid, int p_type, FVector &loc, FRotator &rot);
+	void CreateVehicle(int vid, int v_type, FVector &dim, FVector &loc, FRotator &rot);
+	void CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc, FRotator &rot);
 	void ReadServerState(float deltaTime);
 	void UpdateRemoteVehicleStates(float deltaTime);
 	void UpdateRemotePedestrianStates(float deltaTime);
