@@ -72,6 +72,9 @@ def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, v
 #=============================== MANEUVER COST
 
 def maneuver_cost(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
+    # When a maneuver has an invalid duration, the costs cannot be computed
+    if ft.T == 0 or np.isnan(ft.T):
+        return
     
     for cost in mconfig.cost_weight:
         k = mconfig.cost_weight[cost]

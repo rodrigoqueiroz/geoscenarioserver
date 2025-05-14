@@ -358,8 +358,8 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id.
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
-    half_length = my_vehicle.bounding_box_length / 2
-    half_width  = my_vehicle.bounding_box_width  / 2
+    three_quarter_length = my_vehicle.bounding_box_length / 1.5
+    three_quarter_width  = my_vehicle.bounding_box_width / 1.5
     detection_range_in_meters = 50 # Rodrigo's base assumption to limit the detection range
 
     if my_vehicle.detection_range_in_meters:
@@ -388,19 +388,19 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
         same_lane = lane_config.right_bound <= vehicle.state.d <= lane_config.left_bound
 
         # Left lane
-        if my_vehicle.state.d + half_width < vehicle.state.d - half_width:
-            if (vehicle.state.s - half_length) > (my_vehicle.state.s + half_length):
+        if my_vehicle.state.d + three_quarter_width < vehicle.state.d - three_quarter_width:
+            if (vehicle.state.s - three_quarter_length) > (my_vehicle.state.s + three_quarter_length):
                 occupancy.front_left.vehicles.append(vehicle)
-            elif (vehicle.state.s + half_length) <= (my_vehicle.state.s - half_length):
+            elif (vehicle.state.s + three_quarter_length) <= (my_vehicle.state.s - three_quarter_length):
                 occupancy.back_left.vehicles.append(vehicle)
             else:
                 occupancy.left_center.vehicles.append(vehicle)
 
         # Right lane
-        elif vehicle.state.d + half_width < my_vehicle.state.d - half_width:
-            if (vehicle.state.s - half_length) > (my_vehicle.state.s + half_length):
+        elif vehicle.state.d + three_quarter_width < my_vehicle.state.d - three_quarter_width:
+            if (vehicle.state.s - three_quarter_length) > (my_vehicle.state.s + three_quarter_length):
                 occupancy.front_right.vehicles.append(vehicle)
-            elif (vehicle.state.s + half_length) <= (my_vehicle.state.s - half_length):
+            elif (vehicle.state.s + three_quarter_length) <= (my_vehicle.state.s - three_quarter_length):
                 occupancy.back_right.vehicles.append(vehicle)
             else:
                 occupancy.right_center.vehicles.append(vehicle)
@@ -450,26 +450,26 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
             vehicle_vertex = [ vehicle.state.x, vehicle.state.y ]
 
             # Left Lane
-            if is_at(vehicle_vertex, left, right[0], padding=half_width):
-                if is_at(vehicle_vertex, front, back[0], padding=half_length):
+            if is_at(vehicle_vertex, left, right[0], padding=three_quarter_width):
+                if is_at(vehicle_vertex, front, back[0], padding=three_quarter_length):
                     occupancy.front_left.vehicles.append(vehicle)
-                elif is_at(vehicle_vertex, back, front[0], padding=half_length):
+                elif is_at(vehicle_vertex, back, front[0], padding=three_quarter_length):
                     occupancy.back_left.vehicles.append(vehicle)
                 else:
                     occupancy.left_center.vehicles.append(vehicle)
 
             # Right Lane
-            elif is_at(vehicle_vertex, right, left[0], padding=half_width):
-                if is_at(vehicle_vertex, front, back[0], padding=half_length):
+            elif is_at(vehicle_vertex, right, left[0], padding=three_quarter_width):
+                if is_at(vehicle_vertex, front, back[0], padding=three_quarter_length):
                     occupancy.front_right.vehicles.append(vehicle)
-                elif is_at(vehicle_vertex, back, front[0], padding=half_length):
+                elif is_at(vehicle_vertex, back, front[0], padding=three_quarter_length):
                     occupancy.back_right.vehicles.append(vehicle)
                 else:
                     occupancy.right_center.vehicles.append(vehicle)
 
             # Same Lane
             else:
-                if is_at(vehicle_vertex, front, back[0], padding=half_length):
+                if is_at(vehicle_vertex, front, back[0], padding=three_quarter_length):
                     occupancy.front_center.vehicles.append(vehicle)
                 else:
                     occupancy.back_center.vehicles.append(vehicle)

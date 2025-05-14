@@ -352,11 +352,12 @@ def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
         log.info("PLAN STOP: move to adjust target position {}".format(target_position))
         return plan_velocity_keeping(vehicle, MVelKeepConfig(), traffic_state)
 
+    expected_time = 0
+    if vehicle_state.s_vel != 0:
+        expected_time = 2 * target_position / vehicle_state.s_vel #assuming uniform acceleration
 
-    expected_time    = 2 * target_position / vehicle_state.s_vel #assuming uniform acceleration
-    target_time      = MP(expected_time, 40, 6) #bound >40% recommended for safely finding a suitable stop time
-
-    s_solver = quintic_polynomial_solver
+    target_time = MP(expected_time, 40, 6) #bound >40% recommended for safely finding a suitable stop time
+    s_solver    = quintic_polynomial_solver
 
     #targets
     target_state_set = []
@@ -528,7 +529,11 @@ def quintic_polynomial_solver(start, end, T):
                 end[1] - c_1,
                 end[2] - c_2
                 ])
-    a_3_4_5 = np.linalg.solve(A,B)
+    try:
+        a_3_4_5 = np.linalg.solve(A,B)
+    except np.linalg.LinAlgError:
+        a_3_4_5 = np.array([0.0, 0.0, 0.0])
+
     alphas = np.concatenate([np.array([a_0, a_1, a_2]), a_3_4_5])
     return alphas
 

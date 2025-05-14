@@ -133,7 +133,7 @@ class MP:
     value:float = 0.0               #target value (min is 0.0)
     bound_p:float = 0.0             #boundary in percentage (+/- relative to value)
     nsamples:int = 1                #number of samples
-    sampling:int = SamplingMethod.UNIFORM
+    sampling:int = SamplingMethod.LINEAR
     sigma:float = 1                 #std dev for sampling from normal
     
     def get_samples(self):
@@ -280,7 +280,7 @@ class MStopConfig(MConfig):
 class MStopAtConfig(MConfig):
     max_velocity:MVelKeepConfig = field(default_factory=lambda:MVelKeepConfig()) # Velocity upperbound config
     mkey:int                    = Maneuver.M_STOP_AT
-    progress_speed:float        = 3.0              # VelocityKeeping low crusing speed toward the goal m/s
+    progress_speed:float        = 2.5              # VelocityKeeping low crusing speed toward the goal m/s
     stop_proximity_event:float  = 6.0              # Switch from VelocityKeeping to StopNow when X meters away from target
     target:MStopConfig          = field(default_factory=lambda:MStopConfig())
 

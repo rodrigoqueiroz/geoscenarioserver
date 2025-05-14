@@ -77,7 +77,7 @@ class SDV(Vehicle):
                                      noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate, 
                                      seed=int(os.getenv("GSS_PERCEPTION_SEED", 1)))
 
-        self.tracker    = DynamicObjectTracker(self, tracking_method, ALPHA_BETA_HISTORY_SIZE, TRACKER_RETENTION_TICK)
+        self.tracker    = DynamicObjectTracker(self, detection_range_in_meters, tracking_method, ALPHA_MIN_SIZE, TRACKER_RETENTION_TICK)
 
         #Planning
         self.rule_engine_port = rule_engine_port

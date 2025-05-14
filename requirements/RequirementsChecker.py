@@ -94,8 +94,9 @@ class RequirementsChecker:
 		   s_convergence < goal_s_distance and \
 		   d_convergence < goal_d_distance:
 
-		   # Let the vehicle get closer to its destination...
-			if s_convergence < self.goal_s_distance:
+			# Let the vehicle get closer to its destination...
+			if 1e-12 < abs(s_convergence - self.goal_s_distance) and \
+			   s_convergence < self.goal_s_distance:
 				self.goal_s_distance = s_convergence
 				return
 

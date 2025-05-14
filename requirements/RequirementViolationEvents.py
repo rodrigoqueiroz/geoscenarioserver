@@ -55,7 +55,6 @@ class AgentTick:
 class BrokenScenario(UnmetRequirement):
 	def __init__(self, agent_id, message):
 		self.raise_it(agent_id, {
-			'agentId': agent_id,
 			'message': 'v' + str(agent_id) + ' ' + message
 		})
 		ScenarioEnd()
@@ -66,10 +65,18 @@ class CollisionWithPedestrian(UnmetRequirement):
 	
 
 		if pid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[pid]:
+			alias_name  = 'p_' + str(pid)
+			myself_name = 'v_' + str(agent_id)
+
 			self.raise_it(agent_id, {
-				'colliderId': pid,
-				'message': f'v{str(agent_id)} bounding box overlapped with the pedestrian agent p{str(pid)} on the vehicles {collision_zone} side at {relative_angle} degrees',
 				'angle': relative_angle,
+				'collections': {
+					'pedestrians': {
+						'alias': alias_name,
+						'id':    pid,
+					}
+				},
+				'message': f'{myself_name} bounding box overlapped with the pedestrian agent {alias_name} on the vehicle {collision_zone} side at {relative_angle} degrees',
 				'zone' : collision_zone
 			})
 
@@ -84,9 +91,17 @@ class CollisionWithVehicle(UnmetRequirement):
 
 		# There must be a gap of 5 ticks without collision between collision with the same agent
 		if vid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[vid]:
+			alias_name  = 'v_' + str(vid)
+			myself_name = 'v_' + str(agent_id)
+
 			self.raise_it(agent_id, {
-				'colliderId': vid,
-				'message': 'v' + str(agent_id) + ' bounding box overlapped with the vehicle agent v' + str(vid)
+				'collections': {
+					'vehicles': {
+						'alias': alias_name,
+						'id':    vid
+					}
+				},
+				'message': myself_name + ' bounding box overlapped with the vehicle agent ' + alias_name
 			})
 
 		collision_state[vid] = agent_ticks[agent_id]
