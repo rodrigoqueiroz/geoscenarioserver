@@ -204,11 +204,14 @@ class SDV(Vehicle):
             self.state.y = y_vector[0]
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
-            heading = np.array([self.state.x_vel, self.state.y_vel])
-            if self.motion_plan:
-                if self.motion_plan.reversing:
-                    heading *= -1
-            self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
+
+            # Cannot update the yaw when x_vel is too low since arctan(y_vel/x_vel)
+            if abs(self.state.x_vel) > 1e-4:
+                heading = np.array([self.state.x_vel, self.state.y_vel])
+                if self.motion_plan:
+                    if self.motion_plan.reversing:
+                        heading *= -1
+                self.state.yaw = math.degrees(math.atan2(heading[1], heading[0]))
 
             #DEBUG:
             #Note: use this log to evaluate if the "jump back" issue returns

@@ -482,6 +482,28 @@ def plan_velocity_keeping(vehicle, mconfig:MVelKeepConfig, traffic_state:Traffic
     #log.info('PLAN VK {} target vel {}'.format(vehicle.id,target_vel))
     #log.info(best)
 
+    # Sometimes, when we have no speed, the quartic polynomial fail to interpolate.
+    # Momentarily fallback to a linear interpolation to resolve the issue
+    if best == None:
+        ft                   = FrenetTrajectory()
+        ft.T                 = mconfig.time.value
+
+        # Interpolate longitudally towards the target
+        acceleration_rate = (target_vel.value - vehicle_state.s_vel) / ft.T
+
+        ft.fs     = to_equation([ vehicle_state.s,      vehicle_state.s_vel, acceleration_rate / 2.0 ])
+        ft.fs_vel = to_equation([ vehicle_state.s_vel,  acceleration_rate ])
+        ft.fs_acc = to_equation([ acceleration_rate ])
+
+        # Decelerate laterally towards the target
+        deceleration_rate = vehicle_state.d_vel / ft.T
+
+        ft.fd     = to_equation([ vehicle_state.d,      vehicle_state.d_vel,  -deceleration_rate / 2.0 ])
+        ft.fd_vel = to_equation([ vehicle_state.d_vel, -deceleration_rate ])
+        ft.fd_acc = to_equation([-deceleration_rate ])
+
+        return ft, None
+
     return best, candidates
 
 

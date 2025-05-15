@@ -442,7 +442,7 @@ def direction_cost(frenet_traj:FrenetTrajectory, start_state):
     if start_state[0] > frenet_traj.fs(T):
         return 1
     # if velocity is negative at any point
-    dt = float(T) / 100.0
+    dt = float(T) / 99
     for i in range(100):
         t = dt * i
         if frenet_traj.fs_vel(t) < vel_threshold:

@@ -16,7 +16,7 @@ vehicles_tracked_synchronized   = Value('b', False)
 def get_center_id():
 	return center_id.value
 
-def get_vehicles():	
+def get_vehicles():
 	# Favor vehicles from the Tracker when available
 	with vehicles_tracked_synchronized.get_lock():
 		if vehicles_tracked_synchronized.value:

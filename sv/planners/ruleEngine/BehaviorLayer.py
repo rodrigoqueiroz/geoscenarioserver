@@ -122,13 +122,6 @@ class BehaviorLayer(FeatureGenerator):
         if self.debug and get_center_id() == self.vid:
             print('Behaviour', self.last_behaviour)
 
-        """ Flickering tests
-        if self.iteration < 30 or self.iteration % 5 in [ 0, 3 ]:
-            self._current_mconfig = MVelKeepConfig(vel=MP(8.0, 10, 6), time=MP(6.0))
-        else:
-            self._current_mconfig = MVelKeepConfig(vel=MP(0.0, 10, 6), time=MP(6.0))
-        """
-
         # Default Behaviour
         self._current_mconfig = MStopConfig( target=MStopConfig.StopTarget.NOW )
 
@@ -142,7 +135,6 @@ class BehaviorLayer(FeatureGenerator):
 
             # Stop-At behaviour
             elif self.last_behaviour['maneuver']['type'] == 'STOP_AT':
-                # Stop-At Goal
                 if 'location' in self.last_behaviour['parameters'] and\
                    's' in self.last_behaviour['parameters']['location']:
 
