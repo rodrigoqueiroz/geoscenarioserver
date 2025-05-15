@@ -16,7 +16,7 @@ global_tick      = Value('i', -1)
 violations       = manager.dict()
 
 # Constants
-TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 5
+TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 7
 
 # Generic
 class ScenarioEnd:
@@ -62,7 +62,6 @@ class BrokenScenario(UnmetRequirement):
 class CollisionWithPedestrian(UnmetRequirement):
 	def __init__(self, agent_id, pid, collision_zone, relative_angle):
 		collision_state = agent_collisions[agent_id]
-	
 
 		if pid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[pid]:
 			alias_name  = 'p_' + str(pid)
@@ -126,6 +125,15 @@ class GoalOvershot(UnmetRequirement):
 class ScenarioCompletion(Exception):
     pass
 
+
+class ScenarioInterrupted(UnmetRequirement):
+	def __init__(self, agent_id):
+		self.raise_it(agent_id, {
+			'agentId': agent_id,
+			'message': 'v' + str(agent_id) + ' scenario interrupted by the user'
+		})
+		ScenarioEnd()
+		
 
 class ScenarioTimeout(UnmetRequirement):
 	def __init__(self, timeout):

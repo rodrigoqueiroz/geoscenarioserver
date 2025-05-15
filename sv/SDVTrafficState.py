@@ -358,8 +358,8 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id.
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
-    three_quarter_length = my_vehicle.bounding_box_length / 1.5
-    three_quarter_width  = my_vehicle.bounding_box_width / 1.5
+    three_quarter_length = my_vehicle.length / 1.5
+    three_quarter_width  = my_vehicle.width / 1.5
     detection_range_in_meters = 50 # Rodrigo's base assumption to limit the detection range
 
     if my_vehicle.detection_range_in_meters:

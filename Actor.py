@@ -12,15 +12,14 @@ import numpy as np
 import glog as log
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None):
-        self.bounding_box_length = 0.0
-        self.bounding_box_width  = 0.0
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
         self.id = id
-        self.is_detected = True
         self.ghost_mode  = False
         self.model       = None
         self.name        = name
-        self.radius      = 0.0
+        self.length      = length
+        self.radius      = min(length, width) / 2.0
+        self.width       = width
         self.sim_state   = ActorSimState.ACTIVE
         self.sim_traffic = None
         self.type        = None
@@ -28,39 +27,22 @@ class Actor(object):
         #state
         #start state in sim frame
         self.state:ActorState = state or ActorState()
-        self.state.x = start_state[0]
+        self.state.x     = start_state[0]
         self.state.x_vel = start_state[1]
         self.state.x_acc = start_state[2]
-        self.state.y = start_state[3]
+        self.state.y     = start_state[3]
         self.state.y_vel = start_state[4]
         self.state.y_acc = start_state[5]
+        
         # start state in frenet
-        self.state.s = frenet_state[0]
+        self.state.s     = frenet_state[0]
         self.state.s_vel = frenet_state[1]
         self.state.s_acc = frenet_state[2]
-        self.state.d = frenet_state[3]
+        self.state.d     = frenet_state[3]
         self.state.d_vel = frenet_state[4]
         self.state.d_acc = frenet_state[5]
 
         self.state.yaw = yaw
-
-    def future_state(self, dt):
-        """ Predicts a new state based on time and vel.
-            Used for collision prediction and charts
-            Note: Acc can rapidly change. Using the current acc to predict future
-            can lead to overshooting forward or backwards when vehicle is breaking
-            TODO: predict using history + kalman filter
-        """
-        state = [
-            self.state.s + (self.state.s_vel * dt), #+ (self.state.s_acc * dt * dt),
-            self.state.s_vel, #+ (self.state.s_acc * dt),
-            self.state.s_acc,
-            self.state.d + (self.state.d_vel * dt), #+ (self.state.d_acc * dt * dt),
-            self.state.d_vel, #+ (self.state.d_acc * dt),
-            self.state.d_acc
-        ]
-        return state
-
 
     def future_euclidian_state(self, dt):
         """ Predicts a new state based on time and vel.
@@ -76,6 +58,23 @@ class Actor(object):
             self.state.y + (self.state.y_vel * dt),
             self.state.y_vel,
             self.state.y_acc
+        ]
+        return state
+
+    def future_state(self, dt):
+        """ Predicts a new state based on time and vel.
+            Used for collision prediction and charts
+            Note: Acc can rapidly change. Using the current acc to predict future
+            can lead to overshooting forward or backwards when vehicle is breaking
+            TODO: predict using history + kalman filter
+        """
+        state = [
+            self.state.s + (self.state.s_vel * dt), #+ (self.state.s_acc * dt * dt),
+            self.state.s_vel, #+ (self.state.s_acc * dt),
+            self.state.s_acc,
+            self.state.d + (self.state.d_vel * dt), #+ (self.state.d_acc * dt * dt),
+            self.state.d_vel, #+ (self.state.d_acc * dt),
+            self.state.d_acc
         ]
         return state
 

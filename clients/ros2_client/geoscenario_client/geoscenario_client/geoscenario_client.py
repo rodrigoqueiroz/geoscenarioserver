@@ -72,6 +72,9 @@ class GSClient(Node):
             msg = Vehicle()
             msg.id = vehicle["id"]
             msg.type = vehicle["type"]
+            msg.dimensions.x = vehicle["l"]
+            msg.dimensions.y = vehicle["w"]
+            msg.dimensions.z = vehicle["h"]
             msg.position.x = vehicle["x"]
             msg.position.y = vehicle["y"]
             msg.position.z = vehicle["z"]
@@ -85,6 +88,9 @@ class GSClient(Node):
             msg = Pedestrian()
             msg.id = pedestrian["id"]
             msg.type = pedestrian["type"]
+            msg.dimensions.x = pedestrian["l"]
+            msg.dimensions.y = pedestrian["w"]
+            msg.dimensions.z = pedestrian["h"]
             msg.position.x = pedestrian["x"]
             msg.position.y = pedestrian["y"]
             msg.position.z = pedestrian["z"]
@@ -104,6 +110,9 @@ class GSClient(Node):
             vehicle = {}
             vehicle["id"] = msg_vehicle.id
             vehicle["type"] = msg_vehicle.type # not used
+            vehicle["l"] = msg_vehicle.dimensions.x
+            vehicle["w"] = msg_vehicle.dimensions.y
+            vehicle["h"] = msg_vehicle.dimensions.z
             vehicle["x"] = msg_vehicle.position.x
             vehicle["y"] = msg_vehicle.position.y
             vehicle["z"] = msg_vehicle.position.z
@@ -119,6 +128,9 @@ class GSClient(Node):
             pedestrian = {}
             pedestrian["id"] = msg_pedestrian.id
             pedestrian["type"] = msg_pedestrian.type # not used
+            pedestrian["l"] = msg_pedestrian.dimensions.x
+            pedestrian["w"] = msg_pedestrian.dimensions.y
+            pedestrian["h"] = msg_pedestrian.dimensions.z
             pedestrian["x"] = msg_pedestrian.position.x
             pedestrian["y"] = msg_pedestrian.position.y
             pedestrian["z"] = msg_pedestrian.position.z

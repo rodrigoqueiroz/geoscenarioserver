@@ -20,6 +20,8 @@ from shm.SimSharedMemoryServer import *
 from sp.Pedestrian import *
 from sv.Vehicle import Vehicle
 from TrafficLight import TrafficLight
+from requirements import RequirementsChecker
+from Actor import ActorSimState
 
 try:
     from shm.CarlaSync import *
@@ -59,7 +61,7 @@ class SimTraffic(object):
     def set_origin(self, lat, lon, alt):
         self.origin = (lat, lon, alt)
 
-    def add_vehicle(self, v:Vehicle):
+    def add_vehicle(self, v):
         self.vehicles[v.id] = v
         v.sim_traffic = self
         v.sim_config = self.sim_config
@@ -85,6 +87,12 @@ class SimTraffic(object):
     def add_static_obect(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
 
+    def collision_check(self, pedestrian):
+        for vid, vehicle in self.vehicles.items():
+            if vehicle.type == Vehicle.SDV_TYPE:
+                _requirementsChecker = RequirementsChecker(vehicle, False)
+                _requirementsChecker.collision_check(vid, pedestrian.id, [pedestrian.state.x, pedestrian.state.y], vehicle, pedestrian.radius)
+
     def start(self):
         self.traffic_running = True
         #Optional CARLA co-sim
@@ -106,25 +114,28 @@ class SimTraffic(object):
                 time.sleep(0.5)
 
         #Start SDV Planners
-        for vid, vehicle in self.vehicles.items():
+        for vehicle in self.vehicles.values():
             if vehicle.type == Vehicle.SDV_TYPE:
                 vehicle.start_planner()
 
         #Start SP Planners
-        for pid, pedestrian in self.pedestrians.items():
+        for pedestrian in self.pedestrians.values():
             if pedestrian.type == Pedestrian.SP_TYPE:
                 pedestrian.start_planner()
 
-    def stop_all(self):
+    def stop_all(self, interrupted = False):
         self.traffic_running = False
         if self.carla_sync:
             self.carla_sync.quit()
 
         self.write_log_trajectories()
-        for vid in self.vehicles:
-            self.vehicles[vid].stop()
-        for pid in self.pedestrians:
-            self.pedestrians[pid].stop()
+        for vehicle in self.vehicles.values():
+            if vehicle.type == Vehicle.SDV_TYPE:
+                vehicle.stop(interrupted)
+            else:
+                vehicle.stop()
+        for pedestrian in self.pedestrians.values():
+            pedestrian.stop()
 
         for vid in self.vehicles:
             if self.vehicles[vid].type == Vehicle.SDV_TYPE:
@@ -178,6 +189,10 @@ class SimTraffic(object):
         #tick pedestrians:
         for pid in self.pedestrians:
             self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
+            if self.pedestrians[pid].sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
+                continue
+            self.collision_check(self.pedestrians[pid])
+
         Pedestrian.VEHICLES_POS = {}
 
         #Update traffic light states
@@ -231,7 +246,9 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i ] = vid
             self.traffic_state_sharr[ i+1 ] = vehicle.type
             self.traffic_state_sharr[ i+2 ] = vehicle.sim_state
-            self.traffic_state_sharr[ i+3 : i+3+len(sv) ] = sv
+            self.traffic_state_sharr[ i+3 ] = vehicle.length
+            self.traffic_state_sharr[ i+4 ] = vehicle.width
+            self.traffic_state_sharr[ i+5 : i+5+len(sv) ] = sv
             ri += 1
 
         # pedestrians
@@ -241,7 +258,9 @@ class SimTraffic(object):
             self.traffic_state_sharr[ i ] = pid
             self.traffic_state_sharr[ i+1 ] = pedestrian.type
             self.traffic_state_sharr[ i+2 ] = pedestrian.sim_state
-            self.traffic_state_sharr[ i+3 : i+3+len(sv) ] = sv
+            self.traffic_state_sharr[ i+3 ] = pedestrian.length
+            self.traffic_state_sharr[ i+4 ] = pedestrian.width
+            self.traffic_state_sharr[ i+5 : i+5+len(sv) ] = sv
             ri += 1
 
         # traffic light state
@@ -315,7 +334,7 @@ class SimTraffic(object):
         reference to the shared array.
         This reference must be passed during the process creation.
         '''
-
+        
         #header
         header = traffic_state_sharr[0:5]
         nv = int(header[3])
@@ -331,16 +350,18 @@ class SimTraffic(object):
             vid = int(traffic_state_sharr[i])
             v_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
+            length = float(traffic_state_sharr[i+3])
+            width = float(traffic_state_sharr[i+4])
+
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                     continue
-            vehicle = Vehicle(vid)
+            vehicle = Vehicle(vid, name=self.vehicles[vid].name, length=length, width=width)
             vehicle.type = v_type
             vehicle.sim_state = sim_state
             # state vector contains the vehicle's sim state and frenet state in its OWN ref path
-            state_vector = traffic_state_sharr[ i+3 : i+16 ]
+            state_vector = traffic_state_sharr[ i+5 : i+18 ]
             vehicle.state.set_state_vector(state_vector)
-            vehicle.name = self.vehicles[vid].name  #thread safe. It does not change.
             vehicles[vid] = vehicle
 
         pedestrians = {}
@@ -351,14 +372,16 @@ class SimTraffic(object):
             pid = int(traffic_state_sharr[i])
             p_type = int(traffic_state_sharr[i+1])
             sim_state = int(traffic_state_sharr[i+2])
+            length = float(traffic_state_sharr[i+3])
+            width = float(traffic_state_sharr[i+4])
             if actives_only:
                 if sim_state == ActorSimState.INACTIVE or sim_state == ActorSimState.INVISIBLE:
                         continue
-            pedestrian = Pedestrian(pid)
+            pedestrian = Pedestrian(pid, length=length, width=width)
             pedestrian.type = p_type
             pedestrian.sim_state = sim_state
             # state vector contains the sim state
-            state_vector = traffic_state_sharr[ i+3 : i+16 ]
+            state_vector = traffic_state_sharr[ i+5 : i+18 ]
             pedestrian.state.set_state_vector(state_vector)
             pedestrians[pid] = pedestrian
 

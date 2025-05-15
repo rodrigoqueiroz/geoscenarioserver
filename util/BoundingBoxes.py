@@ -5,8 +5,8 @@ from math import cos, radians, sin
 def calculate_rectangular_bounding_box(actor):
 		center_x     = actor.state.x
 		center_y     = actor.state.y
-		half_length  = actor.bounding_box_length / 2
-		half_width   = actor.bounding_box_width  / 2
+		half_length  = actor.length / 2
+		half_width   = actor.width  / 2
 		yaw          = -actor.state.yaw
 
 		back_left   = rotate(center_x, center_y, center_x - half_length, center_y + half_width, yaw)

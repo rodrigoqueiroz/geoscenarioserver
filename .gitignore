@@ -5,6 +5,7 @@
 .vscode/
 outputs/*.json
 outputs/*.png
+outputs/*.csv
 colcon_ws/
 
 # pixi environments

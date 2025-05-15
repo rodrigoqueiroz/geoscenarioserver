@@ -20,7 +20,7 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
 SHOW_DASHBOARD = True       #show dash with plots, vehicles and trajectories. Optional.
-DASH_RATE = 20              #dash tick rate. Max is traffic rate.
+DASH_RATE = 10              #dash tick rate. Max is traffic rate.
 PLOT_VID = 1                #vehicle to center the main plot around, if not defined by the scenario.
                             #Make sure there exists a vehicle with this id
 #Global Map
@@ -57,6 +57,12 @@ COLL_TYPE_RADIUS = True     #vehicle is computed as a circle to simplify collisi
 VEHICLE_RADIUS = 0.9        #vehicle radius
 VEHICLE_LENGTH = 4.5        #vehicle length in [m]
 VEHICLE_WIDTH  = 1.8        #vehicle width in [m]
+
+# Source NCAP: https://cdn.euroncap.com/media/58226/euro-ncap-aeb-vru-test-protocol-v303.pdf
+# Pedestrian dimensions (width: 0.5 m, length: 0.6 m) approximated by a circle with radius 0.27 m
+PEDESTRIAN_RADIUS = 0.27
+PEDESTRIAN_LENGTH = 0.6
+PEDESTRIAN_WIDTH = 0.5
 
 #Planning
 PLANNER_RATE  = 10               #Planner tick rate

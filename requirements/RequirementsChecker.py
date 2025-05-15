@@ -31,6 +31,72 @@ class RequirementsChecker:
 		for condition in self.conditions:
 			condition(traffic_state)
 
+	def collision_check(self, vid, pid, centre, vehicle, radius):
+		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
+		#the front of the car can be determined by the yaw
+		center_x     = vehicle.state.x
+		center_y     = vehicle.state.y
+		arc_radius  = vehicle.length / 2 # vehicle half length
+		half_width   = vehicle.width  / 2
+		yaw          = np.radians(vehicle.state.yaw)
+		
+		ped_x, ped_y = centre
+		ped_rad = radius
+		theta_max = np.arcsin((half_width)/arc_radius)
+
+		#first check if position of pedestrian is even close to the vehicle
+		outer_rad = arc_radius/np.cos(theta_max)
+		car_to_ped_dist = np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2)
+
+		collision_vector = np.array([ped_x - center_x, ped_y - center_y])
+		vehicle_direction = np.array([np.cos(yaw), np.sin(yaw)])
+		dot_product = np.dot(vehicle_direction, collision_vector)
+		denom = np.linalg.norm(collision_vector)*np.linalg.norm(vehicle_direction)
+		relative_angle = np.arccos(dot_product/denom)
+		collision_zone = None
+
+		if car_to_ped_dist < outer_rad:
+			#first do circle check
+			distance = round(np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2), 2)
+			
+			if distance <= round(arc_radius + ped_rad, 2):
+				#we know there is a possible collision. check if its front
+				collision_vector = np.array([ped_x - center_x, ped_y - center_y])
+				vehicle_direction = np.array([np.cos(yaw), np.sin(yaw)])
+				dot_product = np.dot(vehicle_direction, collision_vector)
+				denom = np.sqrt(((collision_vector[0])**2 + (collision_vector[1])**2))*np.sqrt((vehicle_direction[0])**2 + (vehicle_direction[1])**2)
+
+				relative_angle = np.arccos(dot_product/denom)
+				cross_product = vehicle_direction[0] * collision_vector[1] - vehicle_direction[1] * collision_vector[0]
+
+				#check circle for right or left
+				if cross_product < 0:
+					relative_angle = -relative_angle
+				
+				theta_max = np.degrees(theta_max)
+				relative_angle = round(np.degrees(relative_angle),2)
+
+				#assign a collision zone
+				if (-theta_max <= relative_angle <= theta_max):
+					collision_zone = "front"
+				elif 180 - theta_max <= relative_angle or relative_angle <= -180 + theta_max:
+					collision_zone = "rear"
+				else:
+					if -90 <= relative_angle <= 90:
+						angle = 90 - abs(relative_angle)
+					else:
+						angle = abs(relative_angle) - 90
+					boundary_length = round(half_width/np.cos(np.radians(angle)),2)
+					if distance <= boundary_length + ped_rad:
+						if 0 > relative_angle:
+							collision_zone = "right"
+						else:
+							collision_zone = "left"
+
+		if collision_zone:
+			CollisionWithPedestrian(vid, pid, collision_zone, relative_angle)
+
+
 	def detect_collisions(self, traffic_state:TrafficState):
 		ego_vehicle       = self.ego_vehicle
 
@@ -44,7 +110,7 @@ class RequirementsChecker:
 			if vehicle.sim_state not in [ ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
 				continue
 
-			max_offset = max(vehicle.bounding_box_width / 2, vehicle.bounding_box_length / 2)
+			max_offset = max(vehicle.width / 2, vehicle.length / 2)
 
 			# To avoid O(v²) comparisons and favor O(v) comparisons whenever possible.
 			# Suppose big rectangles were overshoting the real dimension of the vehicles,
@@ -55,19 +121,6 @@ class RequirementsChecker:
 
 				if self.do_polygons_intersect(ego_vehicle.bounding_box, vehicle_box):
 					CollisionWithVehicle(ego_vehicle.id, vid)
-
-		
-		for pid, pedestrian in self.pedestrians.items():
-			if pedestrian.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
-				continue
-			
-			pedestrian_pos = [pedestrian.state.x, pedestrian.state.y]
-			
-			collision_zone = None
-			relative_angle = None
-			collision_zone, relative_angle = self.collision_check(pedestrian_pos, ego_vehicle, pedestrian.PEDESTRIAN_RADIUS)
-			if collision_zone:
-				CollisionWithPedestrian(ego_vehicle.id, pid, collision_zone, relative_angle)
 				
 
 	def detect_goal_overshot(self, traffic_state:TrafficState):
@@ -106,6 +159,7 @@ class RequirementsChecker:
 			if self.goal_ends_simulation:
 				ScenarioEnd()
 				raise ScenarioCompletion()
+
 
 	def do_polygons_intersect(self, polygon_a, polygon_b):
 		"""
@@ -163,61 +217,3 @@ class RequirementsChecker:
 					return False;
 
 		return True
-	
-	def collision_check(self, centre, vehicle, radius):
-		#take the middle of the vehicle and project an arc with a radius half the length of the car to the front of the car
-		#the front of the car can be determined by the yaw
-		center_x     = vehicle.state.x
-		center_y     = vehicle.state.y
-		arc_radius  = vehicle.bounding_box_length / 2 # vehicle half length
-		half_width   = vehicle.bounding_box_width  / 2
-		yaw          = np.radians(vehicle.state.yaw)
-		
-		ped_x, ped_y = centre
-		ped_rad = radius
-		theta_max = np.arcsin((half_width)/arc_radius)
-
-		#first check if position of pedestrian is even close to the vehicle
-		outer_rad = arc_radius/np.cos(theta_max)
-		car_to_ped_dist = np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2)
-
-		if car_to_ped_dist < outer_rad:
-			#first do circle check
-			distance = np.sqrt((center_x - ped_x) ** 2 + (center_y - ped_y) ** 2)
-
-			if distance <= arc_radius + ped_rad:
-				#we know there is a possible collision. check if its front
-				collision_vector = np.array([ped_x - center_x, ped_y - center_y])
-				vehicle_direction = np.array([np.cos(yaw), np.sin(yaw)])
-
-				dot_product = np.dot(vehicle_direction, collision_vector)
-				denom = np.sqrt(((collision_vector[0])**2 + (collision_vector[1])**2))*np.sqrt((vehicle_direction[0])**2 + (vehicle_direction[1])**2)
-
-				relative_angle = np.arccos(dot_product/denom)
-				cross_product = vehicle_direction[0] * collision_vector[1] - vehicle_direction[1] * collision_vector[0]
-
-				#check circle for front or back
-				if cross_product < 0:
-					relative_angle = -relative_angle
-				
-				theta_max = np.degrees(theta_max)
-				collision_zone = None
-				relative_angle = round(np.degrees(relative_angle),2)
-
-				#assign a collision zone
-				if (-theta_max <= relative_angle <= theta_max):
-					collision_zone = "front"
-					return collision_zone, relative_angle
-				elif 180 - theta_max <= relative_angle or relative_angle <= -180 + theta_max:
-					collision_zone = "rear"
-					return collision_zone, relative_angle
-				else:
-					boundary_length = half_width/sin(abs(relative_angle))
-					if distance <= boundary_length:
-						if 0 > relative_angle:
-							collision_zone = "right"
-						else:
-							collision_zone = "left"
-
-						return collision_zone, relative_angle
-		return None, None

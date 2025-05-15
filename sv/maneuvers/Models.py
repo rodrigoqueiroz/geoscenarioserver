@@ -113,7 +113,7 @@ def plan_cutin(vehicle, mconfig:MCutInConfig, traffic_state:TrafficState):
         delta_s_acc =    MP(delta[2], delt_s_sampling[2][0], delt_s_sampling[1][1])
         
         #+= 2 * VEHICLE_RADIUS
-        state_relative_to[0] += VEHICLE_LENGTH*2
+        state_relative_to[0] += vehicle.length*2
 
         dts_samples = delta_s_pos.get_samples()
         dts_vel_samples = delta_s_vel.get_samples()
@@ -336,7 +336,7 @@ def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
             break
     
     # Adjust target pos to vehicle length
-    target_position -= vehicle_state.s + vehicle.bounding_box_length / 2 + mconfig.distance
+    target_position -= vehicle_state.s + vehicle.length / 2 + mconfig.distance
 
     # Adjust target pos to possible dynamic elements:
     lv = get_leading_vehicle(vehicle_state, lane_config, vehicles)

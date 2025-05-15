@@ -65,8 +65,8 @@ class SimSharedMemoryClient(object):
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
                 origin_lat origin_lon origin_alt
-                vid v_type x y z vx vy yaw steering_angle
-                pid p_type x y z vx vy yaw
+                vid v_type l w h x y z vx vy yaw steering_angle
+                pid p_type l w h x y z vx vy yaw
                 ...
         """
         header = {}
@@ -129,9 +129,12 @@ class SimSharedMemoryClient(object):
         try:
             for ri in range(2, header["n_vehicles"] + 2):
                 vehicle = {}
-                id, type, x, y, z, vx, vy, yaw, str_angle = data_arr[ri].split()
+                id, type, l, w, h, x, y, z, vx, vy, yaw, str_angle = data_arr[ri].split()
                 vehicle["id"] = int(id)
                 vehicle["type"] = type
+                vehicle["l"] = float(l)
+                vehicle["w"] = float(w)
+                vehicle["h"] = float(h)
                 vehicle["x"] = float(x)
                 vehicle["y"] = float(y)
                 vehicle["z"] = float(z)
@@ -147,9 +150,12 @@ class SimSharedMemoryClient(object):
         try:
             for ri in range(header["n_vehicles"] + 2, header["n_vehicles"] + 2 + header["n_pedestrians"]):
                 pedestrian = {}
-                id, type, x, y, z, vx, vy, yaw = data_arr[ri].split()
+                id, type, l, w, h, x, y, z, vx, vy, yaw = data_arr[ri].split()
                 pedestrian["id"] = int(id)
                 pedestrian["type"] = type
+                pedestrian["l"] = float(l)
+                pedestrian["w"] = float(w)
+                pedestrian["h"] = float(h)
                 pedestrian["x"] = float(x)
                 pedestrian["y"] = float(y)
                 pedestrian["z"] = float(z)

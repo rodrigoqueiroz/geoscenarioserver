@@ -8,14 +8,14 @@
 from copy import copy
 import glog as log
 from multiprocessing import Array, Process, Value
-from signal import signal, SIGTERM
+from signal import signal, SIGTERM, SIGINT
 import sys
 
 from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
-from requirements.RequirementViolationEvents import AgentTick, BrokenScenario, ScenarioCompletion
+from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
 from SimTraffic import *
 from sv.maneuvers.FrenetTrajectory import *
 from sv.maneuvers.Config import *
@@ -72,10 +72,15 @@ class SVPlanner(object):
             self._debug_shdata), daemon=True)
         self._process.start()
 
-    def stop(self):
+    def stop(self, interrupted = False):
         if self._process:
-            log.info("Terminate Planner Process - vehicle {}".format(self.vid))
-            self._process.terminate()
+            if interrupted:
+                log.info(f"Interrupt planner process for VID: {self.vid}")
+                os.kill(self._process.pid, SIGINT)
+            else:
+                log.info(f"Terminate planner process for VID: {self.vid}")
+                self._process.terminate()
+            self._process.join()
 
     def get_plan(self):
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
@@ -102,16 +107,15 @@ class SVPlanner(object):
     #==SUB PROCESS=============================================
     def before_exit(self,*args):
         if self.sync_planner:
-            self.sync_planner.write_peformance_log()
+            self.sync_planner.write_performance_log()
         sys.exit(0)
 
 
     def run_planner_process(self, traffic_state_sharr, mplan_sharr, debug_shdata):
-        log.info('PLANNER PROCESS START for Vehicle {}'.format(self.vid))
+        log.info(f"PLANNER PROCESS START for VID {self.vid}")
         signal(SIGTERM, self.before_exit)
 
-        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label="PP{}".format(self.vid))
-
+        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label=f"planner_v{self.vid}")
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -134,7 +138,7 @@ class SVPlanner(object):
 
                 # Get sim state from main process
                 # All objects are copies and can be changed
-                header, traffic_vehicles, traffic_pedestrians,traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
+                header, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
                 state_time = header[2]
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:
@@ -222,7 +226,6 @@ class SVPlanner(object):
                 #Maneuver Tick
                 if mconfig and traffic_state.lane_config:
                     #replan maneuver
-                    #traj, cand, unf = plan_maneuver( mconfig.mkey,
                     frenet_traj, cand = plan_maneuver(self.sdv, mconfig,traffic_state)
 
                     if EVALUATION_MODE and not self.last_plan:
@@ -276,11 +279,17 @@ class SVPlanner(object):
             with self.completion.get_lock():
                 self.completion.value = True
 
-        except (KeyboardInterrupt, SystemExit) as e:
-            BrokenScenario(self.vid, "terminated early from user interaction (e.g., closed program).")
-            raise e # bubble up
+        except KeyboardInterrupt:
+            ScenarioInterrupted(self.vid)
+
+        except SystemExit:
+            ScenarioEnd()
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
+        
+        #record the log after ending planner process
+        if self.sync_planner:
+            self.sync_planner.write_performance_log()
 
     def write_motion_plan(self, mplan_sharr, plan:MotionPlan):
         if not plan:
@@ -288,7 +297,7 @@ class SVPlanner(object):
         #write motion plan
         mplan_sharr.acquire() #<=========LOCK
         mplan_sharr[:] = plan.get_plan_vector()
-        #print('Writting Sh Data VP')
+        #print('Writing Sh Data VP')
         #print(mplan_sharr)
         mplan_sharr.release() #<=========RELEASE
 
