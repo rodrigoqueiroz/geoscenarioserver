@@ -13,6 +13,7 @@ test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive
 libc = { family = "glibc", version = "2.31" }
 
 [dependencies]
+gcc ="*"
 python = "3.11.*"
 pip = "*"
 tk = { build = "xft_*" }
