@@ -50,12 +50,6 @@ curl -fsSL https://pixi.sh/install.sh | bash
 ```
 Re-open the terminal or source your `.bashrc` to make `pixi` available.
 
-On WSL2, you may need to install `libXft`. Execute:
-```
-sudo apt install libxft2
-```
-Otherwise, you'll see `ImportError: libXft.so.2: cannot open shared object file`.
-
 All pixi commands must be executed in geoscenarioserver as the working directory.
 ```
 cd geoscenarioserver

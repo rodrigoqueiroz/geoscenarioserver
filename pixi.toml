@@ -16,6 +16,7 @@ libc = { family = "glibc", version = "2.31" }
 gcc ="*"
 python = "3.11.*"
 pip = "*"
+xorg-libxft = "*"
 tk = { build = "xft_*" }
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
