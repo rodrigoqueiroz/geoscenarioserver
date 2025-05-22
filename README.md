@@ -13,6 +13,7 @@ GeoScenario Server can run natively on Linux, within a [conda](https://conda-for
 
 Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 
+- libxft2
 - python3
 - python3-dev
 - python3-tk
@@ -41,13 +42,19 @@ To automatically install the dependencies, execute
 bash scripts/install_dependencies.bash
 ```
 
-#### Conda-forge and robostack (ROS) using pixi (recommended)
+#### Conda-forge and robostack (ROS) using pixi (recommended) on Linux or WSL2
 
 To install [pixi](https://pixi.sh/), execute
 ```
 curl -fsSL https://pixi.sh/install.sh | bash
 ```
 Re-open the terminal or source your `.bashrc` to make `pixi` available.
+
+On WSL2, you may need to install `libXft`. Execute:
+```
+sudo apt install libxft2
+```
+Otherwise, you'll see `ImportError: libXft.so.2: cannot open shared object file`.
 
 All pixi commands must be executed in geoscenarioserver as the working directory.
 ```
