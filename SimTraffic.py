@@ -8,7 +8,6 @@
 # --------------------------------------------
 
 import csv
-import glog as log
 import numpy as np
 import time
 
@@ -22,6 +21,9 @@ from sv.Vehicle import Vehicle
 from TrafficLight import TrafficLight
 from requirements import RequirementsChecker
 from Actor import ActorSimState
+
+import logging
+log = logging.getLogger("SimTraffic")
 
 try:
     from shm.CarlaSync import *
@@ -106,7 +108,7 @@ class SimTraffic(object):
 
         #If cosimulation, hold start waiting for first client state
         if self.cosimulation == True and self.sim_config.wait_for_client:
-            log.warn("GSServer is running in co-simulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
+            log.warning("GSServer is running in co-simulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
             while(True):
                 header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:

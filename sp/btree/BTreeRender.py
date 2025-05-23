@@ -4,12 +4,13 @@
 # Custom Behavior Tree Render in String form for Dashboard and graph image using PyDot
 # --------------------------------------------
 
+import logging
+log = logging.getLogger("sv/BTreeRender")
+import pydot
 from SimConfig import *
 from py_trees import *
-import glog as log
-import pydot
-from sp.btree.BTreeLeaves import BCondition, ManeuverAction
 
+from sp.btree.BTreeLeaves import BCondition, ManeuverAction
 
 def generate_string_tree(tree, pid, current_mconfig, show_status = True, hide_unvisited = False):
     ''''

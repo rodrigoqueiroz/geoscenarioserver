@@ -6,7 +6,6 @@
 # Starts the Server and controls the traffic simulation loop
 # --------------------------------------------
 
-import glog as log
 import screeninfo
 
 from argparse import ArgumentParser
@@ -26,6 +25,9 @@ from ScenarioSetup import *
 from SimConfig import SimConfig
 from SimTraffic import SimTraffic
 from TickSync import TickSync
+
+import logging
+log = logging.getLogger("GSServer")
 
 def start_server(args):
     # log.setLevel("INFO")
@@ -144,7 +146,7 @@ def start_server(args):
     if sim_config.show_dashboard:
         dashboard.start()
     else:
-        log.warn("Dashboard will not start")
+        log.warning("Dashboard will not start")
 
     dashboard_interrupted = False
     while sync_global.tick():

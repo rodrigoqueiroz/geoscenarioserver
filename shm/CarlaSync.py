@@ -3,8 +3,10 @@ from SimConfig import *
 from sv.Vehicle import *
 from TickSync import *
 from util.Utils import *
-import glog as log
 import xml.etree.ElementTree as ET
+
+import logging
+log = logging.getLogger("CarlaSync")
 
 if CARLA_COSIMULATION:
     import carla as carla

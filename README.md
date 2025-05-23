@@ -25,7 +25,6 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 
 - antlr4-python3-runtime >= 4.13
 - antlr-denter
-- glog
 - lanelet2
 - matplotlib
 - numpy
@@ -33,6 +32,7 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 - [py_trees==0.7.6](https://github.com/splintered-reality/py_trees)
 - sysv-ipc
 - tk
+- pydot
 
 #### Ubuntu native or Windows WSL2 installation
 

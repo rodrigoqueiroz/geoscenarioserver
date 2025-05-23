@@ -10,7 +10,8 @@ import datetime
 import numpy as np
 from multiprocessing import shared_memory, Process, Lock, Array, Manager
 from typing import Dict, List
-import glog as log
+import logging
+log = logging.getLogger("SPPlanner")
 from copy import copy
 from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap

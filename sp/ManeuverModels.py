@@ -7,7 +7,8 @@
 import numpy as np
 from copy import copy
 import itertools
-import glog as log
+import logging
+log = logging.getLogger("sp/ManeuverModels")
 from sp.ManeuverConfig import *
 from SimConfig import *
 from Actor import *

@@ -4,7 +4,8 @@
 
 from py_trees import *
 import functools
-import glog as log
+import logging
+log = logging.getLogger("BehaviorModels")
 import numpy as np
 from sp.ManeuverConfig import *
 from sp.ManeuverUtils import *

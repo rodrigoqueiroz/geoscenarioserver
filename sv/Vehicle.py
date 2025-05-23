@@ -5,8 +5,8 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
-import datetime
-import glog as log
+import logging
+log = logging.getLogger("Vehicle")
 import math
 import numpy as np
 

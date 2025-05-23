@@ -17,7 +17,6 @@ from tkinter.font import Font
 import datetime
 from signal import signal, SIGTERM, SIGINT
 from PIL import Image, ImageTk
-import glog as log
 from SimTraffic import *
 from SimConfig import *
 from util.Utils import *
@@ -27,6 +26,9 @@ from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
+
+import logging
+log = logging.getLogger("Dashboard")
 
 class Dashboard(object):
     MAP_FIG_ID = 1

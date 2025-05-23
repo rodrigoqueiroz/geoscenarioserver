@@ -9,7 +9,8 @@
 
 import numpy as np
 from Actor import *
-import glog as log
+import logging
+log = logging.getLogger("sp/ManeuverUtils")
 from SimTraffic import *
 from sp.ManeuverConfig import *
 from sp.ConditionConfig import *

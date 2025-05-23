@@ -6,7 +6,8 @@
 # --------------------------------------------
 import numpy as np
 import random
-import glog as log
+import logging
+log = logging.getLogger("Pedestrian")
 from SimConfig import *
 from util.Utils import *
 from Actor import *
@@ -39,7 +40,7 @@ class Pedestrian(Actor):
     def update_sim_state(self, new_state, delta_time):
         # only be done for remote pedestrians (which don't have a frenet state)
         if self.type is not Pedestrian.EP_TYPE:
-            log.warn("Cannot update sim state for pedestrians directly")
+            log.warning("Cannot update sim state for pedestrians directly")
 
 
     def get_sim_state(self):

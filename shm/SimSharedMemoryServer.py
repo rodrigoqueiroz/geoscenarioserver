@@ -1,7 +1,8 @@
 import sysv_ipc
 from Actor import *
 from SimConfig import *
-import glog as log
+import logging
+log = logging.getLogger("SimSharedMemoryServer")
 
 # Class defining shared memory structure used to sync with
 # an external simulator (client)
@@ -84,7 +85,7 @@ class SimSharedMemoryServer(object):
             self.ss_shm.write(write_str.encode('utf-8'))
             self.ss_sem.release()
         except sysv_ipc.BusyError:
-            log.warn("server state semaphore locked...")
+            log.warning("server state semaphore locked...")
             return
         # log.info("Shared Memory write\n{}".format(write_str))
 
@@ -161,11 +162,11 @@ class SimSharedMemoryServer(object):
                     if not int(active):
                         disabled_vehicles.append(vid)
             else:
-                log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
+                log.warning("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
                     nclient_vehicles,
                     nvehicles
                 ))
-                log.warn(data_str)
+                log.warning(data_str)
         except Exception as e:
             log.error("VehicleState parsing exception")
             log.error(e)
@@ -186,11 +187,11 @@ class SimSharedMemoryServer(object):
                     if not int(active):
                         disabled_pedestrians.append(pid)
             else:
-                log.warn("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(
+                log.warning("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(
                     nclient_pedestrians,
                     npedestrians
                 ))
-                log.warn(data_str)
+                log.warning(data_str)
         except Exception as e:
             log.error("PedestrianState parsing exception")
             log.error(e)

@@ -1,7 +1,8 @@
 from Actor import TrajNode
 from math import floor
 from typing import List
-import glog as log
+import logging
+log = logging.getLogger("SDVRoute")
 from lanelet2.core import ConstLineString3d, Lanelet, Point3d
 from lanelet2.routing import Route
 from matplotlib import pyplot as plt
