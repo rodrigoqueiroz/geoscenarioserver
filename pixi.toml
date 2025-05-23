@@ -28,6 +28,7 @@ pynput = "*"
 screeninfo = "*"
 jq = ">=1.7.1,<2"
 pydot = "*"
+qt6-wayland = "*"
 
 [pypi-dependencies]
 antlr-denter = "*"
