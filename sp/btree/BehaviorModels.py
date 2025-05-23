@@ -4,7 +4,8 @@
 
 from py_trees import *
 import functools
-import glog as log
+import logging
+log = logging.getLogger(__name__)
 import numpy as np
 from sp.ManeuverConfig import *
 from sp.ManeuverUtils import *

@@ -9,9 +9,11 @@
 
 import csv
 import datetime
-import glog as log
 import math
 import time
+
+import logging
+log = logging.getLogger(__name__)
 
 from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *

@@ -7,12 +7,13 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - Linux or Windows 10/11 + WSL2
 - Python >= 3.8
 
-GeoScenario Server can run natively on Linux, within a [conda](https://conda-forge.org/) environment, or on WSL2.
+GeoScenario Server can run natively on Linux or in WSL2 on Windows within a [conda](https://conda-forge.org/) environment.
 
 ### Deb packages for Linux native
 
-Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
+Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `WSL2-README.md` for details).
 
+- libxft2
 - python3
 - python3-dev
 - python3-tk
@@ -24,7 +25,6 @@ Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 
 - antlr4-python3-runtime >= 4.13
 - antlr-denter
-- glog
 - lanelet2
 - matplotlib
 - numpy
@@ -32,6 +32,7 @@ Tested on native Ubuntu 20.04, 22.04, 24.04, and within Windows 10 WSL2.
 - [py_trees==0.7.6](https://github.com/splintered-reality/py_trees)
 - sysv-ipc
 - tk
+- pydot
 
 #### Ubuntu native or Windows WSL2 installation
 
@@ -41,7 +42,7 @@ To automatically install the dependencies, execute
 bash scripts/install_dependencies.bash
 ```
 
-#### Conda-forge and robostack (ROS) using pixi (recommended)
+#### Conda-forge and robostack (ROS) using pixi (recommended) on Linux or WSL2
 
 To install [pixi](https://pixi.sh/), execute
 ```

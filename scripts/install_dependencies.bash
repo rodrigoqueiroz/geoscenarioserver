@@ -10,7 +10,7 @@ echo ""
 echo "Installing Python3 packages"
 echo ""
 # Ensure we have Python3 and pip3
-sudo apt-get install -qq python3 python3-dev python3-tk python3-pip python3-pil python3-pil.imagetk python3-venv
+sudo apt-get install -qq libxft2 python3 python3-dev python3-tk python3-pip python3-pil python3-pil.imagetk python3-venv
 
 echo ""
 echo "Installing GraphViz"

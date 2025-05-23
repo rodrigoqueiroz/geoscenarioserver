@@ -17,7 +17,6 @@ from tkinter.font import Font
 import datetime
 from signal import signal, SIGTERM, SIGINT
 from PIL import Image, ImageTk
-import glog as log
 from SimTraffic import *
 from SimConfig import *
 from util.Utils import *
@@ -27,6 +26,11 @@ from Actor import *
 from TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
+
+import logging
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
+logging.getLogger('PIL.PngImagePlugin').setLevel(logging.WARNING)
+log = logging.getLogger(__name__)
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -206,7 +210,7 @@ class Dashboard(object):
 
     def plot_map_chart(self, vehicles,pedestrians,traffic_light_states,static_objects):
         #-Global Map cartesian plot
-        fig = plt.figure(Dashboard.MAP_FIG_ID, frameon=False)
+        fig = plt.figure(Dashboard.MAP_FIG_ID, frameon=False, clear=True)
         plt.cla()
 
         #boundaries (center is GeoScenario origin)
