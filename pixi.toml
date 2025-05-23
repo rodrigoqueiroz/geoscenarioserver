@@ -39,7 +39,8 @@ sysv-ipc = "*"
 libgl-devel = "*"
 
 [environments]
-humble = { features = ["humble"] }
+default = { solve-group = "common" }
+humble = { features = ["humble"], solve-group = "common" }
 antlr = { features = ["antlr"] }
 
 [feature.humble]
