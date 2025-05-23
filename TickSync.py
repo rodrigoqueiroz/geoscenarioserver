@@ -13,7 +13,7 @@ import math
 import time
 
 import logging
-log = logging.getLogger("TickSync")
+log = logging.getLogger(__name__)
 
 from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *

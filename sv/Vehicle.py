@@ -6,7 +6,7 @@
 # --------------------------------------------
 
 import logging
-log = logging.getLogger("Vehicle")
+log = logging.getLogger(__name__)
 import math
 import numpy as np
 

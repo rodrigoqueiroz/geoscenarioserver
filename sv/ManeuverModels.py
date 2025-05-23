@@ -11,7 +11,7 @@ from TickSync import *
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
 import logging
-log = logging.getLogger("sv/ManeuverModels")
+log = logging.getLogger(__name__)
 #from multiprocessing import Pool as ThreadPool
 from sv.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.ManeuverConfig import *

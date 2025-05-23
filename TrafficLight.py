@@ -8,7 +8,7 @@ from enum import IntEnum
 from math import inf
 
 import logging
-log = logging.getLogger("TrafficLight")
+log = logging.getLogger(__name__)
 
 class TrafficLightColor(IntEnum):
     Red = 1

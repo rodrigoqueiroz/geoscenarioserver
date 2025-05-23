@@ -3,7 +3,7 @@
 #d43sharm@uwaterloo.ca
 
 import logging
-log = logging.getLogger("BehaviorLayer")
+log = logging.getLogger(__name__)
 from sv.ManeuverConfig import *
 from sv.btree.BTreeInterpreter import *
 from sv.btree.BTreeLeaves import *

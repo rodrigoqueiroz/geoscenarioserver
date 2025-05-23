@@ -6,8 +6,6 @@
 # --------------------------------------------
 import numpy as np
 import random
-import logging
-log = logging.getLogger("Pedestrian")
 from SimConfig import *
 from util.Utils import *
 from Actor import *

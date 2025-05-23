@@ -9,7 +9,7 @@
 from __future__ import annotations  #Must be first Include. Will be standard in Python4
 
 import logging
-log = logging.getLogger("SDVTrafficState")
+log = logging.getLogger(__name__)
 import itertools
 import lanelet2.core
 

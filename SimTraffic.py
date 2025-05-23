@@ -23,7 +23,7 @@ from requirements import RequirementsChecker
 from Actor import ActorSimState
 
 import logging
-log = logging.getLogger("SimTraffic")
+log = logging.getLogger(__name__)
 
 try:
     from shm.CarlaSync import *
@@ -300,7 +300,7 @@ class SimTraffic(object):
                 state.x, state.y, state.z,
                 np.linalg.norm([state.x_vel, state.y_vel])
             )
-        log.info(state_str)
+        log.debug(state_str)
 
     def log_trajectories(self,tick_count,delta_time,sim_time):
         if WRITE_TRAJECTORIES:

@@ -11,7 +11,7 @@ import numpy as np
 from multiprocessing import shared_memory, Process, Lock, Array, Manager
 from typing import Dict, List
 import logging
-log = logging.getLogger("SPPlanner")
+log = logging.getLogger(__name__)
 from copy import copy
 from TickSync import TickSync
 from mapping.LaneletMap import LaneletMap
@@ -533,7 +533,7 @@ class SPPlanner(object):
                 pedestrian_state.x, pedestrian_state.y,
                 np.linalg.norm([pedestrian_state.x_vel, pedestrian_state.y_vel])
             )
-            log.info(state_str)
+            log.debug(state_str)
         self.mconfig = mconfig
 
         # Maneuver tick

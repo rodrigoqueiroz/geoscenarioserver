@@ -6,6 +6,7 @@
 outputs/*.json
 outputs/*.png
 outputs/*.csv
+outputs/*.log
 colcon_ws/
 
 # pixi environments

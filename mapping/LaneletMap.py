@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from typing import List
 import logging
-log = logging.getLogger("LaneletMap")
+log = logging.getLogger(__name__)
 from util.Utils import pairwise
 
 

@@ -6,7 +6,7 @@ from util.Utils import *
 import xml.etree.ElementTree as ET
 
 import logging
-log = logging.getLogger("CarlaSync")
+log = logging.getLogger(__name__)
 
 if CARLA_COSIMULATION:
     import carla as carla

@@ -42,7 +42,7 @@ def start_server(args):
         btree_locations.append(base_btree_location)
     else:
         btree_locations = [base_btree_location]
-    log.info ("Btree search locations set (in order) as: " + str(btree_locations))
+    log.info("Btree search locations set (in order) as: " + str(btree_locations))
 
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
@@ -200,6 +200,13 @@ if __name__ == "__main__":
     parser.add_argument("-wi", "--wait-for-input", dest="wait_for_input", action="store_true", help="Wait for the user to press [ENTER] to start the simulation")
     parser.add_argument("-wc", "--wait-for-client", dest="wait_for_client", action="store_true", help="Wait for a valid client state to start the simulation")
     parser.add_argument("--dash-pos", default=[], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
-
+    parser.add_argument("-d", "--debug", dest="debug", action="store_true", help="Set the logging level to DEBUG instead of INFO")
+    parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to outputs/GSServer.log instead of stdout")
     args = parser.parse_args()
+
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    if args.file_log:
+        logging.basicConfig(filename="outputs/GSServer.log", filemode="w", level=log_level)
+    else:
+        logging.basicConfig(level=log_level)
     start_server(args)

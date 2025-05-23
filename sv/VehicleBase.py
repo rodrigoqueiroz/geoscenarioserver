@@ -1,5 +1,5 @@
 import logging
-log = logging.getLogger("VehicleBase")
+log = logging.getLogger(__name__)
 from Actor import Actor, VehicleState
 from SimConfig import *
 

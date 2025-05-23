@@ -10,7 +10,7 @@ from sv.ManeuverConfig import *
 from SimConfig import *
 from Actor import *
 import logging
-log = logging.getLogger("sv/MeneuverUtils")
+log = logging.getLogger(__name__)
 from sv.SDVTrafficState import TrafficState
 
 def check_notnone(obj, msg=None):
@@ -64,7 +64,7 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
                 vehicle_state.s - tvehicle.state.s - 2*VEHICLE_RADIUS,
                 vehicle_state.s_vel - tvehicle.state.s_vel
             )
-        log.info(state_str)
+        log.debug(state_str)
         log.warning("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
         return True
 

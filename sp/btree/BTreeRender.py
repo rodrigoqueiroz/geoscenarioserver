@@ -5,7 +5,7 @@
 # --------------------------------------------
 
 import logging
-log = logging.getLogger("sv/BTreeRender")
+log = logging.getLogger(__name__)
 import pydot
 from SimConfig import *
 from py_trees import *

@@ -2,7 +2,7 @@ import sysv_ipc
 from Actor import *
 from SimConfig import *
 import logging
-log = logging.getLogger("SimSharedMemoryServer")
+log = logging.getLogger(__name__)
 
 # Class defining shared memory structure used to sync with
 # an external simulator (client)

@@ -9,7 +9,7 @@ from enum import IntEnum
 from util.Utils import to_equation, differentiate
 from SimConfig import *
 import logging
-log = logging.getLogger("Actor")
+log = logging.getLogger(__name__)
 
 class Actor(object):
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):

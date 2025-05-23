@@ -7,7 +7,7 @@
 
 from copy import copy
 import logging
-log = logging.getLogger("SDVPlanner")
+log = logging.getLogger(__name__)
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
 import sys
@@ -211,7 +211,7 @@ class SVPlanner(object):
                             self.sdv.state.s - tvehicle.state.s - self.sdv.radius - tvehicle.radius,
                             self.sdv.state.s_vel - tvehicle.state.s_vel
                         )
-                    #log.info(state_str)
+                    log.debug(state_str)
                 self.mconfig = mconfig
 
                 #Maneuver Tick
