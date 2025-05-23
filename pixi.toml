@@ -27,10 +27,10 @@ requests = "*"
 pynput = "*"
 screeninfo = "*"
 jq = ">=1.7.1,<2"
+pydot = "*"
 
 [pypi-dependencies]
 antlr-denter = "*"
-glog = "*"
 lanelet2 = "*"
 py-trees = "==0.7.6"
 sysv-ipc = "*"
@@ -41,7 +41,7 @@ libgl-devel = "*"
 [environments]
 default = { solve-group = "common" }
 humble = { features = ["humble"], solve-group = "common" }
-antlr = { features = ["antlr"] }
+antlr = { features = ["antlr"], no-default-feature = true }
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
