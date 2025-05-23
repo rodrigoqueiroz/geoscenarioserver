@@ -331,7 +331,7 @@ class Dashboard(object):
             for lid,state in traffic_light_states.items():
                 #find physical light locations
                 x,y,line = self.lanelet_map.get_traffic_light_pos(lid)
-                #print("Traffic light {} in {}, {}, with state {}".format( lid, x,y, state))
+                log.debug(f"Traffic light {lid} in {x}, {y}, with state {state}")
                 colorcode,_ = self.get_color_by_type('trafficlight',state)
                 tl_type = self.sim_traffic.traffic_lights[lid].type
                 square_size = 8

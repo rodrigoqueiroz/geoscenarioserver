@@ -315,7 +315,7 @@ class SimTraffic(object):
 
     def write_log_trajectories(self):
         if WRITE_TRAJECTORIES:
-            print("Log all trajectories: ")
+            log.info("Log all trajectories: ")
             for vid,vlog in self.vehicles_log.items():
                 #Path(self.log_traj_folder).mkdir(parents=True, exist_ok=True)
                 filename = "eval/trajlog/{}_{}.csv".format(self.log_file,vid)

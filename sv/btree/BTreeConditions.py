@@ -245,7 +245,7 @@ class BTreeConditions:
         if abs(vehicle_state.s_vel) < vel_threshold: #stopped
             if traffic_state.lane_config._right_lane is None:    #is the rightmost lane
                 if vehicle_state.d < (-distance_threshold):  #is positioned at the right of lane centre
-                    print(vehicle_state.d)
+                    log.debug(vehicle_state.d)
                     #if (vehicle.state.d - VEHICLE_WIDTH/2) < traffic_state.lane_config.get_central_d())
                     return True
             return False     
@@ -389,7 +389,7 @@ class BTreeConditions:
         for intersection in traffic_state.intersections:
             if isinstance(intersection, RightOfWayIntersection):
                 if len(traffic_state.road_occupancy.row_zone) > 0:
-                    print("Occupied row zone {}".format(traffic_state.road_occupancy.row_zone))
+                    log.debug("Occupied row zone {}".format(traffic_state.road_occupancy.row_zone))
                     return True
             if isinstance(intersection, AllWayStopIntersection):
                 if len(traffic_state.road_occupancy.intersecting_zone) > 0:

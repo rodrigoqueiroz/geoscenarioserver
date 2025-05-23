@@ -138,7 +138,7 @@ class SimSharedMemoryServer(object):
             nclient_pedestrians = header[3]
         except Exception as e:
             log.error("Header parsing exception")
-            log.error("data_arr[0]: %s ", data_arr[0])
+            log.error(f"data_arr[0]: {data_arr[0]}")
             log.error(e)
             pass
 

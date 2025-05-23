@@ -778,5 +778,5 @@ def get_line_format(type: str, subtype: str):
     elif type == "traffic_light":
         return None  # do not draw
     else:
-        print(f'Unhandled format of line type: {type}, subtype: {subtype}')
+        log.error(f'Unhandled format of line type: {type}, subtype: {subtype}')
     return (color, linestyle, linewidth)
