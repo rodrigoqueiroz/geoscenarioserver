@@ -389,7 +389,7 @@ class BTreeConditions:
         for intersection in traffic_state.intersections:
             if isinstance(intersection, RightOfWayIntersection):
                 if len(traffic_state.road_occupancy.row_zone) > 0:
-                    log.debug("Occupied row zone {}".format(traffic_state.road_occupancy.row_zone))
+                    log.debug(f"Occupied row zone {traffic_state.road_occupancy.row_zone}")
                     return True
             if isinstance(intersection, AllWayStopIntersection):
                 if len(traffic_state.road_occupancy.intersecting_zone) > 0:

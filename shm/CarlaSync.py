@@ -108,7 +108,7 @@ class CarlaSync(object):
                 
             log.debug(f"Yaw :{transform.rotation.yaw}")
             #= EV
-            log.debug("trying to spawn vehicle {} at {} {} yaw {}".format(vid,vehicle.state.x,vehicle.state.y,vehicle.state.yaw))
+            log.debug(f"trying to spawn vehicle {vid} at {vehicle.state.x} {vehicle.state.y} yaw {vehicle.state.yaw}")
             if vehicle.type == Vehicle.EV_TYPE:
                 if vehicle.bsource == "carla_autopilot":
                     carla_vehicle = world.spawn_actor(vbp, transform)
@@ -127,7 +127,7 @@ class CarlaSync(object):
                 carla_vehicle.set_simulate_physics(True)
                 carla_vehicle.set_enable_gravity(True) #depends on simulate physics
 
-            log.info('created gs vid {} in carla as {}'.format(vehicle.id,carla_vehicle.type_id))
+            log.info(f"created gs vid {vehicle.id} in carla as {carla_vehicle.type_id}")
             time.sleep(2)
             
         if ATTACH_SPECTATOR_TO is not None:
@@ -252,7 +252,7 @@ class CarlaSync(object):
                 lat_ref = float(geo_elem.split('=')[-1])
             elif geo_elem.startswith('+lon_0'):
                 lon_ref = float(geo_elem.split('=')[-1])
-        log.info("open drive origin is {} {} {}".format(lat_ref, lon_ref, 0))
+        log.info(f"open drive origin is {lat_ref} {lon_ref} 0.0")
         return lat_ref, lon_ref, 0.
 
     def __del__(self):

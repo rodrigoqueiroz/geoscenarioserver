@@ -108,7 +108,7 @@ class LaneletMap(object):
         if len(lls) > 0:
             right_ll = lls[0]
         if len(lls) > 1:
-            log.warning("multiple right adjacent lanelets found for {}. Using {}".format(lanelet.id, right_ll.id))
+            log.warning(f"multiple right adjacent lanelets found for {lanelet.id}. Using {right_ll.id}")
         if right_ll:
             return right_ll, "opposite"
         #Not found
@@ -128,7 +128,7 @@ class LaneletMap(object):
         for ll in lls:
             left_ll = ll
         if len(lls) > 1:
-            log.warning("multiple left adjacent lanelets found for {}. Using {}".format(lanelet.id, left_ll.id))
+            log.warning(f"multiple left adjacent lanelets found for {lanelet.id}. Using {left_ll.id}")
         if left_ll:
             return left_ll, "opposite"
         #Not found

@@ -128,7 +128,7 @@ def plan_following(vid, mconfig:MFollowConfig, traffic_state:TrafficState):
         return None, None
     #Is target on the same lane?
     if lane_config.get_current_lane(d_start[0]).id != lane_config.get_current_lane(leading_vehicle.state.d).id:
-        log.warning("Leading vehicle {} is on a different lane.".format(target_vid))
+        log.warning(f"Leading vehicle {target_vid} is on a different lane.")
         return None, None
 
     # check if we need to deccel to increase gap, for the case when both vehicles
@@ -187,12 +187,12 @@ def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:TrafficState):
     target_lane_config = None
     if (lane_config.id == target_lid):
         target_lane_config = lane_config
-        log.warning('already in target lane {}'.format(target_lid))
+        log.warning(f"already in target lane {target_lid}")
         return None, None
     else:
         target_lane_config = lane_config.get_neighbour(target_lid)
     if not target_lane_config:
-        log.warning('target lane {} not found, is it a neighbour lane?'.format(target_lid))
+        log.warning(f"target lane {target_lid} not found, is it a neighbour lane?")
         return None, None
     
     #generates alternative targets:
@@ -222,12 +222,12 @@ def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
     delt_s_sampling = mconfig.delta_s_sampling
 
     if (target_id not in vehicles):
-        log.warning("Target vehicle {} is not in traffic".format(target_id))
+        log.warning(f"Target vehicle {target_id} is not in traffic")
         return None, None
 
     target_lane_config = lane_config.get_current_lane(vehicles[target_id].state.d)
     if not target_lane_config:
-        log.warning("Target vehicle {} is not in an adjacent lane".format(target_id))
+        log.warning(f"Target vehicle {target_id} is not in an adjacent lane")
         return None, None
     elif target_lane_config.id == lane_config.id:
         log.warning("Already in target lane")
@@ -368,7 +368,7 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     # within a certain distance generating new trajectory doesn't make sense
     if target_pos < 1: 
         #or abs(target_pos - vehicle_state.s) < 1:
-        log.warning('PLAN STOP Vehicle {} target position {} is too close or behind'.format(vid,target_pos))
+        log.warning(f"PLAN STOP Vehicle {vid} target position {target_pos} is too close or behind")
         #mconfig.type = MStopConfig.Type.NOW
         #s_solver = quartic_polynomial_solver
         return None, None

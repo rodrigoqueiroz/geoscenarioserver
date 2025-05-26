@@ -187,10 +187,7 @@ class SimSharedMemoryServer(object):
                     if not int(active):
                         disabled_pedestrians.append(pid)
             else:
-                log.warning("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(
-                    nclient_pedestrians,
-                    npedestrians
-                ))
+                log.warning(f"Client state error: No. client pedestrians ({nclient_pedestrians}) not the same as server pedestrians ({npedestrians}).")
                 log.warning(data_str)
         except Exception as e:
             log.error("PedestrianState parsing exception")

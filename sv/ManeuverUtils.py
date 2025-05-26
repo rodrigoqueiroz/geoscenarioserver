@@ -28,7 +28,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
     elif mconfig.target_lid == -1: # right
         current_lane = lane_config.get_current_lane(vehicle_state.d + VEHICLE_RADIUS)
     else: # target_lid is None or 0
-        log.warning("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
+        log.warning(f"Lane swerve completed into target_lid {mconfig.target_lid}")
         current_lane = lane_config
 
     return current_lane.id == mconfig.target_lid
@@ -36,7 +36,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
 def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig, traffic_vehicles):
     target_lane_config = lane_config.get_current_lane(traffic_vehicles[mconfig.target_vid].state.d)
     if not target_lane_config:
-        log.warning("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
+        log.warning(f"Target vehicle {mconfig.target_vid} is not in an adjacent lane")
         return None, None
 
     # To start logging when in other lane (for experiments)
@@ -65,7 +65,7 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
                 vehicle_state.s_vel - tvehicle.state.s_vel
             )
         log.debug(state_str)
-        log.warning("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
+        log.warning(f"Lane swerve completed into target_lid {mconfig.target_lid}")
         return True
 
     # return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lid=target_lane_config.id))
@@ -217,7 +217,7 @@ def reached_gap(vehicle_state, target_lane_config, traffic_vehicles, meters):
     """
     target_vehicle = get_closest_vehicle_in_lane(vehicle_state, target_lane_config, traffic_vehicles)
     if target_vehicle is None:
-        log.warning("No target vehicle in {} lane.".format('LEFT' if target_lane_config.id == 1 else 'RIGHT'))
+        log.warning(f"No target vehicle in {'LEFT' if target_lane_config.id == 1 else 'RIGHT'} lane.")
         return True
     gap = range_gap(vehicle_state,target_vehicle)
     #print("GAP" + str(gap))

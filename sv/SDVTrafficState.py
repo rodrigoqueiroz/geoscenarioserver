@@ -563,7 +563,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
             elif (maneuver == lanelet2.core.ManeuverType.RightOfWay):
                 continue #ignore
             elif (maneuver == lanelet2.core.ManeuverType.Unknown):
-                log.warning("Role of lanelet {} in the RightOfWay is unknown".format(cur_ll.id))
+                log.warning(f"Role of lanelet {cur_ll.id} in the RightOfWay is unknown")
                 continue
 
         # === ALL WAY STOP ===

@@ -49,9 +49,9 @@ class BCondition(behaviour.Behaviour):
                         time = float(self.kwargs['time'])
                         self.ts = TickSync()
                         self.ts.set_timeout(time)
-                        log.info("Create wait condition {}".format(self.ts.sim_time))
+                        log.info(f"Create wait condition {self.ts.sim_time}")
                     if self.ts.tick():
-                        log.info("wait condition timeout {}".format(self.ts.sim_time))
+                        log.info(f"wait condition timeout {self.ts.sim_time}")
                         status = common.Status.SUCCESS
                 #other conditions
                 elif self.bmodel.test_condition(self.condition, self.kwargs):
