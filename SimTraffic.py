@@ -316,10 +316,11 @@ class SimTraffic(object):
     def write_log_trajectories(self):
         if WRITE_TRAJECTORIES:
             log.info("Log all trajectories: ")
-            for vid,vlog in self.vehicles_log.items():
-                #Path(self.log_traj_folder).mkdir(parents=True, exist_ok=True)
-                filename = "eval/trajlog/{}_{}.csv".format(self.log_file,vid)
-                with open(filename,mode='w') as csv_file:
+            for vid, vlog in self.vehicles_log.items():
+                filename = os.path.join(
+                    os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
+                    f"trajectory_v{vid}.csv")
+                with open(filename, mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #vlog.sort()
                     titleline =['id', 'type','sim_state', 'tick_count', 'sim_time', 'delta_time',

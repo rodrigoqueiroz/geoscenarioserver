@@ -7,7 +7,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 - Linux or Windows 10/11 + WSL2
 - Python >= 3.8
 
-GeoScenario Server can run natively on Linux or in WSL2 on Windows within a [conda](https://conda-forge.org/) environment.
+GeoScenario Server can run on Linux natively or in WSL2 on Windows within a [conda](https://conda-forge.org/) environment.
 
 ### Deb packages for Linux native
 
@@ -60,11 +60,11 @@ Pixi project provides the following tasks:
 cd geoscenarioserver
 pixi run gss <parameters>
 pixi run test_scenarios_ci
-pixi run -e humble rqt
-pixi run -e humble ros_client_build
-pixi run -e humble ros_client
-pixi run -e humble ros_mock_co_simulator
-pixi run -e antlr regenerate
+pixi run rqt
+pixi run ros_client_build
+pixi run ros_client
+pixi run ros_mock_co_simulator
+pixi run regenerate
 ```
 
 To run automated test of ROS2 client using the mock co-simulator, execute:
@@ -104,7 +104,7 @@ Usage:
 - run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
 
 ```
-usage: GSServer.py [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc]
+usage: GSServer.py [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [--dash-pos DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl]
 
 options:
   -h, --help            show this help message and exit
@@ -122,6 +122,10 @@ options:
                         Wait for the user to press [ENTER] to start the simulation
   -wc, --wait-for-client
                         Wait for a valid client state to start the simulation
+  --dash-pos DASH_POS DASH_POS DASH_POS DASH_POS
+                        Set the position of the dashboard window (x y width height)
+  -d, --debug           Set the logging level to DEBUG instead of INFO
+  -fl, --file-log       Log to $GSS_OUTPUTS/GSServer.log instead of stdout
 ```
 
 GSServer creates various files on the folder `./outputs`, which can also be overridden using the environment variable `GSS_OUTPUTS`.

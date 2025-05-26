@@ -201,12 +201,15 @@ if __name__ == "__main__":
     parser.add_argument("-wc", "--wait-for-client", dest="wait_for_client", action="store_true", help="Wait for a valid client state to start the simulation")
     parser.add_argument("--dash-pos", default=[], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
     parser.add_argument("-d", "--debug", dest="debug", action="store_true", help="Set the logging level to DEBUG instead of INFO")
-    parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to outputs/GSServer.log instead of stdout")
+    parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to $GSS_OUTPUTS/GSServer.log instead of stdout")
     args = parser.parse_args()
 
     log_level = logging.DEBUG if args.debug else logging.INFO
     if args.file_log:
-        logging.basicConfig(filename="outputs/GSServer.log", filemode="w", level=log_level)
+        filename = os.path.join(
+            os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
+            "GSServer.log")
+        logging.basicConfig(filename=filename, filemode="w", level=log_level)
     else:
         logging.basicConfig(level=log_level)
     start_server(args)
