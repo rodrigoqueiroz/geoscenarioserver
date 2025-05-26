@@ -22,13 +22,13 @@ from TrafficLight import TrafficLight
 from requirements import RequirementsChecker
 from Actor import ActorSimState
 
-import logging
-log = logging.getLogger(__name__)
-
 try:
     from shm.CarlaSync import *
 except:
     log.warning("Carla API not found")
+
+import logging
+log = logging.getLogger(__name__)
 
 class SimTraffic(object):
 

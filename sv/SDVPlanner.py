@@ -6,8 +6,6 @@
 # --------------------------------------------
 
 from copy import copy
-import logging
-log = logging.getLogger(__name__)
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
 import sys, time
@@ -27,6 +25,9 @@ from TickSync import TickSync
 
 import sv.btree.BehaviorLayer       as btree
 import sv.ruleEngine.BehaviorLayer  as rules
+
+import logging
+log = logging.getLogger(__name__)
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, rule_engine_port = None):
@@ -109,9 +110,9 @@ class SVPlanner(object):
                     continue
                 else:
                     if self.last_plan != None and self.last_plan.tick_count > 0:
-                        log.warn(f"At tick {self.last_plan.tick_count+1} no plan received")
+                        log.debug(f"At tick {self.last_plan.tick_count+1} no plan received")
                     else:
-                        log.warn(f"At unknown tick no plan received")
+                        log.debug(f"At unknown tick no plan received")
                     return None
             elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
                 # Same plan
@@ -120,12 +121,12 @@ class SVPlanner(object):
                     time.sleep(0.001)
                     continue
                 else:
-                    log.warn(f"At tick {plan.tick_count} no new plan: the same as the previous")
+                    log.debug(f"At tick {plan.tick_count} no new plan: the same as the previous")
                     return None
             # New plan
             self.last_plan = plan
             if checks_remaining < 100:
-                log.warn(f"At tick {plan.tick_count} waited for a plan {100-checks_remaining} ms")
+                log.debug(f"At tick {plan.tick_count} waited for a plan {100-checks_remaining} ms")
             return plan
 
 

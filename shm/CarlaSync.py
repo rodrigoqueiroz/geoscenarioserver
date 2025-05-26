@@ -5,11 +5,11 @@ from sv.Vehicle import *
 from util.Utils import *
 import xml.etree.ElementTree as ET
 
-import logging
-log = logging.getLogger(__name__)
-
 if CARLA_COSIMULATION:
     import carla as carla
+
+import logging
+log = logging.getLogger(__name__)
     
 ATTACH_SPECTATOR_TO = None          #vehicle ID or None for manual Camera
 USE_SPAWN_POINTS = False

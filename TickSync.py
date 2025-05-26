@@ -12,12 +12,12 @@ import datetime
 import math
 import time
 
-import logging
-log = logging.getLogger(__name__)
-
 from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *
 from util.Utils import truncate
+
+import logging
+log = logging.getLogger(__name__)
 
 class TickSync():
     def __init__(self, rate = TRAFFIC_RATE, block = False, verbose = False, label = "", sim_start_time = 0.0):
@@ -95,7 +95,7 @@ class TickSync():
                 #assume that the expected tick duration has passed
                 self.delta_time = self.expected_tick_duration
                 self.drift = 0.0
-                self._tick_start_clock += time.timedelta(seconds=self.expected_tick_duration)
+                self._tick_start_clock += datetime.timedelta(seconds=self.expected_tick_duration)
                 #Update globals
                 self.sim_time += self.expected_tick_duration
             else:

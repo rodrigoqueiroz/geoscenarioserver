@@ -10,8 +10,6 @@ import itertools
 #from TickSync import *
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
-import logging
-log = logging.getLogger(__name__)
 #from multiprocessing import Pool as ThreadPool
 from sv.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.ManeuverConfig import *
@@ -21,6 +19,8 @@ from sv.FrenetTrajectory import *
 from typing import Callable
 from sv.ManeuverUtils import *
 
+import logging
+log = logging.getLogger(__name__)
 
 def plan_maneuver(sdv, mconfig, traffic_state):
     #log.info('MANEUVER {}:  Vehicle {}'.format(mconfig.mkey,vid))

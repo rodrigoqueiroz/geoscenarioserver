@@ -8,8 +8,6 @@
 # --------------------------------------------
 from __future__ import annotations  #Must be first Include. Will be standard in Python4
 
-import logging
-log = logging.getLogger(__name__)
 import itertools
 import lanelet2.core
 
@@ -32,9 +30,11 @@ from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
 from util.Transformations import (OutsideRefPathException, frenet_to_sim_frame,frenet_to_sim_position, sim_to_frenet_frame,sim_to_frenet_position)
 
+import logging
+log = logging.getLogger(__name__)
+
 #Reg Elements State (for pickling)
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
-
 
 @dataclass
 class AllWayStopIntersection:

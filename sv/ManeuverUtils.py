@@ -9,9 +9,10 @@
 from sv.ManeuverConfig import *
 from SimConfig import *
 from Actor import *
+from sv.SDVTrafficState import TrafficState
+
 import logging
 log = logging.getLogger(__name__)
-from sv.SDVTrafficState import TrafficState
 
 def check_notnone(obj, msg=None):
     if obj is None:

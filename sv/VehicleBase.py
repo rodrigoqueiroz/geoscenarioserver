@@ -1,7 +1,8 @@
-import logging
-log = logging.getLogger(__name__)
 from Actor import Actor, VehicleState
 from SimConfig import *
+
+import logging
+log = logging.getLogger(__name__)
 
 # Vehicle base class for remote control or simulation.
 class Vehicle(Actor):
