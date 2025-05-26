@@ -6,7 +6,6 @@
 # Starts the Server and controls the traffic simulation loop
 # --------------------------------------------
 
-import glog as log
 import screeninfo
 
 from argparse import ArgumentParser
@@ -27,6 +26,9 @@ from SimConfig import SimConfig
 from SimTraffic import SimTraffic
 from TickSync import TickSync
 
+import logging
+log = logging.getLogger("GSServer")
+
 def start_server(args):
     # log.setLevel("INFO")
     log.info('GeoScenario server START')
@@ -40,7 +42,7 @@ def start_server(args):
         btree_locations.append(base_btree_location)
     else:
         btree_locations = [base_btree_location]
-    log.info ("Btree search locations set (in order) as: " + str(btree_locations))
+    log.info("Btree search locations set (in order) as: " + str(btree_locations))
 
     if args.verify_map != "":
         verify_map_file(args.verify_map, lanelet_map)
@@ -81,7 +83,8 @@ def start_server(args):
 
     #find screen info 
     monitors = screeninfo.get_monitors()
-    primary_monitor = None
+    # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
+    primary_monitor = monitors[0]
     for monitor in monitors:
         if monitor.is_primary:
             primary_monitor = monitor
@@ -143,7 +146,7 @@ def start_server(args):
     if sim_config.show_dashboard:
         dashboard.start()
     else:
-        log.warn("Dashboard will not start")
+        log.warning("Dashboard will not start")
 
     dashboard_interrupted = False
     while sync_global.tick():
@@ -197,6 +200,16 @@ if __name__ == "__main__":
     parser.add_argument("-wi", "--wait-for-input", dest="wait_for_input", action="store_true", help="Wait for the user to press [ENTER] to start the simulation")
     parser.add_argument("-wc", "--wait-for-client", dest="wait_for_client", action="store_true", help="Wait for a valid client state to start the simulation")
     parser.add_argument("--dash-pos", default=[], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
-
+    parser.add_argument("-d", "--debug", dest="debug", action="store_true", help="Set the logging level to DEBUG instead of INFO")
+    parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to $GSS_OUTPUTS/GSServer.log instead of stdout")
     args = parser.parse_args()
+
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    if args.file_log:
+        filename = os.path.join(
+            os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
+            "GSServer.log")
+        logging.basicConfig(filename=filename, filemode="w", level=log_level)
+    else:
+        logging.basicConfig(level=log_level)
     start_server(args)

@@ -140,7 +140,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             if 'start_cartesian' in vnode.tags:
                 start_cartesian = vnode.tags['start_cartesian']
                 gs_sc = start_cartesian.split(',')
-                print(gs_sc)
+                log.debug(gs_sc)
                 if len (gs_sc) != 4:
                     log.error("start state in Cartesian must have 4 values [x_vel,x_acc,y_vel,y_acc].")
                     continue
@@ -151,7 +151,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 y_vel = float(gs_sc[2].strip())
                 y_acc = float(gs_sc[3].strip())
                 start_state = [x,x_vel,x_acc,y,y_vel,y_acc]     #vehicle start state in cartesian frame
-                print(start_state)
+                log.debug(start_state)
 
             if 'start_frenet' in vnode.tags:
                 # assume frenet start_state is relative to the first lane of the route

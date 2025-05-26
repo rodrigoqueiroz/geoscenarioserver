@@ -9,9 +9,11 @@
 
 import csv
 import datetime
-import glog as log
 import math
 import time
+
+import logging
+log = logging.getLogger(__name__)
 
 from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *
@@ -51,10 +53,6 @@ class TickSync():
     def set_timeout(self,timeout):
         self.timeout = timeout
     
-    def print(self,msg):
-        if (self.verbose):
-            print(msg)
-
     def tick(self):
         now = datetime.datetime.now()
         #First Tick
@@ -66,7 +64,7 @@ class TickSync():
             #Update globals
             self.tick_count+=1
             self.sim_time = self.sim_start_time #starting time by config
-            self.print('{:05.2f}s {} Tick {:3}# START'.
+            log.debug('{:05.2f}s {} Tick {:3}# START'.
                     format(self.sim_time,self.label,self.tick_count))
             return True
         else:
@@ -77,9 +75,9 @@ class TickSync():
                 #Too fast. Need to chill.
                 if (self.block):
                     time.sleep(-drift)      #blocks diff if negative drift
-                    #self.print('sleep {:.3}'.format(drift))
+                    #log.debug('sleep {:.3}'.format(drift))
                 else:
-                    #self.print('skip {:.3}'.format(drift))
+                    #log.debug('skip {:.3}'.format(drift))
                     return False            #return false to skip
         #Can proceed tick: on time or late (drift):
         now = datetime.datetime.now()    #update after wake up
@@ -111,15 +109,17 @@ class TickSync():
                 truncate(self.drift,3)
             ])
         if self.verbose:
-            log.info('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
+            log.debug('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
                     format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         
     def write_performance_log(self):
         if LOG_PERFORMANCE:
             logtime = time.strftime("%Y%m%d-%H%M%S")
-            filename = f"outputs/{self.label}_performance_log.csv"
+            filename = os.path.join(
+                os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
+                f"{self.label}_performance_log.csv")
             log.info('Writing performance log: {}'.format(filename))
-            with open(filename,mode='w') as csv_file:
+            with open(filename, mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 titleline =['tickcount', 'sim_time','delta_time', 'drift']
                 csv_writer.writerow(titleline)

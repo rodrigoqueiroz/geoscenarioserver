@@ -8,7 +8,6 @@
 # --------------------------------------------
 
 import csv
-import glog as log
 import numpy as np
 import time
 
@@ -22,6 +21,9 @@ from sv.Vehicle import Vehicle
 from TrafficLight import TrafficLight
 from requirements import RequirementsChecker
 from Actor import ActorSimState
+
+import logging
+log = logging.getLogger(__name__)
 
 try:
     from shm.CarlaSync import *
@@ -106,7 +108,7 @@ class SimTraffic(object):
 
         #If cosimulation, hold start waiting for first client state
         if self.cosimulation == True and self.sim_config.wait_for_client:
-            log.warn("GSServer is running in co-simulation. Waiting for client state in SEM:{} KEY:{}...".format(CS_SEM_KEY, CS_SHM_KEY))
+            log.warning(f"GSServer is running in co-simulation. Waiting for client state in SEM:{CS_SEM_KEY} KEY:{CS_SHM_KEY}...")
             while(True):
                 header, vstates, _, _, _ = self.sim_client_shm.read_client_state(len(self.vehicles), len(self.pedestrians))
                 if len(vstates)>0:
@@ -298,7 +300,7 @@ class SimTraffic(object):
                 state.x, state.y, state.z,
                 np.linalg.norm([state.x_vel, state.y_vel])
             )
-        log.info(state_str)
+        log.debug(state_str)
 
     def log_trajectories(self,tick_count,delta_time,sim_time):
         if WRITE_TRAJECTORIES:
@@ -313,11 +315,12 @@ class SimTraffic(object):
 
     def write_log_trajectories(self):
         if WRITE_TRAJECTORIES:
-            print("Log all trajectories: ")
-            for vid,vlog in self.vehicles_log.items():
-                #Path(self.log_traj_folder).mkdir(parents=True, exist_ok=True)
-                filename = "eval/trajlog/{}_{}.csv".format(self.log_file,vid)
-                with open(filename,mode='w') as csv_file:
+            log.info("Log all trajectories: ")
+            for vid, vlog in self.vehicles_log.items():
+                filename = os.path.join(
+                    os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
+                    f"trajectory_v{vid}.csv")
+                with open(filename, mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #vlog.sort()
                     titleline =['id', 'type','sim_state', 'tick_count', 'sim_time', 'delta_time',

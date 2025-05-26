@@ -3,8 +3,10 @@ from SimConfig import *
 from sv.Vehicle import *
 from TickSync import *
 from util.Utils import *
-import glog as log
 import xml.etree.ElementTree as ET
+
+import logging
+log = logging.getLogger(__name__)
 
 if CARLA_COSIMULATION:
     import carla as carla
@@ -48,7 +50,7 @@ class CarlaSync(object):
         #Map
         #self.change_map()
         self.carla_map = self.world.get_map()
-        print("Carla Mao: {}".format( self.carla_map.name))
+        log.info(f"Carla Map: {self.carla_map.name}")
         #Carla maps use simulation 0,0 as gps origin. 
         #In case, ther is a mismatch, use the following and adjust all scenario points (reload scenarios setup)
         #ref_lat, ref_lon, _ = self.get_gps_origin()
@@ -97,16 +99,16 @@ class CarlaSync(object):
             if USE_SPAWN_POINTS:
                 #Using different spawning points as start position
                 transform =  self.carla_map.get_spawn_points()[i]  #random.choice(world.get_map().get_spawn_points())
-                print("Spawn point Location {} GeoLocation {}".format(transform.location, self.carla_map.transform_to_geolocation(transform.location)))
+                log.info("Spawn point Location {} GeoLocation {}".format(transform.location, self.carla_map.transform_to_geolocation(transform.location)))
                 i+1
             else:
                 #manual method (can fail if collision happens)
                 transform = self.get_carla_transform(vehicle.state.x,vehicle.state.y,map_z,
                                                     0,vehicle.state.yaw,0)
                 
-            print(transform.rotation.yaw)
+            log.debug(f"Yaw :{transform.rotation.yaw}")
             #= EV
-            print("trying to spawn vehicle {} at {} {} yaw {}".format(vid,vehicle.state.x,vehicle.state.y,vehicle.state.yaw))
+            log.debug(f"trying to spawn vehicle {vid} at {vehicle.state.x} {vehicle.state.y} yaw {vehicle.state.yaw}")
             if vehicle.type == Vehicle.EV_TYPE:
                 if vehicle.bsource == "carla_autopilot":
                     carla_vehicle = world.spawn_actor(vbp, transform)
@@ -125,7 +127,7 @@ class CarlaSync(object):
                 carla_vehicle.set_simulate_physics(True)
                 carla_vehicle.set_enable_gravity(True) #depends on simulate physics
 
-            print('created gs vid {} in carla as {}'.format(vehicle.id,carla_vehicle.type_id))
+            log.info(f"created gs vid {vehicle.id} in carla as {carla_vehicle.type_id}")
             time.sleep(2)
             
         if ATTACH_SPECTATOR_TO is not None:
@@ -250,7 +252,7 @@ class CarlaSync(object):
                 lat_ref = float(geo_elem.split('=')[-1])
             elif geo_elem.startswith('+lon_0'):
                 lon_ref = float(geo_elem.split('=')[-1])
-        print("open drive origin is {} {} {}".format(lat_ref, lon_ref, 0))
+        log.info(f"open drive origin is {lat_ref} {lon_ref} 0.0")
         return lat_ref, lon_ref, 0.
 
     def __del__(self):

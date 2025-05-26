@@ -8,12 +8,17 @@
 
 from sv.ManeuverConfig import *
 from SimConfig import *
-import numpy as np
 from Actor import *
-import glog as log
+import logging
+log = logging.getLogger(__name__)
 from sv.SDVTrafficState import TrafficState
 
-
+def check_notnone(obj, msg=None):
+    if obj is None:
+        if msg is None:
+            log.error("Object is None")
+        else:
+            log.error(f"{msg} is None")
 
 def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSwerveConfig):
     current_lane = None
@@ -23,7 +28,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
     elif mconfig.target_lid == -1: # right
         current_lane = lane_config.get_current_lane(vehicle_state.d + VEHICLE_RADIUS)
     else: # target_lid is None or 0
-        log.warn("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
+        log.warning(f"Lane swerve completed into target_lid {mconfig.target_lid}")
         current_lane = lane_config
 
     return current_lane.id == mconfig.target_lid
@@ -31,7 +36,7 @@ def lane_swerve_completed(vehicle_state, lane_config:LaneConfig, mconfig:MLaneSw
 def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig, traffic_vehicles):
     target_lane_config = lane_config.get_current_lane(traffic_vehicles[mconfig.target_vid].state.d)
     if not target_lane_config:
-        log.warn("Target vehicle {} is not in an adjacent lane".format(mconfig.target_vid))
+        log.warning(f"Target vehicle {mconfig.target_vid} is not in an adjacent lane")
         return None, None
 
     # To start logging when in other lane (for experiments)
@@ -59,8 +64,8 @@ def cutin_completed(vehicle_state, lane_config:LaneConfig, mconfig:MCutInConfig,
                 vehicle_state.s - tvehicle.state.s - 2*VEHICLE_RADIUS,
                 vehicle_state.s_vel - tvehicle.state.s_vel
             )
-        log.info(state_str)
-        log.warn("WARNING: Lane swerve completed into target_lid {}".format(mconfig.target_lid))
+        log.debug(state_str)
+        log.warning(f"Lane swerve completed into target_lid {mconfig.target_lid}")
         return True
 
     # return lane_swerve_completed(vehicle_state, lane_config, MLaneSwerveConfig(target_lid=target_lane_config.id))
@@ -133,7 +138,7 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
                                 regardless of the time gap to the leading vehicle. This should be around the stopping
                                 distance of SVs.
     """
-    log.check_notnone(lane_config)
+    check_notnone(lane_config, "lane_config")
 
     is_following = False
     leading_vid = None
@@ -157,7 +162,7 @@ def is_in_following_range(self_id, vehicle_state, other_vehicles, lane_config:La
     return is_following, leading_vid
 
 def is_lane_occupied(vehicle_state, lane_config, traffic_vehicles, threshold=50):
-    log.check_notnone(lane_config)
+    check_notnone(lane_config, "lane_config")
 
     smin = vehicle_state.s - threshold
     smax = vehicle_state.s + threshold
@@ -169,7 +174,7 @@ def is_lane_occupied(vehicle_state, lane_config, traffic_vehicles, threshold=50)
     return len(vehicles_in_lane) != 0
 
 def get_vehicles_in_lane(lane_config, traffic_vehicles):
-    log.check_notnone(lane_config)
+    check_notnone(lane_config, "lane_config")
 
     vehicles = []
     for vid, traffic_vehicle in traffic_vehicles.items():
@@ -182,13 +187,13 @@ def get_vehicles_in_lane(lane_config, traffic_vehicles):
 def get_leading_vehicle(vehicle_state, lane_config, traffic_vehicles):
     """ Gets closest vehicle in the same lane as vehicle_state.
     """
-    log.check_notnone(lane_config)
+    check_notnone(lane_config, "lane_config")
 
     cur_lane = lane_config.get_current_lane(vehicle_state.d)
     #if cur_lane is None:
         #print(vehicle_state.d)
         #print(lane_config)
-    log.check_notnone(cur_lane)
+    check_notnone(cur_lane, "cur_lane")
 
     vehicles_ahead = list(filter(
         lambda v: v.state.s > vehicle_state.s,
@@ -212,7 +217,7 @@ def reached_gap(vehicle_state, target_lane_config, traffic_vehicles, meters):
     """
     target_vehicle = get_closest_vehicle_in_lane(vehicle_state, target_lane_config, traffic_vehicles)
     if target_vehicle is None:
-        log.warn("No target vehicle in {} lane.".format('LEFT' if target_lane_config.id == 1 else 'RIGHT'))
+        log.warning(f"No target vehicle in {'LEFT' if target_lane_config.id == 1 else 'RIGHT'} lane.")
         return True
     gap = range_gap(vehicle_state,target_vehicle)
     #print("GAP" + str(gap))

@@ -156,11 +156,11 @@ class BTreeConditions:
         if 'vid' in kwargs or 'lid' in kwargs or 'zid' in kwargs:
             vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
             if not vehicle:
-                log.warn("No vehicle found in condition is_ego")
+                log.warning("No vehicle found in condition is_ego")
                 return False
             return True if vehicle.id == EGO else False
         else:
-            log.warn("Condition is_ego requires at least one id")
+            log.warning("Condition is_ego requires at least one id")
             return False
 
     def vehicle_stopped(self,traffic_state:TrafficState, kwargs):
@@ -172,7 +172,7 @@ class BTreeConditions:
         if 'vid' in kwargs or 'lid' in kwargs or 'zid' in kwargs:
             vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
             if not vehicle:
-                log.warn("No vehicle found in condition vehicle_stopped")
+                log.warning("No vehicle found in condition vehicle_stopped")
                 return False
             vehicle_state = vehicle.state
         else:
@@ -190,7 +190,7 @@ class BTreeConditions:
         if 'vid' in kwargs or 'lid' in kwargs or 'zid' in kwargs:
             vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
             if not vehicle:
-                log.warn("No vehicle found in condition vehicle_moving")
+                log.warning("No vehicle found in condition vehicle_moving")
                 return False
             vehicle_state = vehicle.state
         else: #self
@@ -210,7 +210,7 @@ class BTreeConditions:
         if 'vid' in kwargs or 'lid' in kwargs or 'zid' in kwargs:
             vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
             if not vehicle:
-                log.warn("No vehicle found in condition vehicle_yielding")
+                log.warning("No vehicle found in condition vehicle_yielding")
                 return False
             vehicle_state = vehicle.state
         else: #self
@@ -236,7 +236,7 @@ class BTreeConditions:
         if 'vid' in kwargs or 'lid' in kwargs or 'zid' in kwargs:
             vehicle = get_vehicle_by_ids(traffic_state, kwargs) 
             if not vehicle:
-                log.warn("No vehicle found in condition vehicle_yielding")
+                log.warning("No vehicle found in condition vehicle_yielding")
                 return False
             vehicle_state = vehicle.state
         else: #self
@@ -245,7 +245,7 @@ class BTreeConditions:
         if abs(vehicle_state.s_vel) < vel_threshold: #stopped
             if traffic_state.lane_config._right_lane is None:    #is the rightmost lane
                 if vehicle_state.d < (-distance_threshold):  #is positioned at the right of lane centre
-                    print(vehicle_state.d)
+                    log.debug(vehicle_state.d)
                     #if (vehicle.state.d - VEHICLE_WIDTH/2) < traffic_state.lane_config.get_central_d())
                     return True
             return False     
@@ -257,7 +257,7 @@ class BTreeConditions:
             kwargs["vid"] = lead.id
             return self.vehicle_stopped(traffic_state,kwargs)
         else:
-            log.warn("No lead vehicle")
+            log.warning("No lead vehicle")
             return False
 
     def lv_moving(self,traffic_state:TrafficState, kwargs):
@@ -266,7 +266,7 @@ class BTreeConditions:
             kwargs["vid"] = lead.id
             return self.vehicle_moving(traffic_state,kwargs)
         else:
-            log.warn("No lead vehicle")
+            log.warning("No lead vehicle")
             return False
 
     def lv_parked(self,traffic_state:TrafficState, kwargs):
@@ -275,7 +275,7 @@ class BTreeConditions:
             kwargs["vid"] = lead.id
             return self.vehicle_parket(traffic_state,kwargs)
         else:
-            log.warn("No lead vehicle")
+            log.warning("No lead vehicle")
             return False
 
     #surrounding
@@ -297,7 +297,7 @@ class BTreeConditions:
         
         target_lane_config = traffic_state.lane_config.get_neighbour(lid,include_opposite)
         if not target_lane_config:
-            log.warn("No reachable {} lane for lane changing vehicle {}".format(
+            log.warning("No reachable {} lane for lane changing vehicle {}".format(
                 "LEFT" if lid == 1 else "RIGHT",traffic_state.vid))
             return False
         smin = traffic_state.vehicle_state.s - VEHICLE_LENGTH/2 - distance_gap
@@ -389,7 +389,7 @@ class BTreeConditions:
         for intersection in traffic_state.intersections:
             if isinstance(intersection, RightOfWayIntersection):
                 if len(traffic_state.road_occupancy.row_zone) > 0:
-                    print("Occupied row zone {}".format(traffic_state.road_occupancy.row_zone))
+                    log.debug(f"Occupied row zone {traffic_state.road_occupancy.row_zone}")
                     return True
             if isinstance(intersection, AllWayStopIntersection):
                 if len(traffic_state.road_occupancy.intersecting_zone) > 0:
@@ -569,5 +569,5 @@ def get_vehicle_by_ids(traffic_state:TrafficState, kwargs):
             elif vid in traffic_state.traffic_vehicles_orp:
                 return traffic_state.traffic_vehicles_orp[vid]
         #print(traffic_state.traffic_vehicles)
-        log.warn("No Vehicle found with IDs {} ".format(kwargs))
+        log.warning("No Vehicle found with IDs {} ".format(kwargs))
         return None

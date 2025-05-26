@@ -5,9 +5,10 @@
 # Traffic Light class
 # --------------------------------------------
 from enum import IntEnum
-import glog as log
 from math import inf
 
+import logging
+log = logging.getLogger(__name__)
 
 class TrafficLightColor(IntEnum):
     Red = 1

@@ -13,8 +13,10 @@ test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive
 libc = { family = "glibc", version = "2.31" }
 
 [dependencies]
+gcc ="*"
 python = "3.11.*"
 pip = "*"
+xorg-libxft = "*"
 tk = { build = "xft_*" }
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
@@ -25,10 +27,11 @@ requests = "*"
 pynput = "*"
 screeninfo = "*"
 jq = ">=1.7.1,<2"
+pydot = "*"
+qt6-wayland = "*"
 
 [pypi-dependencies]
 antlr-denter = "*"
-glog = "*"
 lanelet2 = "*"
 py-trees = "==0.7.6"
 sysv-ipc = "*"
@@ -37,8 +40,9 @@ sysv-ipc = "*"
 libgl-devel = "*"
 
 [environments]
-humble = { features = ["humble"] }
-antlr = { features = ["antlr"] }
+default = { solve-group = "common" }
+humble = { features = ["humble"], solve-group = "common" }
+antlr = { features = ["antlr"], no-default-feature = true }
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]

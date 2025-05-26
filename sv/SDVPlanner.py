@@ -6,7 +6,8 @@
 # --------------------------------------------
 
 from copy import copy
-import glog as log
+import logging
+log = logging.getLogger(__name__)
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
 import sys
@@ -156,7 +157,7 @@ class SVPlanner(object):
                 traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
 
                 if not traffic_state:
-                    log.warn("Invalid planner state, skipping planning step...")
+                    log.warning("Invalid planner state, skipping planning step...")
                     continue
 
                 self._requirementsChecker.analyze(traffic_state)
@@ -176,7 +177,7 @@ class SVPlanner(object):
                     # Regenerate planner state and tick btree again. Discard whether ref path changed again.
                     traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                     if not traffic_state:
-                        log.warn("Invalid planner state, skipping planning step...")
+                        log.warning("Invalid planner state, skipping planning step...")
                         continue
 
                     mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
@@ -210,7 +211,7 @@ class SVPlanner(object):
                             self.sdv.state.s - tvehicle.state.s - self.sdv.radius - tvehicle.radius,
                             self.sdv.state.s_vel - tvehicle.state.s_vel
                         )
-                    #log.info(state_str)
+                    log.debug(state_str)
                 self.mconfig = mconfig
 
                 #Maneuver Tick
@@ -226,7 +227,7 @@ class SVPlanner(object):
                         task_delta_time = self.sync_planner.get_task_time()
 
                     if frenet_traj is None:
-                        log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
+                        log.warning("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
                         pass
                     else:
                         plan = MotionPlan()
