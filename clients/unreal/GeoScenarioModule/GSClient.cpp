@@ -165,9 +165,12 @@ void AGSClient::ReadServerState(float deltaTime)
 		vehicles_read++;
 
 		int v_type;
-		float x, y, z, x_vel, y_vel, yaw, steer;
-		iss >> v_type >> x >> y >> z >> x_vel >> y_vel >> yaw >> steer;
+		float l, w, h, x, y, z, x_vel, y_vel, yaw, steer;
+		iss >> v_type >> l >> w >> h >> x >> y >> z >> x_vel >> y_vel >> yaw >> steer;
 		// Unreal uses cm instead of m, and y is flipped
+		l *= 100.0f;
+		w *= 100.0f;
+		h *= 100.0f;
 		x *= 100.0f;
 		y *= -100.0f;
 		z *= 100.0f;
@@ -179,6 +182,7 @@ void AGSClient::ReadServerState(float deltaTime)
 		// Server yaw is counterclockwise, Unreal is clockwise
 		yaw = 360 - yaw;
 
+		FVector dim = {l, w, h};
 		FVector loc = {x, y, z};
 		FRotator rot = {0.0f, yaw, 0.0f};
 
@@ -188,7 +192,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
 			// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
-			CreateVehicle(vid, v_type, loc, rot);
+			CreateVehicle(vid, v_type, dim, loc, rot);
 
 			//debug
 			continue;
@@ -227,9 +231,12 @@ void AGSClient::ReadServerState(float deltaTime)
 		pedestrians_read++;
 
 		int p_type;
-		float x, y, z, x_vel, y_vel, yaw;
-		iss >> p_type >> x >> y >> z >> x_vel >> y_vel >> yaw;
+		float l, w, h, x, y, z, x_vel, y_vel, yaw;
+		iss >> p_type >> l >> w >> h >> x >> y >> z >> x_vel >> y_vel >> yaw;
 		// Unreal uses cm instead of m, and y is flipped
+		l *= 100.0f;
+		w *= 100.0f;
+		h *= 100.0f;
 		x *= 100.0f;
 		y *= -100.0f;
 		z *= 100.0f;
@@ -241,6 +248,7 @@ void AGSClient::ReadServerState(float deltaTime)
 		yaw -= 90;
 		// GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Red, FString::Printf(TEXT("Yaw %f"), yaw));
 
+		FVector dim = {l, w, h};
 		FVector loc = {x, y, z};
 		FRotator rot = {0.0f, yaw, 0.0f};
 
@@ -250,7 +258,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			// UE_LOG(GeoScenarioModule, Warning, TEXT("DEBUG Full ISS"));
 			// UE_LOG(GeoScenarioModule, Log, TEXT("%s"), *fulliss);
 			//creates only if actor is spawned or found.
-			CreatePedestrian(pid, p_type, loc, rot);
+			CreatePedestrian(pid, p_type, dim, loc, rot);
 
 			//debug
 			continue;
@@ -338,7 +346,7 @@ void AGSClient::UpdateRemotePedestrianStates(float deltaTime)
 	}
 }
 
-void AGSClient::CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot)
+void AGSClient::CreateVehicle(int vid, int v_type, FVector &dim, FVector &loc, FRotator &rot)
 {
 	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSVehicle vid=%d v_type=%d"), vid, v_type);
 	GSVehicle gsv = GSVehicle();
@@ -387,7 +395,7 @@ void AGSClient::CreateVehicle(int vid, int v_type, FVector &loc, FRotator &rot)
 	else {UE_LOG(GeoScenarioModule, Error, TEXT("Error creating GSVehicle vid=%d v_type=%d"), vid, v_type);}
 }
 
-void AGSClient::CreatePedestrian(int pid, int p_type, FVector &loc, FRotator &rot)
+void AGSClient::CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc, FRotator &rot)
 {
 	UE_LOG(GeoScenarioModule, Warning, TEXT("New GSPedestrian pid=%d p_type=%d"), pid, p_type);
 	GSPedestrian gsp = GSPedestrian();

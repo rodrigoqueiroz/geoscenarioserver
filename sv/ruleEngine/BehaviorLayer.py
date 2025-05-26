@@ -13,6 +13,9 @@ from functools import partial
 from sv.ManeuverConfig import *
 from sv.ruleEngine.constants import *
 
+import logging
+log = logging.getLogger(__name__)
+
 def flatten(props, keys):
     if props == None or len(props) != len(keys):
         return None
@@ -96,10 +99,10 @@ class BehaviorLayer(object):
             return response.text
 
         except requests.exceptions.RequestException as e:
-            print('RE, RequestException:', e)
+            log.error(f"RE, RequestException: {e}")
 
         except:
-            print("Unexpected error:", sys.exc_info()[0])
+            log.error(f"Unexpected error: {sys.exc_info()[0]}")
 
         # Just retry
         return callback()
@@ -172,7 +175,7 @@ class BehaviorLayer(object):
         self.last_behaviour = self.post_behaviour(convert_to_dict(situation))
 
         if self.debug:
-            print('Behaviour', self.last_behaviour)
+            log.debug(f"Behaviour {self.last_behaviour}")
 
         # Default Behaviour
         self._current_mconfig = MStopConfig( target=MStopConfig.StopTarget.NOW )

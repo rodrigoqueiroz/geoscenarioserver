@@ -1,5 +1,6 @@
 import sysv_ipc
-import math
+import logging
+log = logging.getLogger(__name__)
 import time
 
 SHM_KEY = 123456
@@ -65,8 +66,8 @@ class SimSharedMemoryClient(object):
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
                 origin_lat origin_lon origin_alt
-                vid v_type x y z vx vy yaw steering_angle
-                pid p_type x y z vx vy yaw
+                vid v_type l w h x y z vx vy yaw steering_angle
+                pid p_type l w h x y z vx vy yaw
                 ...
         """
         header = {}
@@ -90,7 +91,7 @@ class SimSharedMemoryClient(object):
             self.is_connected = False
             return header, origin, vehicles, pedestrians
         except sysv_ipc.BusyError:
-            print("Cannot acquire client state semaphore...")
+            log.error("Cannot acquire client state semaphore...")
             return header, origin, vehicles, pedestrians
 
         # Parse server data
@@ -110,9 +111,9 @@ class SimSharedMemoryClient(object):
             header["n_vehicles"] = int(header_str[3])
             header["n_pedestrians"] = int(header_str[4])
         except Exception as e:
-            print("Header parsing exception")
-            print("data_arr[0]: %s ", data_arr[0])
-            print(e)
+            log.error("Header parsing exception")
+            log.error(f"data_arr[0]: {data_arr[0]}")
+            log.error(e)
 
         # Parse origin
         try:
@@ -121,17 +122,20 @@ class SimSharedMemoryClient(object):
             origin["origin_lon"] = float(origin_str[1])
             origin["origin_alt"] = float(origin_str[2])
         except Exception as e:
-            print("Origin parsing exception")
-            print("data_arr[1]: %s ", data_arr[1])
-            print(e)
+            log.error("Origin parsing exception")
+            log.error(f"data_arr[1]: {data_arr[1]}")
+            log.error(e)
 
         # Parse vehicles and pedestrians
         try:
             for ri in range(2, header["n_vehicles"] + 2):
                 vehicle = {}
-                id, type, x, y, z, vx, vy, yaw, str_angle = data_arr[ri].split()
+                id, type, l, w, h, x, y, z, vx, vy, yaw, str_angle = data_arr[ri].split()
                 vehicle["id"] = int(id)
                 vehicle["type"] = type
+                vehicle["l"] = float(l)
+                vehicle["w"] = float(w)
+                vehicle["h"] = float(h)
                 vehicle["x"] = float(x)
                 vehicle["y"] = float(y)
                 vehicle["z"] = float(z)
@@ -141,15 +145,18 @@ class SimSharedMemoryClient(object):
                 vehicle["steering_angle"] = float(str_angle)
                 vehicles.append(vehicle)
         except Exception as e:
-            print("VehicleState parsing exception")
-            print(e)
+            log.error("VehicleState parsing exception")
+            log.error(e)
 
         try:
             for ri in range(header["n_vehicles"] + 2, header["n_vehicles"] + 2 + header["n_pedestrians"]):
                 pedestrian = {}
-                id, type, x, y, z, vx, vy, yaw = data_arr[ri].split()
+                id, type, l, w, h, x, y, z, vx, vy, yaw = data_arr[ri].split()
                 pedestrian["id"] = int(id)
                 pedestrian["type"] = type
+                pedestrian["l"] = float(l)
+                pedestrian["w"] = float(w)
+                pedestrian["h"] = float(h)
                 pedestrian["x"] = float(x)
                 pedestrian["y"] = float(y)
                 pedestrian["z"] = float(z)
@@ -158,8 +165,8 @@ class SimSharedMemoryClient(object):
                 pedestrian["yaw"] = float(yaw)
                 pedestrians.append(pedestrian)
         except Exception as e:
-            print("PedestrianState parsing exception")
-            print(e)
+            log.error("PedestrianState parsing exception")
+            log.error(e)
 
         return header, origin, vehicles, pedestrians
 
@@ -208,7 +215,7 @@ class SimSharedMemoryClient(object):
             self.cs_shm.write(write_str.encode('utf-8'))
             self.cs_sem.release()
         except sysv_ipc.BusyError:
-            print("server state semaphore locked...")
+            log.error("server state semaphore locked...")
             return
         # log.info("Shared Memory write\n{}".format(write_str))
 
@@ -217,4 +224,4 @@ class SimSharedMemoryClient(object):
             # Only detach, leave it up to the server to remove shared memory
             self.ss_shm.detach()
             self.is_connected = False
-            print("Disconnected from server state shared memory")
+            log.error("Disconnected from server state shared memory")

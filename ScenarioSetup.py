@@ -125,7 +125,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #print(yaw)
 
         btype = extract_tag(vnode, 'btype', '', str).lower()
-        goal_ends_simulation = False 
+        goal_ends_simulation = False
 
         if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
             goal_ends_simulation = True
@@ -140,7 +140,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             if 'start_cartesian' in vnode.tags:
                 start_cartesian = vnode.tags['start_cartesian']
                 gs_sc = start_cartesian.split(',')
-                print(gs_sc)
+                log.debug(gs_sc)
                 if len (gs_sc) != 4:
                     log.error("start state in Cartesian must have 4 values [x_vel,x_acc,y_vel,y_acc].")
                     continue
@@ -151,7 +151,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 y_vel = float(gs_sc[2].strip())
                 y_acc = float(gs_sc[3].strip())
                 start_state = [x,x_vel,x_acc,y,y_vel,y_acc]     #vehicle start state in cartesian frame
-                print(start_state)
+                log.debug(start_state)
 
             if 'start_frenet' in vnode.tags:
                 # assume frenet start_state is relative to the first lane of the route
@@ -334,14 +334,24 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 t_name = pnode.tags['trajectory']
                 t_nodes = parser.trajectories[t_name].nodes
                 trajectory = []     #a valid trajectory with at least x,y,time per node
+                prev_node = None
                 for node in t_nodes:
                     nd = TrajNode()
                     nd.time = float(node.tags['time'])
                     nd.x = float(node.x)
                     nd.y = float(node.y)
+                    if prev_node is not None:
+                        dt = nd.time - prev_node.time
+                        nd.x_vel = (nd.x - prev_node.x) / dt
+                        nd.y_vel = (nd.y - prev_node.y) / dt
+                        # the first node has unknown velocity, assume the same as the second node's
+                        if prev_node.x_vel is None or prev_node.y_vel is None:
+                            prev_node.x_vel = nd.x_vel
+                            prev_node.y_vel = nd.y_vel
                     nd.yaw = float(node.tags['yaw']) if 'yaw' in node.tags else None
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
+                    prev_node = nd
                 pedestrian = TP(pid, name, start_state, yaw, trajectory, length=length, width=width)
                 sim_traffic.add_pedestrian(pedestrian)
                 log.info("Pedestrian {} initialized with TP behavior".format(pid))
@@ -406,6 +416,9 @@ def load_geoscenario_from_code(scenario_name:str, sim_traffic:SimTraffic, sim_co
         return sample_scenario(sim_traffic, sim_config, lanelet_map)
     elif scenario_name == 'my_scenario':
         return my_scenario(sim_traffic, sim_config, lanelet_map)
+
+def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
+    raise NotImplementedError('sample_scenario is not implemented yet. Please use a GeoScenario file (.osm) or implement your own scenario in code.')
 
 '''
 TODO: Adapt the sample scenario to current format

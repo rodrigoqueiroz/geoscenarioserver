@@ -9,10 +9,11 @@
 
 import csv
 import datetime
-from datetime import timedelta
-import glog as log
 import math
 import time
+
+import logging
+log = logging.getLogger(__name__)
 
 from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *
@@ -55,11 +56,7 @@ class TickSync():
 
     def set_timeout(self, timeout):
         self.timeout = timeout
-
-    def print(self, msg):
-        if (self.verbose):
-            print(msg)
-
+    
     def tick(self):
         """
         Returns True until the timeout is reached
@@ -76,7 +73,7 @@ class TickSync():
             self._tick_start_clock = now
             #Update globals
             self.sim_time = self.sim_start_time #starting time by config
-            self.print(f"sim_time {self.sim_time:05.2f} s, tick {self.label}, sim_start_clock {self._sim_start_clock:3} # START")
+            log.debug(f"sim_time {self.sim_time:05.2f} s, tick {self.label}, sim_start_clock {self._sim_start_clock:3} # START")
         else:
             #Can tick?
             if self.block:
@@ -85,7 +82,7 @@ class TickSync():
                 if (time_left>0):
                     #Too fast. Need to chill.
                     time.sleep(time_left)      #blocks diff if negative time_left
-                    self.print('sleep {:.3}'.format(time_left))
+                    log.debug('sleep {:.3}'.format(time_left))
                     #Can proceed tick: on time or late (time_left):
                     now = datetime.datetime.now()    #update after wake up
                     self.delta_time = (now - self._tick_start_clock).total_seconds()  #elapsed from the previous tick
@@ -98,7 +95,7 @@ class TickSync():
                 #assume that the expected tick duration has passed
                 self.delta_time = self.expected_tick_duration
                 self.drift = 0.0
-                self._tick_start_clock += timedelta(seconds=self.expected_tick_duration)
+                self._tick_start_clock += time.timedelta(seconds=self.expected_tick_duration)
                 #Update globals
                 self.sim_time += self.expected_tick_duration
             else:
@@ -126,14 +123,17 @@ class TickSync():
                 truncate(self.drift,3)
             ])
         if self.verbose:
-            log.info('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
+            log.debug('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
                     format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
         
     def write_performance_log(self):
         if LOG_PERFORMANCE:
-            filename = f"outputs/{self.label}_performance.csv"
+            logtime = time.strftime("%Y%m%d-%H%M%S")
+            filename = os.path.join(
+                os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
+                f"{self.label}_performance.csv")
             log.info('Writing performance log: {}'.format(filename))
-            with open(filename,mode='w') as csv_file:
+            with open(filename, mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 titleline =['tickcount', 'sim_time','delta_time', 'drift']
                 csv_writer.writerow(titleline)
@@ -182,7 +182,7 @@ class TickSync():
 
     
     #For Debug only:
-    _last_log = None
+    last_log = None
     def clock_log(label):
         now = datetime.datetime.now()
         if TickSync._last_log is None:
