@@ -44,7 +44,7 @@ class SDVRoute(object):
             start_x = curr_ll.centerline[0].x
             start_y = curr_ll.centerline[0].y
         self.update_global_path(start_x, start_y)
-        start_s = sim_to_frenet_position(self.get_global_path(), start_x, start_y, 0)[0]
+        start_s = sim_to_frenet_position(self.get_global_path(), start_x, start_y, 0, max_dist_from_path=5.0)[0]
         self._update_should_lane_swerve(start_s, self.get_global_path(), 0)
         self.update_reference_path(start_s)
 
@@ -108,7 +108,8 @@ class SDVRoute(object):
                 try:
                     sim_to_frenet_position(
                         self.get_reference_path(), node.x,
-                        node.y, self.get_reference_path_s_start()
+                        node.y, self.get_reference_path_s_start(),
+                        max_dist_from_path=5.0
                     )
                     search_until_found = False
                 except OutsideRefPathException:
@@ -262,14 +263,14 @@ class SDVRoute(object):
         if (start is not None) and (end is not None):
             try:
                 start_s = sim_to_frenet_position(
-                    path, start.x, start.y, s_start
+                    path, start.x, start.y, s_start, max_dist_from_path=5.0
                 )[0]
             except OutsideRefPathException:
                 start_s = None
 
             try:
                 end_s = sim_to_frenet_position(
-                    path, end.x, end.y, s_start
+                    path, end.x, end.y, s_start, max_dist_from_path=5.0
                 )[0]
             except OutsideRefPathException:
                 end_s = None
