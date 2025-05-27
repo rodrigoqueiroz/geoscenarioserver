@@ -22,6 +22,7 @@ from sv.maneuvers.Models import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
+from util.BoundingBoxes import calculate_rectangular_bounding_box
 
 import sv.planners.btree.BehaviorLayer       as btree
 import sv.planners.ruleEngine.BehaviorLayer  as rules
@@ -140,6 +141,7 @@ class SVPlanner(object):
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:
                     self.sdv.state = traffic_vehicles.pop(self.vid, None).state #removes self state
+                    self.sdv.bounding_box = calculate_rectangular_bounding_box(self.sdv)
                 else:
                     #vehicle state not available. Vehicle can be inactive.
                     continue
