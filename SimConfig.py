@@ -45,7 +45,7 @@ VEH_TRAJ_CHART = False      #(!HEAVY, not stable) Show detailed trajectory chart
 #BTree
 SHOW_BTREE = True           #whether to show the current behaviour tree
 SHOW_MCONFIG = True         #whether to show the last selected maneuver config together with tree
-GENERATE_GRAPH_TREE = True  #whether to generate a behavior tree graph plot inside GSS_OUTPUTS
+GENERATE_GRAPH_TREE = False #whether to generate a behavior tree graph plot inside GSS_OUTPUTS
 
 # trajectory plots
 SHOW_TRAJ = False
