@@ -16,15 +16,15 @@ from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
 from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
 from SimTraffic import *
-from sv.FrenetTrajectory import *
-from sv.ManeuverConfig import *
-from sv.ManeuverModels import plan_maneuver
+from sv.maneuvers.FrenetTrajectory import *
+from sv.maneuvers.Config import *
+from sv.maneuvers.Models import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
 
-import sv.btree.BehaviorLayer       as btree
-import sv.ruleEngine.BehaviorLayer  as rules
+import sv.planners.btree.BehaviorLayer       as btree
+import sv.planners.ruleEngine.BehaviorLayer  as rules
 
 import logging
 log = logging.getLogger(__name__)

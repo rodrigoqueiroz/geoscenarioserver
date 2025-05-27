@@ -11,13 +11,13 @@ import itertools
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
 #from multiprocessing import Pool as ThreadPool
-from sv.CostFunctions import maneuver_feasibility, maneuver_cost
-from sv.ManeuverConfig import *
+from sv.maneuvers.CostFunctions import maneuver_feasibility, maneuver_cost
+from sv.maneuvers.Config import *
 from SimConfig import *
 from Actor import *
-from sv.FrenetTrajectory import *
+from sv.maneuvers.FrenetTrajectory import *
 from typing import Callable
-from sv.ManeuverUtils import *
+from sv.maneuvers.Utils import *
 
 import logging
 log = logging.getLogger(__name__)
