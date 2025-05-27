@@ -1,6 +1,9 @@
 from Actor import Actor, VehicleState
 from SimConfig import *
 
+import logging
+log = logging.getLogger(__name__)
+
 # Vehicle base class for remote control or simulation.
 class Vehicle(Actor):
     #vehicle types
@@ -10,12 +13,9 @@ class Vehicle(Actor):
     TV_TYPE = 3
     PV_TYPE = 4
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0):
-        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState())
-        self.bounding_box_length = VEHICLE_LENGTH
-        self.bounding_box_width  = VEHICLE_WIDTH
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState(), length=length, width=width)
         self.model  = ''
-        self.radius = VEHICLE_RADIUS
         self.type   = Vehicle.N_TYPE
 
 
@@ -23,10 +23,11 @@ class Vehicle(Actor):
         # NOTE: this may desync the sim and frenet vehicle state, so this should
         # only be done for external vehicles (which don't have a frenet state)
         if self.type is not Vehicle.EV_TYPE:
-            log.warn("Cannot update sim state for gs vehicles directly.")
+            log.warning("Cannot update sim state for gs vehicles directly.")
 
 
     def get_sim_state(self):
+        dimensions = [self.length, self.width, 0.0]
         position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
-        return self.id, self.type, position, velocity, self.state.yaw, self.state.steer
+        return self.id, self.type, dimensions, position, velocity, self.state.yaw, self.state.steer
