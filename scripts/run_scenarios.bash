@@ -50,6 +50,9 @@ else
             "--fastest")
                 ARG_FASTEST="-em fastest"
                 ;;
+            "--single")
+                ARG_SINGLE="true"
+                ;;
             *)
                 if [[ $ARG_SINGLE == "true" && -v SCENARIO_NAME ]]; then
                     SCENARIO_NAME=$arg

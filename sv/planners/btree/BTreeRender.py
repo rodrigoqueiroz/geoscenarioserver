@@ -7,7 +7,7 @@
 import pydot
 from SimConfig import *
 from py_trees import *
-from sv.btree.BTreeLeaves import BCondition, ManeuverAction
+from sv.planners.btree.BTreeLeaves import BCondition, ManeuverAction
 
 import logging
 log = logging.getLogger(__name__)

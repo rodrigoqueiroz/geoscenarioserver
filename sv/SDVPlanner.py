@@ -16,15 +16,19 @@ from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
 from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
 from SimTraffic import *
-from sv.FrenetTrajectory import *
-from sv.ManeuverConfig import *
-from sv.ManeuverModels import plan_maneuver
+from sv.maneuvers.FrenetTrajectory import *
+from sv.maneuvers.Config import *
+from sv.maneuvers.Models import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
+from util.BoundingBoxes import calculate_rectangular_bounding_box
 
-import sv.btree.BehaviorLayer       as btree
-import sv.ruleEngine.BehaviorLayer  as rules
+import sv.planners.btree.BehaviorLayer       as btree
+import sv.planners.ruleEngine.BehaviorLayer  as rules
+
+import logging
+log = logging.getLogger(__name__)
 
 import logging
 log = logging.getLogger(__name__)
@@ -173,6 +177,7 @@ class SVPlanner(object):
                 tick_count = header[0]
                 if self.vid in traffic_vehicles:
                     self.sdv.state = traffic_vehicles.pop(self.vid, None).state #removes self state
+                    self.sdv.bounding_box = calculate_rectangular_bounding_box(self.sdv)
                 else:
                     #vehicle state not available. Vehicle can be inactive.
                     continue

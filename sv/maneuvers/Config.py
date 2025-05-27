@@ -14,17 +14,20 @@ from typing import Dict
 
 
 class Maneuver(Enum):
-    M_VELKEEP = 1
-    M_FOLLOW = 2
-    M_LANESWERVE = 3
-    M_CUTIN = 4
-    M_STOP = 5
-    M_REVERSE = 6
+    M_VELKEEP     = 1
+    M_FOLLOW      = 2
+    M_LANESWERVE  = 3
+    M_CUTIN       = 4
+    M_STOP        = 5
+    M_REVERSE     = 6
+
+    # Frédéric's maneuvers
+    M_STOP_AT     = 100
 
 class SamplingMethod(IntEnum):
-    LINEAR = 1      #linear space
+    LINEAR  = 1     #linear space
     UNIFORM = 2     #random from uniform distribution
-    NORMAL = 3      #random from gaussian
+    NORMAL  = 3     #random from gaussian
 
 
 @dataclass
@@ -131,7 +134,7 @@ class MP:
     value:float = 0.0               #target value (min is 0.0)
     bound_p:float = 0.0             #boundary in percentage (+/- relative to value)
     nsamples:int = 1                #number of samples
-    sampling:int = SamplingMethod.UNIFORM
+    sampling:int = SamplingMethod.LINEAR
     sigma:float = 1                 #std dev for sampling from normal
     
     def get_samples(self):

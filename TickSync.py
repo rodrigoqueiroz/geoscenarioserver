@@ -37,8 +37,8 @@ class TickSync():
         self.sim_start_time = sim_start_time
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
-        self.tick_count = 0
-        self.sim_time = 0.0                 #total simulation time since start() [s]
+        self.tick_count       = 0
+        self.sim_time         = 0           #Total simulation time since start() [s]
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
@@ -177,13 +177,13 @@ class TickSync():
                     log.warning("Task '{}' target adjusted to max time {:3}s (consider reducing the tick rate)".format(self.task_label, self.next_target_t))
                 #returns the last target used
                 
-        #returns actual task duration
+        #returns actual task duration 
         return delta_time
 
     
     #For Debug only:
-    last_log = None
-    def clock_log(label):
+    _last_log = None
+    def clock_log(self, label):
         now = datetime.datetime.now()
         if TickSync._last_log is None:
             newlog = [label,0.0]

@@ -6,7 +6,7 @@
 # --------------------------------------------
 
 
-from sv.ManeuverConfig import *
+from sv.maneuvers.Config import *
 from SimConfig import *
 from Actor import *
 from sv.SDVTrafficState import TrafficState

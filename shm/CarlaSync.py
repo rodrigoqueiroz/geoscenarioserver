@@ -10,7 +10,7 @@ if CARLA_COSIMULATION:
 
 import logging
 log = logging.getLogger(__name__)
-    
+
 ATTACH_SPECTATOR_TO = None          #vehicle ID or None for manual Camera
 USE_SPAWN_POINTS = False
 ENABLE_PHYSICS = True

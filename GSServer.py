@@ -94,7 +94,7 @@ def start_server(args):
     if args.dash_pos:
         screen_param = args.dash_pos
     else:
-        #find screen info
+        #find screen info 
         monitors = screeninfo.get_monitors()
         # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
         primary_monitor = monitors[0]

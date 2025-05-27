@@ -401,7 +401,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     #========= Static Objects
     #Area based objetics are not supported yet.
     for oid, onode in parser.staticobjects.items():
-        sim_traffic.add_static_obect(oid, onode.x, onode.y )
+        sim_traffic.add_static_object(oid, onode.x, onode.y )
 
     #Finished
     return True
@@ -496,7 +496,7 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
     #sim_traffic.vehicles[vid].sim_state = Vehicle.INACTIVE
     '''
 
-def my_scenario():
+def my_scenario(sim_traffic, sim_config, lanelet_map):
     """ Build your custom scenario here
     """
     return False
