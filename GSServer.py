@@ -81,19 +81,19 @@ def start_server(args):
     sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
     sync_global.set_timeout(sim_config.timeout)
 
-    #find screen info 
-    monitors = screeninfo.get_monitors()
-    # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
-    primary_monitor = monitors[0]
-    for monitor in monitors:
-        if monitor.is_primary:
-            primary_monitor = monitor
-            break
-    
-    screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
-    
     if args.dash_pos:
         screen_param = args.dash_pos
+    else:
+        #find screen info 
+        monitors = screeninfo.get_monitors()
+        # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
+        primary_monitor = monitors[0]
+        for monitor in monitors:
+            if monitor.is_primary:
+                primary_monitor = monitor
+                break
+        
+        screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
 
     if sim_config.wait_for_input:
         if not sim_config.show_dashboard:
@@ -141,9 +141,8 @@ def start_server(args):
     traffic.start()
 
     #GUI / Debug screen
-    dashboard = Dashboard(traffic, sim_config, screen_param)
-
     if sim_config.show_dashboard:
+        dashboard = Dashboard(traffic, sim_config, screen_param)
         dashboard.start()
     else:
         log.warning("Dashboard will not start")

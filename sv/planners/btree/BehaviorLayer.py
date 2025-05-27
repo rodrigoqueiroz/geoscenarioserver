@@ -2,13 +2,14 @@
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 
+from sv.maneuvers.Config import *
+from sv.planners.btree.BTreeInterpreter import *
+from sv.planners.btree.BTreeLeaves import *
+from sv.planners.btree.BTreeConditions import *
+from sv.planners.btree.BTreeRender import *
+
 import logging
 log = logging.getLogger(__name__)
-from sv.ManeuverConfig import *
-from sv.btree.BTreeInterpreter import *
-from sv.btree.BTreeLeaves import *
-from sv.btree.BTreeConditions import *
-from sv.btree.BTreeRender import *
 
 class BehaviorLayer(object):
     ''''

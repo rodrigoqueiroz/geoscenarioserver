@@ -1,6 +1,7 @@
 import sysv_ipc
 from Actor import *
 from SimConfig import *
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -18,12 +19,12 @@ class SimSharedMemoryServer(object):
         try:
             # create a semaphore and SHM for server state (SS)
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
-            log.info("ShM SS semaphore created")
+            log.debug("ShM SS semaphore created")
             self.ss_shm = sysv_ipc.SharedMemory(self.ss_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
-            log.info("ShM SS memory created")
+            log.debug("ShM SS memory created")
             # create a semaphore and SHM for client state (CS)
             self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
-            log.info("ShM CS semaphore created")
+            log.debug("ShM CS semaphore created")
             self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
             log.info("ShM CS memory created")
             self.is_connected = True

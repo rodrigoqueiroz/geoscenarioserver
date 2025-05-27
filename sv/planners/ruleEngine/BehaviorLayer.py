@@ -10,8 +10,8 @@ from copy      import deepcopy
 from decimal   import Decimal
 from functools import partial
 
-from sv.ManeuverConfig import *
-from sv.ruleEngine.constants import *
+from sv.maneuvers.Config import *
+from sv.planners.ruleEngine.constants import *
 
 import logging
 log = logging.getLogger(__name__)

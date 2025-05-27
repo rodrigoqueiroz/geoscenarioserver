@@ -5,12 +5,11 @@
 # --------------------------------------------
 
 import numpy as np
-from TickSync import TickSync
-from sv.ManeuverConfig import *
+from sv.maneuvers.Config import *
 from util.Utils import *
 from SimConfig import *
 from sp.Pedestrian import *
-from sv.FrenetTrajectory import *
+from sv.maneuvers.FrenetTrajectory import *
 
 #=============================== FEASIBILITY
 
@@ -72,6 +71,9 @@ def maneuver_feasibility(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, v
 #=============================== MANEUVER COST
 
 def maneuver_cost(ft:FrenetTrajectory, mconfig, lane_config:LaneConfig, vehicles, pedestrians, static_objects):
+    # When a maneuver has an invalid duration, the costs cannot be computed
+    if ft.T == 0 or np.isnan(ft.T):
+        return
     
     for cost in mconfig.cost_weight:
         k = mconfig.cost_weight[cost]
@@ -129,6 +131,10 @@ def effic_cost(frenet_traj:FrenetTrajectory,target_vel):
     for i in range(len(ptrajectory)):
         total += ptrajectory[i][1][1] #1=s_state, 1=s_vel
     avg_vel = float(total) / len(ptrajectory)
+
+    if avg_vel == 0:
+        return 0
+
     return logistic( 2*(target_vel-avg_vel) / avg_vel)
 
 def time_cost(frenet_traj:FrenetTrajectory, target_t):

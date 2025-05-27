@@ -2,7 +2,7 @@
 #rqueiroz@uwaterloo.ca
 # ---------------------------------------------
 # TickSync
-# Syncronize simulation loop based on a given frequency (frame-rate).
+# Synchronize simulation loop based on a given frequency (frame-rate).
 # Higher rate allows smoother trajectories and more precise metrics and collisions,
 # but requires more processing capabilities. Can't avoid drift if hardware is slow.
 # --------------------------------------------
@@ -12,12 +12,12 @@ import datetime
 import math
 import time
 
-import logging
-log = logging.getLogger(__name__)
-
 from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *
 from util.Utils import truncate
+
+import logging
+log = logging.getLogger(__name__)
 
 class TickSync():
 
@@ -33,8 +33,8 @@ class TickSync():
         self.sim_start_time = sim_start_time
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
-        self.tick_count = 0
-        self.sim_time = 0          #Total simulation time since start() [s]
+        self.tick_count       = 0
+        self.sim_time         = 0           #Total simulation time since start() [s]
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
@@ -50,7 +50,7 @@ class TickSync():
     def get_sim_time(self):
         return self.sim_time
 
-    def set_timeout(self,timeout):
+    def set_timeout(self, timeout):
         self.timeout = timeout
     
     def tick(self):
@@ -117,7 +117,7 @@ class TickSync():
             logtime = time.strftime("%Y%m%d-%H%M%S")
             filename = os.path.join(
                 os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
-                f"{self.label}_performance_log.csv")
+                f"{self.label}_performance.csv")
             log.info('Writing performance log: {}'.format(filename))
             with open(filename, mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -126,7 +126,7 @@ class TickSync():
                 for line in self.performance_log:
                     csv_writer.writerow(line)
 
-    def set_task(self,label,target_t,max_t = None):
+    def set_task(self, label, target_t, max_t = None):
         #Note: a single task per object. 
         #Todo: alllow tracking of multiple tasks in the same object
         self.task_label = label
@@ -150,9 +150,8 @@ class TickSync():
             if block:
                 time.sleep(diff) 
         else:
-            log.error("Task {} took longer than expected. Plan Tick: {}, Expected: {}, Actual: {}".format
-                            (self.task_label, self.tick_count, self.target_t, delta_time))
-            #if variable taks time, target will be adjusted for next cycle
+            log.error(f"Task {self.task_label} at tick {self.tick_count} took {delta_time} instead of the expected {self.target_t}")
+            #if variable task time, target will be adjusted for the next cycle
             if self.max_t:
                 #increase target and cap by max t
                 new_t = math.ceil((abs(diff)+self.target_t )*100)/100
@@ -164,13 +163,13 @@ class TickSync():
                     log.warning("Task '{}' target adjusted to max time {:3}s (consider reducing the tick rate)".format(self.task_label, self.next_target_t))
                 #returns the last target used
                 
-        #returns actual time 
+        #returns actual task duration 
         return delta_time
 
     
     #For Debug only:
     _last_log = None
-    def clock_log(label):
+    def clock_log(self, label):
         now = datetime.datetime.now()
         if TickSync._last_log is None:
             newlog = [label,0.0]

@@ -4,8 +4,8 @@
 
 from py_trees import *
 from TickSync import TickSync
-from sv.ManeuverConfig import *
-import sv.ManeuverUtils
+from sv.maneuvers.Config import *
+import sv.maneuvers.Utils
 
 class BCondition(behaviour.Behaviour):
     def __init__(self, behavior_layer, name, label, condition, repeat=True, **kwargs):
@@ -99,7 +99,7 @@ class ManeuverAction(behaviour.Behaviour):
             # status = common.Status.SUCCESS
 
         elif self.mconfig.mkey == Maneuver.M_FOLLOW:
-            leading_vehicle = sv.ManeuverUtils.get_leading_vehicle(
+            leading_vehicle = sv.maneuvers.Utils.get_leading_vehicle(
                 self.behavior_layer.get_traffic_state().vehicle_state,
                 self.behavior_layer.get_traffic_state().lane_config,
                 self.behavior_layer.get_traffic_state().traffic_vehicles)
@@ -111,7 +111,7 @@ class ManeuverAction(behaviour.Behaviour):
         elif self.mconfig.mkey == Maneuver.M_CUTIN:
             if self.mconfig.target_vid is None:
                 # find target vehicle in adjacent lane
-                target_vehicle = sv.ManeuverUtils.get_closest_vehicle_in_lane(
+                target_vehicle = sv.maneuvers.Utils.get_closest_vehicle_in_lane(
                     self.behavior_layer.get_traffic_state().vehicle_state,
                     self.behavior_layer.get_traffic_state().lane_config.get_neighbour(self.mconfig.target_lid),
                     self.behavior_layer.get_traffic_state().traffic_vehicles
@@ -128,7 +128,7 @@ class ManeuverAction(behaviour.Behaviour):
         # Handle completion of lane swerve/cutin maneuver
         if self.mconfig.mkey == Maneuver.M_LANESWERVE or self.mconfig.mkey == Maneuver.M_CUTIN:
             if not self.maneuver_completed and status is not common.Status.FAILURE:
-                if sv.ManeuverUtils.lane_swerve_or_cutin_completed(
+                if sv.maneuvers.Utils.lane_swerve_or_cutin_completed(
                         self.behavior_layer.get_traffic_state().vehicle_state,
                         self.behavior_layer.get_traffic_state().lane_config,
                         self.mconfig,

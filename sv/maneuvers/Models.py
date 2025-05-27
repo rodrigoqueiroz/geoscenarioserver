@@ -7,20 +7,20 @@ from sv.SDVTrafficState import *
 import numpy as np
 from copy import copy
 import itertools
-from TickSync import *
+#from TickSync import *
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
-import logging
-log = logging.getLogger(__name__)
 #from multiprocessing import Pool as ThreadPool
-from sv.CostFunctions import maneuver_feasibility, maneuver_cost
-from sv.ManeuverConfig import *
+from sv.maneuvers.CostFunctions import maneuver_feasibility, maneuver_cost
+from sv.maneuvers.Config import *
 from SimConfig import *
 from Actor import *
-from sv.FrenetTrajectory import *
+from sv.maneuvers.FrenetTrajectory import *
 from typing import Callable
-from sv.ManeuverUtils import *
+from sv.maneuvers.Utils import *
 
+import logging
+log = logging.getLogger(__name__)
 
 def plan_maneuver(sdv, mconfig, traffic_state):
     #log.info('MANEUVER {}:  Vehicle {}'.format(mconfig.mkey,vid))

@@ -16,10 +16,10 @@ from lanelet2.routing import RelationType, Route
 from matplotlib import pyplot as plt
 import numpy as np
 from typing import List
-import logging
-log = logging.getLogger(__name__)
 from util.Utils import pairwise
 
+import logging
+log = logging.getLogger(__name__)
 
 class LaneletMap(object):
     def __init__(self):
