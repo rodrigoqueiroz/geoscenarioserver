@@ -86,7 +86,7 @@ class SimTraffic(object):
         p.sim_traffic = self
         p.sim_config = self.sim_config
 
-    def add_static_obect(self, oid, x,y):
+    def add_static_object(self, oid, x,y):
         self.static_objects[oid] = StaticObject(oid,x,y)
 
     def collision_check(self, pedestrian):

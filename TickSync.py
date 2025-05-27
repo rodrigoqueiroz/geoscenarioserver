@@ -33,8 +33,8 @@ class TickSync():
         self.sim_start_time = sim_start_time
         #global
         self._sim_start_clock = None        #clock time when sim started (first tick) [clock] 
-        self.tick_count = 0
-        self.sim_time = 0          #Total simulation time since start() [s]
+        self.tick_count       = 0
+        self.sim_time         = 0           #Total simulation time since start() [s]
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
         self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
