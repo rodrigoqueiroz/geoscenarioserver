@@ -1,4 +1,4 @@
-# Generated from sv/btree/parser/BTreeDSL.g4 by ANTLR 4.13.2
+# Generated from sv/planners/btree/parser/BTreeDSL.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .BTreeDSLParser import BTreeDSLParser

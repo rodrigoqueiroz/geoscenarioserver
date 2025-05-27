@@ -74,4 +74,4 @@ rqt = "rqt"
 antlr4-tools = "*"
 
 [feature.antlr.tasks]
-regenerate = "antlr4 -Dlanguage=Python3 sv/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 sp/btree/parser/BTreeDSL.g4"
+regenerate = "antlr4 -Dlanguage=Python3 sv/planners/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 sp/btree/parser/BTreeDSL.g4"
