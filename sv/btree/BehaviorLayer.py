@@ -2,8 +2,7 @@
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 
-import logging
-log = logging.getLogger(__name__)
+import glog as log
 from sv.ManeuverConfig import *
 from sv.btree.BTreeInterpreter import *
 from sv.btree.BTreeLeaves import *

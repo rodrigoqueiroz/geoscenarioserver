@@ -2,9 +2,9 @@
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
-# SIMULATED TRAFFIC - Coordinate all vehicle Simulation, Ego interface,
+# SIMULATED TRAFFIC - Coordinate all vehicle agent simulation, ego interface,
 # and ShM for shared state between vehicles (perception ground truth),
-# dashboard (debug), and external Simulator (Unreal or alternative Graphics engine)
+# dashboard (debug), and external Simulator (Unreal or alternative graphics engine)
 # --------------------------------------------
 
 import csv
@@ -12,7 +12,7 @@ import numpy as np
 import time
 
 from copy import copy
-from multiprocessing import  Manager, Array
+from multiprocessing import Manager, Array
 
 from Actor import *
 from shm.SimSharedMemoryServer import *
@@ -22,13 +22,13 @@ from TrafficLight import TrafficLight
 from requirements import RequirementsChecker
 from Actor import ActorSimState
 
-import logging
-log = logging.getLogger(__name__)
-
 try:
     from shm.CarlaSync import *
 except:
     log.warning("Carla API not found")
+
+import logging
+log = logging.getLogger(__name__)
 
 class SimTraffic(object):
 
@@ -102,7 +102,7 @@ class SimTraffic(object):
             self.carla_sync = CarlaSync()
             self.carla_sync.create_gs_actors(self.vehicles)
 
-        #Creates Shared Memory Blocks to publish all vehicles'state.
+        #Creates shared memory blocks to publish the state of all agents.
         self.create_traffic_state_shm()
         self.write_traffic_state(0 , 0.0, 0.0)
 
@@ -139,13 +139,13 @@ class SimTraffic(object):
         for pedestrian in self.pedestrians.values():
             pedestrian.stop()
 
-        for vid in self.vehicles:
-            if self.vehicles[vid].type == Vehicle.SDV_TYPE:
+        for vid, vehicle in self.vehicles.items():
+            if vehicle.type == Vehicle.SDV_TYPE:
                 log.info(
                     "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
                         int(vid),
-                        int(self.vehicles[vid].jump_back_count),
-                        float(self.vehicles[vid].max_jump_back_dist)
+                        int(vehicle.jump_back_count),
+                        float(vehicle.max_jump_back_dist)
                     )
                 )
 
@@ -198,8 +198,8 @@ class SimTraffic(object):
         Pedestrian.VEHICLES_POS = {}
 
         #Update traffic light states
-        for tlid in self.traffic_lights:
-            self.traffic_lights[tlid].tick(tick_count, delta_time, sim_time)
+        for tl in self.traffic_lights.values():
+            tl.tick(tick_count, delta_time, sim_time)
 
         #Write frame snapshot for all vehicles
         self.write_traffic_state(tick_count, delta_time, sim_time)
@@ -209,8 +209,14 @@ class SimTraffic(object):
 
         return 0
 
-    #Shared Memory:
+    #Shared memory for agents
     def create_traffic_state_shm(self):
+        """
+        Format:
+        header: tick_count, delta_time, sim_time, nv, np
+        nv*vehicle: vid, type, sim_state, state_vector
+        vp*pedestrians: pid, type, sim_state, state_vector
+        """
         #External Sim (Unreal) ShM
         if CLIENT_SHM:
             self.sim_client_shm = SimSharedMemoryServer()
@@ -233,7 +239,7 @@ class SimTraffic(object):
         nv = len(self.vehicles)
         np = len(self.pedestrians)
 
-        r = 1 + nv + np #1 for header
+        r = 1 + nv + np #1 for the header
         c = int(len(self.traffic_state_sharr) / r)
 
         #header

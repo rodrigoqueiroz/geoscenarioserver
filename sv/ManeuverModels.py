@@ -7,11 +7,10 @@ from sv.SDVTrafficState import *
 import numpy as np
 from copy import copy
 import itertools
-from TickSync import *
+#from TickSync import *
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
-import logging
-log = logging.getLogger(__name__)
+import glog as log
 #from multiprocessing import Pool as ThreadPool
 from sv.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.ManeuverConfig import *
@@ -22,25 +21,24 @@ from typing import Callable
 from sv.ManeuverUtils import *
 
 
-def plan_maneuver(sdv, mconfig, traffic_state):
+def plan_maneuver(vid, mconfig, traffic_state):
     #log.info('MANEUVER {}:  Vehicle {}'.format(mconfig.mkey,vid))
 
-    vid = int(sdv.id)
     #Micro maneuver layer
     if (mconfig.mkey == Maneuver.M_VELKEEP):
         return plan_velocity_keeping(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_REVERSE):
         return plan_reversing(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_STOP):
-        return plan_stop(sdv, mconfig, traffic_state)
+        return plan_stop(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_FOLLOW):
         return plan_following(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_LANESWERVE):
         return plan_laneswerve(vid, mconfig, traffic_state)
     elif (mconfig.mkey == Maneuver.M_CUTIN):
-        return plan_cutin(sdv, mconfig, traffic_state)
+        return plan_cutin(vid, mconfig, traffic_state)
     
-    log.error(f"Vehicle {vid} trying to execute maneuver not implemented {mconfig.mkey}")
+    log.error("Vehicle {} trying to execute maneuver not implemented {}".format(vid,mconfig.mkey))
     return None, None
     
 
@@ -128,7 +126,7 @@ def plan_following(vid, mconfig:MFollowConfig, traffic_state:TrafficState):
         return None, None
     #Is target on the same lane?
     if lane_config.get_current_lane(d_start[0]).id != lane_config.get_current_lane(leading_vehicle.state.d).id:
-        log.warning(f"Leading vehicle {target_vid} is on a different lane.")
+        log.warn("Leading vehicle {} is on a different lane.".format(target_vid))
         return None, None
 
     # check if we need to deccel to increase gap, for the case when both vehicles
@@ -147,7 +145,7 @@ def plan_following(vid, mconfig:MFollowConfig, traffic_state:TrafficState):
         if abs(leading_vehicle.state.s_vel) < 1.5:
             #log.info("lead stopped")
             #s_target[0] = leading_vehicle.state.s - 5 - VEHICLE_RADIUS * 2  #stop some meters behind stopped vehicle
-            s_target[0] = leading_vehicle.state.s - leading_vehicle.length - mconfig.stop_distance  #some meters behind stopped vehicle
+            s_target[0] = leading_vehicle.state.s - VEHICLE_LENGTH - mconfig.stop_distance  #some meters behind stopped vehicle
             d_target = [d_start[0],0,0]                     #keep in same lateral position
             target_state_set.append((s_target,d_target,t))  #add target
         else:
@@ -187,12 +185,12 @@ def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:TrafficState):
     target_lane_config = None
     if (lane_config.id == target_lid):
         target_lane_config = lane_config
-        log.warning(f"already in target lane {target_lid}")
+        log.warn('already in target lane {}'.format(target_lid))
         return None, None
     else:
         target_lane_config = lane_config.get_neighbour(target_lid)
     if not target_lane_config:
-        log.warning(f"target lane {target_lid} not found, is it a neighbour lane?")
+        log.warn('target lane {} not found, is it a neighbour lane?'.format(target_lid))
         return None, None
     
     #generates alternative targets:
@@ -210,11 +208,10 @@ def plan_laneswerve(vid, mconfig:MLaneSwerveConfig, traffic_state:TrafficState):
     best, candidates = optimized_trajectory(vid, mconfig, traffic_state, target_state_set, s_solver=quartic_polynomial_solver)
     return best, candidates 
 
-def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
+def plan_cutin(vid, mconfig:MCutInConfig, traffic_state:TrafficState):
     """
     CUT-IN LANE SWERVE
     """
-    vid = int(sdv.id)
     lane_config:LaneConfig = traffic_state.lane_config
     vehicles = traffic_state.traffic_vehicles
     target_id = mconfig.target_vid
@@ -222,15 +219,15 @@ def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
     delt_s_sampling = mconfig.delta_s_sampling
 
     if (target_id not in vehicles):
-        log.warning(f"Target vehicle {target_id} is not in traffic")
+        log.warn("Target vehicle {} is not in traffic".format(target_id))
         return None, None
 
     target_lane_config = lane_config.get_current_lane(vehicles[target_id].state.d)
     if not target_lane_config:
-        log.warning(f"Target vehicle {target_id} is not in an adjacent lane")
+        log.warn("Target vehicle {} is not in an adjacent lane".format(target_id))
         return None, None
     elif target_lane_config.id == lane_config.id:
-        log.warning("Already in target lane")
+        log.warn("Already in target lane")
         return None, None
 
     # List[(target s, target d, t)]
@@ -246,7 +243,7 @@ def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
         delta_s_acc =    MP(delta[2], delt_s_sampling[2][0], delt_s_sampling[1][1])
         
         #+= 2 * VEHICLE_RADIUS
-        state_relative_to[0] += sdv.length*2
+        state_relative_to[0] += VEHICLE_LENGTH*2
 
         dts_samples = delta_s_pos.get_samples()
         dts_vel_samples = delta_s_vel.get_samples()
@@ -311,13 +308,12 @@ def plan_cutin(sdv, mconfig:MCutInConfig, traffic_state:TrafficState):
     return best, candidates
 
 
-def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
+def plan_stop(vid, mconfig:MStopConfig, traffic_state:TrafficState):
     """
     STOP
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
-    vid = int(sdv.id)
     vehicle_state:VehicleState = traffic_state.vehicle_state
     lane_config:LaneConfig = traffic_state.lane_config
     vehicles = traffic_state.traffic_vehicles
@@ -337,11 +333,11 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     #log.info("PLAN STOP: can not find stop position in intersection")            
     
     #adjust target pos to vehicle length
-    target_pos = mconfig.pos - sdv.length/2 - mconfig.distance
+    target_pos = mconfig.pos - VEHICLE_LENGTH/2 - mconfig.distance 
 
     #Already stopped?
     if (abs(s_start[1]) <= 0.05):
-        #log.warning('Vehicle already stopped')
+        #log.warn('Vehicle already stopped')
         #TODO: Need another stop maneuver (yielding) for proper configuration
         #if already stopped and not at stopping point, move to it
         if target_pos > 1:
@@ -356,9 +352,9 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     lv = get_leading_vehicle(vehicle_state,lane_config,vehicles)
     if lv:
         #max_pos = lv.state.s - VEHICLE_RADIUS*3
-        max_pos = lv.state.s - sdv.length - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
+        max_pos = lv.state.s - VEHICLE_LENGTH - (max(mconfig.distance,2)) #either use configured distance or a minimum of 2 behind another vehicle
         if target_pos > max_pos:
-            #log.warning('Vehicle {} stop target {} adjusted to lead pos {}. New target {}'.format(vid,target_pos, lv.state.s, max_pos))
+            #log.warn('Vehicle {} stop target {} adjusted to lead pos {}. New target {}'.format(vid,target_pos, lv.state.s, max_pos))
             target_pos = max_pos
     
     stop_distance = target_pos - s_start[0]
@@ -368,14 +364,14 @@ def plan_stop(sdv, mconfig:MStopConfig, traffic_state:TrafficState):
     # within a certain distance generating new trajectory doesn't make sense
     if target_pos < 1: 
         #or abs(target_pos - vehicle_state.s) < 1:
-        log.warning(f"PLAN STOP Vehicle {vid} target position {target_pos} is too close or behind")
+        log.warn('PLAN STOP Vehicle {} target position {} is too close or behind'.format(vid,target_pos))
         #mconfig.type = MStopConfig.Type.NOW
         #s_solver = quartic_polynomial_solver
         return None, None
 
     # when vehicle is past the target point, switch to STOP NOW
     #if (target_pos - vehicle_state.s) < 0:
-    #    log.warning('Vehicle {} stop target position behind. diff={}'.format(vid,target_pos - vehicle_state.s))
+    #    log.warn('Vehicle {} stop target position behind. diff={}'.format(vid,target_pos - vehicle_state.s))
     #    #mconfig.type = MStopConfig.Type.NOW    
     #    #s_solver = quartic_polynomial_solver
     #    return None, None
@@ -436,9 +432,9 @@ def optimized_trajectory(vid:int, mconfig:MConfig, traffic_state:TrafficState, t
         maneuver_cost(ft, mconfig, lane_config, vehicles, pedestrians, static_objects)
     
     if len(feasible) == 0:
-        #log.warning("No feasible trajectory to select from state {}".format(start_state))
+        #log.warn("No feasible trajectory to select from state {}".format(start_state))
         #for traj in frenet_trajectories:
-        #    log.warning(traj.unfeasibility_cause)
+        #    log.warn(traj.unfeasibility_cause)
         return None, frenet_trajectories
     
     #select best by total cost

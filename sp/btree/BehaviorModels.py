@@ -4,8 +4,6 @@
 
 from py_trees import *
 import functools
-import logging
-log = logging.getLogger(__name__)
 import numpy as np
 from sp.ManeuverConfig import *
 from sp.ManeuverUtils import *
@@ -15,6 +13,8 @@ from sp.btree.BTreeRender import *
 from sp.SPPlannerState import TrafficLightState
 from TrafficLight import TrafficLightColor
 
+import logging
+log = logging.getLogger(__name__)
 
 class BehaviorModels(object):
     ''''

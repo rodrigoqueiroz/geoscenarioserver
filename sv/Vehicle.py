@@ -5,8 +5,6 @@
 # SIMULATED VEHICLES
 # --------------------------------------------
 
-import logging
-log = logging.getLogger(__name__)
 import math
 import numpy as np
 
@@ -23,6 +21,9 @@ from sv.SDVRoute import SDVRoute
 from sv.VehicleBase import Vehicle
 from util.Transformations import frenet_to_sim_frame, sim_to_frenet_frame, OutsideRefPathException
 from util.Utils import kalman
+
+import logging
+log = logging.getLogger(__name__)
 
 class SDV(Vehicle):
     ''''

@@ -155,7 +155,7 @@ python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.os
 
 - Check *SimConfig.py* for configuration options.
 - Adjust FRAME_RATE based on hardware performance to avoid drift (Recommended 30Hz).
-- Adjust PLANNER_RATE based on hardware performance and what scenario requirements.
+- Adjust PLANNER_RATE based on hardware performance and scenario requirements.
 - Use SHOW_DASHBOARD = True for GUI. Adjust dashboard refresh rate according to performance.
 - Simulations can only run in Real Time (so far).
 

@@ -1,16 +1,16 @@
 # Synchronization with Carla in co-simulation
 from SimConfig import *
 from sv.Vehicle import *
-from TickSync import *
+#from TickSync import *
 from util.Utils import *
 import xml.etree.ElementTree as ET
+
+if CARLA_COSIMULATION:
+    import carla as carla
 
 import logging
 log = logging.getLogger(__name__)
 
-if CARLA_COSIMULATION:
-    import carla as carla
-    
 ATTACH_SPECTATOR_TO = None          #vehicle ID or None for manual Camera
 USE_SPAWN_POINTS = False
 ENABLE_PHYSICS = True

@@ -6,8 +6,6 @@
 # --------------------------------------------
 
 from copy import copy
-import logging
-log = logging.getLogger(__name__)
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
 import sys
@@ -27,6 +25,9 @@ from TickSync import TickSync
 
 import sv.btree.BehaviorLayer       as btree
 import sv.ruleEngine.BehaviorLayer  as rules
+
+import logging
+log = logging.getLogger(__name__)
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, rule_engine_port = None):

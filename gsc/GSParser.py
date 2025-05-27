@@ -8,12 +8,12 @@ import re
 import gsc.Utils as Utils
 from gsc.Report import Report
 from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
-import logging
-log = logging.getLogger(__name__)
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
 
+import logging
+log = logging.getLogger(__name__)
 
 class Node(object):
     def __init__(self):
