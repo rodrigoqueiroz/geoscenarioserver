@@ -125,7 +125,7 @@ class FrenetTrajectory:
 class MotionPlan:
     trajectory:FrenetTrajectory = field(default_factory=lambda:FrenetTrajectory())
     start_time:float = 0            #sim start time [s]
-    new_frenet_frame = False        #if a new frenet frame was generated
+    new_frenet_frame:bool = False        #if a new frenet frame was generated
     reversing:bool = False               #if the plan is reversed
     tick_count = None
     ref_path_origin:float = None
