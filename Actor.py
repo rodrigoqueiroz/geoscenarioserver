@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from enum import IntEnum
 from util.Utils import to_equation, differentiate
 from SimConfig import *
-
 import logging
 log = logging.getLogger(__name__)
 
