@@ -2,7 +2,7 @@
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
-# SIMULATED TRAFFIC - Coordinate all vehicle agent simulation, ego interface,
+# SIMULATED TRAFFIC - Coordinate all agent simulation, ego interface,
 # and ShM for shared state between vehicles (perception ground truth),
 # dashboard (debug), and external Simulator (Unreal or alternative graphics engine)
 # --------------------------------------------
@@ -36,6 +36,9 @@ class SimTraffic(object):
         self.lanelet_map = laneletmap
         self.sim_config = sim_config
         self.origin = None
+        # initialize with the starting mode
+        # later, read the current mode from the shared memory
+        self.execution_mode:ExecutionMode = sim_config.execution_mode
 
         #Dyn agents
         self.vehicles = {}  #dictionary for direct access using vid
@@ -56,7 +59,6 @@ class SimTraffic(object):
         self.debug_shdata = None
 
         #Traffic Log
-        self.log_file = ''
         self.vehicles_log = {}
         self.traffic_running = False
 
@@ -104,7 +106,7 @@ class SimTraffic(object):
 
         #Creates shared memory blocks to publish the state of all agents.
         self.create_traffic_state_shm()
-        self.write_traffic_state(0 , 0.0, 0.0)
+        self.write_traffic_state(0, 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
         if self.cosimulation == True and self.sim_config.wait_for_client:
@@ -185,15 +187,18 @@ class SimTraffic(object):
                     self.vehicles[vid].update_sim_state(vstates[vid], delta_time) #client_delta_time
 
         #tick vehicles (all types)
-        for vid in self.vehicles:
-            self.vehicles[vid].tick(tick_count, delta_time, sim_time)
+        for v in self.vehicles.values():
+            if v.type == Vehicle.SDV_TYPE:
+                v.tick(tick_count, delta_time, sim_time, self.execution_mode == ExecutionMode.fastest)
+            else:
+                v.tick(tick_count, delta_time, sim_time)
 
         #tick pedestrians:
-        for pid in self.pedestrians:
-            self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
-            if self.pedestrians[pid].sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
+        for p in self.pedestrians.values():
+            p.tick(tick_count, delta_time, sim_time)
+            if p.sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
                 continue
-            self.collision_check(self.pedestrians[pid])
+            self.collision_check(p)
 
         Pedestrian.VEHICLES_POS = {}
 
@@ -325,7 +330,7 @@ class SimTraffic(object):
             for vid, vlog in self.vehicles_log.items():
                 filename = os.path.join(
                     os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")),
-                    f"trajectory_v{vid}.csv")
+                    f"trajectory_{self.execution_mode.name}_v{vid}.csv")
                 with open(filename, mode='w') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     #vlog.sort()
@@ -404,4 +409,3 @@ class SimTraffic(object):
         static_objects = copy(self.static_objects)
 
         return header, vehicles, pedestrians, traffic_light_states, static_objects
-    

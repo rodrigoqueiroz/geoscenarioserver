@@ -1,7 +1,8 @@
 import sysv_ipc
+import time
+
 import logging
 log = logging.getLogger(__name__)
-import time
 
 SHM_KEY = 123456
 SEM_KEY = 346565

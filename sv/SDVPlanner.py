@@ -8,7 +8,7 @@
 from copy import copy
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
-import sys
+import sys, time
 
 from Actor import *
 from mapping.LaneletMap import *
@@ -46,7 +46,7 @@ class SVPlanner(object):
         self.vid = int(sdv.id)
         self.laneletmap:LaneletMap = sim_traffic.lanelet_map
         self.sim_config = sim_traffic.sim_config
-        self.sim_traffic:SimTraffic = sim_traffic
+        self.sim_traffic = sim_traffic
 
         #Subprocess space
         self.behavior_model  = None
@@ -62,14 +62,17 @@ class SVPlanner(object):
         self.sync_planner    = None
 
     def start(self):
-        #Create shared arrray for Motion Plan
+        #Create shared arrray for the motion plan
         c = MotionPlan().get_vector_length()
         self._mplan_sharr = Array('f', c)
         #Process based
-        self._process = Process(target=self.run_planner_process, args=(
-            self.traffic_state_sharr,
-            self._mplan_sharr,
-            self._debug_shdata), daemon=True)
+        self._process = Process(target=self.run_planner_process,
+                                args=(
+                                    self.traffic_state_sharr,
+                                    self._mplan_sharr,
+                                    self._debug_shdata
+                                ),
+                                daemon=True)
         self._process.start()
 
     def stop(self, interrupted = False):
@@ -82,26 +85,50 @@ class SVPlanner(object):
                 self._process.terminate()
             self._process.join()
 
-    def get_plan(self):
+    def get_plan(self, wait_for_plan = False):
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
         # because then NEXT tick planner will write trajectory based on new path while SV is following
         # the old path. This could be solved by adding a 'frame' variable to the shared array, like
         # a sim frame position that can be used to compute the reference path when the SV notices it's
         # changed. Unlike `new_frenet_frame` this won't be a per-tick variable.
-
         plan = MotionPlan()
-        self._mplan_sharr.acquire() #<=========LOCK
-        plan.set_plan_vector(copy(self._mplan_sharr[:]))
-        self._mplan_sharr.release() #<=========RELEASE
-        if (plan.trajectory.T == 0):
-            # Empty plan
-            return None
-        elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
-            # Same plan
-            return None
-        # New plan
-        self.last_plan = plan
-        return plan
+        checks_remaining = 100  # number of times to check for a new plan
+        while (checks_remaining > 0 and
+               (
+                (plan.trajectory.T is None) or                                                    # no plan yet
+                (plan.trajectory.T == 0) or                                                       # no plan yet
+                (plan.trajectory.T is not None and plan.tick_count == self.last_plan.tick_count)  # same plan
+               )
+        ):
+            self._mplan_sharr.acquire() #<=========LOCK
+            plan.set_plan_vector(copy(self._mplan_sharr[:]))
+            self._mplan_sharr.release() #<=========RELEASE
+            if (plan.trajectory.T == 0):
+                # Empty plan
+                if wait_for_plan:
+                    time.sleep(0.001)
+                    checks_remaining -= 1
+                    continue
+                else:
+                    if self.last_plan != None and self.last_plan.tick_count > 0:
+                        log.debug(f"At tick {self.last_plan.tick_count+1} no plan received")
+                    else:
+                        log.debug(f"At unknown tick no plan received")
+                    return None
+            elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
+                # Same plan
+                if wait_for_plan:
+                    checks_remaining -= 1
+                    time.sleep(0.001)
+                    continue
+                else:
+                    log.debug(f"At tick {plan.tick_count} no new plan: the same as the previous")
+                    return None
+            # New plan
+            self.last_plan = plan
+            if checks_remaining < 100:
+                log.debug(f"At tick {plan.tick_count} waited for a plan {100-checks_remaining} ms")
+            return plan
 
 
     #==SUB PROCESS=============================================
@@ -114,7 +141,13 @@ class SVPlanner(object):
         log.info(f"PLANNER PROCESS START for VID {self.vid}")
         signal(SIGTERM, self.before_exit)
 
-        self.sync_planner = TickSync(rate=PLANNER_RATE, realtime=True, block=True, verbose=False, label=f"planner_v{self.vid}")
+        block = False
+        match self.sim_config.execution_mode:
+            case ExecutionMode.realtime:
+                block = True
+            case ExecutionMode.fastest:
+                block = None
+        self.sync_planner = TickSync(rate=self.sim_config.planner_rate, block=block, verbose=False, label=f"planner_{self.sim_config.execution_mode.name}_v{self.vid}")
 
         #Behavior Layer
         #Note: If an alternative behavior module is to be used, it must be replaced here.
@@ -124,11 +157,11 @@ class SVPlanner(object):
             self.behavior_layer = btree.BehaviorLayer(self.vid, self.root_btree_name, self.btree_reconfig, self.btree_locations, self.btype)
 
         # target time for planning task. Can be fixed or variable up to max planner tick time
-        task_label = "V{} plan".format(self.vid)
-        if USE_FIXED_PLANNING_TIME:
-            self.sync_planner.set_task(task_label,PLANNING_TIME)
+        task_label = f"v{self.vid} plan"
+        if self.sim_config.use_fixed_planning_time:
+            self.sync_planner.set_task(task_label, self.sim_config.planning_time)
         else:
-            self.sync_planner.set_task(task_label,PLANNING_TIME,1/PLANNER_RATE)
+            self.sync_planner.set_task(task_label, self.sim_config.planning_time, 1/self.sim_config.planner_rate)
 
         try:
             while self.sync_planner.tick():
@@ -220,17 +253,20 @@ class SVPlanner(object):
                 #Maneuver Tick
                 if mconfig and traffic_state.lane_config:
                     #replan maneuver
-                    frenet_traj, cand = plan_maneuver(self.sdv, mconfig,traffic_state)
+                    frenet_traj, cand = plan_maneuver(self.sdv, mconfig, traffic_state)
 
                     if EVALUATION_MODE and not self.last_plan:
-                        self.sync_planner.end_task(False) #blocks if < target
+                        self.sync_planner.end_task(False) #otherwise blocks if < target
                         task_delta_time = 0
                     else:
-                        self.sync_planner.end_task() #blocks if < target
-                        task_delta_time = self.sync_planner.get_task_time()
+                        self.sync_planner.end_task(self.sim_config.execution_mode == ExecutionMode.realtime) #blocks if < target only in realtime
+                        if self.sim_config.execution_mode == ExecutionMode.realtime:
+                            task_delta_time = self.sync_planner.get_task_time()
+                        else:
+                            task_delta_time = 0
 
                     if frenet_traj is None:
-                        log.warning("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
+                        log.warning(f"VID {self.vid} plan_maneuver return invalid trajectory.")
                         pass
                     else:
                         plan = MotionPlan()
@@ -246,7 +282,7 @@ class SVPlanner(object):
                 else:
                     frenet_traj, cand = None, None
 
-                #Debug info (for Dahsboard and Log)
+                #Debug info for dashboard and logs
                 if self.sim_config.show_dashboard:
                     # change ref path format for pickling (maybe always keep it like this?)
                     debug_ref_path = [(pt.x, pt.y) for pt in self.sdv_route.get_reference_path()]
