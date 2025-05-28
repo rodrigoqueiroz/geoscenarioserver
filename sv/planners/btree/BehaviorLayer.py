@@ -11,9 +11,6 @@ from sv.planners.btree.BTreeRender import *
 import logging
 log = logging.getLogger(__name__)
 
-import logging
-log = logging.getLogger(__name__)
-
 class BehaviorLayer(object):
     ''''
         Behavior Layer using Behavior Trees and PyTrees as core implementation.
