@@ -30,11 +30,11 @@ from sv.SDVRoute import SDVRoute
 from TickSync import TickSync
 from util.Transformations import (OutsideRefPathException, frenet_to_sim_frame,frenet_to_sim_position, sim_to_frenet_frame,sim_to_frenet_position)
 
-import logging
-log = logging.getLogger(__name__)
-
 #Reg Elements State (for pickling)
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
+
+import logging
+log = logging.getLogger(__name__)
 
 @dataclass
 class AllWayStopIntersection:
