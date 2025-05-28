@@ -30,9 +30,6 @@ import sv.planners.ruleEngine.BehaviorLayer  as rules
 import logging
 log = logging.getLogger(__name__)
 
-import logging
-log = logging.getLogger(__name__)
-
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, rule_engine_port = None):
         #MainProcess space:
