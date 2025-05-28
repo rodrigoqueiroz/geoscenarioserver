@@ -45,7 +45,7 @@ VEH_TRAJ_CHART = False      #(!HEAVY, not stable) Show detailed trajectory chart
 #BTree
 SHOW_BTREE = True           #whether to show the current behaviour tree
 SHOW_MCONFIG = True         #whether to show the last selected maneuver config together with tree
-GENERATE_GRAPH_TREE = True  #whether to generate a behavior tree graph plot inside GSS_OUTPUTS
+GENERATE_GRAPH_TREE = False #whether to generate a behavior tree graph plot inside GSS_OUTPUTS
 
 # trajectory plots
 SHOW_TRAJ = False
@@ -111,10 +111,13 @@ UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
 class SimConfig:
     pedestrian_lanelet_routes:Dict = field(default_factory=dict)
     pedestrian_goal_points:Dict = field(default_factory=dict)
-    scenario_name:str = "Unamed scenario"
+    scenario_name:str = "Unnamed scenario"
     map_name:str = "Unknown map"
     timeout:int = TIMEOUT
     traffic_rate:int = TRAFFIC_RATE
+    planner_rate:int = PLANNER_RATE
+    planning_time:float = PLANNING_TIME
+    use_fixed_planning_time:bool = USE_FIXED_PLANNING_TIME
     plot_vid:int = PLOT_VID
     show_dashboard:bool = SHOW_DASHBOARD
     wait_for_input:bool = WAIT_FOR_INPUT

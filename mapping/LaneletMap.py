@@ -15,11 +15,11 @@ from lanelet2.routing import RelationType, Route
 
 from matplotlib import pyplot as plt
 import numpy as np
-import glog as log
 from typing import List
-
 from util.Utils import pairwise
 
+import logging
+log = logging.getLogger(__name__)
 
 class LaneletMap(object):
     def __init__(self):
@@ -108,7 +108,7 @@ class LaneletMap(object):
         if len(lls) > 0:
             right_ll = lls[0]
         if len(lls) > 1:
-            log.warn("multiple right adjacent lanelets found for {}. Using {}".format(lanelet.id, right_ll.id))
+            log.warning(f"multiple right adjacent lanelets found for {lanelet.id}. Using {right_ll.id}")
         if right_ll:
             return right_ll, "opposite"
         #Not found
@@ -128,7 +128,7 @@ class LaneletMap(object):
         for ll in lls:
             left_ll = ll
         if len(lls) > 1:
-            log.warn("multiple left adjacent lanelets found for {}. Using {}".format(lanelet.id, left_ll.id))
+            log.warning(f"multiple left adjacent lanelets found for {lanelet.id}. Using {left_ll.id}")
         if left_ll:
             return left_ll, "opposite"
         #Not found
@@ -416,7 +416,7 @@ class LaneletMap(object):
             intersecting_lls = list(
                 filter(lambda ll: inside(ll, point), intersecting_lls))
             if len(intersecting_lls) > 1:
-                #log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                #log.warning("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                 #    (x, y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
         return intersecting_lls[0]
@@ -464,13 +464,13 @@ class LaneletMap(object):
 
             # case: agent is on more than one lanelet where they are the allowed participant
             if len(participant_lls) > 1:
-                # log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                # log.warning("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                 #     (x,y), [ll.id for ll in participant_lls]))
                 return participant_lls[1]
 
             # case: agent is on more than one lanelet where they are NOT the allowed participant
             if len(intersecting_lls) > 1:
-                # log.warn("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
+                # log.warning("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                 #     (x,y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
 
@@ -525,7 +525,7 @@ class LaneletMap(object):
             intersecting_areas = list(
                 filter(lambda area: inside(area, point), intersecting_lls))
             if len(intersecting_areas) > 1:
-                log.warn("Point {} part of more than one area ({}), cannot automatically resolve.".format(
+                log.warning("Point {} part of more than one area ({}), cannot automatically resolve.".format(
                     (x, y), [area.id for area in intersecting_areas]))
                 return intersecting_areas[1]
 
@@ -778,5 +778,5 @@ def get_line_format(type: str, subtype: str):
     elif type == "traffic_light":
         return None  # do not draw
     else:
-        print(f'Unhandled format of line type: {type}, subtype: {subtype}')
+        log.error(f'Unhandled format of line type: {type}, subtype: {subtype}')
     return (color, linestyle, linewidth)

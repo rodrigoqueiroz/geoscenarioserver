@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from enum import IntEnum
 from util.Utils import to_equation, differentiate
 from SimConfig import *
-import numpy as np
-import glog as log
+import logging
+log = logging.getLogger(__name__)
 
 class Actor(object):
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
@@ -90,7 +90,7 @@ class Actor(object):
 
     def remove(self):
         self.sim_state = ActorSimState.INACTIVE
-        log.warn("Actor id {} is now INACTIVE".format(self.id))
+        log.warning("Actor id {} is now INACTIVE".format(self.id))
 
     def tick(self, tick_count, delta_time, sim_time):
         pass
@@ -103,15 +103,15 @@ class Actor(object):
             if start_time <= sim_time <= end_time:
                 #Trajectory starts
                 if self.sim_state is ActorSimState.INACTIVE:
-                    log.warn("Actor ID {} is now ACTIVE".format(self.id))
+                    log.warning(f"Actor ID {self.id} is now ACTIVE")
                     self.sim_state = ActorSimState.ACTIVE
                     if self.ghost_mode:
                         self.sim_state = ActorSimState.INVISIBLE
-                        log.warn("vid {} is now INVISIBLE".format(self.id))
+                        log.warning(f"vid {self.id} is now INVISIBLE")
                     if EVALUATION_MODE:
                         if -self.id in self.sim_traffic.vehicles:
                             self.sim_traffic.vehicles[-self.id].sim_state = ActorSimState.ACTIVE
-                            log.warn("vid {} is now ACTIVE".format(-self.id))
+                            log.warning(f"vid {-self.id} is now ACTIVE")
 
                 #find closest pair of nodes
                 for i in range(len(trajectory)-1):

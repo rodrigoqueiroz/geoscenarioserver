@@ -108,7 +108,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_vehicle(ego_vehicle)
 
     #========= Vehicles
-    log.info("Scenario Setup, initializing vehicles:")
+    log.debug("Scenario Setup, initializing vehicles:")
     for vid, vnode in parser.vehicles.items():
         if len(sim_traffic.vehicles) >= MAX_NVEHICLES:
             break
@@ -150,7 +150,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         tracking_method               =  extract_tag(vnode, 'tracking_method',               None, str)
         yaw                           = -extract_tag(vnode, 'yaw',                           0.0,  float)
 
-        log.info("Vehicle {}, behavior type {}".format(vid,btype))
+        log.debug(f"Initializing vehicle VID:{vid} with behavior type: {btype}...")
 
         #SDV Model (dynamic vehicle)
         if btype == 'sdv':
@@ -158,7 +158,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             if 'start_cartesian' in vnode.tags:
                 start_cartesian = vnode.tags['start_cartesian']
                 gs_sc = start_cartesian.split(',')
-                print(gs_sc)
+                log.debug(gs_sc)
                 if len (gs_sc) != 4:
                     log.error("start state in Cartesian must have 4 values [x_vel,x_acc,y_vel,y_acc].")
                     continue
@@ -169,7 +169,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 y_vel = float(gs_sc[2].strip())
                 y_acc = float(gs_sc[3].strip())
                 start_state = [x,x_vel,x_acc,y,y_vel,y_acc]     #vehicle start state in cartesian frame
-                print(start_state)
+                log.debug(start_state)
 
             if 'start_frenet' in vnode.tags:
                 # assume frenet start_state is relative to the first lane of the route
@@ -327,7 +327,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
     #========= Pedestrians
     if len(parser.pedestrians.items()) > 0:
-        log.info("Scenario Setup, initializing pedestrians:")
+        log.debug("Scenario Setup, initializing pedestrians:")
     for pid, pnode in parser.pedestrians.items():
         pid = int(pid)
         name = pnode.tags['name']
@@ -437,6 +437,9 @@ def load_geoscenario_from_code(scenario_name:str, sim_traffic:SimTraffic, sim_co
     elif scenario_name == 'my_scenario':
         return my_scenario(sim_traffic, sim_config, lanelet_map)
 
+def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
+    raise NotImplementedError('sample_scenario is not implemented yet. Please use a GeoScenario file (.osm) or implement your own scenario in code.')
+
 '''
 TODO: Adapt the sample scenario to current format
 
@@ -513,7 +516,7 @@ def sample_scenario(sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:La
     #sim_traffic.vehicles[vid].sim_state = Vehicle.INACTIVE
     '''
 
-def my_scenario():
+def my_scenario(sim_traffic, sim_config, lanelet_map):
     """ Build your custom scenario here
     """
     return False

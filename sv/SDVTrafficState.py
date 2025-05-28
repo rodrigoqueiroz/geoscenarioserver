@@ -8,7 +8,6 @@
 # --------------------------------------------
 from __future__ import annotations  #Must be first Include. Will be standard in Python4
 
-import glog as log
 import itertools
 import lanelet2.core
 
@@ -34,6 +33,8 @@ from util.Transformations import (OutsideRefPathException, frenet_to_sim_frame,f
 #Reg Elements State (for pickling)
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])
 
+import logging
+log = logging.getLogger(__name__)
 
 @dataclass
 class AllWayStopIntersection:
@@ -289,7 +290,7 @@ def get_traffic_state(
     lane_config, intersections, reg_elems = read_map(my_vid, lanelet_map, sdv_route, my_vehicle.state, traffic_light_states,traffic_vehicles)
     if not lane_config:
         # No map data for current position
-        log.warn("no lane config")
+        log.warning("no lane config")
         return None
 
     # transform other vehicles and pedestrians to frenet frame based on this vehicle
@@ -686,7 +687,7 @@ def read_map(my_vid:int, lanelet_map:LaneletMap, sdv_route:SDVRoute, vehicle_sta
             elif (maneuver == lanelet2.core.ManeuverType.RightOfWay):
                 continue #ignore
             elif (maneuver == lanelet2.core.ManeuverType.Unknown):
-                log.warn("Role of lanelet {} in the RightOfWay is unknown".format(cur_ll.id))
+                log.warning(f"Role of lanelet {cur_ll.id} in the RightOfWay is unknown")
                 continue
 
         # === ALL WAY STOP ===

@@ -147,7 +147,8 @@ class BTreeInterpreter(object):
                             reconfigured=True
                             break
 
-                    if not reconfigured: print(id + " node could not be found in " + btree_name)
+                    if not reconfigured:
+                        log.error(f"{id} node could not be found in {btree_name}")
 
     def link_subtrees(self, tree, nodes, subtrees):
         for subtree in subtrees:

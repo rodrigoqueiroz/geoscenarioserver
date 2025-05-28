@@ -1,7 +1,9 @@
 import sysv_ipc
 from Actor import *
 from SimConfig import *
-import glog as log
+
+import logging
+log = logging.getLogger(__name__)
 
 # Class defining shared memory structure used to sync with
 # an external simulator (client)
@@ -17,12 +19,12 @@ class SimSharedMemoryServer(object):
         try:
             # create a semaphore and SHM for server state (SS)
             self.ss_sem = sysv_ipc.Semaphore(self.ss_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
-            log.info("ShM SS semaphore created")
+            log.debug("ShM SS semaphore created")
             self.ss_shm = sysv_ipc.SharedMemory(self.ss_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
-            log.info("ShM SS memory created")
+            log.debug("ShM SS memory created")
             # create a semaphore and SHM for client state (CS)
             self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
-            log.info("ShM CS semaphore created")
+            log.debug("ShM CS semaphore created")
             self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
             log.info("ShM CS memory created")
             self.is_connected = True
@@ -84,7 +86,7 @@ class SimSharedMemoryServer(object):
             self.ss_shm.write(write_str.encode('utf-8'))
             self.ss_sem.release()
         except sysv_ipc.BusyError:
-            log.warn("server state semaphore locked...")
+            log.warning("server state semaphore locked...")
             return
         # log.info("Shared Memory write\n{}".format(write_str))
 
@@ -137,7 +139,7 @@ class SimSharedMemoryServer(object):
             nclient_pedestrians = header[3]
         except Exception as e:
             log.error("Header parsing exception")
-            log.error("data_arr[0]: %s ", data_arr[0])
+            log.error(f"data_arr[0]: {data_arr[0]}")
             log.error(e)
             pass
 
@@ -161,11 +163,11 @@ class SimSharedMemoryServer(object):
                     if not int(active):
                         disabled_vehicles.append(vid)
             else:
-                log.warn("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
+                log.warning("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
                     nclient_vehicles,
                     nvehicles
                 ))
-                log.warn(data_str)
+                log.warning(data_str)
         except Exception as e:
             log.error("VehicleState parsing exception")
             log.error(e)
@@ -186,11 +188,8 @@ class SimSharedMemoryServer(object):
                     if not int(active):
                         disabled_pedestrians.append(pid)
             else:
-                log.warn("Client state error: No. client pedestrians ({}) not the same as server pedestrians ({}).".format(
-                    nclient_pedestrians,
-                    npedestrians
-                ))
-                log.warn(data_str)
+                log.warning(f"Client state error: No. client pedestrians ({nclient_pedestrians}) not the same as server pedestrians ({npedestrians}).")
+                log.warning(data_str)
         except Exception as e:
             log.error("PedestrianState parsing exception")
             log.error(e)

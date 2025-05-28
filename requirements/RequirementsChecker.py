@@ -1,5 +1,3 @@
-import numpy as np
-
 from requirements.ExplicitRequirements import ExplicitRequirements
 from requirements.ImplicitRequirements import ImplicitRequirements
 from sv.SDVTrafficState import TrafficState

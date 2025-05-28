@@ -3,7 +3,6 @@
 # --------------------------------------------
 # GEOSCENARIO Micro Maneuver Models for Motion Planning
 # --------------------------------------------
-import glog as log
 import itertools
 import numpy as np
 
@@ -20,6 +19,9 @@ from sv.maneuvers.Config   import *
 from sv.maneuvers.Utils    import *
 from sv.SDVTrafficState  import *
 from TickSync  import *
+
+import logging
+log = logging.getLogger(__name__)
 
 LOWEST_DRIVABLE_SPEED    = 0.1 # m/s
 MINIMUM_PROGRESSION_PACE = 1.0 # m/s
@@ -89,15 +91,15 @@ def plan_cutin(vehicle, mconfig:MCutInConfig, traffic_state:TrafficState):
     delt_s_sampling = mconfig.delta_s_sampling
 
     if (target_id not in vehicles):
-        log.warn("Target vehicle {} is not in traffic".format(target_id))
+        log.warning(f"Target vehicle {target_id} is not in traffic")
         return None, None
 
     target_lane_config = lane_config.get_current_lane(vehicles[target_id].state.d)
     if not target_lane_config:
-        log.warn("Target vehicle {} is not in an adjacent lane".format(target_id))
+        log.warning(f"Target vehicle {target_id} is not in an adjacent lane")
         return None, None
     elif target_lane_config.id == lane_config.id:
-        log.warn("Already in target lane")
+        log.warning("Already in target lane")
         return None, None
 
     # List[(target s, target d, t)]

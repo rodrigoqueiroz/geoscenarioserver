@@ -8,11 +8,12 @@ import re
 import gsc.Utils as Utils
 from gsc.Report import Report
 from SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
-import glog as log
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
 
+import logging
+log = logging.getLogger(__name__)
 
 class Node(object):
     def __init__(self):
@@ -374,11 +375,11 @@ class GSParser(object):
 
     def print_stats(self):
         print(Report.bcolors.HEADER+"#### GeoScenario Summary #### "+Report.bcolors.ENDC)
-        print("Pedestrians: " + str(len(self.pedestrians)))
-        print("Vehicles: " + str(len(self.vehicles)))
-        print("Static Objects: " + str(len(self.staticobjects)))
-        print("Triggers: " + str(len(self.triggers)))
-        print("Paths: " + str(len(self.paths)))
+        log.info(f"Pedestrians: {len(self.pedestrians)}")
+        log.info(f"Vehicles: {len(self.vehicles)}")
+        log.info(f"Static Objects: {len(self.staticobjects)}")
+        log.info(f"Triggers: {len(self.triggers)}")
+        log.info(f"Paths: {len(self.paths)}")
 
     def print_scenario(self):
         print(Report.bcolors.HEADER+"#### GeoScenario Detailed #### "+Report.bcolors.ENDC)

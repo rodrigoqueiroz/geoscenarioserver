@@ -15,6 +15,9 @@ from sv.planners.ruleEngine.constants import *
 from sv.planners.ruleEngine.FeatureGenerator import FeatureGenerator
 from SimConfig import PLANNER_RATE
 
+import logging
+log = logging.getLogger(__name__)
+
 class NanConverter(json.JSONEncoder):
     def encode(self, obj, *args, **kwargs):
         return super().encode(self.nan2None(obj), *args, **kwargs)
@@ -83,10 +86,10 @@ class BehaviorLayer(FeatureGenerator):
             return response.text
 
         except requests.exceptions.RequestException as e:
-            print('RE, RequestException:', e)
+            log.error(f"RE, RequestException: {e}")
 
         except:
-            print("Unexpected error:", sys.exc_info()[0])
+            log.error(f"Unexpected error: {sys.exc_info()[0]}")
 
         # Just retry
         return callback()
@@ -120,7 +123,7 @@ class BehaviorLayer(FeatureGenerator):
         self.last_behaviour = self.post_behaviour(situation)
 
         if self.debug and get_center_id() == self.vid:
-            print('Behaviour', self.last_behaviour)
+            log.debug(f"Behaviour {self.last_behaviour}")
 
         # Default Behaviour
         self._current_mconfig = MStopConfig( target=MStopConfig.StopTarget.NOW )

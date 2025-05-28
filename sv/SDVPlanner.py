@@ -5,9 +5,6 @@
 # GeoScenario Simulated Driver-Vehicle Model (SDV) Planner
 # --------------------------------------------
 
-import glog as log
-import sys
-
 from copy import copy
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
@@ -28,6 +25,9 @@ from util.BoundingBoxes import calculate_rectangular_bounding_box
 
 import sv.planners.btree.BehaviorLayer       as btree
 import sv.planners.ruleEngine.BehaviorLayer  as rules
+
+import logging
+log = logging.getLogger(__name__)
 
 class SVPlanner(object):
     def __init__(self, sdv, sim_traffic, btree_locations, route_nodes, goal_ends_simulation = False, perception = None, rule_engine_port = None, tracker = None):
@@ -163,7 +163,7 @@ class SVPlanner(object):
                 traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
 
                 if not traffic_state:
-                    log.warn("Invalid planner state, skipping planning step...")
+                    log.warning("Invalid planner state, skipping planning step...")
                     continue
 
                 self._requirementsChecker.analyze(traffic_state)
@@ -185,7 +185,7 @@ class SVPlanner(object):
                     # Regenerate planner state and tick btree again. Discard whether ref path changed again.
                     traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
                     if not traffic_state:
-                        log.warn("Invalid planner state, skipping planning step...")
+                        log.warning("Invalid planner state, skipping planning step...")
                         continue
 
                     traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
@@ -221,7 +221,7 @@ class SVPlanner(object):
                             self.sdv.state.s - tvehicle.state.s - self.sdv.radius - tvehicle.radius,
                             self.sdv.state.s_vel - tvehicle.state.s_vel
                         )
-                    #log.info(state_str)
+                    log.debug(state_str)
                 self.mconfig = mconfig
 
                 #Maneuver Tick
@@ -238,7 +238,8 @@ class SVPlanner(object):
 
                     # Invalid trajectory are apparently valid in Geoscenario.
                     if frenet_traj is None:
-                        log.warn("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
+                        log.warning("VID {} plan_maneuver return invalid trajectory.".format(self.vid))
+                        pass
                     else:
                         plan = MotionPlan()
                         plan.trajectory = frenet_traj

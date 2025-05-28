@@ -12,8 +12,8 @@ from sv.planners.btree.parser.BTreeDSLLexer import BTreeDSLLexer
 from sv.planners.btree.parser.BTreeDSLParser import BTreeDSLParser
 from sv.planners.btree.parser.BTreeDSLListener import BTreeDSLListener
 
-import random
-import string
+import logging
+log = logging.getLogger(__name__)
 
 import re
 import os
@@ -146,7 +146,8 @@ class BTreeInterpreter(object):
                             reconfigured=True
                             break
                     
-                    if not reconfigured: print(id + " node could not be found in " + btree_name)
+                    if not reconfigured:
+                        log.error(f"{id} node could not be found in {btree_name}")
 
     def link_subtrees(self, tree, nodes, subtrees):        
         for subtree in subtrees:
@@ -181,10 +182,10 @@ class BTreeInterpreter(object):
             expanded_nodes = len(self.collect_nodes(tree))
             reuse = ((expanded_nodes-roottree_nodes)/expanded_nodes)*100
 
-        print("[vehicle " + str(self.vid) + "]")
-        print(" root tree nodes = " + str(roottree_nodes))
-        print(" tree with subtrees nodes = " + str(expanded_nodes))
-        print(" reuse = " + str(reuse) + "%")
+        log.debug(f"[vehicle {str(self.vid)} ]")
+        log.debug(f" root tree nodes = {str(roottree_nodes)}")
+        log.debug(f" tree with subtrees nodes = {str(expanded_nodes)}")
+        log.debug(f" reuse = {str(reuse)}")
 
         self.tree=tree
         return tree
