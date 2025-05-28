@@ -91,16 +91,16 @@ class TrafficLightIntersection:
 
 class OccupancyZone:
     def __init__(self, proximity_func, search_func):
-        self.closest  = partial(self.find_id, proximity_func, search_func)
+        self.closest  = partial(self.find, proximity_func, search_func)
         self.vehicles = []
 
-    def find_id(self, proximity_func, search_func, attribute = 'vehicles'):
+    def find(self, proximity_func, search_func, attribute = 'vehicles'):
         collection = getattr(self, attribute)
         
         if len(collection) == 0:
             return None
 
-        return proximity_func(collection, key=search_func).id
+        return proximity_func(collection, key=search_func)
 
     def is_empty(self):
         return len(self.vehicles) == 0
@@ -327,6 +327,9 @@ def get_traffic_state(
         except OutsideRefPathException:
             del static_objects[soid]
 
+    road_occupancy = fill_occupancy(my_vehicle, lane_config, traffic_vehicles, traffic_vehicles_orp, 
+                                    lanelet_map, intersections)
+
     # Goal
     try:
         goal_point_frenet = sim_to_frenet_position(
@@ -350,7 +353,7 @@ def get_traffic_state(
         pedestrians=traffic_pedestrians,
         static_objects=static_objects,
         lane_swerve_target=lane_swerve_target,
-        road_occupancy = None
+        road_occupancy = road_occupancy
     )
 
 def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections, euclid_only=False, frenet_only=False):

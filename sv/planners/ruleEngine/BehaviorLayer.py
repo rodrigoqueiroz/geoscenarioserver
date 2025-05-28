@@ -94,8 +94,8 @@ class BehaviorLayer(FeatureGenerator):
     def deactivate_logs(self):
         return self.communicate('GET', '/deactivateLog', self.deactivate_logs)
 
-    def flush(self):
-        return self.communicate('GET', '/flush', self.flush)
+    def flushFeatures(self):
+        return self.communicate('GET', '/flushFeatures', self.flushFeatures)
 
     def get_traffic_state(self):
         return self._traffic_state

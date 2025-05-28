@@ -316,6 +316,7 @@ def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
     Stop can be a stop request by time and/or distance from current pos.
     Or optionally have a specific target position to stop (stop line, before an object, etc).
     """
+    best, candidates           = None, None
     target_position            = mconfig.pos
     lane_config:LaneConfig     = traffic_state.lane_config
     vehicle_state:VehicleState = traffic_state.vehicle_state
@@ -337,6 +338,7 @@ def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
     
     # Adjust target pos to vehicle length
     target_position -= vehicle_state.s + vehicle.length / 2 + mconfig.distance
+    target_position  = max(target_position, 0.0) # In case of overshoot
 
     # Adjust target pos to possible dynamic elements:
     lv = get_leading_vehicle(vehicle_state, lane_config, vehicles)
@@ -353,29 +355,29 @@ def plan_stop(vehicle, mconfig:MStopConfig, traffic_state:TrafficState):
         return plan_velocity_keeping(vehicle, MVelKeepConfig(), traffic_state)
 
     expected_time = 0
-    if vehicle_state.s_vel != 0:
+    if LOWEST_DRIVABLE_SPEED < vehicle_state.s_vel:
         expected_time = 2 * target_position / vehicle_state.s_vel #assuming uniform acceleration
 
-    target_time = MP(expected_time, 40, 6) #bound >40% recommended for safely finding a suitable stop time
-    s_solver    = quintic_polynomial_solver
+        target_time = MP(expected_time, 40, 6) #bound >40% recommended for safely finding a suitable stop time
+        s_solver    = quintic_polynomial_solver
 
-    #targets
-    target_state_set = []
-    #generates alternative targets
-    for t in target_time.get_samples():
-        #longitudinal movement: goal is to reach vel and acc 0
-        s_target = [target_position, 0, 0]
-        #lateral movement
-        for di in mconfig.lat_target.get_samples(lane_config):
-            d_target = [di, 0, 0]
-            #add target
-            target_state_set.append((s_target, d_target, t))
-    
-    best, candidates = optimized_trajectory(vehicle, mconfig, traffic_state, target_state_set, s_solver = s_solver)
+        #targets
+        target_state_set = []
+        #generates alternative targets
+        for t in target_time.get_samples():
+            #longitudinal movement: goal is to reach vel and acc 0
+            s_target = [target_position, 0, 0]
+            #lateral movement
+            for di in mconfig.lat_target.get_samples(lane_config):
+                d_target = [di, 0, 0]
+                #add target
+                target_state_set.append((s_target, d_target, t))
+        
+        best, candidates = optimized_trajectory(vehicle, mconfig, traffic_state, target_state_set, s_solver = s_solver)
 
     # When we get closer Quintic Polynomial is unreliable, to ensure feasibility of the maneuver,
     # Fallback to a Linear Interpolation
-    if best == None:
+    if best == None or best.T == 0.0:
         max_deceleration     = mconfig.max_deceleration
         ft                   = FrenetTrajectory()
         ft.T                 = vehicle_state.s_vel / max_deceleration

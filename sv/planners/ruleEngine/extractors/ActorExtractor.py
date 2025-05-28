@@ -11,7 +11,7 @@ class ActorExtractor(Extractor):
 	def extract_actor(self, actor, traffic_state):
 		distance          = None
 		ego_state         = traffic_state.vehicle_state
-		speed             = actor.state.s_vel
+		speed             = max(actor.state.s_vel, 0.0)
 		time_to_collision = None
 
 		if speed == 0.0:

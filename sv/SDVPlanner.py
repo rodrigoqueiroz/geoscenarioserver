@@ -5,11 +5,12 @@
 # GeoScenario Simulated Driver-Vehicle Model (SDV) Planner
 # --------------------------------------------
 
-from copy import copy
 import glog as log
+import sys
+
+from copy import copy
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
-import sys
 
 from Actor import *
 from mapping.LaneletMap import *
