@@ -7,7 +7,7 @@ from requirements.RequirementViolationEvents import CollisionWithVehicle, Collis
 from sv.SDVTrafficState import TrafficState
 from util.BoundingBoxes import calculate_rectangular_bounding_box
 
-class ExplicitRequirements:
+class HardRequirements:
 	def __init__(self, ego_vehicle, goal_ends_simulation):
 		self.ego_vehicle          = ego_vehicle
 		self.goal_ends_simulation = goal_ends_simulation

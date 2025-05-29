@@ -1,14 +1,14 @@
-from requirements.ExplicitRequirements import ExplicitRequirements
-from requirements.ImplicitRequirements import ImplicitRequirements
+from requirements.HardRequirements import HardRequirements
+from requirements.SoftRequirements import SoftRequirements
 from sv.SDVTrafficState import TrafficState
 
-class RequirementsChecker(ExplicitRequirements, ImplicitRequirements):
+class RequirementsChecker(HardRequirements, SoftRequirements):
 	def __init__(self, ego_vehicle, goal_ends_simulation):
-		ExplicitRequirements.__init__(self, ego_vehicle, goal_ends_simulation)
-		ImplicitRequirements.__init__(self, ego_vehicle)
+		HardRequirements.__init__(self, ego_vehicle, goal_ends_simulation)
+		SoftRequirements.__init__(self, ego_vehicle)
 
-		self.conditions = ExplicitRequirements.all_conditions(self) +\
-			              ImplicitRequirements.all_conditions(self)
+		self.conditions = HardRequirements.all_conditions(self) +\
+			              SoftRequirements.all_conditions(self)
 
 
 	def analyze(self, traffic_state:TrafficState):

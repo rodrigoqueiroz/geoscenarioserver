@@ -21,7 +21,7 @@ violations         = manager.dict()
 TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 7
 
 # Generic
-class ImplicitRequirement:
+class SoftRequirement:
 	def __init__(self, agent_id, metric_name, metric_value):
 		updated_agent = {}
 

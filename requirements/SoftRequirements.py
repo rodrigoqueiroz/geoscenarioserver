@@ -3,11 +3,11 @@ import os
 
 from functools import partial
 
-from requirements.RequirementViolationEvents import ImplicitRequirement
+from requirements.RequirementViolationEvents import SoftRequirement
 from sv.SDVTrafficState import TrafficState
 from util.Utils import distance_2p
 
-class ImplicitRequirements:
+class SoftRequirements:
 	def __init__(self, ego_vehicle):
 		self.ego_vehicle = ego_vehicle
 		self.prev_acc    = np.array([0, 0]) # (s_acc, d_acc) Assuming the vehicle starts standstill
@@ -25,12 +25,12 @@ class ImplicitRequirements:
 		]
 
 
-	def as_implicit_requirement(self, getter, traffic_state:TrafficState):
+	def as_soft_requirement(self, getter, traffic_state:TrafficState):
 		agent_id     = self.ego_vehicle.id
 		metric_name  = getter.__name__
 		metric_value = getter(traffic_state)
 
-		ImplicitRequirement(agent_id, metric_name, metric_value)
+		SoftRequirement(agent_id, metric_name, metric_value)
 
 	def distance_with_closest_obstacle(self, traffic_state:TrafficState):
 		actor     = traffic_state.road_occupancy.front_center.closest()
