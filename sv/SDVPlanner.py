@@ -4,6 +4,7 @@
 # --------------------------------------------
 # GeoScenario Simulated Driver-Vehicle Model (SDV) Planner
 # --------------------------------------------
+import sys
 
 from copy import copy
 from multiprocessing import Array, Process, Value
