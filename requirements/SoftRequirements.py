@@ -15,7 +15,7 @@ class SoftRequirements:
 	def all_conditions(self):
 		evaluation_mode = os.getenv("GSS_EVALUATION_NAME", "") != ""
 
-		# Implicit Requirements are unimportant unless we evaluate the final policy
+		# Soft Requirements are unimportant unless we evaluate the final policy
 		if not evaluation_mode:
 			return []
 

@@ -8,14 +8,14 @@ from SimConfig import TRAFFIC_RATE
 manager = Manager()
 
 # Singleton
-agent_collisions   = manager.dict()
-agent_ticks        = manager.dict()
-file_name_folder   = os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs"))
-file_name_explicit = os.path.join(file_name_folder, "violations.json")
-file_name_implicit = os.getenv("GSS_EVALUATION_NAME", "")
-global_tick        = Value('i', -1)
-metrics            = manager.dict()
-violations         = manager.dict()
+agent_collisions = manager.dict()
+agent_ticks      = manager.dict()
+file_name_folder = os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs"))
+file_name_hard   = os.path.join(file_name_folder, "violations.json")
+file_name_soft   = os.getenv("GSS_EVALUATION_NAME", "")
+global_tick      = Value('i', -1)
+metrics          = manager.dict()
+violations       = manager.dict()
 
 # Constants
 TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 7
@@ -42,11 +42,11 @@ class ScenarioEnd:
 		scenario_completion = global_tick.value / TRAFFIC_RATE
 		print('Scenario Ended in {} seconds'.format(scenario_completion))
 
-		# Explicit Requirements Report
-		self.write_file(file_name_explicit, json.dumps(violations.copy()))
+		# Hard Requirements Report
+		self.write_file(file_name_hard, json.dumps(violations.copy()))
 
 		# Custom Requirements Reports
-		if file_name_implicit != "":
+		if file_name_soft != "":
 			
 			# No clue why .copy() is required here while it was working without .copy()
 			# in other functions?!? Python is inconsistent sometimes...
@@ -61,12 +61,12 @@ class ScenarioEnd:
 				# Required because of manager.dict() does not allow nested update
 				metrics[agent_id] = updated_agent
 
-			# Implicit Requirements Report
-			file_name = os.path.join(file_name_folder, file_name_implicit + ".json")
+			# Soft Requirements Report
+			file_name = os.path.join(file_name_folder, file_name_soft + ".json")
 			self.write_file(file_name, json.dumps(metrics.copy()))
 
-			# Explicit Requirements Report
-			file_name = os.path.join(file_name_folder, file_name_implicit + "__violations.json")
+			# Hard Requirements Report
+			file_name = os.path.join(file_name_folder, file_name_soft + "__violations.json")
 			self.write_file(file_name, json.dumps(violations.copy()))
 
 	def write_file(self, file_name, content):
@@ -198,5 +198,5 @@ class ScenarioTimeout(UnmetRequirement):
 
 
 # Autoclean to avoid learning on a broken stack
-if os.path.exists(file_name_explicit):
-	os.remove(file_name_explicit)
+if os.path.exists(file_name_hard):
+	os.remove(file_name_hard)
