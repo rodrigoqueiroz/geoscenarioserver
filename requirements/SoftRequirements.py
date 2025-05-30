@@ -20,8 +20,8 @@ class SoftRequirements:
 			return []
 
 		return [
-			partial(self.as_implicit_requirement, self.distance_with_closest_obstacle),
-			partial(self.as_implicit_requirement, self.jerk)
+			partial(self.as_soft_requirement, self.distance_with_closest_obstacle),
+			partial(self.as_soft_requirement, self.jerk)
 		]
 
 
