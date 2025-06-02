@@ -20,7 +20,7 @@ class SoftRequirements:
 			return []
 
 		return [
-			partial(self.as_soft_requirement, self.distance_with_closest_obstacle),
+			partial(self.as_soft_requirement, self.distance_to_closest_obstacle),
 			partial(self.as_soft_requirement, self.jerk)
 		]
 
@@ -32,7 +32,7 @@ class SoftRequirements:
 
 		SoftRequirement(agent_id, metric_name, metric_value)
 
-	def distance_with_closest_obstacle(self, traffic_state:TrafficState):
+	def distance_to_closest_obstacle(self, traffic_state:TrafficState):
 		actor     = traffic_state.road_occupancy.front_center.closest()
 		distance  = None
 		ego_state = self.ego_vehicle.state
