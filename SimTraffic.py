@@ -2,7 +2,7 @@
 #rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # --------------------------------------------
-# SIMULATED TRAFFIC - Coordinate all vehicle agent simulation, ego interface,
+# SIMULATED TRAFFIC - Coordinate all agent simulation, ego interface,
 # and ShM for shared state between vehicles (perception ground truth),
 # dashboard (debug), and external Simulator (Unreal or alternative graphics engine)
 # --------------------------------------------
@@ -56,7 +56,6 @@ class SimTraffic(object):
         self.debug_shdata = None
 
         #Traffic Log
-        self.log_file = ''
         self.vehicles_log = {}
         self.traffic_running = False
 
@@ -104,7 +103,7 @@ class SimTraffic(object):
 
         #Creates shared memory blocks to publish the state of all agents.
         self.create_traffic_state_shm()
-        self.write_traffic_state(0 , 0.0, 0.0)
+        self.write_traffic_state(0, 0.0, 0.0)
 
         #If cosimulation, hold start waiting for first client state
         if self.cosimulation == True and self.sim_config.wait_for_client:

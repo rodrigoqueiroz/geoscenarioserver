@@ -53,9 +53,8 @@ class Dashboard(object):
         
 
     def start(self):
-        """ Start dashboard in subprocess.
-            global constant SHOW_DASHBOARD must be true
-            Traffic must have started, otherwise the shared array is not ready
+        """ Start the dashboard in a subprocess when sim_config.show_dashboard=True
+            Traffic must have already started, otherwise the shared array is not ready
         """
 
         if not self.sim_traffic:

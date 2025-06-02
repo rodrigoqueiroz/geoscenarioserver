@@ -60,7 +60,7 @@
   <node id='-5365121' action='modify' lat='43.47112691911' lon='-80.53872032203' />
   <node id='-5365122' action='modify' lat='43.47112712927' lon='-80.53872064886' />
   <node id='-5365123' action='modify' lat='43.47115364934' lon='-80.53874290283'>
-    <tag k='btree' v='walk.btree' />
+    <tag k='btree' v='walk_ensure_collision.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />

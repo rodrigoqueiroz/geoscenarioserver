@@ -21,12 +21,11 @@ log = logging.getLogger(__name__)
 
 class TickSync():
 
-    def __init__(self, rate = 30, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
+    def __init__(self, rate = TRAFFIC_RATE, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
         self.timeout = None
         self.tick_rate = rate
         self.expected_tick_duration = 1.0/rate
-        self.realtime = realtime
         self.block = block
         self.verbose = verbose
         self.label = label
@@ -46,7 +45,7 @@ class TickSync():
             self.timeout,
             self.tick_rate,
             self.expected_tick_duration]
-    
+
     def get_sim_time(self):
         return self.sim_time
 
@@ -57,15 +56,14 @@ class TickSync():
         now = datetime.datetime.now()
         #First Tick
         if (self.tick_count==0): 
-            #First Tick is special:
+            #The first Tick is special:
             self._sim_start_clock = now
             self.delta_time = 0.0
             self._tick_start_clock = now
             #Update globals
             self.tick_count+=1
             self.sim_time = self.sim_start_time #starting time by config
-            log.debug('{:05.2f}s {} Tick {:3}# START'.
-                    format(self.sim_time,self.label,self.tick_count))
+            log.debug(f"sim_time {self.sim_time:05.2f} s, tick {self.label}, sim_start_clock {self._sim_start_clock:3} # START")
             return True
         else:
             #Can tick? Preliminary numbers:
@@ -94,6 +92,7 @@ class TickSync():
         #Check timeout
         if (self.timeout):
             if (self.sim_time>=self.timeout):
+                # TODO: not always scenario timeout, could also be timeout of a condition or another task
                 ScenarioTimeout(self.timeout)
                 log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False

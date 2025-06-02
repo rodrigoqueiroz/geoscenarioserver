@@ -26,7 +26,8 @@ class SimSharedMemoryServer(object):
             self.cs_sem = sysv_ipc.Semaphore(self.cs_sem_key, flags=sysv_ipc.IPC_CREAT, initial_value=1)
             log.debug("ShM CS semaphore created")
             self.cs_shm = sysv_ipc.SharedMemory(self.cs_shm_key, flags=sysv_ipc.IPC_CREAT, mode=int(str(666), 8), size=SHM_SIZE)
-            log.info("ShM CS memory created")
+            log.debug("ShM CS memory created")
+            log.info("Shared memory and semaphores created")
             self.is_connected = True
         except sysv_ipc.Error:
             log.error("Error creating Shared Memory")
