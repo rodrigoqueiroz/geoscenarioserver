@@ -39,6 +39,7 @@
     <tag k='name' v='ego_placeholder' />
     <tag k='route' v='ego_route' />
     <tag k='vid' v='2' />
+    <tag k='goal_ends_simulation' v='yes' />
   </node>
   <node id='-2716513' action='modify' visible='true' lat='43.47802474174' lon='-80.51997900076'>
     <tag k='duration' v='15' />
