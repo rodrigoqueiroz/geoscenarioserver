@@ -32,6 +32,12 @@ logging.getLogger('matplotlib').setLevel(logging.WARNING)
 logging.getLogger('PIL.PngImagePlugin').setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 
+def draw_square(anchor_x, anchor_y, size, collection=None, facecolor='none'):
+    if collection is not None:
+        facecolor = 'none' if collection.is_empty() else 'k'
+
+    return plt.Rectangle((anchor_x,  anchor_y), size, size, linewidth=1, zorder=2, edgecolor='k', facecolor=facecolor)
+
 class Dashboard(object):
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
@@ -473,29 +479,20 @@ class Dashboard(object):
         if SHOW_OCCUPANCY and traffic_state.road_occupancy is not None:
             road_occupancy:RoadOccupancy = traffic_state.road_occupancy
             cellsize = 1
-            size = cellsize*3
-            anchorx = vehicle_state.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
-            anchory = vehicle_state.d + 8 - size
-            rect = plt.Rectangle( (anchorx,anchory),size,size,linewidth=1, zorder=2, edgecolor='k', facecolor = "none") #overall
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+1,anchory+1),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "b") #Self
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+1,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right else 'none') #right
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+2,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right_front else 'none') #right front
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right_back else 'none') #right back
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+1,anchory+2),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.left else 'none') #left
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+2,anchory+2),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.left_front else 'none') #left front
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx,anchory+2),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.left_back else 'none') #left back
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+2,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.front else 'none') #front
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.back else 'none') #back
-            plt.gca().add_patch(rect)
+            size     = 3 * cellsize
+            anchorx  = vehicle_state.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
+            anchory  = vehicle_state.d + 8 - size
+
+            plt.gca().add_patch(draw_square(anchorx,     anchory,     size)) # Overall
+            plt.gca().add_patch(draw_square(anchorx + 1, anchory + 1, cellsize, facecolor = "b")) #Self
+            plt.gca().add_patch(draw_square(anchorx + 1, anchory,     cellsize, collection = road_occupancy.right_center))
+            plt.gca().add_patch(draw_square(anchorx + 2, anchory,     cellsize, collection = road_occupancy.front_right))
+            plt.gca().add_patch(draw_square(anchorx,     anchory,     cellsize, collection = road_occupancy.back_right))
+            plt.gca().add_patch(draw_square(anchorx + 1, anchory + 2, cellsize, collection = road_occupancy.left_center))
+            plt.gca().add_patch(draw_square(anchorx + 2, anchory + 2, cellsize, collection = road_occupancy.front_left))
+            plt.gca().add_patch(draw_square(anchorx,     anchory + 2, cellsize, collection = road_occupancy.back_left))
+            plt.gca().add_patch(draw_square(anchorx + 2, anchory + 1, cellsize, collection = road_occupancy.front_center))
+            plt.gca().add_patch(draw_square(anchorx,     anchory + 1, cellsize, collection = road_occupancy.back_center))
 
             anchorx = anchorx + size + 1
             y_label = "y: " + str(road_occupancy.yielding_zone)
