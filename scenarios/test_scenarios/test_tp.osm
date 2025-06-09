@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-31950' action='modify' visible='true' lat='43.47170598511' lon='-80.53963859323'>
+    <tag k='btype' v='TP' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='trajectory_ped' />
+    <tag k='pid' v='2' />
+    <tag k='trajectory' v='test_traj_1' />
+    <tag k='yaw' v='240' />
+  </node>
+  <node id='-31958' action='modify' visible='true' lat='43.47168358513' lon='-80.5396394055' />
+  <node id='-31959' action='modify' visible='true' lat='43.47166295355' lon='-80.53967920655' />
+  <node id='-31960' action='modify' visible='true' lat='43.47164644829' lon='-80.53972063213' />
+  <node id='-31961' action='modify' visible='true' lat='43.47162110091' lon='-80.53970601134' />
+  <node id='-31962' action='modify' visible='true' lat='43.47159457457' lon='-80.53976043319' />
+  <node id='-31966' action='modify' visible='true' lat='43.47178379553' lon='-80.53954416726'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='test_tp_scenario' />
+    <tag k='timeout' v='60' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-31967' action='modify' visible='true' lat='43.47166236408' lon='-80.53975170132'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <way id='-7188' action='modify' visible='true'>
+    <nd ref='-31958' />
+    <nd ref='-31959' />
+    <nd ref='-31960' />
+    <nd ref='-31961' />
+    <nd ref='-31962' />
+    <tag k='gs' v='trajectory' />
+    <tag k='name' v='test_traj_1' />
+  </way>
+</osm>
