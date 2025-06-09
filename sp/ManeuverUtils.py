@@ -195,17 +195,20 @@ def can_cross_before_red(planner_state, **kwargs):
 
     return False
 
-def speed_to_ensure_collision(pedestrian_state, vehicle_state, collision_pt):
-    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+def speed_to_ensure_collision(pedestrian, vehicle, collision_pt):
+    pedestrian_state = pedestrian.state
+    vehicle_state = vehicle.state
     vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
+    dist_veh_col = np.linalg.norm(collision_pt - vehicle_pos) - vehicle.length/2
+    if dist_veh_col <= 0:
+        return 0.0  # Vehicle is already in collision
 
-    vehicle_speed = np.linalg.norm(np.array([vehicle_state.x_vel, vehicle_state.y_vel]))
+    pedestrian_pos = np.array([pedestrian_state.x, pedestrian_state.y])
+    dist_ped_col = np.linalg.norm(collision_pt - pedestrian_pos) - pedestrian.radius
+    if dist_ped_col <= 0:
+        return 0.0  # Pedestrian is already in collision
 
-    dist_veh_col = np.linalg.norm(collision_pt - vehicle_pos) # - (VEHICLE_LENGTH / 2)
-    dist_ped_col = np.linalg.norm(collision_pt - pedestrian_pos)
-
-    speed_for_collision = (dist_ped_col * vehicle_speed) / dist_veh_col
-
+    speed_for_collision = (dist_ped_col/dist_veh_col)*abs(vehicle_state.s_vel) # s_vel is negative if vehicle is reversing
     return speed_for_collision
 
 def get_xwalk_vehicle_collision_pt(xwalk, ped_state, vehicle_state):
@@ -220,6 +223,9 @@ def get_xwalk_vehicle_collision_pt(xwalk, ped_state, vehicle_state):
     d_xwalk = p2-p1
     p_veh = np.array([vehicle_state.x, vehicle_state.y])
     veh_yaw_rad = np.radians(vehicle_state.yaw)
+    if vehicle_state.s_vel < 0:
+        # if vehicle is reversing, flip the direction
+        veh_yaw_rad += np.pi
     d_veh = np.array([np.cos(veh_yaw_rad), np.sin(veh_yaw_rad)])
 
     # system of equations

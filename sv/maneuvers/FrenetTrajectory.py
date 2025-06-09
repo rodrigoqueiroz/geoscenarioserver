@@ -125,8 +125,8 @@ class FrenetTrajectory:
 class MotionPlan:
     trajectory:FrenetTrajectory = field(default_factory=lambda:FrenetTrajectory())
     start_time:float = 0            #sim start time [s]
-    new_frenet_frame = False        #if a new frenet frame was generated
-    reversing = False               #if the plan is reversed
+    new_frenet_frame:bool = False        #if a new frenet frame was generated
+    reversing:bool = False               #if the plan is reversed
     tick_count = None
     ref_path_origin:float = None
     
@@ -143,8 +143,8 @@ class MotionPlan:
         t = P[ns + nd]
         self.start_time = P[ns + nd + 1]
         self.new_frenet_frame = P[ns + nd + 2]
-        self.reversing = P[ns + nd + 3]
-        self.tick_count = P[ns + nd + 4]
+        self.reversing = bool(P[ns + nd + 3])
+        self.tick_count = int(P[ns + nd + 4])
         self.ref_path_origin = P[ns + nd + 5]
         self.trajectory.set_trajectory(s_coef,d_coef,t)
 
