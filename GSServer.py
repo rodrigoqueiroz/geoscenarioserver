@@ -22,7 +22,7 @@ from dash.Dashboard import *
 from mapping.LaneletMap import *
 from requirements.RequirementViolationEvents import GlobalTick
 from ScenarioSetup import *
-from SimConfig import SimConfig
+from SimConfig import SimConfig, ExecutionMode
 from SimTraffic import SimTraffic
 from TickSync import TickSync
 
@@ -57,6 +57,9 @@ def start_server(args):
     if args.wait_for_client:
         sim_config.wait_for_client = True
 
+    if args.execution_mode:
+        sim_config.execution_mode = ExecutionMode[args.execution_mode]
+
     # use sim_config after all modifications
     traffic = SimTraffic(lanelet_map, sim_config)
 
@@ -78,7 +81,14 @@ def start_server(args):
         log.error("Failed to load scenario")
         return
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
+    block = True
+    if sim_config.execution_mode == ExecutionMode.fastest:
+        block = None
+
+    sync_global = TickSync(rate=sim_config.traffic_rate,
+                           block=block,
+                           verbose=False,
+                           label=f"traffic_{sim_config.execution_mode.name}")
     sync_global.set_timeout(sim_config.timeout)
 
     if args.dash_pos:
@@ -196,6 +206,7 @@ if __name__ == "__main__":
     parser.add_argument("-wi", "--wait-for-input", dest="wait_for_input", action="store_true", help="Wait for the user to press [ENTER] to start the simulation")
     parser.add_argument("-wc", "--wait-for-client", dest="wait_for_client", action="store_true", help="Wait for a valid client state to start the simulation")
     parser.add_argument("-dp", "--dash-pos", default=[], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
+    parser.add_argument("-em", "--execution-mode", default="realtime", dest="execution_mode", choices=["realtime", "fastest", "synchronized", "paused"], help="Set the execution mode of the simulation")
     parser.add_argument("-d", "--debug", dest="debug", action="store_true", help="Set the logging level to DEBUG instead of INFO")
     parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to $GSS_OUTPUTS/GSServer.log instead of stdout")
     args = parser.parse_args()
