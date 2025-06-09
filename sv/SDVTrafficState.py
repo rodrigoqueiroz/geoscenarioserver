@@ -273,7 +273,6 @@ def get_traffic_state(
     """
     my_vid = my_vehicle.id
 
-
     s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_global_path(), my_vehicle.state.get_X(), my_vehicle.state.get_Y(), 0)
     my_vehicle.state.set_S(s_vector)
     my_vehicle.state.set_D(d_vector)
@@ -305,7 +304,10 @@ def get_traffic_state(
             vehicle.state.set_S(s_vector)
             vehicle.state.set_D(d_vector)
         except OutsideRefPathException:
-            traffic_vehicles_orp[vid] = traffic_vehicles[vid]
+            # Hides the frenet frame of the vehicle which is expressed with respect to its own reference path
+            vehicle.state.set_S([0.,0.,0.])
+            vehicle.state.set_D([0.,0.,0.])
+            traffic_vehicles_orp[vid] = vehicle
             del traffic_vehicles[vid]
 
     for pid, pedestrian in list(traffic_pedestrians.items()):
@@ -317,6 +319,10 @@ def get_traffic_state(
             pedestrian.state.set_S(s_vector)
             pedestrian.state.set_D(d_vector)
         except OutsideRefPathException:
+            # Hides the frenet frame of the pedestrian which is expressed with respect to its own reference path
+            pedestrian.state.set_S(s_vector)
+            pedestrian.state.set_D(d_vector)
+            pedestrians_orp[pid] = pedestrian
             del traffic_pedestrians[pid]
 
     for soid, so in list(static_objects.items()):
@@ -364,10 +370,6 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
     '''
     three_quarter_length = my_vehicle.length / 1.5
     three_quarter_width  = my_vehicle.width / 1.5
-    detection_range_in_meters = 50 # Rodrigo's base assumption to limit the detection range
-
-    if my_vehicle.detection_range_in_meters:
-        detection_range_in_meters = my_vehicle.detection_range_in_meters
 
     #Lane zones
     left_lane    = lane_config._left_lane
@@ -387,7 +389,7 @@ def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles,
 
     occupancy = RoadOccupancy()
 
-    # Using Frénet Frames
+    # Using Frenet Frames
     for vid, vehicle in frenet_set.items():
         same_lane = lane_config.right_bound <= vehicle.state.d <= lane_config.left_bound
 

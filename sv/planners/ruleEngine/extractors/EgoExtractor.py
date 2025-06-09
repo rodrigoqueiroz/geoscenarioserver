@@ -5,4 +5,6 @@ class EgoExtractor(Extractor):
 		self.name = "ego"
 
 	def generate_features(self, traffic_state):
-		return {}
+		return {
+			"speed": traffic_state.vehicle_state.s
+		}

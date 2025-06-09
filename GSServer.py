@@ -20,7 +20,7 @@ except ImportError:
 
 from dash.Dashboard import *
 from mapping.LaneletMap import *
-from requirements.RequirementViolationEvents import GlobalTick
+from requirements.RequirementViolationEvents import GlobalTick, InstanciateOnThread
 from ScenarioSetup import *
 from SimConfig import SimConfig
 from SimTraffic import SimTraffic
@@ -32,6 +32,7 @@ log = logging.getLogger("GSServer")
 def start_server(args):
     # log.setLevel("INFO")
     log.info('GeoScenario server START')
+    InstanciateOnThread()
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
 

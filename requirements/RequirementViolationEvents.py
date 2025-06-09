@@ -8,21 +8,45 @@ from SimConfig import TRAFFIC_RATE
 manager = Manager()
 
 # Singleton
-agent_collisions = manager.dict()
-agent_ticks      = manager.dict()
+agent_collisions = None
+agent_finished   = None
+agent_ticks      = None
+global_tick      = None
+metrics          = None
+number_of_agents = None
+violations       = None
+
+# Global Variables
 file_name_folder = os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs"))
 file_name_hard   = os.path.join(file_name_folder, "violations.json")
 file_name_soft   = os.getenv("GSS_EVALUATION_NAME", "")
-global_tick      = Value('i', -1)
-metrics          = manager.dict()
-violations       = manager.dict()
 
 # Constants
 TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR = 7
 
 # Generic
+class InstanciateOnThread:
+	def __init__(self):
+		global agent_collisions
+		global agent_finished
+		global agent_ticks
+		global global_tick
+		global metrics
+		global number_of_agents
+		global violations
+
+		agent_collisions = manager.dict()
+		agent_finished   = Value('i', 0)
+		agent_ticks      = manager.dict()
+		global_tick      = Value('i', -1)
+		metrics          = manager.dict()
+		number_of_agents = Value('i', 0)
+		violations       = manager.dict()
+
 class SoftRequirement:
 	def __init__(self, agent_id, metric_name, metric_value):
+		global metrics
+
 		updated_agent = {}
 
 		if agent_id in metrics:
@@ -38,36 +62,34 @@ class SoftRequirement:
 
 
 class ScenarioEnd:
-	def __init__(self):
+	def __init__(self, agent_id):
+		global agent_finished
+		global metrics
+		global number_of_agents
+
 		scenario_completion = global_tick.value / TRAFFIC_RATE
 		print('Scenario Ended in {} seconds'.format(scenario_completion))
 
-		# Hard Requirements Report
-		self.write_file(file_name_hard, json.dumps(violations.copy()))
-
-		# Custom Requirements Reports
 		if file_name_soft != "":
-			
-			# No clue why .copy() is required here while it was working without .copy()
-			# in other functions?!? Python is inconsistent sometimes...
-			for agent_id in agent_ticks.copy():
-				updated_agent = {}
+			# This copy is necessary because manager.dict are awefully managing an object state
+			metrics_copy = metrics.copy()
+			updated_agent = {}
 				
-				if agent_id in metrics:
-					updated_agent = metrics[agent_id]
+			if agent_id in metrics_copy:
+				updated_agent = metrics_copy[agent_id]
 
-				updated_agent['scenario_completion'] = [ scenario_completion ]
+			updated_agent['scenario_completion'] = [ scenario_completion ]
 
-				# Required because of manager.dict() does not allow nested update
-				metrics[agent_id] = updated_agent
+			# Required because of manager.dict() does not allow nested update
+			metrics[agent_id] = updated_agent
 
-			# Soft Requirements Report
-			file_name = os.path.join(file_name_folder, file_name_soft + ".json")
-			self.write_file(file_name, json.dumps(metrics.copy()))
+		# Only write the reports once all monitored vehicles called their scenario end
+		with agent_finished.get_lock():
+			agent_finished.value += 1
 
-			# Hard Requirements Report
-			file_name = os.path.join(file_name_folder, file_name_soft + "__violations.json")
-			self.write_file(file_name, json.dumps(violations.copy()))
+			with number_of_agents.get_lock():
+				if agent_finished.value == number_of_agents.value:
+					self.write_files()
 
 	def write_file(self, file_name, content):
 		# Clean File
@@ -78,10 +100,35 @@ class ScenarioEnd:
 		os.makedirs(os.path.dirname(file_name), exist_ok=True)
 		with open(file_name, "w+") as file:
 			file.write(content)
+			file.flush()
+
+	def write_files(self):
+		global metrics
+		global violations
+
+		violations_copy = violations.copy()
+		print('violations', violations_copy)
+
+		# Hard Requirements Report
+		self.write_file(file_name_hard, json.dumps(violations_copy))
+
+		# Custom Requirements Reports
+		if file_name_soft != "":
+
+			# Soft Requirements Report
+			file_name = os.path.join(file_name_folder, file_name_soft + ".json")
+			self.write_file(file_name, json.dumps(metrics.copy()))
+
+			# Hard Requirements Report
+			file_name = os.path.join(file_name_folder, file_name_soft + "__violations.json")
+			self.write_file(file_name, json.dumps(violations_copy))
 
 
 class UnmetRequirement:
 	def raise_it(self, agent_id, payload):
+		global agent_ticks
+		global violations
+
 		agent_logs = violations[agent_id]
 		agent_tick = agent_ticks[agent_id]
 
@@ -97,10 +144,18 @@ class UnmetRequirement:
 # Specific
 class AgentTick:
 	def __init__(self, agent_id):
+		global agent_collisions
+		global agent_ticks
+		global number_of_agents
+		global violations
+
 		if agent_id not in agent_ticks:
 			agent_collisions[agent_id] = {}
 			agent_ticks[agent_id]      = -1
 			violations[agent_id]       = {}
+
+			with number_of_agents.get_lock():
+				number_of_agents.value += 1
 
 		agent_ticks[agent_id] += 1
 
@@ -109,10 +164,13 @@ class BrokenScenario(UnmetRequirement):
 		self.raise_it(agent_id, {
 			'message': 'v' + str(agent_id) + ' ' + message
 		})
-		ScenarioEnd()
+		ScenarioEnd(agent_id)
 
 class CollisionWithPedestrian(UnmetRequirement):
 	def __init__(self, agent_id, pid, collision_zone, relative_angle):
+		global agent_collisions
+		global agent_ticks
+
 		collision_state = agent_collisions[agent_id]
 
 		if pid not in collision_state or agent_ticks[agent_id] - TICKS_REQUIRED_WITHOUT_OVERLAPING_THIS_ACTOR > collision_state[pid]:
@@ -138,6 +196,9 @@ class CollisionWithPedestrian(UnmetRequirement):
 
 class CollisionWithVehicle(UnmetRequirement):
 	def __init__(self, agent_id, vid):
+		global agent_collisions
+		global agent_ticks
+
 		collision_state = agent_collisions[agent_id]
 
 		# There must be a gap of 5 ticks without collision between collision with the same agent
@@ -164,6 +225,7 @@ class CollisionWithVehicle(UnmetRequirement):
 class GlobalTick:
 	def __init__(self):
 		global global_tick
+		
 		with global_tick.get_lock():
 			global_tick.value += 1
 
@@ -184,7 +246,7 @@ class ScenarioInterrupted(UnmetRequirement):
 			'agentId': agent_id,
 			'message': 'v' + str(agent_id) + ' scenario interrupted by the user'
 		})
-		ScenarioEnd()
+		ScenarioEnd(agent_id)
 		
 
 class ScenarioTimeout(UnmetRequirement):
@@ -194,7 +256,7 @@ class ScenarioTimeout(UnmetRequirement):
 				'message': 'v' + str(agent_id) + ' did not reach its target location during the ' 
 				    		   + str(timeout) + ' seconds allowed by this scenario.'
 			})
-		ScenarioEnd()
+			ScenarioEnd(agent_id)
 
 
 # Autoclean to avoid learning on a broken stack

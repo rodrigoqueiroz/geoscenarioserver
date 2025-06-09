@@ -150,7 +150,7 @@ class HardRequirements:
 				GoalOvershot(traffic_state.vid)
 			
 			if self.goal_ends_simulation:
-				ScenarioEnd()
+				ScenarioEnd(traffic_state.vid)
 				raise ScenarioCompletion()
 
 

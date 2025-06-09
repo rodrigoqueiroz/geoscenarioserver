@@ -8,7 +8,7 @@ class ActorExtractor(Extractor):
 	def __init__(self, name):
 		self.name = name
 
-	def extract_actor(self, actor, traffic_state):
+	def extract_actor(self, actor, closest_id, traffic_state):
 		distance          = None
 		ego_state         = traffic_state.vehicle_state
 		speed             = max(actor.state.s_vel, 0.0)
@@ -32,19 +32,23 @@ class ActorExtractor(Extractor):
 
 		return {
 			"distance":          distance,
+			"is_leading":		 actor.id == closest_id,
 			"speed":             speed * KMH_TO_MS,
 			"time_to_collision": time_to_collision
 		}
 
-	def extract_actors(self, actors, traffic_state):
+	def extract_actors(self, actors, closest_id, traffic_state):
 		workspace = {}
 
 		for actor in actors:
-			workspace[self.name[0] + '_' + str(actor.id)] = self.extract_actor(actor, traffic_state)
+			workspace[self.name[0] + '_' + str(actor.id)] = self.extract_actor(actor, closest_id, traffic_state)
 
 		return workspace
 
 	def generate_features(self, traffic_state):
+		closest_actor = traffic_state.road_occupancy.front_center.closest()
+		closest_id    = closest_actor.id if closest_actor else None
+
 		return {
-			"front_center": self.extract_actors(getattr(traffic_state.road_occupancy.front_center, self.name), traffic_state)
+			"front_center": self.extract_actors(getattr(traffic_state.road_occupancy.front_center, self.name), closest_id, traffic_state)
 		}

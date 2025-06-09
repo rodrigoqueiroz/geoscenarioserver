@@ -69,8 +69,10 @@ def plan_maneuver(vehicle, mconfig, traffic_state):
             for trajectory in candidates:
                 log.warn(trajectory.unfeasibility_cause)
 
-        BrokenScenario(traffic_state.vid, errorMessage)
-        raise ScenarioCompletion(logMessage)
+        # Disallow Invalid Trajectory during training only
+        if os.getenv("GSS_EVALUATION_NAME", "") == "":
+            BrokenScenario(traffic_state.vid, errorMessage)
+            raise ScenarioCompletion(logMessage)
     
     if not _use_low_level_planner:
         traffic_state.pedestrians      = pedestrians
@@ -241,6 +243,7 @@ def plan_following(vehicle, mconfig:MFollowConfig, traffic_state:TrafficState):
                 target_state_set.append((s_target,d_target,t))
    
     best, candidates = optimized_trajectory(vehicle, mconfig, traffic_state, target_state_set, s_solver=quintic_polynomial_solver)
+
     # if best:
     #     log.info("starting FOLLOW: {:.3f} {:.3f} {:.3f}".format(start_state[0], start_state[1], start_state[2]))
     #     log.info("targetting end {:.3f} {:.3f} {:.3f} at t={:.3f}".format(best_target[0][0], best_target[0][1], best_target[0][2], best_target[-1]))

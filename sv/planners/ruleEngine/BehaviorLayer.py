@@ -88,6 +88,9 @@ class BehaviorLayer(FeatureGenerator):
         except requests.exceptions.RequestException as e:
             log.error(f"RE, RequestException: {e}")
 
+        except SystemExit as e:
+            raise e # Bubble up
+
         except:
             log.error(f"Unexpected error: {sys.exc_info()[0]}")
 
@@ -123,7 +126,7 @@ class BehaviorLayer(FeatureGenerator):
         self.last_behaviour = self.post_behaviour(situation)
 
         if self.debug and get_center_id() == self.vid:
-            log.debug(f"Behaviour {self.last_behaviour}")
+            print(f"Behaviour {self.last_behaviour}")
 
         # Default Behaviour
         self._current_mconfig = MStopConfig( target=MStopConfig.StopTarget.NOW )
@@ -149,6 +152,11 @@ class BehaviorLayer(FeatureGenerator):
                         max_velocity = MVelKeepConfig(vel=MP(speed_upperbound, 10, 6)),
                         target = MStopConfig( pos=self.last_behaviour['parameters']['location']['s'])
                     )
+
+            # Creep-Forward behaviour
+            elif self.last_behaviour['maneuver']['type'] == 'CREEP_FORWARD':
+                desired_speed = 5.0
+                self._current_mconfig = MVelKeepConfig(vel=MP(desired_speed, 10, 6))
 
         self._current_mconfig.use_low_level_planner = False
         return self._current_mconfig, self._ref_path_changed, ""

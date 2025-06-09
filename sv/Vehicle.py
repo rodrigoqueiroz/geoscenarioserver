@@ -149,7 +149,6 @@ class SDV(Vehicle):
             #note: add an emergency break /fallback as a backup plan
             if (time > self.motion_plan.trajectory.T):
                 if self.state.s_vel > 0.1:
-                    print('ooops', time, self.motion_plan.trajectory.T, self.state.s_vel)
                     errorMessage = "finished last trajectory without stopping."
                     BrokenScenario(self.id, errorMessage)
                     raise ScenarioCompletion("Vehicle {} {}".format(self.id, errorMessage))

@@ -286,7 +286,7 @@ class SVPlanner(object):
             ScenarioInterrupted(self.vid)
 
         except SystemExit:
-            ScenarioEnd()
+            ScenarioEnd(self.vid)
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         

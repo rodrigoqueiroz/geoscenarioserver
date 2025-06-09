@@ -281,7 +281,7 @@ class MStopAtConfig(MConfig):
     max_velocity:MVelKeepConfig = field(default_factory=lambda:MVelKeepConfig()) # Velocity upperbound config
     mkey:int                    = Maneuver.M_STOP_AT
     progress_speed:float        = 2.5              # VelocityKeeping low crusing speed toward the goal m/s
-    stop_proximity_event:float  = 6.0              # Switch from VelocityKeeping to StopNow when X meters away from target
+    stop_proximity_event:float  = 8.0              # Switch from VelocityKeeping to StopNow when X meters away from target
     target:MStopConfig          = field(default_factory=lambda:MStopConfig())
 
 @dataclass
