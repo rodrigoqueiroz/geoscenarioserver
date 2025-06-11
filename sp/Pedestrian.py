@@ -293,3 +293,41 @@ class SP(Pedestrian):
         fiv = A*np.exp((riv-div)/B)*niv * (lambda_i + ((1 - lambda_i)*((1+np.cos(np.radians(theta))) / 2)))
 
         return fiv
+    
+class PP(Pedestrian):
+
+    def __init__(self, id, path, debug_shdata, keep_active, frenet_state, name = '', start_state=[0, 0, 0, 0, 0, 0], yaw = 0, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
+        super().__init__(id, name, start_state, yaw, length, width)
+        self.type = Pedestrian.PP_TYPE
+        self.path = path
+        self._debug_shdata = debug_shdata
+        self.keep_active = keep_active
+
+        self.current_path_node = 0
+
+    def tick(self, tick_count, delta_time, sim_time):
+        Pedestrian.tick(self, tick_count, delta_time, sim_time)
+        self.follow_path(delta_time, sim_time, self.path)
+
+        # Fill in some applicable debug data
+        # traffic_state = TrafficState(
+        #     vid = self.id,
+        #     sim_time = sim_time,
+        #     vehicle_state = self.state,
+        #     lane_config = LaneConfig(left_bound=None, right_bound=None),
+        #     traffic_vehicles = {},
+        #     traffic_vehicles_orp = {},
+        # )
+        # vehicle_path = [(n.x, n.y) for n in self.path]
+        # self.sim_traffic.debug_shdata[int(self.id)] = (
+        #     traffic_state,
+        #     None,
+        #     vehicle_path,
+        #     None,
+        #     None,
+        #     None,
+        #     0
+        # )
+
+
+

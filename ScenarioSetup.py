@@ -424,9 +424,25 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("Path Pedestrian {} has no initial speed".format(vid))
                 continue
 
-            pedestrian = Pedestrian(pid, name, start_state, yaw)
+            pedestrian = PP(
+                id=pid,
+                path=path,
+                debug_shdata=sim_traffic.debug_shdata,
+                keep_active=True,  # or whatever the value is
+                frenet_state=frenet_state,
+                name=p_name,
+                start_state=start_state,
+                yaw=yaw,
+                length=length,
+                width=width
+            )
+            
+
             sim_traffic.add_pedestrian(pedestrian)
-            log.info("Pedestrian {} initialized as a motionless pedestrian".format(pid))
+            log.info("Pedestrian {} initialized with PP behavior".format(pid))
+            log.info("Path length: {}".format(path_length))
+            print(path)
+            continue
 
     #========= Static Objects
     #Area based objetics are not supported yet.
