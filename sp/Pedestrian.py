@@ -46,6 +46,7 @@ class Pedestrian(Actor):
         position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, dimensions, position, velocity, self.state.yaw
+    
 
 
 class TP(Pedestrian):
@@ -296,8 +297,17 @@ class SP(Pedestrian):
     
 class PP(Pedestrian):
 
-    def __init__(self, id, path, debug_shdata, keep_active, frenet_state, name = '', start_state=[0, 0, 0, 0, 0, 0], yaw = 0, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw, length, width)
+    # def __init__(self, pid, path, debug_shdata, keep_active, frenet_state, name = '', start_state=[0, 0, 0, 0, 0, 0], yaw = 0, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
+    #     super().__init__(pid, name, start_state, yaw, length, width)
+    #     self.type = Pedestrian.PP_TYPE
+    #     self.path = path
+    #     self._debug_shdata = debug_shdata
+    #     self.keep_active = keep_active
+
+    #     self.current_path_node = 0
+    
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
+        super().__init__(pid, name, start_state, yaw, length, width)
         self.type = Pedestrian.PP_TYPE
         self.path = path
         self._debug_shdata = debug_shdata

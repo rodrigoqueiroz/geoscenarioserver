@@ -425,23 +425,18 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 continue
 
             pedestrian = PP(
-                id=pid,
-                path=path,
-                debug_shdata=sim_traffic.debug_shdata,
-                keep_active=True,  # or whatever the value is
-                frenet_state=frenet_state,
-                name=p_name,
-                start_state=start_state,
-                yaw=yaw,
-                length=length,
-                width=width
+                pid,
+                p_name,
+                start_state,
+                frenet_state,
+                yaw, 
+                path, 
+                sim_traffic.debug_shdata
             )
             
 
             sim_traffic.add_pedestrian(pedestrian)
             log.info("Pedestrian {} initialized with PP behavior".format(pid))
-            log.info("Path length: {}".format(path_length))
-            print(path)
             continue
 
     #========= Static Objects

@@ -7,7 +7,7 @@
     <tag k='name' v='test_pp' />
     <tag k='path' v='test_path_1' />
     <tag k='pid' v='1' />
-    <tag k='speed' v='3' />
+    <tag k='speed' v='10' />
     <tag k='start' v='yes' />
     <tag k='yaw' v='240' />
   </node>
