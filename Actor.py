@@ -142,6 +142,7 @@ class Actor(object):
 
     def follow_path(self, delta_time, sim_time, path):
         if path:
+            # print("length of path: {}", len(path))
             # Which path node have we most recently passed
             node_checkpoint = 0
 
@@ -153,6 +154,8 @@ class Actor(object):
             for i in range(len(path)-1):
                 n1 = path[i]
                 n2 = path[i+1]
+                print(n1)
+                print(n2)
                 if (n1.s <= self.state.s <= n2.s):
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
@@ -190,6 +193,7 @@ class Actor(object):
 
             # Reached the end of the path
             if self.state.s > path[-1].s:
+                # print("reached path end?")
                 self.force_stop()
                 if not self.keep_active:
                     self.state.set_X([-9999, 0, 0])

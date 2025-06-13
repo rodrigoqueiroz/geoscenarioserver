@@ -14514,6 +14514,10 @@
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='20' />
     <tag k='type' v='lanelet' />
+    <tag k='participant:pedestrian' v='yes' />
+    <tag k='participant:bicycle' v='yes' />
+    <tag k='participant:vehicle' v='yes' />
+    <tag k='one_way:pedestrian' v='no' />
   </relation>
   <relation id='-5001754' action='modify' visible='true'>
     <member type='way' ref='-1952097' role='left' />
@@ -14525,6 +14529,10 @@
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='20' />
     <tag k='type' v='lanelet' />
+    <tag k='participant:pedestrian' v='yes' />
+    <tag k='participant:bicycle' v='yes' />
+    <tag k='participant:vehicle' v='yes' />
+    <tag k='one_way:pedestrian' v='no' />
   </relation>
   <relation id='-5001755' action='modify' visible='true'>
     <member type='way' ref='-1952098' role='left' />
@@ -14536,6 +14544,10 @@
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='20' />
     <tag k='type' v='lanelet' />
+    <tag k='participant:pedestrian' v='yes' />
+    <tag k='participant:bicycle' v='yes' />
+    <tag k='participant:vehicle' v='yes' />
+    <tag k='one_way:pedestrian' v='no' />
   </relation>
   <relation id='-5001756' action='modify' visible='true'>
     <member type='relation' ref='-5001833' role='' />
@@ -14548,6 +14560,10 @@
     <tag k='right_marking' v='none' />
     <tag k='speed_limit' v='20' />
     <tag k='type' v='lanelet' />
+    <tag k='participant:pedestrian' v='yes' />
+    <tag k='participant:bicycle' v='yes' />
+    <tag k='participant:vehicle' v='yes' />
+    <tag k='one_way:pedestrian' v='no' />
   </relation>
   <relation id='-5001757' action='modify' visible='true'>
     <member type='relation' ref='-5001833' role='' />
