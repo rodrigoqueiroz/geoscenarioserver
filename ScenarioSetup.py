@@ -393,6 +393,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
+            
+        # Path pedestrian    
         else:
             if 'path' not in pnode.tags:
                 log.error("Path Pedestrian {} requires a path".format(vid))
@@ -427,11 +429,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             pedestrian = PP(
                 pid,
                 p_name,
-                start_state,
-                frenet_state,
-                yaw, 
-                path, 
-                sim_traffic.debug_shdata
+                start_state=start_state,
+                frenet_state=frenet_state,
+                yaw=yaw,
+                path=path,
+                debug_shdata=sim_traffic.debug_shdata,
             )
             
 

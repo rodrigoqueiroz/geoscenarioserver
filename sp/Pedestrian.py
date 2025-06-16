@@ -31,8 +31,8 @@ class Pedestrian(Actor):
 
     VEHICLES_POS = {}
 
-    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
+    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
+        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState(), length=length, width=width)
         self.type = Pedestrian.N_TYPE
 
     def update_sim_state(self, new_state, delta_time):
@@ -296,28 +296,21 @@ class SP(Pedestrian):
         return fiv
     
 class PP(Pedestrian):
-
-    # def __init__(self, pid, path, debug_shdata, keep_active, frenet_state, name = '', start_state=[0, 0, 0, 0, 0, 0], yaw = 0, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
-    #     super().__init__(pid, name, start_state, yaw, length, width)
-    #     self.type = Pedestrian.PP_TYPE
-    #     self.path = path
-    #     self._debug_shdata = debug_shdata
-    #     self.keep_active = keep_active
-
-    #     self.current_path_node = 0
     
     def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
-        super().__init__(pid, name, start_state, yaw, length, width)
+        super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.PP_TYPE
         self.path = path
         self._debug_shdata = debug_shdata
         self.keep_active = keep_active
 
         self.current_path_node = 0
-
+    
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.follow_path(delta_time, sim_time, self.path)
+        
+        # print(self.state.s)
 
         # Fill in some applicable debug data
         # traffic_state = TrafficState(
