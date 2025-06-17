@@ -2,9 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>geoscenario_msgs</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>Message package for geoscenario</description>
-  <maintainer email="ian.colwell@hexagon.com">Ian</maintainer>
+  <maintainer email="michal.antkiewicz@uwaterloo.ca">Michal Antkiewicz</maintainer>
+  <maintainer email="ian.colwell@hexagon.com">Ian Colwell</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

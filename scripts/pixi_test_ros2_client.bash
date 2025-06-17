@@ -3,10 +3,15 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
+WGS84=
+if [[ "$1" == "--wgs84" ]]; then
+    WGS84="_wgs84"
+fi
+
 cd ${REPO_DIR}
 pixi run -e humble ros_client_build
 pixi run -e humble rqt &
-pixi run -e humble ros_client &
+pixi run -e humble ros_client${WGS84} &
 pixi run -e humble ros_mock_co_simulator &
 
 shutdown_nodes() {

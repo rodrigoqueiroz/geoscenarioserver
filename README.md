@@ -63,14 +63,17 @@ pixi run test_scenarios_ci
 pixi run rqt
 pixi run ros_client_build
 pixi run ros_client
+pixi run ros_client_wgs84
 pixi run ros_mock_co_simulator
 pixi run regenerate
 ```
 
 To run automated test of ROS2 client using the mock co-simulator, execute:
 ```
-bash geoscenarioserver/scripts/pixi_test_ros2_client.bash
+bash geoscenarioserver/scripts/pixi_test_ros2_client.bash [--wgs84]
 ```
+By default, the client will use local coordinates.
+Use `--wgs84` flag to convert to and from WGS84 coordinates.
 
 Finally, to activate the environment and execute arbitary commands without ROS2, execute
 ```

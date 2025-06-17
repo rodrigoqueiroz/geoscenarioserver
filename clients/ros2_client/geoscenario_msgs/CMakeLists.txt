@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(geoscenario_msgs)
+project(geoscenario_msgs VERSION 0.1.0)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
