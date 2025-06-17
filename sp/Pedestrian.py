@@ -32,7 +32,7 @@ class Pedestrian(Actor):
     VEHICLES_POS = {}
 
     def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState(), length=length, width=width)
+        super().__init__(id, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.N_TYPE
 
     def update_sim_state(self, new_state, delta_time):
@@ -47,7 +47,6 @@ class Pedestrian(Actor):
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, dimensions, position, velocity, self.state.yaw
     
-
 
 class TP(Pedestrian):
     """
