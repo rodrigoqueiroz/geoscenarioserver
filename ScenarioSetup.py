@@ -397,7 +397,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         # Path pedestrian    
         else:
             if 'path' not in pnode.tags:
-                log.error("Path Pedestrian {} requires a path".format(vid))
+                log.error(f"Path Pedestrian {pid} requires a path")
                 continue
             
             p_name = pnode.tags['path']
@@ -423,7 +423,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             elif 'speed' in pnode.tags:
                 frenet_state[1] = float(pnode.tags['speed']) / 3.6
             else:
-                log.error("Path Pedestrian {} has no initial speed".format(vid))
+                log.error(f"Path Pedestrian {pid} has no initial speed")
                 continue
 
             pedestrian = PP(
@@ -438,7 +438,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             
 
             sim_traffic.add_pedestrian(pedestrian)
-            log.info("Pedestrian {} initialized with PP behavior".format(pid))
+            log.info(f"Pedestrian {pid} initialized with PP behavior")
             continue
 
     #========= Static Objects
