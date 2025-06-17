@@ -46,7 +46,6 @@ class Pedestrian(Actor):
         position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, dimensions, position, velocity, self.state.yaw
-    
 
 class TP(Pedestrian):
     """
