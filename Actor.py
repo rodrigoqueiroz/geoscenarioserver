@@ -156,7 +156,7 @@ class Actor(object):
                 if (n1.s <= self.state.s <= n2.s):
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
-                    if n1.speed is not None and n2.speed is not None:   
+                    if n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
@@ -175,7 +175,7 @@ class Actor(object):
                     dx = n2.x - n1.x
                     dy = n2.y - n1.y
                     d = n2.s - n1.s
-                    # Calculate position 
+                    # Calculate position
                     ratio = (self.state.s - n1.s)/(d)
                     self.state.x = n1.x + (dx) * ratio
                     self.state.y = n1.y + (dy) * ratio
