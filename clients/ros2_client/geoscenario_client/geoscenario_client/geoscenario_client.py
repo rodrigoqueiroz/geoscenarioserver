@@ -199,9 +199,16 @@ class GSClient(Node):
         if self.roundtrip_test:
             # check if the tick matches the one we sent
             if msg.tick_count in self.ticks:
-                diff = DeepDiff(self.ticks[msg.tick_count]["vehicles"][0], vehicles[0], ignore_order=True)
-                if diff:
-                    self.get_logger().error(f"Roundtrip test failed for tick {msg.tick_count}: {diff}")
+                if len(self.ticks[msg.tick_count]["vehicles"]) > 0:
+                    # compare the first vehicle only
+                    diff = DeepDiff(self.ticks[msg.tick_count]["vehicles"][0], vehicles[0], ignore_order=True)
+                    if diff:
+                        self.get_logger().error(f"Roundtrip test failed, tick({msg.tick_count}), vehicle(0):\n {diff['values_changed']}")
+                if len(self.ticks[msg.tick_count]["pedestrians"]) > 0:
+                    # compare the first pedestrian only
+                    diff = DeepDiff(self.ticks[msg.tick_count]["pedestrians"][0], pedestrians[0], ignore_order=True)
+                    if diff:
+                        self.get_logger().error(f"Roundtrip test failed, tick({msg.tick_count}), pedestrian(0):\n {diff['values_changed']}")
             else:
                 self.get_logger().error(f"Received tick {msg.tick_count} not found in stored ticks")
 
