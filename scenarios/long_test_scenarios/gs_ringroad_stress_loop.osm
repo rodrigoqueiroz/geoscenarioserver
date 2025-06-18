@@ -24,6 +24,7 @@
   </node>
   <node id='-5149173' action='modify' visible='true' lat='43.4681668322' lon='-80.5436763174'>
     <tag k='gs' v='origin' />
+    <tag k='altitude' v='298' />
   </node>
   <node id='-5149174' action='modify' visible='true' lat='43.47439847793' lon='-80.54246962216' />
   <node id='-5149175' action='modify' visible='true' lat='43.47268272607' lon='-80.54813411343' />
