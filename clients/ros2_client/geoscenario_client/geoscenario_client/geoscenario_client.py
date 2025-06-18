@@ -10,17 +10,19 @@ from lanelet2.core import BasicPoint3d, GPSPoint
 
 from .SimSharedMemoryClient import *
 
+from deepdiff import DeepDiff
+
 class GSClient(Node):
     def __init__(self):
         super().__init__('geoscenario_client')
-        self.initialize_state()
-        self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
-        self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
         # use local+origin=(lat,lon,alt) or WGS84+origin=(0,0,0) coordinates
         self.declare_parameter('wgs84', False)
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
-        # we can only initialize the projector after we receive the origin
-        self.local_cartesian_projector = None
+        self.declare_parameter('roundtriptest', False)
+        self.roundtrip_test = self.get_parameter('roundtriptest').get_parameter_value().bool_value
+        self.initialize_state()
+        self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
+        self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
         self.timer = self.create_timer(self.short_timer_period, self.timer_callback)
         print(f"GeoScenario client started with wgs84={self.wgs84}")
 
@@ -32,34 +34,53 @@ class GSClient(Node):
         self.previously_connected = False
         self.frequent_polling_switch_count = 0
         self.sim_client_shm = SimSharedMemoryClient()
+        # we can only initialize the projector after we receive the origin
+        self.local_cartesian_projector = None
+        # roundtrip test only: keep each tick in a dictionary and compare it with the received tick from the client
+        if self.roundtrip_test:
+            self.ticks = {}
 
-    def set_msg_position_from_agent(self, msg, agent):
+    def set_msg_pos_vel_from_agent(self, msg, agent):
         if not self.wgs84:
             msg.position.x = agent["x"]
             msg.position.y = agent["y"]
             msg.position.z = agent["z"]
+            msg.velocity.x = agent["vx"]
+            msg.velocity.y = agent["vy"]
         else:
             # convert position to WGS84 coordinates
             wgs84_point = self.local_cartesian_projector.reverse(
                 BasicPoint3d(agent["x"], agent["y"], agent["z"])
             )
+            wgs84_vel_point = self.local_cartesian_projector.reverse(
+                BasicPoint3d(agent["x"]+agent["vx"], agent["y"]+agent["vy"], agent["z"])
+            )
             msg.position.x = wgs84_point.lat
             msg.position.y = wgs84_point.lon
             msg.position.z = wgs84_point.ele
+            msg.velocity.x = wgs84_vel_point.lat - wgs84_point.lat
+            msg.velocity.y = wgs84_vel_point.lon - wgs84_point.lon
 
-    def set_agent_position_from_msg(self, agent, msg):
+    def set_agent_pos_vel_from_msg(self, agent, msg):
         if not self.wgs84:
             agent["x"] = msg.position.x
             agent["y"] = msg.position.y
             agent["z"] = msg.position.z
+            agent["vx"] = msg.velocity.x
+            agent["vy"] = msg.velocity.y
         else:
             # convert position from WGS84 to local coordinates
             local_point = self.local_cartesian_projector.forward(
                 GPSPoint(msg.position.x, msg.position.y, msg.position.z)
             )
+            local_vel_point = self.local_cartesian_projector.forward(
+                GPSPoint(msg.position.x + msg.velocity.x, msg.position.y + msg.velocity.y, msg.position.z)
+            )
             agent["x"] = local_point.x
             agent["y"] = local_point.y
             agent["z"] = local_point.z
+            agent["vx"] = local_vel_point.x - local_point.x
+            agent["vy"] = local_vel_point.y - local_point.y
 
     def timer_callback(self):
         header, origin, vehicles, pedestrians = self.sim_client_shm.read_server_state()
@@ -120,10 +141,7 @@ class GSClient(Node):
             msg.dimensions.x = vehicle["l"]
             msg.dimensions.y = vehicle["w"]
             msg.dimensions.z = vehicle["h"]
-            self.set_msg_position_from_agent(msg, vehicle)
-            # TODO: convert velocity to WGS84?
-            msg.velocity.x = vehicle["vx"]
-            msg.velocity.y = vehicle["vy"]
+            self.set_msg_pos_vel_from_agent(msg, vehicle)
             msg.yaw = vehicle["yaw"]
             msg.steering_angle = vehicle["steering_angle"]
             tick_msg.vehicles.append(msg)
@@ -135,15 +153,17 @@ class GSClient(Node):
             msg.dimensions.x = pedestrian["l"]
             msg.dimensions.y = pedestrian["w"]
             msg.dimensions.z = pedestrian["h"]
-            self.set_msg_position_from_agent(msg, pedestrian)
-            # TODO: convert velocity to WGS84?
-            msg.velocity.x = pedestrian["vx"]
-            msg.velocity.y = pedestrian["vy"]
+            self.set_msg_pos_vel_from_agent(msg, pedestrian)
             msg.yaw = pedestrian["yaw"]
             tick_msg.pedestrians.append(msg)
 
         self.tick_pub.publish(tick_msg)
         self.previous_tick_count = tick_count
+        if self.roundtrip_test:
+            self.ticks[tick_count] = {
+                "vehicles": vehicles,
+                "pedestrians": pedestrians
+            }
 
     def tick_from_client(self, msg):
         # convert the msg into dictionaries
@@ -156,9 +176,7 @@ class GSClient(Node):
             vehicle["l"] = msg_vehicle.dimensions.x
             vehicle["w"] = msg_vehicle.dimensions.y
             vehicle["h"] = msg_vehicle.dimensions.z
-            self.set_agent_position_from_msg(vehicle, msg_vehicle)
-            vehicle["vx"] = msg_vehicle.velocity.x
-            vehicle["vy"] = msg_vehicle.velocity.y
+            self.set_agent_pos_vel_from_msg(vehicle, msg_vehicle)
             vehicle["yaw"] = msg_vehicle.yaw # not used
             vehicle["steering_angle"] = msg_vehicle.steering_angle # not used
             vehicle["active"] = msg_vehicle.active
@@ -172,14 +190,20 @@ class GSClient(Node):
             pedestrian["l"] = msg_pedestrian.dimensions.x
             pedestrian["w"] = msg_pedestrian.dimensions.y
             pedestrian["h"] = msg_pedestrian.dimensions.z
-            self.set_agent_position_from_msg(pedestrian, msg_pedestrian)
-            pedestrian["vx"] = msg_pedestrian.velocity.x
-            pedestrian["vy"] = msg_pedestrian.velocity.y
+            self.set_agent_pos_vel_from_msg(pedestrian, msg_pedestrian)
             pedestrian["yaw"] = msg_pedestrian.yaw # not used
             pedestrian["active"] = msg_vehicle.active
             pedestrians.append(pedestrian)
 
         self.sim_client_shm.write_client_state(msg.tick_count, msg.delta_time, vehicles, pedestrians)
+        if self.roundtrip_test:
+            # check if the tick matches the one we sent
+            if msg.tick_count in self.ticks:
+                diff = DeepDiff(self.ticks[msg.tick_count]["vehicles"][0], vehicles[0], ignore_order=True)
+                if diff:
+                    self.get_logger().error(f"Roundtrip test failed for tick {msg.tick_count}: {diff}")
+            else:
+                self.get_logger().error(f"Received tick {msg.tick_count} not found in stored ticks")
 
 def main(args=None):
     rclpy.init(args=args)
