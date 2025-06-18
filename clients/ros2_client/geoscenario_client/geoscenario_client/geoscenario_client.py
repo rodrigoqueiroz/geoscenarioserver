@@ -33,6 +33,34 @@ class GSClient(Node):
         self.frequent_polling_switch_count = 0
         self.sim_client_shm = SimSharedMemoryClient()
 
+    def set_msg_position_from_agent(self, msg, agent):
+        if not self.wgs84:
+            msg.position.x = agent["x"]
+            msg.position.y = agent["y"]
+            msg.position.z = agent["z"]
+        else:
+            # convert position to WGS84 coordinates
+            wgs84_point = self.local_cartesian_projector.reverse(
+                BasicPoint3d(agent["x"], agent["y"], agent["z"])
+            )
+            msg.position.x = wgs84_point.lat
+            msg.position.y = wgs84_point.lon
+            msg.position.z = wgs84_point.ele
+
+    def set_agent_position_from_msg(self, agent, msg):
+        if not self.wgs84:
+            agent["x"] = msg.position.x
+            agent["y"] = msg.position.y
+            agent["z"] = msg.position.z
+        else:
+            # convert position from WGS84 to local coordinates
+            local_point = self.local_cartesian_projector.forward(
+                GPSPoint(msg.position.x, msg.position.y, msg.position.z)
+            )
+            agent["x"] = local_point.x
+            agent["y"] = local_point.y
+            agent["z"] = local_point.z
+
     def timer_callback(self):
         header, origin, vehicles, pedestrians = self.sim_client_shm.read_server_state()
 
@@ -92,19 +120,8 @@ class GSClient(Node):
             msg.dimensions.x = vehicle["l"]
             msg.dimensions.y = vehicle["w"]
             msg.dimensions.z = vehicle["h"]
-            if not self.wgs84:
-                msg.position.x = vehicle["x"]
-                msg.position.y = vehicle["y"]
-                msg.position.z = vehicle["z"]
-            else:
-                # convert position to WGS84 coordinates
-                wgs84_point = self.local_cartesian_projector.reverse(
-                    BasicPoint3d(vehicle["x"], vehicle["y"], vehicle["z"])
-                )
-                msg.position.x = wgs84_point.lat
-                msg.position.y = wgs84_point.lon
-                msg.position.z = wgs84_point.ele
-                # TODO: convert velocity to WGS84?
+            self.set_msg_position_from_agent(msg, vehicle)
+            # TODO: convert velocity to WGS84?
             msg.velocity.x = vehicle["vx"]
             msg.velocity.y = vehicle["vy"]
             msg.yaw = vehicle["yaw"]
@@ -118,19 +135,8 @@ class GSClient(Node):
             msg.dimensions.x = pedestrian["l"]
             msg.dimensions.y = pedestrian["w"]
             msg.dimensions.z = pedestrian["h"]
-            if not self.wgs84:
-                msg.position.x = pedestrian["x"]
-                msg.position.y = pedestrian["y"]
-                msg.position.z = pedestrian["z"]
-            else:
-                # convert position to WGS84 coordinates
-                wgs84_point = self.local_cartesian_projector.reverse(
-                    BasicPoint3d(vehicle["x"], vehicle["y"], vehicle["z"])
-                )
-                msg.position.x = wgs84_point.lat
-                msg.position.y = wgs84_point.lon
-                msg.position.z = wgs84_point.ele
-                # TODO: convert velocity to WGS84?
+            self.set_msg_position_from_agent(msg, pedestrian)
+            # TODO: convert velocity to WGS84?
             msg.velocity.x = pedestrian["vx"]
             msg.velocity.y = pedestrian["vy"]
             msg.yaw = pedestrian["yaw"]
@@ -150,18 +156,7 @@ class GSClient(Node):
             vehicle["l"] = msg_vehicle.dimensions.x
             vehicle["w"] = msg_vehicle.dimensions.y
             vehicle["h"] = msg_vehicle.dimensions.z
-            if not self.wgs84:
-                vehicle["x"] = msg_vehicle.position.x
-                vehicle["y"] = msg_vehicle.position.y
-                vehicle["z"] = msg_vehicle.position.z
-            else:
-                # convert position from WGS84 to local coordinates
-                local_point = self.local_cartesian_projector.forward(
-                    GPSPoint(msg_vehicle.position.x, msg_vehicle.position.y, msg_vehicle.position.z)
-                )
-                vehicle["x"] = local_point.x
-                vehicle["y"] = local_point.y
-                vehicle["z"] = local_point.z
+            self.set_agent_position_from_msg(vehicle, msg_vehicle)
             vehicle["vx"] = msg_vehicle.velocity.x
             vehicle["vy"] = msg_vehicle.velocity.y
             vehicle["yaw"] = msg_vehicle.yaw # not used
@@ -177,18 +172,7 @@ class GSClient(Node):
             pedestrian["l"] = msg_pedestrian.dimensions.x
             pedestrian["w"] = msg_pedestrian.dimensions.y
             pedestrian["h"] = msg_pedestrian.dimensions.z
-            if not self.wgs84:
-                pedestrian["x"] = msg_pedestrian.position.x
-                pedestrian["y"] = msg_pedestrian.position.y
-                pedestrian["z"] = msg_pedestrian.position.z
-            else:
-                # convert position from WGS84 to local coordinates
-                local_point = self.local_cartesian_projector.forward(
-                    GPSPoint(msg_pedestrian.position.x, msg_pedestrian.position.y, msg_pedestrian.position.z)
-                )
-                pedestrian["x"] = local_point.x
-                pedestrian["y"] = local_point.y
-                pedestrian["z"] = local_point.z
+            self.set_agent_position_from_msg(pedestrian, msg_pedestrian)
             pedestrian["vx"] = msg_pedestrian.velocity.x
             pedestrian["vy"] = msg_pedestrian.velocity.y
             pedestrian["yaw"] = msg_pedestrian.yaw # not used
