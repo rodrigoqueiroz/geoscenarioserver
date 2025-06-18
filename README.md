@@ -64,6 +64,7 @@ pixi run rqt
 pixi run ros_client_build
 pixi run ros_client
 pixi run ros_client_wgs84
+pixi run ros_client_wgs84_roundtriptest
 pixi run ros_mock_co_simulator
 pixi run regenerate
 ```
