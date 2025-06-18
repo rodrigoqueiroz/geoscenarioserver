@@ -15,3 +15,5 @@ The argument `wgs84:=true` (`false` by default) changes the coordinate frame to 
 
 A ROS2 subscriber to `/tick` can determine that WGS84 coordinates are used if `/tick/origin=(0,0,0)`.
 
+The client can execute a round-trip test: store values from server shared memory, convert to WGS84, send to mock co-simulator, receive, convert from WGS84, compare with stored.
+The argument `roundtriptest:=true` (`false` by default) enables this round-trip test.
