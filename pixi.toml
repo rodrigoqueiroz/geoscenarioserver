@@ -60,6 +60,7 @@ catkin_tools = "*"
 rosdep = "*"
 colcon-common-extensions = ">=0.3.0,<0.4"
 setuptools = "<=58.2.0"
+deepdiff = "*"
 
 [feature.humble.activation]
 scripts = ["colcon_ws/install/setup.bash"]
@@ -68,6 +69,7 @@ scripts = ["colcon_ws/install/setup.bash"]
 ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build"] }
 ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", depends-on = ["ros_client_build"] }
+ros_client_wgs84_roundtriptest = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", depends-on = ["ros_client_build"] }
 ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_client_build"] }
 rqt = "rqt"
 
