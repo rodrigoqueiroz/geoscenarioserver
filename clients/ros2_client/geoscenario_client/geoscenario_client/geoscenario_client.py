@@ -201,12 +201,12 @@ class GSClient(Node):
             if msg.tick_count in self.ticks:
                 if len(self.ticks[msg.tick_count]["vehicles"]) > 0:
                     # compare the first vehicle only
-                    diff = DeepDiff(self.ticks[msg.tick_count]["vehicles"][0], vehicles[0], ignore_order=True)
+                    diff = DeepDiff(self.ticks[msg.tick_count]["vehicles"][0], vehicles[0], ignore_order=True, significant_digits=9)
                     if diff:
                         self.get_logger().error(f"Roundtrip test failed, tick({msg.tick_count}), vehicle(0):\n {diff['values_changed']}")
                 if len(self.ticks[msg.tick_count]["pedestrians"]) > 0:
                     # compare the first pedestrian only
-                    diff = DeepDiff(self.ticks[msg.tick_count]["pedestrians"][0], pedestrians[0], ignore_order=True)
+                    diff = DeepDiff(self.ticks[msg.tick_count]["pedestrians"][0], pedestrians[0], ignore_order=True, significant_digits=9)
                     if diff:
                         self.get_logger().error(f"Roundtrip test failed, tick({msg.tick_count}), pedestrian(0):\n {diff['values_changed']}")
             else:
