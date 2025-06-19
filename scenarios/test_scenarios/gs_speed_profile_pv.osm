@@ -8,15 +8,15 @@
   <node id='-5347322' action='modify' visible='true' lat='43.47159784948' lon='-80.53941962763'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='lanelet2_ringroad_pedestrians.osm' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='gs_scenatio_pv_speed_profile' />
     <tag k='timeout' v='60' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347323' action='modify' visible='true' lat='43.4715040238' lon='-80.53933276291'>
-    <tag k='agentacceleration' v='0.5' />
-    <tag k='agentspeed' v='0.5' />
+    <tag k='agentacceleration' v='2' />
+    <tag k='agentspeed' v='5' />
     <tag k='timetoacceleration' v='1' />
   </node>
   <node id='-5347324' action='modify' visible='true' lat='43.47151795106' lon='-80.53946811027'>
@@ -40,6 +40,7 @@
     <tag k='goal_ends_simulation' v='no' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='speed_proile_pv_1' />
+    <tag k='path' v='speed_profile_pv_path_1' />
     <tag k='start' v='yes' />
     <tag k='usespeedprofile' v='yes' />
     <tag k='vid' v='1' />

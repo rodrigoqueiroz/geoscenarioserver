@@ -308,27 +308,7 @@ class PP(Pedestrian):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.follow_path(delta_time, sim_time, self.path)
         
-        # print(self.state.s)
-
-        # Fill in some applicable debug data
-        # traffic_state = TrafficState(
-        #     vid = self.id,
-        #     sim_time = sim_time,
-        #     vehicle_state = self.state,
-        #     lane_config = LaneConfig(left_bound=None, right_bound=None),
-        #     traffic_vehicles = {},
-        #     traffic_vehicles_orp = {},
-        # )
-        # vehicle_path = [(n.x, n.y) for n in self.path]
-        # self.sim_traffic.debug_shdata[int(self.id)] = (
-        #     traffic_state,
-        #     None,
-        #     vehicle_path,
-        #     None,
-        #     None,
-        #     None,
-        #     0
-        # )
+    
 
 
 

@@ -12,8 +12,8 @@
     <tag k='yaw' v='30' />
   </node>
   <node id='-5347271' action='modify' visible='true' lat='43.47163816515' lon='-80.53954234931'>
-    <tag k='agentacceleration' v='0.5' />
-    <tag k='agentspeed' v='0.5' />
+    <tag k='agentacceleration' v='2' />
+    <tag k='agentspeed' v='5' />
     <tag k='timetoacceleration' v='1' />
   </node>
   <node id='-5347272' action='modify' visible='true' lat='43.47165209238' lon='-80.53967769666'>
@@ -34,7 +34,7 @@
   <node id='-5347301' action='modify' visible='true' lat='43.47173199062' lon='-80.53962921403'>
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
-    <tag k='lanelet' v='lanelet2_ringroad_pedestrians.osm' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='gs_scenatio_pp_speed_profile' />
     <tag k='timeout' v='60' />
