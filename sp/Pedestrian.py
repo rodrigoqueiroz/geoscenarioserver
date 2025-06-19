@@ -307,8 +307,3 @@ class PP(Pedestrian):
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.follow_path(delta_time, sim_time, self.path)
-        
-    
-
-
-
