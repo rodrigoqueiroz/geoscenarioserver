@@ -401,6 +401,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/cyrus-sasl-2.1.27-h54b06d7_7.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/dav1d-1.2.1-hd590300_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/dbus-1.13.6-h5008d03_3.tar.bz2
+      - conda: https://conda.anaconda.org/conda-forge/noarch/deepdiff-8.5.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/distro-1.9.0-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.2-pyhd8ed1ab_1.conda
@@ -634,6 +635,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.3-h5fbd93e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openldap-2.6.10-he970967_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openssl-3.5.0-h7b32b05_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/orderly-set-5.4.1-pyhe01879c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/orocos-kdl-1.5.1-h5888daf_8.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/osrf_pycommon-0.2.1-pyhd8ed1ab_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/packaging-25.0-pyh29332c3_1.conda
@@ -2185,6 +2187,19 @@ packages:
   purls: []
   size: 618596
   timestamp: 1640112124844
+- conda: https://conda.anaconda.org/conda-forge/noarch/deepdiff-8.5.0-pyhd8ed1ab_0.conda
+  sha256: 25f8bf4c2727874e0ad71794b784611de2c85c339f0ae0a5e581202a33eac07a
+  md5: adbda62a2137571fcecc74e3eb139c6f
+  depends:
+  - orderly-set >=5.4.1,<6
+  - python >=3.9
+  channel: https://fast.prefix.dev/conda-forge
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/deepdiff?source=hash-mapping
+  size: 74931
+  timestamp: 1746837116800
 - conda: https://conda.anaconda.org/conda-forge/noarch/distlib-0.3.9-pyhd8ed1ab_1.conda
   sha256: 0e160c21776bd881b79ce70053e59736f51036784fa43a50da10a04f0c1b9c45
   md5: 8d88f4a2242e6b96f9ecff9a6a05b2f1
@@ -5635,6 +5650,19 @@ packages:
   purls: []
   size: 3117410
   timestamp: 1746223723843
+- conda: https://conda.anaconda.org/conda-forge/noarch/orderly-set-5.4.1-pyhe01879c_0.conda
+  sha256: d1c3dc9078e5a7e05692581bdcd5b51fd9bf5c676b43174452399d92d0fbc929
+  md5: fdbf73cac03fdc051be700da11779b60
+  depends:
+  - python >=3.9
+  - python
+  channel: https://fast.prefix.dev/conda-forge
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/orderly-set?source=hash-mapping
+  size: 18526
+  timestamp: 1746626574918
 - conda: https://conda.anaconda.org/conda-forge/linux-64/orocos-kdl-1.5.1-h5888daf_8.conda
   sha256: 2c32fc459cabed3b272b3d41c63a869de3bee69636dee39519005fbc3e9c7b64
   md5: 81554d1604c59c8eabf592eacd1f561a

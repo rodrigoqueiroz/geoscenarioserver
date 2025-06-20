@@ -3,10 +3,17 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
 
+ROS_CLIENT="ros_client"
+if [[ "$1" == "--wgs84" ]]; then
+    ROS_CLIENT="${ROS_CLIENT}_wgs84"
+elif [[ "$1" == "--roundtriptest" ]]; then
+    ROS_CLIENT="${ROS_CLIENT}_wgs84_roundtriptest"
+fi
+
 cd ${REPO_DIR}
 pixi run -e humble ros_client_build
 pixi run -e humble rqt &
-pixi run -e humble ros_client &
+pixi run -e humble ${ROS_CLIENT} &
 pixi run -e humble ros_mock_co_simulator &
 
 shutdown_nodes() {
