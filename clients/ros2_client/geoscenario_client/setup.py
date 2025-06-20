@@ -4,7 +4,7 @@ package_name = 'geoscenario_client'
 
 setup(
     name=package_name,
-    version='0.0.2',
+    version='0.1.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
