@@ -10,7 +10,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
-    <tag k='name' v='gs_scenatio_pv_speed_profile' />
+    <tag k='name' v='path vehicle with speed profile' />
     <tag k='timeout' v='60' />
     <tag k='version' v='2.0' />
   </node>
