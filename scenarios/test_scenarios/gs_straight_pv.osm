@@ -4,7 +4,7 @@
     <tag k='collision' v='yes' />
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
-    <tag k='name' v='Straight road path vehicle' />
+    <tag k='name' v='path vehicle constant speed' />
     <tag k='timeout' v='15' />
     <tag k='version' v='2.0' />
   </node>

@@ -393,10 +393,53 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             except Exception as e:
                 log.error("Failed to initialize pedestrian {}".format(pid))
                 raise e
+            
+        # Path pedestrian    
         else:
-            pedestrian = Pedestrian(pid, name, start_state, yaw)
+            if 'path' not in pnode.tags:
+                log.error(f"Path Pedestrian {pid} requires a path")
+                continue
+            
+            p_name = pnode.tags['path']
+            p_nodes = parser.paths[p_name].nodes
+
+            path = []
+            path_length = 0.0
+
+            for i in range(len(p_nodes)):
+                if (i > 0):
+                    path_length += math.hypot(p_nodes[i].x - p_nodes[i-1].x, p_nodes[i].y - p_nodes[i-1].y)
+                node = PathNode()
+                node.x = float(p_nodes[i].x)
+                node.y = float(p_nodes[i].y)
+                node.s = float(path_length)
+                node.speed = float(p_nodes[i].tags['agentspeed']/3.6) if ('agentspeed' in p_nodes[i].tags) else None
+                path.append(node)
+            
+            # Set initial longitudinal velocity, path always takes precedence
+            frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
+            if path[0].speed is not None:
+                frenet_state[1] = path[0].speed / 3.6
+            elif 'speed' in pnode.tags:
+                frenet_state[1] = float(pnode.tags['speed']) / 3.6
+            else:
+                log.error(f"Path Pedestrian {pid} has no initial speed")
+                continue
+
+            pedestrian = PP(
+                pid,
+                p_name,
+                start_state=start_state,
+                frenet_state=frenet_state,
+                yaw=yaw,
+                path=path,
+                debug_shdata=sim_traffic.debug_shdata,
+            )
+            
+
             sim_traffic.add_pedestrian(pedestrian)
-            log.info("Pedestrian {} initialized as a motionless pedestrian".format(pid))
+            log.info(f"Pedestrian {pid} initialized with PP behavior")
+            continue
 
     #========= Static Objects
     #Area based objetics are not supported yet.
