@@ -85,7 +85,7 @@ run_scenario_save_regression()
     if [[ -f "${regression_folder}violations.json" ]]; then
         echo ""
         echo "=== diff violations.json for \"$(basename ${scenario})\" ==="
-        diff <(jq --sort-keys . ${REPO_DIR}/outputs/violations.json) <(jq --sort-keys . ${regression_folder}violations.json) 
+        diff <(jq --sort-keys . ${regression_folder}violations.json) <(jq --sort-keys . ${REPO_DIR}/outputs/violations.json)
         if [[ $? -gt 0 ]]; then
             ((regression_failures++))
             save="yes"
