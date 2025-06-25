@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5390768' action='modify' visible='true' lat='43.45482024528' lon='-80.57009078117'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/avin.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='CCC_scp' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5390769' action='modify' visible='true' lat='43.45479182411' lon='-80.56992764919'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5390770' action='modify' visible='true' lat='43.45506340027' lon='-80.56907827869'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='SUT' />
+    <tag k='route' v='vut_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='150' />
+  </node>
+  <node id='-5390771' action='modify' visible='true' lat='43.45433688638' lon='-80.56934659553'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='GVT' />
+    <tag k='route' v='gvt_route' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='-130' />
+  </node>
+  <node id='-5390772' action='modify' visible='true' lat='43.4544918266' lon='-80.56951764604' />
+  <node id='-5390773' action='modify' visible='true' lat='43.45466866765' lon='-80.56968730274' />
+  <node id='-5390774' action='modify' visible='true' lat='43.45524260804' lon='-80.57006794277' />
+  <node id='-5390775' action='modify' visible='true' lat='43.45485811614' lon='-80.56965757041' />
+  <node id='-5390777' action='modify' visible='true' lat='43.45462597513' lon='-80.57016047638' />
+  <way id='-1956763' action='modify' visible='true'>
+    <nd ref='-5390772' />
+    <nd ref='-5390773' />
+    <nd ref='-5390774' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='gvt_route' />
+  </way>
+  <way id='-1956764' action='modify' visible='true'>
+    <nd ref='-5390775' />
+    <nd ref='-5390777' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='vut_route' />
+  </way>
+</osm>

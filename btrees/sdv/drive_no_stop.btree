@@ -1,0 +1,9 @@
+behaviortree drive:
+    ?
+        ->
+            condition c_laneocc(lane_occupied(zid=FRONT, distance=30))
+            maneuver m_keepvelocity(MVelKeepConfig(vel=MP(14.0,10,6)))
+        ->
+            condition c_goal(reached_goal())
+            maneuver m_stop_goal(MStopConfig(target=GOAL_POINT))
+        maneuver m_keepvelocity(MVelKeepConfig(vel=MP(14.0,10,6)))

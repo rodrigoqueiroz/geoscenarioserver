@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5382445' action='modify' lat='43.43530230918' lon='-80.58011301839' />
+  <node id='-5382446' action='modify' lat='43.43543371156' lon='-80.57979051079'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_firetower_4waystop.osm' />
+    <tag k='name' v='Car to car front turn across path' />
+    <tag k='timeout' v='30' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5382447' action='modify' lat='43.43537306152' lon='-80.57978848592'>
+    <tag k='altitude' v='329' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5382448' action='modify' lat='43.435133707' lon='-80.57961082609' />
+  <node id='-5382449' action='modify' lat='43.43500255567' lon='-80.57958149035'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='goal_ends_simulation' v='yes' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='vleftturn' />
+    <tag k='notgs' v='vehicle' />
+    <tag k='route' v='north_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='270' />
+  </node>
+  <node id='-5382450' action='modify' lat='43.435671382' lon='-80.57972549253'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='vsouth' />
+    <tag k='route' v='south_route' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='90' />
+  </node>
+  <node id='-5382451' action='modify' lat='43.43599087227' lon='-80.57976372375' />
+  <node id='-5382452' action='modify' lat='43.43506575297' lon='-80.57966640935' />
+  <node id='-5382453' action='modify' lat='43.43550967388' lon='-80.57970748618' />
+  <way id='-1956230' action='modify'>
+    <nd ref='-5382448' />
+    <nd ref='-5382445' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='north_route' />
+  </way>
+  <way id='-1956231' action='modify'>
+    <nd ref='-5382451' />
+    <nd ref='-5382453' />
+    <nd ref='-5382452' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='south_route' />
+  </way>
+</osm>

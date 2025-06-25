@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-2720158' action='modify' lat='43.47169299867' lon='-80.54007110225'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='nhtsa/maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='NHTSA 20 - Making a maneuver - opposite direction' />
+    <tag k='timeout' v='180' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-2720159' action='modify' lat='43.47172459721' lon='-80.54007196904'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-2720160' action='modify' lat='43.47146010168' lon='-80.5393490633' />
+  <node id='-2720161' action='modify' lat='43.47131010229' lon='-80.53909949703'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='breaking_vehicle' />
+    <tag k='route' v='break_path' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-2720162' action='modify' lat='43.4711592753' lon='-80.53884132628' />
+  <node id='-2720163' action='modify' lat='43.47112542789' lon='-80.53877849316'>
+    <tag k='btree' v='drive_no_stop.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-2720164' action='modify' lat='43.47131628381' lon='-80.53911037706' />
+  <node id='-2720165' action='modify' lat='43.47139688372' lon='-80.53924645537' />
+  <way id='-1948463' action='modify'>
+    <nd ref='-2720162' />
+    <nd ref='-2720160' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1948464' action='modify'>
+    <nd ref='-2720164' />
+    <nd ref='-2720165' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='break_path' />
+  </way>
+</osm>

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5382469' action='modify' lat='43.47169299867' lon='-80.54007110225'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='nhtsa/maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='car to car rear stationary' />
+    <tag k='timeout' v='8' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5382470' action='modify' lat='43.47172459721' lon='-80.54007196904'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5382471' action='modify' lat='43.47152024899' lon='-80.53945236854' />
+  <node id='-5382472' action='modify' lat='43.47141617986' lon='-80.53928224517'>
+    <tag k='btree' v='drive.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='stopped_vehicle' />
+    <tag k='route' v='stationary' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5382473' action='modify' lat='43.4712294' lon='-80.53895759377' />
+  <node id='-5382474' action='modify' lat='43.47120952055' lon='-80.53892186355'>
+    <tag k='btree' v='drive_no_stop.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='2' />
+    <tag k='gs' v='vehicle' />
+    <tag k='model' v='light_vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='route' v='east_west_route' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5382475' action='modify' lat='43.47141673146' lon='-80.53928374722' />
+  <node id='-5382476' action='modify' lat='43.47141708726' lon='-80.5392842374' />
+  <way id='-1956235' action='modify'>
+    <nd ref='-5382473' />
+    <nd ref='-5382471' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='east_west_route' />
+  </way>
+  <way id='-1956236' action='modify'>
+    <nd ref='-5382475' />
+    <nd ref='-5382476' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='stationary' />
+  </way>
+</osm>
