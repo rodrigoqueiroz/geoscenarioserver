@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-28674' action='modify' visible='true' lat='43.47179794287' lon='-80.53977058652'>
+    <tag k='btype' v='PP' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='test_pp' />
+    <tag k='path' v='test_path_1' />
+    <tag k='pid' v='1' />
+    <tag k='speed' v='10' />
+    <tag k='start' v='yes' />
+    <tag k='yaw' v='240' />
+  </node>
+  <node id='-28675' action='modify' visible='true' lat='43.47187811106' lon='-80.53987618115'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='path pedestrian constant speed' />
+    <tag k='timeout' v='60' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-28676' action='modify' visible='true' lat='43.47178202712' lon='-80.53978277051' />
+  <node id='-28677' action='modify' visible='true' lat='43.47174312192' lon='-80.53984287822' />
+  <node id='-28678' action='modify' visible='true' lat='43.47170646839' lon='-80.53988524485'>
+    <tag k='elevation' v='298.0' />
+  </node>
+  <node id='-28679' action='modify' visible='true' lat='43.47168594302' lon='-80.53993710112' />
+  <node id='-28680' action='modify' visible='true' lat='43.47176964819' lon='-80.53990582887'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <way id='-6978' action='modify' visible='true'>
+    <nd ref='-28676' />
+    <nd ref='-28677' />
+    <nd ref='-28678' />
+    <nd ref='-28679' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='test_path_1' />
+  </way>
+</osm>

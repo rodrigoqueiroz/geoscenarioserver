@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5347261' action='modify' visible='true' lat='43.47165868949' lon='-80.53953426887'>
+    <tag k='btype' v='PP' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='Ped_1_speed_profile' />
+    <tag k='path' v='speed_profile_path_1' />
+    <tag k='pid' v='1' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='yes' />
+    <tag k='yaw' v='30' />
+  </node>
+  <node id='-5347271' action='modify' visible='true' lat='43.47163816515' lon='-80.53954234931'>
+    <tag k='agentacceleration' v='2' />
+    <tag k='agentspeed' v='5' />
+    <tag k='timetoacceleration' v='1' />
+  </node>
+  <node id='-5347272' action='modify' visible='true' lat='43.47165209238' lon='-80.53967769666'>
+    <tag k='agentacceleration' v='3' />
+    <tag k='agentspeed' v='2' />
+    <tag k='timetoacceleration' v='0.5' />
+  </node>
+  <node id='-5347273' action='modify' visible='true' lat='43.4715817232' lon='-80.53964234474'>
+    <tag k='agentacceleration' v='2' />
+    <tag k='agentspeed' v='10' />
+    <tag k='timetoacceleration' v='2' />
+  </node>
+  <node id='-5347274' action='modify' visible='true' lat='43.47151941709' lon='-80.53970294804'>
+    <tag k='agentacceleration' v='5' />
+    <tag k='agentspeed' v='5' />
+    <tag k='timetoacceleration' v='2' />
+  </node>
+  <node id='-5347301' action='modify' visible='true' lat='43.47173199062' lon='-80.53962921403'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='path pedestrian with speed profile' />
+    <tag k='timeout' v='60' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5347310' action='modify' visible='true' lat='43.47160737864' lon='-80.53958376156'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <way id='-1952717' action='modify' visible='true'>
+    <nd ref='-5347271' />
+    <nd ref='-5347272' />
+    <nd ref='-5347273' />
+    <nd ref='-5347274' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='speed_profile_path_1' />
+  </way>
+</osm>

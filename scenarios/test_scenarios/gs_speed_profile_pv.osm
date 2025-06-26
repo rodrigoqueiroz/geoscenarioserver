@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5347321' action='modify' visible='true' lat='43.47147323722' lon='-80.53937417516'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5347322' action='modify' visible='true' lat='43.47159784948' lon='-80.53941962763'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='path vehicle with speed profile' />
+    <tag k='timeout' v='60' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5347323' action='modify' visible='true' lat='43.4715040238' lon='-80.53933276291'>
+    <tag k='agentacceleration' v='2' />
+    <tag k='agentspeed' v='5' />
+    <tag k='timetoacceleration' v='1' />
+  </node>
+  <node id='-5347324' action='modify' visible='true' lat='43.47151795106' lon='-80.53946811027'>
+    <tag k='agentacceleration' v='3' />
+    <tag k='agentspeed' v='2' />
+    <tag k='timetoacceleration' v='0.5' />
+  </node>
+  <node id='-5347325' action='modify' visible='true' lat='43.47144758173' lon='-80.53943275835'>
+    <tag k='agentacceleration' v='2' />
+    <tag k='agentspeed' v='10' />
+    <tag k='timetoacceleration' v='2' />
+  </node>
+  <node id='-5347326' action='modify' visible='true' lat='43.47138527548' lon='-80.53949336164'>
+    <tag k='agentacceleration' v='5' />
+    <tag k='agentspeed' v='5' />
+    <tag k='timetoacceleration' v='2' />
+  </node>
+  <node id='-5347332' action='modify' visible='true' lat='43.47151428599' lon='-80.53931609701'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='no' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='speed_proile_pv_1' />
+    <tag k='path' v='speed_profile_pv_path_1' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='yes' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='240' />
+  </node>
+  <way id='-1952740' action='modify' visible='true'>
+    <nd ref='-5347323' />
+    <nd ref='-5347324' />
+    <nd ref='-5347325' />
+    <nd ref='-5347326' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='speed_profile_pv_path_1' />
+  </way>
+</osm>

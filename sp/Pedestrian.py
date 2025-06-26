@@ -31,8 +31,8 @@ class Pedestrian(Actor):
 
     VEHICLES_POS = {}
 
-    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
+    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
+        super().__init__(id, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.N_TYPE
 
     def update_sim_state(self, new_state, delta_time):
@@ -47,14 +47,13 @@ class Pedestrian(Actor):
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, dimensions, position, velocity, self.state.yaw
 
-
 class TP(Pedestrian):
     """
     A trajectory following pedestrian.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
     def __init__(self, id:int, name:str, start_state, yaw:float, trajectory, keep_active:bool = True, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw, length=length, width=width)
+        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -76,7 +75,7 @@ class SP(Pedestrian):
     """
 
     def __init__(self, id:int, name:str, start_state, yaw:float, goal_points, root_btree_name, btree_locations=[], btype="", length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw, length=length, width=width)
+        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
         self.btype = btype
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
@@ -293,3 +292,18 @@ class SP(Pedestrian):
         fiv = A*np.exp((riv-div)/B)*niv * (lambda_i + ((1 - lambda_i)*((1+np.cos(np.radians(theta))) / 2)))
 
         return fiv
+    
+class PP(Pedestrian):
+    
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH):
+        super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
+        self.type = Pedestrian.PP_TYPE
+        self.path = path
+        self._debug_shdata = debug_shdata
+        self.keep_active = keep_active
+
+        self.current_path_node = 0
+    
+    def tick(self, tick_count, delta_time, sim_time):
+        Pedestrian.tick(self, tick_count, delta_time, sim_time)
+        self.follow_path(delta_time, sim_time, self.path)
