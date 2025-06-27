@@ -58,8 +58,18 @@
     <tag k='time' v='4' />
     <tag k='yaw' v='320' />
   </node>
-  <node id='-5350785' action='modify' visible='true' lat='43.47115782997' lon='-80.53874152883' />
-  <node id='-5350786' action='modify' visible='true' lat='43.47118662547' lon='-80.53886221758' />
+  <node id='-5350785' action='modify' visible='true' lat='43.47115782997' lon='-80.53874152883'>
+    <tag k='gs' v='tnode' />
+    <tag k='speed' v='5' />
+    <tag k='time' v='6' />
+    <tag k='yaw' v='320' />
+  </node>
+  <node id='-5350786' action='modify' visible='true' lat='43.47118662547' lon='-80.53886221758'>
+    <tag k='gs' v='tnode' />
+    <tag k='speed' v='5' />
+    <tag k='time' v='10' />
+    <tag k='yaw' v='320' />
+  </node>
   <node id='-5396159' action='modify' visible='true' lat='43.47115353924' lon='-80.53874301343'>
     <tag k='btree' v='walk_ensure_collision.btree' />
     <tag k='btype' v='SP' />
