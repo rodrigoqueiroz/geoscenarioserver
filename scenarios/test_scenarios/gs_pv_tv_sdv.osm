@@ -42,7 +42,7 @@
     <tag k='name' v='path_vehicle' />
     <tag k='path' v='vehicle_path' />
     <tag k='speed' v='10' />
-    <tag k='vid' v='1' />
+    <tag k='vid' v='2' />
     <tag k='yaw' v='320' />
   </node>
   <node id='-5396145' action='modify' visible='true' lat='43.47106897999' lon='-80.53875018474' />
