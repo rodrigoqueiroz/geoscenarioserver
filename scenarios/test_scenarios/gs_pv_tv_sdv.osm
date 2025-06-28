@@ -111,5 +111,7 @@
     <nd ref='-5396162' />
     <nd ref='-5396163' />
     <nd ref='-5396164' />
+    <tag k='gs' v='trajectory' />
+    <tag k='name' v='vehicle_traj' />
   </way>
 </osm>
