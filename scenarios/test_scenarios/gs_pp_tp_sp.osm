@@ -71,7 +71,7 @@
     <tag k='yaw' v='320' />
   </node>
   <node id='-5396159' action='modify' visible='true' lat='43.47115353924' lon='-80.53874301343'>
-    <tag k='btree' v='walk_ensure_collision.btree' />
+    <tag k='btree' v='walk.btree' />
     <tag k='btype' v='SP' />
     <tag k='destination' v='ped_2_dest' />
     <tag k='gs' v='pedestrian' />
