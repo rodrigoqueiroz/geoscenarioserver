@@ -72,7 +72,8 @@ POINTS_PER_METER = 3.0           #The number of points per meter to be used alon
                                  #Note that the value that is used may be slightly different
 
 # Tracking
-ALPHA_MIN_SIZE = 0.75           # Number of ticks kept in the tracker memory for an observation (e.g., speed, position)
+ALPHA_MIN_SIZE         = 0.75   # Fraction of the history kept in the tracker memory for an observation (e.g., speed, position)
+ALPHA_HEAT_SIZE        = 20
 TRACKER_RETENTION_TICK = 5      # Number of ticks of consecutive missed detection require to 
                                 # drop a dynamic obtacle from the tracker memory 
 

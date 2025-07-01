@@ -3,7 +3,7 @@ import numpy as np
 from math import sin
 
 from Actor import ActorSimState
-from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
+from requirements.RequirementEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import TrafficState
 from util.BoundingBoxes import calculate_rectangular_bounding_box
 
@@ -13,7 +13,10 @@ class HardRequirements:
 		self.goal_ends_simulation = goal_ends_simulation
 		self.goal_s_distance      = float('inf')
 
-	def all_conditions(self):
+	def all_comparable_conditions(self):
+		return []
+
+	def all_direct_conditions(self):
 		return [
 			self.detect_collisions,
 			self.detect_goal_overshot
@@ -83,7 +86,7 @@ class HardRequirements:
 							collision_zone = "left"
 
 		if collision_zone:
-			CollisionWithPedestrian(vid, pid, collision_zone, relative_angle)
+			self.ego_vehicle.events_queue.put(CollisionWithPedestrian(vid, pid, collision_zone, relative_angle))
 
 
 	def detect_collisions(self, traffic_state:TrafficState):
@@ -113,7 +116,7 @@ class HardRequirements:
 				vehicle_box = calculate_rectangular_bounding_box(vehicle)
 
 				if self.do_polygons_intersect(ego_vehicle.bounding_box, vehicle_box):
-					CollisionWithVehicle(ego_vehicle.id, vid)
+					self.ego_vehicle.events_queue.put(CollisionWithVehicle(ego_vehicle.id, vid))
 				
 
 	def detect_goal_overshot(self, traffic_state:TrafficState):
@@ -147,10 +150,10 @@ class HardRequirements:
 				return
 
 			if traffic_state.vehicle_state.s_vel > 1.0:
-				GoalOvershot(traffic_state.vid)
+				self.ego_vehicle.events_queue.put(GoalOvershot(traffic_state.vid))
 			
 			if self.goal_ends_simulation:
-				ScenarioEnd(traffic_state.vid)
+				self.ego_vehicle.events_queue.put(ScenarioEnd(traffic_state.vid))
 				raise ScenarioCompletion()
 
 

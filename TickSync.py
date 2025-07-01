@@ -13,7 +13,6 @@ import datetime
 import math
 import time
 
-from requirements.RequirementViolationEvents import ScenarioTimeout
 from SimConfig  import *
 from util.Utils import truncate
 
@@ -24,28 +23,32 @@ class TickSync():
 
     def __init__(self, rate = TRAFFIC_RATE, realtime = True, block = False, verbose = False, label = "", sim_start_time = 0.0):
         #config
-        self.timeout = None
-        self.tick_rate = rate
+        self.block          = block
         self.expected_tick_duration = 1.0/rate
-        self.block = block
-        self.verbose = verbose
-        self.label = label
+        self.label          = label
         self.sim_start_time = sim_start_time
+        self.tick_rate      = rate
+        self.timeout        = None
+        self.verbose        = verbose
+
         #global
-        self._sim_start_clock = None        #clock time when sim started (first tick) [clock]
-        self.tick_count       = 0
-        self.sim_time         = 0           #Total simulation time since start() [s]
+        self._sim_start_clock  = None       #clock time when sim started (first tick) [clock]
+        self.tick_count        = 0
+        self.sim_time          = 0          #Total simulation time since start() [s]
+        
         #per tick
         self._tick_start_clock = None       #sim time when tick started [s] 
-        self.delta_time = 0.0               #diff since previous tick [s] (aka frame time) 
-        self.drift = 0.0                    #diff between expected tick time and actual time caused by lag
+        self.delta_time        = 0.0        #diff since previous tick [s] (aka frame time) 
+        self.drift             = 0.0        #diff between expected tick time and actual time caused by lag
+        
         #stats
         self.performance_log = []
         self.target_performance_stats = [
             self.label,
             self.timeout,
             self.tick_rate,
-            self.expected_tick_duration]
+            self.expected_tick_duration
+        ]
 
     def get_sim_time(self):
         return self.sim_time
@@ -56,45 +59,48 @@ class TickSync():
     def tick(self):
         now = datetime.datetime.now()
         #First Tick
-        if (self.tick_count==0): 
+        if self.tick_count == 0: 
             #The first Tick is special:
-            self._sim_start_clock = now
-            self.delta_time = 0.0
+            self.delta_time        = 0.0
+            self._sim_start_clock  = now
             self._tick_start_clock = now
+
             #Update globals
-            self.tick_count+=1
-            self.sim_time = self.sim_start_time #starting time by config
+            self.tick_count += 1
+            self.sim_time    = self.sim_start_time #starting time by config
             log.debug(f"sim_time {self.sim_time:05.2f} s, tick {self.label}, sim_start_clock {self._sim_start_clock:3} # START")
             return True
-        else:
-            #Can tick? Preliminary numbers:
-            diff_tick = (now - self._tick_start_clock).total_seconds()                #diff from previous tick
-            drift =  diff_tick - self.expected_tick_duration                        #diff from expected time
-            if (drift<0):
-                #Too fast. Need to chill.
-                if (self.block):
-                    time.sleep(-drift)      #blocks diff if negative drift
-                    #log.debug('sleep {:.3}'.format(drift))
-                else:
-                    #log.debug('skip {:.3}'.format(drift))
-                    return False            #return false to skip
+
+        #Can tick? Preliminary numbers:
+        diff_tick = (now - self._tick_start_clock).total_seconds()        #diff from previous tick
+        drift     =  diff_tick - self.expected_tick_duration              #diff from expected time
+        
+        if drift < 0:
+            if not self.block:
+                #log.debug('skip {:.3}'.format(drift))
+                return False   #return false to skip
+
+            # Too fast. Need to chill.
+            time.sleep(-drift)      #blocks diff if negative drift
+            #log.debug('sleep {:.3}'.format(drift))
+        
         #Can proceed tick: on time or late (drift):
         now = datetime.datetime.now()    #update after wake up
-        self.delta_time = (now - self._tick_start_clock).total_seconds()         #diff from previous tick
-        self.drift = self.delta_time - self.expected_tick_duration        #diff from expected time
+        self.delta_time        = (now - self._tick_start_clock).total_seconds()  #diff from previous tick
+        self.drift             = self.delta_time - self.expected_tick_duration   #diff from expected time
         self._tick_start_clock = now
+        
         #Update globals
-        passed_time = (now - self._sim_start_clock).total_seconds()
-        self.sim_time =  self.sim_start_time + passed_time
-        self.tick_count+=1
+        passed_time      = (now - self._sim_start_clock).total_seconds()
+        self.sim_time    =  self.sim_start_time + passed_time
+        self.tick_count += 1
+        
         #stats
         self.update_stats()
 
         #Check timeout
-        if (self.timeout):
-            if (self.sim_time>=self.timeout):
-                # TODO: not always scenario timeout, could also be timeout of a condition or another task
-                ScenarioTimeout(self.timeout)
+        if self.timeout:
+            if self.sim_time >= self.timeout:
                 log.info('{} TIMEOUT: {:.3}s'.format(self.label, self.sim_time))
                 return False
                 
@@ -108,6 +114,7 @@ class TickSync():
                 truncate(self.delta_time,3),
                 truncate(self.drift,3)
             ])
+        
         if self.verbose:
             log.debug('{:05.2f}s {} Tick {:3}# +{:.3f} e{:.3f} d{:.3f} '.
                     format(self.sim_time,self.label,self.tick_count, self.delta_time, self.expected_tick_duration, self.drift))
@@ -128,11 +135,11 @@ class TickSync():
 
     def set_task(self, label, target_t, max_t = None):
         #Note: a single task per object. 
-        #Todo: alllow tracking of multiple tasks in the same object
-        self.task_label = label
-        self.target_t = target_t
+        #Todo: allow tracking of multiple tasks in the same object
+        self.max_t         = max_t
         self.next_target_t = target_t
-        self.max_t = max_t
+        self.target_t      = target_t
+        self.task_label    = label
 
     def get_task_time(self):
         return self.target_t

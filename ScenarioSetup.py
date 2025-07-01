@@ -6,6 +6,7 @@
 # --------------------------------------------
 
 from lanelet2.core import GPSPoint
+from multiprocessing import Queue
 from types import LambdaType
 
 try:
@@ -33,7 +34,7 @@ def extract_tag(vnode, name, default_value, parser_fn):
     return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
 
 
-def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
+def load_geoscenario_from_file(gsfiles, events_queue:Queue, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
     """
     full_scenario_paths = []
@@ -203,7 +204,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                                 lanelet_map, route_nodes,
                                 start_state_in_frenet=start_in_frenet,
-                                btree_locations=btree_locations, btype=btype, detection_range_in_meters=detection_range_in_meters, 
+                                btree_locations=btree_locations, btype=btype, 
+                                detection_range_in_meters=detection_range_in_meters, events_queue=events_queue,
                                 goal_ends_simulation=goal_ends_simulation, hallucination_retention=hallucination_retention, 
                                 hallucination_weight=hallucination_weight, missed_detection_weight=missed_detection_weight, 
                                 noise_position_mixture=noise_position_mixture, noise_yaw_mostly_reliable=noise_yaw_mostly_reliable, 
@@ -426,7 +428,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     #Finished
     return True
 
-def load_geoscenario_from_code(scenario_name:str, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
+def load_geoscenario_from_code(scenario_name:str, events_queue:Queue, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap):
     """ Setup scenario directly from code
         Add more entries as more scenarios are added
     """

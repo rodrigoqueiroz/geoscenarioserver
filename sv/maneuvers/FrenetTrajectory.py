@@ -92,6 +92,7 @@ class FrenetTrajectory:
         #limit max time
         if time > self.T: 
             time = self.T
+            
         return [self.fs(time), self.fs_vel(time), self.fs_acc(time),
                 self.fd(time), self.fd_vel(time), self.fd_acc(time)]
 

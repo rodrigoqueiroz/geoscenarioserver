@@ -6,7 +6,7 @@
 # --------------------------------------------
 import sys
 
-from copy import copy
+from copy import copy, deepcopy
 from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
 
@@ -14,7 +14,7 @@ from Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
-from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
+from requirements.RequirementEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
 from SimTraffic import *
 from sv.maneuvers.FrenetTrajectory import *
 from sv.maneuvers.Config import *
@@ -41,7 +41,7 @@ class SVPlanner(object):
         self._mplan_sharr         = None
         self._perception          = perception
         self._tracker             = tracker
-        self._requirementsChecker = RequirementsChecker(sdv, goal_ends_simulation)
+        self._requirements_checker = RequirementsChecker(sdv, goal_ends_simulation)
         self._rule_engine_port    = rule_engine_port
 
         #Shared space
@@ -110,6 +110,7 @@ class SVPlanner(object):
     def before_exit(self,*args):
         if self.sync_planner:
             self.sync_planner.write_performance_log()
+
         sys.exit(0)
 
 
@@ -161,18 +162,19 @@ class SVPlanner(object):
 
                 # Get traffic, lane config and regulatory elements in current frenet frame
                 project_dynamic_objects(self.last_plan, self.sdv_route, self.sdv.state, traffic_vehicles, traffic_pedestrians, state_time, self.sync_planner.get_task_time())
-                traffic_state = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+                traffic_state              = get_traffic_state(self.sync_planner, self.sdv, self.laneletmap, self.sdv_route, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects)
+                ground_truth_traffic_state = deepcopy(traffic_state)
 
                 if not traffic_state:
                     log.warning("Invalid planner state, skipping planning step...")
                     continue
 
-                self._requirementsChecker.analyze(traffic_state)
+                self._requirements_checker.analyze(traffic_state)
 
                 # Must be after requirementChecker.analyze, since we are not yet sure if the next tick is required
-                AgentTick(traffic_state.vid)
+                self.sdv.events_queue.put(AgentTick(traffic_state.vid))
                 traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
-                traffic_state = self._tracker.track_dynamic_objects(    traffic_state, self.laneletmap, self.sdv_route)
+                traffic_state = self._tracker.track_dynamic_objects(    traffic_state, self.laneletmap, self.sdv_route, self.sync_planner.delta_time)
                 
                 #BTree Tick - using frenet state and lane config based on old ref path
                 mconfig, ref_path_changed, snapshot_tree = self.behavior_layer.tick(traffic_state)
@@ -190,9 +192,10 @@ class SVPlanner(object):
                         continue
 
                     traffic_state = self._perception.restrict_to_perception(traffic_state, self.laneletmap, self.sdv_route)
-                    traffic_state = self._tracker.track_dynamic_objects(    traffic_state, self.laneletmap, self.sdv_route)
+                    traffic_state = self._tracker.track_dynamic_objects(    traffic_state, self.laneletmap, self.sdv_route, self.sync_planner.delta_time)
                     mconfig, _, snapshot_tree = self.behavior_layer.tick(traffic_state)
 
+                self._requirements_checker.compare(ground_truth_traffic_state, traffic_state)
 
                 # new maneuver
                 if self.mconfig and self.mconfig.mkey != mconfig.mkey:
@@ -283,10 +286,10 @@ class SVPlanner(object):
                 self.completion.value = True
 
         except KeyboardInterrupt:
-            ScenarioInterrupted(self.vid)
+            self.sdv.events_queue.put(ScenarioInterrupted(self.vid))
 
         except SystemExit:
-            ScenarioEnd(self.vid)
+            self.sdv.events_queue.put(ScenarioEnd(self.vid))
 
         log.info('PLANNER PROCESS END. Vehicle{}'.format(self.vid))
         

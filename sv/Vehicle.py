@@ -9,6 +9,7 @@ import math
 import numpy as np
 import os
 
+from multiprocessing import Queue
 from typing import List
 
 from Actor import *
@@ -16,7 +17,7 @@ from gsc.GSParser import Node
 from mapping.LaneletMap import LaneletMap
 from perception.DynamicObjectTracker import DynamicObjectTracker
 from perception.Perception import Perception
-from requirements.RequirementViolationEvents import BrokenScenario, ScenarioCompletion
+from requirements.RequirementEvents import BrokenScenario, ScenarioCompletion
 from shm.SimSharedMemoryServer import *
 from SimConfig import *
 from sv.SDVPlanner import *
@@ -36,8 +37,8 @@ class SDV(Vehicle):
             self, vid:int, name:str, root_btree_name:str, start_state:List[float],
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="", 
-            detection_range_in_meters:float=None, goal_ends_simulation:bool=False,
-            hallucination_retention:float=None, hallucination_weight:float=None, 
+            detection_range_in_meters:float=None, events_queue:Queue=Queue(), goal_ends_simulation:bool=False,
+            hallucination_retention:float=None, hallucination_weight:float=None,
             missed_detection_weight:float=None, noise_position_mixture:List[float]=[0,0], 
             noise_yaw_mostly_reliable:float=0, noise_yaw_strongly_inaccurate:float=0, 
             rule_engine_port:int=None, tracking_method:str=None,
@@ -45,6 +46,7 @@ class SDV(Vehicle):
         self.btype = btype
         self.btree_locations           = btree_locations
         self.detection_range_in_meters = detection_range_in_meters
+        self.events_queue              = events_queue
         self.goal_ends_simulation      = goal_ends_simulation
         self.route_nodes               = route_nodes
 
@@ -76,7 +78,7 @@ class SDV(Vehicle):
                                      noise_yaw_mostly_reliable, noise_yaw_strongly_inaccurate, 
                                      seed=int(os.getenv("GSS_PERCEPTION_SEED", 1)))
 
-        self.tracker    = DynamicObjectTracker(self, detection_range_in_meters, tracking_method, ALPHA_MIN_SIZE, TRACKER_RETENTION_TICK)
+        self.tracker    = DynamicObjectTracker(self, detection_range_in_meters, tracking_method, ALPHA_HEAT_SIZE, ALPHA_MIN_SIZE, TRACKER_RETENTION_TICK)
 
         #Planning
         self.rule_engine_port = rule_engine_port
@@ -131,14 +133,15 @@ class SDV(Vehicle):
         #Check if vehicle can switch to new plan
         if (self.next_motion_plan):
             time = sim_time - self.next_motion_plan.start_time
+            
             #if ahead of current im time
             if time < 0:
                 log.warning("Next v{} plan at {:2f}s is ahead of sim_time {:2f}s (diff{:2f}s) and will be delayed".format(
                     self.id,self.next_motion_plan.start_time,sim_time, time))
                 return
-            else:
-                self.motion_plan = self.next_motion_plan
-                self.next_motion_plan = None
+            
+            self.motion_plan      = self.next_motion_plan
+            self.next_motion_plan = None
 
         #Follow current plan
         if (self.motion_plan):
@@ -150,7 +153,7 @@ class SDV(Vehicle):
             if (time > self.motion_plan.trajectory.T):
                 if self.state.s_vel > 0.1:
                     errorMessage = "finished last trajectory without stopping."
-                    BrokenScenario(self.id, errorMessage)
+                    self.events_queue.put(BrokenScenario(self.id, errorMessage))
                     raise ScenarioCompletion("Vehicle {} {}".format(self.id, errorMessage))
                 return
 
@@ -197,10 +200,10 @@ class SDV(Vehicle):
                 #raise e
 
             # update sim state
-            self.state.x = x_vector[0]
+            self.state.x     = x_vector[0]
             self.state.x_vel = x_vector[1]
             self.state.x_acc = x_vector[2]
-            self.state.y = y_vector[0]
+            self.state.y     = y_vector[0]
             self.state.y_vel = y_vector[1]
             self.state.y_acc = y_vector[2]
 

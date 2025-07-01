@@ -419,6 +419,7 @@ class LaneletMap(object):
                 #log.warning("Point {} part of more than one lanelet ({}), cannot automatically resolve.".format(
                 #    (x, y), [ll.id for ll in intersecting_lls]))
                 return intersecting_lls[1]
+
         return intersecting_lls[0]
 
     def get_all_occupying_lanelets(self, x, y):

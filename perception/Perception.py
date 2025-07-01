@@ -268,8 +268,6 @@ class Perception:
 		self.random.seed(self.my_vid * self.seed * self.rng_tick) # With additions changing the seed result in simulation that are similar
 
 		if self.detection_range_in_meters == None:
-			traffic_state.road_occupancy = fill_occupancy(self.vehicle, traffic_state.lane_config, traffic_state.traffic_vehicles, 
-													      traffic_state.traffic_vehicles_orp, lanelet_map, traffic_state.intersections)
 			return traffic_state
 
 		self.all_vehicles = {}

@@ -31,6 +31,18 @@ class ActorExtractor(Extractor):
 			time_to_collision = distance / (ego_pessimistic_speed - speed)
 
 		return {
+			"d":        actor.state.d,
+			"d_vel":    actor.state.d_vel,
+			"d_acc":    actor.state.d_acc,
+			"s":        actor.state.s,
+			"s_vel":    actor.state.s_vel,
+			"s_acc":    actor.state.s_acc,
+			"x":        actor.state.x,
+			"x_vel":    actor.state.x_vel,
+			"x_acc":    actor.state.x_acc,
+			"y":        actor.state.y,
+			"y_vel":    actor.state.y_vel,
+			"y_acc":    actor.state.y_acc,
 			"distance":          distance,
 			"is_leading":		 actor.id == closest_id,
 			"speed":             speed * KMH_TO_MS,

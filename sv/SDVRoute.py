@@ -354,16 +354,17 @@ class SDVPath(object):
         self._global_path_s_origin = ref_path_origin
 
         global_path_s_start = self._global_path_s_origin + self._ref_path_s_start
-        global_path_s_end = self._global_path_s_origin + self._ref_path_s_end
+        global_path_s_end   = self._global_path_s_origin + self._ref_path_s_end
+        
         if self._lane_is_loop:
             global_path_s_start %= self._global_path_s_len
-            global_path_s_end %= self._global_path_s_len
+            global_path_s_end   %= self._global_path_s_len
         else:
             global_path_s_start = max(0.0, global_path_s_start)
-            global_path_s_end = min(global_path_s_end, self._global_path_s_len)
+            global_path_s_end   = min(global_path_s_end, self._global_path_s_len)
 
         delta_s_start = global_path_s_start - self._global_path_s_start
-        delta_s_end = global_path_s_end - self._global_path_s_end
+        delta_s_end   = global_path_s_end   - self._global_path_s_end
 
         if self._lane_is_loop:
             if abs(delta_s_start + self._global_path_s_len) < abs(delta_s_start):

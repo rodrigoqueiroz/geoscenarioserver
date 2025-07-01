@@ -11,7 +11,7 @@ from functools import partial
 from typing import Callable
 
 from Actor     import *
-from requirements.RequirementViolationEvents import BrokenScenario, ScenarioCompletion
+from requirements.RequirementEvents import BrokenScenario, ScenarioCompletion
 from SimConfig import *
 from sv.maneuvers.CostFunctions    import maneuver_feasibility, maneuver_cost
 from sv.maneuvers.FrenetTrajectory import *
@@ -52,7 +52,7 @@ def plan_maneuver(vehicle, mconfig, traffic_state):
     # Invalid maneuver, must stop simulation
     if mconfig.mkey not in maneuvers:
         errorMessage = "trying to execute, {}, a maneuver not implemented.".format(mconfig.mkey)
-        BrokenScenario(traffic_state.vid, errorMessage)
+        vehicle.events_queue.put(BrokenScenario(traffic_state.vid, errorMessage))
         raise ScenarioCompletion("Vehicle {} {}".format(traffic_state.vid, mconfig.mkey))
 
     best, candidates = maneuvers[mconfig.mkey](vehicle, mconfig, traffic_state)
@@ -71,7 +71,7 @@ def plan_maneuver(vehicle, mconfig, traffic_state):
 
         # Disallow Invalid Trajectory during training only
         if os.getenv("GSS_EVALUATION_NAME", "") == "":
-            BrokenScenario(traffic_state.vid, errorMessage)
+            vehicle.events_queue.put(BrokenScenario(traffic_state.vid, errorMessage))
             raise ScenarioCompletion(logMessage)
     
     if not _use_low_level_planner:

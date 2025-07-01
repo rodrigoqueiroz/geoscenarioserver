@@ -9,6 +9,7 @@
 import screeninfo
 
 from argparse import ArgumentParser
+from multiprocessing import Manager, Queue
 from pynput import keyboard
 
 try:
@@ -20,7 +21,8 @@ except ImportError:
 
 from dash.Dashboard import *
 from mapping.LaneletMap import *
-from requirements.RequirementViolationEvents import GlobalTick, InstanciateOnThread
+from requirements.RequirementEvents import ElapsedTime, ScenarioTimeout
+from requirements.RequirementEventsParser import RequirementEventsParser
 from ScenarioSetup import *
 from SimConfig import SimConfig
 from SimTraffic import SimTraffic
@@ -32,7 +34,7 @@ log = logging.getLogger("GSServer")
 def start_server(args):
     # log.setLevel("INFO")
     log.info('GeoScenario server START')
-    InstanciateOnThread()
+    
     lanelet_map = LaneletMap()
     sim_config = SimConfig()
 
@@ -59,21 +61,22 @@ def start_server(args):
         sim_config.wait_for_client = True
 
     # use sim_config after all modifications
-    traffic = SimTraffic(lanelet_map, sim_config)
+    events_queue = Queue()
+    traffic      = SimTraffic(lanelet_map, sim_config)
 
     # SCENARIO SETUP
     if args.gsfiles:
         if all(['.osm' in file for file in args.gsfiles]):
             #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfiles, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
+            res = load_geoscenario_from_file(args.gsfiles, events_queue, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
         elif len(args.gsfiles) > 1:
             log.error("Can only load multiple scenarios from .osm files.")
             return
         else:
             #Direct setup
-            res = load_geoscenario_from_code(args.gsfiles[0], traffic, sim_config, lanelet_map)
+            res = load_geoscenario_from_code(args.gsfiles[0], events_queue, traffic, sim_config, lanelet_map)
     else:
-        res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
+        res = load_geoscenario_from_code("", events_queue, traffic, sim_config, lanelet_map)
 
     if not res:
         log.error("Failed to load scenario")
@@ -140,6 +143,9 @@ def start_server(args):
     log.info('SIMULATION START')
     traffic.start()
 
+    requirements = RequirementEventsParser(events_queue)
+    requirements.start()
+
     #GUI / Debug screen
     if sim_config.show_dashboard:
         dashboard = Dashboard(traffic, sim_config, screen_param)
@@ -159,7 +165,7 @@ def start_server(args):
                 sync_global.sim_time
             )
 
-            GlobalTick()
+            events_queue.put(ElapsedTime(sync_global.delta_time))
 
             if sim_status < 0:
                 break
@@ -167,8 +173,12 @@ def start_server(args):
             log.error(e)
             break
 
+    if sync_global.sim_time >= sync_global.timeout:
+        events_queue.put(ScenarioTimeout())
+
     sync_global.write_performance_log()
     traffic.stop_all(dashboard_interrupted)
+    requirements.stop()
 
     print('dashboard is alive?', dashboard._process.is_alive())
 

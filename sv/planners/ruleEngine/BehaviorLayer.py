@@ -52,7 +52,6 @@ class BehaviorLayer(FeatureGenerator):
         self.vid = vid
 
         # Runtime status:
-        self._traffic_state    = None
         self.iteration         = 0
 
         # Decision
@@ -72,7 +71,9 @@ class BehaviorLayer(FeatureGenerator):
         }
 
         self.last_behaviour = {
-            "maneuver": "EMERGENCY_STOP"
+            "maneuver": {
+                "type": "EMERGENCY_STOP"
+            }
         }
 
     def communicate(self, method, uri, callback, data=None):
@@ -103,26 +104,15 @@ class BehaviorLayer(FeatureGenerator):
     def flushFeatures(self):
         return self.communicate('GET', '/flushFeatures', self.flushFeatures)
 
-    def get_traffic_state(self):
-        return self._traffic_state
-
     def post_behaviour(self, situation):
         return self.communicate('POST', '/behaviour', partial(self.post_behaviour, situation), data=json.dumps(situation, cls=NanConverter))
 
-    def set_maneuver(self, mconfig):
-        self._current_mconfig = mconfig
-
-    def set_ref_path_changed(self, val):
-        self._ref_path_changed = val
-
     def tick(self, traffic_state):
-        self._ref_path_changed = False
-        self._traffic_state = traffic_state
         self.iteration += 1
 
         situation = self.parse(traffic_state)
+        situation['last_behaviour'] = self.last_behaviour
 
-        #parameters['situation']['last_behaviour'] = self.last_behaviour
         self.last_behaviour = self.post_behaviour(situation)
 
         if self.debug and get_center_id() == self.vid:
