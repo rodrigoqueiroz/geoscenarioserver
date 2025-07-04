@@ -416,6 +416,9 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 node.speed = float(p_nodes[i].tags['agentspeed']/3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(node)
             
+            print("DEBUG")    
+            print(path)
+            
             # Set initial longitudinal velocity, path always takes precedence
             frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
             if path[0].speed is not None:

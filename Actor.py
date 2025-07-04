@@ -139,6 +139,10 @@ class Actor(object):
                         self.remove()
                 else:
                     self.force_stop()
+                    
+    # def get_collision_pt(self, ped_state, ped_path, vehicle_state):
+        
+        
 
     def follow_path(self, delta_time, sim_time, path):
         if path:

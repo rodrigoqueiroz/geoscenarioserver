@@ -307,3 +307,15 @@ class PP(Pedestrian):
     def tick(self, tick_count, delta_time, sim_time):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.follow_path(delta_time, sim_time, self.path)
+        
+        # required to display path of PP on selecting it in the Dashboard table
+        ped_path = [(n.x, n.y) for n in self.path]
+        self.sim_traffic.debug_shdata[int(self.id)] = (
+            None,
+            None,
+            ped_path,
+            None,
+            None,
+            None,
+            0
+        )

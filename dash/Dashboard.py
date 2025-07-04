@@ -143,7 +143,8 @@ class Dashboard(object):
                 if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     pid = int(self.center_id)
                     if SHOW_CPLOT: #cartesian plot with lanelet map
-                        self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, traffic_lights, static_objects)
+                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[pid]
+                        self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
 
             self.cart_canvas.draw()
             self.fren_canvas.draw()
@@ -234,7 +235,7 @@ class Dashboard(object):
         #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
         fig.tight_layout(pad=0.0)
 
-    def plot_pedestrian_cartesian_chart(self, center_id, vehicles, pedestrians, traffic_lights = None, static_objects = None):
+    def plot_pedestrian_cartesian_chart(self, center_id, vehicles, pedestrians, reference_path = None, traffic_lights = None, static_objects = None):
         #-Pedestrian focus cartesian plot
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
@@ -247,7 +248,11 @@ class Dashboard(object):
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
-
+        
+        if REFERENCE_PATH and reference_path is not None:
+            path_x, path_y = zip(*reference_path)
+            plt.plot(path_x, path_y, 'b--', alpha=0.5, zorder=0)
+            
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
 
