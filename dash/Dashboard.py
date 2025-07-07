@@ -256,7 +256,7 @@ class Dashboard(object):
         
         if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
-            plt.plot(path_x, path_y, linestyle='-', color='r', alpha=0.5, zorder=0)
+            plt.plot(path_x, path_y, linestyle='-', color='r', linewidth = 1.2, alpha=0.6, zorder=0)
             
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
