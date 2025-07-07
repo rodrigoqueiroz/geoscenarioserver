@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_ringroad_modified.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Ringroad cutin scenario with Ego' />
-    <tag k='plotvid' v='1' />
+    <tag k='plotid' v='1' />
     <tag k='timeout' v='300' />
     <tag k='version' v='2.0' />
   </node>

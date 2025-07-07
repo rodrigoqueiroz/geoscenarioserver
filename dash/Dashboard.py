@@ -44,7 +44,7 @@ class Dashboard(object):
 
     def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
-        self.center_id = int(sim_config.plot_vid)
+        self.center_id = sim_config.plot_id
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
@@ -136,16 +136,21 @@ class Dashboard(object):
                                 self.tree_msg.insert("1.0", btree_snapshot)
                         else:
                             #vehicles without planner:
-                            self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                            if SHOW_CPLOT: #cartesian plot with lanelet map
+                                self.plot_cartesian_chart(vid, vehicles, pedestrians)
                     except BrokenPipeError:
                         return
             elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
-                if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
+                if SHOW_CPLOT and pedestrians[self.center_id].sim_state != ActorSimState.INACTIVE:
                     pid = int(self.center_id)
-                    planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[pid]
-                    if SHOW_CPLOT: #cartesian plot with lanelet map
-                        self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-
+                    try:
+                        if pid in debug_shdata:
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[pid]
+                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                        else:
+                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
+                    except BrokenPipeError:
+                        return
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()

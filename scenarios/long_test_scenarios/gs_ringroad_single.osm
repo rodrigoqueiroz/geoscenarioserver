@@ -6,7 +6,7 @@
     <tag k='lanelet' v='maps/lanelet2_ringroad_modified.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='Campus ring road loop test' />
-    <tag k='plotvid' v='1' />
+    <tag k='plotid' v='1' />
     <tag k='timeout' v='240' />
     <tag k='version' v='2.0' />
   </node>

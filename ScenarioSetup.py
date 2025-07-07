@@ -53,8 +53,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     #========= Scenario config
     sim_config.scenario_name = parser.globalconfig.tags['name']
     sim_config.timeout = parser.globalconfig.tags['timeout']
-    if 'plotvid' in parser.globalconfig.tags:
-        sim_config.plot_vid = int(parser.globalconfig.tags['plotvid'])
+    if 'plotid' in parser.globalconfig.tags:
+        sim_config.plot_id = parser.globalconfig.tags['plotid']
 
     #========= Map
     if map_path == "":
