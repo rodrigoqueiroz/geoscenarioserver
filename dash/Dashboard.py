@@ -139,7 +139,7 @@ class Dashboard(object):
                             self.plot_cartesian_chart(vid, vehicles, pedestrians)
                     except BrokenPipeError:
                         return
-            elif self.center_pedestrian and self.center_id in pedestrians:
+            elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
                 if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     pid = int(self.center_id)
                     planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[pid]
