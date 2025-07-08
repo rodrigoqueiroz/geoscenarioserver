@@ -119,11 +119,14 @@ class Dashboard(object):
             if self.center_pedestrian == False and self.center_id in vehicles:
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
+                    
+                    v_string_id = f"v{vid}"  # 'v' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                    
                     #vehicles with planner: cartesian, frenet chart and behavior tree
                     try:
-                        if vid in debug_shdata:
+                        if v_string_id in debug_shdata:
                             #read vehicle planning data from debug_shdata
-                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[v_string_id]
                             if SHOW_CPLOT: #cartesian plot with lanelet map
                                 self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
                             if SHOW_FFPLOT: #frenet frame plot
@@ -143,9 +146,10 @@ class Dashboard(object):
             elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
                 if SHOW_CPLOT and pedestrians[self.center_id].sim_state != ActorSimState.INACTIVE:
                     pid = int(self.center_id)
+                    p_string_id = f"p{pid}" # 'p' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
                     try:
-                        if pid in debug_shdata:
-                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[pid]
+                        if p_string_id in debug_shdata:
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[p_string_id]
                             self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
                         else:
                             self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)

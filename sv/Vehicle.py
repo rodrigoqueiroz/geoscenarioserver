@@ -347,7 +347,7 @@ class PV(Vehicle):
             traffic_vehicles_orp = {},
         )
         vehicle_path = [(n.x, n.y) for n in self.path]
-        self.sim_traffic.debug_shdata[int(self.id)] = (
+        self.sim_traffic.debug_shdata[f"v{self.id}"] = (
             traffic_state,
             None,
             vehicle_path,

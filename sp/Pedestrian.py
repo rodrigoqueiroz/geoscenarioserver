@@ -312,7 +312,7 @@ class PP(Pedestrian):
         self.follow_path(delta_time, sim_time, self.path)
         
         ped_path = [(n.x, n.y) for n in self.path]
-        self.sim_traffic.debug_shdata[int(self.id)] = (
+        self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
             None,
             ped_path,
