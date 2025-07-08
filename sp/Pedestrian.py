@@ -57,6 +57,7 @@ class TP(Pedestrian):
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
+        self.current_waypoint = 0.0
         if not keep_active:
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
@@ -301,6 +302,8 @@ class PP(Pedestrian):
         self.path = path
         self._debug_shdata = debug_shdata
         self.keep_active = keep_active
+        
+        self.current_waypoint = 0.0
 
         self.current_path_node = 0
     
