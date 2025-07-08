@@ -5,7 +5,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/ll2_mapping_example.osm' />
     <tag k='name' v='Roundabout Scenario' />
-    <tag k='plotvid' v='1' />
+    <tag k='plotid' v='1' />
     <tag k='timeout' v='20' />
     <tag k='version' v='2.0' />
   </node>

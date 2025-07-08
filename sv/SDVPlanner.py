@@ -258,7 +258,7 @@ class SVPlanner(object):
                     #For pickling
                     traffic_state.intersections = [ intersection.to_primitives() for intersection in traffic_state.intersections]
 
-                    debug_shdata[int(self.vid)] = (
+                    debug_shdata[f"v{self.vid}"] = (
                         traffic_state,
                         snapshot_tree,
                         debug_ref_path,

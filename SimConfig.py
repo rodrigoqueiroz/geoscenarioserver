@@ -21,8 +21,9 @@ WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 #Dash Config
 SHOW_DASHBOARD = True       #show dash with plots, vehicles and trajectories. Optional.
 DASH_RATE = 10              #dash tick rate. Max is traffic rate.
-PLOT_VID = 1                #vehicle to center the main plot around, if not defined by the scenario.
-                            #Make sure there exists a vehicle with this id
+PLOT_ID = 1                 #vehicle ID to center the main plot around, if not defined by the scenario using globalconfig/plotid.
+#PLOT_ID = 'p1'             #pedestrian ID to center the main plot around, if not defined by the scenario using globalconfig/plotid.
+
 #Global Map
 SHOW_MPLOT = True           #whether to show the global map cartesian plot
 MPLOT_SIZE = 80			    #map plot: road length in meters (shorter=better performance)
@@ -40,7 +41,7 @@ SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
 SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
 
 #Vehicle trajectory
-VEH_TRAJ_CHART = False      #(!HEAVY, not stable) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_VID
+VEH_TRAJ_CHART = False      #(!HEAVY, not stable) Show detailed trajectory chart, with Lat and Long Velocity and Acceleraton. Limited to PLOT_ID
 
 #BTree
 SHOW_BTREE = True           #whether to show the current behaviour tree
@@ -113,7 +114,7 @@ class SimConfig:
     planner_rate:int = PLANNER_RATE
     planning_time:float = PLANNING_TIME
     use_fixed_planning_time:bool = USE_FIXED_PLANNING_TIME
-    plot_vid:int = PLOT_VID
+    plot_id = PLOT_ID
     show_dashboard:bool = SHOW_DASHBOARD
     wait_for_input:bool = WAIT_FOR_INPUT
     wait_for_client:bool = WAIT_FOR_CLIENT

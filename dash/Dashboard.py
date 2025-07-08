@@ -44,7 +44,7 @@ class Dashboard(object):
 
     def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
-        self.center_id = int(sim_config.plot_vid)
+        self.center_id = sim_config.plot_id
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
@@ -119,11 +119,14 @@ class Dashboard(object):
             if self.center_pedestrian == False and self.center_id in vehicles:
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
+                    
+                    v_string_id = f"v{vid}"  # 'v' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                    
                     #vehicles with planner: cartesian, frenet chart and behavior tree
                     try:
-                        if vid in debug_shdata:
+                        if v_string_id in debug_shdata:
                             #read vehicle planning data from debug_shdata
-                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[v_string_id]
                             if SHOW_CPLOT: #cartesian plot with lanelet map
                                 self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
                             if SHOW_FFPLOT: #frenet frame plot
@@ -136,15 +139,22 @@ class Dashboard(object):
                                 self.tree_msg.insert("1.0", btree_snapshot)
                         else:
                             #vehicles without planner:
-                            self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                            if SHOW_CPLOT: #cartesian plot with lanelet map
+                                self.plot_cartesian_chart(vid, vehicles, pedestrians)
                     except BrokenPipeError:
                         return
-            elif self.center_pedestrian and self.center_id in pedestrians:
-                if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
+            elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
+                if SHOW_CPLOT and pedestrians[self.center_id].sim_state != ActorSimState.INACTIVE:
                     pid = int(self.center_id)
-                    if SHOW_CPLOT: #cartesian plot with lanelet map
-                        self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, traffic_lights, static_objects)
-
+                    p_string_id = f"p{pid}" # 'p' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                    try:
+                        if p_string_id in debug_shdata:
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[p_string_id]
+                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                        else:
+                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
+                    except BrokenPipeError:
+                        return
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
@@ -234,7 +244,7 @@ class Dashboard(object):
         #plt.subplots_adjust(bottom=0.1,top=0.9,left=0.1,right=0.9,hspace=0,wspace=0)
         fig.tight_layout(pad=0.0)
 
-    def plot_pedestrian_cartesian_chart(self, center_id, vehicles, pedestrians, traffic_lights = None, static_objects = None):
+    def plot_pedestrian_cartesian_chart(self, center_id, vehicles, pedestrians, reference_path = None, traffic_lights = None, static_objects = None):
         #-Pedestrian focus cartesian plot
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
@@ -247,7 +257,11 @@ class Dashboard(object):
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
-
+        
+        if REFERENCE_PATH and reference_path is not None:
+            path_x, path_y = zip(*reference_path)
+            plt.plot(path_x, path_y, linestyle='-', color='r', linewidth = 1.2, alpha=0.6, zorder=0)
+            
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
 
