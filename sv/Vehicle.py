@@ -176,7 +176,7 @@ class SDV(Vehicle):
                     log.info(self.state.get_frenet_state_vector())
                     log.info(new_state)
                     #log.info(self.motion_plan.trajectory)
-                    self.jump_back_count += 1
+                    self.jump_back_count   += 1
                     self.max_jump_back_dist = max(self.max_jump_back_dist, abs(s_delta))
             else:
                 self.jump_back_check = True
@@ -200,12 +200,8 @@ class SDV(Vehicle):
                 #raise e
 
             # update sim state
-            self.state.x     = x_vector[0]
-            self.state.x_vel = x_vector[1]
-            self.state.x_acc = x_vector[2]
-            self.state.y     = y_vector[0]
-            self.state.y_vel = y_vector[1]
-            self.state.y_acc = y_vector[2]
+            self.state.set_X(x_vector)
+            self.state.set_Y(y_vector)
 
             # Cannot update the yaw when x_vel is too low since arctan(y_vel/x_vel)
             if abs(self.state.x_vel) > 1e-4:

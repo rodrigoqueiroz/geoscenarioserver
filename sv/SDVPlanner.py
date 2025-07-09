@@ -144,12 +144,13 @@ class SVPlanner(object):
                 header, traffic_vehicles, traffic_pedestrians, traffic_light_states, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, True)
                 state_time = header[2]
                 tick_count = header[0]
-                if self.vid in traffic_vehicles:
-                    self.sdv.state = traffic_vehicles.pop(self.vid, None).state #removes self state
-                    self.sdv.bounding_box = calculate_rectangular_bounding_box(self.sdv)
-                else:
+
+                if self.vid not in traffic_vehicles:
                     #vehicle state not available. Vehicle can be inactive.
                     continue
+                
+                self.sdv.state        = traffic_vehicles.pop(self.vid, None).state #removes self state
+                self.sdv.bounding_box = calculate_rectangular_bounding_box(self.sdv)
 
                 if self.sdv_route is None:
                     self.sdv_route = SDVRoute(
