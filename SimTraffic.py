@@ -59,8 +59,8 @@ class SimTraffic(object):
         self.vehicles_log = {}
         self.traffic_running = False
 
-    def set_origin(self, lat, lon, alt):
-        self.origin = (lat, lon, alt)
+    def set_origin(self, lat, lon, alt, area=MPLOT_SIZE):
+        self.origin = (lat, lon, alt, area)
 
     def add_vehicle(self, v):
         self.vehicles[v.id] = v

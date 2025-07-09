@@ -222,11 +222,12 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.MAP_FIG_ID, frameon=False, clear=True)
         plt.cla()
 
+        map_area = self.sim_traffic.origin[3] if len(self.sim_traffic.origin) > 3 else MPLOT_SIZE
         #boundaries (center is GeoScenario origin)
-        x_min = -(MPLOT_SIZE/2)
-        y_min = -(MPLOT_SIZE/2)
-        x_max = (MPLOT_SIZE/2)
-        y_max = (MPLOT_SIZE/2)
+        x_min = -(map_area/2)
+        y_min = -(map_area/2)
+        x_max = (map_area/2)
+        y_max = (map_area/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_light_states)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
