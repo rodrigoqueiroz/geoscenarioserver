@@ -228,7 +228,7 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.MAP_FIG_ID, frameon=False, clear=True)
         plt.cla()
 
-        map_area = self.sim_traffic.origin[3] if len(self.sim_traffic.origin) > 3 else MPLOT_SIZE
+        map_area = self.sim_traffic.origin[3]
         #boundaries (center is GeoScenario origin)
         x_min = -(map_area/2)
         y_min = -(map_area/2)
@@ -256,7 +256,7 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
-        c_plot_area = self.sim_traffic.origin[3] if len(self.sim_traffic.origin) > 3 else CPLOT_SIZE
+        c_plot_area = self.sim_traffic.origin[3]
         
         #boundaries
         x_min = pedestrians[center_id].state.x - (c_plot_area/2)
@@ -289,7 +289,7 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
-        c_plot_area = self.sim_traffic.origin[3] if len(self.sim_traffic.origin) > 3 else CPLOT_SIZE
+        c_plot_area = self.sim_traffic.origin[3]
 
         #boundaries
         x_min = vehicles[center_id].state.x - (c_plot_area/2)
