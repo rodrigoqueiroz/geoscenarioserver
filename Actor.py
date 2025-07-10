@@ -141,7 +141,11 @@ class Actor(object):
                     self.force_stop()
                     
     def get_collision_pt(self, ped_state, path, vehicle_state):
-        
+        for i in range(len(path)-1):
+            n1 = path[i]
+            n2 = path[i+1]
+            
+            p_veh = vehicle_state.
         
 
     def follow_path(self, delta_time, sim_time, path):
