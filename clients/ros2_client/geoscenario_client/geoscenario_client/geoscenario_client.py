@@ -15,7 +15,7 @@ from deepdiff import DeepDiff
 class GSClient(Node):
     def __init__(self):
         super().__init__('geoscenario_client')
-        # use local+origin=(lat,lon,alt) or WGS84+origin=(0,0,0) coordinates
+        # use local+origin=(lat,lon,alt,area) or WGS84+origin=(0,0,0,0) coordinates
         self.declare_parameter('wgs84', False)
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
         self.declare_parameter('roundtriptest', False)
@@ -125,13 +125,15 @@ class GSClient(Node):
             tick_msg.origin.latitude = origin["origin_lat"]
             tick_msg.origin.longitude = origin["origin_lon"]
             tick_msg.origin.altitude = origin["origin_alt"]
+            tick_msg.origin.area = origin["origin_area"]
         else:
             tick_msg.origin.latitude = 0.0
             tick_msg.origin.longitude = 0.0
             tick_msg.origin.altitude = 0.0
+            tick_msg.origin.area = 0.0
             if self.local_cartesian_projector is None:
                 self.local_cartesian_projector = LocalCartesianProjector(
-                        Origin(origin["origin_lat"], origin["origin_lon"], origin["origin_alt"])
+                        Origin(origin["origin_lat"], origin["origin_lon"], origin["origin_alt"]), origin["origin_area"]
                     )
 
         for vehicle in vehicles:
