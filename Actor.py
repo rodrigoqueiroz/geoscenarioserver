@@ -140,7 +140,7 @@ class Actor(object):
                 else:
                     self.force_stop()
                     
-    # def get_collision_pt(self, ped_state, ped_path, vehicle_state):
+    def get_collision_pt(self, ped_state, path, vehicle_state):
         
         
 
