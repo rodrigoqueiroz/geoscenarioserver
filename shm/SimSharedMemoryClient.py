@@ -122,6 +122,7 @@ class SimSharedMemoryClient(object):
             origin["origin_lat"] = float(origin_str[0])
             origin["origin_lon"] = float(origin_str[1])
             origin["origin_alt"] = float(origin_str[2])
+            origin["origin_area"] = float(origin_str[3])
         except Exception as e:
             log.error("Origin parsing exception")
             log.error(f"data_arr[1]: {data_arr[1]}")
