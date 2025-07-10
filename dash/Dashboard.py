@@ -256,11 +256,13 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
+        c_plot_area = self.sim_traffic.origin[3] if len(self.sim_traffic.origin) > 3 else CPLOT_SIZE
+        
         #boundaries
-        x_min = pedestrians[center_id].state.x - (CPLOT_SIZE/2)
-        x_max = pedestrians[center_id].state.x + (CPLOT_SIZE/2)
-        y_min = pedestrians[center_id].state.y - (CPLOT_SIZE/2)
-        y_max = pedestrians[center_id].state.y + (CPLOT_SIZE/2)
+        x_min = pedestrians[center_id].state.x - (c_plot_area/2)
+        x_max = pedestrians[center_id].state.x + (c_plot_area/2)
+        y_min = pedestrians[center_id].state.y - (c_plot_area/2)
+        y_max = pedestrians[center_id].state.y + (c_plot_area/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
@@ -287,11 +289,13 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
+        c_plot_area = self.sim_traffic.origin[3] if len(self.sim_traffic.origin) > 3 else CPLOT_SIZE
+
         #boundaries
-        x_min = vehicles[center_id].state.x - (CPLOT_SIZE/2)
-        x_max = vehicles[center_id].state.x + (CPLOT_SIZE/2)
-        y_min = vehicles[center_id].state.y - (CPLOT_SIZE/2)
-        y_max = vehicles[center_id].state.y + (CPLOT_SIZE/2)
+        x_min = vehicles[center_id].state.x - (c_plot_area/2)
+        x_max = vehicles[center_id].state.x + (c_plot_area/2)
+        y_min = vehicles[center_id].state.y - (c_plot_area/2)
+        y_max = vehicles[center_id].state.y + (c_plot_area/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
