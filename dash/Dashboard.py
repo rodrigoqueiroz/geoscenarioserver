@@ -32,6 +32,12 @@ logging.getLogger('matplotlib').setLevel(logging.WARNING)
 logging.getLogger('PIL.PngImagePlugin').setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 
+def draw_square(anchor_x, anchor_y, size, collection=None, facecolor='none'):
+    if collection is not None:
+        facecolor = 'none' if collection.is_empty() else 'k'
+
+    return plt.Rectangle((anchor_x,  anchor_y), size, size, linewidth=1, zorder=2, edgecolor='k', facecolor=facecolor)
+
 class Dashboard(object):
     MAP_FIG_ID = 1
     CART_FIG_ID = 2
@@ -44,7 +50,7 @@ class Dashboard(object):
 
     def __init__(self, sim_traffic:SimTraffic, sim_config:SimConfig, screen_param):
         self.sim_traffic:SimTraffic = sim_traffic
-        self.center_id = int(sim_config.plot_vid)
+        self.center_id = sim_config.plot_id
         self.sim_config = sim_config
         self.window = None
         self.center_pedestrian = False
@@ -119,11 +125,14 @@ class Dashboard(object):
             if self.center_pedestrian == False and self.center_id in vehicles:
                 if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                     vid = int(self.center_id)
+                    
+                    v_string_id = f"v{vid}"  # 'v' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                    
                     #vehicles with planner: cartesian, frenet chart and behavior tree
                     try:
-                        if vid in debug_shdata:
+                        if v_string_id in debug_shdata:
                             #read vehicle planning data from debug_shdata
-                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[vid]
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[v_string_id]
                             if SHOW_CPLOT: #cartesian plot with lanelet map
                                 self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
                             if SHOW_FFPLOT: #frenet frame plot
@@ -136,16 +145,23 @@ class Dashboard(object):
                                 self.tree_msg.insert("1.0", btree_snapshot)
                         else:
                             #vehicles without planner:
-                            self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                            if SHOW_CPLOT: #cartesian plot with lanelet map
+                                self.plot_cartesian_chart(vid, vehicles, pedestrians)
                     except BrokenPipeError:
                         return
-            elif self.center_pedestrian and self.center_id in pedestrians:
-                if pedestrians[self.center_id].sim_state is not ActorSimState.INACTIVE:
+            elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
+                if SHOW_CPLOT and pedestrians[self.center_id].sim_state != ActorSimState.INACTIVE:
                     pid = int(self.center_id)
-                    if SHOW_CPLOT: #cartesian plot with lanelet map
-                        planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[pid]
-                        self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-
+                    
+                    p_string_id = f"p{pid}" # 'p' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                    try:
+                        if p_string_id in debug_shdata:
+                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[p_string_id]
+                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                        else:
+                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
+                    except BrokenPipeError:
+                        return
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
@@ -213,11 +229,12 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.MAP_FIG_ID, frameon=False, clear=True)
         plt.cla()
 
+        map_area = self.sim_traffic.origin[3]
         #boundaries (center is GeoScenario origin)
-        x_min = -(MPLOT_SIZE/2)
-        y_min = -(MPLOT_SIZE/2)
-        x_max = (MPLOT_SIZE/2)
-        y_max = (MPLOT_SIZE/2)
+        x_min = -(map_area/2)
+        y_min = -(map_area/2)
+        x_max = (map_area/2)
+        y_max = (map_area/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_light_states)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
@@ -240,18 +257,20 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
+        c_plot_area = self.sim_traffic.origin[3]
+        
         #boundaries
-        x_min = pedestrians[center_id].state.x - (CPLOT_SIZE/2)
-        x_max = pedestrians[center_id].state.x + (CPLOT_SIZE/2)
-        y_min = pedestrians[center_id].state.y - (CPLOT_SIZE/2)
-        y_max = pedestrians[center_id].state.y + (CPLOT_SIZE/2)
+        x_min = pedestrians[center_id].state.x - (c_plot_area/2)
+        x_max = pedestrians[center_id].state.x + (c_plot_area/2)
+        y_min = pedestrians[center_id].state.y - (c_plot_area/2)
+        y_max = pedestrians[center_id].state.y + (c_plot_area/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
         
         if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
-            plt.plot(path_x, path_y, 'b--', alpha=0.5, zorder=0)
+            plt.plot(path_x, path_y, linestyle='-', color='r', linewidth = 1.2, alpha=0.6, zorder=0)
             
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
@@ -271,11 +290,13 @@ class Dashboard(object):
         fig = plt.figure(Dashboard.CART_FIG_ID)
         plt.cla()
 
+        c_plot_area = self.sim_traffic.origin[3]
+
         #boundaries
-        x_min = vehicles[center_id].state.x - (CPLOT_SIZE/2)
-        x_max = vehicles[center_id].state.x + (CPLOT_SIZE/2)
-        y_min = vehicles[center_id].state.y - (CPLOT_SIZE/2)
-        y_max = vehicles[center_id].state.y + (CPLOT_SIZE/2)
+        x_min = vehicles[center_id].state.x - (c_plot_area/2)
+        x_max = vehicles[center_id].state.x + (c_plot_area/2)
+        y_min = vehicles[center_id].state.y - (c_plot_area/2)
+        y_max = vehicles[center_id].state.y + (c_plot_area/2)
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
@@ -478,29 +499,20 @@ class Dashboard(object):
         if SHOW_OCCUPANCY and traffic_state.road_occupancy is not None:
             road_occupancy:RoadOccupancy = traffic_state.road_occupancy
             cellsize = 1
-            size = cellsize*3
-            anchorx = vehicle_state.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
-            anchory = vehicle_state.d + 8 - size
-            rect = plt.Rectangle( (anchorx,anchory),size,size,linewidth=1, zorder=2, edgecolor='k', facecolor = "none") #overall
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+1,anchory+1),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "b") #Self
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+1,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right else 'none') #right
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+2,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right_front else 'none') #right front
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx,anchory),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.right_back else 'none') #right back
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+1,anchory+2),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.left else 'none') #left
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+2,anchory+2),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.left_front else 'none') #left front
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx,anchory+2),cellsize,cellsize,linewidth=1, zorder=2, edgecolor='k', facecolor = "k" if road_occupancy.left_back else 'none') #left back
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx+2,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.front else 'none') #front
-            plt.gca().add_patch(rect)
-            rect = plt.Rectangle( (anchorx,anchory+1),cellsize,cellsize,linewidth=1,zorder=2, edgecolor='k',facecolor = "k" if road_occupancy.back else 'none') #back
-            plt.gca().add_patch(rect)
+            size     = 3 * cellsize
+            anchorx  = vehicle_state.s - ( (1/5) * FFPLOT_LENGTH )   #1/3 before vehicle
+            anchory  = vehicle_state.d + 8 - size
+
+            plt.gca().add_patch(draw_square(anchorx,     anchory,     size)) # Overall
+            plt.gca().add_patch(draw_square(anchorx + 1, anchory + 1, cellsize, facecolor = "b")) #Self
+            plt.gca().add_patch(draw_square(anchorx + 1, anchory,     cellsize, collection = road_occupancy.right_center))
+            plt.gca().add_patch(draw_square(anchorx + 2, anchory,     cellsize, collection = road_occupancy.front_right))
+            plt.gca().add_patch(draw_square(anchorx,     anchory,     cellsize, collection = road_occupancy.back_right))
+            plt.gca().add_patch(draw_square(anchorx + 1, anchory + 2, cellsize, collection = road_occupancy.left_center))
+            plt.gca().add_patch(draw_square(anchorx + 2, anchory + 2, cellsize, collection = road_occupancy.front_left))
+            plt.gca().add_patch(draw_square(anchorx,     anchory + 2, cellsize, collection = road_occupancy.back_left))
+            plt.gca().add_patch(draw_square(anchorx + 2, anchory + 1, cellsize, collection = road_occupancy.front_center))
+            plt.gca().add_patch(draw_square(anchorx,     anchory + 1, cellsize, collection = road_occupancy.back_center))
 
             anchorx = anchorx + size + 1
             y_label = "y: " + str(road_occupancy.yielding_zone)

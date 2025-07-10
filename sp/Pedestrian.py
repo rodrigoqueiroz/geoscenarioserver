@@ -57,6 +57,7 @@ class TP(Pedestrian):
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
+        self.current_waypoint = 0.0
         if not keep_active:
             #starts as inactive until trajectory begins
             self.sim_state = ActorSimState.INACTIVE
@@ -301,6 +302,8 @@ class PP(Pedestrian):
         self.path = path
         self._debug_shdata = debug_shdata
         self.keep_active = keep_active
+        
+        self.current_waypoint = 0.0
 
         self.current_path_node = 0
     
@@ -308,9 +311,8 @@ class PP(Pedestrian):
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
         self.follow_path(delta_time, sim_time, self.path)
         
-        # required to display path of PP on selecting it in the Dashboard table
         ped_path = [(n.x, n.y) for n in self.path]
-        self.sim_traffic.debug_shdata[int(self.id)] = (
+        self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
             None,
             ped_path,

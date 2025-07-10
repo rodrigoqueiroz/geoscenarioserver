@@ -8,6 +8,7 @@
     <tag k='name' v='crossing light scenario' />
     <tag k='timeout' v='75' />
     <tag k='version' v='2.0' />
+    <tag k='plotid' v='p2' />
   </node>
   <node id='-5347408' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
     <tag k='gs' v='origin' />

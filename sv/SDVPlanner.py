@@ -256,9 +256,10 @@ class SVPlanner(object):
                         traj_s_shift = self.last_plan.ref_path_origin - self.sdv_route.get_reference_path_origin()
 
                     #For pickling
-                    traffic_state.intersections = [ intersection.to_primitives() for intersection in traffic_state.intersections]
+                    traffic_state.intersections  = [ intersection.to_primitives() for intersection in traffic_state.intersections]
+                    traffic_state.road_occupancy = traffic_state.road_occupancy.to_primitives()
 
-                    debug_shdata[int(self.vid)] = (
+                    debug_shdata[f"v{self.vid}"] = (
                         traffic_state,
                         snapshot_tree,
                         debug_ref_path,

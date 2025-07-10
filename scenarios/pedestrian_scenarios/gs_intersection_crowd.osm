@@ -8,6 +8,7 @@
     <tag k='name' v='pedestrian crowd scenario' />
     <tag k='timeout' v='70' />
     <tag k='version' v='2.0' />
+    <tag k='plotid' v='p3' />
   </node>
   <node id='-5338036' action='modify' visible='true' lat='43.47800705624' lon='-80.51976589147'>
     <tag k='gs' v='origin' />

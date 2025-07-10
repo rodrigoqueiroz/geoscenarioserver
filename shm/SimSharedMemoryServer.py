@@ -50,8 +50,8 @@ class SimSharedMemoryServer(object):
         # write tick count, deltatime, numbers of vehicles and pedestrians
         write_str = f"{int(tick_count)} {sim_time} {delta_time} {len(vehicles)} {len(pedestrians)}\n"
         # write origin
-        (lat, lon, alt) = origin
-        write_str += f"{lat} {lon} {alt}\n"
+        (lat, lon, alt, area) = origin
+        write_str += f"{lat} {lon} {alt} {area}\n"
         # write vehicle states, rounding the numerical data to reasonable significant figures
         for svid in vehicles:
             vid, v_type, dimensions, position, velocity, yaw, steering_angle = vehicles[svid].get_sim_state()

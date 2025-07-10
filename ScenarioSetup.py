@@ -53,8 +53,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     #========= Scenario config
     sim_config.scenario_name = parser.globalconfig.tags['name']
     sim_config.timeout = parser.globalconfig.tags['timeout']
-    if 'plotvid' in parser.globalconfig.tags:
-        sim_config.plot_vid = int(parser.globalconfig.tags['plotvid'])
+    if 'plotid' in parser.globalconfig.tags:
+        sim_config.plot_id = parser.globalconfig.tags['plotid']
 
     #========= Map
     if map_path == "":
@@ -63,8 +63,9 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
+    area = parser.origin.tags['area'] if 'area' in parser.origin.tags else MPLOT_SIZE
     # preserve the origin
-    sim_traffic.set_origin(parser.origin.lat, parser.origin.lon, altitude)
+    sim_traffic.set_origin(parser.origin.lat, parser.origin.lon, altitude, area)
     if use_local_cartesian:
         projector = LocalCartesianProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
         log.info("Using LocalCartesianProjector")
