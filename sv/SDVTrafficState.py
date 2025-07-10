@@ -10,6 +10,7 @@ from __future__ import annotations  #Must be first Include. Will be standard in 
 
 import itertools
 import lanelet2.core
+import numpy as np
 
 from copy import copy, deepcopy
 from collections import namedtuple
@@ -90,6 +91,30 @@ class TrafficLightIntersection:
         my_copy.intersecting_lanelets = [ [ll.id, 0 ] for ll, sl in self.intersecting_lanelets ]
         return my_copy
 
+class OccupancyZone:
+    def __init__(self, proximity_func, search_func):
+        self.closest  = partial(self.find, proximity_func, search_func)
+        self.vehicles = []
+
+    def find(self, proximity_func, search_func, attribute = 'vehicles'):
+        collection = getattr(self, attribute)
+        
+        if len(collection) == 0:
+            return None
+
+        return proximity_func(collection, key=search_func)
+
+    def is_empty(self):
+        return len(self.vehicles) == 0
+
+    def to_primitives(self):
+        #Creates a copy replacing collection objects to IDs for pickling (for Debug)
+        my_copy = copy(self)
+        del my_copy.closest
+
+        my_copy.vehicles = [ vehicle.id for vehicle in self.vehicles ]
+        return my_copy
+
 @dataclass
 class PedestrianIntersection:
     stop_position:tuple = None
@@ -107,15 +132,18 @@ class PedestrianIntersection:
 #Holds vehicle IDs if zone is occupied
 @dataclass
 class RoadOccupancy:
-    front:int = None            #Zone 1: same lane, closest vehicle ahead, up to 50m
-    left_front:int = None       #Zone 2: lateral, ahead (gap > 0), closest vehicle
-    left:int = None             #Zone 3: lateral, gap == 0,
-    left_back:int = None        #Zone 4: lateral, behind (gap < 0), closest vehicle
-    back:int = None             #Zone 5: same lane, closest vehicle behind, up to 50m
-    right_back:int = None       #Zone 6
-    right:int = None            #Zone 7
-    right_front:int = None      #Zone 8
+    '''
+        Frédéric's 9-Grid System
+        Note that the ego zone is not listed, since it would imply that something collided with it.
 
+        ---------------------------------------------
+        | Front Left  | Front Center | Front Right  |
+        ---------------------------------------------
+        | Left Center |     EGO      | Right Center |
+        ---------------------------------------------
+        | Back Left   |  Back Center |  Back Right  |
+        ---------------------------------------------
+    '''
     lead:int = None
     #trailing_vid:int = None
     yielding_zone:List =  field(default_factory=list)               #Intersection, vehicles yielding
@@ -123,6 +151,38 @@ class RoadOccupancy:
     intersecting_zone:List =  field(default_factory=list)           #Intersection, vehicles in one of conflicting lanelets
     appr_intersecting_zone:List =  field(default_factory=list)      #Intersection, vehicles approaching conflicting lanelets
     row_zone:List =  field(default_factory=list)                    #Intersection, vehicles in lanelets with right of way
+
+    # Need to be initialized there elsewhere when creating a new instance, 
+    # each OccupancyZone is not instanciated (additive side-effect)
+    def __post_init__(self):
+        self.back_center  = OccupancyZone(max, lambda v: v.state.s)
+        self.back_left    = OccupancyZone(max, lambda v: v.state.s)
+        self.back_right   = OccupancyZone(max, lambda v: v.state.s)
+
+        self.front_center = OccupancyZone(min, lambda v: v.state.s)
+        self.front_left   = OccupancyZone(min, lambda v: v.state.s)
+        self.front_right  = OccupancyZone(min, lambda v: v.state.s)
+
+        self.left_center  = OccupancyZone(min, lambda v: v.state.d)
+        self.right_center = OccupancyZone(max, lambda v: v.state.d)
+
+    def to_primitives(self):
+        #Creates a copy replacing occupancy zones by their primitives for pickling (for Debug)
+        my_copy = copy(self)
+
+        my_copy.back_center  = my_copy.back_center.to_primitives()
+        my_copy.back_left    = my_copy.back_left.to_primitives()
+        my_copy.back_right   = my_copy.back_right.to_primitives()
+
+        my_copy.front_center = my_copy.front_center.to_primitives()
+        my_copy.front_left   = my_copy.front_left.to_primitives()
+        my_copy.front_right  = my_copy.front_right.to_primitives()
+
+        my_copy.left_center  = my_copy.left_center.to_primitives()
+        my_copy.right_center = my_copy.right_center.to_primitives()
+
+        return my_copy
+
 
 @dataclass
 class TrafficState:
@@ -214,7 +274,6 @@ def get_traffic_state(
     """
     my_vid = my_vehicle.id
 
-
     s_vector, d_vector = sim_to_frenet_frame(sdv_route.get_global_path(), my_vehicle.state.get_X(), my_vehicle.state.get_Y(), 0)
     my_vehicle.state.set_S(s_vector)
     my_vehicle.state.set_D(d_vector)
@@ -246,7 +305,10 @@ def get_traffic_state(
             vehicle.state.set_S(s_vector)
             vehicle.state.set_D(d_vector)
         except OutsideRefPathException:
-            traffic_vehicles_orp[vid] = traffic_vehicles[vid]
+            # Hides the frenet frame of the vehicle which is expressed with respect to its own reference path
+            vehicle.state.set_S([0., 0., 0.])
+            vehicle.state.set_D([0., 0., 0.])
+            traffic_vehicles_orp[vid] = vehicle
             del traffic_vehicles[vid]
 
     for pid, pedestrian in list(traffic_pedestrians.items()):
@@ -258,6 +320,9 @@ def get_traffic_state(
             pedestrian.state.set_S(s_vector)
             pedestrian.state.set_D(d_vector)
         except OutsideRefPathException:
+            # Hides the frenet frame of the pedestrian which is expressed with respect to its own reference path
+            pedestrian.state.set_S([np.nan, np.nan, np.nan])
+            pedestrian.state.set_D([np.nan, np.nan, np.nan])
             del traffic_pedestrians[pid]
 
     for soid, so in list(static_objects.items()):
@@ -298,62 +363,124 @@ def get_traffic_state(
         road_occupancy = road_occupancy
     )
 
-def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections):
+def fill_occupancy(my_vehicle:Vehicle, lane_config:LaneConfig, traffic_vehicles, traffic_vehicles_orp, lanelet_map:LaneletMap, intersections, euclid_only=False, frenet_only=False):
     '''
         Identify vehicles in strategic zones using the (Frénet Frame) and assign their id.
         Road Occupancy contains only one vehicle per zone (closest to SDV)
     '''
-    half_length = my_vehicle.length/2
+    enlargement_factor = 2.0 / 3.0
+    two_third_length   = my_vehicle.length * enlargement_factor
+    two_third_width    = my_vehicle.width  * enlargement_factor
 
     #Lane zones
-    front = []
-    back = []
-    right = []
-    right_front = []
-    right_back = []
-    left = []
-    left_front = []
-    left_back = []
-    left_lane = lane_config._left_lane
-    right_lane = lane_config._right_lane
-    for vid, vehicle in traffic_vehicles.items():
-            their_lane = lane_config.get_current_lane(vehicle.state.d)
-            if abs(vehicle.state.s-my_vehicle.state.s) < 50: #limit to vehicles within 50 range
-                if their_lane:
-                    #same lane
-                    if their_lane.id == lane_config.id:
-                        if vehicle.state.s > my_vehicle.state.s:
-                            front.append(vehicle)
-                        else:
-                            back.append(vehicle)
-                    #left lane
-                    elif left_lane and their_lane.id == left_lane.id:
-                        if (vehicle.state.s - half_length) >= (my_vehicle.state.s + half_length):
-                            left_front.append(vehicle)
-                        elif (vehicle.state.s + half_length) <= (my_vehicle.state.s - half_length):
-                            left_back.append(vehicle)
-                        else:
-                            left.append(vehicle)
-                    #right lane
-                    elif right_lane and their_lane.id == right_lane.id:
-                        if (vehicle.state.s - half_length) > (my_vehicle.state.s + half_length):
-                            right_front.append(vehicle)
-                        elif (vehicle.state.s + half_length) < (my_vehicle.state.s - half_length):
-                            right_back.append(vehicle)
-                        else:
-                            right.append(vehicle)
+    left_lane    = lane_config._left_lane
+    right_lane   = lane_config._right_lane
+
+    euclid_set = {}
+    frenet_set = {}
+
+    if euclid_only:
+        euclid_set.update(traffic_vehicles)
+        euclid_set.update(traffic_vehicles_orp)
+    elif frenet_only:
+        frenet_set.update(traffic_vehicles)
+    else:
+        euclid_set.update(traffic_vehicles_orp)
+        frenet_set.update(traffic_vehicles)
 
     occupancy = RoadOccupancy()
-    occupancy.front = min(front, key=lambda v: v.state.s).id if len(front) > 0 else None
-    occupancy.back = max(back, key=lambda v: v.state.s).id if len(back) > 0 else None
 
-    occupancy.left = min(left, key=lambda v: v.state.d).id if len(left) > 0 else None
-    occupancy.left_back = max(left_back, key=lambda v: v.state.s).id if len(left_back) > 0 else None
-    occupancy.left_front = min(left_front, key=lambda v: v.state.s).id if len(left_front) > 0 else None
+    # Using Frenet Frames
+    for vid, vehicle in frenet_set.items():
+        same_lane = lane_config.right_bound <= vehicle.state.d <= lane_config.left_bound
 
-    occupancy.right = max(right, key=lambda v: v.state.d).id if len(right) > 0 else None
-    occupancy.right_back = max(right_back, key=lambda v: v.state.s).id if len(right_back) > 0 else None
-    occupancy.right_front = min(right_front, key=lambda v: v.state.s).id if len(right_front) > 0 else None
+        # Left lane
+        if my_vehicle.state.d + two_third_width < vehicle.state.d - two_third_width:
+            if (vehicle.state.s - two_third_length) > (my_vehicle.state.s + two_third_length):
+                occupancy.front_left.vehicles.append(vehicle)
+            elif (vehicle.state.s + two_third_length) <= (my_vehicle.state.s - two_third_length):
+                occupancy.back_left.vehicles.append(vehicle)
+            else:
+                occupancy.left_center.vehicles.append(vehicle)
+
+        # Right lane
+        elif vehicle.state.d + two_third_width < my_vehicle.state.d - two_third_width:
+            if (vehicle.state.s - two_third_length) > (my_vehicle.state.s + two_third_length):
+                occupancy.front_right.vehicles.append(vehicle)
+            elif (vehicle.state.s + two_third_length) <= (my_vehicle.state.s - two_third_length):
+                occupancy.back_right.vehicles.append(vehicle)
+            else:
+                occupancy.right_center.vehicles.append(vehicle)
+
+        # Same lane
+        else:
+            if vehicle.state.s > my_vehicle.state.s:
+                occupancy.front_center.vehicles.append(vehicle)
+            else:
+                occupancy.back_center.vehicles.append(vehicle)
+
+
+    # Using Euclidian Space
+    if len(euclid_set) != 0:
+        front_left, front_right, back_right, back_left = my_vehicle.bounding_box
+        
+        back  = np.array([back_left,  back_right])
+        left  = np.array([back_left,  front_left])
+        right = np.array([back_right, front_right])
+        front = np.array([front_left, front_right])
+
+        def is_at(other_vertex, edge, ego_vertex, padding):
+            myOwn_x, myOwn_y = ego_vertex
+            other_x, other_y = other_vertex
+            [ x1, y1 ], [ x2, y2 ] = edge
+
+            # Vertical Line Separator
+            if x1 == x2:
+                return myOwn_x < x1 < other_x or \
+                       other_x < x1 < myOwn_x
+
+            # yhat = ax + b Separator
+            slope     = (y2 - y1) / (x2 - x1)
+            intercept = y1 - slope * x1
+
+            my_yhat    = myOwn_x * slope + intercept
+            other_yhat = other_x * slope + intercept
+
+            # My vertex and the other vehicle vertex are on opposite side of the separator
+            return myOwn_y < my_yhat              and other_yhat < other_y - padding or \
+                   other_y < other_yhat - padding and my_yhat    < myOwn_y
+
+        # In this algorithm, if we use the center vertex of ego, we get too much inacuracy
+        # when estimating the side on which ego lies from the yhat separator. Thus, we
+        # instead provide one of the vertex that are on the opposite side.
+        for vid, vehicle in euclid_set.items():
+            vehicle_vertex = [ vehicle.state.x, vehicle.state.y ]
+
+            # Left Lane
+            if is_at(vehicle_vertex, left, right[0], padding=two_third_width):
+                if is_at(vehicle_vertex, front, back[0], padding=two_third_length):
+                    occupancy.front_left.vehicles.append(vehicle)
+                elif is_at(vehicle_vertex, back, front[0], padding=two_third_length):
+                    occupancy.back_left.vehicles.append(vehicle)
+                else:
+                    occupancy.left_center.vehicles.append(vehicle)
+
+            # Right Lane
+            elif is_at(vehicle_vertex, right, left[0], padding=two_third_width):
+                if is_at(vehicle_vertex, front, back[0], padding=two_third_length):
+                    occupancy.front_right.vehicles.append(vehicle)
+                elif is_at(vehicle_vertex, back, front[0], padding=two_third_length):
+                    occupancy.back_right.vehicles.append(vehicle)
+                else:
+                    occupancy.right_center.vehicles.append(vehicle)
+
+            # Same Lane
+            else:
+                if is_at(vehicle_vertex, front, back[0], padding=two_third_length):
+                    occupancy.front_center.vehicles.append(vehicle)
+                else:
+                    occupancy.back_center.vehicles.append(vehicle)
+        
 
     # vehicle and lanelets mapping [vehicle, [ll1,ll2]]
     vehicle_lanelet_map = {}
