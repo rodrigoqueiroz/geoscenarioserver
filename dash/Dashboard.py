@@ -161,6 +161,9 @@ class Dashboard(object):
                             self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
                     except BrokenPipeError:
                         return
+            else:
+                log.error("Dashboard requires traffic, try adding parts")
+                return 
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
