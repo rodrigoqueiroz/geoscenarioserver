@@ -178,9 +178,10 @@ class Dashboard(object):
             #log.info("Changed focus to {}".format(self.center_id))
     
     def get_maneuver(self, id):
+        v_string_id = f"v{id}"
         try:
-            if id in self.sim_traffic.debug_shdata:
-                btree_snapshot = self.sim_traffic.debug_shdata[id][1]
+            if v_string_id in self.sim_traffic.debug_shdata:
+                btree_snapshot = self.sim_traffic.debug_shdata[v_string_id][1]
                 if btree_snapshot:
                     maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
                     return maneuver
