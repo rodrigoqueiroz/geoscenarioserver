@@ -121,6 +121,8 @@ class Dashboard(object):
                 else:
                     self.center_pedestrian = False
                 self.center_id = int(self.center_id[1:]) #remove first letter
+
+            # if atleast one agent is present in the base scenario
             if len(vehicles) != 0 or len(pedestrians) != 0:    
                 if self.center_pedestrian == False and self.center_id in vehicles:
                     if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
