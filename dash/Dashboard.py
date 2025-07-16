@@ -74,7 +74,7 @@ class Dashboard(object):
         #get new data
         _, vehicles, pedestrians, _, _  = self.sim_traffic.read_traffic_state(self.sim_traffic.traffic_state_sharr, False)
         if len(vehicles) == 0 or len(pedestrians) == 0: 
-            log.error("Dashboard requires traffic, add agents to the scenario")
+            log.warning("No traffic; add agents to the scenario")
 
         self.lanelet_map = self.sim_traffic.lanelet_map
         self._process = Process(target=self.run_dash_process,
@@ -91,6 +91,7 @@ class Dashboard(object):
         signal(SIGTERM, lambda s, f: sync_dash.write_performance_log())
         # handle user's <CTRL>+C
         signal(SIGINT, lambda s, f: sync_dash.write_performance_log())
+        previous_sim_time = None
         while sync_dash.tick():
             if not self.window:
                 return
@@ -100,13 +101,19 @@ class Dashboard(object):
             #get new data
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
+            if sim_time == previous_sim_time:
+                    return
+            previous_sim_time = sim_time
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
             config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time)
 
             #config/stats
-            self.scenario_config_lb['text'] = config_txt
+            try:
+                self.scenario_config_lb['text'] = config_txt
+            except Exception as e:
+                return  # window was closed, exit the loop
 
             #global Map
             if SHOW_MPLOT:
@@ -168,14 +175,6 @@ class Dashboard(object):
                                 self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
                         except BrokenPipeError:
                             return
-            else:
-                self.cart_canvas.draw()
-                self.fren_canvas.draw()
-                self.traj_canvas.draw()
-                if SHOW_MPLOT:
-                    self.map_canvas.draw()
-                self.window.update()
-                
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
