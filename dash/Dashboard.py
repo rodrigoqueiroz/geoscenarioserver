@@ -70,6 +70,11 @@ class Dashboard(object):
         if not (self.sim_traffic.traffic_state_sharr):
             log.error("Dashboard can not start before traffic")
             return
+        
+        #get new data
+        _, vehicles, pedestrians, _, _  = self.sim_traffic.read_traffic_state(self.sim_traffic.traffic_state_sharr, False)
+        if len(vehicles) == 0 or len(pedestrians) == 0: 
+            log.warning("No traffic; add agents to the scenario")
 
         self.lanelet_map = self.sim_traffic.lanelet_map
         self._process = Process(target=self.run_dash_process,
@@ -86,6 +91,7 @@ class Dashboard(object):
         signal(SIGTERM, lambda s, f: sync_dash.write_performance_log())
         # handle user's <CTRL>+C
         signal(SIGINT, lambda s, f: sync_dash.write_performance_log())
+        previous_sim_time = None
         while sync_dash.tick():
             if not self.window:
                 return
@@ -95,13 +101,19 @@ class Dashboard(object):
             #get new data
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
+            if sim_time == previous_sim_time:
+                    return
+            previous_sim_time = sim_time
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
             config_txt += "\nTraffic Rate: {}Hz   |   Planner Rate: {}Hz   |   Dashboard Rate: {}Hz".format(TRAFFIC_RATE, PLANNER_RATE, DASH_RATE)
             config_txt += "\nTick#: {}   |   SimTime: {}   |   DeltaTime: {:.2} s".format(tickcount,sim_time_formated,delta_time)
 
             #config/stats
-            self.scenario_config_lb['text'] = config_txt
+            try:
+                self.scenario_config_lb['text'] = config_txt
+            except Exception as e:
+                return  # window was closed, exit the loop
 
             #global Map
             if SHOW_MPLOT:
@@ -122,45 +134,47 @@ class Dashboard(object):
                     self.center_pedestrian = False
                 self.center_id = int(self.center_id[1:]) #remove first letter
 
-            if self.center_pedestrian == False and self.center_id in vehicles:
-                if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
-                    vid = int(self.center_id)
-                    
-                    v_string_id = f"v{vid}"  # 'v' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
-                    
-                    #vehicles with planner: cartesian, frenet chart and behavior tree
-                    try:
-                        if v_string_id in debug_shdata:
-                            #read vehicle planning data from debug_shdata
-                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[v_string_id]
-                            if SHOW_CPLOT: #cartesian plot with lanelet map
-                                self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-                            if SHOW_FFPLOT: #frenet frame plot
-                                self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
-                            if VEH_TRAJ_CHART: #vehicle traj plot
-                                self.plot_vehicle_sd(traj, cand)
-                            #behavior tree
-                            self.tree_msg.delete("1.0", "end")
-                            if btree_snapshot:
-                                self.tree_msg.insert("1.0", btree_snapshot)
-                        else:
-                            #vehicles without planner:
-                            if SHOW_CPLOT: #cartesian plot with lanelet map
-                                self.plot_cartesian_chart(vid, vehicles, pedestrians)
-                    except BrokenPipeError:
-                        return
-            elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
-                if SHOW_CPLOT and pedestrians[self.center_id].sim_state != ActorSimState.INACTIVE:
-                    pid = int(self.center_id)
-                    p_string_id = f"p{pid}" # 'p' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
-                    try:
-                        if p_string_id in debug_shdata:
-                            planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[p_string_id]
-                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
-                        else:
-                            self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
-                    except BrokenPipeError:
-                        return
+            # if atleast one agent is present in the scenario
+            if len(vehicles) != 0 or len(pedestrians) != 0:    
+                if self.center_pedestrian == False and self.center_id in vehicles:
+                    if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
+                        vid = int(self.center_id)
+                        
+                        v_string_id = f"v{vid}"  # 'v' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                        
+                        #vehicles with planner: cartesian, frenet chart and behavior tree
+                        try:
+                            if v_string_id in debug_shdata:
+                                #read vehicle planning data from debug_shdata
+                                planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[v_string_id]
+                                if SHOW_CPLOT: #cartesian plot with lanelet map
+                                    self.plot_cartesian_chart(vid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                                if SHOW_FFPLOT: #frenet frame plot
+                                    self.plot_frenet_chart(vid, planner_state, ref_path, traj, cand, unf, traj_s_shift)
+                                if VEH_TRAJ_CHART: #vehicle traj plot
+                                    self.plot_vehicle_sd(traj, cand)
+                                #behavior tree
+                                self.tree_msg.delete("1.0", "end")
+                                if btree_snapshot:
+                                    self.tree_msg.insert("1.0", btree_snapshot)
+                            else:
+                                #vehicles without planner:
+                                if SHOW_CPLOT: #cartesian plot with lanelet map
+                                    self.plot_cartesian_chart(vid, vehicles, pedestrians)
+                        except BrokenPipeError:
+                            return
+                elif (self.center_pedestrian and self.center_id in pedestrians) or len(vehicles) == 0:
+                    if SHOW_CPLOT and pedestrians[self.center_id].sim_state != ActorSimState.INACTIVE:
+                        pid = int(self.center_id)
+                        p_string_id = f"p{pid}" # 'p' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
+                        try:
+                            if p_string_id in debug_shdata:
+                                planner_state, btree_snapshot, ref_path, traj, cand, unf, traj_s_shift = debug_shdata[p_string_id]
+                                self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians, ref_path, traffic_lights, static_objects)
+                            else:
+                                self.plot_pedestrian_cartesian_chart(pid, vehicles, pedestrians)
+                        except BrokenPipeError:
+                            return
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
@@ -178,9 +192,10 @@ class Dashboard(object):
             #log.info("Changed focus to {}".format(self.center_id))
     
     def get_maneuver(self, id):
+        v_string_id = f"v{id}"
         try:
-            if id in self.sim_traffic.debug_shdata:
-                btree_snapshot = self.sim_traffic.debug_shdata[id][1]
+            if v_string_id in self.sim_traffic.debug_shdata:
+                btree_snapshot = self.sim_traffic.debug_shdata[v_string_id][1]
                 if btree_snapshot:
                     maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
                     return maneuver
