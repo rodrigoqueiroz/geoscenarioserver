@@ -70,6 +70,11 @@ class Dashboard(object):
         if not (self.sim_traffic.traffic_state_sharr):
             log.error("Dashboard can not start before traffic")
             return
+        
+        #get new data
+        _, vehicles, pedestrians, _, _  = self.sim_traffic.read_traffic_state(self.sim_traffic.traffic_state_sharr, False)
+        if len(vehicles) == 0 or len(pedestrians) == 0: 
+            log.error("Dashboard requires traffic, add agents to the scenario")
 
         self.lanelet_map = self.sim_traffic.lanelet_map
         self._process = Process(target=self.run_dash_process,
@@ -122,7 +127,7 @@ class Dashboard(object):
                     self.center_pedestrian = False
                 self.center_id = int(self.center_id[1:]) #remove first letter
 
-            # if atleast one agent is present in the base scenario
+            # if atleast one agent is present in the scenario
             if len(vehicles) != 0 or len(pedestrians) != 0:    
                 if self.center_pedestrian == False and self.center_id in vehicles:
                     if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
@@ -164,7 +169,13 @@ class Dashboard(object):
                         except BrokenPipeError:
                             return
             else:
-                log.error("Dashboard requires traffic, add agents to the base scenario")
+                self.cart_canvas.draw()
+                self.fren_canvas.draw()
+                self.traj_canvas.draw()
+                if SHOW_MPLOT:
+                    self.map_canvas.draw()
+                self.window.update()
+                
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
