@@ -162,8 +162,7 @@ class Dashboard(object):
                         except BrokenPipeError:
                             return
             else:
-                log.error("Dashboard requires traffic, try adding parts")
-                return 
+                log.error("Dashboard requires traffic, add agents to the base scenario")
             self.cart_canvas.draw()
             self.fren_canvas.draw()
             self.traj_canvas.draw()
