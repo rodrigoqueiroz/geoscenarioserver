@@ -6,9 +6,10 @@
 # --------------------------------------------
 from dataclasses import dataclass
 from enum import IntEnum
-from util.Utils import to_equation, differentiate
+from util.Utils import to_equation, differentiate, normalize_angle
 from SimConfig import *
 import logging
+import numpy as np
 log = logging.getLogger(__name__)
 
 class Actor(object):
@@ -140,12 +141,58 @@ class Actor(object):
                 else:
                     self.force_stop()
                     
-    def get_collision_pt(self, ped_state, path, vehicle_state):
+                    
+    def get_velocity_yaw(self, velocity):
+        return math.atan2(velocity[1], velocity[2])
+    
+            
+    def get_collision_pt(self, vehicle_pos, vehicle_vel, path):
+        vehicle_yaw = self.get_velocity_yaw(vehicle_vel)
+        
+        def is_between(yaw, yaw1, yaw2):
+            yaw = normalize_angle(yaw)
+            yaw1 = normalize_angle(yaw1)
+            yaw2 = normalize_angle(yaw2)
+            if yaw1 < yaw2:
+                return yaw1 <= yaw <= yaw2
+            else:
+                return yaw1 <= yaw or yaw <= yaw2
+        
         for i in range(len(path)-1):
             n1 = path[i]
             n2 = path[i+1]
             
-            p_veh = vehicle_state.
+            vec_a = n1 - vehicle_pos
+            vec_b = n2 - vehicle_pos
+            
+            yaw_a = math.atan2(vec_a[1], vec_a[0])
+            yaw_b = math.atan2(vec_b[1], vec_b[0])
+            
+            if is_between(vehicle_yaw, yaw_a, yaw_b):
+                x1, y1 = n1
+                x2, y2 = n2
+                x3, y3 = vehicle_pos
+                x4, y4 = vehicle_pos + vehicle_vel
+                
+                denom = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4)
+                if denom == 0:
+                    continue  # Lines are parallel
+
+                px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / denom
+                py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / denom
+
+                return np.array([px, py])
+            
+        return None
+
+        
+                    
+    # def get_collision_pt(self, ped_state, path, vehicle_state):
+    #     for i in range(len(path)-1):
+    #         n1 = path[i]
+    #         n2 = path[i+1]
+            
+    #         p_veh = vehicle_state.
         
 
     def follow_path(self, delta_time, sim_time, path):
