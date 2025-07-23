@@ -308,10 +308,22 @@ class PP(Pedestrian):
         self.current_path_node = 0
     
     def tick(self, tick_count, delta_time, sim_time):
-        Pedestrian.tick(self, tick_count, delta_time, sim_time)
-        self.follow_path(delta_time, sim_time, self.path)
         
         ped_path = [(n.x, n.y) for n in self.path]
+        # for unit testing puposes
+        
+        vehicle_state = ActorState()
+        vehicle_state.set_X([3, 5, 2])
+        vehicle_state.set_Y([4, 6, 3])
+        
+        vehicle_pos = (vehicle_state.x, vehicle_state.y)
+        vehicle_vel = (vehicle_state.x_vel, vehicle_state.y_vel)
+        Pedestrian.tick(self, tick_count, delta_time, sim_time)
+        
+        self.get_collision_pt(vehicle_pos, vehicle_vel, ped_path)
+        self.follow_path(delta_time, sim_time, self.path)
+        
+        
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
             None,

@@ -169,6 +169,8 @@ class Actor(object):
             yaw_b = math.atan2(vec_b[1], vec_b[0])
             
             if is_between(vehicle_yaw, yaw_a, yaw_b):
+                
+                # cramer's rule, maybe replace with something more intuitve
                 x1, y1 = n1
                 x2, y2 = n2
                 x3, y3 = vehicle_pos
