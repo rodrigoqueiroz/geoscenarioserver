@@ -87,14 +87,17 @@ class SDV(Vehicle):
         if self.sv_planner:
             self.sv_planner.stop(interrupted)
 
-    def tick(self, tick_count:int, delta_time:float, sim_time:float):
+    def tick(self, tick_count:int, delta_time:float, sim_time:float, wait_for_plan:bool = False):
         if self.goal_ends_simulation and self.sv_planner.completion.value:
             raise ScenarioCompletion("Vehicle under test reached its target")
             
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
-            plan = self.sv_planner.get_plan()
+            if tick_count == 0:
+                # always wait for the first plan at the first tick
+                wait_for_plan = True
+            plan = self.sv_planner.get_plan(wait_for_plan)
             if plan is not None:
                 self.set_new_motion_plan(plan, sim_time)
                 if plan.new_frenet_frame:

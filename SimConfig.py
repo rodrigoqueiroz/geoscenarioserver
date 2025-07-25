@@ -8,6 +8,7 @@
 
 from dataclasses import dataclass, field
 from typing import Dict
+from enum import Enum
 import os
 import math
 
@@ -15,7 +16,7 @@ ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 #Sim Config
 TIMEOUT = 30                #default timeout in [s] if not defined by scenario
-TRAFFIC_RATE = 40           #global tick rate
+TRAFFIC_RATE = 20           #global tick rate
 WAIT_FOR_INPUT = False      #wait for user input before starting simulation
 
 #Dash Config
@@ -67,8 +68,8 @@ PEDESTRIAN_WIDTH = 0.5
 
 #Planning
 PLANNER_RATE = 5                 #Planner tick rate
-PLANNING_TIME = 0.2              #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
-USE_FIXED_PLANNING_TIME = True   #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
+PLANNING_TIME = 0.1              #[s] Must be <= 1/PLANNER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
+USE_FIXED_PLANNING_TIME = True   #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNER_RATE)
 POINTS_PER_METER = 3.0           #The number of points per meter to be used along the vehicle's reference path
                                  #Note that the value that is used may be slightly different
 
@@ -103,6 +104,12 @@ SHM_SIZE = 2048
 # list of gs tags that must be unique per scenario
 UNIQUE_GS_TAGS_PER_SCENARIO = ['origin', 'globalconfig']
 
+class ExecutionMode(Enum):
+    realtime = 0
+    fastest = 1
+    synchronized = 2
+    paused = 3
+
 @dataclass
 class SimConfig:
     pedestrian_lanelet_routes:Dict = field(default_factory=dict)
@@ -118,3 +125,4 @@ class SimConfig:
     show_dashboard:bool = SHOW_DASHBOARD
     wait_for_input:bool = WAIT_FOR_INPUT
     wait_for_client:bool = WAIT_FOR_CLIENT
+    execution_mode:ExecutionMode = ExecutionMode.realtime
