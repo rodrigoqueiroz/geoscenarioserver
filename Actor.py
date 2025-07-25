@@ -142,13 +142,12 @@ class Actor(object):
                     self.force_stop()
                     
                     
-    def get_velocity_yaw(self, velocity):
-        return math.atan2(velocity[1], velocity[2])
-    
-            
+    def get_velocity_yaw(self, velocity_x, velocity_y):
+        return math.atan2(velocity_y, velocity_x)
+
     def get_collision_pt(self, vehicle_pos, vehicle_vel, path):
-        vehicle_yaw = self.get_velocity_yaw(vehicle_vel)
-        
+        vehicle_yaw = self.get_velocity_yaw(vehicle_vel[0], vehicle_vel[1])
+
         def is_between(yaw, yaw1, yaw2):
             yaw = normalize_angle(yaw)
             yaw1 = normalize_angle(yaw1)
@@ -162,17 +161,20 @@ class Actor(object):
             n1 = path[i]
             n2 = path[i+1]
             
-            vec_a = n1 - vehicle_pos
-            vec_b = n2 - vehicle_pos
+            n1_vector = np.array([n1.x, n1.y])
+            n2_vector = np.array([n2.x, n2.y])
             
+            vec_a = n1_vector - vehicle_pos
+            vec_b = n2_vector - vehicle_pos
+
             yaw_a = math.atan2(vec_a[1], vec_a[0])
             yaw_b = math.atan2(vec_b[1], vec_b[0])
             
             if is_between(vehicle_yaw, yaw_a, yaw_b):
                 
                 # cramer's rule, maybe replace with something more intuitve
-                x1, y1 = n1
-                x2, y2 = n2
+                x1, y1 = n1.x, n1.y
+                x2, y2 = n2.x, n2.y
                 x3, y3 = vehicle_pos
                 x4, y4 = vehicle_pos + vehicle_vel
                 
