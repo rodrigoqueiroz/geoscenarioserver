@@ -161,8 +161,8 @@ class Actor(object):
             n1 = path[i]
             n2 = path[i+1]
             
-            n1_vector = np.array([n1.x, n1.y])
-            n2_vector = np.array([n2.x, n2.y])
+            n1_vector = np.array([n1[0], n1[1]])
+            n2_vector = np.array([n2[0], n2[1]])
             
             vec_a = n1_vector - vehicle_pos
             vec_b = n2_vector - vehicle_pos
@@ -173,8 +173,8 @@ class Actor(object):
             if is_between(vehicle_yaw, yaw_a, yaw_b):
                 
                 # cramer's rule, maybe replace with something more intuitve
-                x1, y1 = n1.x, n1.y
-                x2, y2 = n2.x, n2.y
+                x1, y1 = n1[0], n1[1]
+                x2, y2 = n2[0], n2[1]
                 x3, y3 = vehicle_pos
                 x4, y4 = vehicle_pos + vehicle_vel
                 

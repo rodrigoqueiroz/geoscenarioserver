@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5347261' action='modify' visible='true' lat='43.47161324274' lon='-80.53937569025'>
+    <tag k='btype' v='PP' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='path_ped' />
+    <tag k='path' v='pp1' />
+    <tag k='pid' v='1' />
+    <tag k='speed' v='3' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='yaw' v='180' />
+  </node>
+  <node id='-5347272' action='modify' visible='true' lat='43.47159638345' lon='-80.53938680085' />
+  <node id='-5347273' action='modify' visible='true' lat='43.47156559692' lon='-80.53954133925' />
+  <node id='-5347274' action='modify' visible='true' lat='43.47147910133' lon='-80.53957972134' />
+  <node id='-5347275' action='modify' visible='true' lat='43.47148349942' lon='-80.53974436029' />
+  <node id='-5347276' action='modify' visible='true' lat='43.47173932073' lon='-80.53951608788'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5347280' action='modify' visible='true' lat='43.47166821864' lon='-80.53951002755'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='collision_pt_test_scenario' />
+    <tag k='timeout' v='30' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5347288' action='modify' visible='true' lat='43.47148716449' lon='-80.53940397178'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='no' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='path_vehicle' />
+    <tag k='path' v='pv2' />
+    <tag k='speed' v='2' />
+    <tag k='start' v='yes' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='220' />
+  </node>
+  <node id='-5347299' action='modify' visible='true' lat='43.47151355298' lon='-80.5394393237' />
+  <node id='-5347300' action='modify' visible='true' lat='43.47164183021' lon='-80.53964739502' />
+  <way id='-1952717' action='modify' visible='true'>
+    <nd ref='-5347272' />
+    <nd ref='-5347273' />
+    <nd ref='-5347274' />
+    <nd ref='-5347275' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='pp1' />
+  </way>
+  <way id='-1952720' action='modify' visible='true'>
+    <nd ref='-5347299' />
+    <nd ref='-5347300' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='pv2' />
+  </way>
+</osm>

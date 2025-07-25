@@ -314,8 +314,8 @@ class PP(Pedestrian):
         # for unit testing puposes
         
         vehicle_state = ActorState()
-        vehicle_state.set_X([3, 5, 2])      # pos, vel, acc
-        vehicle_state.set_Y([4, 6, 3])
+        vehicle_state.set_X([2.7, -0.4, 0.0])      # pos, vel, acc
+        vehicle_state.set_Y([-22.1, 0.3, 0.0])
         
         vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
         vehicle_vel = np.array([vehicle_state.x_vel, vehicle_state.y_vel])
@@ -324,7 +324,7 @@ class PP(Pedestrian):
         collision_pt = self.get_collision_pt(vehicle_pos, vehicle_vel, ped_path)
         print(collision_pt)
         self.follow_path(delta_time, sim_time, self.path)
-            
+
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
             None,
