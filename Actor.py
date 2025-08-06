@@ -185,7 +185,7 @@ class Actor(object):
                 px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / denom
                 py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / denom
 
-                return np.array([px, py])
+                return np.array([px, py]), n1, n2
             
         return None
 

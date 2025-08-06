@@ -187,9 +187,12 @@ class SimTraffic(object):
         for vid in self.vehicles:
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
 
+        # get collisin vehicle vid
+        collision_vehicle_vid = 1  # replace with some variable which reads osm file
+
         #tick pedestrians:
         for pid in self.pedestrians:
-            self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
+            self.pedestrians[pid].tick(tick_count, delta_time, sim_time, self.vehicles[collision_vehicle_vid])
             if self.pedestrians[pid].sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
                 continue
             self.collision_check(self.pedestrians[pid])

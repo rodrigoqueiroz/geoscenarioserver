@@ -30,7 +30,7 @@
     <tag k='timeout' v='30' />
     <tag k='version' v='2.0' />
   </node>
-  <node id='-5347288' action='modify' visible='true' lat='43.47148716449' lon='-80.53940397178'>
+  <node id='-5347288' action='modify' visible='true' lat='43.4714666401' lon='-80.539371145'>
     <tag k='btype' v='PV' />
     <tag k='cycles' v='1' />
     <tag k='goal_ends_simulation' v='no' />
@@ -42,8 +42,10 @@
     <tag k='vid' v='1' />
     <tag k='yaw' v='220' />
   </node>
-  <node id='-5347299' action='modify' visible='true' lat='43.47151355298' lon='-80.5394393237' />
-  <node id='-5347300' action='modify' visible='true' lat='43.47164183021' lon='-80.53964739502' />
+  <node id='-5347299' action='modify' visible='true' lat='43.47147910133' lon='-80.5393933662' />
+  <node id='-5347300' action='modify' visible='true' lat='43.47148313291' lon='-80.53946306' />
+  <node id='-5350657' action='modify' visible='true' lat='43.47155789992' lon='-80.53946002933' />
+  <node id='-5350659' action='modify' visible='true' lat='43.47158978597' lon='-80.53958982138' />
   <way id='-1952717' action='modify' visible='true'>
     <nd ref='-5347272' />
     <nd ref='-5347273' />
@@ -56,6 +58,8 @@
   <way id='-1952720' action='modify' visible='true'>
     <nd ref='-5347299' />
     <nd ref='-5347300' />
+    <nd ref='-5350657' />
+    <nd ref='-5350659' />
     <tag k='abstract' v='no' />
     <tag k='gs' v='path' />
     <tag k='name' v='pv2' />

@@ -307,7 +307,7 @@ class PP(Pedestrian):
 
         self.current_path_node = 0
     
-    def tick(self, tick_count, delta_time, sim_time):
+    def tick(self, tick_count, delta_time, sim_time, collision_vehicle):
         
         ped_path = [(n.x, n.y) for n in self.path]
 
@@ -316,12 +316,17 @@ class PP(Pedestrian):
         vehicle_state = ActorState()
         vehicle_state.set_X([2.7, -0.4, 0.0])      # pos, vel, acc
         vehicle_state.set_Y([-22.1, 0.3, 0.0])
-        
-        vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
-        vehicle_vel = np.array([vehicle_state.x_vel, vehicle_state.y_vel])
+        # vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
+        # vehicle_vel = np.array([vehicle_state.x_vel, vehicle_state.y_vel])
+
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
-        
-        collision_pt = self.get_collision_pt(vehicle_pos, vehicle_vel, ped_path)
+
+        vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
+        vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
+
+        # get the collision point and the nodes surrounding the collision point to help compute distance of pedestrian to collision point
+        collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, ped_path)
+
         print(collision_pt)
         self.follow_path(delta_time, sim_time, self.path)
 
