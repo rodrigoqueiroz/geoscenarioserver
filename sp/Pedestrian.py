@@ -327,8 +327,8 @@ class PP(Pedestrian):
         print(time_to_collision)
 
         ## getting some positional argument error, use chatgpt to determine if it is syntax based or logical as in the parameters need to be calculated in the follow path function itself
-        # self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node)
-        self.follow_path(delta_time, sim_time, self.path)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node)
+        # self.follow_path(delta_time, sim_time, self.path)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
