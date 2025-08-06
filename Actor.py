@@ -199,6 +199,7 @@ class Actor(object):
     #         p_veh = vehicle_state.
         
 
+    # def follow_path(self, delta_time, sim_time, path, time_to_collision, collision_pt, collision_segment_prev_node):
     def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed

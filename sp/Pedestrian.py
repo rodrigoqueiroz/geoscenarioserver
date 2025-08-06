@@ -311,14 +311,6 @@ class PP(Pedestrian):
         
         ped_path = [(n.x, n.y) for n in self.path]
 
-        # for unit testing puposes
-        
-        vehicle_state = ActorState()
-        vehicle_state.set_X([2.7, -0.4, 0.0])      # pos, vel, acc
-        vehicle_state.set_Y([-22.1, 0.3, 0.0])
-        # vehicle_pos = np.array([vehicle_state.x, vehicle_state.y])
-        # vehicle_vel = np.array([vehicle_state.x_vel, vehicle_state.y_vel])
-
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
         vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
@@ -327,7 +319,15 @@ class PP(Pedestrian):
         # get the collision point and the nodes surrounding the collision point to help compute distance of pedestrian to collision point
         collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, ped_path)
 
-        print(collision_pt)
+        # euclidian distance between vehicile and collision point
+        collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos)**2))
+        time_to_collision = collision_vehicle_dist_to_collision/collision_vehicle.state.s_vel
+
+        # print(collision_pt)
+        print(time_to_collision)
+
+        ## getting some positional argument error, use chatgpt to determine if it is syntax based or logical as in the parameters need to be calculated in the follow path function itself
+        # self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node)
         self.follow_path(delta_time, sim_time, self.path)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
