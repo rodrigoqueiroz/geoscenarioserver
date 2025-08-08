@@ -317,7 +317,7 @@ class PP(Pedestrian):
         vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
 
         # get the collision point and the nodes surrounding the collision point to help compute distance of pedestrian to collision point
-        collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, ped_path)
+        collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
 
         # euclidian distance between vehicile and collision point
         collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos)**2))
@@ -326,8 +326,7 @@ class PP(Pedestrian):
         # print(collision_pt)
         print(time_to_collision)
 
-        ## getting some positional argument error, use chatgpt to determine if it is syntax based or logical as in the parameters need to be calculated in the follow path function itself
-        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node)
         # self.follow_path(delta_time, sim_time, self.path)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (

@@ -161,8 +161,8 @@ class Actor(object):
             n1 = path[i]
             n2 = path[i+1]
             
-            n1_vector = np.array([n1[0], n1[1]])
-            n2_vector = np.array([n2[0], n2[1]])
+            n1_vector = np.array([n1.x, n1.y])
+            n2_vector = np.array([n2.x, n2.y])
             
             vec_a = n1_vector - vehicle_pos
             vec_b = n2_vector - vehicle_pos
@@ -173,8 +173,8 @@ class Actor(object):
             if is_between(vehicle_yaw, yaw_a, yaw_b):
                 
                 # cramer's rule, maybe replace with something more intuitve
-                x1, y1 = n1[0], n1[1]
-                x2, y2 = n2[0], n2[1]
+                x1, y1 = n1.x, n1.y
+                x2, y2 = n2.x, n2.y
                 x3, y3 = vehicle_pos
                 x4, y4 = vehicle_pos + vehicle_vel
                 
@@ -199,7 +199,7 @@ class Actor(object):
     #         p_veh = vehicle_state.
         
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None):
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None):
     # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
@@ -214,14 +214,33 @@ class Actor(object):
                 n1 = path[i]
                 n2 = path[i+1]
                 if (n1.s <= self.state.s <= n2.s):
+
+                    node_checkpoint = i
+
+                    # if collision point provided, use different speed logic
+                    if collision_pt is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
+                        # calculate euclidian distance between prev node and collision point
+                        diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x, collision_segment_prev_node.y])
+                        euclidian_dist = np.sqrt(np.sum(diff ** 2))
+                        
+                        # estimate s value of collision point
+                        collision_pt_s = collision_segment_prev_node.s + euclidian_dist  
+
+                        # compute distance to collision point for pedestrian
+                        distance_remaining = collision_pt_s - self.state.s
+
+                        if time_to_collision > 0:
+                            self.state.s_vel = distance_remaining / time_to_collision
+                        else:
+                            self.state.s_vel = 0.0  # stop either collided or missed collision window
+
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
-                    if n1.speed is not None and n2.speed is not None:
+                    elif n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
 
-                    node_checkpoint = i
                     break
 
             # Calculate frenet position
