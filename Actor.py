@@ -234,6 +234,7 @@ class Actor(object):
                         else:
                             self.state.s_vel = 0.0  # stop either collided or missed collision window
 
+                    # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
                     elif n1.speed is not None and n2.speed is not None:

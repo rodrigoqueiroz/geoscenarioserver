@@ -317,11 +317,17 @@ class PP(Pedestrian):
         vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
 
         # get the collision point and the nodes surrounding the collision point to help compute distance of pedestrian to collision point
-        collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
+        if self.get_collision_pt(vehicle_pos, vehicle_vel, self.path) != None:
+            collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
 
-        # euclidian distance between vehicile and collision point
-        collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos)**2))
-        time_to_collision = collision_vehicle_dist_to_collision/collision_vehicle.state.s_vel
+            # euclidian distance between vehicile and collision point
+            collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos)**2))
+            time_to_collision = collision_vehicle_dist_to_collision/collision_vehicle.state.s_vel
+        else:
+            collision_pt = None
+            collision_segment_next_node = None
+            collision_segment_prev_node = None
+            time_to_collision = None
 
         # print(collision_pt)
         print(time_to_collision)
