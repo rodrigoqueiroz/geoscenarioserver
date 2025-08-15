@@ -296,22 +296,25 @@ class SP(Pedestrian):
     
 class PP(Pedestrian):
     
-    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None):
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None):
         super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.PP_TYPE
         self.path = path
         self._debug_shdata = debug_shdata
         self.keep_active = keep_active
         self.collision_vid = collision_vid
+        self.scenario_vehicles = scenario_vehicles
         
         self.current_waypoint = 0.0
 
         self.current_path_node = 0
     
-    def tick(self, tick_count, delta_time, sim_time, collision_vehicle):  
+    def tick(self, tick_count, delta_time, sim_time):  
         ped_path = [(n.x, n.y) for n in self.path]
 
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
+
+        collision_vehicle = self.scenario_vehicles[self.collision_vid]
 
         vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
         vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])

@@ -192,7 +192,7 @@ class SimTraffic(object):
 
         #tick pedestrians:
         for pid in self.pedestrians:
-            self.pedestrians[pid].tick(tick_count, delta_time, sim_time, self.vehicles[collision_vehicle_vid])
+            self.pedestrians[pid].tick(tick_count, delta_time, sim_time)
             if self.pedestrians[pid].sim_state not in [ActorSimState.ACTIVE, ActorSimState.ACTIVE.value]:
                 continue
             self.collision_check(self.pedestrians[pid])
