@@ -404,6 +404,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             p_name = pnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
 
+            if "collision_vehicle_vid" in pnode.tags:
+                collision_vid = pnode.tags['collision_vehicle_vid']
+            else:
+                collision_vid = None
+
             path = []
             path_length = 0.0
 
@@ -438,6 +443,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 yaw=yaw,
                 path=path,
                 debug_shdata=sim_traffic.debug_shdata,
+                collision_vid=collision_vid
             )
             
 
