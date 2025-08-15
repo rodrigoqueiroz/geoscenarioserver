@@ -2,7 +2,7 @@
 <osm version='0.6' generator='JOSM'>
   <node id='-5347261' action='modify' visible='true' lat='43.47161324274' lon='-80.53937569025'>
     <tag k='btype' v='PP' />
-    <tag k='collision_vehicle_vid' v='2' />
+    <tag k='collision_vehicle_vid' v='1' />
     <tag k='cycles' v='1' />
     <tag k='gs' v='pedestrian' />
     <tag k='name' v='path_ped' />
