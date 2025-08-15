@@ -314,7 +314,11 @@ class PP(Pedestrian):
 
         Pedestrian.tick(self, tick_count, delta_time, sim_time)
 
-        collision_vehicle = self.scenario_vehicles[self.collision_vid]
+        try:
+            collision_vehicle = self.scenario_vehicles[self.collision_vid]
+        except KeyError:
+            log.error(f"collision vehicle with vid {self.collision_vid} not found in scenario")
+            raise
 
         vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
         vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
