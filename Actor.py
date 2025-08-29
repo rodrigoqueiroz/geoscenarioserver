@@ -140,8 +140,7 @@ class Actor(object):
                         self.remove()
                 else:
                     self.force_stop()
-                    
-                    
+                     
     def get_velocity_yaw(self, velocity_x, velocity_y):
         return math.atan2(velocity_y, velocity_x)
 
@@ -155,7 +154,7 @@ class Actor(object):
             if yaw1 < yaw2:
                 return yaw1 <= yaw <= yaw2
             else:
-                return yaw1 <= yaw or yaw <= yaw2
+                return yaw1 <= yaw or yaw >= yaw2
         
         for i in range(len(path)-1):
             n1 = path[i]
@@ -172,7 +171,7 @@ class Actor(object):
             
             if is_between(vehicle_yaw, yaw_a, yaw_b):
                 
-                # cramer's rule, maybe replace with something more intuitve
+                # cramer's rule
                 x1, y1 = n1.x, n1.y
                 x2, y2 = n2.x, n2.y
                 x3, y3 = vehicle_pos
@@ -187,20 +186,9 @@ class Actor(object):
 
                 return np.array([px, py]), n1, n2
             
-        return None
-
-        
-                    
-    # def get_collision_pt(self, ped_state, path, vehicle_state):
-    #     for i in range(len(path)-1):
-    #         n1 = path[i]
-    #         n2 = path[i+1]
-            
-    #         p_veh = vehicle_state.
-        
+        return None        
 
     def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None):
-    # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
@@ -217,7 +205,7 @@ class Actor(object):
 
                     node_checkpoint = i
 
-                    # if collision point provided, use different speed logic
+                    # if collision point provided, use ensured collision logic
                     if collision_pt is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
                         # calculate euclidian distance between prev node and collision point
                         diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x, collision_segment_prev_node.y])
