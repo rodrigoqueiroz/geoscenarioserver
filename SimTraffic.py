@@ -187,9 +187,6 @@ class SimTraffic(object):
         for vid in self.vehicles:
             self.vehicles[vid].tick(tick_count, delta_time, sim_time)
 
-        # get collisin vehicle vid
-        collision_vehicle_vid = 1  # replace with some variable which reads osm file
-
         #tick pedestrians:
         for pid in self.pedestrians:
             self.pedestrians[pid].tick(tick_count, delta_time, sim_time)

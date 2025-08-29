@@ -338,7 +338,7 @@ class PP(Pedestrian):
                     collision_segment_prev_node = None
                     time_to_collision = None
         else:
-            # If collision_vid is None, set default None values
+            # If collision_vid is None, set default None values to make pedestrian behave with default speed parameters from scenario file
             time_to_collision = None
             collision_pt = None
             collision_segment_prev_node = None
