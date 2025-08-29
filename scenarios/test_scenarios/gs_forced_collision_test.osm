@@ -17,9 +17,9 @@
   <node id='-5347273' action='modify' visible='true' lat='43.47156559692' lon='-80.53954133925' />
   <node id='-5347274' action='modify' visible='true' lat='43.47147910133' lon='-80.53957972134' />
   <node id='-5347275' action='modify' visible='true' lat='43.47148349942' lon='-80.53974436029' />
-  <node id='-5347276' action='modify' visible='true' lat='43.47173932073' lon='-80.53951608788'>
+  <node id='-5347276' action='modify' visible='true' lat='43.47150157207' lon='-80.53950133085'>
     <tag k='altitude' v='300' />
-    <tag k='area' v='100' />
+    <tag k='area' v='40' />
     <tag k='gs' v='origin' />
   </node>
   <node id='-5347280' action='modify' visible='true' lat='43.47166821864' lon='-80.53951002755'>
