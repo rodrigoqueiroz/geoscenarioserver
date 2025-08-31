@@ -241,3 +241,6 @@ def point_in_rectangle(P, A, B, C, D):
     inside_rect = first_two and last_two
 
     return inside_rect
+
+def normalize_angle(angle):
+        return angle % (2 * np.pi)

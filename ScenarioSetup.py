@@ -254,9 +254,16 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             if 'path' not in vnode.tags:
                 log.error("PV {} requires a path".format(vid))
                 continue
-
+        
             p_name = vnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
+            set_speed = vnode.tags.get('speed', 0)
+
+            if "collision_vehicle_vid" in vnode.tags:
+                collision_vid = vnode.tags['collision_vehicle_vid']
+            else:
+                collision_vid = None
+
             path = []
             path_length = 0.0
 
@@ -283,7 +290,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("PV {} has no initial speed".format(vid))
                 continue
 
-            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width)
+            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width, collision_vid=collision_vid, scenario_vehicles=sim_traffic.vehicles, set_speed=set_speed)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info("Vehicle {} initialized with PV behavior".format(vid))

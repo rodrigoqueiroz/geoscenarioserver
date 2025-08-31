@@ -323,11 +323,14 @@ class PV(Vehicle):
     - agentacceleration (not implemented)
     - timetoacceleration (not implemented)
     """
-    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, collision_vid=None, set_speed=None):
         super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.PV_TYPE
         self.path = path
         self._debug_shdata = debug_shdata
+        self.collision_vid = collision_vid
+        self.scenario_vehicles = scenario_vehicles
+        self.set_speed = set_speed
         self.keep_active = keep_active
 
         self.current_path_node = 0
@@ -335,7 +338,6 @@ class PV(Vehicle):
 
     def tick(self, tick_count, delta_time, sim_time):
         Vehicle.tick(self, tick_count, delta_time, sim_time)
-        self.follow_path(delta_time, sim_time, self.path)
 
         # Fill in some applicable debug data
         traffic_state = TrafficState(
@@ -347,6 +349,38 @@ class PV(Vehicle):
             traffic_vehicles_orp = {},
         )
         vehicle_path = [(n.x, n.y) for n in self.path]
+
+        if self.collision_vid is not None:
+            # Try to get the collision vehicle, if not found, raise a KeyError
+            try:
+                collision_vehicle = self.scenario_vehicles[self.collision_vid]
+                vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
+                vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
+            except KeyError:
+                raise KeyError(f"collision vehicle with vid {self.collision_vid} not found in scenario")
+
+            # Calculate collision details if vehicle exists
+            if collision_vehicle:
+                if self.get_collision_pt(vehicle_pos, vehicle_vel, self.path) is not None:
+                    collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
+
+                    # Euclidean distance between vehicle and collision point
+                    collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
+                    time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                else:
+                    collision_pt = None
+                    collision_segment_next_node = None
+                    collision_segment_prev_node = None
+                    time_to_collision = None
+        else:
+            # If collision_vid is None, set default None values
+            time_to_collision = None
+            collision_pt = None
+            collision_segment_prev_node = None
+            collision_segment_next_node = None
+
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node, set_speed=self.set_speed)
+
         self.sim_traffic.debug_shdata[f"v{self.id}"] = (
             traffic_state,
             None,
