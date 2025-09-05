@@ -143,6 +143,7 @@ class Actor(object):
                 else:
                     self.force_stop()
                     
+                    
     def get_velocity_yaw(self, velocity_x, velocity_y):
         return math.atan2(velocity_y, velocity_x)
 
@@ -189,6 +190,7 @@ class Actor(object):
                 return np.array([px, py]), n1, n2
             
         return None
+        
 
     def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, set_speed = None):
     # def follow_path(self, delta_time, sim_time, path):
@@ -196,6 +198,10 @@ class Actor(object):
             # Which path node have we most recently passed
             node_checkpoint = 0
             
+
+            # Ideally we should first calculate acceleration, then velocity, then position (euler integration)
+            # For now, we'll ignore acceleration
+            # TODO: This could be improved by saving the current path node instead of having to find it again every tick
             # Calculate velocity
             for i in range(len(path)-1):
                 n1 = path[i]
@@ -231,9 +237,8 @@ class Actor(object):
                         # Keep it within reasonable bounds (seconds)
                         buffer_min, buffer_max = 0.01, 1.5
                         buffer = min(max(min(buffer_log, buffer_ttc), buffer_min), buffer_max)
-                        
-                        # seconds; oncoming cannot leave earlier than this TTC (could be adjusted)
-                        ttc_cap = 1.0  
+
+                        ttc_cap = 1.0  # seconds; oncoming cannot leave earlier than this TTC
 
                         if time_to_collision > ttc_cap:
                             self.state.s_vel = 0.0
@@ -243,6 +248,11 @@ class Actor(object):
                             self.released = True
                         else:
                             self.state.s_vel = 0.0
+
+                    elif n1.speed is not None and n2.speed is not None:
+                        # Interpolate the velocity
+                        ratio = (self.state.s - n1.s)/(n2.s - n1.s)
+                        self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
     
                     break
 
