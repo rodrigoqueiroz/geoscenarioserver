@@ -317,6 +317,7 @@ class PP(Pedestrian):
         # Check if collision_vid is provided
         if self.collision_vid is not None:
             # Try to get the collision vehicle, if not found, raise a KeyError
+            collision_vehicle = None
             try:
                 collision_vehicle = self.scenario_vehicles[self.collision_vid]
                 vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
@@ -331,7 +332,10 @@ class PP(Pedestrian):
 
                     # Euclidean distance between vehicle and collision point
                     collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                    time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                    if collision_vehicle.state.s_vel == 0:
+                        time_to_collision = float('inf')
+                    else:
+                        time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
                 else:
                     collision_pt = None
                     collision_segment_next_node = None

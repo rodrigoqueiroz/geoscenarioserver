@@ -36,7 +36,7 @@
   </node>
   <node id='-5419568' action='modify' visible='true' lat='43.47174139034' lon='-80.53951394089'>
     <tag k='altitude' v='300' />
-    <tag k='area' v='100' />
+    <tag k='area' v='40' />
     <tag k='gs' v='origin' />
   </node>
   <node id='-5419569' action='modify' visible='true' lat='43.47138294701' lon='-80.53953919226' />
