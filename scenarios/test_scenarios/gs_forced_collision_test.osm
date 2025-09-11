@@ -17,7 +17,7 @@
   <node id='-5347273' action='modify' visible='true' lat='43.47156559692' lon='-80.53954133925' />
   <node id='-5347274' action='modify' visible='true' lat='43.47147910133' lon='-80.53957972134' />
   <node id='-5347275' action='modify' visible='true' lat='43.47148349942' lon='-80.53974436029' />
-  <node id='-5347276' action='modify' visible='true' lat='43.47150157207' lon='-80.53950133085'>
+  <node id='-5347276' action='modify' visible='true' lat='43.47154071935' lon='-80.53955105217'>
     <tag k='altitude' v='300' />
     <tag k='area' v='40' />
     <tag k='gs' v='origin' />
@@ -28,13 +28,13 @@
     <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
     <tag k='mutate' v='no' />
     <tag k='name' v='collision_pt_test_scenario' />
-    <tag k='timeout' v='30' />
+    <tag k='timeout' v='22' />
     <tag k='version' v='2.0' />
   </node>
   <node id='-5347288' action='modify' visible='true' lat='43.4713478917' lon='-80.53959032692'>
     <tag k='btype' v='PV' />
     <tag k='cycles' v='1' />
-    <tag k='goal_ends_simulation' v='no' />
+    <tag k='goal_ends_simulation' v='yes' />
     <tag k='gs' v='vehicle' />
     <tag k='name' v='path_vehicle' />
     <tag k='path' v='pv2' />
