@@ -10,7 +10,6 @@ from util.Utils import to_equation, differentiate, normalize_angle
 from SimConfig import *
 import logging
 import numpy as np
-import math
 log = logging.getLogger(__name__)
 
 class Actor(object):
@@ -142,8 +141,7 @@ class Actor(object):
                         self.remove()
                 else:
                     self.force_stop()
-                    
-                    
+                     
     def get_velocity_yaw(self, velocity_x, velocity_y):
         return math.atan2(velocity_y, velocity_x)
 
@@ -157,7 +155,7 @@ class Actor(object):
             if yaw1 < yaw2:
                 return yaw1 <= yaw <= yaw2
             else:
-                return yaw1 <= yaw or yaw <= yaw2
+                return yaw1 <= yaw or yaw >= yaw2
         
         for i in range(len(path)-1):
             n1 = path[i]
@@ -174,7 +172,7 @@ class Actor(object):
             
             if is_between(vehicle_yaw, yaw_a, yaw_b):
                 
-                # cramer's rule, maybe replace with something more intuitve
+                # cramer's rule
                 x1, y1 = n1.x, n1.y
                 x2, y2 = n2.x, n2.y
                 x3, y3 = vehicle_pos
@@ -207,53 +205,70 @@ class Actor(object):
                 n1 = path[i]
                 n2 = path[i+1]
                 if (n1.s <= self.state.s <= n2.s):
+
                     node_checkpoint = i
 
-                    # if collision point provided, use different speed logic
-                    if (path and time_to_collision is not None
-                        and collision_segment_prev_node is not None and collision_segment_next_node is not None
-                        and not self.released and self.id != 1):
-                        
-                        # Project collision point to arc length s
-                        diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x,
-                                                                collision_segment_prev_node.y])
-                        euclidian_dist = float(np.sqrt(np.sum(diff**2)))
-                        collision_pt_s = collision_segment_prev_node.s + euclidian_dist
+                    # if collision point provided, use ensured collision logic
+                    
+                    if path and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
+                        if self.type == 4 and not self.released and self.id != 1:
+                            
+                            # Project collision point to arc lengths
+                            diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x,
+                                                                    collision_segment_prev_node.y])
+                            euclidian_dist = float(np.sqrt(np.sum(diff**2)))
+                            collision_pt_s = collision_segment_prev_node.s + euclidian_dist
 
-                        # Distance this oncoming vehicle must travel to the collision point (along s)
-                        distance_remaining = collision_pt_s - self.state.s
+                            # Distance this oncoming vehicle must travel to the collision point (along s)
+                            distance_remaining = collision_pt_s - self.state.s
 
-                        v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
-                        t_oncoming = distance_remaining / v_set
+                            v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
+                            t_oncoming = distance_remaining / v_set
 
-                        # Log buffer (shrinks with higher set_speed)
-                        k_log, c_log = 1.2, 5.0
-                        buffer_log = k_log / max(1e-6, math.log(set_speed + c_log))
+                            # Log buffer (shrinks with higher set_speed)
+                            k_log, c_log = 1.2, 5.0
+                            buffer_log = k_log / max(1e-6, math.log(set_speed + c_log))
 
-                        # Also shrink with TTC (fraction of TTC)
-                        alpha = 0.13 
-                        buffer_ttc = alpha * t_oncoming
+                            # Also shrink with TTC (fraction of TTC)
+                            alpha = 0.13
+                            buffer_ttc = alpha * t_oncoming
 
-                        # Keep it within reasonable bounds (seconds)
-                        buffer_min, buffer_max = 0.01, 1.5
-                        buffer = min(max(min(buffer_log, buffer_ttc), buffer_min), buffer_max)
+                            # Keep it within reasonable bounds (seconds)
+                            buffer_min, buffer_max = 0.01, 1.5
+                            buffer = min(max(min(buffer_log, buffer_ttc), buffer_min), buffer_max)
 
-                        ttc_cap = 1.0  # seconds; oncoming cannot leave earlier than this TTC
+                            ttc_cap = 1.0  # seconds; oncoming cannot leave earlier than this TTC
 
-                        if time_to_collision > ttc_cap:
-                            self.state.s_vel = 0.0
+                            if time_to_collision > ttc_cap:
+                                self.state.s_vel = 0.0
 
-                        if time_to_collision <= t_oncoming + buffer:
-                            self.state.s_vel = v_set
-                            self.released = True
+                            if time_to_collision <= t_oncoming + buffer:
+                                self.state.s_vel = v_set
+                                self.released = True
+                            else:
+                                self.state.s_vel = 0.0
+
                         else:
-                            self.state.s_vel = 0.0
+                            # calculate euclidian distance between prev node and collision point
+                            diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x, collision_segment_prev_node.y])
+                            euclidian_dist = np.sqrt(np.sum(diff ** 2))
+                            
+                            # estimate s value of collision point
+                            collision_pt_s = collision_segment_prev_node.s + euclidian_dist  
 
-                    elif n1.speed is not None and n2.speed is not None:
+                            # compute distance to collision point for pedestrian
+                            distance_remaining = collision_pt_s - self.state.s
+
+                            if time_to_collision > 0:
+                                self.state.s_vel = distance_remaining / time_to_collision
+                            else:
+                                self.state.s_vel = 0.0  # stop either collided or missed collision window
+                    
+                    if n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
-    
+                    
                     break
 
             # Calculate frenet position
