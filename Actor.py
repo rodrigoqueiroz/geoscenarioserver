@@ -6,9 +6,10 @@
 # --------------------------------------------
 from dataclasses import dataclass
 from enum import IntEnum
-from util.Utils import to_equation, differentiate
+from util.Utils import to_equation, differentiate, normalize_angle
 from SimConfig import *
 import logging
+import numpy as np
 log = logging.getLogger(__name__)
 
 class Actor(object):
@@ -139,8 +140,55 @@ class Actor(object):
                         self.remove()
                 else:
                     self.force_stop()
+                     
+    def get_velocity_yaw(self, velocity_x, velocity_y):
+        return math.atan2(velocity_y, velocity_x)
 
-    def follow_path(self, delta_time, sim_time, path):
+    def get_collision_pt(self, vehicle_pos, vehicle_vel, path):
+        vehicle_yaw = self.get_velocity_yaw(vehicle_vel[0], vehicle_vel[1])
+
+        def is_between(yaw, yaw1, yaw2):
+            yaw = normalize_angle(yaw)
+            yaw1 = normalize_angle(yaw1)
+            yaw2 = normalize_angle(yaw2)
+            if yaw1 < yaw2:
+                return yaw1 <= yaw <= yaw2
+            else:
+                return yaw1 <= yaw or yaw >= yaw2
+        
+        for i in range(len(path)-1):
+            n1 = path[i]
+            n2 = path[i+1]
+            
+            n1_vector = np.array([n1.x, n1.y])
+            n2_vector = np.array([n2.x, n2.y])
+            
+            vec_a = n1_vector - vehicle_pos
+            vec_b = n2_vector - vehicle_pos
+
+            yaw_a = math.atan2(vec_a[1], vec_a[0])
+            yaw_b = math.atan2(vec_b[1], vec_b[0])
+            
+            if is_between(vehicle_yaw, yaw_a, yaw_b):
+                
+                # cramer's rule
+                x1, y1 = n1.x, n1.y
+                x2, y2 = n2.x, n2.y
+                x3, y3 = vehicle_pos
+                x4, y4 = vehicle_pos + vehicle_vel
+                
+                denom = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4)
+                if denom == 0:
+                    continue  # Lines are parallel
+
+                px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / denom
+                py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / denom
+
+                return np.array([px, py]), n1, n2
+            
+        return None        
+
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
@@ -154,14 +202,34 @@ class Actor(object):
                 n1 = path[i]
                 n2 = path[i+1]
                 if (n1.s <= self.state.s <= n2.s):
+
+                    node_checkpoint = i
+
+                    # if collision point provided, use ensured collision logic
+                    if collision_pt is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
+                        # calculate euclidian distance between prev node and collision point
+                        diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x, collision_segment_prev_node.y])
+                        euclidian_dist = np.sqrt(np.sum(diff ** 2))
+                        
+                        # estimate s value of collision point
+                        collision_pt_s = collision_segment_prev_node.s + euclidian_dist  
+
+                        # compute distance to collision point for pedestrian
+                        distance_remaining = collision_pt_s - self.state.s
+
+                        if time_to_collision > 0:
+                            self.state.s_vel = distance_remaining / time_to_collision
+                        else:
+                            self.state.s_vel = 0.0  # stop either collided or missed collision window
+
+                    # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
-                    if n1.speed is not None and n2.speed is not None:
+                    elif n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
 
-                    node_checkpoint = i
                     break
 
             # Calculate frenet position
