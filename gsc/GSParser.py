@@ -185,9 +185,18 @@ class GSParser(object):
     def check_pedestrian(self, n):
         mandatory = {"gs","pid","name"}
         optional = {"yaw","model","btype","trajectory", "esource", "eid",
-                    "speed","path","cycles","usespeedprofile","start","group"}
+                    "speed","path","cycles","usespeedprofile","start","group", "collision_vehicle_vid"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
+
+        #  Validate collision_vehicle_vid if present
+        if "collision_vehicle_vid" in n.tags:
+            try:
+                n.tags["collision_vehicle_vid"] = int(n.tags["collision_vehicle_vid"])
+            except ValueError:
+                self.report.log_error(
+                    f"Element {n.id}: collision_vehicle_vid must be an integer"
+                )
 
         self.pedestrians[n.tags["pid"]] = n
 
