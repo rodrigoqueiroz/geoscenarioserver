@@ -159,7 +159,6 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 start_in_frenet = True
                 start_frenet = vnode.tags['start_frenet']
                 gs_sf = start_frenet.split(',')
-                #print(gs_sf)
                 if len (gs_sf) != 6:
                     log.error("start state in Frenet must have 6 values [s,s_vel,s_acc,d,d_vel,d_acc].")
                     continue
@@ -257,13 +256,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         
             p_name = vnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
-            set_speed = vnode.tags.get('speed', 0)
-
-            if "collision_vehicle_vid" in vnode.tags:
-                collision_vid = vnode.tags['collision_vehicle_vid']
-            else:
-                collision_vid = None
-
+            set_speed = extract_tag(vnode, "speed", None, float)
+            collision_vid = extract_tag(vnode, "collision_vehicle_vid", None, int)
+            collision_point = None
+            
             path = []
             path_length = 0.0
 
@@ -279,6 +275,12 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(nd)
 
+                if "collision_pt" in p_nodes[i].tags:
+                    collision_point = PathNode()
+                    collision_point.x = float(p_nodes[i].x)
+                    collision_point.y = float(p_nodes[i].y)
+                    collision_point.s = path_length
+
 
             # Set initial longitudinal velocity, path always takes precedence
             frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
@@ -290,7 +292,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("PV {} has no initial speed".format(vid))
                 continue
 
-            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width, collision_vid=collision_vid, scenario_vehicles=sim_traffic.vehicles, set_speed=set_speed)
+            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width, collision_vid=collision_vid, scenario_vehicles=sim_traffic.vehicles, set_speed=set_speed, collision_point=collision_point)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info("Vehicle {} initialized with PV behavior".format(vid))
@@ -411,8 +413,6 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             p_name = pnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
 
-            collision_vid = extract_tag(pnode, 'collision_vehicle_vid', None, int)
-
             path = []
             path_length = 0.0
 
@@ -425,7 +425,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 node.s = float(path_length)
                 node.speed = float(p_nodes[i].tags['agentspeed']/3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(node)
-
+            
             # Set initial longitudinal velocity, path always takes precedence
             frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
             if path[0].speed is not None:
@@ -444,8 +444,6 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 yaw=yaw,
                 path=path,
                 debug_shdata=sim_traffic.debug_shdata,
-                scenario_vehicles=sim_traffic.vehicles,
-                collision_vid=collision_vid
             )
             
 
