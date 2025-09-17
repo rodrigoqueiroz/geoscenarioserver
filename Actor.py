@@ -188,7 +188,7 @@ class Actor(object):
             
         return None        
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None):
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, speed_qualifier=None):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
@@ -217,10 +217,45 @@ class Actor(object):
                         # compute distance to collision point for pedestrian
                         distance_remaining = collision_pt_s - self.state.s
 
+                        # Calculate the collision-required speed
                         if time_to_collision > 0:
-                            self.state.s_vel = distance_remaining / time_to_collision
+                            collision_required_speed = distance_remaining / time_to_collision
                         else:
-                            self.state.s_vel = 0.0  # stop either collided or missed collision window
+                            collision_required_speed = 0.0  # stop either collided or missed collision window
+
+                        # Apply speed qualifier constraints
+                        if speed_qualifier is None:
+                            speed_qualifier = SpeedQualifier.CONSTANT
+                        
+                        # Get the reference speed from the path nodes
+                        if n1.speed is not None and n2.speed is not None:
+                            # Interpolate the reference speed
+                            ratio = (self.state.s - n1.s)/(n2.s - n1.s)
+                            reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
+                        elif n1.speed is not None:
+                            reference_speed = n1.speed
+                        elif n2.speed is not None:
+                            reference_speed = n2.speed
+                        else:
+                            # No speed defined in path, use current speed as reference
+                            reference_speed = self.state.s_vel
+
+                        # Apply speed qualifier logic
+                        if speed_qualifier == SpeedQualifier.CONSTANT:
+                            # Use reference speed regardless of collision requirements
+                            self.state.s_vel = reference_speed
+                        elif speed_qualifier == SpeedQualifier.MAXIMUM:
+                            # Reference speed is upper bound, use minimum of reference and collision-required
+                            self.state.s_vel = min(reference_speed, collision_required_speed)
+                        elif speed_qualifier == SpeedQualifier.MINIMUM:
+                            # Reference speed is lower bound, use maximum of reference and collision-required
+                            self.state.s_vel = max(reference_speed, collision_required_speed)
+                        elif speed_qualifier == SpeedQualifier.INITIAL:
+                            # Use collision-required speed, allowing realistic adjustments
+                            self.state.s_vel = collision_required_speed
+                        else:
+                            # Default to collision-required speed for unknown qualifiers
+                            self.state.s_vel = collision_required_speed
 
                     # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
@@ -280,6 +315,13 @@ class PathNode:
     y:float = 0.0      # [m]
     s:float = 0.0      # [m]
     speed:float = 0.0  # [m/s]
+
+@dataclass
+class SpeedQualifier(IntEnum):
+    CONSTANT = 0          # treat the speed as constant throughout the path (default)
+    MAXIMUM = 1          # treat the given speed as the upper bound
+    MINIMUM = 2          # treat the given speed as the lower bound  
+    INITIAL = 3          # start the agent with the given speed but adjust for collision as needed
 
 @dataclass
 class ActorSimState(IntEnum):
