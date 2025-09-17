@@ -156,6 +156,7 @@
 		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
 		<text key="usespeedprofile" text="Use Speed Profile (y/n)" />
 		<text key="collision_vehicle_vid" text="Collision Vehicle ID" />
+		<combo key="speed_qualifier" text="Speed Qualifier:" values="constant,maximum,minimum,initial" default="" />
 		<check key="can_reverse" text="Can Reverse?" />
 		<check key="start" text="Start In Motion" />
 		<item_separator />
