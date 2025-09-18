@@ -443,6 +443,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 frenet_state=frenet_state,
                 yaw=yaw,
                 path=path,
+                scenario_vehicles=sim_traffic.vehicles,
                 debug_shdata=sim_traffic.debug_shdata,
             )
             

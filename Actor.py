@@ -239,11 +239,11 @@ class Actor(object):
                             
                             if not self.set_constant and time_to_collision is not None:
                                 if time_to_collision > 6.0:
-                                    self.k, self.c = 4.5, 7.8
-                                    self.alpha1 = 0.9
+                                    self.k, self.c = 4.2, 7.8
+                                    self.alpha1 = 0.8
                                 elif 3.0 < time_to_collision <= 6.0:
-                                    self.k, self.c = 2.5, 7.8
-                                    self.alpha1 = 0.9
+                                    self.k, self.c = 2.2, 7.8
+                                    self.alpha1 = 0.6
                                 else:
                                     self.k, self.c = 1.0, 7.8
                                     self.alpha1 = 0.9
