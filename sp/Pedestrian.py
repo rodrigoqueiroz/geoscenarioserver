@@ -296,7 +296,7 @@ class SP(Pedestrian):
     
 class PP(Pedestrian):
     
-    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None, speed_qualifier = None):
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None, speed_qualifier = None, reference_speed = None):
         super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.PP_TYPE
         self.path = path
@@ -304,6 +304,7 @@ class PP(Pedestrian):
         self.keep_active = keep_active
         self.collision_vid = collision_vid
         self.speed_qualifier = speed_qualifier
+        self.reference_speed = reference_speed
         self.scenario_vehicles = scenario_vehicles
         
         self.current_waypoint = 0.0
@@ -350,7 +351,7 @@ class PP(Pedestrian):
             collision_segment_next_node = None
 
         # Proceed with follow_path, using None values if no collision or vehicle exists
-        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node, self.speed_qualifier)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node, self.speed_qualifier, self.reference_speed)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,

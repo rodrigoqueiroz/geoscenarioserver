@@ -188,11 +188,11 @@ class Actor(object):
             
         return None        
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, speed_qualifier=None):
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, speed_qualifier=None, reference_speed=None):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
-
+            speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.CONSTANT
             # Ideally we should first calculate acceleration, then velocity, then position (euler integration)
             # For now, we'll ignore acceleration
             # TODO: This could be improved by saving the current path node instead of having to find it again every tick
@@ -222,40 +222,32 @@ class Actor(object):
                             collision_required_speed = distance_remaining / time_to_collision
                         else:
                             collision_required_speed = 0.0  # stop either collided or missed collision window
-
-                        # Apply speed qualifier constraints
-                        if speed_qualifier is None:
-                            speed_qualifier = SpeedQualifier.CONSTANT
                         
-                        # Get the reference speed from the path nodes
+                        # Get the reference speed from the path nodes is speed profile to be used
                         if n1.speed is not None and n2.speed is not None:
                             # Interpolate the reference speed
                             ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                             reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
-                        elif n1.speed is not None:
-                            reference_speed = n1.speed
-                        elif n2.speed is not None:
-                            reference_speed = n2.speed
-                        else:
-                            # No speed defined in path, use current speed as reference
-                            reference_speed = self.state.s_vel
 
                         # Apply speed qualifier logic
-                        if speed_qualifier == SpeedQualifier.CONSTANT:
+                        if speed_qualifier_enum == SpeedQualifier.CONSTANT:
                             # Use reference speed regardless of collision requirements
                             self.state.s_vel = reference_speed
-                        elif speed_qualifier == SpeedQualifier.MAXIMUM:
+                        elif speed_qualifier_enum == SpeedQualifier.MAXIMUM:
                             # Reference speed is upper bound, use minimum of reference and collision-required
-                            self.state.s_vel = min(reference_speed, collision_required_speed)
-                        elif speed_qualifier == SpeedQualifier.MINIMUM:
+                            # if collision_required_speed > 0:
+                                self.state.s_vel = min(reference_speed, collision_required_speed)
+                            # elif collision_required_speed <= 0:
+                            #     self.state.s_vel = collision_required_speed
+                        elif speed_qualifier_enum == SpeedQualifier.MINIMUM:
                             # Reference speed is lower bound, use maximum of reference and collision-required
                             self.state.s_vel = max(reference_speed, collision_required_speed)
-                        elif speed_qualifier == SpeedQualifier.INITIAL:
+                        elif speed_qualifier_enum == SpeedQualifier.INITIAL:
                             # Use collision-required speed, allowing realistic adjustments
                             self.state.s_vel = collision_required_speed
-                        else:
-                            # Default to collision-required speed for unknown qualifiers
-                            self.state.s_vel = collision_required_speed
+                        # else:
+                        #     # Default to collision-required speed for unknown qualifiers
+                        #     self.state.s_vel = collision_required_speed
 
                     # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
@@ -316,7 +308,7 @@ class PathNode:
     s:float = 0.0      # [m]
     speed:float = 0.0  # [m/s]
 
-@dataclass
+
 class SpeedQualifier(IntEnum):
     CONSTANT = 0          # treat the speed as constant throughout the path (default)
     MAXIMUM = 1          # treat the given speed as the upper bound
