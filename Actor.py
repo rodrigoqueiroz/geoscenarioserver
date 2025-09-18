@@ -204,7 +204,7 @@ class Actor(object):
         return None
         
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, set_speed = None):
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, set_speed = None, agent_type = None):
     # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
@@ -213,7 +213,6 @@ class Actor(object):
             # For now, we'll ignore acceleration
             # TODO: This could be improved by saving the current path node instead of having to find it again every tick
             # Calculate velocity
-
             
             for i in range(len(path)-1):
                 n1 = path[i]
@@ -233,13 +232,12 @@ class Actor(object):
 
                         # Distance this oncoming vehicle must travel to the collision point (along s)
                         distance_remaining = collision_pt_s - self.state.s
-
-                        if self.type == 4 and not self.released and self.id != 1:
+                        #if the actor type is PV 
+                        if agent_type == "PV" and not self.released and self.id != 1:
                             v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
                             t_oncoming = distance_remaining / v_set
                             
                             if not self.set_constant and time_to_collision is not None:
-                                print(f"time to collision: {time_to_collision}")
                                 if time_to_collision > 6.0:
                                     self.k, self.c = 4.5, 7.8
                                     self.alpha1 = 0.9
@@ -272,12 +270,26 @@ class Actor(object):
                                 self.released = True
                             else:
                                 self.state.s_vel = 0.0
-                    
+                        elif agent_type == "PP":
+                            # estimate s value of collision point
+                            collision_pt_s = collision_segment_prev_node.s + euclidian_dist  
+
+                            # compute distance to collision point for pedestrian
+                            distance_remaining = collision_pt_s - self.state.s
+
+                            if time_to_collision > 0:
+                                self.state.s_vel = distance_remaining / time_to_collision
+                            else:
+                                self.state.s_vel = 0.0  # stop either collided or missed collision window
+
+                    # Else just follow speed profile or given speed
+                    # For now we assume that the velocity is specified at each path point or none of them
+                    # Later we could instead interpolate between points with speed specified
                     if n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
-                    
+
                     break
 
             # Calculate frenet position

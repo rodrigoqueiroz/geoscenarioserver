@@ -317,7 +317,6 @@ class PP(Pedestrian):
         # Check if collision_vid is provided
         if self.collision_vid is not None:
             # Try to get the collision vehicle, if not found, raise a KeyError
-            collision_vehicle = None
             try:
                 collision_vehicle = self.scenario_vehicles[self.collision_vid]
                 vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
@@ -332,24 +331,22 @@ class PP(Pedestrian):
 
                     # Euclidean distance between vehicle and collision point
                     collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                    if collision_vehicle.state.s_vel == 0:
-                        time_to_collision = float('inf')
-                    else:
-                        time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                    time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
                 else:
                     collision_pt = None
                     collision_segment_next_node = None
                     collision_segment_prev_node = None
                     time_to_collision = None
         else:
-            # If collision_vid is None, set default None values to make pedestrian behave with default speed parameters from scenario file
+            # If collision_vid is None, set default None values
             time_to_collision = None
             collision_pt = None
             collision_segment_prev_node = None
             collision_segment_next_node = None
 
+        agent_type = "PP"
         # Proceed with follow_path, using None values if no collision or vehicle exists
-        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node, agent_type=agent_type)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
