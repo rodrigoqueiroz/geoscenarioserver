@@ -245,9 +245,6 @@ class Actor(object):
                         elif speed_qualifier_enum == SpeedQualifier.INITIAL:
                             # Use collision-required speed, allowing realistic adjustments
                             self.state.s_vel = collision_required_speed
-                        # else:
-                        #     # Default to collision-required speed for unknown qualifiers
-                        #     self.state.s_vel = collision_required_speed
 
                     # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
