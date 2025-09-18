@@ -405,7 +405,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             p_nodes = parser.paths[p_name].nodes
 
             collision_vid = extract_tag(pnode, 'collision_vehicle_vid', None, int)
-            speed_qualifier = extract_tag(pnode, 'speed_qualifier', None, str).lower()
+            speed_qualifier = extract_tag(pnode, 'speed_qualifier', None, str)
 
             path = []
             path_length = 0.0
