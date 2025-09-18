@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5419665' action='modify' visible='true' lat='43.47167028826' lon='-80.53950935626'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad_pedestrians.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='collision_pt_test_scenario' />
+    <tag k='timeout' v='30' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5419666' action='modify' visible='true' lat='43.47174139034' lon='-80.53951541659'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5419667' action='modify' visible='true' lat='43.47161531236' lon='-80.53937501896'>
+    <tag k='btype' v='PP' />
+    <tag k='collision_vehicle_vid' v='1' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='path_ped' />
+    <tag k='path' v='pp1' />
+    <tag k='pid' v='1' />
+    <tag k='speed' v='3' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='no' />
+    <tag k='yaw' v='180' />
+  </node>
+  <node id='-5419668' action='modify' visible='true' lat='43.47134996133' lon='-80.53958965563'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='no' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='p2' />
+    <tag k='path' v='pv2' />
+    <tag k='speed' v='7' />
+    <tag k='start' v='yes' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='320' />
+  </node>
+  <node id='-5419669' action='modify' visible='true' lat='43.47159845307' lon='-80.53938612956' />
+  <node id='-5419670' action='modify' visible='true' lat='43.47156766654' lon='-80.53954066796' />
+  <node id='-5419671' action='modify' visible='true' lat='43.47148117095' lon='-80.53957905005' />
+  <node id='-5419672' action='modify' visible='true' lat='43.47148556904' lon='-80.539743689' />
+  <node id='-5419673' action='modify' visible='true' lat='43.47138294701' lon='-80.53954066796' />
+  <node id='-5419674' action='modify' visible='true' lat='43.471432059' lon='-80.53946794401' />
+  <node id='-5419675' action='modify' visible='true' lat='43.47144085517' lon='-80.53945885351' />
+  <node id='-5419676' action='modify' visible='true' lat='43.47145331642' lon='-80.53945279318' />
+  <node id='-5419677' action='modify' visible='true' lat='43.47146137957' lon='-80.53945178313' />
+  <node id='-5419678' action='modify' visible='true' lat='43.47147237479' lon='-80.53945481329' />
+  <node id='-5419679' action='modify' visible='true' lat='43.47148263698' lon='-80.53945784346' />
+  <node id='-5419680' action='modify' visible='true' lat='43.47149729726' lon='-80.53946794401' />
+  <node id='-5419681' action='modify' visible='true' lat='43.47150389438' lon='-80.53947804456' />
+  <node id='-5419682' action='modify' visible='true' lat='43.47151049151' lon='-80.53948915516' />
+  <node id='-5419683' action='modify' visible='true' lat='43.47151782164' lon='-80.53950430598' />
+  <node id='-5419684' action='modify' visible='true' lat='43.4716175114' lon='-80.53968712592' />
+  <node id='-5419721' action='modify' visible='true' lat='43.47146799351' lon='-80.53937073185'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='no' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='path_vehicle' />
+    <tag k='path' v='pv1' />
+    <tag k='speed' v='2' />
+    <tag k='start' v='yes' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='220' />
+  </node>
+  <node id='-5419722' action='modify' visible='true' lat='43.47148045474' lon='-80.53939295305' />
+  <node id='-5419723' action='modify' visible='true' lat='43.47148448632' lon='-80.53946264685' />
+  <node id='-5419724' action='modify' visible='true' lat='43.47155925333' lon='-80.53945961618' />
+  <node id='-5419725' action='modify' visible='true' lat='43.47159113938' lon='-80.53958940823' />
+  <way id='-1959344' action='modify' visible='true'>
+    <nd ref='-5419669' />
+    <nd ref='-5419670' />
+    <nd ref='-5419671' />
+    <nd ref='-5419672' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='pp1' />
+  </way>
+  <way id='-1959345' action='modify' visible='true'>
+    <nd ref='-5419673' />
+    <nd ref='-5419674' />
+    <nd ref='-5419675' />
+    <nd ref='-5419676' />
+    <nd ref='-5419677' />
+    <nd ref='-5419678' />
+    <nd ref='-5419679' />
+    <nd ref='-5419680' />
+    <nd ref='-5419681' />
+    <nd ref='-5419682' />
+    <nd ref='-5419683' />
+    <nd ref='-5419684' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='pv2' />
+  </way>
+  <way id='-1959368' action='modify' visible='true'>
+    <nd ref='-5419722' />
+    <nd ref='-5419723' />
+    <nd ref='-5419724' />
+    <nd ref='-5419725' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='pv1' />
+  </way>
+</osm>

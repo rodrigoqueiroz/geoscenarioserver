@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5420534' action='modify' visible='true' lat='43.43539124377' lon='-80.57976704405'>
+    <tag k='btype' v='PP' />
+    <tag k='collision_vehicle_vid' v='1' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='VRU_same' />
+    <tag k='path' v='vru_ped_path_same' />
+    <tag k='pid' v='1' />
+    <tag k='speed' v='4' />
+    <tag k='yaw' v='360' />
+  </node>
+  <node id='-5420535' action='modify' visible='true' lat='43.43539761782' lon='-80.57956380253' />
+  <node id='-5420549' action='modify' visible='true' lat='43.43528526702' lon='-80.57988756744'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='yes' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='path' v='path_10' />
+    <tag k='speed' v='10' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='360' />
+  </node>
+  <node id='-5420550' action='modify' visible='true' lat='43.43526222232' lon='-80.57975387369'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5420551' action='modify' visible='true' lat='43.4353396917' lon='-80.57954320473'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ll2_firetower_4waystop.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Car-to-Pedestrian Turning farside' />
+    <tag k='timeout' v='20' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5420552' action='modify' visible='true' lat='43.43529360233' lon='-80.57974171971' />
+  <node id='-5420553' action='modify' visible='true' lat='43.43529703452' lon='-80.5797126852' />
+  <node id='-5420554' action='modify' visible='true' lat='43.43530182271' lon='-80.57969036464'>
+    <tag k='elevation' v='341.79399486' />
+  </node>
+  <node id='-5420555' action='modify' visible='true' lat='43.43531076327' lon='-80.5796708215' />
+  <node id='-5420556' action='modify' visible='true' lat='43.43532400171' lon='-80.57965056487' />
+  <node id='-5420557' action='modify' visible='true' lat='43.43533724014' lon='-80.579641787' />
+  <node id='-5420558' action='modify' visible='true' lat='43.43534900763' lon='-80.57963841089' />
+  <node id='-5420559' action='modify' visible='true' lat='43.43536371699' lon='-80.57963706045' />
+  <node id='-5420560' action='modify' visible='true' lat='43.43538234885' lon='-80.57963503479' />
+  <node id='-5420561' action='modify' visible='true' lat='43.43550590732' lon='-80.57964718877' />
+  <way id='-1959057' action='modify' visible='true'>
+    <nd ref='-5420534' />
+    <nd ref='-5420535' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='vru_ped_path_same' />
+  </way>
+  <way id='-1959059' action='modify' visible='true'>
+    <nd ref='-5420549' />
+    <nd ref='-5420552' />
+    <nd ref='-5420553' />
+    <nd ref='-5420554' />
+    <nd ref='-5420555' />
+    <nd ref='-5420556' />
+    <nd ref='-5420557' />
+    <nd ref='-5420558' />
+    <nd ref='-5420559' />
+    <nd ref='-5420560' />
+    <nd ref='-5420561' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='path_10' />
+  </way>
+</osm>
