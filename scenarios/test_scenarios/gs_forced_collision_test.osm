@@ -8,8 +8,8 @@
     <tag k='name' v='path_ped' />
     <tag k='path' v='pp1' />
     <tag k='pid' v='1' />
-    <tag k='speed' v='1' />
-    <tag k='speed_qualifier' v='minimum' />
+    <tag k='speed' v='4' />
+    <tag k='speed_qualifier' v='maximum' />
     <tag k='start' v='yes' />
     <tag k='usespeedprofile' v='no' />
     <tag k='yaw' v='180' />
