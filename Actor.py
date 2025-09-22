@@ -204,7 +204,7 @@ class Actor(object):
         return None
         
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, set_speed = None, agent_type = None):
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, set_speed = None):
     # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
@@ -213,7 +213,7 @@ class Actor(object):
             # For now, we'll ignore acceleration
             # TODO: This could be improved by saving the current path node instead of having to find it again every tick
             # Calculate velocity
-            
+            actor_type = self.__class__.__name__
             for i in range(len(path)-1):
                 n1 = path[i]
                 n2 = path[i+1]
@@ -232,8 +232,9 @@ class Actor(object):
 
                         # Distance this oncoming vehicle must travel to the collision point (along s)
                         distance_remaining = collision_pt_s - self.state.s
+                        
                         #if the actor type is PV 
-                        if agent_type == "PV" and not self.released and self.id != 1:
+                        if actor_type == "PV" and not self.released and self.id != 1:
                             v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
                             t_oncoming = distance_remaining / v_set
                             
@@ -270,7 +271,7 @@ class Actor(object):
                                 self.released = True
                             else:
                                 self.state.s_vel = 0.0
-                        elif agent_type == "PP":
+                        elif actor_type == "PP":
                             # estimate s value of collision point
                             collision_pt_s = collision_segment_prev_node.s + euclidian_dist  
 

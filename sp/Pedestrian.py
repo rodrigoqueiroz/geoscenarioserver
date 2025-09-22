@@ -344,9 +344,8 @@ class PP(Pedestrian):
             collision_segment_prev_node = None
             collision_segment_next_node = None
 
-        agent_type = "PP"
         # Proceed with follow_path, using None values if no collision or vehicle exists
-        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node, agent_type=agent_type)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,

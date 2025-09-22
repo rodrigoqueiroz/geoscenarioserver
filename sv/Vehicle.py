@@ -381,8 +381,7 @@ class PV(Vehicle):
             collision_segment_next_node = None
             collision_pt = None
 
-        agent_type = "PV"
-        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_segment_prev_node=collision_segment_prev_node, collision_segment_next_node=collision_segment_next_node, collision_pt=collision_pt, set_speed=self.set_speed, agent_type = agent_type)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_segment_prev_node=collision_segment_prev_node, collision_segment_next_node=collision_segment_next_node, collision_pt=collision_pt, set_speed=self.set_speed)
         self.sim_traffic.debug_shdata[f"v{self.id}"] = (
             traffic_state,
             None,
