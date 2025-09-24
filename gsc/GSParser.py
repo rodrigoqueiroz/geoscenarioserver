@@ -185,7 +185,7 @@ class GSParser(object):
     def check_pedestrian(self, n):
         mandatory = {"gs","pid","name"}
         optional = {"yaw","model","btype","trajectory", "esource", "eid",
-                    "speed","path","cycles","usespeedprofile","start","group", "collision_vehicle_vid"}
+                    "speed","path","cycles","usespeedprofile","start","group", "collision_vehicle_vid", "speed_qualifier"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
@@ -196,6 +196,15 @@ class GSParser(object):
             except ValueError:
                 self.report.log_error(
                     f"Element {n.id}: collision_vehicle_vid must be an integer"
+                )
+
+        # Validate speed_qualifier if present
+        if "speed_qualifier" in n.tags:
+            valid_speed_qualifiers = {"constant", "maximum", "minimum", "initial"}
+            speed_qualifier = n.tags["speed_qualifier"]
+            if speed_qualifier not in valid_speed_qualifiers:
+                self.report.log_error(
+                    f"Element {n.id}: speed_qualifier must be one of {valid_speed_qualifiers}, got '{speed_qualifier}'"
                 )
 
         self.pedestrians[n.tags["pid"]] = n

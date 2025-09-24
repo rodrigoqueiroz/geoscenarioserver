@@ -412,6 +412,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             
             p_name = pnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
+            speed_qualifier = extract_tag(pnode, 'speed_qualifier', None, str)
 
             path = []
             path_length = 0.0
@@ -445,6 +446,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 path=path,
                 scenario_vehicles=sim_traffic.vehicles,
                 debug_shdata=sim_traffic.debug_shdata,
+                speed_qualifier=speed_qualifier,
+                reference_speed=frenet_state[1],
             )
             
 
