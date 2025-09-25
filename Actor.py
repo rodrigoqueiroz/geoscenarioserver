@@ -204,7 +204,7 @@ class Actor(object):
         return None
         
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, speed_qualifier=None, reference_speed=None, set_speed = None):
+    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, speed_qualifier=None, reference_speed=None, set_speed = None, use_collision_point=None):
     # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
@@ -214,7 +214,7 @@ class Actor(object):
             # For now, we'll ignore acceleration
             # TODO: This could be improved by saving the current path node instead of having to find it again every tick
             # Calculate velocity
-            actor_type = self.__class__.__name__
+            
             for i in range(len(path)-1):
                 n1 = path[i]
                 n2 = path[i+1]
@@ -222,9 +222,9 @@ class Actor(object):
                 if (n1.s <= self.state.s <= n2.s):
 
                     node_checkpoint = i
-
+                    
                     # if collision point provided, use ensured collision logic
-                    if path and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
+                    if collision_pt is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
                         # Project collision point to arc lengths
                         diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x,
                                                                 collision_segment_prev_node.y])
@@ -233,9 +233,9 @@ class Actor(object):
 
                         # Distance this oncoming vehicle must travel to the collision point (along s)
                         distance_remaining = collision_pt_s - self.state.s
-                        
-                        #if the actor type is PV 
-                        if actor_type == "PV" and not self.released and self.id != 1:
+
+                        # If using collision point logic
+                        if use_collision_point and not self.released and self.id != 1:
                             v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
                             t_oncoming = distance_remaining / v_set
                             
@@ -272,12 +272,9 @@ class Actor(object):
                                 self.released = True
                             else:
                                 self.state.s_vel = 0.0
-                        elif actor_type == "PP":
-                            # estimate s value of collision point
-                            collision_pt_s = collision_segment_prev_node.s + euclidian_dist  
 
-                            # compute distance to collision point for pedestrian
-                            distance_remaining = collision_pt_s - self.state.s
+                        #else use actor heading collision logic 
+                        else:
 
                         # Calculate the collision-required speed
                             if time_to_collision > 0:
@@ -286,32 +283,33 @@ class Actor(object):
                                 collision_required_speed = 0.0  # stop either collided or missed collision window
                         
                         # Get the reference speed from the path nodes is speed profile to be used
-                        if n1.speed is not None and n2.speed is not None:
-                            # Interpolate the reference speed
-                            ratio = (self.state.s - n1.s)/(n2.s - n1.s)
-                            reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
+                            if n1.speed is not None and n2.speed is not None:
+                                # Interpolate the reference speed
+                                ratio = (self.state.s - n1.s)/(n2.s - n1.s)
+                                reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
 
-                        # Apply speed qualifier logic
-                        if speed_qualifier_enum == SpeedQualifier.CONSTANT:
-                            # Use reference speed regardless of collision requirements
-                            self.state.s_vel = reference_speed
-                        elif speed_qualifier_enum == SpeedQualifier.MAXIMUM:
-                            # Reference speed is upper bound, use minimum of reference and collision-required
-                            # if collision_required_speed > 0:
-                                self.state.s_vel = min(reference_speed, collision_required_speed)
-                            # elif collision_required_speed <= 0:
-                            #     self.state.s_vel = collision_required_speed
-                        elif speed_qualifier_enum == SpeedQualifier.MINIMUM:
-                            # Reference speed is lower bound, use maximum of reference and collision-required
-                            self.state.s_vel = max(reference_speed, collision_required_speed)
-                        elif speed_qualifier_enum == SpeedQualifier.INITIAL:
-                            # Use collision-required speed, allowing realistic adjustments
-                            self.state.s_vel = collision_required_speed
+                            # Apply speed qualifier logic
+                            if speed_qualifier_enum:
+                                if speed_qualifier_enum == SpeedQualifier.CONSTANT:
+                                    # Use reference speed regardless of collision requirements
+                                    self.state.s_vel = reference_speed
+                                elif speed_qualifier_enum == SpeedQualifier.MAXIMUM:
+                                    # Reference speed is upper bound, use minimum of reference and collision-required
+                                    # if collision_required_speed > 0:
+                                        self.state.s_vel = min(reference_speed, collision_required_speed)
+                                    # elif collision_required_speed <= 0:
+                                    #     self.state.s_vel = collision_required_speed
+                                elif speed_qualifier_enum == SpeedQualifier.MINIMUM:
+                                    # Reference speed is lower bound, use maximum of reference and collision-required
+                                    self.state.s_vel = max(reference_speed, collision_required_speed)
+                                elif speed_qualifier_enum == SpeedQualifier.INITIAL:
+                                    # Use collision-required speed, allowing realistic adjustments
+                                    self.state.s_vel = collision_required_speed
 
                     # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
-                    if n1.speed is not None and n2.speed is not None:
+                    elif n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
