@@ -292,7 +292,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
         # External Vehicle (EV)
         elif btype == 'ev':
-            bsource = vnode.tags['bsource']
+            bsource = extract_tag(vnode, 'bsource', 'co-simulator', str)
             vehicle = EV(vid, name, start_state, yaw, bsource)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)

@@ -146,7 +146,7 @@
 
 		<label text="EP (external pedestrian)"/>
 		<label text="Pedestrian behavior is handled outside GeoScenario." />
-		<text key="esource" text="Behavior source" />
+		<text key="bsource" text="Behavior source" />
 		<text key="eid" text="External ID" />
 		<item_separator />
 
@@ -210,7 +210,7 @@
 
 		<label text="EV (external vehicle)"/>
 		<label text="Vehicle behavior is handled outside GeoScenario." />
-		<text key="esource" text="Behavior source" />
+		<text key="bsource" text="Behavior source" />
 		<text key="eid" text="External ID" />
 		<item_separator />
 
