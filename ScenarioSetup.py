@@ -422,14 +422,23 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             path_length = 0.0
 
             for i in range(len(p_nodes)):
+            # for node in p_nodes:
                 if (i > 0):
                     path_length += math.hypot(p_nodes[i].x - p_nodes[i-1].x, p_nodes[i].y - p_nodes[i-1].y)
-                node = PathNode()
-                node.x = float(p_nodes[i].x)
-                node.y = float(p_nodes[i].y)
-                node.s = float(path_length)
-                node.speed = float(p_nodes[i].tags['agentspeed']/3.6) if ('agentspeed' in p_nodes[i].tags) else None
-                path.append(node)
+                nd = PathNode()
+                nd.x = float(p_nodes[i].x)
+                nd.y = float(p_nodes[i].y)
+                nd.s = path_length
+                # Convert from km/h to m/s
+                nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
+                path.append(nd)
+
+                if "collision_pt" in p_nodes[i].tags:
+                    collision_point = PathNode()
+                    collision_point.x = float(p_nodes[i].x)
+                    collision_point.y = float(p_nodes[i].y)
+                    collision_point.s = path_length
+                    use_collision_point = True 
             
             # Set initial longitudinal velocity, path always takes precedence
             frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
@@ -453,6 +462,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 collision_vid=collision_vid,
                 speed_qualifier=speed_qualifier,
                 reference_speed=frenet_state[1],
+                use_collision_point=use_collision_point,
             )
             
 

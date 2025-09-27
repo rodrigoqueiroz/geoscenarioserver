@@ -204,17 +204,43 @@ class Actor(object):
         return None
         
 
-    def follow_path(self, delta_time, sim_time, path, time_to_collision=None, collision_pt=None, collision_segment_prev_node=None, collision_segment_next_node = None, speed_qualifier=None, reference_speed=None, set_speed = None, use_collision_point=None):
+    def follow_path(self, delta_time, sim_time, path, collision_pt=None, speed_qualifier=None, reference_speed=None, set_speed = None):
     # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
             speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.CONSTANT
-            # Ideally we should first calculate acceleration, then velocity, then position (euler integration)
-            # For now, we'll ignore acceleration
-            # TODO: This could be improved by saving the current path node instead of having to find it again every tick
-            # Calculate velocity
-            
+            collision_segment_prev_node = None
+            collision_segment_next_node = None
+            time_to_collision = None
+            collision_vehicle = None
+
+            if self.collision_vid is not None:
+                try:
+                    collision_vehicle = self.scenario_vehicles[self.collision_vid]
+                    vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
+                    vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
+                except KeyError:
+                    raise KeyError(f"collision vehicle with vid {self.collision_vid} not found in scenario")
+
+                # Calculate collision details if vehicle exists
+                if collision_vehicle:
+                    if self.use_collision_point and self.collision_point:
+                        collision_pt = [self.collision_point.x, self.collision_point.y]
+                        collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes(self.path)
+
+                        # Euclidean distance between vehicle and collision point
+                        collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
+                        time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                        
+                    elif self.get_collision_pt(vehicle_pos, vehicle_vel, self.path) is not None:
+                        collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
+
+                        # Euclidean distance between vehicle and collision point
+                        collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
+                        time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+
+
             for i in range(len(path)-1):
                 n1 = path[i]
                 n2 = path[i+1]
@@ -235,7 +261,7 @@ class Actor(object):
                         distance_remaining = collision_pt_s - self.state.s
 
                         # If using collision point logic
-                        if use_collision_point and not self.released and self.id != 1:
+                        if self.use_collision_point and not self.released and self.id != 1:
                             v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
                             t_oncoming = distance_remaining / v_set
                             

@@ -296,7 +296,7 @@ class SP(Pedestrian):
     
 class PP(Pedestrian):
     
-    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None, speed_qualifier = None, reference_speed = None, collision_point = None, use_collision_point = False):
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None, speed_qualifier = None, reference_speed = None, use_collision_point = False):
         super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.PP_TYPE
         self.path = path
@@ -306,7 +306,6 @@ class PP(Pedestrian):
         self.speed_qualifier = speed_qualifier
         self.reference_speed = reference_speed
         self.scenario_vehicles = scenario_vehicles
-        self.collision_point = collision_point
         self.use_collision_point = use_collision_point
         
         self.current_waypoint = 0.0
@@ -315,52 +314,12 @@ class PP(Pedestrian):
     
     def tick(self, tick_count, delta_time, sim_time):  
         ped_path = [(n.x, n.y) for n in self.path]
-        Pedestrian.tick(self, tick_count, delta_time, sim_time)
+        time_to_collision = None
         
-        # Check if collision_vid is provided
-        if self.collision_vid is not None:
-            # Try to get the collision vehicle, if not found, raise a KeyError
-            try:
-                collision_vehicle = self.scenario_vehicles[self.collision_vid]
-                vehicle_pos = np.array([collision_vehicle.state.x, collision_vehicle.state.y])
-                vehicle_vel = np.array([collision_vehicle.state.x_vel, collision_vehicle.state.y_vel])
-            except KeyError:
-                raise KeyError(f"collision vehicle with vid {self.collision_vid} not found in scenario")
-
-            # Calculate collision details if vehicle exists
-            if collision_vehicle:
-                if self.collision_point is not None:
-                    collision_pt = [self.collision_point.x, self.collision_point.y]
-                    collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes(self.path)
-
-                    # Euclidean distance between vehicle and collision point
-                    collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                    time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
-                    
-                elif self.get_collision_pt(vehicle_pos, vehicle_vel, self.path) is not None:
-                    collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
-
-                    # Euclidean distance between vehicle and collision point
-                    collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                    time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
-                
-                else:
-                    collision_pt = None
-                    collision_segment_next_node = None
-                    collision_segment_prev_node = None
-                    time_to_collision = None
-        else:
-            # If collision_vid is None, set default None values
-            time_to_collision = None
-            collision_pt = None
-            collision_segment_prev_node = None
-            collision_segment_next_node = None
-
-        print(f"collision vehihle: {self.collision_vid}")
-        print(f"collision pt: {collision_pt}")
+        Pedestrian.tick(self, tick_count, delta_time, sim_time)  
 
         # Proceed with follow_path, using None values if no collision or vehicle exists
-        self.follow_path(delta_time, sim_time, self.path, time_to_collision, collision_pt, collision_segment_prev_node, collision_segment_next_node, self.speed_qualifier, self.reference_speed, use_collision_point=self.use_collision_point)
+        self.follow_path(delta_time, sim_time, self.path, time_to_collision, self.speed_qualifier, self.reference_speed)
 
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
