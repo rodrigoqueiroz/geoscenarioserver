@@ -209,7 +209,7 @@ class Actor(object):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
-            speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.CONSTANT
+            speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.INITIAL
             collision_segment_prev_node = None
             collision_segment_next_node = None
             time_to_collision = None
