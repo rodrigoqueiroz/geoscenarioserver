@@ -39,15 +39,22 @@ class Actor(object):
         self.state.y     = start_state[3]
         self.state.y_vel = start_state[4]
         self.state.y_acc = start_state[5]
-        # start state in frenet
+        #start state in frenet
         self.state.s     = frenet_state[0]
         self.state.s_vel = frenet_state[1]
         self.state.s_acc = frenet_state[2]
         self.state.d     = frenet_state[3]
         self.state.d_vel = frenet_state[4]
         self.state.d_acc = frenet_state[5]
-
+        #common state
         self.state.yaw = yaw
+        #path following
+        self.path = [] #list of PathNode
+        self.collision_vid = None
+        self.collision_point = None
+        self.use_collision_point = False
+        self.scenario_vehicles = [] #dict of vehicles in the scenario, used for collision checking
+        self.keep_active = False #if true, vehicle will remain active after trajectory ends
 
     def future_euclidian_state(self, dt):
         """ Predicts a new state based on time and vel.
@@ -228,17 +235,24 @@ class Actor(object):
                     if self.use_collision_point and self.collision_point:
                         collision_pt = [self.collision_point.x, self.collision_point.y]
                         collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes(self.path)
-
                         # Euclidean distance between vehicle and collision point
                         collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                        time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                        if collision_vehicle.state.s_vel == 0.0:
+                            time_to_collision = float('inf')
+                        else:
+                            time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
                         
-                    elif self.get_collision_pt(vehicle_pos, vehicle_vel, self.path) is not None:
-                        collision_pt, collision_segment_prev_node, collision_segment_next_node = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
-
-                        # Euclidean distance between vehicle and collision point
-                        collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                        time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                    else:
+                        #find the point once and save the result
+                        collision_pt_result = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
+                        if collision_pt_result is not None:
+                            collision_pt, collision_segment_prev_node, collision_segment_next_node = collision_pt_result
+                            # Euclidean distance between vehicle and collision point
+                            collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
+                            if collision_vehicle.state.s_vel == 0.0:
+                                time_to_collision = float('inf')
+                            else:
+                                time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
 
 
             for i in range(len(path)-1):
@@ -379,8 +393,8 @@ class Actor(object):
 class TrajNode:
     x:float = 0.0
     y:float = 0.0
-    x_vel:float = None  # calculated as dx/dt, the first node same as the second
-    y_vel:float = None  # calculated as dy/dt, the first node same as the second
+    x_vel = None  # calculated as dx/dt, the first node same as the second
+    y_vel = None  # calculated as dy/dt, the first node same as the second
     time:float = 0.0
     yaw:float = 0.0
 
@@ -398,7 +412,6 @@ class SpeedQualifier(IntEnum):
     MINIMUM = 2          # treat the given speed as the lower bound  
     INITIAL = 3          # start the agent with the given speed but adjust for collision as needed
 
-@dataclass
 class ActorSimState(IntEnum):
     INACTIVE = 0          #not in simulation, not present in traffic, and not visible for other agents
     ACTIVE = 1            #in simulation and visible to other agents

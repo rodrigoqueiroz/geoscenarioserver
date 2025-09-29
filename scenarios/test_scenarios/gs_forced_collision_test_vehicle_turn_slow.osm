@@ -21,6 +21,7 @@
     <tag k='name' v='GVT' />
     <tag k='path' v='gvt_path' />
     <tag k='speed' v='30' />
+    <tag k='speed_qualifier' v='constant' />
     <tag k='vid' v='2' />
     <tag k='yaw' v='86' />
   </node>
