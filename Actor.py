@@ -192,7 +192,7 @@ class Actor(object):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
-            speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.CONSTANT
+            speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.INITIAL
             # Ideally we should first calculate acceleration, then velocity, then position (euler integration)
             # For now, we'll ignore acceleration
             # TODO: This could be improved by saving the current path node instead of having to find it again every tick
