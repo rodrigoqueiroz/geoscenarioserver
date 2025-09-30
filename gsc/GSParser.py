@@ -184,7 +184,7 @@ class GSParser(object):
 
     def check_pedestrian(self, n):
         mandatory = {"gs","pid","name"}
-        optional = {"yaw","model","btype","trajectory", "esource", "eid",
+        optional = {"yaw","model","btype","trajectory", "bsource", "eid",
                     "speed","path","cycles","usespeedprofile","start","group", "collision_vehicle_vid", "speed_qualifier"}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
@@ -211,7 +211,7 @@ class GSParser(object):
 
     def check_vehicle(self, n):
         mandatory = {"gs","vid","name"}
-        optional = { "yaw","model","btype","trajectory","route","btree", "esource", "eid",
+        optional = { "yaw","model","btype","trajectory","route","btree", "bsource", "eid",
                     "speed","path","cycles","usespeedprofile","start","group",}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)

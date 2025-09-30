@@ -1,3 +1,4 @@
+import math
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
@@ -15,6 +16,9 @@ class MockCoSimulator(Node):
     def tick_from_server(self, msg):
         for v in msg.vehicles:
             v.active = True
+            if v.type == '2': # EV_TYPE
+                v.position.x -= math.sin(msg.simulation_time)
+                v.position.y += math.cos(msg.simulation_time)
         for p in msg.pedestrians:
             p.active = True
         self.tick_pub.publish(msg)
