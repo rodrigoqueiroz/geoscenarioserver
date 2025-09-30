@@ -15,16 +15,16 @@
 		<label text="Global Scenario Configuration" />
 		<item_separator />
 
-		<text key="name" text="*Scenario Name" />
+		<text key="name" text="*Scenario name" />
 		<text key="author" text="Author" />
 		<text key="notes" text="Notes" />
 		<item_separator />
 
 		<label text="Road Network" />
-		<text key="lanelet" text="*Lanelet Layer" />
+		<text key="lanelet" text="*Lanelet layer" />
 		<item_separator />
 
-		<label text="Global Failure Conditions" />
+		<label text="Global failure conditions" />
 		<check key="collision" text="*Collision" default="on"/>
 		<text key="timeout" text="*Timeout (s)" default="60"/>
 		<text key="metric" text="Metric []" />
@@ -32,7 +32,7 @@
 		<item_separator />
 
 		<label text="Scenario Mutation:" />
-		<check key="mutate" text="Mutate on Start" default="off"/>
+		<check key="mutate" text="Mutate on start" default="off"/>
 		<item_separator />
 
 		<link href="https://geoscenario2.readthedocs.io/" text="https://geoscenario2.readthedocs.io/"/>
@@ -92,7 +92,7 @@
 		<key key="gs" value="staticobject" />
 		<key key="area" value="no" />
 		<space/>
-		<label text="GeoScenario Static Object" />
+		<label text="GeoScenario static object" />
 		<item_separator />
 
 		<text key="name" text="*Name" />
@@ -109,7 +109,7 @@
 		<key key="gs" value="staticobject" />
 		<key key="area" value="yes" />
 		<space/>
-		<label text="GeoScenario Static Object" />
+		<label text="GeoScenario static object" />
 		<item_separator />
 
 		<text key="name" text="*Name" />
@@ -127,7 +127,7 @@
   	<item name="Pedestrian" type="node"  icon="pedestrian_black.png"  preset_name_label="true">
 		<key key="gs" value="pedestrian" />
 		<space/>
-		<label text="GeoScenario Pedestrian" />
+		<label text="GeoScenario pedestrian" />
 		<item_separator />
 
 		<text key="pid" text="*PID" />
@@ -136,7 +136,7 @@
 		<text key="model" text="Model" />
 		<text key="length" text="Length (m)" />
 		<text key="width" text="Width (m)" />
-		<combo key="btype" text="Behavior Type:" values="TP,EP,PP,SP" default="" />
+		<combo key="btype" text="Behavior type:" values="TP,EP,PP,SP" default="" />
 		<item_separator />
 
 		<label text="TP (trajectory-based pedestrian)" />
@@ -154,11 +154,11 @@
 		<text key="speed" text="Speed[] (km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
-		<text key="usespeedprofile" text="Use Speed Profile (y/n)" />
+		<text key="usespeedprofile" text="Use speed profile (yes/no)" />
 		<text key="collision_vehicle_vid" text="Collision Vehicle ID" />
-		<combo key="speed_qualifier" text="Speed Qualifier:" values="constant,maximum,minimum,initial" default="" />
-		<check key="can_reverse" text="Can Reverse?" />
-		<check key="start" text="Start In Motion" />
+		<combo key="speed_qualifier" text="Speed qualifier:" values="constant,maximum,minimum,initial" default="" />
+		<check key="can_reverse" text="Can reverse (yes/no)" />
+		<check key="start" text="Start in motion (yes/no)" />
 		<item_separator />
 
 		<label text="SP (simulated dynamic behavior pedestrian)" />
@@ -178,7 +178,7 @@
   <item name="Vehicle" type="node"  icon="vehicle_black.png" preset_name_label="true">
 		<key key="gs" value="vehicle" />
 		<space/>
-		<label text="GeoScenario Vehicle" />
+		<label text="GeoScenario vehicle" />
 		<item_separator />
 
 		<text key="vid" text="*VID" />
@@ -187,7 +187,7 @@
 		<text key="model" text="Model" />
 		<text key="length" text="Length (m)" />
 		<text key="width" text="Width (m)" />
-		<combo key="btype" text="Behavior Type:" values="SDV,TV,EV,PV" default="" />
+		<combo key="btype" text="Behavior type:" values="SDV,TV,EV,PV" default="" />
 		<item_separator />
 
 		<label text="SDV Model (GeoScenario Simulated Driver-Vehicle Model)"/>
@@ -219,8 +219,8 @@
 		<text key="speed" text="Speed[] (km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 for infinite)" default="1" />
-		<check key="usespeedprofile" text="Use Speed Profile" />
-		<check key="start" text="Start In Motion" />
+		<check key="usespeedprofile" text="Use speed profile (yes/no)" />
+		<check key="start" text="Start in motion (yes/no)" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
@@ -300,7 +300,7 @@
 		<key key="gs" value="location" />
 		<key key="area" value="no" />
 		<space/>
-		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers. Can be used to tag points of interest." />
+		<label text="GeoScenario named location (or boundaries) for dynamic location of agents, obstacles, and triggers. Can be used to tag points of interest." />
 		<item_separator />
 
 		<text key="name" text="*Name" />
@@ -318,7 +318,7 @@
 		<key key="gs" value="location" />
 		<key key="area" value="yes" />
 		<space/>
-		<label text="GeoScenario Named Location (or boundaries) for dynamic location of Agents, Obstacles, and Triggers" />
+		<label text="GeoScenario named location (or boundaries) for dynamic location of agents, obstacles, and triggers" />
 		<item_separator />
 
 		<text key="name" text="*Name" />
@@ -356,15 +356,15 @@
 		
 		<label text="Actions" />
 		<text key="aspeed" text="Change speed (km/h)"/>
-		<text key="aspeedprofile" text="Use speed profile (y/n)"/>
+		<text key="aspeedprofile" text="Use speed profile (yes/no)"/>
 		<text key="alocation" text="Change location"/>
 		<text key="apath" text="Change path"/>
 		<text key="astate" text="Change state"/>
-		<check key="astart" text="Start"/>
+		<check key="astart" text="Start (yes/no)"/>
 		<space/>
 		<label text="Global Actions" />
-		<check key="afail" text="Fail Scenario"/>
-		<check key="asuccess" text="Success Scenario"/>
+		<check key="afail" text="Fail scenario"/>
+		<check key="asuccess" text="Success scenario"/>
 		<item_separator />
 
 		<text key="delay" text="Action delay (s)"/>
