@@ -318,25 +318,20 @@ class PV(Vehicle):
     Not yet supported:
     Vehicle parameters:
     - cycles
-    - usespeedprofile
     Path parameters:
     - agentacceleration (not implemented)
     - timetoacceleration (not implemented)
     """
-    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None):
         super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.PV_TYPE
-        self.path = path
+        self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active)
         self._debug_shdata = debug_shdata
-        self.keep_active = keep_active
-
-        self.current_path_node = 0
+        self.scenario_vehicles = scenario_vehicles
 
 
     def tick(self, tick_count, delta_time, sim_time):
-        Vehicle.tick(self, tick_count, delta_time, sim_time)
-        self.follow_path(delta_time, sim_time, self.path)
-
+        self.follow_path(delta_time)
         # Fill in some applicable debug data
         traffic_state = TrafficState(
             vid = self.id,
@@ -346,11 +341,10 @@ class PV(Vehicle):
             traffic_vehicles = {},
             traffic_vehicles_orp = {},
         )
-        vehicle_path = [(n.x, n.y) for n in self.path]
         self.sim_traffic.debug_shdata[f"v{self.id}"] = (
             traffic_state,
             None,
-            vehicle_path,
+            self.debug_path,
             None,
             None,
             None,
