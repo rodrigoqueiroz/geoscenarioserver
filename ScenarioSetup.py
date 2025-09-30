@@ -259,7 +259,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             set_speed = extract_tag(vnode, "speed", None, float)
             collision_vid = extract_tag(vnode, "collision_vehicle_vid", None, int)
             collision_point = None
-            use_collision_point = False
+            speed_qualifier = extract_tag(vnode, 'speed_qualifier', None, str)
             
             path = []
             path_length = 0.0
@@ -281,7 +281,6 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     collision_point.x = float(p_nodes[i].x)
                     collision_point.y = float(p_nodes[i].y)
                     collision_point.s = path_length
-                    use_collision_point = True 
 
 
             # Set initial longitudinal velocity, path always takes precedence
@@ -294,7 +293,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("PV {} has no initial speed".format(vid))
                 continue
 
-            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width, collision_vid=collision_vid, scenario_vehicles=sim_traffic.vehicles, set_speed=set_speed, collision_point=collision_point, use_collision_point=use_collision_point)
+            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width, collision_vid=collision_vid, scenario_vehicles=sim_traffic.vehicles, set_speed=set_speed, collision_point=collision_point, speed_qualifier=speed_qualifier)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info("Vehicle {} initialized with PV behavior".format(vid))
@@ -438,7 +437,6 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     collision_point.x = float(p_nodes[i].x)
                     collision_point.y = float(p_nodes[i].y)
                     collision_point.s = path_length
-                    use_collision_point = True 
             
             # Set initial longitudinal velocity, path always takes precedence
             frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
@@ -461,8 +459,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 debug_shdata=sim_traffic.debug_shdata,
                 collision_vid=collision_vid,
                 speed_qualifier=speed_qualifier,
-                reference_speed=frenet_state[1],
-                use_collision_point=use_collision_point,
+                reference_speed=frenet_state[1]
             )
             
 

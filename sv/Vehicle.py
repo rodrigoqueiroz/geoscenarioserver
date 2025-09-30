@@ -323,7 +323,7 @@ class PV(Vehicle):
     - agentacceleration (not implemented)
     - timetoacceleration (not implemented)
     """
-    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, collision_vid=None, set_speed=None, collision_point=None, use_collision_point=False):
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, collision_vid=None, set_speed=None, collision_point=None, speed_qualifier=None):
         super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.PV_TYPE
         self.path = path
@@ -333,7 +333,7 @@ class PV(Vehicle):
         self.set_speed = set_speed
         self.keep_active = keep_active
         self.collision_point = collision_point
-        self.use_collision_point = use_collision_point
+        self.speed_qualifier = speed_qualifier
 
         self.current_path_node = 0
 
@@ -352,7 +352,7 @@ class PV(Vehicle):
         )
         vehicle_path = [(n.x, n.y) for n in self.path]
 
-        self.follow_path(delta_time, sim_time, self.path, set_speed=self.set_speed)
+        self.follow_path(delta_time, sim_time, self.path)
         self.sim_traffic.debug_shdata[f"v{self.id}"] = (
             traffic_state,
             None,

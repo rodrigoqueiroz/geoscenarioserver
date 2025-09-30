@@ -52,9 +52,9 @@ class Actor(object):
         self.path = [] #list of PathNode
         self.collision_vid = None
         self.collision_point = None
-        self.use_collision_point = False
         self.scenario_vehicles = [] #dict of vehicles in the scenario, used for collision checking
         self.keep_active = False #if true, vehicle will remain active after trajectory ends
+        
 
     def future_euclidian_state(self, dt):
         """ Predicts a new state based on time and vel.
@@ -211,16 +211,17 @@ class Actor(object):
         return None
         
 
-    def follow_path(self, delta_time, sim_time, path, collision_pt=None, speed_qualifier=None, reference_speed=None, set_speed = None):
+    def follow_path(self, delta_time, sim_time, path):
     # def follow_path(self, delta_time, sim_time, path):
         if path:
             # Which path node have we most recently passed
             node_checkpoint = 0
-            speed_qualifier_enum = SpeedQualifier[speed_qualifier.upper()] if speed_qualifier is not None else SpeedQualifier.INITIAL
+            speed_qualifier_enum = SpeedQualifier[self.speed_qualifier.upper()] if self.speed_qualifier is not None else SpeedQualifier.INITIAL
             collision_segment_prev_node = None
             collision_segment_next_node = None
             time_to_collision = None
             collision_vehicle = None
+            collision_pt = None
 
             if self.collision_vid is not None:
                 try:
@@ -232,7 +233,8 @@ class Actor(object):
 
                 # Calculate collision details if vehicle exists
                 if collision_vehicle:
-                    if self.use_collision_point and self.collision_point:
+                    if self.collision_point is not None:
+                        #use provided collision point
                         collision_pt = [self.collision_point.x, self.collision_point.y]
                         collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes(self.path)
                         # Euclidean distance between vehicle and collision point
@@ -264,7 +266,7 @@ class Actor(object):
                     node_checkpoint = i
                     
                     # if collision point provided, use ensured collision logic
-                    if collision_pt is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
+                    if self.collision_point is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
                         # Project collision point to arc lengths
                         diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x,
                                                                 collision_segment_prev_node.y])
@@ -275,8 +277,8 @@ class Actor(object):
                         distance_remaining = collision_pt_s - self.state.s
 
                         # If using collision point logic
-                        if self.use_collision_point and not self.released and self.id != 1:
-                            v_set = max(1e-6, set_speed / 3.6)  # m/s, avoid divide-by-zero
+                        if not self.released and self.id != 1:
+                            v_set = max(1e-6, self.set_speed / 3.6)  # m/s, avoid divide-by-zero
                             t_oncoming = distance_remaining / v_set
                             
                             if not self.set_constant and time_to_collision is not None:
@@ -302,7 +304,7 @@ class Actor(object):
                             buffer_min, buffer_max = 0.01, 2.0
                             buffer = min(max(min(buffer_exp, buffer_ttc), buffer_min), buffer_max)
 
-                            ttc_cap = 1.0  # seconds; oncoming cannot leave earlier than this TTC
+                            ttc_cap = 0.5  # seconds; oncoming cannot leave earlier than this TTC
 
                             if time_to_collision > ttc_cap:
                                 self.state.s_vel = 0.0
@@ -326,22 +328,22 @@ class Actor(object):
                             if n1.speed is not None and n2.speed is not None:
                                 # Interpolate the reference speed
                                 ratio = (self.state.s - n1.s)/(n2.s - n1.s)
-                                reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
+                                self.reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
 
                             # Apply speed qualifier logic
                             if speed_qualifier_enum:
                                 if speed_qualifier_enum == SpeedQualifier.CONSTANT:
                                     # Use reference speed regardless of collision requirements
-                                    self.state.s_vel = reference_speed
+                                    self.state.s_vel = self.reference_speed
                                 elif speed_qualifier_enum == SpeedQualifier.MAXIMUM:
                                     # Reference speed is upper bound, use minimum of reference and collision-required
                                     # if collision_required_speed > 0:
-                                        self.state.s_vel = min(reference_speed, collision_required_speed)
+                                        self.state.s_vel = min(self.reference_speed, collision_required_speed)
                                     # elif collision_required_speed <= 0:
                                     #     self.state.s_vel = collision_required_speed
                                 elif speed_qualifier_enum == SpeedQualifier.MINIMUM:
                                     # Reference speed is lower bound, use maximum of reference and collision-required
-                                    self.state.s_vel = max(reference_speed, collision_required_speed)
+                                    self.state.s_vel = max(self.reference_speed, collision_required_speed)
                                 elif speed_qualifier_enum == SpeedQualifier.INITIAL:
                                     # Use collision-required speed, allowing realistic adjustments
                                     self.state.s_vel = collision_required_speed
