@@ -26,6 +26,15 @@ from Actor import *
 def extract_tag(vnode, name, default_value, parser_fn):
     return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
 
+def extract_bool_tag(vnode, name, default_value=False):
+    if name in vnode.tags:
+        val = vnode.tags[name].strip().lower()
+        if val in ['yes', 'true', 'on']:
+            return True
+        elif val in ['no', 'false', 'off']:
+            return False
+        else:
+            return default_value
 
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
     """ Setup scenario from GeoScenario file
@@ -126,10 +135,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         #print(yaw)
 
         btype = extract_tag(vnode, 'btype', '', str).lower()
-        goal_ends_simulation = False
-
-        if 'goal_ends_simulation' in vnode.tags and vnode.tags['goal_ends_simulation'] == 'yes':
-            goal_ends_simulation = True
+        goal_ends_simulation = extract_bool_tag(vnode, 'goal_ends_simulation', False)
         rule_engine_port = extract_tag(vnode, 'rule_engine_port', None, int)
         yaw = -extract_tag(vnode, 'yaw', 0.0, float)
 
