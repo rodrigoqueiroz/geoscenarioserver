@@ -154,11 +154,11 @@
 		<text key="speed" text="Speed[] (km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 = ∞)" default="1" />
-		<text key="usespeedprofile" text="Use speed profile (yes/no)" />
+		<check key="usespeedprofile" text="Use speed profile?" />
 		<text key="collision_vehicle_vid" text="Collision Vehicle ID" />
 		<combo key="speed_qualifier" text="Speed qualifier:" values="constant,maximum,minimum,initial" default="" />
-		<check key="can_reverse" text="Can reverse (yes/no)" />
-		<check key="start" text="Start in motion (yes/no)" />
+		<check key="can_reverse" text="Can reverse?" />
+		<check key="start" text="Start in motion?" />
 		<item_separator />
 
 		<label text="SP (simulated dynamic behavior pedestrian)" />
@@ -195,7 +195,7 @@
 		<text key="btree" text="BehaviorTree (root)" />
 		<text key="rule_engine_port" text="Rule engine port (int 0-65535)" />
 		<text key="route" text="Route ID" />
-		<text key="goal_ends_simulation" text="Goal ends simulation (yes/no)" default="no" />
+		<check key="goal_ends_simulation" text="Goal ends simulation?" />
 		<label text="Start State: choose between cartesian or frenet format:" />
 		<text key="start_cartesian" text="Cartesian" />
 		<text key="start_frenet" text="Frenet" />
@@ -219,8 +219,8 @@
 		<text key="speed" text="Speed[] (km/h)" />
 		<text key="path" text="Path ID" />
 		<text key="cycles" text="Cycles(-1 for infinite)" default="1" />
-		<check key="usespeedprofile" text="Use speed profile (yes/no)" />
-		<check key="start" text="Start in motion (yes/no)" />
+		<check key="usespeedprofile" text="Use speed profile?" />
+		<check key="start" text="Start in motion?" />
 		<item_separator />
 
 		<text key="group" text="Group []" />
@@ -356,11 +356,11 @@
 		
 		<label text="Actions" />
 		<text key="aspeed" text="Change speed (km/h)"/>
-		<text key="aspeedprofile" text="Use speed profile (yes/no)"/>
+		<check key="aspeedprofile" text="Use speed profile?"/>
 		<text key="alocation" text="Change location"/>
 		<text key="apath" text="Change path"/>
 		<text key="astate" text="Change state"/>
-		<check key="astart" text="Start (yes/no)"/>
+		<check key="astart" text="Start?"/>
 		<space/>
 		<label text="Global Actions" />
 		<check key="afail" text="Fail scenario"/>
