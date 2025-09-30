@@ -12,6 +12,17 @@ import logging
 import numpy as np
 log = logging.getLogger(__name__)
 
+class SpeedQualifier(IntEnum):
+    CONSTANT = 0          # treat the speed as constant throughout the path (default)
+    MAXIMUM = 1          # treat the given speed as the upper bound
+    MINIMUM = 2          # treat the given speed as the lower bound
+    INITIAL = 3          # start the agent with the given speed but adjust for collision as needed
+
+class ActorSimState(IntEnum):
+    INACTIVE = 0          #not in simulation, not present in traffic, and not visible for other agents
+    ACTIVE = 1            #in simulation and visible to other agents
+    INVISIBLE = 2         #in simulation but NOT visible to other agents (for reference)
+
 class Actor(object):
     def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
         self.id = id
@@ -50,11 +61,15 @@ class Actor(object):
         self.state.yaw = yaw
         #path following
         self.path = [] #list of PathNode
+        self.debug_path = [] # list of (x, y)
+        self.set_speed = None #desired constant speed in m/s, used if speed profile is not provided in path
+        self.reference_speed = None # for Pedestrian?
         self.collision_vid = None
         self.collision_point = None
         self.scenario_vehicles = [] #dict of vehicles in the scenario, used for collision checking
         self.keep_active = False #if true, vehicle will remain active after trajectory ends
-        
+        self.current_path_node = 0
+
 
     def future_euclidian_state(self, dt):
         """ Predicts a new state based on time and vel.
@@ -156,17 +171,17 @@ class Actor(object):
     def get_velocity_yaw(self, velocity_x, velocity_y):
         return math.atan2(velocity_y, velocity_x)
     
-    def get_curr_and_prev_path_nodes(self, path):
-        if path:
-            for i in range(len(path)-1):
-                n1 = path[i]
-                n2 = path[i+1]
+    def get_curr_and_prev_path_nodes(self):
+        if self.path:
+            for i in range(len(self.path)-1):
+                n1 = self.path[i]
+                n2 = self.path[i+1]
 
                 if (n1.s <= self.state.s <= n2.s):
                     return n1, n2
         return None, None
 
-    def get_collision_pt(self, vehicle_pos, vehicle_vel, path):
+    def get_collision_pt(self, vehicle_pos, vehicle_vel):
         vehicle_yaw = self.get_velocity_yaw(vehicle_vel[0], vehicle_vel[1])
 
         def is_between(yaw, yaw1, yaw2):
@@ -178,9 +193,9 @@ class Actor(object):
             else:
                 return yaw1 <= yaw or yaw >= yaw2
             
-        for i in range(len(path)-1):
-            n1 = path[i]
-            n2 = path[i+1]
+        for i in range(len(self.path)-1):
+            n1 = self.path[i]
+            n2 = self.path[i+1]
             
             n1_vector = np.array([n1.x, n1.y])
             n2_vector = np.array([n2.x, n2.y])
@@ -210,13 +225,34 @@ class Actor(object):
             
         return None
         
+    def configure_path_following(self, path, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None, keep_active=False):
+        """
+        For path following actors (PP and PV), must be called before follow_path can be used
+        Arguments:
+        - path: list of PathNode consisting of at least 2 nodes
+        - set_speed: desired constant speed in m/s, used if speed profile is not provided in path
+        - speed_qualifier: used only when set_speed is provided
+        - collision_vid: vehicle id to be collided with, used for ensured collision
+        - collision_point: designated collision point, used for ensured collision with fixed point
 
-    def follow_path(self, delta_time, sim_time, path):
-    # def follow_path(self, delta_time, sim_time, path):
-        if path:
-            # Which path node have we most recently passed
+        For constant speed, set set_speed to the desired speed and speed_qualifier as required 
+        For speed profile, set set_speed=None and speed_qualifier to None
+        For ensured collision, set collision_vid to the vehicle id to be collided with
+        For ensured collision with the designated point, set collision_point
+        """
+        self.path = path
+        self.debug_path = [(n.x, n.y) for n in self.path]
+        self.set_speed = set_speed
+        self.speed_qualifier = speed_qualifier
+        self.collision_vid = collision_vid
+        self.collision_point = collision_point
+        self.keep_active = keep_active
+
+
+    def follow_path(self, delta_time):
+        if self.path:
+            # Which path node we have most recently passed
             node_checkpoint = 0
-            speed_qualifier_enum = SpeedQualifier[self.speed_qualifier.upper()] if self.speed_qualifier is not None else SpeedQualifier.INITIAL
             collision_segment_prev_node = None
             collision_segment_next_node = None
             time_to_collision = None
@@ -236,17 +272,16 @@ class Actor(object):
                     if self.collision_point is not None:
                         #use provided collision point
                         collision_pt = [self.collision_point.x, self.collision_point.y]
-                        collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes(self.path)
+                        collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes()
                         # Euclidean distance between vehicle and collision point
                         collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
                         if collision_vehicle.state.s_vel == 0.0:
                             time_to_collision = float('inf')
                         else:
                             time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
-                        
                     else:
                         #find the point once and save the result
-                        collision_pt_result = self.get_collision_pt(vehicle_pos, vehicle_vel, self.path)
+                        collision_pt_result = self.get_collision_pt(vehicle_pos, vehicle_vel)
                         if collision_pt_result is not None:
                             collision_pt, collision_segment_prev_node, collision_segment_next_node = collision_pt_result
                             # Euclidean distance between vehicle and collision point
@@ -257,9 +292,9 @@ class Actor(object):
                                 time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
 
 
-            for i in range(len(path)-1):
-                n1 = path[i]
-                n2 = path[i+1]
+            for i in range(len(self.path)-1):
+                n1 = self.path[i]
+                n2 = self.path[i+1]
 
                 if (n1.s <= self.state.s <= n2.s):
 
@@ -269,15 +304,15 @@ class Actor(object):
                     if self.collision_point is not None and time_to_collision is not None and collision_segment_prev_node is not None and collision_segment_next_node is not None:
                         # Project collision point to arc lengths
                         diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x,
-                                                                collision_segment_prev_node.y])
+                                                                  collision_segment_prev_node.y])
                         euclidian_dist = float(np.sqrt(np.sum(diff**2)))
                         collision_pt_s = collision_segment_prev_node.s + euclidian_dist
 
                         # Distance this oncoming vehicle must travel to the collision point (along s)
                         distance_remaining = collision_pt_s - self.state.s
 
-                        # If using collision point logic
-                        if not self.released and self.id != 1:
+                        # If using collision point logic with constant speed
+                        if not self.released and self.set_speed and self.id != 1:
                             v_set = max(1e-6, self.set_speed / 3.6)  # m/s, avoid divide-by-zero
                             t_oncoming = distance_remaining / v_set
                             
@@ -315,38 +350,40 @@ class Actor(object):
                             else:
                                 self.state.s_vel = 0.0
 
-                        #else use actor heading collision logic 
-                        else:
-
+                    #else use actor heading collision logic
+                    elif time_to_collision is not None:
                         # Calculate the collision-required speed
-                            if time_to_collision > 0:
-                                collision_required_speed = distance_remaining / time_to_collision
-                            else:
-                                collision_required_speed = 0.0  # stop either collided or missed collision window
-                        
-                        # Get the reference speed from the path nodes is speed profile to be used
-                            if n1.speed is not None and n2.speed is not None:
-                                # Interpolate the reference speed
-                                ratio = (self.state.s - n1.s)/(n2.s - n1.s)
-                                self.reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
+                        distance_remaining = np.sqrt(np.sum((collision_pt - np.array([self.state.x, self.state.y])) ** 2))
+                        if time_to_collision > 0:
+                            collision_required_speed = distance_remaining / time_to_collision
+                        else:
+                            collision_required_speed = 0.0  # stop either collided or missed collision window
+                    
+                        # Get the reference speed from the path nodes if speed profile to be used
+                        if n1.speed is not None and n2.speed is not None:
+                            # Interpolate the reference speed
+                            ratio = (self.state.s - n1.s)/(n2.s - n1.s)
+                            self.reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
+                        else:
+                            self.reference_speed = self.set_speed if self.set_speed else 0.0
 
-                            # Apply speed qualifier logic
-                            if speed_qualifier_enum:
-                                if speed_qualifier_enum == SpeedQualifier.CONSTANT:
-                                    # Use reference speed regardless of collision requirements
-                                    self.state.s_vel = self.reference_speed
-                                elif speed_qualifier_enum == SpeedQualifier.MAXIMUM:
-                                    # Reference speed is upper bound, use minimum of reference and collision-required
-                                    # if collision_required_speed > 0:
-                                        self.state.s_vel = min(self.reference_speed, collision_required_speed)
-                                    # elif collision_required_speed <= 0:
-                                    #     self.state.s_vel = collision_required_speed
-                                elif speed_qualifier_enum == SpeedQualifier.MINIMUM:
-                                    # Reference speed is lower bound, use maximum of reference and collision-required
-                                    self.state.s_vel = max(self.reference_speed, collision_required_speed)
-                                elif speed_qualifier_enum == SpeedQualifier.INITIAL:
-                                    # Use collision-required speed, allowing realistic adjustments
-                                    self.state.s_vel = collision_required_speed
+                        # Apply speed qualifier logic
+                        if self.speed_qualifier:
+                            if self.speed_qualifier == SpeedQualifier.CONSTANT:
+                                # Use reference speed regardless of collision requirements
+                                self.state.s_vel = self.reference_speed
+                            elif self.speed_qualifier == SpeedQualifier.MAXIMUM:
+                                # Reference speed is upper bound, use minimum of reference and collision-required
+                                # if collision_required_speed > 0:
+                                    self.state.s_vel = min(self.reference_speed, collision_required_speed)
+                                # elif collision_required_speed <= 0:
+                                #     self.state.s_vel = collision_required_speed
+                            elif self.speed_qualifier == SpeedQualifier.MINIMUM:
+                                # Reference speed is lower bound, use maximum of reference and collision-required
+                                self.state.s_vel = max(self.reference_speed, collision_required_speed)
+                            elif self.speed_qualifier == SpeedQualifier.INITIAL:
+                                # Use collision-required speed, allowing realistic adjustments
+                                self.state.s_vel = collision_required_speed
 
                     # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
@@ -355,16 +392,15 @@ class Actor(object):
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                         self.state.s_vel = n1.speed + (n2.speed - n1.speed) * ratio
-
                     break
 
             # Calculate frenet position
             self.state.s += (self.state.s_vel * delta_time)
 
             # Now calculate the cartesian state from the frenet state
-            for i in range(node_checkpoint, len(path)-1):
-                n1 = path[i]
-                n2 = path[i+1]
+            for i in range(node_checkpoint, len(self.path)-1):
+                n1 = self.path[i]
+                n2 = self.path[i+1]
                 if (n1.s <= self.state.s <= n2.s):
                     dx = n2.x - n1.x
                     dy = n2.y - n1.y
@@ -383,7 +419,7 @@ class Actor(object):
                     break
 
             # Reached the end of the path
-            if self.state.s > path[-1].s:
+            if self.state.s > self.path[-1].s:
                 self.force_stop()
                 if not self.keep_active:
                     self.state.set_X([-9999, 0, 0])
@@ -406,18 +442,6 @@ class PathNode:
     y:float = 0.0      # [m]
     s:float = 0.0      # [m]
     speed:float = 0.0  # [m/s]
-
-
-class SpeedQualifier(IntEnum):
-    CONSTANT = 0          # treat the speed as constant throughout the path (default)
-    MAXIMUM = 1          # treat the given speed as the upper bound
-    MINIMUM = 2          # treat the given speed as the lower bound  
-    INITIAL = 3          # start the agent with the given speed but adjust for collision as needed
-
-class ActorSimState(IntEnum):
-    INACTIVE = 0          #not in simulation, not present in traffic, and not visible for other agents
-    ACTIVE = 1            #in simulation and visible to other agents
-    INVISIBLE = 2         #in simulation but NOT visible to other agents (for reference)
 
 @dataclass
 class ActorState:

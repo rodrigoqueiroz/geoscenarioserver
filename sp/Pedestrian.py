@@ -295,34 +295,24 @@ class SP(Pedestrian):
         return fiv
     
 class PP(Pedestrian):
-    
-    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, collision_vid = None, speed_qualifier = None, reference_speed = None):
+    """
+    A path following pedestrian.
+    """
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, set_speed = None, speed_qualifier = SpeedQualifier.INITIAL, collision_vid = None, collision_point = None, reference_speed = None):
         super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.PP_TYPE
-        self.path = path
+        self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active)
         self._debug_shdata = debug_shdata
-        self.keep_active = keep_active
-        self.collision_vid = collision_vid
-        self.speed_qualifier = speed_qualifier
         self.reference_speed = reference_speed
         self.scenario_vehicles = scenario_vehicles
-        
         self.current_waypoint = 0.0
-
-        self.current_path_node = 0
     
     def tick(self, tick_count, delta_time, sim_time):  
-        ped_path = [(n.x, n.y) for n in self.path]
-        
-        Pedestrian.tick(self, tick_count, delta_time, sim_time)  
-
-        # Proceed with follow_path, using None values if no collision or vehicle exists
-        self.follow_path(delta_time, sim_time, self.path)
-
+        self.follow_path(delta_time)
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
             None,
-            ped_path,
+            self.debug_path,
             None,
             None,
             None,

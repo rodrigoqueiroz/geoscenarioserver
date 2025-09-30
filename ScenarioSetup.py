@@ -257,15 +257,23 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         # Path Vehicle (PV)
         elif btype == 'pv':
             if 'path' not in vnode.tags:
-                log.error("PV {} requires a path".format(vid))
+                log.error(f"PV {vid} requires a path")
                 continue
         
             p_name = vnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
             set_speed = extract_tag(vnode, "speed", None, float)
+            speed_qualifier = extract_tag(vnode, 'speed_qualifier', None, str)
+            if speed_qualifier is not None:
+                try:
+                    speed_qualifier = SpeedQualifier[speed_qualifier.upper()]
+                except KeyError:
+                    log.warning(f"Path vehicle {vid} has invalid speed_qualifier '{speed_qualifier}'. Using INITIAL.")
+                    speed_qualifier = SpeedQualifier.INITIAL
+            else:
+                speed_qualifier = SpeedQualifier.INITIAL
             collision_vid = extract_tag(vnode, "collision_vehicle_vid", None, int)
             collision_point = None
-            speed_qualifier = extract_tag(vnode, 'speed_qualifier', None, str)
             
             path = []
             path_length = 0.0
@@ -282,7 +290,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(nd)
 
-                if "collision_pt" in p_nodes[i].tags:
+                if extract_bool_tag(p_nodes[i], "collision_pt", False):
                     collision_point = PathNode()
                     collision_point.x = float(p_nodes[i].x)
                     collision_point.y = float(p_nodes[i].y)
@@ -298,12 +306,11 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             else:
                 log.error("PV {} has no initial speed".format(vid))
                 continue
-
-            vehicle = PV(vid, name, start_state=start_state, frenet_state=frenet_state, yaw=yaw, path=path, debug_shdata=sim_traffic.debug_shdata, length=length, width=width, collision_vid=collision_vid, scenario_vehicles=sim_traffic.vehicles, set_speed=set_speed, collision_point=collision_point, speed_qualifier=speed_qualifier)
+            
+            vehicle = PV(vid, name, start_state, frenet_state, yaw, path, sim_traffic.debug_shdata, sim_traffic.vehicles, length=length, width=width, set_speed=set_speed, speed_qualifier=speed_qualifier, collision_vid=collision_vid, collision_point=collision_point)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
-            log.info("Vehicle {} initialized with PV behavior".format(vid))
-            log.warning("Path-based vehicles are only partially supported in GeoScenario Server {}".format(vid))
+            log.info(f"Vehicle {vid} initialized with PV behavior")
             continue
 
         # External Vehicle (EV)
@@ -312,14 +319,14 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             vehicle = EV(vid, name, start_state, yaw, bsource)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
-            log.info("Vehicle {} initialized as an external vehicle".format(vid))
+            log.info(f"Vehicle {vid} initialized as an external vehicle")
 
         # Neutral Vehicle
         else:
             vehicle = Vehicle(vid, name, start_state, yaw=yaw)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
-            log.info("Vehicle {} initialized as a motionless vehicle".format(vid))
+            log.info(f"Vehicle {vid} initialized as a motionless vehicle")
         #=========
 
     #========= Pedestrians
@@ -420,8 +427,18 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             p_name = pnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
 
-            collision_vid = extract_tag(pnode, 'collision_vehicle_vid', None, int)
+            set_speed = extract_tag(pnode, "speed", None, float)
             speed_qualifier = extract_tag(pnode, 'speed_qualifier', None, str)
+            if speed_qualifier is not None:
+                try:
+                    speed_qualifier = SpeedQualifier[speed_qualifier.upper()]
+                except KeyError:
+                    log.warning(f"Pedestrian {pid} has invalid speed_qualifier '{speed_qualifier}'. Using INITIAL.")
+                    speed_qualifier = SpeedQualifier.INITIAL
+            else:
+                speed_qualifier = SpeedQualifier.INITIAL
+            collision_vid = extract_tag(pnode, 'collision_vehicle_vid', None, int)
+            collision_point = None
 
             path = []
             path_length = 0.0
@@ -438,12 +455,12 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(nd)
 
-                if "collision_pt" in p_nodes[i].tags:
+                if extract_bool_tag(p_nodes[i], "collision_pt", False):
                     collision_point = PathNode()
                     collision_point.x = float(p_nodes[i].x)
                     collision_point.y = float(p_nodes[i].y)
                     collision_point.s = path_length
-            
+
             # Set initial longitudinal velocity, path always takes precedence
             frenet_state = [0.0,0.0,0.0, 0.0,0.0,0.0]
             if path[0].speed is not None:
@@ -463,12 +480,12 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 path=path,
                 scenario_vehicles=sim_traffic.vehicles,
                 debug_shdata=sim_traffic.debug_shdata,
-                collision_vid=collision_vid,
+                set_speed=set_speed,
+                reference_speed=frenet_state[1],
                 speed_qualifier=speed_qualifier,
-                reference_speed=frenet_state[1]
+                collision_vid=collision_vid,
+                collision_point=collision_point
             )
-            
-
             sim_traffic.add_pedestrian(pedestrian)
             log.info(f"Pedestrian {pid} initialized with PP behavior")
             continue
