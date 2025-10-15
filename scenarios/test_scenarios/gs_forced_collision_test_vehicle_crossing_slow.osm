@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-5437723' action='modify' visible='true' lat='43.45482024528' lon='-80.57009078117'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/ParadiseCr.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Car-to-Car crossing straight crossing path' />
+    <tag k='timeout' v='15' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5437724' action='modify' visible='true' lat='43.45479182411' lon='-80.56992764919'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-5437725' action='modify' visible='true' lat='43.454632467' lon='-80.56965459062' />
+  <node id='-5437726' action='modify' visible='true' lat='43.45464142102' lon='-80.56966273946' />
+  <node id='-5437727' action='modify' visible='true' lat='43.45521497572' lon='-80.57005315471' />
+  <node id='-5437728' action='modify' visible='true' lat='43.45480040578' lon='-80.56977533268'>
+    <tag k='collision_pt' v='true' />
+  </node>
+  <node id='-5437729' action='modify' visible='true' lat='43.45504893971' lon='-80.56912445392' />
+  <node id='-5437730' action='modify' visible='true' lat='43.45485475887' lon='-80.56966639302' />
+  <node id='-5437731' action='modify' visible='true' lat='43.4547555346' lon='-80.56987042508' />
+  <node id='-5437732' action='modify' visible='true' lat='43.45461904048' lon='-80.57017713995' />
+  <node id='-5437739' action='modify' visible='true' lat='43.45455300632' lon='-80.56958605132'>
+    <tag k='btype' v='PV' />
+    <tag k='collision_vehicle_vid' v='1' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='GVT' />
+    <tag k='path' v='gvt_route' />
+    <tag k='speed' v='20' />
+    <tag k='speed_qualifier' v='constant' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='-125' />
+  </node>
+  <node id='-5437742' action='modify' visible='true' lat='43.45506368392' lon='-80.56907814149'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='path' v='vut_route' />
+    <tag k='speed' v='20' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='150' />
+  </node>
+  <way id='-1962682' action='modify' visible='true'>
+    <nd ref='-5437725' />
+    <nd ref='-5437726' />
+    <nd ref='-5437728' />
+    <nd ref='-5437727' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='gvt_route' />
+  </way>
+  <way id='-1962683' action='modify' visible='true'>
+    <nd ref='-5437729' />
+    <nd ref='-5437730' />
+    <nd ref='-5437731' />
+    <nd ref='-5437732' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='vut_route' />
+  </way>
+</osm>
