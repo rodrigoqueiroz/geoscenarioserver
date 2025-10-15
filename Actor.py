@@ -352,8 +352,17 @@ class Actor(object):
 
                     #else use actor heading collision logic
                     elif time_to_collision is not None:
+                        
+                        # Project collision point to arc lengths
+                        diff = np.array(collision_pt) - np.array([collision_segment_prev_node.x,
+                                                                  collision_segment_prev_node.y])
+                        euclidian_dist = float(np.sqrt(np.sum(diff**2)))
+                        collision_pt_s = collision_segment_prev_node.s + euclidian_dist
+
+                        # Distance this oncoming vehicle must travel to the collision point (along s)
+                        distance_remaining = collision_pt_s - self.state.s
+                        
                         # Calculate the collision-required speed
-                        distance_remaining = np.sqrt(np.sum((collision_pt - np.array([self.state.x, self.state.y])) ** 2))
                         if time_to_collision > 0:
                             collision_required_speed = distance_remaining / time_to_collision
                         else:
@@ -364,9 +373,7 @@ class Actor(object):
                             # Interpolate the reference speed
                             ratio = (self.state.s - n1.s)/(n2.s - n1.s)
                             self.reference_speed = n1.speed + (n2.speed - n1.speed) * ratio
-                        else:
-                            self.reference_speed = self.set_speed if self.set_speed else 0.0
-
+                        
                         # Apply speed qualifier logic
                         if self.speed_qualifier:
                             if self.speed_qualifier == SpeedQualifier.CONSTANT:
@@ -374,10 +381,7 @@ class Actor(object):
                                 self.state.s_vel = self.reference_speed
                             elif self.speed_qualifier == SpeedQualifier.MAXIMUM:
                                 # Reference speed is upper bound, use minimum of reference and collision-required
-                                # if collision_required_speed > 0:
-                                    self.state.s_vel = min(self.reference_speed, collision_required_speed)
-                                # elif collision_required_speed <= 0:
-                                #     self.state.s_vel = collision_required_speed
+                                self.state.s_vel = min(self.reference_speed, collision_required_speed)
                             elif self.speed_qualifier == SpeedQualifier.MINIMUM:
                                 # Reference speed is lower bound, use maximum of reference and collision-required
                                 self.state.s_vel = max(self.reference_speed, collision_required_speed)
