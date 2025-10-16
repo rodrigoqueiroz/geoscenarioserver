@@ -61,6 +61,8 @@ cd geoscenarioserver
 pixi run gss <parameters>
 pixi run test_scenarios_ci
 pixi run rqt
+pixi run rqt_topic
+pixi run ros_gss <parameters>
 pixi run ros_client_build
 pixi run ros_client
 pixi run ros_client_wgs84
@@ -68,6 +70,8 @@ pixi run ros_client_wgs84_roundtriptest
 pixi run ros_mock_co_simulator
 pixi run regenerate
 ```
+
+The task `gss` runs in the environment `default` whereas `ros_gss` runs in `humble`.
 
 To run automated test of ROS2 client using the mock co-simulator, execute:
 ```
@@ -179,4 +183,6 @@ GeoScenario Server running in High Fidelity Simulation with UE5 and Carla
 [Youtube Video](https://youtu.be/Fk890JvgwWk?feature=shared)
 
 ## Questions?
+
 rqueiroz@uwaterloo.ca
+michal.antkiewicz@uwaterloo.ca
