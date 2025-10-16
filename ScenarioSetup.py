@@ -273,6 +273,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             else:
                 speed_qualifier = SpeedQualifier.INITIAL
             collision_vid = extract_tag(vnode, "collision_vehicle_vid", None, int)
+            use_speed_profile = extract_tag(vnode, "usespeedprofile", "no", str).lower() == 'yes'
             collision_point = None
             
             path = []
@@ -287,6 +288,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 nd.y = float(p_nodes[i].y)
                 nd.s = path_length
                 # Convert from km/h to m/s
+                nd.accel = float(p_nodes[i].tags['agentacceleration']) if ('agentacceleration' in p_nodes[i].tags) else None
+                nd.time_to_accel = float(p_nodes[i].tags['timetoacceleration']) if ('timetoacceleration' in p_nodes[i].tags) else None
                 nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(nd)
 
@@ -307,7 +310,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("PV {} has no initial speed".format(vid))
                 continue
             
-            vehicle = PV(vid, name, start_state, frenet_state, yaw, path, sim_traffic.debug_shdata, sim_traffic.vehicles, length=length, width=width, set_speed=set_speed, speed_qualifier=speed_qualifier, collision_vid=collision_vid, collision_point=collision_point)
+            vehicle = PV(vid, name, start_state, frenet_state, yaw, path, sim_traffic.debug_shdata, sim_traffic.vehicles, length=length, width=width, set_speed=set_speed, speed_qualifier=speed_qualifier, collision_vid=collision_vid, collision_point=collision_point, use_speed_profile=use_speed_profile)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info(f"Vehicle {vid} initialized with PV behavior")

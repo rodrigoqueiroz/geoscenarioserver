@@ -392,6 +392,17 @@ class Actor(object):
                     # Else just follow speed profile or given speed
                     # For now we assume that the velocity is specified at each path point or none of them
                     # Later we could instead interpolate between points with speed specified
+
+                    # use speed profile if available
+                    if self.use_speed_profile and n1.accel is not None:
+                        if n1.time_to_accel is not None and n1.time_to_accel > 0:
+                            #gradually reach the acceleration in the given time
+                            accel_step = (n1.accel - self.state.s_acc) * (delta_time / n1.time_to_accel)
+                            self.state.s_acc += accel_step
+                        else:
+                            self.state.s_acc = n1.accel
+                        if self.state.s_vel > 0:
+                            self.state.s_vel += self.state.s_acc * delta_time
                     elif n1.speed is not None and n2.speed is not None:
                         # Interpolate the velocity
                         ratio = (self.state.s - n1.s)/(n2.s - n1.s)

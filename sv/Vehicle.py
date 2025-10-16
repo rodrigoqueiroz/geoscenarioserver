@@ -322,12 +322,13 @@ class PV(Vehicle):
     - agentacceleration (not implemented)
     - timetoacceleration (not implemented)
     """
-    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None):
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None, use_speed_profile=False):
         super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Vehicle.PV_TYPE
         self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active)
         self._debug_shdata = debug_shdata
         self.scenario_vehicles = scenario_vehicles
+        self.use_speed_profile = use_speed_profile
 
 
     def tick(self, tick_count, delta_time, sim_time):
