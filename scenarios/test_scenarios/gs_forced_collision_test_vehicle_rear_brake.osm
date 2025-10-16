@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5444789' action='modify' lat='43.47142873456' lon='-80.5397724439'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='Car-to-car rear breaking' />
+    <tag k='timeout' v='10' />
+    <tag k='version' v='2.0' />
+  </node>
+  <node id='-5444790' action='modify' lat='43.4715203612' lon='-80.53970887458'>
+    <tag k='gs' v='origin' />
+    <tag k='name' v='origin' />
+  </node>
+  <node id='-5444852' action='modify' lat='43.47167756959' lon='-80.53970535968'>
+    <tag k='agentspeed' v='0' />
+  </node>
+  <node id='-5444853' action='modify' lat='43.47131541611' lon='-80.53910865336'>
+    <tag k='agentspeed' v='40' />
+  </node>
+  <node id='-5444854' action='modify' lat='43.47151189653' lon='-80.53943406317'>
+    <tag k='agentacceleration' v='-4' />
+    <tag k='agentspeed' v='40' />
+    <tag k='timetoacceleration' v='0.4' />
+  </node>
+  <node id='-5444855' action='modify' lat='43.47130707787' lon='-80.53909440622'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='no' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='gvt' />
+    <tag k='path' v='gvt_path' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='yes' />
+    <tag k='vid' v='2' />
+  </node>
+  <node id='-5444856' action='modify' lat='43.47143034384' lon='-80.53930041411'>
+    <tag k='agentspeed' v='40' />
+  </node>
+  <node id='-5444867' action='modify' lat='43.47125758174' lon='-80.53900716229'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='goal_ends_simulation' v='no' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='path' v='vut_path' />
+    <tag k='speed' v='40' />
+    <tag k='vid' v='1' />
+  </node>
+  <node id='-5444868' action='modify' lat='43.47125954154' lon='-80.53901068087' />
+  <node id='-5444869' action='modify' lat='43.47130678228' lon='-80.53909144123' />
+  <node id='-5444870' action='modify' lat='43.47166739237' lon='-80.53968815361' />
+  <way id='-1963110' action='modify'>
+    <nd ref='-5444853' />
+    <nd ref='-5444856' />
+    <nd ref='-5444854' />
+    <nd ref='-5444852' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='gvt_path' />
+  </way>
+  <way id='-1963118' action='modify'>
+    <nd ref='-5444868' />
+    <nd ref='-5444869' />
+    <nd ref='-5444870' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='vut_path' />
+  </way>
+</osm>
