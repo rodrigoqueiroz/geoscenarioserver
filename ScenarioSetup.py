@@ -441,6 +441,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             else:
                 speed_qualifier = SpeedQualifier.INITIAL
             collision_vid = extract_tag(pnode, 'collision_vehicle_vid', None, int)
+            use_speed_profile = extract_bool_tag(vnode, "usespeedprofile", False)
             collision_point = None
 
             path = []
@@ -455,6 +456,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 nd.y = float(p_nodes[i].y)
                 nd.s = path_length
                 # Convert from km/h to m/s
+                nd.accel = extract_tag(p_nodes[i], 'agentacceleration', None, float)
+                nd.time_to_accel = extract_tag(p_nodes[i], 'timetoacceleration', None, float)
                 nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(nd)
 
@@ -487,7 +490,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 reference_speed=frenet_state[1],
                 speed_qualifier=speed_qualifier,
                 collision_vid=collision_vid,
-                collision_point=collision_point
+                collision_point=collision_point,
+                use_speed_profile=use_speed_profile
             )
             sim_traffic.add_pedestrian(pedestrian)
             log.info(f"Pedestrian {pid} initialized with PP behavior")

@@ -13,8 +13,8 @@ class Vehicle(Actor):
     TV_TYPE = 3
     PV_TYPE = 4
 
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, use_speed_profile=False):
-        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState(), length=length, width=width, use_speed_profile=use_speed_profile)
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+        super().__init__(id, name, start_state, frenet_state, yaw, VehicleState(), length=length, width=width)
         self.model  = ''
         self.type   = Vehicle.N_TYPE
 

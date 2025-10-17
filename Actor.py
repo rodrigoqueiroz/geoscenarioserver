@@ -24,7 +24,7 @@ class ActorSimState(IntEnum):
     INVISIBLE = 2         #in simulation but NOT visible to other agents (for reference)
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0, use_speed_profile=False):
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
         self.id = id
         self.name = name
         self.length = length
@@ -40,7 +40,6 @@ class Actor(object):
         self.c = 0
         self.k = 0
         self.alpha1 = 0
-        self.use_speed_profile = use_speed_profile
 
         #state
         #start state in sim frame
@@ -226,7 +225,7 @@ class Actor(object):
             
         return None
         
-    def configure_path_following(self, path, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None, keep_active=False):
+    def configure_path_following(self, path, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None, keep_active=False, use_speed_profile=False):
         """
         For path following actors (PP and PV), must be called before follow_path can be used
         Arguments:
@@ -248,6 +247,7 @@ class Actor(object):
         self.collision_vid = collision_vid
         self.collision_point = collision_point
         self.keep_active = keep_active
+        self.use_speed_profile = use_speed_profile
 
 
     def follow_path(self, delta_time):
