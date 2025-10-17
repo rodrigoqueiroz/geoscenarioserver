@@ -273,7 +273,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             else:
                 speed_qualifier = SpeedQualifier.INITIAL
             collision_vid = extract_tag(vnode, "collision_vehicle_vid", None, int)
-            use_speed_profile = extract_tag(vnode, "usespeedprofile", "no", str).lower() == 'yes'
+            use_speed_profile = extract_bool_tag(vnode, "usespeedprofile", False)
             collision_point = None
             
             path = []
@@ -288,8 +288,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 nd.y = float(p_nodes[i].y)
                 nd.s = path_length
                 # Convert from km/h to m/s
-                nd.accel = float(p_nodes[i].tags['agentacceleration']) if ('agentacceleration' in p_nodes[i].tags) else None
-                nd.time_to_accel = float(p_nodes[i].tags['timetoacceleration']) if ('timetoacceleration' in p_nodes[i].tags) else None
+                nd.accel = extract_tag(p_nodes[i], 'agentacceleration', None, float)
+                nd.time_to_accel = extract_tag(p_nodes[i], 'timetoacceleration', None, float)
                 nd.speed = float(p_nodes[i].tags['agentspeed'] / 3.6) if ('agentspeed' in p_nodes[i].tags) else None
                 path.append(nd)
 

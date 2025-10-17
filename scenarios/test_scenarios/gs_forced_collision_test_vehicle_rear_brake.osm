@@ -5,7 +5,7 @@
     <tag k='gs' v='globalconfig' />
     <tag k='lanelet' v='maps/lanelet2_ringroad.osm' />
     <tag k='mutate' v='no' />
-    <tag k='name' v='Car-to-car rear breaking' />
+    <tag k='name' v='Car-to-car rear braking' />
     <tag k='timeout' v='10' />
     <tag k='version' v='2.0' />
   </node>
