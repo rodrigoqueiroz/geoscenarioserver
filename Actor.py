@@ -24,7 +24,7 @@ class ActorSimState(IntEnum):
     INVISIBLE = 2         #in simulation but NOT visible to other agents (for reference)
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0, use_speed_profile=False):
         self.id = id
         self.name = name
         self.length = length
@@ -40,7 +40,7 @@ class Actor(object):
         self.c = 0
         self.k = 0
         self.alpha1 = 0
-        self.use_speed_profile = False
+        self.use_speed_profile = use_speed_profile
 
         #state
         #start state in sim frame
