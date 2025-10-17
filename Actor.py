@@ -40,6 +40,7 @@ class Actor(object):
         self.c = 0
         self.k = 0
         self.alpha1 = 0
+        self.use_speed_profile = False
 
         #state
         #start state in sim frame
