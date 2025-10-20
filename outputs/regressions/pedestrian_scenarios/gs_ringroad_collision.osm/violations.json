@@ -1,1 +1,1 @@
-{"1": {"30": {"CollisionWithPedestrian": {"angle": 12.86, "collections": {"pedestrians": {"alias": "p_1", "id": 1}}, "message": "v_1 bounding box overlapped with the pedestrian agent p_1 on the vehicle front side at 12.86 degrees", "zone": "front"}}}}
+{"1": {"30": {"CollisionWithPedestrian": {"angle": 7.85, "collections": {"pedestrians": {"alias": "p_1", "id": 1}}, "message": "v_1 bounding box overlapped with the pedestrian agent p_1 on the vehicle front side at 7.85 degrees", "zone": "front"}}}}
