@@ -298,10 +298,10 @@ class PP(Pedestrian):
     """
     A path following pedestrian.
     """
-    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, set_speed = None, speed_qualifier = SpeedQualifier.INITIAL, collision_vid = None, collision_point = None, reference_speed = None):
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, set_speed = None, speed_qualifier = SpeedQualifier.INITIAL, collision_vid = None, collision_point = None, reference_speed = None, use_speed_profile=False):
         super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
         self.type = Pedestrian.PP_TYPE
-        self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active)
+        self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active, use_speed_profile)
         self._debug_shdata = debug_shdata
         self.reference_speed = reference_speed
         self.scenario_vehicles = scenario_vehicles
