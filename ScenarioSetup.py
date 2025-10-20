@@ -441,7 +441,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             else:
                 speed_qualifier = SpeedQualifier.INITIAL
             collision_vid = extract_tag(pnode, 'collision_vehicle_vid', None, int)
-            use_speed_profile = extract_bool_tag(vnode, "usespeedprofile", False)
+            use_speed_profile = extract_bool_tag(pnode, "usespeedprofile", False)
             collision_point = None
 
             path = []
