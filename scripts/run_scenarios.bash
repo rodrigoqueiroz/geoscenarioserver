@@ -2,6 +2,7 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
+GSS_DIR="${REPO_DIR}/geoscenarioserver"
 
 ARG_SINGLE="false"
 ARG_VEHICLES="true"
@@ -79,7 +80,7 @@ run_scenario_save_regression()
     scenario=$1
     pixi run gss ${ARG_NO_DASH} ${ARG_FASTEST} ${ARG_INTERACTIVE} --scenario ${scenario}
     # save and compare with regression
-    scenario_relative=${scenario#$REPO_DIR/scenarios/}
+    scenario_relative=${scenario#$GSS_DIR/scenarios/}
     regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/
     save="no"
     if [[ -f "${regression_folder}violations.json" ]]; then
@@ -116,16 +117,16 @@ else
     # run all scenarios
     test_scenarios=""
     if [[ "$ARG_VEHICLES" == "true" ]]; then
-        coretest_scenarios=$(find "${REPO_DIR}/scenarios/coretest_scenarios" -name "*.osm" | sort)
-        test_scenarios=$(find "${REPO_DIR}/scenarios/test_scenarios" -name "*.osm" | sort)
+        coretest_scenarios=$(find "${GSS_DIR}/scenarios/coretest_scenarios" -name "*.osm" | sort)
+        test_scenarios=$(find "${GSS_DIR}/scenarios/test_scenarios" -name "*.osm" | sort)
     fi
     pedestrian_scenarios=""
     if [[ "$ARG_PEDESTRIANS" == "true" ]]; then
-        pedestrian_scenarios=$(find "${REPO_DIR}/scenarios/pedestrian_scenarios" -name "*.osm" | sort)
+        pedestrian_scenarios=$(find "${GSS_DIR}/scenarios/pedestrian_scenarios" -name "*.osm" | sort)
     fi
     long_test_scenarios=
     if [[ "$ARG_LONG" == "true" ]]; then
-        long_test_scenarios=$(find "${REPO_DIR}/scenarios/long_test_scenarios" -name "*.osm" | sort)
+        long_test_scenarios=$(find "${GSS_DIR}/scenarios/long_test_scenarios" -name "*.osm" | sort)
     fi
     all_scenarios="$coretest_scenarios $test_scenarios $pedestrian_scenarios $long_test_scenarios"
     cd ${REPO_DIR}
