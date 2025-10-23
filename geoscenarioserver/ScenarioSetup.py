@@ -37,18 +37,38 @@ def extract_bool_tag(vnode, name, default_value=False):
             return default_value
 
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
-    """ Setup scenario from GeoScenario file
+    """ Setup scenario from GeoScenario files
+    gsfiles: list of GeoScenario file paths. Absolute paths or relative to cwd or built-in scenarios.
     """
     full_scenario_paths = []
     for gsfile in gsfiles:
         if (os.path.isabs(gsfile[0])):
             # absolute path
-            full_scenario_paths.append(gsfile)
+            if os.path.isfile(gsfile):
+                full_scenario_paths.append(gsfile)
+                log.info(f"Loading scenario from absolute path {gsfile}")
+            else:
+                log.error("Skipping scenario file not found: {}".format(gsfile))
+                continue   
         else:
-            # relative to ROOT_DIR
-            full_scenario_paths.append(os.path.join(ROOT_DIR, gsfile))
+            # try relative to the current working directory
+            cwd_path = os.path.join(os.getcwd(), gsfile)
+            if os.path.isfile(cwd_path):
+                full_scenario_paths.append(cwd_path)
+                log.info(f"Loading scenario relative to working directory {cwd_path}")
+            else:
+                # try a built-in scenario
+                root_path = os.path.join(ROOT_DIR, gsfile)
+                if os.path.isfile(root_path):
+                    full_scenario_paths.append(root_path)
+                    log.info(f"Loading a built-in scenario {root_path}")
+                else:
+                    log.error("Skipping scenario file not found: {}".format(gsfile))
+                    continue
 
-    log.info("Loading GeoScenario file(s): {}".format(", ".join(full_scenario_paths)))
+    if len(full_scenario_paths) == 0:
+        log.error("No existing scenario files to load.")
+        return False
 
     #========= Parse GeoScenario File
     parser = GSParser()
