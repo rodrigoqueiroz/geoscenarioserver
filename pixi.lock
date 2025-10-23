@@ -306,6 +306,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-3.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py311h9ecbd09_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb8e6e7a_2.conda
+      - conda: .
       - pypi: https://files.pythonhosted.org/packages/0b/7d/90b9b27e51099deff45ae426157332c8d29448c62df0036efaa28ef3c27b/antlr_denter-1.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/13/d0/91296f31ca60eea107077aba00bf417090eabf134cd7627271200ea54c4a/lanelet2-1.2.2-cp311-cp311-manylinux_2_31_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/7f/e9/e24c577cdc3c11987d00e46b19d0ae0d6a13a895e9bb12081f58aa6b904d/py_trees-0.7.6-py3-none-any.whl
@@ -1072,6 +1073,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py311h9ecbd09_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb8e6e7a_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zziplib-0.13.69-he45264a_2.conda
+      - conda: .
       - pypi: https://files.pythonhosted.org/packages/0b/7d/90b9b27e51099deff45ae426157332c8d29448c62df0036efaa28ef3c27b/antlr_denter-1.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/13/d0/91296f31ca60eea107077aba00bf417090eabf134cd7627271200ea54c4a/lanelet2-1.2.2-cp311-cp311-manylinux_2_31_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/7f/e9/e24c577cdc3c11987d00e46b19d0ae0d6a13a895e9bb12081f58aa6b904d/py_trees-0.7.6-py3-none-any.whl
@@ -2698,6 +2700,19 @@ packages:
   purls: []
   size: 528149
   timestamp: 1715782983957
+- conda: .
+  name: geoscenarioserver
+  version: 0.1.0
+  build: pyh4616a5c_0
+  subdir: noarch
+  depends:
+  - python >=3.8
+  - python *
+  license: MIT
+  input:
+    hash: f111ff3cdce2c5e888383cf3d7c2abb7a7c6f6e818b4f4fc14ca5522165eebf7
+    globs:
+    - pyproject.toml
 - conda: https://conda.anaconda.org/conda-forge/linux-64/gettext-0.24.1-h5888daf_0.conda
   sha256: 88db27c666e1f8515174bf622a3e2ad983c94d69e3a23925089e476b9b06ad00
   md5: c63e7590d4d6f4c85721040ed8b12888
