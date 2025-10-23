@@ -8,13 +8,13 @@ import numpy as np
 import random
 from SimConfig import *
 from util.Utils import *
-from Actor import *
+from core.Actor import *
 from sp.SPPlanner import *
 from sp.SPPlannerState import *
 from shm.SimSharedMemoryServer import *
 from util.Utils import kalman, distance_point_to_border
 from util.Transformations import normalize
-from SimTraffic import *
+from core.SimTraffic import *
 from sp.btree.BehaviorModels import BehaviorModels
 from sp.ManeuverModels import *
 import lanelet2.core

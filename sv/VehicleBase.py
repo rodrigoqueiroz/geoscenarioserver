@@ -1,4 +1,4 @@
-from Actor import Actor, VehicleState
+from core.Actor import Actor, VehicleState
 from SimConfig import *
 
 import logging

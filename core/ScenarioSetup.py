@@ -15,13 +15,13 @@ except ImportError:
 from lanelet2.core import GPSPoint
 from mapping.LaneletMap import *
 from SimConfig import SimConfig
-from SimTraffic import SimTraffic
-from TrafficLight import TrafficLight as TL
-from TrafficLight import TrafficLightType, TrafficLightColor
+from core.SimTraffic import SimTraffic
+from core.TrafficLight import TrafficLight as TL
+from core.TrafficLight import TrafficLightType, TrafficLightColor
 from sv.Vehicle import *
 from sp.Pedestrian import *
 from gsc.GSParser import GSParser
-from Actor import *
+from core.Actor import *
 
 def extract_tag(vnode, name, default_value, parser_fn):
     return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value

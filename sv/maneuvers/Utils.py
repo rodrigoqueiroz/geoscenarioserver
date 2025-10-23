@@ -8,7 +8,7 @@
 
 from sv.maneuvers.Config import *
 from SimConfig import *
-from Actor import *
+from core.Actor import *
 from sv.SDVTrafficState import TrafficState
 
 import logging

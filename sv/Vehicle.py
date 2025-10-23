@@ -10,7 +10,7 @@ import numpy as np
 
 from typing import List
 
-from Actor import *
+from core.Actor import *
 from gsc.GSParser import Node
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementViolationEvents import ScenarioCompletion

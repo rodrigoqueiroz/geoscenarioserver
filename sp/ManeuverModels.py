@@ -9,7 +9,7 @@ from copy import copy
 import itertools
 from sp.ManeuverConfig import *
 from SimConfig import *
-from Actor import *
+from core.Actor import *
 from typing import Callable
 from sp.ManeuverUtils import *
 from util.Transformations import normalize

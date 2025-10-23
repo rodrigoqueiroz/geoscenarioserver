@@ -2,7 +2,7 @@ import numpy as np
 
 from math import sin
 
-from Actor import ActorSimState
+from core.Actor import ActorSimState
 from requirements.RequirementViolationEvents import CollisionWithVehicle, CollisionWithPedestrian, GoalOvershot, ScenarioCompletion, ScenarioEnd
 from sv.SDVTrafficState import TrafficState
 from util.BoundingBoxes import calculate_rectangular_bounding_box

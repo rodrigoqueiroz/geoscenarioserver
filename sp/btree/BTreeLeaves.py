@@ -5,7 +5,7 @@
 
 from py_trees import *
 import random
-from TickSync import TickSync
+from core.TickSync import TickSync
 from sp.ManeuverConfig import *
 from sp.ManeuverUtils import *
 

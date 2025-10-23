@@ -21,10 +21,10 @@ except ImportError:
 from dash.Dashboard import *
 from mapping.LaneletMap import *
 from requirements.RequirementViolationEvents import GlobalTick
-from ScenarioSetup import *
+from core.ScenarioSetup import *
 from SimConfig import SimConfig
-from SimTraffic import SimTraffic
-from TickSync import TickSync
+from core.SimTraffic import SimTraffic
+from core.TickSync import TickSync
 
 import logging
 log = logging.getLogger("GSServer")

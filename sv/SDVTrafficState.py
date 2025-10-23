@@ -22,13 +22,13 @@ from math import sqrt
 from turtle import color
 from typing import Tuple, Dict, List
 
-from Actor import VehicleState
+from core.Actor import VehicleState
 from mapping.LaneletMap import *
 from SimConfig import *
 from sv.VehicleBase import Vehicle
 from sv.maneuvers.Config import LaneConfig
 from sv.SDVRoute import SDVRoute
-from TickSync import TickSync
+from core.TickSync import TickSync
 from util.Transformations import (OutsideRefPathException, frenet_to_sim_frame,frenet_to_sim_position, sim_to_frenet_frame,sim_to_frenet_position)
 
 #Reg Elements State (for pickling)

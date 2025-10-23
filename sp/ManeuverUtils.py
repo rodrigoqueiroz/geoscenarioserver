@@ -8,8 +8,8 @@
 
 
 import numpy as np
-from Actor import *
-from SimTraffic import *
+from core.Actor import *
+from core.SimTraffic import *
 from sp.ManeuverConfig import *
 from sp.ConditionConfig import *
 from SimConfig import *

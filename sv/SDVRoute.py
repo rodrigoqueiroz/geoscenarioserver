@@ -1,4 +1,4 @@
-from Actor import TrajNode
+from core.Actor import TrajNode
 from math import floor
 from typing import List
 from lanelet2.core import ConstLineString3d, Lanelet, Point3d

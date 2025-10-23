@@ -10,18 +10,18 @@ from multiprocessing import Array, Process, Value
 from signal import signal, SIGTERM, SIGINT
 import sys
 
-from Actor import *
+from core.Actor import *
 from mapping.LaneletMap import *
 from mapping.LaneletMap import LaneletMap
 from requirements.RequirementsChecker import RequirementsChecker
 from requirements.RequirementViolationEvents import AgentTick, ScenarioCompletion, ScenarioInterrupted, ScenarioEnd
-from SimTraffic import *
+from core.SimTraffic import *
 from sv.maneuvers.FrenetTrajectory import *
 from sv.maneuvers.Config import *
 from sv.maneuvers.Models import plan_maneuver
 from sv.SDVTrafficState import *
 from sv.SDVRoute import SDVRoute
-from TickSync import TickSync
+from core.TickSync import TickSync
 from util.BoundingBoxes import calculate_rectangular_bounding_box
 
 import sv.planners.btree.BehaviorLayer       as btree

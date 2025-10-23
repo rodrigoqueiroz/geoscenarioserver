@@ -10,20 +10,20 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from multiprocessing import Process
-from TickSync import TickSync
+from core.TickSync import TickSync
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 import datetime
 from signal import signal, SIGTERM, SIGINT
 from PIL import Image, ImageTk
-from SimTraffic import *
+from core.SimTraffic import *
 from SimConfig import *
 from util.Utils import *
 import sv.SDVTrafficState
 from sv.Vehicle import *
-from Actor import *
-from TrafficLight import *
+from core.Actor import *
+from core.TrafficLight import *
 from sp.Pedestrian import *
 from mapping.LaneletMap import get_line_format
 

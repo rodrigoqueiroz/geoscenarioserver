@@ -14,13 +14,13 @@ import time
 from copy import copy
 from multiprocessing import Manager, Array
 
-from Actor import *
+from core.Actor import *
 from shm.SimSharedMemoryServer import *
 from sp.Pedestrian import *
 from sv.Vehicle import Vehicle
-from TrafficLight import TrafficLight
+from core.TrafficLight import TrafficLight
 from requirements import RequirementsChecker
-from Actor import ActorSimState
+from core.Actor import ActorSimState
 
 try:
     from shm.CarlaSync import *

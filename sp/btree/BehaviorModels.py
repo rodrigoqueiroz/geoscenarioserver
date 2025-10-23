@@ -11,7 +11,7 @@ from sp.btree.BTreeInterpreter import *
 from sp.btree.BTreeLeaves import *
 from sp.btree.BTreeRender import *
 from sp.SPPlannerState import TrafficLightState
-from TrafficLight import TrafficLightColor
+from core.TrafficLight import TrafficLightColor
 
 import logging
 log = logging.getLogger(__name__)

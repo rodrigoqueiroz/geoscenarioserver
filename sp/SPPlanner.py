@@ -18,11 +18,11 @@ from sp.ManeuverModels import plan_maneuver
 from sp.btree.BehaviorModels import BehaviorModels
 from sp.SPPlannerState import PedestrianPlannerState, TrafficLightState
 from util.Utils import get_lanelet_entry_exit_points, angle_btwn_vectors
-from TrafficLight import TrafficLightColor
+from core.TrafficLight import TrafficLightColor
 import lanelet2.core
 from mapping.LaneletMap import *
-from Actor import *
-from SimTraffic import *
+from core.Actor import *
+from core.SimTraffic import *
 
 import logging
 log = logging.getLogger(__name__)

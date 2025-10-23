@@ -1,5 +1,5 @@
 import sysv_ipc
-from Actor import *
+from core.Actor import *
 from SimConfig import *
 
 import logging

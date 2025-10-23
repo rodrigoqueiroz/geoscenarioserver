@@ -7,14 +7,14 @@ from sv.SDVTrafficState import *
 import numpy as np
 from copy import copy
 import itertools
-#from TickSync import *
+#from core.TickSync import *
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.core.records import array
 #from multiprocessing import Pool as ThreadPool
 from sv.maneuvers.CostFunctions import maneuver_feasibility, maneuver_cost
 from sv.maneuvers.Config import *
 from SimConfig import *
-from Actor import *
+from core.Actor import *
 from sv.maneuvers.FrenetTrajectory import *
 from typing import Callable
 from sv.maneuvers.Utils import *

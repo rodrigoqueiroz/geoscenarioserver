@@ -11,8 +11,8 @@ from collections import namedtuple
 from typing import Tuple, Dict, List
 
 from mapping.LaneletMap import *
-from Actor import PedestrianState
-from TrafficLight import TrafficLightColor
+from core.Actor import PedestrianState
+from core.TrafficLight import TrafficLightColor
 
 
 TrafficLightState = namedtuple('TrafficLightState', ['color', 'stop_position'])

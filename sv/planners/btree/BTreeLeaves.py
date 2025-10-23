@@ -3,7 +3,7 @@
 #rqueiroz@uwaterloo.ca
 
 from py_trees import *
-from TickSync import TickSync
+from core.TickSync import TickSync
 from sv.maneuvers.Config import *
 import sv.maneuvers.Utils
 
