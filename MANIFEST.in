@@ -1,0 +1,25 @@
+# Include important metadata files
+include README.md
+include LICENSE
+include CONTRIBUTORS
+include WSL2-README.md
+include requirements.txt
+include pixi.toml
+
+# Exclude build artifacts, caches, and outputs
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+prune .pixi
+prune build
+prune dist
+prune outputs
+prune colcon_ws
+prune .git
+prune *.egg-info
+prune geoscenarioserver/scenarios/aaa
+prune geoscenarioserver/scenarios/carla_scenarios
+prune geoscenarioserver/scenarios/eval_scenarios
+prune geoscenarioserver/scenarios/experimental_scenarios
+prune geoscenarioserver/scenarios/nhtsa
+prune geoscenarioserver/scenarios/trees
