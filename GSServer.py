@@ -183,9 +183,8 @@ def verify_map_file(map_file, lanelet_map:LaneletMap):
         log.info("Using UTMProjector")
     lanelet_map.load_lanelet_map(map_file, projector)
 
-
-
-if __name__ == "__main__":
+def main():
+    """Main entry point for GeoScenario Server"""
     parser = ArgumentParser(description="Starts the GeoScenario Server simulation", allow_abbrev=True)
     parser.add_argument("-s", "--scenario", dest="gsfiles", nargs='*', metavar="FILE", default="", help="GeoScenario file. If no file is provided, the GSServer will load a scenario from code")
     parser.add_argument("--verify_map", dest="verify_map", metavar="FILE", default="", help="Lanelet map file")
@@ -209,3 +208,6 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(level=log_level)
     start_server(args)
+
+if __name__ == "__main__":
+    main()
