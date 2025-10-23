@@ -58,8 +58,7 @@ ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
 catkin_tools = "*"
 rosdep = "*"
-colcon-common-extensions = ">=0.3.0,<0.4"
-setuptools = "<=58.2.0"
+colcon-common-extensions = "*"
 deepdiff = "*"
 
 [feature.humble.activation]
