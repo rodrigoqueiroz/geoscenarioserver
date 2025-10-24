@@ -112,7 +112,7 @@ class GSClient(Node):
         elif tick_count == self.previous_tick_count:
             # nothing new yet, delta_time must have increased
             # switch back to a more frequent polling than the delta_time
-            self.timer.timer_period_ns == self.short_timer_period * 1e9
+            self.timer.timer_period_ns = self.short_timer_period * 1e9
             self.frequent_polling_switch_count += 1
             return
 
