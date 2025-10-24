@@ -6,6 +6,13 @@ include WSL2-README.md
 include requirements.txt
 include pixi.toml
 
+graft geoscenarioserver/btrees
+graft geoscenarioserver/dash/img
+graft geoscenarioserver/josm
+graft geoscenarioserver/outputs
+graft geoscenarioserver/scenarios
+graft geoscenarioserver/btrees
+
 # Exclude build artifacts, caches, and outputs
 global-exclude *.pyc
 global-exclude *.pyo

@@ -10,6 +10,7 @@ preview = ["pixi-build"]
 gss = "python3 geoscenarioserver/GSServer.py"
 test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive"
 test_scenario = "bash scripts/run_scenarios.bash --no-dash --single"
+build_wheel = "python3 -m build"
 
 [system-requirements]
 libc = { family = "glibc", version = "2.31" }
