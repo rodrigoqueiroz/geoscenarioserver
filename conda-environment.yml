@@ -1,0 +1,22 @@
+name: gss
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - tk=*=xft_* # use the TrueType variant
+  - antlr4-python3-runtime>=4.13
+  - graphviz
+  - matplotlib
+  - numpy
+  - scipy
+  - requests
+  - pynput
+  - screeninfo
+  - jq
+  - pydot
+  - pip:
+    - antlr-denter
+    - lanelet2
+    - py_trees==0.7.6
+    - sysv-ipc
