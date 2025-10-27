@@ -2706,11 +2706,23 @@ packages:
   build: pyh4616a5c_0
   subdir: noarch
   depends:
-  - python >=3.8
+  - python >=3.11
   - python *
+  - xorg-libxft
+  - antlr4-python3-runtime >=4.13
+  - graphviz
+  - matplotlib
+  - numpy
+  - scipy
+  - requests
+  - pynput
+  - screeninfo
+  - jq >=1.7.1,<2
+  - pydot
+  - qt6-wayland
   license: MIT
   input:
-    hash: f111ff3cdce2c5e888383cf3d7c2abb7a7c6f6e818b4f4fc14ca5522165eebf7
+    hash: 13d6790cd7640c6b6d1e1500d437517fb430922f5fd57060adf1605523f28223
     globs:
     - pyproject.toml
 - conda: https://conda.anaconda.org/conda-forge/linux-64/gettext-0.24.1-h5888daf_0.conda

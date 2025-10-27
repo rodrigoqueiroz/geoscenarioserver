@@ -13,3 +13,4 @@ dist/
 # pixi environments
 .pixi/
 *.egg-info
+*.conda
