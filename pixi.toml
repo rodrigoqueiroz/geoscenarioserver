@@ -55,7 +55,22 @@ name = "pixi-build-python"
 version = "0.4.*"
 
 [package.host-dependencies] 
-hatchling = "==1.26.3"
+hatchling = "*"
+
+[package.run-dependencies]
+python = ">=3.11"
+xorg-libxft = "*"
+antlr4-python3-runtime = ">=4.13"
+graphviz = "*"
+matplotlib = "*"
+numpy = "*"
+scipy = "*"
+requests = "*"
+pynput = "*"
+screeninfo = "*"
+jq = ">=1.7.1,<2"
+pydot = "*"
+qt6-wayland = "*"
 
 [environments]
 default = { solve-group = "common" }

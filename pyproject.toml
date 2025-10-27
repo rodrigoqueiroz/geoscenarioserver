@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "geoscenarioserver"
@@ -33,11 +33,9 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Testing",
 ]
@@ -66,18 +64,6 @@ dependencies = [
     "screeninfo",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "antlr4-tools",
-]
-ros2 = [
-    "deepdiff",
-]
-test = [
-    "pytest>=7.0",
-    "pytest-cov",
-]
-
 [project.urls]
 Homepage = "https://github.com/rodrigoqueiroz/geoscenarioserver"
 Documentation = "https://geoscenario2.readthedocs.io"
@@ -87,87 +73,43 @@ Issues = "https://github.com/rodrigoqueiroz/geoscenarioserver/issues"
 [project.scripts]
 gsserver = "geoscenarioserver.GSServer:main"
 
-[tool.setuptools]
-packages = [
-    "geoscenarioserver",
-    "geoscenarioserver.dash",
-    "geoscenarioserver.gsc",
-    "geoscenarioserver.mapping",
-    "geoscenarioserver.requirements",
-    "geoscenarioserver.shm",
-    "geoscenarioserver.sp",
-    "geoscenarioserver.sp.btree",
-    "geoscenarioserver.sp.btree.parser",
-    "geoscenarioserver.sv",
-    "geoscenarioserver.sv.maneuvers",
-    "geoscenarioserver.sv.planners",
-    "geoscenarioserver.sv.planners.btree",
-    "geoscenarioserver.sv.planners.btree.parser",
-    "geoscenarioserver.sv.planners.ruleEngine",
-    "geoscenarioserver.sv.planners.ruleEngine.extractors",
-    "geoscenarioserver.util",
-]
-include-package-data = true
-
-[tool.setuptools.package-data]
-"geoscenarioserver" = ["*.btree", "*.g4", "*.osm", "*.xsd", "*.xml", "*.css"]
-"geoscenarioserver.dash" = ["*.png"]
-"geoscenarioserver.sp.btree.parser" = ["*.g4"]
-"geoscenarioserver.sv.planners.btree.parser" = ["*.g4"]
-
-[tool.pytest.ini_options]
-testpaths = ["test"]
-python_files = ["test_*.py"]
-addopts = [
-    "--verbose",
-    "--strict-markers",
-]
-
-[tool.black]
-line-length = 120
-target-version = ["py38", "py39", "py310", "py311", "py312"]
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-  | __pycache__
-  | outputs
-  | colcon_ws
-  | \.pixi
-)/
-'''
-
-[tool.isort]
-profile = "black"
-line_length = 120
-skip_gitignore = true
-extend_skip_glob = ["outputs/*", "colcon_ws/*", ".pixi/*"]
-
-[tool.pylint.messages_control]
-max-line-length = 120
-disable = [
-    "C0103",  # Invalid name (lots of single-char variables in math code)
-    "C0114",  # Missing module docstring
-    "R0913",  # Too many arguments (common in simulation code)
-    "R0914",  # Too many local variables
-]
-
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true
+[tool.hatch.build.targets.wheel]
+packages = ["geoscenarioserver"]
 exclude = [
-    "outputs/",
-    "colcon_ws/",
-    ".pixi/",
-    "__pycache__/",
+    "geoscenarioserver/scenarios/aaa",
+    "geoscenarioserver/scenarios/carla_scenarios",
+    "geoscenarioserver/scenarios/eval_scenarios",
+    "geoscenarioserver/scenarios/experimental_scenarios",
+    "geoscenarioserver/scenarios/nhtsa",
+    "geoscenarioserver/scenarios/trees",
+    "geoscenarioserver/outputs",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/geoscenarioserver",
+    "/README.md",
+    "/LICENSE",
+    "/CONTRIBUTORS",
+    "/WSL2-README.md",
+    "/requirements.txt",
+    "/pixi.toml",
+]
+exclude = [
+    "*.pyc",
+    "*.pyo",
+    "__pycache__",
+    "/.pixi",
+    "/build",
+    "/dist",
+    "/outputs",
+    "/colcon_ws",
+    "*.egg-info",
+    "/geoscenarioserver/scenarios/aaa",
+    "/geoscenarioserver/scenarios/carla_scenarios",
+    "/geoscenarioserver/scenarios/eval_scenarios",
+    "/geoscenarioserver/scenarios/experimental_scenarios",
+    "/geoscenarioserver/scenarios/nhtsa",
+    "/geoscenarioserver/scenarios/trees",
+    "/geoscenarioserver/outputs",
 ]
