@@ -5,7 +5,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 ## Dependencies
 
 - Linux or Windows 10/11 + WSL2
-- Python >= 3.8
+- Python >= 3.11
 
 GeoScenario Server can run on Linux natively or in WSL2 on Windows within a [conda](https://conda-forge.org/) environment.
 
@@ -110,10 +110,10 @@ Usage:
 
 ## Running
 
-- run `python3 GSServer.py -s scenarios/<geoscenario_file>` to start the Server.
+- run `gsserver -s scenarios/<geoscenario_file>` to start the Server.
 
 ```
-usage: GSServer.py [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [--dash-pos DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl]
+usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [--dash-pos DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl]
 
 options:
   -h, --help            show this help message and exit
@@ -168,10 +168,35 @@ python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.os
 - Use SHOW_DASHBOARD = True for GUI. Adjust dashboard refresh rate according to performance.
 - Simulations can only run in Real Time (so far).
 
+## Building
+
+To build a `.conda` package, execute
+```
+pixi build
+```
+To test the package in a fresh conda environment, execute
+```
+bash test/test_conda_package.bash
+```
+
+To build a `.whl` package, execute
+```
+pixi run build_wheel
+```
+To test the package in a fresh venv environment, execute
+```
+bash test/test_wheel_package.bash
+```
+
 ## Co-Simulation:
 
 - Use the shared memory keys inside SimConfig to read/write the server shared memory blocks.
-- We provide a GeoScenario Client for Unreal in */unreal*.
+- We provide a GeoScenario Client for Unreal in `clients/unreal`.
+- We provide a ROS2 Client for Humble in `clients/ros2_client`.
+To test the ROS2 client with a mock co-simulator, execute
+```
+bash test/test_ros2_client.bash
+```
 
 ## Documentation:
 
