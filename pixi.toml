@@ -10,7 +10,7 @@ version = "0.1.0"
 preview = ["pixi-build"]
 
 [tasks]
-gss = "python3 geoscenarioserver/GSServer.py"
+gss = "gsserver"
 test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive"
 test_scenario = "bash scripts/run_scenarios.bash --no-dash --single"
 build_wheel = "python3 -m build"
@@ -104,7 +104,7 @@ deepdiff = "*"
 scripts = ["colcon_ws/install/setup.bash"]
 
 [feature.humble.tasks]
-ros_gss = "python3 geoscenarioserver/GSServer.py"
+ros_gss = "gsserver"
 ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash --symlink-install", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client_build_release = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build_release"] }
