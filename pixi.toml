@@ -5,7 +5,7 @@ channels = [
   "https://prefix.dev/conda-forge"
 ]
 name = "gss"
-platforms = ["linux-64", "linux-aarch64", "osx-64", "osx-arm64"]
+platforms = ["linux-64", "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
 version = "0.1.0"
 preview = ["pixi-build"]
 
@@ -26,12 +26,12 @@ scipy = "*"
 requests = "*"
 pynput = "*"
 screeninfo = "*"
-jq = ">=1.7.1,<2"
 pydot = "*"
 ros-humble-lanelet2 = "*"
 geoscenarioserver = { path = "." }
 
 [pypi-dependencies]
+jq = "*"
 antlr-denter = "*"
 py-trees = "==0.7.6"
 sysv-ipc = "*"
@@ -42,7 +42,9 @@ qt6-wayland = "*"
 xorg-libxft = "*"
 tk = { build = "xft_*" }
 
-#[target.osx.dependencies]
+[target.osx.dependencies]
+
+[target.win.dependencies]
 
 [package]
 name = "geoscenarioserver"
@@ -70,7 +72,6 @@ scipy = "*"
 requests = "*"
 pynput = "*"
 screeninfo = "*"
-jq = ">=1.7.1,<2"
 pydot = "*"
 ros-humble-lanelet2 = "*"
 
