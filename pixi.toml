@@ -4,7 +4,7 @@ channels = [
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]
-name = "gss"
+name = "geoscenarioserver"
 platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
 version = "0.1.0"
 preview = ["pixi-build"]
@@ -24,10 +24,10 @@ antlr-denter = "*"
 py-trees = "==0.7.6"
 
 [target.linux.dependencies]
-tk = { build = "xft*" }               # to have true type fonts
+tk = { build = "xft*" }  # to have true type fonts on linux
 
 [package]
-name = "geoscenarioserver"
+name = { workspace = true }
 version = "0.1.0"
 
 [package.build.backend]
@@ -55,11 +55,14 @@ screeninfo = "*"
 pydot = "*"
 ros-humble-lanelet2 = "*"
 
-[package.target.linux.run-dependencies]
+[package.target.unix.run-dependencies]
 sysv_ipc = "*"
+xorg-libxft = "*"
+
+[package.target.linux.run-dependencies]
 libgl-devel = "*"
 qt6-wayland = "*"
-xorg-libxft = "*"
+#tk = { build = "xft*" }  # we want this instead of in [target.linux.dependencies] but pixi has a bug and it's not found
 
 [environments]
 default = { solve-group = "common" }
@@ -79,13 +82,13 @@ cmake = "*"
 pkg-config = "*"
 make = "*"
 ninja = "*"
-ros-humble-ros-core = "*"
-ros-humble-desktop = "*"
-ros-humble-geographic-msgs = "*"
 catkin_tools = "*"
 rosdep = "*"
 colcon-common-extensions = "*"
 deepdiff = "*"
+ros-humble-ros-core = "*"
+ros-humble-desktop = "*"
+ros-humble-geographic-msgs = "*"
 
 [feature.humble.target.unix.activation]
 scripts = ["colcon_ws/install/setup.bash"]

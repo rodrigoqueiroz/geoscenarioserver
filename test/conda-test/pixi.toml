@@ -11,8 +11,10 @@ version = "0.1.0"
 [tasks]
 
 [dependencies]
-tk = { build = "xft*" }
 geoscenarioserver = { path = "geoscenarioserver.conda"}
+
+[target.linux.dependencies]
+tk = { build = "xft*" }  # to have true type fonts on linux
 
 [pypi-dependencies]
 antlr-denter = "*"

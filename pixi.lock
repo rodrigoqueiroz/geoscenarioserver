@@ -2894,12 +2894,12 @@ packages:
   - pydot
   - ros-humble-lanelet2
   - sysv_ipc
+  - xorg-libxft
   - libgl-devel
   - qt6-wayland
-  - xorg-libxft
   license: MIT
   input:
-    hash: efdc25d6b5291083274f9fc1a2b3f2c4244148685d1d4bd79bee9d98017e5cb9
+    hash: 3ed5dcd67c16313b7af20dfbb8452fb3f5e3f7fbc088eac7826802b926873d24
     globs:
     - pyproject.toml
 - conda: https://prefix.dev/conda-forge/linux-64/gettext-0.25.1-h3f43e3d_1.conda
