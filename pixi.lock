@@ -2895,7 +2895,7 @@ packages:
   - ros-humble-lanelet2
   license: MIT
   input:
-    hash: 3ace34e0d633ad657ff06e4cc80bc091cb26216055d230b08f54bed994fef4f7
+    hash: 72700bc28308c623a2966bde881afec368fb3dc1e6848c6abcab1472010874a3
     globs:
     - pyproject.toml
 - conda: https://prefix.dev/conda-forge/linux-64/gettext-0.25.1-h3f43e3d_1.conda

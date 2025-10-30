@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
@@ -94,13 +94,13 @@ include = [
     "/CONTRIBUTORS",
     "/WSL2-README.md",
     "/requirements.txt",
-    "/pixi.toml",
 ]
 exclude = [
     "*.pyc",
     "*.pyo",
     "__pycache__",
     "/.pixi",
+    "/pixi.*",
     "/build",
     "/dist",
     "/outputs",
