@@ -42,10 +42,6 @@ qt6-wayland = "*"
 xorg-libxft = "*"
 tk = { build = "xft_*" }
 
-[target.osx.dependencies]
-
-[target.win.dependencies]
-
 [package]
 name = "geoscenarioserver"
 version = "0.1.0"
