@@ -406,6 +406,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/noarch/six-1.17.0-pyhe01879c_1.conda
       - conda: https://prefix.dev/conda-forge/noarch/sniffio-1.3.1-pyhd8ed1ab_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/spdlog-1.15.3-h6dc744f_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/sysv_ipc-1.1.0-py311h331c9d8_7.conda
       - conda: https://prefix.dev/conda-forge/linux-64/tinyxml2-11.0.0-h3f2d84a_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/tk-8.6.13-xft_h3b7531c_2.conda
       - conda: https://prefix.dev/conda-forge/noarch/tomli-2.3.0-pyhcf101f3_0.conda
@@ -452,7 +453,6 @@ environments:
       - conda: .
       - pypi: https://files.pythonhosted.org/packages/0b/7d/90b9b27e51099deff45ae426157332c8d29448c62df0036efaa28ef3c27b/antlr_denter-1.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7f/e9/e24c577cdc3c11987d00e46b19d0ae0d6a13a895e9bb12081f58aa6b904d/py_trees-0.7.6-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/0c/d7/5d2f861155e9749f981e6c58f2a482d3ab458bf8c35ae24d4b4d5899ebf9/sysv_ipc-1.1.0.tar.gz
   humble:
     channels:
     - url: https://prefix.dev/robostack-humble/
@@ -1176,6 +1176,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/sqlite-3.50.4-hbc0de68_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/svt-av1-3.0.2-h5888daf_0.conda
       - conda: https://prefix.dev/conda-forge/noarch/sysroot_linux-64-2.28-h4ee821c_8.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/sysv_ipc-1.1.0-py311h331c9d8_7.conda
       - conda: https://prefix.dev/conda-forge/linux-64/tbb-2022.3.0-h8d10470_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/tbb-devel-2022.3.0-h74b38a2_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/tinyxml-2.6.2-h4bd325d_2.tar.bz2
@@ -1246,7 +1247,6 @@ environments:
       - conda: .
       - pypi: https://files.pythonhosted.org/packages/0b/7d/90b9b27e51099deff45ae426157332c8d29448c62df0036efaa28ef3c27b/antlr_denter-1.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7f/e9/e24c577cdc3c11987d00e46b19d0ae0d6a13a895e9bb12081f58aa6b904d/py_trees-0.7.6-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/0c/d7/5d2f861155e9749f981e6c58f2a482d3ab458bf8c35ae24d4b4d5899ebf9/sysv_ipc-1.1.0.tar.gz
 packages:
 - conda: https://prefix.dev/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
   sha256: fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726
@@ -2893,9 +2893,13 @@ packages:
   - screeninfo
   - pydot
   - ros-humble-lanelet2
+  - sysv_ipc
+  - libgl-devel
+  - qt6-wayland
+  - xorg-libxft
   license: MIT
   input:
-    hash: 72700bc28308c623a2966bde881afec368fb3dc1e6848c6abcab1472010874a3
+    hash: efdc25d6b5291083274f9fc1a2b3f2c4244148685d1d4bd79bee9d98017e5cb9
     globs:
     - pyproject.toml
 - conda: https://prefix.dev/conda-forge/linux-64/gettext-0.25.1-h3f43e3d_1.conda
@@ -13756,10 +13760,19 @@ packages:
   purls: []
   size: 24210909
   timestamp: 1752669140965
-- pypi: https://files.pythonhosted.org/packages/0c/d7/5d2f861155e9749f981e6c58f2a482d3ab458bf8c35ae24d4b4d5899ebf9/sysv_ipc-1.1.0.tar.gz
-  name: sysv-ipc
-  version: 1.1.0
-  sha256: 0f063cbd36ec232032e425769ebc871f195a7d183b9af32f9901589ea7129ac3
+- conda: https://prefix.dev/conda-forge/linux-64/sysv_ipc-1.1.0-py311h331c9d8_7.conda
+  sha256: 98fad1d10421f21300424f56f52172a440779340a8615499485abbd1b66efecd
+  md5: eb085e5dd45a234b106e17b792b237f0
+  depends:
+  - libgcc-ng >=12
+  - python >=3.11,<3.12.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  license_family: BSD
+  purls:
+  - pkg:pypi/sysv-ipc?source=hash-mapping
+  size: 38981
+  timestamp: 1715423521216
 - conda: https://prefix.dev/conda-forge/linux-64/tbb-2022.3.0-h8d10470_0.conda
   sha256: f2ec146157293a2ba4980e82ad2c62cd916f324d5878edfc3f255b7ad650bbcc
   md5: f3c6f02e1f7def38e1e9e543747676fc

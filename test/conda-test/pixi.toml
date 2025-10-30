@@ -1,6 +1,9 @@
 [workspace]
 authors = ["Michał Antkiewicz <michal.antkiewicz@uwaterloo.ca>"]
-channels = ["conda-forge", "robostack-humble"]
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
 name = "conda-test"
 platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
 version = "0.1.0"
@@ -8,9 +11,9 @@ version = "0.1.0"
 [tasks]
 
 [dependencies]
+tk = { build = "xft*" }
 geoscenarioserver = { path = "geoscenarioserver.conda"}
 
 [pypi-dependencies]
 antlr-denter = "*"
 py-trees = "==0.7.6"
-sysv-ipc = "*"

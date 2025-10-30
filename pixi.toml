@@ -13,34 +13,18 @@ preview = ["pixi-build"]
 gss = "gsserver"
 test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive"
 test_scenario = "bash scripts/run_scenarios.bash --no-dash --single"
-build_wheel = "python3 -m build"
+build_wheel = "python -m build"
 
 [dependencies]
-python = ">=3.11"
-tk = "*"
-antlr4-python3-runtime = ">=4.13"
-graphviz = "*"
-matplotlib = "*"
-numpy = "*"
-scipy = "*"
-requests = "*"
-pynput = "*"
-screeninfo = "*"
-pydot = "*"
-jq = "*"
-ros-humble-lanelet2 = "*"
+jq = "*"                              # used by run_scenarios.bash
 geoscenarioserver = { path = "." }
 
 [pypi-dependencies]
 antlr-denter = "*"
 py-trees = "==0.7.6"
-sysv-ipc = "*"
 
 [target.linux.dependencies]
-libgl-devel = "*"
-qt6-wayland = "*"
-xorg-libxft = "*"
-tk = { build = "xft_*" }
+tk = { build = "xft*" }               # to have true type fonts
 
 [package]
 name = "geoscenarioserver"
@@ -70,6 +54,12 @@ pynput = "*"
 screeninfo = "*"
 pydot = "*"
 ros-humble-lanelet2 = "*"
+
+[package.target.linux.run-dependencies]
+sysv_ipc = "*"
+libgl-devel = "*"
+qt6-wayland = "*"
+xorg-libxft = "*"
 
 [environments]
 default = { solve-group = "common" }
