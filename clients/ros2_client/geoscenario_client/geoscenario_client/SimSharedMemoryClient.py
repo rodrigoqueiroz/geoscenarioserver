@@ -1,1 +1,1 @@
-../../../../shm/SimSharedMemoryClient.py
+../../../../geoscenarioserver/shm/SimSharedMemoryClient.py

@@ -1,0 +1,116 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "geoscenarioserver"
+version = "0.1.0"
+description = "Traffic scenario simulation framework for GeoScenario2"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "CONTRIBUTORS"]
+authors = [
+    {name = "Rodrigo Queiroz"},
+    {name = "Divit Sharma"},
+    {name = "Ricardo Caldas"},
+    {name = "Michał Antkiewicz"},
+    {name = "Scott Larter"},
+    {name = "Michael Sawyer"},
+    {name = "Ian Colwell"},
+    {name = "Alex Eliasmith"},
+    {name = "Frédéric Bouchard"},
+    {name = "Charlie Zheng"},
+    {name = "Shourrya Guha"},
+]
+maintainers = [
+    {name = "Rodrigo Queiroz", email = "rqueiroz@uwaterloo.ca"},
+    {name = "Michał Antkiewicz", email = "michal.antkiewicz@uwaterloo.ca"},
+]
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Testing",
+]
+keywords = [
+    "automated-vehicles",
+    "simulation",
+    "behavior-trees",
+    "motion-planning",
+    "frenet-frame",
+    "scenario-testing",
+    "lanelet2",
+]
+
+dependencies = [
+    "tk",
+    "antlr4-python3-runtime>=4.13",
+    "antlr-denter",
+    "lanelet2",
+    "matplotlib",
+    "numpy",
+    "scipy",
+    "py_trees==0.7.6",
+    "sysv-ipc",
+    "pydot",
+    "requests",
+    "pynput",
+    "screeninfo",
+]
+
+[project.urls]
+Homepage = "https://github.com/rodrigoqueiroz/geoscenarioserver"
+Documentation = "https://geoscenario2.readthedocs.io"
+Repository = "https://github.com/rodrigoqueiroz/geoscenarioserver"
+Issues = "https://github.com/rodrigoqueiroz/geoscenarioserver/issues"
+
+[project.scripts]
+gsserver = "geoscenarioserver.GSServer:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["geoscenarioserver"]
+exclude = [
+    "geoscenarioserver/scenarios/aaa",
+    "geoscenarioserver/scenarios/carla_scenarios",
+    "geoscenarioserver/scenarios/eval_scenarios",
+    "geoscenarioserver/scenarios/experimental_scenarios",
+    "geoscenarioserver/scenarios/nhtsa",
+    "geoscenarioserver/scenarios/trees",
+    "geoscenarioserver/outputs",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/geoscenarioserver",
+    "/README.md",
+    "/LICENSE",
+    "/CONTRIBUTORS",
+    "/WSL2-README.md",
+    "/requirements.txt",
+]
+exclude = [
+    "*.pyc",
+    "*.pyo",
+    "__pycache__",
+    "/.pixi",
+    "/pixi.*",
+    "/build",
+    "/dist",
+    "/outputs",
+    "/colcon_ws",
+    "*.egg-info",
+    "/geoscenarioserver/scenarios/aaa",
+    "/geoscenarioserver/scenarios/carla_scenarios",
+    "/geoscenarioserver/scenarios/eval_scenarios",
+    "/geoscenarioserver/scenarios/experimental_scenarios",
+    "/geoscenarioserver/scenarios/nhtsa",
+    "/geoscenarioserver/scenarios/trees",
+    "/geoscenarioserver/outputs",
+]

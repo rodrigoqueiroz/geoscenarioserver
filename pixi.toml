@@ -1,24 +1,49 @@
-[project]
+[workspace]
 authors = [ "See CONTRIBUTORS" ]
-channels = ["https://fast.prefix.dev/conda-forge"]
-name = "gss"
-platforms = ["linux-64"]
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+name = "geoscenarioserver"
+platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
 version = "0.1.0"
+preview = ["pixi-build"]
 
 [tasks]
-gss = "python3 GSServer.py"
+gss = "gsserver"
 test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive"
 test_scenario = "bash scripts/run_scenarios.bash --no-dash --single"
-
-[system-requirements]
-libc = { family = "glibc", version = "2.31" }
+build_wheel = "python -m build"
 
 [dependencies]
-gcc ="*"
-python = "3.11.*"
-pip = "*"
-xorg-libxft = "*"
-tk = { build = "xft_*" }
+jq = "*"                              # used by run_scenarios.bash
+geoscenarioserver = { path = "." }
+
+[pypi-dependencies]
+antlr-denter = "*"
+py-trees = "==0.7.6"
+
+[target.linux.dependencies]
+tk = { build = "xft*" }  # to have true type fonts on linux
+
+[package]
+name = { workspace = true }
+version = "0.1.0"
+
+[package.build.backend]
+channels = [
+  "https://prefix.dev/pixi-build-backends",
+  "https://prefix.dev/conda-forge",
+]
+name = "pixi-build-python"
+version = ">=0.4.1"
+
+[package.host-dependencies] 
+hatchling = "*"
+
+[package.run-dependencies]
+python = ">=3.11"
+tk = "*"
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
 matplotlib = "*"
@@ -27,18 +52,17 @@ scipy = "*"
 requests = "*"
 pynput = "*"
 screeninfo = "*"
-jq = ">=1.7.1,<2"
 pydot = "*"
-qt6-wayland = "*"
+ros-humble-lanelet2 = "*"
 
-[pypi-dependencies]
-antlr-denter = "*"
-lanelet2 = "*"
-py-trees = "==0.7.6"
-sysv-ipc = "*"
+[package.target.unix.run-dependencies]
+sysv_ipc = "*"
+xorg-libxft = "*"
 
-[target.linux.dependencies]
+[package.target.linux.run-dependencies]
 libgl-devel = "*"
+qt6-wayland = "*"
+#tk = { build = "xft*" }  # we want this instead of in [target.linux.dependencies] but pixi has a bug and it's not found
 
 [environments]
 default = { solve-group = "common" }
@@ -46,28 +70,31 @@ humble = { features = ["humble"], solve-group = "common" }
 antlr = { features = ["antlr"], no-default-feature = true }
 
 [feature.humble]
-channels = ["https://prefix.dev/robostack-humble"]
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
 
 [feature.humble.dependencies]
+python = ">=3.11"
 compilers = "*"
 cmake = "*"
 pkg-config = "*"
 make = "*"
 ninja = "*"
+catkin_tools = "*"
+rosdep = "*"
+colcon-common-extensions = "*"
+deepdiff = "*"
 ros-humble-ros-core = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
-catkin_tools = "*"
-rosdep = "*"
-colcon-common-extensions = ">=0.3.0,<0.4"
-setuptools = "<=58.2.0"
-deepdiff = "*"
 
-[feature.humble.activation]
+[feature.humble.target.unix.activation]
 scripts = ["colcon_ws/install/setup.bash"]
 
 [feature.humble.tasks]
-ros_gss = "python3 GSServer.py"
+ros_gss = "gsserver"
 ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash --symlink-install", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client_build_release = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build_release"] }
@@ -81,4 +108,4 @@ rqt_topic = { cmd = "rqt -s rqt_topic.topic.Topic", depends-on = ["ros_client_bu
 antlr4-tools = "*"
 
 [feature.antlr.tasks]
-regenerate = "antlr4 -Dlanguage=Python3 sv/planners/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 sp/btree/parser/BTreeDSL.g4"
+regenerate = "antlr4 -Dlanguage=Python3 geoscenarioserver/sv/planners/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 geoscenarioserver/sp/btree/parser/BTreeDSL.g4"

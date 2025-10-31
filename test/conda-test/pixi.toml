@@ -1,0 +1,21 @@
+[workspace]
+authors = ["Michał Antkiewicz <michal.antkiewicz@uwaterloo.ca>"]
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+name = "conda-test"
+platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+geoscenarioserver = { path = "geoscenarioserver.conda"}
+
+[target.linux.dependencies]
+tk = { build = "xft*" }  # to have true type fonts on linux
+
+[pypi-dependencies]
+antlr-denter = "*"
+py-trees = "==0.7.6"
