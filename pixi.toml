@@ -94,7 +94,8 @@ ros-humble-geographic-msgs = "*"
 scripts = ["colcon_ws/install/setup.bash"]
 
 [feature.humble.tasks]
-ros_gss = "gsserver"
+gss = "gsserver"
+ros_gss = { cmd = "ros2 run geoscenario_server geoscenario_server", depends-on = ["ros_client_build_release"] }
 ros_client_build = { cmd = "bash scripts/pixi_build_ros2_client.bash --symlink-install", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client_build_release = { cmd = "bash scripts/pixi_build_ros2_client.bash", outputs = ["colcon_ws/install/setup.bash"] }
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_client_build_release"] }

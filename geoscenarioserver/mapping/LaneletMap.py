@@ -7,6 +7,8 @@
 # Class to parse a Lanelet 2 map and interface with lanelet2 library
 # --------------------------------------------
 
+
+
 import lanelet2
 from lanelet2.core import getId, BasicPoint2d, BasicPoint3d, Point3d, Point2d, ConstPoint2d, ConstPoint3d, BoundingBox2d, BoundingBox3d, LineString3d, LineString2d, ConstLineString2d, ConstLineString3d, Lanelet, RegulatoryElement, TrafficLight, AllWayStop, RightOfWay
 from lanelet2.geometry import distance, to2D, boundingBox2d, boundingBox3d, inside, toArcCoordinates, project, length2d, findNearest, intersects2d, intersects3d
@@ -20,6 +22,23 @@ from geoscenarioserver.util.Utils import pairwise
 
 import logging
 log = logging.getLogger(__name__)
+
+def verify_lanelet_map_file(self, map_file):
+    try:
+        from lanelet2.projection import LocalCartesianProjector
+        use_local_cartesian=True
+    except ImportError:
+        from lanelet2.projection import UtmProjector
+        use_local_cartesian=False
+
+    lanelet_map = LaneletMap()
+    if use_local_cartesian:
+        projector = LocalCartesianProjector(lanelet2.io.Origin(43.4681668322, -80.5436763174, 302))
+        log.info("Using LocalCartesianProjector")
+    else:
+        projector = UtmProjector(lanelet2.io.Origin(43.4681668322, -80.5436763174, 302))
+        log.info("Using UTMProjector")
+    lanelet_map.load_lanelet_map(map_file, projector)
 
 class LaneletMap(object):
     def __init__(self):

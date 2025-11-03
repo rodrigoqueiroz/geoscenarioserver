@@ -17,6 +17,9 @@ from tkinter.font import Font
 import datetime
 import signal
 from PIL import Image, ImageTk
+import screeninfo
+from pynput import keyboard
+
 from geoscenarioserver.SimTraffic import *
 from geoscenarioserver.SimConfig import *
 from geoscenarioserver.util.Utils import *
@@ -37,6 +40,62 @@ def draw_square(anchor_x, anchor_y, size, collection=None, facecolor='none'):
         facecolor = 'none' if collection.is_empty() else 'k'
 
     return plt.Rectangle((anchor_x,  anchor_y), size, size, linewidth=1, zorder=2, edgecolor='k', facecolor=facecolor)
+
+def wait_for_input(show_dashboard, dashboard_position, screen_param):
+    if not show_dashboard:
+        input("Press [ENTER] to start...")
+    else:
+        #create a small window
+        def on_enter(key):
+            if key == keyboard.Key.enter:
+                start_window.after(0, start_window.quit())
+        
+        pos_x = screen_param[0]
+        pos_y = screen_param[1]
+        
+        start_window = tk.Tk()
+        set_width = 300
+        set_height = 200
+
+        if dashboard_position:
+            #place in the middle of the dashboard
+            pos_x = dashboard_position[0] + dashboard_position[2] // 2 - set_width // 2
+            pos_y = dashboard_position[1] + dashboard_position[3] // 2 - set_height // 2
+        else:
+            pos_x += (screen_param[2] - set_width) // 2
+            pos_y += (screen_param[3] - set_height) // 2
+        
+        # Apply position
+        start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")
+
+        #set window text
+        instructions = tk.Label(start_window, text="Press [ENTER] to start...")
+        instructions.pack(expand=True)
+
+        start_window.lift()
+        start_window.attributes('-topmost', True)
+        start_window.focus_force()
+
+        listener = keyboard.Listener(on_press=on_enter)
+        listener.start()
+
+        start_window.mainloop()
+        start_window.destroy()
+
+def get_screen_parameters(dashboard_position):
+    if dashboard_position:
+        screen_param = dashboard_position
+    else:
+        #find screen info 
+        monitors = screeninfo.get_monitors()
+        # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
+        primary_monitor = monitors[0]
+        for monitor in monitors:
+            if monitor.is_primary:
+                primary_monitor = monitor
+                break
+        screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
+    return screen_param
 
 class Dashboard(object):
     MAP_FIG_ID = 1
