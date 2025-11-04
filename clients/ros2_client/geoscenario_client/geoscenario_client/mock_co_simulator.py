@@ -55,12 +55,9 @@ class MockCoSimulator(Node):
 
         # if target_dt <= 0.0 assume external control
         if self.target_dt > 0.0:
-            # Update internal tracking
-            self.simulation_time = msg.simulation_time
 
-            # Set message fields for next simulation step
-            msg.delta_time = self.target_dt  # How much time to advance
-            msg.simulation_time = self.simulation_time + self.target_dt
+            # How much time to advance on the server
+            msg.delta_time = self.target_dt  
 
             # Optional sleep for visualization/debugging (if real_time_factor > 0)
             if self.rt_factor > 0:
@@ -68,7 +65,7 @@ class MockCoSimulator(Node):
                 time.sleep(sleep_duration)
 
             # Check for simulation completion
-            if self.max_sim_time != -1 and self.simulation_time >= self.max_sim_time:
+            if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
                 return
 
         # Publish to drive server forward
