@@ -30,7 +30,6 @@ class LaneletMap(object):
         self.all_way_stops = None
 
     @staticmethod
-
     def verify_map(map_file):
         try:
             from lanelet2.projection import LocalCartesianProjector
