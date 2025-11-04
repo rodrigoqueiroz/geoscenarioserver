@@ -9,7 +9,7 @@
 from argparse import ArgumentParser
 
 from geoscenarioserver.GSServerBase import GSServerBase
-from geoscenarioserver.geoscenarioserver.mapping.LaneletMap import LaneletMap, verify_lanelet_map_file
+from geoscenarioserver.mapping.LaneletMap import LaneletMap, verify_lanelet_map_file
 from geoscenarioserver.dash.Dashboard import *
 from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick
 from geoscenarioserver.SimTraffic import SimTraffic

@@ -23,7 +23,7 @@ class GSServerBase:
             btree_paths.extend(btree_locations.split(":"))
             btree_paths.append(base_btree_location)
         else:
-            btree_locations = [base_btree_location]
+            btree_paths = [base_btree_location]
         log.info("Btree search locations set (in order) as: " + str(btree_locations))
         return btree_paths
     
