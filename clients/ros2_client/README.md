@@ -1,19 +1,34 @@
-# GeoScenarioServer shared memory client for ROS2
+# Mock Co-Simulator for GeoScenarioServer
 
-The `ros2_client` interfaces between GSS shared memory and ROS2 topics:
-1. reads from GSS shared memory block for server and publishes to `/tick`
-2. subscribes to `/tick_from_client` and writes to GSS shared memory block for client
+Lock-step co-simulator node that drives GeoScenarioServer simulation forward by publishing delta_time values and controlling external vehicle motion.
+
+## Lock-Step Flow
+
+1. Server publishes current state on `/gs/tick`
+2. Mock co-simulator receives state and updates external vehicles
+3. Mock co-simulator publishes next step on `/gs/tick_from_client`
+4. Server advances simulation by delta_time
+5. Repeat until max_simulation_time reached
 
 ## Usage
 
+```bash
+ros2 run geoscenario_client mock_co_simulator
 ```
-ros2 run geoscenario_client geoscenario_client [--ros-args -p wgs84:=true]
+
+## Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `target_delta_time` | 0.025 | Simulation timestep in seconds (40 Hz) |
+| `real_time_factor` | 1.0 | Speed multiplier (0=max speed, 1=real-time, >1=slower) |
+| `max_simulation_time` | 30.0 | Auto-shutdown timeout in seconds (-1 for no limit) |
+
+## Example
+
+```bash
+ros2 run geoscenario_client mock_co_simulator --ros-args \
+  -p target_delta_time:=0.05 \
+  -p real_time_factor:=0.5 \
+  -p max_simulation_time:=60.0
 ```
-
-The client publishes the coordinates in a local cartesian frame defined by the scenario's origin. 
-The argument `wgs84:=true` (`false` by default) changes the coordinate frame to WGS84 instead of local cartesian coordinates.
-
-A ROS2 subscriber to `/tick` can determine that WGS84 coordinates are used if `/tick/origin=(0,0,0)`.
-
-The client can execute a round-trip test: store values from server shared memory, convert to WGS84, send to mock co-simulator, receive, convert from WGS84, compare with stored.
-The argument `roundtriptest:=true` (`false` by default) enables this round-trip test.

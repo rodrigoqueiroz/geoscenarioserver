@@ -73,7 +73,7 @@ if [[ ${ARG_ROS2} == "true" ]]; then
         echo ""
         echo "-------------------------------"
         echo "To run the ROS2 client, execute"
-        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/colcon_ws/install/setup.bash && ros2 run geoscenario_client geoscenario_client'"
+        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/colcon_ws/install/setup.bash && ros2 run geoscenario_client mock_co_simulator'"
     else
         echo "Failed to install ROS2 and build the GSS ROS2 client."
     fi
