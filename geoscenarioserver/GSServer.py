@@ -7,12 +7,12 @@
 # --------------------------------------------
 
 from argparse import ArgumentParser
+import os
 
 from geoscenarioserver.GSServerBase import GSServerBase
-from geoscenarioserver.mapping.LaneletMap import LaneletMap, verify_lanelet_map_file
-from geoscenarioserver.dash.Dashboard import *
+from geoscenarioserver.mapping.LaneletMap import verify_lanelet_map_file
+from geoscenarioserver.dash.Dashboard import wait_for_input, get_screen_parameters
 from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick
-from geoscenarioserver.SimTraffic import SimTraffic
 from geoscenarioserver.TickSync import TickSync
 
 import logging
@@ -24,56 +24,55 @@ class GSServer(GSServerBase):
         super().__init__()
 
     def construct_sim_config(self, args):
-        sim_config = SimConfig()
-
-        sim_config.show_dashboard = not args.no_dash
-        sim_config.wait_for_input = args.wait_for_input
-        sim_config.wait_for_client = args.wait_for_client
-
-        return sim_config
+        """
+        Configure SimConfig based on command-line arguments
+        Note: sim_config is created by initialize_core_components()
+        """
+        self.sim_config.show_dashboard = not args.no_dash
+        self.sim_config.wait_for_input = args.wait_for_input
+        self.sim_config.wait_for_client = args.wait_for_client
 
     def start(self, args):
         # log.setLevel("INFO")
         log.info('GeoScenario server START')
 
-        lanelet_map = LaneletMap()
-
-        sim_config = self.construct_sim_config(args)
+        # Initialize core components using base class method
+        self.initialize_core_components()
+        self.construct_sim_config(args)
         btree_locations = self.parse_btree_paths(args.btree_locations)
 
-        # use sim_config after all modifications
-        traffic = SimTraffic(lanelet_map, sim_config)
-
         # SCENARIO SETUP
-        if not self.construct_scenario(args.gsfiles, traffic, sim_config, lanelet_map, args.map_path, btree_locations):
+        if not self.construct_scenario(args.gsfiles, self.traffic, self.sim_config, self.lanelet_map, args.map_path, btree_locations):
             log.error("Failed to load scenario")
             return
 
-        sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
-        sync_global.set_timeout(sim_config.timeout)
+        sync_global = TickSync(rate=self.sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
+        sync_global.set_timeout(self.sim_config.timeout)
 
         screen_param = get_screen_parameters(args.dash_pos)
 
-        if sim_config.wait_for_input:
-            wait_for_input(sim_config.show_dashboard, args.dash_pos, screen_param)
+        if self.sim_config.wait_for_input:
+            wait_for_input(self.sim_config.show_dashboard, args.dash_pos, screen_param)
 
         #SIM EXECUTION START
         log.info('SIMULATION START')
-        traffic.start()
+        self.start_traffic()
 
-        #GUI / Debug screen
-        if sim_config.show_dashboard:
-            dashboard = Dashboard(traffic, sim_config, screen_param)
-            dashboard.start()
+        #GUI / Debug screen - using base class method
+        self.setup_dashboard(args.dash_pos)
 
         dashboard_interrupted = False
         while sync_global.tick():
-            if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+            # Check if dashboard is alive using base class method
+            if self.sim_config.show_dashboard and not self.is_dashboard_alive():
                 dashboard_interrupted = True
                 break
             try:
+                # Update simulation state tracking
+                self.update_simulation_state(sync_global.tick_count, sync_global.delta_time, sync_global.sim_time)
+
                 #Update Traffic
-                sim_status = traffic.tick(
+                sim_status = self.traffic.tick(
                     sync_global.tick_count,
                     sync_global.delta_time,
                     sync_global.sim_time
@@ -86,12 +85,11 @@ class GSServer(GSServerBase):
             except Exception as e:
                 log.error(e)
                 break
-            
-        sync_global.write_performance_log()
-        traffic.stop_all(dashboard_interrupted)
 
-        if sim_config.show_dashboard and dashboard._process.is_alive():
-            dashboard.quit()
+        sync_global.write_performance_log()
+
+        # Shutdown using unified base class method
+        self.shutdown(interrupted=dashboard_interrupted)
 
         #SIM END
         log.info('SIMULATION END')
