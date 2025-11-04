@@ -1,26 +1,73 @@
+"""
+Mock Co-Simulator for GeoScenario Server
+
+This module implements a mock co-simulator client that interacts with the GeoScenario server.
+It subscribes to tick messages from the server, updates vehicle and pedestrian states,
+and publishes updated tick messages back to the server. 
+
+This module can run with or without the geoscenario_client. The default parameters are configured assuming
+that the geoscenario_client is running. For standalone operation, set the target_delta_time to > 0.0.
+
+"""
+
 import math
+
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
+from rclpy.timer import Rate
 
 from geoscenario_msgs.msg import Tick
 
 class MockCoSimulator(Node):
     def __init__(self):
         super().__init__('mock_co_simulator')
-        
+
+        # Declare ROS2 parameters with defaults
+        self.declare_parameter('target_delta_time', 0.0)  # The amount of simulation time to advance each tick, if 0 assume outside control
+        self.declare_parameter('real_time_factor', 0.0)   # 0 = max speed, 1 = real-time, >1 = slower than real-time
+        self.declare_parameter('max_simulation_time', -1) # Auto-shutdown timeout, -1 for no limit
+
+        # Retrieve parameter values
+        self.target_dt = self.get_parameter('target_delta_time').value
+        self.rt_factor = self.get_parameter('real_time_factor').value
+        self.max_sim_time = self.get_parameter('max_simulation_time').value
+
+        self.rate = None
+        if self.rt_factor > 0.0 and self.target_dt > 0.0:
+            self.rate = self.create_rate(1.0/(self.target_dt * self.rt_factor))
+
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
         self.get_logger().info('Mock co-simulator started...')
 
     def tick_from_server(self, msg):
+        # Update external vehicle positions using circular motion
         for v in msg.vehicles:
             v.active = True
             if v.type == '2': # EV_TYPE
+                # Update position (circular motion pattern)
                 v.position.x -= math.sin(msg.simulation_time)
                 v.position.y += math.cos(msg.simulation_time)
+
         for p in msg.pedestrians:
             p.active = True
+
+        # if target_dt <= 0.0 assume external control
+        if self.target_dt > 0.0:
+
+            # How much time to advance on the server
+            msg.delta_time = self.target_dt  
+
+            # Optional sleep for visualization/debugging (if real_time_factor > 0)
+            if self.rate:
+                self.rate.sleep()
+
+            # Check for simulation completion
+            if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
+                return
+
+        # Publish to drive server forward
         self.tick_pub.publish(msg)
 
 def main(args=None):
