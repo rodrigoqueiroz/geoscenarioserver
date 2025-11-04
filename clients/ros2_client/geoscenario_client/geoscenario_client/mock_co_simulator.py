@@ -16,16 +16,12 @@ import time
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
-from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSHistoryPolicy
 
 from geoscenario_msgs.msg import Tick
 
 class MockCoSimulator(Node):
     def __init__(self):
         super().__init__('mock_co_simulator')
-
-        # Simulation state tracking
-        self.simulation_time = 0.0
 
         # Declare ROS2 parameters with defaults
         self.declare_parameter('target_delta_time', 0.0)  # The amount of simulation time to advance each tick, if 0 assume outside control
