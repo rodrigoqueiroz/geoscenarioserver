@@ -11,11 +11,11 @@ that the geoscenario_client is running. For standalone operation, set the target
 """
 
 import math
-import time
 
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
+from rclpy.timer import Rate
 
 from geoscenario_msgs.msg import Tick
 
@@ -32,6 +32,10 @@ class MockCoSimulator(Node):
         self.target_dt = self.get_parameter('target_delta_time').value
         self.rt_factor = self.get_parameter('real_time_factor').value
         self.max_sim_time = self.get_parameter('max_simulation_time').value
+
+        self.rate = None
+        if self.rt_factor > 0.0 and self.target_dt > 0.0:
+            self.rate = self.create_rate(1.0/(self.target_dt * self.rt_factor))
 
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
@@ -56,9 +60,8 @@ class MockCoSimulator(Node):
             msg.delta_time = self.target_dt  
 
             # Optional sleep for visualization/debugging (if real_time_factor > 0)
-            if self.rt_factor > 0:
-                sleep_duration = self.target_dt * self.rt_factor
-                time.sleep(sleep_duration)
+            if self.rate:
+                self.rate.sleep()
 
             # Check for simulation completion
             if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
