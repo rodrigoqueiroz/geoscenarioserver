@@ -161,7 +161,14 @@ class Dashboard(object):
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
             if sim_time == previous_sim_time:
-                    return
+                # In lock-step mode, sim_time may stay at 0.0 while waiting for first client tick
+                # Don't exit during initialization - just skip rendering this frame
+                if previous_sim_time == 0.0 and tickcount == 0:
+                    continue  # Waiting for simulation to start
+                elif previous_sim_time > 0.0:
+                    return  # Simulation has stalled or ended
+                else:
+                    continue  # Skip redundant frame
             previous_sim_time = sim_time
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
