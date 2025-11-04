@@ -29,6 +29,25 @@ class LaneletMap(object):
         self.stop_signs = None
         self.all_way_stops = None
 
+    @staticmethod
+
+    def verify_map(map_file):
+        try:
+            from lanelet2.projection import LocalCartesianProjector
+            use_local_cartesian=True
+        except ImportError:
+            from lanelet2.projection import UtmProjector
+            use_local_cartesian=False
+
+        lanelet_map = LaneletMap()
+        if use_local_cartesian:
+            projector = LocalCartesianProjector(lanelet2.io.Origin(43.4681668322, -80.5436763174, 302))
+            log.info("Using LocalCartesianProjector")
+        else:
+            projector = UtmProjector(lanelet2.io.Origin(43.4681668322, -80.5436763174, 302))
+            log.info("Using UTMProjector")
+        lanelet_map.load_lanelet_map(map_file, projector)
+
     def load_lanelet_map(self, filename, projector):
         self.lanelet_map, errors = lanelet2.io.loadRobust(filename, projector)
         assert not errors, log.error(errors)
