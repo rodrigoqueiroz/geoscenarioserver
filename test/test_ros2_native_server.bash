@@ -14,10 +14,11 @@ REPO_DIR=$(dirname "$SCRIPT_DIR")
 
 cd ${REPO_DIR}
 pixi run ros_client_build_release
+sleep 2  # Allow pixi to update build cache before launching dependent tasks
 pixi run rqt_topic &
 pixi run ros_mock_co_simulator --ros-args \
-    -p target_delta_time:=1.0 \
-    -p max_simulation_time:=10 \
+    -p target_delta_time:=0.025 \
+    -p max_simulation_time:=10.0 \
     -p real_time_factor:=1.0 &
 
 pixi run ros_native_gss --ros-args \
