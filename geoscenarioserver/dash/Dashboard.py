@@ -166,7 +166,7 @@ class Dashboard(object):
             if sim_time == previous_sim_time:
                 # In lock-step mode, sim_time may stay at 0.0 while waiting for first client tick
                 # Don't exit during initialization - just skip rendering this frame
-                # if delta_time is larger than DASH_RATE, then just wait
+                # if delta_time is slower than DASH_RATE, then just wait since it'll have many ticks before states update
                 if (previous_sim_time == 0.0 and tickcount == 0) or (1.0/delta_time < DASH_RATE):
                     continue  # Waiting for simulation to start
                 elif previous_sim_time > 0.0:
