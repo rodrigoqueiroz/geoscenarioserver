@@ -2,7 +2,7 @@
 set -e
 
 if [ -z $1 ]; then
-    echo "Usage: $0 <fastest|--realtime|--2xrealtime> [scenario_file]"
+    echo "Usage: $0 [--fastest|--realtime|--2xrealtime] [scenario_file]"
     echo "  --fastest : Run the test with the as fast as possible time control, runs simulation till scenario completion"
     echo "  --realtime : Run the test in real-time time for max 30 simualted seconds"
     echo "  --2xrealtime : Run the test with 2x faster than real-time for max 30 simualted seconds"
@@ -34,7 +34,7 @@ else
 fi
 
 cd ${REPO_DIR}
-pixi run ros_client_build_release
+pixi run ros_build_release
 sleep 2  # Allow pixi to update build cache before launching dependent tasks
 pixi run rqt_topic &
 

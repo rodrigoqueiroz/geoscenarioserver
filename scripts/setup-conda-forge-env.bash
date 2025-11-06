@@ -66,14 +66,12 @@ if [[ ${ARG_ROS2} == "true" ]]; then
     if [[ $? == 0 ]]; then
         echo "ROS2 installed successfully. Building the GSS ROS2 client..."
         echo ""
-        mkdir -p ${REPO_DIR}/colcon_ws/src
-        ln -sfn ${REPO_DIR}/clients/ros2_client ${REPO_DIR}/colcon_ws/src/ros2_client
-        cd ${REPO_DIR}/colcon_ws
+        cd ${REPO_DIR}/ros2
         $MAMBA_EXE -n gss run colcon build
         echo ""
         echo "-------------------------------"
         echo "To run the ROS2 client, execute"
-        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/colcon_ws/install/setup.bash && ros2 run geoscenario_client geoscenario_client'"
+        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/ros2/install/setup.bash && ros2 run geoscenario_client geoscenario_client'"
     else
         echo "Failed to install ROS2 and build the GSS ROS2 client."
     fi

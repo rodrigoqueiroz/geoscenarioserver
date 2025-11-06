@@ -104,7 +104,7 @@ exclude = [
     "/build",
     "/dist",
     "/outputs",
-    "/colcon_ws",
+    "/ros2",
     "*.egg-info",
     "/geoscenarioserver/scenarios/aaa",
     "/geoscenarioserver/scenarios/carla_scenarios",

@@ -1,6 +1,18 @@
+# Native ROS2 GeoScenarioServer
+
+The `ros2/geoscenario_server` wraps GSServer into a ROS2 node
+1. publishes server state to `/tick`
+2. subscribes to `/tick_from_client` and updates server state for external vehicles. 
+
+## Usage
+
+```
+ros2 run geoscenario_server geoscenario_server [--ros-args -p scenario_files -p no_dashboard -p map_path -p btree_locations -p dashboard_position -p wgs84 ]
+```
+
 # GeoScenarioServer shared memory client for ROS2
 
-The `ros2_client` interfaces between GSS shared memory and ROS2 topics:
+The `ros2/geoscenario_client` interfaces between GSS shared memory and ROS2 topics:
 1. reads from GSS shared memory block for server and publishes to `/tick`
 2. subscribes to `/tick_from_client` and writes to GSS shared memory block for client
 
