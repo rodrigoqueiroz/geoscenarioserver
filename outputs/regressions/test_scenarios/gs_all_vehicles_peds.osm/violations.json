@@ -1,1 +1,1 @@
-{"1": {}}
+{"1": {"38": {"CollisionWithVehicle": {"collections": {"vehicles": {"alias": "v_2", "id": 2}}, "message": "v_1 bounding box overlapped with the vehicle agent v_2"}}}}
