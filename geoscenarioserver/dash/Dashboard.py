@@ -86,7 +86,7 @@ def get_screen_parameters(dashboard_position):
     """
         Get screen parameters for dashboard placement
     """
-    if dashboard_position:
+    if dashboard_position and len(dashboard_position) == 4:
         screen_param = dashboard_position
     else:
         #find screen info 
