@@ -35,7 +35,7 @@ fi
 
 cd ${REPO_DIR}
 pixi run ros_build_release
-sleep 2  # Allow pixi to update build cache before launching dependent tasks
+
 pixi run rqt_topic &
 
 pixi run ros_mock_co_simulator --ros-args \
