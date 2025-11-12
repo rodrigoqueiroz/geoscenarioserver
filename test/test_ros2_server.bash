@@ -4,8 +4,8 @@ set -e
 if [ -z $1 ]; then
     echo "Usage: $0 [--fastest|--realtime|--2xrealtime] [scenario_file]"
     echo "  --fastest : Run the test with the as fast as possible time control, runs simulation till scenario completion"
-    echo "  --realtime : Run the test in real-time time for max 30 simualted seconds"
-    echo "  --2xrealtime : Run the test with 2x faster than real-time for max 30 simualted seconds"
+    echo "  --realtime : Run the test in real-time time for max 30 simulated seconds"
+    echo "  --2xrealtime : Run the test with 2x faster than real-time for max 30 simulated seconds"
     echo "  [scenario_file] : Optional scenario file to use (gs_all_vehicles_peds.osm by default)"
     exit 1
 fi  
