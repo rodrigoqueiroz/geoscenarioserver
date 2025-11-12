@@ -96,8 +96,8 @@ scripts = ["ros2/install/setup.bash"]
 [feature.humble.tasks]
 ros_gss = "gsserver"
 ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", depends-on = ["ros_build_release"] }
-ros_build = { cmd = "bash scripts/build_ros2.bash --symlink-install", outputs = ["ros2/install/setup.bash"] }
-ros_build_release = { cmd = "bash scripts/build_ros2.bash", outputs = ["ros2/install/setup.bash"] }
+ros_build = { cmd = "colcon build --symlink-install", cwd="ros2", outputs = ["ros2/install/setup.bash"] }
+ros_build_release = { cmd = "colcon build", cwd="ros2", outputs = ["ros2/install/setup.bash"] }
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_build_release"] }
 ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", depends-on = ["ros_build_release"] }
 ros_client_wgs84_roundtriptest = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", depends-on = ["ros_build_release"] }
