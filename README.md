@@ -38,32 +38,34 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 
 To automatically install the dependencies, execute
 
-```
+```bash
 bash scripts/install_dependencies.bash
 ```
 
 #### Conda-forge and robostack (ROS) using pixi (recommended) on Linux or WSL2
 
 To install [pixi](https://pixi.sh/), execute
-```
+```bash
 curl -fsSL https://pixi.sh/install.sh | bash
 ```
 Re-open the terminal or source your `.bashrc` to make `pixi` available.
 
 All pixi commands must be executed in geoscenarioserver as the working directory.
-```
+```bash
 cd geoscenarioserver
 ```
 
 Pixi project provides the following tasks:
-```
+```bash
 cd geoscenarioserver
 pixi run gss <parameters>
 pixi run test_scenarios_ci
 pixi run rqt
 pixi run rqt_topic
 pixi run ros_gss <parameters>
-pixi run ros_client_build
+pixi run ros_build
+pixi run ros_build_release
+pixi run ros_server <ros parameters>
 pixi run ros_client
 pixi run ros_client_wgs84
 pixi run ros_client_wgs84_roundtriptest
@@ -74,7 +76,7 @@ pixi run regenerate
 The task `gss` runs in the environment `default` whereas `ros_gss` runs in `humble`.
 
 To run automated test of ROS2 client using the mock co-simulator, execute:
-```
+```bash
 bash geoscenarioserver/scripts/pixi_test_ros2_client.bash [--wgs84|--roundtriptest]
 ```
 By default, the client will use local coordinates.
@@ -82,12 +84,12 @@ Use `--wgs84` flag to convert to and from WGS84 coordinates.
 Use `--roundtriptest` flag to enable round-trip testing in addition to WGS84 conversion.
 
 Finally, to activate the environment and execute arbitrary commands without ROS2, execute
-```
+```bash
 cd geoscenarioserver
 pixi shell
 ```
 or with ROS2, execute
-```
+```bash
 cd geoscenarioserver
 pixi shell -e humble
 ```
@@ -95,7 +97,7 @@ pixi shell -e humble
 #### Conda-forge and robostack (ROS) using micromamba
 
 To automatically create a conda-forge environment called `gss` with the required packages, use the script `setup-conda-forge-env.bash`:
-```
+```bash
 bash setup-conda-forge-env.bash --help
 
 Create a conda-forge environment called gss for running GeoScenarioServer
@@ -148,7 +150,7 @@ GSServer creates various files on the folder `./outputs`, which can also be over
 
 - The `--scenario` option can take more than one `.osm` file as its arguments
 - For example,
-```
+```bash
 python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
 ```
 - With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
@@ -171,30 +173,39 @@ python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.os
 ## Building
 
 To build a `.conda` package, execute
-```
+```bash
 pixi build
 ```
 To test the package in a fresh conda environment, execute
-```
+```bash
 bash test/test_conda_package.bash
 ```
 
 To build a `.whl` package, execute
-```
+```bash
 pixi run build_wheel
 ```
 To test the package in a fresh venv environment, execute
-```
+```bash
 bash test/test_wheel_package.bash
 ```
 
 ## Co-Simulation:
 
+### Native ROS2 server
+
+To test the native ROS2 serever with a mock co-simulator, execute
+```bash
+bash test/test_ros2_server.bash [--fastest|--realtime|--2xrealtime]
+```
+
+### Via shared memory and ROS2 client
+
 - Use the shared memory keys inside SimConfig to read/write the server shared memory blocks.
 - We provide a GeoScenario Client for Unreal in `clients/unreal`.
-- We provide a ROS2 Client for Humble in `clients/ros2_client`.
+- We provide a ROS2 Client for Humble in `ros2/geoscenario_client`.
 To test the ROS2 client with a mock co-simulator, execute
-```
+```bash
 bash test/test_ros2_client.bash
 ```
 

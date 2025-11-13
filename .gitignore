@@ -7,7 +7,7 @@ outputs/*.json
 outputs/*.png
 outputs/*.csv
 outputs/*.log
-colcon_ws/
+ros2/
 dist/
 
 # pixi environments

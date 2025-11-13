@@ -6,10 +6,8 @@
 # Starts the Server and controls the traffic simulation loop
 # --------------------------------------------
 
-import screeninfo
-
 from argparse import ArgumentParser
-from pynput import keyboard
+import os
 
 try:
     from lanelet2.projection import LocalCartesianProjector
@@ -18,161 +16,83 @@ except ImportError:
     from lanelet2.projection import UtmProjector
     use_local_cartesian=False
 
-from geoscenarioserver.dash.Dashboard import *
 from geoscenarioserver.mapping.LaneletMap import *
 from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick
 from geoscenarioserver.ScenarioSetup import *
 from geoscenarioserver.SimConfig import *
 from geoscenarioserver.SimTraffic import SimTraffic
 from geoscenarioserver.TickSync import TickSync
+from geoscenarioserver.GSServerBase import GSServerBase
 
 import logging
 log = logging.getLogger("GSServer")
 
-def start_server(args):
-    # log.setLevel("INFO")
-    log.info('GeoScenario server START')
-    lanelet_map = LaneletMap()
-    sim_config = SimConfig()
+class GSServer(GSServerBase):
+    def __init__(self):
+        # This way we can reference the base functions directly
+        super().__init__()
 
-    base_btree_location = os.path.join(ROOT_DIR, "btrees") #default btree folders location
-    btree_locations = []
-    if len(args.btree_locations) > 0:
-        btree_locations.extend(args.btree_locations.split(":"))
-        btree_locations.append(base_btree_location)
-    else:
-        btree_locations = [base_btree_location]
-    log.info("Btree search locations set (in order) as: " + str(btree_locations))
+    def start(self, args):
+        # log.setLevel("INFO")
+        log.info('GeoScenario server START')
 
-    if args.verify_map != "":
-        verify_map_file(args.verify_map, lanelet_map)
-        return
+        btree_locations = self.parse_btree_paths(args.btree_locations)
 
-    if args.no_dash:
-        sim_config.show_dashboard = False
+        self.sim_config.show_dashboard = not args.no_dash
+        self.sim_config.wait_for_input = args.wait_for_input
+        self.sim_config.wait_for_client = args.wait_for_client
 
-    if args.wait_for_input:
-        sim_config.wait_for_input = True
+        # use sim_config after all modifications
+        self.traffic = SimTraffic(self.lanelet_map, self.sim_config)
 
-    if args.wait_for_client:
-        sim_config.wait_for_client = True
-
-    # use sim_config after all modifications
-    traffic = SimTraffic(lanelet_map, sim_config)
-
-    # SCENARIO SETUP
-    if args.gsfiles:
-        if all(['.osm' in file for file in args.gsfiles]):
-            #GeoScenario XML files (GSParser)
-            res = load_geoscenario_from_file(args.gsfiles, traffic, sim_config, lanelet_map, args.map_path, btree_locations)
-        elif len(args.gsfiles) > 1:
-            log.error("Can only load multiple scenarios from .osm files.")
+        # SCENARIO SETUP
+        if not self.construct_scenario(args.gsfiles, self.traffic, self.sim_config, self.lanelet_map, args.map_path, btree_locations):
+            log.error("Failed to load scenario")
             return
-        else:
-            #Direct setup
-            res = load_geoscenario_from_code(args.gsfiles[0], traffic, sim_config, lanelet_map)
-    else:
-        res = load_geoscenario_from_code("", traffic, sim_config, lanelet_map)
 
-    if not res:
-        log.error("Failed to load scenario")
-        return
+        sync_global = TickSync(rate=self.sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
+        sync_global.set_timeout(self.sim_config.timeout)
 
-    sync_global = TickSync(rate=sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
-    sync_global.set_timeout(sim_config.timeout)
+        if self.sim_config.wait_for_input:
+            from geoscenarioserver.dash.Dashboard import wait_for_input
+            wait_for_input(self.sim_config.show_dashboard, args.dash_pos)
 
-    if args.dash_pos:
-        screen_param = args.dash_pos
-    else:
-        #find screen info 
-        monitors = screeninfo.get_monitors()
-        # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
-        primary_monitor = monitors[0]
-        for monitor in monitors:
-            if monitor.is_primary:
-                primary_monitor = monitor
+        #SIM EXECUTION START
+        log.info('SIMULATION START')
+        self.traffic.start()
+
+        #GUI / Debug screen
+        self.show_dashboard(args.dash_pos)
+
+        dashboard_interrupted = False
+        while sync_global.tick():
+            if self.dashboard and not self.dashboard._process.is_alive(): # might/might not be wanted
+                dashboard_interrupted = True
                 break
-        screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
+            try:
+                #Update Traffic
+                sim_status = self.traffic.tick(
+                    sync_global.tick_count,
+                    sync_global.delta_time,
+                    sync_global.sim_time
+                )
 
-    if sim_config.wait_for_input:
-        if not sim_config.show_dashboard:
-            input("Press [ENTER] to start...")
-        else:
-            #create a small window
-            def on_enter(key):
-                if key == keyboard.Key.enter:
-                    start_window.after(0, start_window.quit())
-            
-            pos_x = screen_param[0]
-            pos_y = screen_param[1]
-            
-            start_window = tk.Tk()
-            set_width = 300
-            set_height = 200
+                GlobalTick()
 
-            if args.dash_pos:
-                #place in the middle of the dashboard
-                pos_x = args.dash_pos[0] + args.dash_pos[2] // 2 - set_width // 2
-                pos_y = args.dash_pos[1] + args.dash_pos[3] // 2 - set_height // 2
-            else:
-                pos_x += (screen_param[2] - set_width) // 2
-                pos_y += (screen_param[3] - set_height) // 2
-            
-            # Apply position
-            start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")
-
-            #set window text
-            instructions = tk.Label(start_window, text="Press [ENTER] to start...")
-            instructions.pack(expand=True)
-
-            start_window.lift()
-            start_window.attributes('-topmost', True)
-            start_window.focus_force()
-
-            listener = keyboard.Listener(on_press=on_enter)
-            listener.start()
-
-            start_window.mainloop()
-            start_window.destroy()
-
-    #SIM EXECUTION START
-    log.info('SIMULATION START')
-    traffic.start()
-
-    #GUI / Debug screen
-    if sim_config.show_dashboard:
-        dashboard = Dashboard(traffic, sim_config, screen_param)
-        dashboard.start()
-
-    dashboard_interrupted = False
-    while sync_global.tick():
-        if sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
-            dashboard_interrupted = True
-            break
-        try:
-            #Update Traffic
-            sim_status = traffic.tick(
-                sync_global.tick_count,
-                sync_global.delta_time,
-                sync_global.sim_time
-            )
-
-            GlobalTick()
-
-            if sim_status < 0:
+                if sim_status < 0:
+                    break
+            except Exception as e:
+                log.error(e)
                 break
-        except Exception as e:
-            log.error(e)
-            break
-    sync_global.write_performance_log()
-    traffic.stop_all(dashboard_interrupted)
+        sync_global.write_performance_log()
+        self.traffic.stop_all(dashboard_interrupted)
 
-    if sim_config.show_dashboard and dashboard._process.is_alive():
-        dashboard.quit()
+        if self.dashboard and self.dashboard._process.is_alive():
+            self.dashboard.quit()
 
-    #SIM END
-    log.info('SIMULATION END')
-    log.info('GeoScenario server shutdown')
+        #SIM END
+        log.info('SIMULATION END')
+        log.info('GeoScenario server shutdown')
 
 def verify_map_file(map_file, lanelet_map:LaneletMap):
     if use_local_cartesian:
@@ -207,7 +127,13 @@ def main():
         logging.basicConfig(filename=filename, filemode="w", level=log_level)
     else:
         logging.basicConfig(level=log_level)
-    start_server(args)
+    
+    if args.verify_map != "":
+        LaneletMap.verify_map(args.verify_map)
+        return
+
+    gs = GSServer()
+    gs.start(args)
 
 if __name__ == "__main__":
     main()

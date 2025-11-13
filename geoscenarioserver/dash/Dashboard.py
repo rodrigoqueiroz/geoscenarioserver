@@ -10,13 +10,16 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from multiprocessing import Process
-from geoscenarioserver.TickSync import TickSync
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 import datetime
 import signal
 from PIL import Image, ImageTk
+import screeninfo
+from pynput import keyboard
+
+from geoscenarioserver.TickSync import TickSync
 from geoscenarioserver.SimTraffic import *
 from geoscenarioserver.SimConfig import *
 from geoscenarioserver.util.Utils import *
@@ -37,6 +40,66 @@ def draw_square(anchor_x, anchor_y, size, collection=None, facecolor='none'):
         facecolor = 'none' if collection.is_empty() else 'k'
 
     return plt.Rectangle((anchor_x,  anchor_y), size, size, linewidth=1, zorder=2, edgecolor='k', facecolor=facecolor)
+
+def wait_for_input(show_dashboard, dashboard_position):
+    if not show_dashboard:
+        input("Press [ENTER] to start...")
+    else:
+        #create a small window
+        def on_enter(key):
+            if key == keyboard.Key.enter:
+                start_window.after(0, start_window.quit())
+
+        screen_param = get_screen_parameters(dashboard_position)
+        pos_x = screen_param[0]
+        pos_y = screen_param[1]
+
+        start_window = tk.Tk()
+        set_width = 300
+        set_height = 200
+
+        if dashboard_position:
+            #place in the middle of the dashboard
+            pos_x = dashboard_position[0] + dashboard_position[2] // 2 - set_width // 2
+            pos_y = dashboard_position[1] + dashboard_position[3] // 2 - set_height // 2
+        else:
+            pos_x += (screen_param[2] - set_width) // 2
+            pos_y += (screen_param[3] - set_height) // 2
+
+        # Apply position
+        start_window.geometry(f"{set_width}x{set_height}+{int(pos_x)}+{int(pos_y)}")
+
+        #set window text
+        instructions = tk.Label(start_window, text="Press [ENTER] to start...")
+        instructions.pack(expand=True)
+
+        start_window.lift()
+        start_window.attributes('-topmost', True)
+        start_window.focus_force()
+
+        listener = keyboard.Listener(on_press=on_enter)
+        listener.start()
+
+        start_window.mainloop()
+        start_window.destroy()
+
+def get_screen_parameters(dashboard_position):
+    """
+        Get screen parameters for dashboard placement
+    """
+    if dashboard_position and len(dashboard_position) == 4:
+        screen_param = dashboard_position
+    else:
+        #find screen info 
+        monitors = screeninfo.get_monitors()
+        # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
+        primary_monitor = monitors[0]
+        for monitor in monitors:
+            if monitor.is_primary:
+                primary_monitor = monitor
+                break
+        screen_param = [primary_monitor.x, primary_monitor.y, primary_monitor.width, primary_monitor.height]
+    return screen_param
 
 class Dashboard(object):
     MAP_FIG_ID = 1
@@ -102,7 +165,15 @@ class Dashboard(object):
             header, vehicles, pedestrians, traffic_lights, static_objects = self.sim_traffic.read_traffic_state(traffic_state_sharr, False)
             tickcount, delta_time, sim_time = header[0:3]
             if sim_time == previous_sim_time:
-                    return
+                # In lock-step mode, sim_time may stay at 0.0 while waiting for first client tick
+                # Don't exit during initialization - just skip rendering this frame
+                # if delta_time is slower than DASH_RATE, then just wait since it'll have many ticks before states update
+                if (previous_sim_time == 0.0 and tickcount == 0) or (1.0/delta_time < DASH_RATE):
+                    continue  # Waiting for simulation to start
+                elif previous_sim_time > 0.0:
+                    return  # Simulation has stalled or ended
+                else:
+                    continue  # Skip redundant frame
             previous_sim_time = sim_time
             sim_time_formated = str(datetime.timedelta(seconds=sim_time))
             config_txt = "Scenario: {}   |   Map: {}".format(self.sim_traffic.sim_config.scenario_name,self.sim_traffic.sim_config.map_name)
