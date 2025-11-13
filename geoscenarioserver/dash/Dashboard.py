@@ -41,7 +41,7 @@ def draw_square(anchor_x, anchor_y, size, collection=None, facecolor='none'):
 
     return plt.Rectangle((anchor_x,  anchor_y), size, size, linewidth=1, zorder=2, edgecolor='k', facecolor=facecolor)
 
-def wait_for_input(show_dashboard, dashboard_position, screen_param):
+def wait_for_input(show_dashboard, dashboard_position):
     if not show_dashboard:
         input("Press [ENTER] to start...")
     else:
@@ -50,6 +50,7 @@ def wait_for_input(show_dashboard, dashboard_position, screen_param):
             if key == keyboard.Key.enter:
                 start_window.after(0, start_window.quit())
 
+        screen_param = get_screen_parameters(dashboard_position)
         pos_x = screen_param[0]
         pos_y = screen_param[1]
 

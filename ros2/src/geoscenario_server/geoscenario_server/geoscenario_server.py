@@ -13,7 +13,6 @@ from rcl_interfaces.msg import ParameterType, ParameterDescriptor
 from geoscenarioserver.GSServerBase import GSServerBase
 from geoscenarioserver.SimTraffic import SimTraffic
 from geoscenarioserver.shm.SimSharedMemoryClient import SimSharedMemoryClient
-from geoscenarioserver.dash.Dashboard import Dashboard, get_screen_parameters
 
 from geoscenario_msgs.msg import Tick, Pedestrian, Vehicle
 from geographic_msgs.msg import GeoPoint
@@ -75,12 +74,8 @@ class GSServer(Node, GSServerBase):
         self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
 
         #GUI / Debug screen
-        if self.sim_config.show_dashboard:
-            self.get_logger().debug("Starting Dashboard...")
-            dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().double_array_value
-            screen_param = get_screen_parameters(dashboard_position)
-            self.dashboard = Dashboard(self.traffic, self.sim_config, screen_param)
-            self.dashboard.start()
+        dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().double_array_value
+        self.show_dashboard(dashboard_position)
 
         # publishes initial state
         self.publish_server_state()
@@ -249,7 +244,8 @@ def main(args=None):
         gs_server.get_logger().info('External shutdown (SIGTERM)')
     finally:
         gs_server.traffic.stop_all(interrupted=True)
-        gs_server.dashboard.quit()
+        if gs_server.dashboard:
+            gs_server.dashboard.quit()
         gs_server.destroy_node()
         rclpy.try_shutdown()
 

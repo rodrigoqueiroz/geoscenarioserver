@@ -16,7 +16,6 @@ except ImportError:
     from lanelet2.projection import UtmProjector
     use_local_cartesian=False
 
-from geoscenarioserver.dash.Dashboard import *
 from geoscenarioserver.mapping.LaneletMap import *
 from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick
 from geoscenarioserver.ScenarioSetup import *
@@ -54,23 +53,20 @@ class GSServer(GSServerBase):
         sync_global = TickSync(rate=self.sim_config.traffic_rate, realtime=True, block=True, verbose=False, label="traffic")
         sync_global.set_timeout(self.sim_config.timeout)
 
-        screen_param = get_screen_parameters(args.dash_pos)
-
         if self.sim_config.wait_for_input:
-            wait_for_input(self.sim_config.show_dashboard, args.dash_pos, screen_param)
+            from geoscenarioserver.dash.Dashboard import wait_for_input
+            wait_for_input(self.sim_config.show_dashboard, args.dash_pos)
 
         #SIM EXECUTION START
         log.info('SIMULATION START')
         self.traffic.start()
 
         #GUI / Debug screen
-        if self.sim_config.show_dashboard:
-            dashboard = Dashboard(self.traffic, self.sim_config, screen_param)
-            dashboard.start()
+        self.show_dashboard(args.dash_pos)
 
         dashboard_interrupted = False
         while sync_global.tick():
-            if self.sim_config.show_dashboard and not dashboard._process.is_alive(): # might/might not be wanted
+            if self.dashboard and not self.dashboard._process.is_alive(): # might/might not be wanted
                 dashboard_interrupted = True
                 break
             try:
@@ -91,8 +87,8 @@ class GSServer(GSServerBase):
         sync_global.write_performance_log()
         self.traffic.stop_all(dashboard_interrupted)
 
-        if self.sim_config.show_dashboard and dashboard._process.is_alive():
-            dashboard.quit()
+        if self.dashboard and self.dashboard._process.is_alive():
+            self.dashboard.quit()
 
         #SIM END
         log.info('SIMULATION END')

@@ -5,6 +5,7 @@ from geoscenarioserver.SimTraffic import SimTraffic
 from geoscenarioserver.mapping.LaneletMap import LaneletMap
 from geoscenarioserver.SimConfig import ROOT_DIR, SimConfig
 from geoscenarioserver.ScenarioSetup import load_geoscenario_from_file, load_geoscenario_from_code
+from geoscenarioserver.dash.Dashboard import Dashboard, get_screen_parameters
 
 log = logging.getLogger("GSServer")
 
@@ -13,6 +14,21 @@ class GSServerBase:
         self.lanelet_map = LaneletMap()
         self.sim_config = SimConfig()
         self.traffic = None # will be initialized by subclass
+        self.dashboard = None # will be initialized if sim_config.show_dashboard set to True
+
+    def show_dashboard(self, dashboard_position):
+        """Initialize and start the dashboard if enabled.
+
+        Args:
+            dashboard_position: Dashboard position array [x, y, width, height] or empty/None for auto-detect
+        """
+        if self.sim_config.show_dashboard:
+            log.debug("Starting Dashboard...")
+            screen_param = get_screen_parameters(dashboard_position)
+            self.dashboard = Dashboard(self.traffic, self.sim_config, screen_param)
+            self.dashboard.start()
+        else:
+            self.dashboard = None
 
     def parse_btree_paths(self, btree_locations):
         """
