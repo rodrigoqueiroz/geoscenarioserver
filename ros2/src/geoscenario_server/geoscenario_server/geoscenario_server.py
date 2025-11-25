@@ -149,8 +149,8 @@ class GSServer(Node, GSServerBase):
         if self.dashboard:
             self.dashboard.quit()
 
-        # Stop the ROS2 spin loop by raising shutdown exception
-        raise ExternalShutdownException()
+        self.destroy_node()
+        rclpy.try_shutdown()
 
     def publish_server_state(self):
         # Read state directly from self.traffic instead of shared memory
@@ -341,13 +341,8 @@ def main(args=None):
     except ExternalShutdownException:
         gs_server.get_logger().info('External shutdown (SIGTERM)')
     finally:
-        # Only stop if not already shut down (avoid double-stop)
-        if not gs_server.shutdown_called:
-            gs_server.traffic.stop_all(interrupted=True)
-        if gs_server.dashboard:
-            gs_server.dashboard.quit()
-        gs_server.destroy_node()
-        rclpy.try_shutdown()
+        gs_server.shutdown(interrupted=False)
+        
 
 
 if __name__ == '__main__':
