@@ -108,13 +108,13 @@ class GSServer(Node, GSServerBase):
             msg.velocity.x = wgs84_vel_point.lat - wgs84_point.lat
             msg.velocity.y = wgs84_vel_point.lon - wgs84_point.lon
 
-    def set_agent_pos_vel_from_msg(self, agent, msg):
+    def set_agent_pos_vel_from_msg(self, vs, msg):
         if not self.wgs84:
-            agent["x"] = msg.position.x
-            agent["y"] = msg.position.y
-            agent["z"] = msg.position.z
-            agent["vx"] = msg.velocity.x
-            agent["vy"] = msg.velocity.y
+            vs.x = msg.position.x
+            vs.y = msg.position.y
+            vs.z = msg.position.z
+            vs.x_vel = msg.velocity.x
+            vs.y_vel = msg.velocity.y
         else:
             # convert position from WGS84 to local coordinates
             local_point = self.local_cartesian_projector.forward(
@@ -123,11 +123,11 @@ class GSServer(Node, GSServerBase):
             local_vel_point = self.local_cartesian_projector.forward(
                 GPSPoint(msg.position.x + msg.velocity.x, msg.position.y + msg.velocity.y, msg.position.z)
             )
-            agent["x"] = local_point.x
-            agent["y"] = local_point.y
-            agent["z"] = local_point.z
-            agent["vx"] = local_vel_point.x - local_point.x
-            agent["vy"] = local_vel_point.y - local_point.y
+            vs.x = local_point.x
+            vs.y = local_point.y
+            vs.z = local_point.z
+            vs.x_vel = local_vel_point.x - local_point.x
+            vs.y_vel = local_vel_point.y - local_point.y
 
     def shutdown(self, interrupted=False):
         """Gracefully shutdown the server.
@@ -257,14 +257,7 @@ class GSServer(Node, GSServerBase):
             vs = VehicleState()
 
             # Get position and velocity (handles WGS84 conversion if needed)
-            pos_vel = {}
-            self.set_agent_pos_vel_from_msg(pos_vel, msg_vehicle)
-
-            vs.x = pos_vel["x"]
-            vs.y = pos_vel["y"]
-            vs.z = pos_vel["z"]
-            vs.x_vel = pos_vel["vx"]
-            vs.y_vel = pos_vel["vy"]
+            self.set_agent_pos_vel_from_msg(vs, msg_vehicle)
 
             # Estimate yaw from velocity if moving, otherwise use message yaw
             if abs(vs.y_vel) > 0.01 or abs(vs.x_vel) > 0.01:
