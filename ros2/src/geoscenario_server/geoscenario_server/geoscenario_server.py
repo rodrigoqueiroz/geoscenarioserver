@@ -83,20 +83,24 @@ class GSServer(Node, GSServerBase):
         # publishes initial state
         self.publish_server_state()
 
-    def set_msg_pos_vel_from_agent(self, msg, agent):
+    def set_msg_pos_vel_from_agent(self, msg, position, velocity):
+        """        
+        Position: tuple with x, y, z
+        Velocity: tuple with x, y
+        """
         if not self.wgs84:
-            msg.position.x = agent["x"]
-            msg.position.y = agent["y"]
-            msg.position.z = agent["z"]
-            msg.velocity.x = agent["vx"]
-            msg.velocity.y = agent["vy"]
+            msg.position.x = position[0]
+            msg.position.y = position[1]
+            msg.position.z = position[2]
+            msg.velocity.x = velocity[0]
+            msg.velocity.y = velocity[1]
         else:
             # convert position to WGS84 coordinates
             wgs84_point = self.local_cartesian_projector.reverse(
-                BasicPoint3d(agent["x"], agent["y"], agent["z"])
+                BasicPoint3d(position[0], position[1], position[2])
             )
             wgs84_vel_point = self.local_cartesian_projector.reverse(
-                BasicPoint3d(agent["x"]+agent["vx"], agent["y"]+agent["vy"], agent["z"])
+                BasicPoint3d(position[0]+velocity[0], position[1]+velocity[1], position[2])
             )
             msg.position.x = wgs84_point.lat
             msg.position.y = wgs84_point.lon
@@ -181,22 +185,13 @@ class GSServer(Node, GSServerBase):
         for vehicle in self.traffic.vehicles.values():
             vid, vtype, dimensions, position, velocity, yaw, steer = vehicle.get_sim_state()
 
-            # Convert to dictionary format expected by set_msg_pos_vel_from_agent
-            vehicle_dict = {
-                "x": position[0],
-                "y": position[1],
-                "z": position[2],
-                "vx": velocity[0],
-                "vy": velocity[1]
-            }
-
             msg = VehicleMsg()
             msg.id = vid
             msg.type = str(vtype)  # Convert integer type to string
             msg.dimensions.x = dimensions[0]  # length
             msg.dimensions.y = dimensions[1]  # width
             msg.dimensions.z = dimensions[2]  # height
-            self.set_msg_pos_vel_from_agent(msg, vehicle_dict)
+            self.set_msg_pos_vel_from_agent(msg, position, velocity)
             msg.yaw = yaw
             msg.steering_angle = steer
             tick_msg.vehicles.append(msg)
@@ -205,22 +200,13 @@ class GSServer(Node, GSServerBase):
         for pedestrian in self.traffic.pedestrians.values():
             pid, ptype, dimensions, position, velocity, yaw = pedestrian.get_sim_state()
 
-            # Convert to dictionary format expected by set_msg_pos_vel_from_agent
-            pedestrian_dict = {
-                "x": position[0],
-                "y": position[1],
-                "z": position[2],
-                "vx": velocity[0],
-                "vy": velocity[1]
-            }
-
             msg = PedestrianMsg()
             msg.id = pid
             msg.type = str(ptype)  # Convert integer type to string
             msg.dimensions.x = dimensions[0]  # length
             msg.dimensions.y = dimensions[1]  # width
             msg.dimensions.z = dimensions[2]  # height
-            self.set_msg_pos_vel_from_agent(msg, pedestrian_dict)
+            self.set_msg_pos_vel_from_agent(msg, position, velocity)
             msg.yaw = yaw
             tick_msg.pedestrians.append(msg)
 
