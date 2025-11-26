@@ -39,6 +39,7 @@ class SoftRequirement:
 
 class ScenarioEnd:
 	def __init__(self):
+		# TODO: This is no longer valid wrt to the ROS2 server as TRAFFIC_RATE is no longer controlled by the server
 		scenario_completion = global_tick.value / TRAFFIC_RATE
 		print('Scenario Ended in {} seconds'.format(scenario_completion))
 

@@ -12,10 +12,9 @@ from rcl_interfaces.msg import ParameterType, ParameterDescriptor
 
 from geoscenarioserver.GSServerBase import GSServerBase
 from geoscenarioserver.SimTraffic import SimTraffic
-from geoscenarioserver.Actor import VehicleState, PedestrianState
+from geoscenarioserver.Actor import VehicleState
 from geoscenarioserver.sv.Vehicle import Vehicle
-from geoscenarioserver.sp.Pedestrian import Pedestrian as PedestrianBase
-from geoscenarioserver.requirements.RequirementViolationEvents import ScenarioCompletion
+from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick, ScenarioCompletion, ScenarioTimeout
 
 from geoscenario_msgs.msg import Tick, Pedestrian as PedestrianMsg, Vehicle as VehicleMsg
 import math
@@ -308,25 +307,26 @@ class GSServer(Node, GSServerBase):
         # 1. Update all vehicle/pedestrian positions
         # 2. Automatically write to shared memory for Dashboard
         # 3. Return status (-1 if complete, 0 if continuing)
-        # May raise ScenarioCompletion when scenario objectives are met
-        try:
-            sim_status = self.traffic.tick(
-                self.tick_count,
-                msg.delta_time,
-                self.simulation_time
-            )
+        # Will raise ScenarioCompletion when scenario objectives are met
+        sim_status = self.traffic.tick(
+            self.tick_count,
+            msg.delta_time,
+            self.simulation_time
+        )
 
-            # Check if simulation complete
-            if sim_status < 0:
-                self.get_logger().info('Simulation complete!')
-                self.shutdown(interrupted=False)
-                return
+        GlobalTick()
 
-            # reads from shm to then send to topic
-            self.publish_server_state()
-        except ScenarioCompletion as e:
-            self.get_logger().info(f'Scenario completed successfully: {e}')
+        if sim_status < 0:
+            self.get_logger().info(f'Simulation complete, with status={sim_status}')
+            self.shutdown(interrupted=True)
+            return
+
+        if self.sim_config.timeout and self.simulation_time >= self.sim_config.timeout:
+            ScenarioTimeout(self.sim_config.timeout)
             self.shutdown(interrupted=False)
+            return
+
+        self.publish_server_state()
 
 
 def main(args=None):
@@ -340,6 +340,9 @@ def main(args=None):
         gs_server.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
     except ExternalShutdownException:
         gs_server.get_logger().info('External shutdown (SIGTERM)')
+    except ScenarioCompletion as e:
+        gs_server.get_logger().info(f'Scenario completed successfully: {e}')
+        gs_server.shutdown(interrupted=False)
     finally:
         gs_server.shutdown(interrupted=False)
         
