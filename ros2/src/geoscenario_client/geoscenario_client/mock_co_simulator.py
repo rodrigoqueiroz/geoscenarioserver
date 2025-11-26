@@ -34,6 +34,7 @@ class MockCoSimulator(Node):
 
         # Store latest tick from server for rate-controlled publishing
         self.latest_tick = None
+        self.simulation_time = 0.0
 
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
@@ -46,6 +47,25 @@ class MockCoSimulator(Node):
         else:
             self.timer = None
             self.get_logger().info('Mock co-simulator started (lock-step mode)...')
+
+    def advance_simulation_time(self, msg) -> bool:
+        """Advance simulation time and update message. Returns False if max time reached."""
+        # Check for time sync before updating
+        if msg.simulation_time != self.simulation_time:
+            self.get_logger().warning(
+                f'Simulation time mismatch: msg={msg.simulation_time}, self={self.simulation_time}'
+            )
+
+        msg.delta_time = self.target_dt
+        self.simulation_time += self.target_dt
+        msg.simulation_time = self.simulation_time
+
+        # Check for simulation completion
+        if self.max_sim_time != -1 and self.simulation_time >= self.max_sim_time:
+            self.get_logger().info('Max simulation time reached, shutting down...')
+            return False
+
+        return True
 
     def tick_from_server(self, msg):
         # Update external vehicle positions using circular motion
@@ -68,13 +88,8 @@ class MockCoSimulator(Node):
             self.latest_tick = msg
         else:
             # Internal control at max speed (rt_factor = 0) - publish immediately
-            msg.delta_time = self.target_dt
-
-            # Check for simulation completion
-            if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
-                self.get_logger().info('Max simulation time reached, shutting down...')
+            if not self.advance_simulation_time(msg):
                 return
-
             self.tick_pub.publish(msg)
 
     def timer_callback(self):
@@ -87,12 +102,8 @@ class MockCoSimulator(Node):
         # Clear after reading to prevent duplicate publishes
         self.latest_tick = None
 
-        # How much time to advance on the server
-        msg.delta_time = self.target_dt
-
-        # Check for simulation completion
-        if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
-            self.get_logger().info('Max simulation time reached, shutting down...')
+        # Advance simulation time
+        if not self.advance_simulation_time(msg):
             return
 
         # Publish to drive server forward

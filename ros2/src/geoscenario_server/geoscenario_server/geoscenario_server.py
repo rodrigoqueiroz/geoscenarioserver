@@ -232,8 +232,23 @@ class GSServer(Node, GSServerBase):
                 f'got {len(msg.pedestrians)} in message'
             )
 
-        # Store delta_time for publishing
+        # Update and check the server's internal states
+        self.tick_count += 1
         self.last_delta_time = msg.delta_time
+        
+        if self.simulation_time + msg.delta_time != msg.simulation_time:
+            self.get_logger().error(
+                f'Simulation time mismatch: expected {self.simulation_time + msg.delta_time}, '
+                f'got {msg.simulation_time} in message'
+            )
+            self.shutdown(interrupted=False)
+            return
+        elif self.sim_config.timeout and msg.simulation_time >= self.sim_config.timeout:
+            ScenarioTimeout(self.sim_config.timeout)
+            self.shutdown(interrupted=False)
+            return
+        else:
+            self.simulation_time = msg.simulation_time
 
         # Track disabled vehicles for collision detection
         disabled_vehicles = []
@@ -278,9 +293,6 @@ class GSServer(Node, GSServerBase):
         for vid, vstate in vstates.items():
             self.traffic.vehicles[vid].update_sim_state(vstate, msg.delta_time)
 
-        self.tick_count += 1
-        self.simulation_time += msg.delta_time
-
         # Update traffic simulation
         # SimTraffic.tick() will:
         # 1. Update all vehicle/pedestrian positions
@@ -289,7 +301,7 @@ class GSServer(Node, GSServerBase):
         # Will raise ScenarioCompletion when scenario objectives are met
         sim_status = self.traffic.tick(
             self.tick_count,
-            msg.delta_time,
+            self.last_delta_time,
             self.simulation_time
         )
 
@@ -298,11 +310,6 @@ class GSServer(Node, GSServerBase):
         if sim_status < 0:
             self.get_logger().info(f'Simulation complete, with status={sim_status}')
             self.shutdown(interrupted=True)
-            return
-
-        if self.sim_config.timeout and self.simulation_time >= self.sim_config.timeout:
-            ScenarioTimeout(self.sim_config.timeout)
-            self.shutdown(interrupted=False)
             return
 
         self.publish_server_state()
