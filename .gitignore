@@ -9,9 +9,9 @@ outputs/*.csv
 outputs/*.log
 
 # ROS folders
-**/build/**
-**/install/**
-**/log/**
+ros2/build/**
+ros2/install/**
+ros2/log/**
 
 dist/
 
