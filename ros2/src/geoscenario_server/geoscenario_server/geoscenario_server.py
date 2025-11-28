@@ -48,7 +48,6 @@ class GSServer(Node, GSServerBase):
             param_descriptor = ParameterDescriptor(type=param.type, description=param.description)
             self.declare_parameter(param.name, param.default_value, param_descriptor)
 
-        self.previous_tick_count = -1
         self.tick_count = 0
         self.simulation_time = 0.0
         self.last_delta_time = 0.0
@@ -211,7 +210,6 @@ class GSServer(Node, GSServerBase):
             tick_msg.pedestrians.append(msg)
 
         self.tick_pub.publish(tick_msg)
-        self.previous_tick_count = tick_count
 
 
     def tick_from_client(self, msg):
@@ -232,10 +230,16 @@ class GSServer(Node, GSServerBase):
                 f'got {len(msg.pedestrians)} in message'
             )
 
-        # Update and check the server's internal states
-        self.tick_count += 1
-        self.last_delta_time = msg.delta_time
-        
+        if msg.tick_count != self.tick_count + 1:
+            self.get_logger().error(
+                f'Tick count mismatch: expected {self.tick_count + 1}, '
+                f'got {msg.tick_count} in message'
+            )
+            self.shutdown(interrupted=True)
+            return
+        else:
+            self.tick_count = msg.tick_count
+
         if self.simulation_time + msg.delta_time != msg.simulation_time:
             self.get_logger().error(
                 f'Simulation time mismatch: expected {self.simulation_time + msg.delta_time}, '
@@ -249,6 +253,8 @@ class GSServer(Node, GSServerBase):
             return
         else:
             self.simulation_time = msg.simulation_time
+
+        self.last_delta_time = msg.delta_time
 
         # Track disabled vehicles for collision detection
         disabled_vehicles = []

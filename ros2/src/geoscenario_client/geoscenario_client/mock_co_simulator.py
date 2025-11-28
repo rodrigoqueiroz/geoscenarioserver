@@ -35,6 +35,7 @@ class MockCoSimulator(Node):
         # Store latest tick from server for rate-controlled publishing
         self.latest_tick = None
         self.simulation_time = 0.0
+        self.tick_count = 0
 
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
@@ -55,7 +56,14 @@ class MockCoSimulator(Node):
             self.get_logger().warning(
                 f'Simulation time mismatch: msg={msg.simulation_time}, self={self.simulation_time}'
             )
+        
+        if msg.tick_count != self.tick_count:
+            self.get_logger().warning(
+                f'Tick count mismatch: msg={msg.tick_count}, self={self.tick_count}'
+            )
 
+        self.tick_count += 1
+        msg.tick_count = self.tick_count
         msg.delta_time = self.target_dt
         self.simulation_time += self.target_dt
         msg.simulation_time = self.simulation_time
