@@ -311,7 +311,7 @@ class GSServer(Node, GSServerBase):
             self.simulation_time
         )
 
-        GlobalTick(simulation_time=self.simulation_time)
+        GlobalTick(delta_time=self.last_delta_time)
 
         if sim_status < 0:
             self.get_logger().info(f'Simulation complete, with status={sim_status}')
