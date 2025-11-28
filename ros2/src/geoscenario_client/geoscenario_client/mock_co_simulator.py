@@ -39,6 +39,7 @@ class MockCoSimulator(Node):
 
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
+        self.monitor_timer = self.create_timer(5.0, self.check_publisher_status)
 
         # Create timer for rate-controlled mode (non-blocking)
         if self.rt_factor > 0.0 and self.target_dt > 0.0:
@@ -48,6 +49,17 @@ class MockCoSimulator(Node):
         else:
             self.timer = None
             self.get_logger().info('Mock co-simulator started (lock-step mode)...')
+
+    def check_publisher_status(self):
+        """Check if publishers still exist on subscribed topic after simulation starts."""
+        if self.tick_count <= 0:
+            return
+
+        publisher_count = self.count_publishers('/gs/tick')
+
+        if publisher_count == 0:
+            self.get_logger().info('No publishers on /gs/tick detected, shutting down...')
+            raise SystemExit(0)
 
     def advance_simulation_time(self, msg) -> bool:
         """Advance simulation time and update message. Returns False if max time reached."""
@@ -128,6 +140,8 @@ def main(args=None):
         co_simulator.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
     except ExternalShutdownException:
         co_simulator.get_logger().info('External shutdown (SIGTERM)')
+    except SystemExit:
+        pass  # Graceful exit from publisher monitoring
     finally:
         co_simulator.destroy_node()
         rclpy.try_shutdown()
