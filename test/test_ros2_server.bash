@@ -47,3 +47,8 @@ pixi run ros_server --ros-args \
     --log-level INFO \
     -p dashboard_position:="[0.0, 0.0, 1920.0, 1080.0]" \
     -p scenario_files:="['$SCENARIO_FILE']"
+
+
+echo "Sleeping 5s to allow the nodes to shutdown..."
+sleep 5
+echo "Shutdown complete."
