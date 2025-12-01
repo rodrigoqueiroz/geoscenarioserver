@@ -115,7 +115,9 @@ Usage:
 - run `gsserver -s scenarios/<geoscenario_file>` to start the Server.
 
 ```
-usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [--dash-pos DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl]
+usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [-dp DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl] [-wt]
+
+Starts the GeoScenario Server simulation
 
 options:
   -h, --help            show this help message and exit
@@ -133,10 +135,12 @@ options:
                         Wait for the user to press [ENTER] to start the simulation
   -wc, --wait-for-client
                         Wait for a valid client state to start the simulation
-  --dash-pos DASH_POS DASH_POS DASH_POS DASH_POS
+  -dp DASH_POS DASH_POS DASH_POS DASH_POS, --dash-pos DASH_POS DASH_POS DASH_POS DASH_POS
                         Set the position of the dashboard window (x y width height)
   -d, --debug           Set the logging level to DEBUG instead of INFO
   -fl, --file-log       Log to $GSS_OUTPUTS/GSServer.log instead of stdout
+  -wt, --write-trajectories
+                        Write all agent trajectories to CSV files inside $GSS_OUTPUTS
 ```
 
 GSServer creates various files on the folder `./outputs`, which can also be overridden using the environment variable `GSS_OUTPUTS`.

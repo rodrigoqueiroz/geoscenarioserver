@@ -308,7 +308,7 @@ class SimTraffic(object):
         log.debug(state_str)
 
     def log_trajectories(self,tick_count,delta_time,sim_time):
-        if WRITE_TRAJECTORIES:
+        if self.sim_config.write_trajectories:
             for vid, vehicle in sorted(self.vehicles.items()):
                 if vehicle.sim_state == ActorSimState.ACTIVE or vehicle.sim_state == ActorSimState.INVISIBLE:
                     sv = vehicle.state.get_state_vector()
@@ -319,7 +319,7 @@ class SimTraffic(object):
                     self.vehicles_log[vid].append(line)
 
     def write_log_trajectories(self):
-        if WRITE_TRAJECTORIES:
+        if self.sim_config.write_trajectories:
             log.info("Log all trajectories: ")
             for vid, vlog in self.vehicles_log.items():
                 filename = os.path.join(
