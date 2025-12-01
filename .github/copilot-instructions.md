@@ -40,7 +40,10 @@ Behavior trees are parsed from `.btree` files using custom ANTLR4 DSL (`sv/plann
 ### Running Scenarios
 ```bash
 # Using pixi (recommended)
-pixi run gss --scenario scenarios/test_scenarios/gs_intersection_greenlight.osm
+pixi run gss --scenario scenarios/test_scenarios/gs_all_vehicles_peds.osm
+
+# Set origin to vehicle starting position (useful for VUT-relative coordinates)
+pixi run gss --scenario <file.osm> --origin-from-vid 10
 
 # Run test suite
 pixi run test_scenarios_ci  # or bash scripts/run_scenarios.bash --no-dash --non-interactive
@@ -48,6 +51,9 @@ pixi run test_scenarios_ci  # or bash scripts/run_scenarios.bash --no-dash --non
 # With ROS2 client
 pixi run -e humble ros_gss --scenario <file.osm>
 pixi run -e humble ros_client  # in another terminal
+
+# ROS2 with origin from vehicle vid
+ros2 run geoscenario_server geoscenario_server --ros-args -p origin_from_vid:=10
 ```
 
 ### Environment Setup
@@ -80,7 +86,7 @@ Format documented in [GeoScenario2](https://geoscenario2.readthedocs.io/).
 
 Parsed by `gsc/GSParser.py`. Key elements:
 - `<tag k='gs' v='globalconfig'>`: timeout, lanelet map, scenario name
-- `<tag k='gs' v='origin'>`: lat/lon/altitude for coordinate projection
+- `<tag k='gs' v='origin'>`: lat/lon/altitude for coordinate projection (can be set to vehicle position via `--origin-from-vid` CLI argument)
 - `<node>` with `gs='vehicle'`: must have `btype` (sdv/tv/pv/ev), optional `btree`, `route`/`trajectory`/`path`, `vid`
 - `<node>` with `gs='pedestrian'`: `btype` (sp/tp/pp), optional `btree`, `destination`/`route`, `pid`
 - Multiple `.osm` files can be merged (see `--scenario` accepting multiple files)

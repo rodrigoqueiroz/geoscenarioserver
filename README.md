@@ -141,6 +141,8 @@ options:
   -fl, --file-log       Log to $GSS_OUTPUTS/GSServer.log instead of stdout
   -wt, --write-trajectories
                         Write all agent trajectories to CSV files inside $GSS_OUTPUTS
+  -ofv ORIGIN_FROM_VID, --origin-from-vid ORIGIN_FROM_VID
+                        Set the origin to the starting position of the vehicle with the specified vid (e.g., --origin-from-vid=10)
 ```
 
 GSServer creates various files on the folder `./outputs`, which can also be overridden using the environment variable `GSS_OUTPUTS`.

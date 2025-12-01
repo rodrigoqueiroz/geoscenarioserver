@@ -42,7 +42,8 @@ class GSServer(Node, GSServerBase):
             Parameter(name='btree_locations', type=ParameterType.PARAMETER_STRING, description='Add higher priority locations to search for btrees by agent btypes', default_value=""),
             Parameter(name='dashboard_position', type=ParameterType.PARAMETER_DOUBLE_ARRAY, description='Set the position of the dashboard window (x y width height)', default_value=[0.0]),
             Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
-            Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False)
+            Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False),
+            Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0)
         ]
 
         for param in parameters:
@@ -66,8 +67,9 @@ class GSServer(Node, GSServerBase):
 
         gsfiles = self.get_parameter('scenario_files').get_parameter_value().string_array_value
         map_path = self.get_parameter('map_path').get_parameter_value().string_value
+        origin_from_vid = self.get_parameter('origin_from_vid').get_parameter_value().integer_value
 
-        if not self.construct_scenario(gsfiles, self.traffic, self.sim_config, self.lanelet_map, map_path, btree_locations):
+        if not self.construct_scenario(gsfiles, self.traffic, self.sim_config, self.lanelet_map, map_path, btree_locations, origin_from_vid):
             self.get_logger().error("Failed to load scenario")
             raise RuntimeError("Failed to load scenario")
 

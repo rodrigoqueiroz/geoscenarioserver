@@ -45,9 +45,12 @@ class GSServerBase:
         log.info("Btree search locations set (in order) as: " + str(btree_locations))
         return btree_paths
 
-    def construct_scenario(self, gsfiles, traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path:str, btree_locations:list):
+    def construct_scenario(self, gsfiles, traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path:str, btree_locations:list, origin_from_vid:int=0):
         """
         Construct scenario from gsfiles
+        
+        Args:
+            origin_from_vid: Optional vehicle ID whose starting position will be used as the origin (0 = use scenario origin)
         """
 
         res = False
@@ -55,7 +58,7 @@ class GSServerBase:
         if gsfiles:
             if all(['.osm' in file for file in gsfiles]):
                 #GeoScenario XML files (GSParser)
-                res = load_geoscenario_from_file(gsfiles, traffic, sim_config, lanelet_map, map_path, btree_locations)
+                res = load_geoscenario_from_file(gsfiles, traffic, sim_config, lanelet_map, map_path, btree_locations, origin_from_vid)
             elif len(gsfiles) > 1:
                 log.error("Can only load multiple scenarios from .osm files.")
             else:

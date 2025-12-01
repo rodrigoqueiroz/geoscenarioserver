@@ -36,9 +36,10 @@ def extract_bool_tag(vnode, name, default_value=False):
         else:
             return default_value
 
-def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations):
+def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations, origin_from_vid=0):
     """ Setup scenario from GeoScenario files
     gsfiles: list of GeoScenario file paths. Absolute paths or relative to cwd or built-in scenarios.
+    origin_from_vid: Optional vehicle ID whose starting position will be used as the origin (0 = use scenario origin)
     """
     full_scenario_paths = []
     for gsfile in gsfiles:
@@ -93,13 +94,30 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
     area = parser.origin.tags['area'] if 'area' in parser.origin.tags else MPLOT_SIZE
+    
+    # Check for origin-from-vid
+    origin_lat = parser.origin.lat
+    origin_lon = parser.origin.lon
+    origin_alt = altitude
+    
+    if origin_from_vid > 0:
+        # Find the vehicle with the specified vid
+        if origin_from_vid in parser.vehicles:
+            vehicle_node = parser.vehicles[origin_from_vid]
+            origin_lat = vehicle_node.lat
+            origin_lon = vehicle_node.lon
+            # Keep the altitude from the original origin
+            log.info(f"Origin set from vehicle vid={origin_from_vid}: lat={origin_lat}, lon={origin_lon}, alt={origin_alt}")
+        else:
+            log.error(f"Vehicle with vid={origin_from_vid} not found in scenario. Using scenario origin.")
+    
     # preserve the origin
-    sim_traffic.set_origin(parser.origin.lat, parser.origin.lon, altitude, area)
+    sim_traffic.set_origin(origin_lat, origin_lon, origin_alt, area)
     if use_local_cartesian:
-        projector = LocalCartesianProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
+        projector = LocalCartesianProjector(lanelet2.io.Origin(origin_lat, origin_lon, origin_alt))
         log.info("Using LocalCartesianProjector")
     else:
-        projector = UtmProjector(lanelet2.io.Origin(parser.origin.lat, parser.origin.lon, altitude))
+        projector = UtmProjector(lanelet2.io.Origin(origin_lat, origin_lon, origin_alt))
         log.info("Using UTMProjector")
 
     parser.project_nodes(projector,altitude)
