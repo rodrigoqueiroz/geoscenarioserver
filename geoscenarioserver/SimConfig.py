@@ -81,7 +81,7 @@ PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle
 LOG_PERFORMANCE = False
 MAX_NVEHICLES = math.inf       #Limit max number of active vehicles (math.inf if no limit)
 EVALUATION_MODE = False
-WRITE_TRAJECTORIES = False     #If True, all vehicle trajectories will be saved inside eval/ as csv files
+WRITE_TRAJECTORIES = False     #If True, all agent trajectories will be saved inside $GSS_OUTPUTS as csv files
 
 #Client (Unreal or similar)
 
@@ -119,3 +119,4 @@ class SimConfig:
     wait_for_input:bool = WAIT_FOR_INPUT
     wait_for_client:bool = WAIT_FOR_CLIENT
     client_shm:bool = CLIENT_SHM
+    write_trajectories:bool = WRITE_TRAJECTORIES

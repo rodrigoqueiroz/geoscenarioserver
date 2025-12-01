@@ -41,7 +41,8 @@ class GSServer(Node, GSServerBase):
             Parameter(name='map_path', type=ParameterType.PARAMETER_STRING, description='Set the prefix to append to the value of the attribute `globalconfig->lanelet`', default_value=""),
             Parameter(name='btree_locations', type=ParameterType.PARAMETER_STRING, description='Add higher priority locations to search for btrees by agent btypes', default_value=""),
             Parameter(name='dashboard_position', type=ParameterType.PARAMETER_DOUBLE_ARRAY, description='Set the position of the dashboard window (x y width height)', default_value=[0.0]),
-            Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False)
+            Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
+            Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False)
         ]
 
         for param in parameters:
@@ -55,6 +56,7 @@ class GSServer(Node, GSServerBase):
 
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
         self.sim_config.show_dashboard = not self.get_parameter('no_dashboard').get_parameter_value().bool_value
+        self.sim_config.write_trajectories = self.get_parameter('write_trajectories').get_parameter_value().bool_value
         self.sim_config.client_shm = False # always false for server side with ros
 
         btree_locations_param = self.get_parameter('btree_locations').get_parameter_value().string_value
