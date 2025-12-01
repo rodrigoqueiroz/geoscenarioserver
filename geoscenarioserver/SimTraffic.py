@@ -68,7 +68,7 @@ class SimTraffic(object):
         v.sim_config = self.sim_config
 
         #If shared memory is active and there is at least one EV
-        if v.type == Vehicle.EV_TYPE and CLIENT_SHM:
+        if v.type == Vehicle.EV_TYPE and self.sim_config.client_shm:
             self.cosimulation = True
 
     def add_traffic_light(self, tl):
@@ -217,7 +217,7 @@ class SimTraffic(object):
         vp*pedestrians: pid, type, sim_state, state_vector
         """
         #External Sim (Unreal) ShM
-        if CLIENT_SHM:
+        if self.sim_config.client_shm:
             self.sim_client_shm = SimSharedMemoryServer()
 
         #Internal ShM

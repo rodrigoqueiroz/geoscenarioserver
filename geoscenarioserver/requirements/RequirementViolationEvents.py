@@ -14,6 +14,7 @@ file_name_folder = os.getenv("GSS_OUTPUTS", os.path.join(os.getcwd(), "outputs")
 file_name_hard   = os.path.join(file_name_folder, "violations.json")
 file_name_soft   = os.getenv("GSS_EVALUATION_NAME", "")
 global_tick      = Value('i', -1)
+global_simulation_time = Value('d', 0.0)
 metrics          = manager.dict()
 violations       = manager.dict()
 
@@ -39,8 +40,12 @@ class SoftRequirement:
 
 class ScenarioEnd:
 	def __init__(self):
-		scenario_completion = global_tick.value / TRAFFIC_RATE
-		print('Scenario Ended in {} seconds'.format(scenario_completion))
+		if global_simulation_time.value > 0.0:
+			scenario_completion = global_simulation_time.value
+		else:
+			scenario_completion = global_tick.value / TRAFFIC_RATE
+
+		print(f'Scenario Ended in {global_tick.value} ticks after {scenario_completion} simulated seconds')
 
 		# Hard Requirements Report
 		self.write_file(file_name_hard, json.dumps(violations.copy()))
@@ -162,10 +167,14 @@ class CollisionWithVehicle(UnmetRequirement):
 
 
 class GlobalTick:
-	def __init__(self):
+	def __init__(self, delta_time=None):
 		global global_tick
+		global global_simulation_time
 		with global_tick.get_lock():
 			global_tick.value += 1
+		if delta_time is not None:
+			with global_simulation_time.get_lock():
+				global_simulation_time.value += delta_time
 
 
 class GoalOvershot(UnmetRequirement):

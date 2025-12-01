@@ -34,9 +34,12 @@ class MockCoSimulator(Node):
 
         # Store latest tick from server for rate-controlled publishing
         self.latest_tick = None
+        self.simulation_time = 0.0
+        self.tick_count = 0
 
         self.tick_pub = self.create_publisher(Tick, '/gs/tick_from_client', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick', self.tick_from_server, 10)
+        self.monitor_timer = self.create_timer(5.0, self.check_publisher_status)
 
         # Create timer for rate-controlled mode (non-blocking)
         if self.rt_factor > 0.0 and self.target_dt > 0.0:
@@ -46,6 +49,43 @@ class MockCoSimulator(Node):
         else:
             self.timer = None
             self.get_logger().info('Mock co-simulator started (lock-step mode)...')
+
+    def check_publisher_status(self):
+        """Check if publishers still exist on subscribed topic after simulation starts."""
+        if self.tick_count <= 0:
+            return
+
+        publisher_count = self.count_publishers('/gs/tick')
+
+        if publisher_count == 0:
+            self.get_logger().info('No publishers on /gs/tick detected, shutting down...')
+            raise SystemExit(0)
+
+    def advance_simulation_time(self, msg) -> bool:
+        """Advance simulation time and update message. Returns False if max time reached."""
+        # Check for time sync before updating
+        if msg.simulation_time != self.simulation_time:
+            self.get_logger().warning(
+                f'Simulation time mismatch: msg={msg.simulation_time}, self={self.simulation_time}'
+            )
+        
+        if msg.tick_count != self.tick_count:
+            self.get_logger().warning(
+                f'Tick count mismatch: msg={msg.tick_count}, self={self.tick_count}'
+            )
+
+        self.tick_count += 1
+        msg.tick_count = self.tick_count
+        msg.delta_time = self.target_dt
+        self.simulation_time += self.target_dt
+        msg.simulation_time = self.simulation_time
+
+        # Check for simulation completion
+        if self.max_sim_time != -1 and self.simulation_time >= self.max_sim_time:
+            self.get_logger().info('Max simulation time reached, shutting down...')
+            return False
+
+        return True
 
     def tick_from_server(self, msg):
         # Update external vehicle positions using circular motion
@@ -68,13 +108,8 @@ class MockCoSimulator(Node):
             self.latest_tick = msg
         else:
             # Internal control at max speed (rt_factor = 0) - publish immediately
-            msg.delta_time = self.target_dt
-
-            # Check for simulation completion
-            if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
-                self.get_logger().info('Max simulation time reached, shutting down...')
+            if not self.advance_simulation_time(msg):
                 return
-
             self.tick_pub.publish(msg)
 
     def timer_callback(self):
@@ -87,12 +122,8 @@ class MockCoSimulator(Node):
         # Clear after reading to prevent duplicate publishes
         self.latest_tick = None
 
-        # How much time to advance on the server
-        msg.delta_time = self.target_dt
-
-        # Check for simulation completion
-        if self.max_sim_time != -1 and msg.simulation_time >= self.max_sim_time:
-            self.get_logger().info('Max simulation time reached, shutting down...')
+        # Advance simulation time
+        if not self.advance_simulation_time(msg):
             return
 
         # Publish to drive server forward
@@ -109,6 +140,8 @@ def main(args=None):
         co_simulator.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
     except ExternalShutdownException:
         co_simulator.get_logger().info('External shutdown (SIGTERM)')
+    except SystemExit:
+        pass  # Graceful exit from publisher monitoring
     finally:
         co_simulator.destroy_node()
         rclpy.try_shutdown()

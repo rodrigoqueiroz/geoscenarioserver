@@ -118,3 +118,4 @@ class SimConfig:
     show_dashboard:bool = SHOW_DASHBOARD
     wait_for_input:bool = WAIT_FOR_INPUT
     wait_for_client:bool = WAIT_FOR_CLIENT
+    client_shm:bool = CLIENT_SHM

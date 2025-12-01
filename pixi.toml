@@ -42,7 +42,7 @@ version = ">=0.4.1"
 hatchling = "*"
 
 [package.run-dependencies]
-python = ">=3.11"
+python = ">=3.11,<3.13"
 tk = "*"
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
