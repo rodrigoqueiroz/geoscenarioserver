@@ -37,18 +37,119 @@ Behavior trees are parsed from `.btree` files using custom ANTLR4 DSL (`sv/plann
 
 ## Development Workflows
 
+### Server Implementations
+
+GeoScenario Server has **two implementations**:
+
+1. **Standalone Python Server** (`GSServer.py`)
+   - Command: `pixi run gss` or `gsserver`
+   - Timer-based simulation loop at fixed rate (default 40Hz)
+   - Uses shared memory for co-simulation with external clients
+   - Suitable for standalone simulations and legacy co-sim workflows
+
+2. **Native ROS2 Server** (`geoscenario_server.py`)
+   - Command: `pixi run -e humble ros_gss` or `ros2 run geoscenario_server geoscenario_server`
+   - Event-driven simulation controlled by ROS2 topics `/gs/tick` and `/gs/tick_from_client`
+   - No shared memory - direct ROS2 topic communication
+   - Suitable for ROS2-integrated systems and co-simulation
+
+Both implementations support the same core features (scenario loading, behavior trees, trajectory generation) but differ in their external interface and execution model.
+
 ### Running Scenarios
+
+**Standalone Python Server:**
 ```bash
-# Using pixi (recommended)
-pixi run gss --scenario scenarios/test_scenarios/gs_intersection_greenlight.osm
+# Basic scenario execution
+pixi run gss --scenario scenarios/test_scenarios/gs_all_vehicles_peds.osm
+
+# Multiple scenario files (merged at runtime)
+pixi run gss -s scenario1.osm scenario2.osm scenario3.osm
+
+# Set origin to vehicle starting position (VUT-relative coordinates)
+pixi run gss -s <file.osm> --origin-from-vid 10
+
+# Run without dashboard
+pixi run gss -s <file.osm> --no-dash
+
+# Write trajectory CSV files
+pixi run gss -s <file.osm> --write-trajectories
+
+# Debug mode with file logging
+pixi run gss -s <file.osm> --debug --file-log
+
+# Wait for user input before starting
+pixi run gss -s <file.osm> --wait-for-input
+
+# Custom dashboard position (x y width height)
+pixi run gss -s <file.osm> --dash-pos 100 100 1200 800
+
+# Custom map path prefix
+pixi run gss -s <file.osm> --map-path /custom/maps/
+
+# Custom behavior tree locations (colon-separated)
+pixi run gss -s <file.osm> --btree-locations /path/to/btrees:/another/path
 
 # Run test suite
-pixi run test_scenarios_ci  # or bash scripts/run_scenarios.bash --no-dash --non-interactive
-
-# With ROS2 client
-pixi run -e humble ros_gss --scenario <file.osm>
-pixi run -e humble ros_client  # in another terminal
+pixi run test_scenarios_ci
+# or with options:
+bash scripts/run_scenarios.bash --no-dash --non-interactive
 ```
+
+**Native ROS2 Server:**
+```bash
+# Build ROS2 packages first
+pixi run -e humble ros_build
+
+# Basic ROS2 server
+pixi run -e humble ros_gss --scenario <file.osm>
+
+# With ROS2 parameters
+ros2 run geoscenario_server geoscenario_server --ros-args \
+  -p scenario_files:="['/path/to/scenario.osm']" \
+  -p origin_from_vid:=10 \
+  -p no_dashboard:=true \
+  -p write_trajectories:=true \
+  -p wgs84:=true
+
+# Run ROS2 client (in separate terminal)
+pixi run -e humble ros_client
+
+# Run mock co-simulator for testing
+pixi run -e humble ros_mock_co_simulator
+```
+
+### Command-Line Parameters
+
+**Standalone Python Server (`gsserver`):**
+
+| Parameter | Short | Type | Default | Description |
+|-----------|-------|------|---------|-------------|
+| `--scenario` | `-s` | list[str] | `[]` | GeoScenario .osm file(s). Multiple files are merged at runtime |
+| `--verify_map` | | str | `""` | Verify Lanelet map file and exit |
+| `--no-dash` | `-n` | flag | False | Run without the dashboard GUI |
+| `--map-path` | `-m` | str | `""` | Prefix for lanelet map file path |
+| `--btree-locations` | `-b` | str | `""` | Colon-separated additional btree search paths |
+| `--wait-for-input` | `-wi` | flag | False | Wait for [ENTER] before starting simulation |
+| `--wait-for-client` | `-wc` | flag | False | Wait for valid client state before starting |
+| `--dash-pos` | `-dp` | float[4] | `[]` | Dashboard window position: x y width height |
+| `--debug` | `-d` | flag | False | Set log level to DEBUG (default: INFO) |
+| `--file-log` | `-fl` | flag | False | Write logs to `$GSS_OUTPUTS/GSServer.log` |
+| `--write-trajectories` | `-wt` | flag | False | Write agent trajectories to CSV files |
+| `--origin-from-vid` | `-ofv` | int | 0 | Set origin to vehicle's starting position (0 = use scenario origin) |
+| `--quiet` | `-q` | flag | True | Don't print messages to stdout |
+
+**Native ROS2 Server Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `scenario_files` | string_array | `['']` | GeoScenario .osm file paths |
+| `no_dashboard` | bool | False | Run without the dashboard |
+| `map_path` | string | `""` | Prefix for lanelet map file path |
+| `btree_locations` | string | `""` | Additional btree search locations |
+| `dashboard_position` | double_array | `[0.0]` | Dashboard window position [x, y, width, height] |
+| `wgs84` | bool | False | Use WGS84+origin(0,0,0) instead of local+origin=(lat,lon,alt) |
+| `write_trajectories` | bool | False | Write agent trajectories to CSV files |
+| `origin_from_vid` | int | 0 | Set origin to vehicle's starting position (0 = use scenario origin) |
 
 ### Environment Setup
 - **Pixi (recommended)**: `pixi shell` (default env) or `pixi shell -e humble` (with ROS2)
@@ -80,7 +181,7 @@ Format documented in [GeoScenario2](https://geoscenario2.readthedocs.io/).
 
 Parsed by `gsc/GSParser.py`. Key elements:
 - `<tag k='gs' v='globalconfig'>`: timeout, lanelet map, scenario name
-- `<tag k='gs' v='origin'>`: lat/lon/altitude for coordinate projection
+- `<tag k='gs' v='origin'>`: lat/lon/altitude for coordinate projection (can be set to vehicle position via `--origin-from-vid` CLI argument)
 - `<node>` with `gs='vehicle'`: must have `btype` (sdv/tv/pv/ev), optional `btree`, `route`/`trajectory`/`path`, `vid`
 - `<node>` with `gs='pedestrian'`: `btype` (sp/tp/pp), optional `btree`, `destination`/`route`, `pid`
 - Multiple `.osm` files can be merged (see `--scenario` accepting multiple files)
