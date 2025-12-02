@@ -40,7 +40,7 @@ class GSServer(Node, GSServerBase):
             Parameter(name='no_dashboard', type=ParameterType.PARAMETER_BOOL, description='run without the dashboard', default_value=False),
             Parameter(name='map_path', type=ParameterType.PARAMETER_STRING, description='Set the prefix to append to the value of the attribute `globalconfig->lanelet`', default_value=""),
             Parameter(name='btree_locations', type=ParameterType.PARAMETER_STRING, description='Add higher priority locations to search for btrees by agent btypes', default_value=""),
-            Parameter(name='dashboard_position', type=ParameterType.PARAMETER_DOUBLE_ARRAY, description='Set the position of the dashboard window (x y width height)', default_value=[0.0]),
+            Parameter(name='dashboard_position', type=ParameterType.PARAMETER_INTEGER_ARRAY, description='Set the position of the dashboard window [x, y, width, height]', default_value=[0]),
             Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
             Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False),
             Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0)
@@ -80,7 +80,7 @@ class GSServer(Node, GSServerBase):
         self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
 
         #GUI / Debug screen
-        dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().double_array_value
+        dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().integer_array_value
         self.show_dashboard(dashboard_position)
 
         # publishes initial state
