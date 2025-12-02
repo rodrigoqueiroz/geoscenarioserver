@@ -23,6 +23,9 @@ from lanelet2.io import Origin
 from lanelet2.projection import LocalCartesianProjector
 from lanelet2.core import BasicPoint3d, GPSPoint
 
+HEARTBEAT_PERIOD = 5.0  # seconds - check every 5 seconds
+STALL_MULTIPLIER = 5    # trigger shutdown if elapsed time > 5x previous delta_time
+
 @dataclass
 class Parameter:
     name:str = ""
@@ -53,6 +56,12 @@ class GSServer(Node, GSServerBase):
         self.last_delta_time = 0.0
         self.shutdown_called = False
 
+        # Heartbeat tracking
+        self.last_tick_sent_time = None
+        self.last_tick_received_time = None
+        self.last_round_trip_time = None
+        self.heartbeat_timer = None
+
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
         self.sim_config.show_dashboard = not self.get_parameter('no_dashboard').get_parameter_value().bool_value
         self.sim_config.client_shm = False # always false for server side with ros
@@ -74,6 +83,7 @@ class GSServer(Node, GSServerBase):
         
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
+        self.heartbeat_timer = self.create_timer(HEARTBEAT_PERIOD, self.heartbeat_callback)
 
         #GUI / Debug screen
         dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().double_array_value
@@ -138,6 +148,10 @@ class GSServer(Node, GSServerBase):
             return  # Already shut down, avoid double-stop
 
         self.shutdown_called = True
+
+        if self.heartbeat_timer is not None:
+            self.heartbeat_timer.cancel()
+            self.heartbeat_timer = None
 
         if interrupted:
             self.get_logger().warn('Shutting down due to interruption or error')
@@ -210,9 +224,42 @@ class GSServer(Node, GSServerBase):
             tick_msg.pedestrians.append(msg)
 
         self.tick_pub.publish(tick_msg)
+        self.last_tick_sent_time = self.get_clock().now()
 
+    def heartbeat_callback(self):
+        if self.shutdown_called:
+            return
+
+        now = self.get_clock().now()
+
+        # No tick ever received - check initial connection timeout
+        if self.last_tick_received_time is None:
+            if self.last_tick_sent_time is not None:
+                elapsed = (now - self.last_tick_sent_time).nanoseconds / 1e9
+                if self.sim_config.timeout and elapsed >= self.sim_config.timeout:
+                    self.get_logger().error(
+                        f'No tick received from co-simulator after {elapsed:.1f}s'
+                    )
+                    self.shutdown(interrupted=True)
+            return
+
+        # Check for stall: tick sent after last receive with no response
+        if self.last_tick_sent_time > self.last_tick_received_time and self.last_tick_sent_time is not None:
+            elapsed = (now - self.last_tick_sent_time).nanoseconds / 1e9
+            threshold = self.last_round_trip_time * STALL_MULTIPLIER if self.last_round_trip_time else HEARTBEAT_PERIOD
+
+            if elapsed > threshold:
+                self.get_logger().error(
+                    f'Co-simulator stalled: no response for {elapsed:.1f}s (threshold: {threshold:.1f}s)'
+                )
+                self.shutdown(interrupted=True)
 
     def tick_from_client(self, msg):
+        # Track round-trip time for heartbeat stall detection
+        now = self.get_clock().now()
+        self.last_round_trip_time = (now - self.last_tick_sent_time).nanoseconds / 1e9
+        self.last_tick_received_time = now
+
         # Validate message counts match expected actors
         # Protocol sends/receives ALL actors (not just EV/EP), but only EV/EP are updated
         expected_vehicle_count = len(self.traffic.vehicles)
