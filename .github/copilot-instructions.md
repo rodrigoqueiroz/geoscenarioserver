@@ -146,7 +146,7 @@ pixi run -e humble ros_mock_co_simulator
 | `no_dashboard` | bool | False | Run without the dashboard |
 | `map_path` | string | `""` | Prefix for lanelet map file path |
 | `btree_locations` | string | `""` | Additional btree search locations |
-| `dashboard_position` | double_array | `[0.0]` | Dashboard window position [x, y, width, height] |
+| `dashboard_position` | integer_array | `[0.0]` | Dashboard window position [x, y, width, height] |
 | `wgs84` | bool | False | Use WGS84+origin(0,0,0) instead of local+origin=(lat,lon,alt) |
 | `write_trajectories` | bool | False | Write agent trajectories to CSV files |
 | `origin_from_vid` | int | 0 | Set origin to vehicle's starting position (0 = use scenario origin) |
