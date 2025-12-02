@@ -43,8 +43,10 @@ class GSServer(Node, GSServerBase):
             Parameter(name='no_dashboard', type=ParameterType.PARAMETER_BOOL, description='run without the dashboard', default_value=False),
             Parameter(name='map_path', type=ParameterType.PARAMETER_STRING, description='Set the prefix to append to the value of the attribute `globalconfig->lanelet`', default_value=""),
             Parameter(name='btree_locations', type=ParameterType.PARAMETER_STRING, description='Add higher priority locations to search for btrees by agent btypes', default_value=""),
-            Parameter(name='dashboard_position', type=ParameterType.PARAMETER_DOUBLE_ARRAY, description='Set the position of the dashboard window (x y width height)', default_value=[0.0]),
-            Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False)
+            Parameter(name='dashboard_position', type=ParameterType.PARAMETER_INTEGER_ARRAY, description='Set the position of the dashboard window [x, y, width, height]', default_value=[0]),
+            Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
+            Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False),
+            Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0)
         ]
 
         for param in parameters:
@@ -64,6 +66,7 @@ class GSServer(Node, GSServerBase):
 
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
         self.sim_config.show_dashboard = not self.get_parameter('no_dashboard').get_parameter_value().bool_value
+        self.sim_config.write_trajectories = self.get_parameter('write_trajectories').get_parameter_value().bool_value
         self.sim_config.client_shm = False # always false for server side with ros
 
         btree_locations_param = self.get_parameter('btree_locations').get_parameter_value().string_value
@@ -73,8 +76,9 @@ class GSServer(Node, GSServerBase):
 
         gsfiles = self.get_parameter('scenario_files').get_parameter_value().string_array_value
         map_path = self.get_parameter('map_path').get_parameter_value().string_value
+        origin_from_vid = self.get_parameter('origin_from_vid').get_parameter_value().integer_value
 
-        if not self.construct_scenario(gsfiles, self.traffic, self.sim_config, self.lanelet_map, map_path, btree_locations):
+        if not self.construct_scenario(gsfiles, self.traffic, self.sim_config, self.lanelet_map, map_path, btree_locations, origin_from_vid):
             self.get_logger().error("Failed to load scenario")
             raise RuntimeError("Failed to load scenario")
 
@@ -86,7 +90,7 @@ class GSServer(Node, GSServerBase):
         self.heartbeat_timer = self.create_timer(HEARTBEAT_PERIOD, self.heartbeat_callback)
 
         #GUI / Debug screen
-        dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().double_array_value
+        dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().integer_array_value
         self.show_dashboard(dashboard_position)
 
         # publishes initial state
