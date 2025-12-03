@@ -274,7 +274,7 @@ class Dashboard(object):
             pass
         return "Unknown"
 
-    def print_sim_state(self, sim_state):
+    def print_sim_state(self, sim_state:ActorSimState):
         match sim_state:
             case ActorSimState.ACTIVE:
                 return "Active"
@@ -282,8 +282,6 @@ class Dashboard(object):
                 return "Inactive"
             case ActorSimState.INVISIBLE:
                 return "Invisible"
-            case _:
-                return "Unknown"
 
     def update_table(self, vehicles):
         current_set = self.tab.get_children()
