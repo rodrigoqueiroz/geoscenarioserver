@@ -136,7 +136,7 @@ class Dashboard(object):
         
         #get new data
         _, vehicles, pedestrians, _, _  = self.sim_traffic.read_traffic_state(self.sim_traffic.traffic_state_sharr, False)
-        if len(vehicles) == 0 or len(pedestrians) == 0: 
+        if len(vehicles) == 0 and len(pedestrians) == 0:
             log.warning("No traffic; add agents to the scenario")
 
         self.lanelet_map = self.sim_traffic.lanelet_map
@@ -205,7 +205,7 @@ class Dashboard(object):
                     self.center_pedestrian = False
                 self.center_id = int(self.center_id[1:]) #remove first letter
 
-            # if atleast one agent is present in the scenario
+            # if at least one agent is present in the scenario
             if len(vehicles) != 0 or len(pedestrians) != 0:    
                 if self.center_pedestrian == False and self.center_id in vehicles:
                     if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
@@ -270,11 +270,20 @@ class Dashboard(object):
                 if btree_snapshot:
                     maneuver = Dashboard.maneuver_map[btree_snapshot[btree_snapshot.find("Maneuver.")+len("Maneuver."):-5]]
                     return maneuver
-                else:
-                    return "Active"
         except:
             pass
-        return "Inactive"
+        return "Unknown"
+
+    def print_sim_state(self, sim_state):
+        match sim_state:
+            case ActorSimState.ACTIVE:
+                return "Active"
+            case ActorSimState.INACTIVE:
+                return "Inactive"
+            case ActorSimState.INVISIBLE:
+                return "Invisible"
+            case _:
+                return "Unknown"
 
     def update_table(self, vehicles):
         current_set = self.tab.get_children()
@@ -282,7 +291,10 @@ class Dashboard(object):
             self.tab.delete(*current_set)
         for vid in vehicles:
             vehicle = vehicles[vid]
-            status = self.get_maneuver(vid)
+            if vehicle.type == Vehicle.SDV_TYPE:
+                status = self.get_maneuver(vid)
+            else: # PV, TV, EV
+                status = self.print_sim_state(vehicle.sim_state)
             agent_type = Dashboard.vehicle_types[vehicle.type]
             sv = vehicle.state.get_state_vector()
             truncate_vector(sv,1)
@@ -298,13 +310,9 @@ class Dashboard(object):
         for pid in pedestrians:
             pedestrian = pedestrians[pid]
             agent_type = Dashboard.ped_types[pedestrian.type]
-            sim_state = pedestrians[pid].sim_state
             sp = pedestrian.state.get_state_vector()
             truncate_vector(sp,1)
-            if sim_state == 1:
-                status = "Active"
-            else:
-                status = "Inactive"
+            status = self.print_sim_state(pedestrian.sim_state)
             sp = [f"{sp[0]} | {sp[1]} | {sp[2]}", f"{sp[3]} | {sp[4]} | {sp[5]}", f"{sp[6]} | {sp[7]} | {sp[8]}", f"{sp[9]} | {sp[10]} | {sp[11]}", int(sp[12])]
             sp = ['p' + str(pid)] + [agent_type] + [status] + sp
             self.tab.insert('','end', 'p' + str(pid), values=(sp))

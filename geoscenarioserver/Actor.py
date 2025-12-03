@@ -129,7 +129,7 @@ class Actor(object):
             if start_time <= sim_time <= end_time:
                 #Trajectory starts
                 if self.sim_state is ActorSimState.INACTIVE:
-                    log.warning(f"Actor ID {self.id} is now ACTIVE")
+                    log.info(f"Actor ID {self.id} is now ACTIVE")
                     self.sim_state = ActorSimState.ACTIVE
                     if self.ghost_mode:
                         self.sim_state = ActorSimState.INVISIBLE
