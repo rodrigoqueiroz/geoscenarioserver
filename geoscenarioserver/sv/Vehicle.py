@@ -234,12 +234,14 @@ class EV(Vehicle):
         self.type = Vehicle.EV_TYPE
         self.P = np.identity(2) * 0.5 # some large error
         self.bsource = bsource
+        self.sim_state = ActorSimState.INACTIVE
         # experiment w these values
         self.POS_VAR = 0.01 ** 2
         self.VEL_VAR = 0.1 ** 2
         self.SENSOR_VAR = 0.01 ** 2
 
     def update_sim_state(self, new_state, delta_time):
+        self.sim_state = ActorSimState.ACTIVE
         # NOTE: this may desync the sim and frenet vehicle state, so this should
         # only be done for remote vehicles (which don't have a frenet state)
 
