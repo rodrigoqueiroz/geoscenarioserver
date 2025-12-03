@@ -244,7 +244,8 @@ class GSServer(Node, GSServerBase):
         else:
             self.tick_count = msg.tick_count
 
-        if self.simulation_time + msg.delta_time != msg.simulation_time:
+        expected_time = self.simulation_time + msg.delta_time
+        if not math.isclose(expected_time, msg.simulation_time, rel_tol=1e-6):
             self.get_logger().error(
                 f'Simulation time mismatch: expected {self.simulation_time + msg.delta_time}, '
                 f'got {msg.simulation_time} in message'
