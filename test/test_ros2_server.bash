@@ -5,7 +5,7 @@ if [ "$1" == "--help" ]; then
     echo "Usage: $0 [--fastest|--10xrealtime|--2xrealtime] [scenario_file]"
     echo "  Runs the ROS2 GeoScenarioServer with the mock co-simulator in real-time (default) or faster modes:"
     echo "  --fastest : Run the test with the as fast as possible time control, runs simulation till scenario completion"
-    echo "  --10xrealtime : Run the test in 10x real-time for max 30 simulated seconds"
+    echo "  --10xrealtime : Run the test with 10x faster than real-time for max 30 simulated seconds"
     echo "  --2xrealtime : Run the test with 2x faster than real-time for max 30 simulated seconds"
     echo "  [scenario_file] : Optional scenario file to use (gs_all_vehicles_peds.osm by default)"
     exit 1
@@ -24,25 +24,26 @@ REPO_DIR=$(dirname "$SCRIPT_DIR")
 MAX_SIM_TIME=30.0
 
 case "$1" in
-    --fastest|--2xrealtime|--10xrealtime|"")
-        TIMEMODE="$1"
+    --fastest)
+        TIME_FACTOR=0.0
+        MAX_SIM_TIME=-1.0
+        SCENARIO_FILE=${2:-scenarios/test_scenarios/gs_all_vehicles_peds.osm}
+        ;;
+    --2xrealtime)
+        TIME_FACTOR=0.5
+        SCENARIO_FILE=${2:-scenarios/test_scenarios/gs_all_vehicles_peds.osm}
+        ;;
+    --10xrealtime)
+        TIME_FACTOR=0.1
         SCENARIO_FILE=${2:-scenarios/test_scenarios/gs_all_vehicles_peds.osm}
         ;;
     *)
+        # no time mode specified, default to real-time
         SCENARIO_FILE=${1:-scenarios/test_scenarios/gs_all_vehicles_peds.osm}
+        TIME_FACTOR=1.0
+        echo "Running in real-time mode."
+        ;;
 esac
-
-if [ "$TIMEMODE" == "--fastest" ]; then
-    TIME_FACTOR=0.0
-    MAX_SIM_TIME=-1.0
-elif [ "$TIMEMODE" == "--2xrealtime" ]; then
-    TIME_FACTOR=0.5
-elif [ "$TIMEMODE" == "--10xrealtime" ]; then
-    TIME_FACTOR=0.1
-else
-    TIME_FACTOR=1.0
-    echo "Running in real-time mode."
-fi
 
 cd ${REPO_DIR}
 pixi run ros_build_release
