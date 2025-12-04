@@ -58,7 +58,9 @@ pixi run ros_mock_co_simulator --ros-args \
 pixi run ros_server --ros-args \
     --log-level INFO \
     -p dashboard_position:="[0, 0, 1920, 1080]" \
-    -p scenario_files:="['$SCENARIO_FILE']"
+    -p scenario_files:="['$SCENARIO_FILE']" \
+    -p write_trajectories:=true \
+    -p origin_from_vid:=1
 
 
 echo "Sleeping 5s to allow the nodes to shutdown..."

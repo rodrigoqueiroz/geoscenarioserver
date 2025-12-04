@@ -82,7 +82,7 @@ class SVPlanner(object):
                 self._process.terminate()
             self._process.join()
 
-    def get_plan(self):
+    def get_plan(self, wait_for_new:bool = False) -> MotionPlan|None:
         # TODO: knowledge of reference path changing should be written even if trajectory is invalid
         # because then NEXT tick planner will write trajectory based on new path while SV is following
         # the old path. This could be solved by adding a 'frame' variable to the shared array, like
@@ -90,18 +90,29 @@ class SVPlanner(object):
         # changed. Unlike `new_frenet_frame` this won't be a per-tick variable.
 
         plan = MotionPlan()
-        self._mplan_sharr.acquire() #<=========LOCK
-        plan.set_plan_vector(copy(self._mplan_sharr[:]))
-        self._mplan_sharr.release() #<=========RELEASE
-        if (plan.trajectory.T == 0):
-            # Empty plan
-            return None
-        elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
-            # Same plan
-            return None
-        # New plan
-        self.last_plan = plan
-        return plan
+        while True:
+            self._mplan_sharr.acquire() #<=========LOCK
+            plan.set_plan_vector(copy(self._mplan_sharr[:]))
+            self._mplan_sharr.release() #<=========RELEASE
+            if (plan.trajectory.T == 0):
+                # Empty plan
+                if not wait_for_new:
+                    return None
+                else:
+                    # sleep 5 ms and retry
+                    time.sleep(0.005)
+                    continue
+            elif (self.last_plan is not None) and (plan.tick_count == self.last_plan.tick_count):
+                # Same plan
+                if not wait_for_new:
+                    return None
+                else:
+                    # sleep 5 ms and retry
+                    time.sleep(0.005)
+                    continue
+            # New plan
+            self.last_plan = plan
+            return plan
 
 
     #==SUB PROCESS=============================================

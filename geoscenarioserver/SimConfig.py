@@ -66,11 +66,13 @@ PEDESTRIAN_LENGTH = 0.6
 PEDESTRIAN_WIDTH = 0.5
 
 #Planning
-PLANNER_RATE = 5                 #Planner tick rate
-PLANNING_TIME = 0.2              #[s] Must be <= 1/PLANNTER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
-USE_FIXED_PLANNING_TIME = True   #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNTER_RATE)
-POINTS_PER_METER = 3.0           #The number of points per meter to be used along the vehicle's reference path
-                                 #Note that the value that is used may be slightly different
+PLANNER_RATE = 10                  #[Hz] Planner tick rate
+PLANNING_TIME = 0.1               #[s] Must be <= 1/PLANNER_RATE (we recommend 0.100 for scenarios with <4 vehicles)
+USE_FIXED_PLANNING_TIME = False    #True: the plan will target PLANNING_TIME. False, the planner will vary between PLANNING_TIME and max time (1/PLANNER_RATE)
+POINTS_PER_METER = 3.0            #The number of points per meter to be used along the vehicle's reference path
+                                  #Note that the value that is used may be slightly different
+MAX_TRAFFIC_TICKS_PER_PLAN = 200   #[int] Maximum number of traffic ticks per one planner tick. When exceeded, the traffic will stop until the next plan (no longer real-time).
+# MAX_TRAFFIC_TICKS_PER_PLAN = -1  #Use -1 to indicate no limit
 
 #Debugging and Log
 PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle's global paths
@@ -78,7 +80,7 @@ PLOT_VEHICLE_ROUTES = False    #If True, will open figures for each of a vehicle
                                #Figures are opened for each vehicle in the scenario
                                #This should only be set when you want to see these figures
                                #The program will crash after showing figures for all vehicles (an XIO error)
-LOG_PERFORMANCE = False
+LOG_PERFORMANCE = True
 MAX_NVEHICLES = math.inf       #Limit max number of active vehicles (math.inf if no limit)
 EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all agent trajectories will be saved inside $GSS_OUTPUTS as csv files
@@ -114,6 +116,7 @@ class SimConfig:
     planner_rate:int = PLANNER_RATE
     planning_time:float = PLANNING_TIME
     use_fixed_planning_time:bool = USE_FIXED_PLANNING_TIME
+    max_traffic_ticks_per_plan:int = MAX_TRAFFIC_TICKS_PER_PLAN
     plot_id = PLOT_ID
     show_dashboard:bool = SHOW_DASHBOARD
     wait_for_input:bool = WAIT_FOR_INPUT

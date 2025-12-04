@@ -39,6 +39,8 @@ class SDV(Vehicle):
         self.btree_locations = btree_locations
         self.goal_ends_simulation    = goal_ends_simulation
         self.route_nodes = route_nodes
+        #Traffic tick limiting (see SimConfig.MAX_TRAFFIC_TICKS_PER_PLAN)
+        self.traffic_tick_count_per_plan = 0
 
         if start_state_in_frenet:
             # assume frenet start_state is relative to the starting global path
@@ -90,11 +92,23 @@ class SDV(Vehicle):
     def tick(self, tick_count:int, delta_time:float, sim_time:float):
         if self.goal_ends_simulation and self.sv_planner.completion.value:
             raise ScenarioCompletion("Vehicle under test reached its target")
-            
+
+        self.traffic_tick_count_per_plan += 1
         Vehicle.tick(self, tick_count, delta_time, sim_time)
         #Read planner
         if self.sv_planner:
-            plan = self.sv_planner.get_plan()
+            tick_limit = self.sim_traffic.sim_config.max_traffic_ticks_per_plan
+            if tick_limit > 0 and self.traffic_tick_count_per_plan >= tick_limit:
+                log.warning(f"At sim_time: {sim_time} Vehicle {self.id} traffic tick limit of {tick_limit} reached, waiting until new plan is available")
+                #get current time and calculate waiting time
+                wait_start_time = datetime.datetime.now().timestamp()
+                plan = self.sv_planner.get_plan(wait_for_new=True)
+                wait_time = datetime.datetime.now().timestamp() - wait_start_time
+                log.warning(f"At sim_time: {sim_time} Vehicle {self.id} waited {wait_time:.5f}s for new plan")
+                self.traffic_tick_count_per_plan = 1
+            else:
+                plan = self.sv_planner.get_plan()
+            
             if plan is not None:
                 self.set_new_motion_plan(plan, sim_time)
                 if plan.new_frenet_frame:
