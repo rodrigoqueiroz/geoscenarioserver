@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Any
 import os
 
-
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
@@ -15,6 +14,7 @@ from geoscenarioserver.SimTraffic import SimTraffic
 from geoscenarioserver.Actor import VehicleState
 from geoscenarioserver.sv.Vehicle import Vehicle
 from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick, ScenarioCompletion, ScenarioTimeout
+from geoscenario_server.ros2_logging_handler import setup_ros2_logging, cleanup_ros2_logging
 
 from geoscenario_msgs.msg import Tick, Pedestrian as PedestrianMsg, Vehicle as VehicleMsg
 import math
@@ -49,6 +49,8 @@ class GSServer(Node, GSServerBase):
         for param in parameters:
             param_descriptor = ParameterDescriptor(type=param.type, description=param.description)
             self.declare_parameter(param.name, param.default_value, param_descriptor)
+
+        self._ros2_log_handler = setup_ros2_logging(self)
 
         self.tick_count = 0
         self.simulation_time = 0.0
@@ -154,6 +156,9 @@ class GSServer(Node, GSServerBase):
         # Quit dashboard if running
         if self.dashboard:
             self.dashboard.quit()
+
+        if hasattr(self, '_ros2_log_handler'):
+            cleanup_ros2_logging(self._ros2_log_handler)
 
         self.destroy_node()
         rclpy.try_shutdown()
