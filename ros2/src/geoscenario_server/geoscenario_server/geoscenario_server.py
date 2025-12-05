@@ -222,23 +222,7 @@ class GSServer(Node, GSServerBase):
 
 
     def tick_from_client(self, msg):
-        # Validate message counts match expected actors
-        # Protocol sends/receives ALL actors (not just EV/EP), but only EV/EP are updated
-        expected_vehicle_count = len(self.traffic.vehicles)
-        expected_pedestrian_count = len(self.traffic.pedestrians)
-
-        if len(msg.vehicles) != expected_vehicle_count:
-            self.get_logger().warn(
-                f'Vehicle count mismatch: expected {expected_vehicle_count} total vehicles, '
-                f'got {len(msg.vehicles)} in message'
-            )
-
-        if len(msg.pedestrians) != expected_pedestrian_count:
-            self.get_logger().warn(
-                f'Pedestrian count mismatch: expected {expected_pedestrian_count} total pedestrians, '
-                f'got {len(msg.pedestrians)} in message'
-            )
-
+        # Process incoming tick - only EV/EP types are updated from client messages
         if msg.tick_count != self.tick_count + 1:
             self.get_logger().error(
                 f'Tick count mismatch: expected {self.tick_count + 1}, '
