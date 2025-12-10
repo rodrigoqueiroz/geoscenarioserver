@@ -41,12 +41,13 @@ class GSServer(GSServerBase):
         self.sim_config.show_dashboard = not args.no_dash
         self.sim_config.wait_for_input = args.wait_for_input
         self.sim_config.wait_for_client = args.wait_for_client
+        self.sim_config.write_trajectories = args.write_trajectories
 
         # use sim_config after all modifications
         self.traffic = SimTraffic(self.lanelet_map, self.sim_config)
 
         # SCENARIO SETUP
-        if not self.construct_scenario(args.gsfiles, self.traffic, self.sim_config, self.lanelet_map, args.map_path, btree_locations):
+        if not self.construct_scenario(args.gsfiles, self.traffic, self.sim_config, self.lanelet_map, args.map_path, btree_locations, args.origin_from_vid):
             log.error("Failed to load scenario")
             return
 
@@ -117,6 +118,8 @@ def main():
     parser.add_argument("-dp", "--dash-pos", default=[], dest="dash_pos", type=float, nargs=4, help="Set the position of the dashboard window (x y width height)")
     parser.add_argument("-d", "--debug", dest="debug", action="store_true", help="Set the logging level to DEBUG instead of INFO")
     parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to $GSS_OUTPUTS/GSServer.log instead of stdout")
+    parser.add_argument("-wt", "--write-trajectories", dest="write_trajectories", action="store_true", help="Write all agent trajectories to CSV files inside $GSS_OUTPUTS")
+    parser.add_argument("-ofv", "--origin-from-vid", dest="origin_from_vid", type=int, default=0, help="Set the origin to the starting position of the vehicle with the specified vid (e.g., --origin-from-vid=10)")
     args = parser.parse_args()
 
     log_level = logging.DEBUG if args.debug else logging.INFO

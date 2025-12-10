@@ -7,7 +7,14 @@ The `ros2/geoscenario_server` wraps GSServer into a ROS2 node
 ## Usage
 
 ```
-ros2 run geoscenario_server geoscenario_server [--ros-args -p scenario_files -p no_dashboard -p map_path -p btree_locations -p dashboard_position -p wgs84 ]
+ros2 run geoscenario_server geoscenario_server --ros-args \
+        -p scenario_files:=[<path>, ...] \
+        -p no_dashboard:=true \
+        -p map_path:=<path> \
+        -p btree_locations:=[<path>, ...] \
+        -p dashboard_position:=[<x>, <y>, <w>, <h>] \
+        -p wgs84:=true \
+        -p write_trajectories:=true
 ```
 
 # GeoScenarioServer shared memory client for ROS2
