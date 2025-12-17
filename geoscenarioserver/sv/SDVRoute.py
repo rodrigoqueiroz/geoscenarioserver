@@ -13,6 +13,9 @@ from geoscenarioserver.SimConfig import SimConfig, POINTS_PER_METER, PLOT_VEHICL
 from geoscenarioserver.util.Transformations import OutsideRefPathException, sim_to_frenet_position
 from geoscenarioserver.util.Utils import distance_2p
 
+import logging
+log = logging.getLogger("GSServer")
+
 class SDVRoute(object):
     lanelet_map = None
 

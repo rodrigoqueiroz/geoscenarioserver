@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <!-- Map -->
+  <node id='-133105' action='modify' visible='true' lat='43.50984896879' lon='-80.53828513943'>
+    <tag k='altitude' v='300' />
+    <tag k='area' v='100' />
+    <tag k='gs' v='origin' />
+  </node>
+  <node id='-133109' action='modify' visible='true' lat='43.50998138248' lon='-80.538409771'>
+    <tag k='collision' v='yes' />
+    <tag k='gs' v='globalconfig' />
+    <tag k='lanelet' v='maps/experimental_maps/lanelet2_bathurst_50kmh.osm' />
+    <tag k='mutate' v='no' />
+    <tag k='name' v='[Train] Long Straight Road' />
+    <tag k='timeout' v='300' />
+    <tag k='version' v='2.0' />
+  </node>
+  <!-- Vehicle Under Test -->
+  <node id='-138107' action='modify' visible='true' lat='43.5162514' lon='-80.51565785'>
+    <!-- <tag k='btree' v='st_standard_driver.btree' /> -->
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='detection_range_in_meters' v='50' />
+    <tag k='goal_ends_simulation' v='yes' />
+    <tag k='gs' v='vehicle' />
+    <tag k='hallucination_retention' v='0.99' />
+    <tag k='hallucination_weight' v='0.01' />
+    <tag k='missed_detection_weight' v='0.25' />
+    <tag k='name' v='cul_de_sac_follower' />
+    <!-- Noise used for Training and Same Distribution Testing -->
+    <!-- <tag k='noise_std_position' v='1.0' /> -->
+    <!-- Increased Noise used for Testing -->
+    <!-- <tag k='noise_std_position' v='1.5' /> -->
+    <tag k='noise_std_position' v='1.0' />
+    <tag k='noise_yaw_mostly_reliable' v='4.0' />
+    <tag k='noise_yaw_strongly_inaccurate' v='1.5' />
+    <tag k='route' v='cul_de_sac_follower' />
+    <tag k='rule_engine_port' v='5001' />
+    <!-- <tag k='tracking_method' v='alpha_beta' /> -->
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='150' />
+  </node>
+  <node id='-1150939' action='modify' visible='true' lat='43.5160643' lon='-80.5162602' />
+  <node id='-1150940' action='modify' visible='true' lat='43.512434999999996' lon='-80.52774795' />
+  <way id='-1148313' action='modify' visible='true'>
+    <nd ref='-1150939' />
+    <nd ref='-1150940' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='cul_de_sac_follower' />
+  </way>
+  <!-- Leading vehicle -->
+  <node id='-1145799' action='modify' visible='true' lat='43.5160643' lon='-80.5162602'>
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='cul_de_sac_leader' />
+    <tag k='route' v='cul_de_sac_leader' />
+    <tag k='rule_engine_port' v='5002' />
+    <tag k='vid' v='2' />
+    <tag k='yaw' v='150' />
+  </node>
+  <node id='-1300940' action='modify' visible='true' lat='43.515852249999995' lon='-80.51694135' />
+  <node id='-1300941' action='modify' visible='true' lat='43.5077362' lon='-80.53799445' />
+  <way id='-1148328' action='modify' visible='true'>
+    <nd ref='-1300940' />
+    <nd ref='-1300941' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='cul_de_sac_leader' />
+  </way>
+</osm>
