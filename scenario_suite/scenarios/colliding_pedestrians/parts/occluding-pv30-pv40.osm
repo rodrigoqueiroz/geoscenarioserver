@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5396561' action='modify' lat='43.47109538645' lon='-80.53866514073'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v30' />
+    <tag k='path' v='v30_path' />
+    <tag k='speed' v='1' />
+    <tag k='vid' v='30' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5396562' action='modify' lat='43.4711259851' lon='-80.53871866741'>
+    <tag k='btype' v='PV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='v40' />
+    <tag k='path' v='v40_path' />
+    <tag k='speed' v='1' />
+    <tag k='vid' v='40' />
+    <tag k='yaw' v='217' />
+  </node>
+  <node id='-5396563' action='modify' lat='43.47112691911' lon='-80.53872032203' />
+  <node id='-5396564' action='modify' lat='43.47112712927' lon='-80.53872064886' />
+  <node id='-5396565' action='modify' lat='43.47109546318' lon='-80.5386652908' />
+  <node id='-5396566' action='modify' lat='43.47109555401' lon='-80.53866545114' />
+  <way id='-1958130' action='modify'>
+    <nd ref='-5396563' />
+    <nd ref='-5396564' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='v40_path' />
+  </way>
+  <way id='-1958131' action='modify'>
+    <nd ref='-5396565' />
+    <nd ref='-5396566' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='v30_path' />
+  </way>
+</osm>

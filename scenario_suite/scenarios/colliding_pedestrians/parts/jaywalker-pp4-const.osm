@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5396419' action='modify' lat='43.47122291461' lon='-80.53881452083'>
+    <tag k='btype' v='PP' />
+    <tag k='can_reverse' v='yes' />
+    <tag k='collision_vehicle_vid' v='1' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='p4' />
+    <tag k='path' v='jaywalk' />
+    <tag k='pid' v='4' />
+    <tag k='speed' v='6' />
+    <tag k='speed_qualifier' v='constant' />
+    <tag k='start' v='yes' />
+  </node>
+  <node id='-5396425' action='modify' lat='43.4712215452' lon='-80.53880934152' />
+  <node id='-5396426' action='modify' lat='43.47121578374' lon='-80.53880846884' />
+  <node id='-5396427' action='modify' lat='43.47120504797' lon='-80.53880899717' />
+  <node id='-5396428' action='modify' lat='43.47119431219' lon='-80.53881428048' />
+  <node id='-5396429' action='modify' lat='43.47118434325' lon='-80.53882114879' />
+  <node id='-5396430' action='modify' lat='43.47117514115' lon='-80.53882960208' />
+  <node id='-5396431' action='modify' lat='43.47116629298' lon='-80.53883773026' />
+  <node id='-5396432' action='modify' lat='43.47115673695' lon='-80.53884122537' />
+  <node id='-5396433' action='modify' lat='43.4711429338' lon='-80.53884333869' />
+  <node id='-5396434' action='modify' lat='43.47112273406' lon='-80.53884643136' />
+  <node id='-5396435' action='modify' lat='43.47110804248' lon='-80.53884122537' />
+  <node id='-5396436' action='modify' lat='43.47108542062' lon='-80.53884122537' />
+  <node id='-5396437' action='modify' lat='43.47107161745' lon='-80.53883911205' />
+  <node id='-5396438' action='modify' lat='43.47105896454' lon='-80.53882960208' />
+  <node id='-5396439' action='modify' lat='43.47105206296' lon='-80.53881850713' />
+  <node id='-5396440' action='modify' lat='43.47104299616' lon='-80.53880393141' />
+  <node id='-5396441' action='modify' lat='43.47102897646' lon='-80.53878139342' />
+  <way id='-1958032' action='modify'>
+    <nd ref='-5396425' />
+    <nd ref='-5396426' />
+    <nd ref='-5396427' />
+    <nd ref='-5396428' />
+    <nd ref='-5396429' />
+    <nd ref='-5396430' />
+    <nd ref='-5396431' />
+    <nd ref='-5396432' />
+    <nd ref='-5396433' />
+    <nd ref='-5396434' />
+    <nd ref='-5396435' />
+    <nd ref='-5396436' />
+    <nd ref='-5396437' />
+    <nd ref='-5396438' />
+    <nd ref='-5396439' />
+    <nd ref='-5396440' />
+    <nd ref='-5396441' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='jaywalk' />
+  </way>
+</osm>

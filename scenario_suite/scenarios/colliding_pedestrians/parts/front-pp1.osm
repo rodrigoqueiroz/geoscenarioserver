@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5396484' action='modify' lat='43.4711312483' lon='-80.53879332944'>
+    <tag k='area' v='no' />
+    <tag k='continuous' v='no' />
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_1_dest' />
+  </node>
+  <node id='-5396485' action='modify' lat='43.47110124438' lon='-80.53878205767'>
+    <tag k='btree' v='walk_ensure_collision.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_1_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='ped_1' />
+    <tag k='pid' v='1' />
+    <tag k='route' v='ped_1_route' />
+    <tag k='speed' v='1' />
+  </node>
+  <node id='-5396486' action='modify' lat='43.47111477432' lon='-80.53876761875' />
+  <node id='-5396487' action='modify' lat='43.47110090508' lon='-80.53878074839' />
+  <way id='-1958067' action='modify'>
+    <nd ref='-5396487' />
+    <nd ref='-5396486' />
+    <nd ref='-5396484' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ped_1_route' />
+  </way>
+</osm>
