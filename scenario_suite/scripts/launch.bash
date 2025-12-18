@@ -152,17 +152,28 @@ mkdir -p "$suite_dir/logs/$timestamp"
 ## Launch GeoScenario Server ##
 ###############################
 
-# Example ROS2 server launch command:
-# pixi run ros_server --ros-args \
-#   -p "map_path:=/scenario_suite" \
-#   -p "btree_locations:=/scenario_suite/btrees" \
-#   -p "dashboard_position:=[0.0, 0.0, 1920.0, 1080.0]" \
-#   -p "no_dashboard:=true" \
-#   -p "scenario_files:=['/scenario_suite/scenarios/Reuther-Fwy-MI-cut-in-from-left/Reuther-Fwy-MI-cut-in-from-left.osm',\
-#                        '/scenario_suite/scenarios/Reuther-Fwy-MI-cut-in-from-left/parts/vut_tv99.osm',\
-#                        '/scenario_suite/scenarios/Reuther-Fwy-MI-cut-in-from-left/parts/gvt_sdv1_cut_in.osm',\
-#                        '/scenario_suite/scenarios/Reuther-Fwy-MI-cut-in-from-left/parts/gvt_sdv2_generic.osm']"
+# Example ROS2 server launch_command.log:
 
+# pixi run ros_server --ros-args --params-file /<GSS_path>/scenario_suite/logs/2025-12-18-084927/launch_params.yaml
+
+# Example launch_params.yaml:
+
+# geoscenario_server:
+#   ros__parameters:
+#     map_path: /<GSS_path>/scenario_suite
+#     scenario_files:
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/colliding_pedestrians.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/front-sp1.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/left-sp3.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/right-sp2.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/jaywalker-pp4-const.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/jaywalker-pp5-profile.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/occluding-pv10-pv20.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/occluding-pv30-pv40.osm
+#       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/vut_sdv1-reverse.osm
+#     write_trajectories: true
+#     origin_from_vid: 1
+#     dashboard_position: [100, 200, 800, 900]
 
 gss_scenario_dir="${scenarios_dir}/${scenario_name}"
 gss_scenario_file="${gss_scenario_dir}/${scenario_name}.osm"
