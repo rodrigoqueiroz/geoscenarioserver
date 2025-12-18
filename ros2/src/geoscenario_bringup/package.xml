@@ -8,6 +8,8 @@
   <maintainer email="michal.antkiewicz@uwaterloo.ca">Michal Antkiewicz</maintainer>
   <license>MIT</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
   <exec_depend>geoscenario_server</exec_depend>
   <exec_depend>geoscenario_client</exec_depend>
   <exec_depend>geoscenario_msgs</exec_depend>
@@ -18,6 +20,6 @@
   <test_depend>launch_testing_ros</test_depend>
 
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
