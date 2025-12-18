@@ -106,16 +106,21 @@ class MockCoSimulator(Node):
         return True
 
     def tick_from_server(self, msg):
-        # Update external vehicle positions using circular motion
+        # Only send EV vehicles that we're updating (partial agent list)
+        updated_vehicles = []
         for v in msg.vehicles:
-            v.active = True
             if v.type == '2': # EV_TYPE
+                v.active = True
                 # Update position (circular motion pattern)
                 v.position.x -= math.sin(msg.simulation_time)
                 v.position.y += math.cos(msg.simulation_time)
+                updated_vehicles.append(v)
 
-        for p in msg.pedestrians:
-            p.active = True
+        # Replace full list with only updated vehicles
+        msg.vehicles = updated_vehicles
+
+        # Don't send pedestrians since we're not updating any
+        msg.pedestrians = []
 
         # Determine publishing strategy based on control mode
         if self.target_dt <= 0.0:

@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Any
 import os
 
-
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
@@ -15,6 +14,7 @@ from geoscenarioserver.SimTraffic import SimTraffic
 from geoscenarioserver.Actor import VehicleState
 from geoscenarioserver.sv.Vehicle import Vehicle
 from geoscenarioserver.requirements.RequirementViolationEvents import GlobalTick, ScenarioCompletion, ScenarioTimeout
+from geoscenario_server.ros2_logging_handler import setup_ros2_logging, cleanup_ros2_logging
 
 from geoscenario_msgs.msg import Tick, Pedestrian as PedestrianMsg, Vehicle as VehicleMsg
 import math
@@ -52,6 +52,8 @@ class GSServer(Node, GSServerBase):
         for param in parameters:
             param_descriptor = ParameterDescriptor(type=param.type, description=param.description)
             self.declare_parameter(param.name, param.default_value, param_descriptor)
+
+        self._ros2_log_handler = setup_ros2_logging(self)
 
         self.tick_count = 0
         self.simulation_time = 0.0
@@ -170,6 +172,9 @@ class GSServer(Node, GSServerBase):
         if self.dashboard:
             self.dashboard.quit()
 
+        if hasattr(self, '_ros2_log_handler'):
+            cleanup_ros2_logging(self._ros2_log_handler)
+
         self.destroy_node()
         rclpy.try_shutdown()
 
@@ -265,23 +270,6 @@ class GSServer(Node, GSServerBase):
         self.last_round_trip_time = (now - self.last_tick_sent_time).nanoseconds / 1e9
         self.last_tick_received_time = now
 
-        # Validate message counts match expected actors
-        # Protocol sends/receives ALL actors (not just EV/EP), but only EV/EP are updated
-        expected_vehicle_count = len(self.traffic.vehicles)
-        expected_pedestrian_count = len(self.traffic.pedestrians)
-
-        if len(msg.vehicles) != expected_vehicle_count:
-            self.get_logger().warn(
-                f'Vehicle count mismatch: expected {expected_vehicle_count} total vehicles, '
-                f'got {len(msg.vehicles)} in message'
-            )
-
-        if len(msg.pedestrians) != expected_pedestrian_count:
-            self.get_logger().warn(
-                f'Pedestrian count mismatch: expected {expected_pedestrian_count} total pedestrians, '
-                f'got {len(msg.pedestrians)} in message'
-            )
-
         if msg.tick_count != self.tick_count + 1:
             self.get_logger().error(
                 f'Tick count mismatch: expected {self.tick_count + 1}, '
@@ -292,7 +280,8 @@ class GSServer(Node, GSServerBase):
         else:
             self.tick_count = msg.tick_count
 
-        if self.simulation_time + msg.delta_time != msg.simulation_time:
+        expected_time = self.simulation_time + msg.delta_time
+        if not math.isclose(expected_time, msg.simulation_time, rel_tol=1e-6):
             self.get_logger().error(
                 f'Simulation time mismatch: expected {self.simulation_time + msg.delta_time}, '
                 f'got {msg.simulation_time} in message'
