@@ -57,6 +57,9 @@ Arguments:
      <scenario_name>      name of the folder 'scenarios/<scenario_name>' (mandatory)
      [<part_name>.osm*]   names of the files in the folder 'scenarios/<scenario_name>/parts' (optional list)
      [--ros]              launch ROS2 node geoscenario_server (launch standalone by default)
+     [--mock-co-sim <real_time_factor>]
+                          launch mock_co_simulator with delta_time=0.025 and the given real_time_factor (only valid with --ros)
+                          real_time_factor: 0: max speed, (0..1): faster than real time, 1: real time, >1 = slower than real time
      [<gss_options>*]     additional options for the GeoScenarioServer (optional list):
                           --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid
 ...

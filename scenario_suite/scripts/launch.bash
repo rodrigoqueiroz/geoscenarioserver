@@ -23,7 +23,7 @@ fi
 
 print_help() {
     echo ""
-    echo "Usage: slaunch <scenario_name> [<part_name>.osm*] [--ros] [<gss_options>*]"
+    echo "Usage: slaunch <scenario_name> [<part_name>.osm*] [--ros] [--mock-co-sim] [<gss_options>*]"
     echo ""
     echo "Launches the specified scenario with the GeoScenarioServer traffic simulator"
     if [[ -L ${suite_dir}/geoscenarioserver ]]; then
@@ -35,11 +35,14 @@ print_help() {
     fi
     echo ""
     echo "Arguments:"
-    echo "     <scenario_name>      name of the folder 'scenarios/<scenario_name>' (mandatory)"
-    echo "     [<part_name>.osm*]   names of the files in the folder 'scenarios/<scenario_name>/parts' (optional list)"
-    echo "     [--ros]              launch ROS2 node geoscenario_server (launch standalone by default)"
-    echo "     [<gss_options>*]     additional options for the GeoScenarioServer (optional list):"
-    echo "                          --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid"
+    echo "     <scenario_name>       name of the folder 'scenarios/<scenario_name>' (mandatory)"
+    echo "     [<part_name>.osm*]    names of the files in the folder 'scenarios/<scenario_name>/parts' (optional list)"
+    echo "     [--ros]               launch ROS2 node geoscenario_server (launch standalone by default)"
+    echo "     [--mock-co-sim <real_time_factor>]"
+    echo "                           launch mock_co_simulator with delta_time=0.025 and the given real_time_factor (only valid with --ros)"
+    echo "                           real_time_factor: 0: max speed, (0..1): faster than real time, 1: real time, >1 = slower than real time"
+    echo "     [<gss_options>*]      additional options for the GeoScenarioServer (optional list):"
+    echo "                           --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid"
     echo ""
     echo "The following scenarios are available in the suite ${suite_dir}:"
     echo ""
@@ -72,6 +75,7 @@ args=("$@")
 full_parts_list=""
 gss_options=""
 ros=
+mock_co_sim=
 ros_full_parts_list=()
 ros_gss_options=()
 number_is_for=
@@ -88,6 +92,9 @@ for arg in ${args[@]}; do
         case $arg in
             --ros)
                 ros="true"
+                ;;
+            --mock-co-sim)
+                number_is_for="mock-co-sim"
                 ;;
             --no-dash)
                 gss_options="${gss_options} ${arg}"
@@ -114,6 +121,9 @@ for arg in ${args[@]}; do
                 # determine for which parameter this number is intended
                 if [[ ${number_is_for} == "origin-from-vid" ]]; then
                     ros_gss_options+=("origin_from_vid: ${arg}")
+                    number_is_for=
+                elif [[ ${number_is_for} == "mock-co-sim" ]]; then
+                    mock_co_sim=("-p real_time_factor:=${arg}")
                     number_is_for=
                 elif [[ ${number_is_for} == "dash-pos" ]] && [[ -z ${dash_pos_x} ]]; then
                     dash_pos_x=${arg}
@@ -190,7 +200,9 @@ if [[ -f "${gss_scenario_file}" ]]; then
         ros_btree_locations=""
     fi
     gss_command_log="${suite_dir}/logs/${timestamp}/launch_command.log"
+    mock_co_sim_command_log="${suite_dir}/logs/${timestamp}/mock_co_sim_command.log"
     gss_output_log="${suite_dir}/logs/${timestamp}/gss_output.log"
+    mock_co_sim_output_log="${suite_dir}/logs/${timestamp}/mock_co_sim_output.log"
     export GSS_OUTPUTS="${suite_dir}/logs/${timestamp}"
     if [[ ${ros} == "true" ]]; then
         echo "Launching ROS2 GeoScenario server..."
@@ -214,6 +226,11 @@ END_YAML
             done
         fi
         ros_gss_command="pixi run ros_server --ros-args --params-file ${gss_launch_params}"
+        if [[ -n ${mock_co_sim} ]]; then
+            mock_co_sim_command="pixi run ros_mock_co_simulator --ros-args -p target_delta_time:=0.025 ${mock_co_sim}"
+            echo "${mock_co_sim_command}" > "${mock_co_sim_command_log}"
+            ${mock_co_sim_command} 2>&1 | tee "${mock_co_sim_output_log}" &
+        fi
         # log the command for debugging
         echo "${ros_gss_command}" >> "${gss_command_log}"
         ${ros_gss_command} 2>&1 | tee "${gss_output_log}"
