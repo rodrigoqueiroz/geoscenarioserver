@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5396411' action='modify' lat='43.47116435012' lon='-80.53870423545'>
+    <tag k='area' v='no' />
+    <tag k='continuous' v='no' />
+    <tag k='gs' v='location' />
+    <tag k='name' v='ped_3_dest' />
+  </node>
+  <node id='-5396410' action='modify' lat='43.47106588543' lon='-80.53883823005' />
+  <node id='-5396409' action='modify' lat='43.4710656038' lon='-80.53884704999'>
+    <tag k='btree' v='walk_ensure_collision.btree' />
+    <tag k='btype' v='SP' />
+    <tag k='destination' v='ped_3_dest' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='ped_3' />
+    <tag k='pid' v='3' />
+    <tag k='route' v='ped_3_route' />
+    <tag k='speed' v='5' />
+  </node>
+  <way id='-1958008' action='modify'>
+    <nd ref='-5396410' />
+    <nd ref='-5396411' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='ped_3_route' />
+  </way>
+</osm>

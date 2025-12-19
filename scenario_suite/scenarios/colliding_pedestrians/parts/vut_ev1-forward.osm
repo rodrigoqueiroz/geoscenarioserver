@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5396403' action='modify' lat='43.47103525777' lon='-80.53862856203'>
+    <tag k='btype' v='EV' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='225' />
+  </node>
+</osm>

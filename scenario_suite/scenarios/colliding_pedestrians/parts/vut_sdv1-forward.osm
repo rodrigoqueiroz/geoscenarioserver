@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5396402' action='modify' lat='43.47136827917' lon='-80.53920406045'>
+    <tag k='gs' v='egogoal' />
+    <tag k='name' v='g1' />
+  </node>
+  <node id='-5396403' action='modify' lat='43.47103525777' lon='-80.53862856203'>
+    <tag k='btree' v='st_standard_driver.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='goal_ends_simulation' v='yes' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='route' v='forward_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='225' />
+  </node>
+  <node id='-5396414' action='modify' lat='43.47103485945' lon='-80.53862815254' />
+  <node id='-5396415' action='modify' lat='43.47138338875' lon='-80.53922968597' />
+  <way id='-1958030' action='modify'>
+    <nd ref='-5396414' />
+    <nd ref='-5396415' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='forward_route' />
+  </way>
+</osm>
