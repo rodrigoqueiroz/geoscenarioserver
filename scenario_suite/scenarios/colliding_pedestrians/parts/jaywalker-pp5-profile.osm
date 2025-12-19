@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5399823' action='modify' lat='43.4711282964' lon='-80.53891332321'>
+    <tag k='btype' v='PP' />
+    <tag k='can_reverse' v='yes' />
+    <tag k='collision_vehicle_vid' v='1' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='name' v='p5' />
+    <tag k='path' v='jaywalk-profile' />
+    <tag k='pid' v='5' />
+    <tag k='start' v='yes' />
+    <tag k='usespeedprofile' v='yes' />
+  </node>
+  <node id='-5399864' action='modify' lat='43.4711227574' lon='-80.53890967128'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-5399865' action='modify' lat='43.4711328085' lon='-80.53886476375'>
+    <tag k='agentspeed' v='7' />
+  </node>
+  <node id='-5399866' action='modify' lat='43.47114316859' lon='-80.53880182138'>
+    <tag k='agentspeed' v='7' />
+  </node>
+  <node id='-5399867' action='modify' lat='43.47113563398' lon='-80.53869151002'>
+    <tag k='agentspeed' v='5' />
+  </node>
+  <node id='-5399868' action='modify' lat='43.47110832099' lon='-80.53851176739'>
+    <tag k='agentspeed' v='4' />
+  </node>
+  <node id='-5399886' action='modify' lat='43.47114314195' lon='-80.53878807431'>
+    <tag k='agentspeed' v='1' />
+  </node>
+  <way id='-1958259' action='modify'>
+    <nd ref='-5399864' />
+    <nd ref='-5399865' />
+    <nd ref='-5399866' />
+    <nd ref='-5399886' />
+    <nd ref='-5399867' />
+    <nd ref='-5399868' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='jaywalk-profile' />
+  </way>
+</osm>

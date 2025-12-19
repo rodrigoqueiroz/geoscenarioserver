@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='false' generator='JOSM'>
+  <node id='-5399903' action='modify' lat='43.47104834979' lon='-80.53865610473'/>
+  <node id='-5399904' action='modify' lat='43.47214744126' lon='-80.54036889684'/>
+  <node id='-5399905' action='modify' lat='43.47121633663' lon='-80.53892509411'>
+    <tag k='btree' v='st_reverse.btree' />
+    <tag k='btype' v='SDV' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='vehicle' />
+    <tag k='name' v='VUT' />
+    <tag k='route' v='reverse_route' />
+    <tag k='vid' v='1' />
+    <tag k='yaw' v='217' />
+  </node>
+  <way id='-1958279' action='modify'>
+    <nd ref='-5399903' />
+    <nd ref='-5399904' />
+    <tag k='gs' v='route' />
+    <tag k='name' v='reverse_route' />
+  </way>
+</osm>
