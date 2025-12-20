@@ -48,7 +48,7 @@ def generate_test_description():
         output='screen',
         arguments=['--ros-args', '--log-level', 'INFO'],
         parameters=[{
-            'scenario_files': SCENARIO_FILE,
+            'scenario_files': [SCENARIO_FILE],
             'no_dashboard': True,
         }]
     )

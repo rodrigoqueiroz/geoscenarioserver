@@ -75,7 +75,7 @@ def generate_launch_description():
         output='screen',
         arguments=['--ros-args', '--log-level', 'INFO'],
         parameters=[{
-            'scenario_files': scenario_file,
+            'scenario_files': [scenario_file],
             'dashboard_position': dashboard_position,
         }]
     )

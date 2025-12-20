@@ -39,7 +39,7 @@ class GSServer(Node, GSServerBase):
         GSServerBase.__init__(self)
 
         parameters = [
-            Parameter(name='scenario_files', type=ParameterType.PARAMETER_STRING, description='GeoScenario file paths (comma-separated)', default_value=''),
+            Parameter(name='scenario_files', type=ParameterType.PARAMETER_STRING_ARRAY, description='GeoScenario file paths', default_value=['']),
             Parameter(name='no_dashboard', type=ParameterType.PARAMETER_BOOL, description='run without the dashboard', default_value=False),
             Parameter(name='map_path', type=ParameterType.PARAMETER_STRING, description='Set the prefix to append to the value of the attribute `globalconfig->lanelet`', default_value=""),
             Parameter(name='btree_locations', type=ParameterType.PARAMETER_STRING, description='Add higher priority locations to search for btrees by agent btypes', default_value=""),
@@ -76,8 +76,7 @@ class GSServer(Node, GSServerBase):
         
         self.traffic = SimTraffic(self.lanelet_map, self.sim_config)
 
-        gsfiles_param = self.get_parameter('scenario_files').get_parameter_value().string_value
-        gsfiles = [f.strip() for f in gsfiles_param.split(',') if f.strip()]
+        gsfiles = self.get_parameter('scenario_files').get_parameter_value().string_array_value
         map_path = self.get_parameter('map_path').get_parameter_value().string_value
         origin_from_vid = self.get_parameter('origin_from_vid').get_parameter_value().integer_value
 

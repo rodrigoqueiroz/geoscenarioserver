@@ -55,7 +55,7 @@ The argument `roundtriptest:=true` (`false` by default) enables this round-trip 
 
 Run all bringup tests:
 ```bash
-pixi run -e humble ros_test_bringup
+pixi run ros_test_bringup
 ```
 
 Or using colcon directly:
