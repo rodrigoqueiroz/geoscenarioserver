@@ -150,10 +150,22 @@ class Dashboard(object):
         sync_dash = TickSync(DASH_RATE, realtime=True, block=True, verbose=False, label="dash")
         # handle user closing the window
         self.window.protocol("WM_DELETE_WINDOW", lambda arg=self.window: (sync_dash.write_performance_log(), arg.destroy()))
+
+        # Signal handler that properly exits the process
+        def handle_termination(signum, frame):
+            sync_dash.write_performance_log()
+            if self.window:
+                try:
+                    self.window.destroy()
+                except Exception:
+                    pass
+            import sys
+            sys.exit(0)
+
         # handle process termination sent from quit()
-        signal.signal(signal.SIGTERM, lambda s, f: sync_dash.write_performance_log())
+        signal.signal(signal.SIGTERM, handle_termination)
         # handle user's <CTRL>+C
-        signal.signal(signal.SIGINT, lambda s, f: sync_dash.write_performance_log())
+        signal.signal(signal.SIGINT, handle_termination)
         previous_sim_time = None
         while sync_dash.tick():
             if not self.window:
@@ -255,6 +267,10 @@ class Dashboard(object):
 
     def quit(self):
         self._process.terminate()
+        self._process.join(timeout=5.0)  # Wait up to 5 seconds for clean shutdown
+        if self._process.is_alive():
+            self._process.kill()  # Force kill if still running
+            self._process.join(timeout=1.0)
 
     def change_tab_focus(self, event):
         focus = self.tab.focus()
