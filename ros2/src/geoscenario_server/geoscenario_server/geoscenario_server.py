@@ -144,11 +144,12 @@ class GSServer(Node, GSServerBase):
             vs.x_vel = local_vel_point.x - local_point.x
             vs.y_vel = local_vel_point.y - local_point.y
 
-    def shutdown(self, interrupted=False):
+    def shutdown(self, interrupted=False, from_callback=True):
         """Gracefully shutdown the server.
 
         Args:
             interrupted: True if shutdown due to interruption/error, False for normal completion
+            from_callback: True if called from a ROS2 callback, False if called from main
         """
         if self.shutdown_called:
             return  # Already shut down, avoid double-stop
@@ -174,8 +175,11 @@ class GSServer(Node, GSServerBase):
         if hasattr(self, '_ros2_log_handler'):
             cleanup_ros2_logging(self._ros2_log_handler)
 
-        self.destroy_node()
-        rclpy.try_shutdown()
+        if from_callback:
+            # Don't call rclpy.shutdown() from callback - it causes deadlock
+            # (see https://github.com/ros2/rclpy/issues/944)
+            # Raise SystemExit to break out of spin() loop
+            raise SystemExit(0)
 
     def publish_server_state(self):
         # Read state directly from self.traffic instead of shared memory
@@ -372,11 +376,16 @@ def main(args=None):
         gs_server.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
     except ExternalShutdownException:
         gs_server.get_logger().info('External shutdown (SIGTERM)')
+    except SystemExit:
+        # Raised by shutdown() when called from a callback to break out of spin()
+        gs_server.get_logger().info('Shutdown requested from callback (SystemExit)')
     except ScenarioCompletion as e:
         gs_server.get_logger().info(f'Scenario completed successfully: {e}')
-        gs_server.shutdown(interrupted=False)
     finally:
-        gs_server.shutdown(interrupted=False)
+        # Ensure application cleanup is done (no-op if already called from callback)
+        if not gs_server.shutdown_called:
+            gs_server.shutdown(interrupted=False, from_callback=False)
+        rclpy.try_shutdown()
         
 
 
