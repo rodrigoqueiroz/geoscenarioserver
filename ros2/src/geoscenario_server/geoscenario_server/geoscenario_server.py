@@ -23,9 +23,6 @@ from lanelet2.io import Origin
 from lanelet2.projection import LocalCartesianProjector
 from lanelet2.core import BasicPoint3d, GPSPoint
 
-HEARTBEAT_PERIOD = 5.0  # seconds - check every 5 seconds
-STALL_MULTIPLIER = 5    # trigger shutdown if elapsed time > 5x previous delta_time
-
 @dataclass
 class Parameter:
     name:str = ""
@@ -46,7 +43,9 @@ class GSServer(Node, GSServerBase):
             Parameter(name='dashboard_position', type=ParameterType.PARAMETER_INTEGER_ARRAY, description='Set the position of the dashboard window [x, y, width, height]', default_value=[0]),
             Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
             Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False),
-            Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0)
+            Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0),
+            Parameter(name='heartbeat_period', type=ParameterType.PARAMETER_DOUBLE, description='Heartbeat check period in seconds', default_value=5.0),
+            Parameter(name='stall_multiplier', type=ParameterType.PARAMETER_DOUBLE, description='Trigger shutdown if elapsed time > stall_multiplier * previous delta_time', default_value=5.0),
         ]
 
         for param in parameters:
@@ -70,6 +69,8 @@ class GSServer(Node, GSServerBase):
         self.sim_config.show_dashboard = not self.get_parameter('no_dashboard').get_parameter_value().bool_value
         self.sim_config.write_trajectories = self.get_parameter('write_trajectories').get_parameter_value().bool_value
         self.sim_config.client_shm = False # always false for server side with ros
+        self.heartbeat_period = self.get_parameter('heartbeat_period').get_parameter_value().double_value
+        self.stall_multiplier = self.get_parameter('stall_multiplier').get_parameter_value().double_value
 
         btree_locations_param = self.get_parameter('btree_locations').get_parameter_value().string_value
         btree_locations = self.parse_btree_paths(btree_locations_param)
@@ -89,7 +90,7 @@ class GSServer(Node, GSServerBase):
         
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
-        self.heartbeat_timer = self.create_timer(HEARTBEAT_PERIOD, self.heartbeat_callback)
+        self.heartbeat_timer = self.create_timer(self.heartbeat_period, self.heartbeat_callback)
 
         #GUI / Debug screen
         dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().integer_array_value
@@ -259,7 +260,7 @@ class GSServer(Node, GSServerBase):
         # Check for stall: tick sent after last receive with no response
         if self.last_tick_sent_time > self.last_tick_received_time and self.last_tick_sent_time is not None:
             elapsed = (now - self.last_tick_sent_time).nanoseconds / 1e9
-            threshold = self.last_round_trip_time * STALL_MULTIPLIER if self.last_round_trip_time else HEARTBEAT_PERIOD
+            threshold = self.last_round_trip_time * self.stall_multiplier if self.last_round_trip_time else self.heartbeat_period
 
             if elapsed > threshold:
                 self.get_logger().error(

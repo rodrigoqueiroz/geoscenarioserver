@@ -34,8 +34,8 @@ def generate_launch_description():
 
     dashboard_position_arg = DeclareLaunchArgument(
         'dashboard_position',
-        default_value='[0, 0, 1920, 1080]',
-        description='Dashboard window position [x, y, width, height]'
+        default_value='[0]',
+        description='Dashboard window position [x, y, width, height] (auto-detect if not specified)'
     )
 
     # Get launch configurations

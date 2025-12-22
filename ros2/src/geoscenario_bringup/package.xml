@@ -11,8 +11,6 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>geoscenario_server</exec_depend>
-  <exec_depend>geoscenario_client</exec_depend>
-  <exec_depend>geoscenario_msgs</exec_depend>
 
   <test_depend>python3-pytest</test_depend>
   <test_depend>launch_testing</test_depend>
