@@ -279,7 +279,13 @@ class BTreeListener(BTreeDSLListener):
         else:
             name = ctx.name().getText()
         
-        s =  name + " = composites." + op + "(\"" + name + "\")"
+        # py_trees 2.x requires explicit memory for Sequence/Selector and policy for Parallel
+        if op == "Sequence" or op == "Selector":
+            s = name + " = composites." + op + "(\"" + name + "\", memory=False)"
+        elif op == "Parallel":
+            s = name + " = composites.Parallel(\"" + name + "\", policy=common.ParallelPolicy.SuccessOnAll(synchronise=False))"
+        else:
+            s = name + " = composites." + op + "(\"" + name + "\")"
         self.exec_stack.append(s)
 
         aux = []
