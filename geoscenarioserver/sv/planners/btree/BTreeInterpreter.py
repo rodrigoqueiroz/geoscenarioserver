@@ -280,8 +280,12 @@ class BTreeListener(BTreeDSLListener):
             name = ctx.name().getText()
         
         # py_trees 2.x requires explicit memory for Sequence/Selector and policy for Parallel
-        if op == "Sequence" or op == "Selector":
-            s = name + " = composites." + op + "(\"" + name + "\", memory=False)"
+        # https://py-trees.readthedocs.io/en/devel/changelog.html#x-2023-01-23-sequences-and-selectors-with-and-without-memory
+        # "Previously Selectors operated without memory and Sequences with memory."
+        if op == "Selector":
+            s = name + " = composites.Selector(\"" + name + "\", memory=False)"
+        elif op == "Sequence":
+            s = name + " = composites.Sequence(\"" + name + "\", memory=True)"
         elif op == "Parallel":
             s = name + " = composites.Parallel(\"" + name + "\", policy=common.ParallelPolicy.SuccessOnAll(synchronise=False))"
         else:
