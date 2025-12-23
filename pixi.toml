@@ -21,7 +21,7 @@ geoscenarioserver = { path = "." }
 
 [pypi-dependencies]
 antlr-denter = "*"
-py-trees = "*"
+py-trees = ">=2.2"
 
 [target.linux.dependencies]
 tk = { build = "xft*" }  # to have true type fonts on linux

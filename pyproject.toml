@@ -58,7 +58,7 @@ dependencies = [
     "matplotlib",
     "numpy",
     "scipy",
-    "py-trees",
+    "py-trees>=2.2",
     "sysv-ipc",
     "pydot",
     "requests",

@@ -271,6 +271,8 @@ class BTreeListener(BTreeDSLListener):
         # py_trees 2.x requires explicit memory for Sequence/Selector and policy for Parallel
         # https://py-trees.readthedocs.io/en/devel/changelog.html#x-2023-01-23-sequences-and-selectors-with-and-without-memory
         # "Previously Selectors operated without memory and Sequences with memory."
+        # https://py-trees.readthedocs.io/en/devel/modules.html#py_trees.common.ParallelPolicy.SuccessOnAll
+        # synchronise is True by default, but we want it False to match previous behaviour
         if op == "Selector":
             s = name + " = composites.Selector(\"" + name + "\", memory=False)"
         elif op == "Sequence":
