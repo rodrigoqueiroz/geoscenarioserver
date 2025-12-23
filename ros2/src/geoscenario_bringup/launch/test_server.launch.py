@@ -68,6 +68,9 @@ def generate_launch_description():
     )
 
     # GeoScenario server node
+    # Note: scenario_files needs to be passed as a PythonExpression to create a proper list
+    # because [LaunchConfiguration] doesn't serialize correctly to STRING_ARRAY
+    scenario_files_param = PythonExpression(["['", scenario_file, "']"])
     geoscenario_server_node = Node(
         package='geoscenario_server',
         executable='geoscenario_server',
@@ -75,7 +78,7 @@ def generate_launch_description():
         output='screen',
         arguments=['--ros-args', '--log-level', 'INFO'],
         parameters=[{
-            'scenario_files': [scenario_file],
+            'scenario_files': scenario_files_param,
             'dashboard_position': dashboard_position,
         }]
     )
