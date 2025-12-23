@@ -84,9 +84,11 @@ class TestHeartbeatTimeout(unittest.TestCase):
 class TestProcessOutput(unittest.TestCase):
 
     def test_server_exit_code(self, proc_info, geoscenario_server):
+        # Allow SIGINT (-2) since launch_testing may send it while server is already shutting down
         launch_testing.asserts.assertExitCodes(
             proc_info,
             process=geoscenario_server,
+            allowable_exit_codes=[0, -2],
         )
 
     def test_mock_cosim_exit_code(self, proc_info, mock_co_simulator):

@@ -26,10 +26,10 @@ def generate_launch_description():
         description='Time control mode: `realtime`, `fastest`, or `2xrealtime`'
     )
 
-    scenario_file_arg = DeclareLaunchArgument(
-        'scenario_file',
-        default_value='scenarios/test_scenarios/gs_all_vehicles_peds.osm',
-        description='Path to scenario file'
+    scenario_files_arg = DeclareLaunchArgument(
+        'scenario_files',
+        default_value="['scenarios/test_scenarios/gs_all_vehicles_peds.osm']",
+        description="GeoScenario file paths as JSON array, e.g. \"['file1.osm', 'file2.osm']\""
     )
 
     dashboard_position_arg = DeclareLaunchArgument(
@@ -40,7 +40,7 @@ def generate_launch_description():
 
     # Get launch configurations
     time_mode = LaunchConfiguration('time_mode')
-    scenario_file = LaunchConfiguration('scenario_file')
+    scenario_files = LaunchConfiguration('scenario_files')
     dashboard_position = LaunchConfiguration('dashboard_position')
 
     # Calculate parameters based on time_mode
@@ -68,9 +68,6 @@ def generate_launch_description():
     )
 
     # GeoScenario server node
-    # Note: scenario_files needs to be passed as a PythonExpression to create a proper list
-    # because [LaunchConfiguration] doesn't serialize correctly to STRING_ARRAY
-    scenario_files_param = PythonExpression(["['", scenario_file, "']"])
     geoscenario_server_node = Node(
         package='geoscenario_server',
         executable='geoscenario_server',
@@ -78,7 +75,7 @@ def generate_launch_description():
         output='screen',
         arguments=['--ros-args', '--log-level', 'INFO'],
         parameters=[{
-            'scenario_files': scenario_files_param,
+            'scenario_files': scenario_files,
             'dashboard_position': dashboard_position,
         }]
     )
@@ -93,7 +90,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         time_mode_arg,
-        scenario_file_arg,
+        scenario_files_arg,
         dashboard_position_arg,
         mock_co_simulator_node,
         geoscenario_server_node,
