@@ -26,11 +26,15 @@ class MockCoSimulator(Node):
         self.declare_parameter('target_delta_time', 0.0)  # The amount of simulation time to advance each tick, if 0 assume outside control
         self.declare_parameter('real_time_factor', 0.0)   # 0 = max speed, 1 = real-time, >1 = slower than real-time
         self.declare_parameter('max_simulation_time', -1.0) # Auto-shutdown timeout, -1 for no limit
+        self.declare_parameter('stall_after_ticks', -1)   # Stop responding after N ticks, -1 for never stall
 
         # Retrieve parameter values
         self.target_dt = self.get_parameter('target_delta_time').value
         self.rt_factor = self.get_parameter('real_time_factor').value
         self.max_sim_time = self.get_parameter('max_simulation_time').value
+        self.stall_after_ticks = self.get_parameter('stall_after_ticks').value
+
+        self.is_stalled = False
 
         # Store latest tick from server for rate-controlled publishing
         self.latest_tick = None
@@ -50,6 +54,17 @@ class MockCoSimulator(Node):
             self.timer = None
             self.get_logger().info('Mock co-simulator started (lock-step mode)...')
 
+        if self.stall_after_ticks >= 0:
+            self.get_logger().info(f'Stall mode enabled: will stop responding after {self.stall_after_ticks} ticks')
+
+    def check_stall_condition(self):
+        if self.stall_after_ticks >= 0 and self.tick_count >= self.stall_after_ticks:
+            if not self.is_stalled:
+                self.get_logger().warn(f'Now stalling at tick {self.tick_count}')
+                self.is_stalled = True
+            return True
+        return False
+
     def check_publisher_status(self):
         """Check if publishers still exist on subscribed topic after simulation starts."""
         if self.tick_count <= 0:
@@ -62,7 +77,10 @@ class MockCoSimulator(Node):
             raise SystemExit(0)
 
     def advance_simulation_time(self, msg) -> bool:
-        """Advance simulation time and update message. Returns False if max time reached."""
+        """Advance simulation time and update message. Returns False if max time reached or stalling."""
+        if self.check_stall_condition():
+            return False
+
         # Check for time sync before updating
         if msg.simulation_time != self.simulation_time:
             self.get_logger().warning(

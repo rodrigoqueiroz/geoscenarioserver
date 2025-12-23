@@ -43,7 +43,9 @@ class GSServer(Node, GSServerBase):
             Parameter(name='dashboard_position', type=ParameterType.PARAMETER_INTEGER_ARRAY, description='Set the position of the dashboard window [x, y, width, height]', default_value=[0]),
             Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
             Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False),
-            Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0)
+            Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0),
+            Parameter(name='heartbeat_period', type=ParameterType.PARAMETER_DOUBLE, description='Heartbeat check period in seconds', default_value=5.0),
+            Parameter(name='stall_multiplier', type=ParameterType.PARAMETER_DOUBLE, description='Trigger shutdown if elapsed time > stall_multiplier * previous delta_time', default_value=5.0),
         ]
 
         for param in parameters:
@@ -57,10 +59,18 @@ class GSServer(Node, GSServerBase):
         self.last_delta_time = 0.0
         self.shutdown_called = False
 
+        # Heartbeat tracking
+        self.last_tick_sent_time = None
+        self.last_tick_received_time = None
+        self.last_round_trip_time = None
+        self.heartbeat_timer = None
+
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
         self.sim_config.show_dashboard = not self.get_parameter('no_dashboard').get_parameter_value().bool_value
         self.sim_config.write_trajectories = self.get_parameter('write_trajectories').get_parameter_value().bool_value
         self.sim_config.client_shm = False # always false for server side with ros
+        self.heartbeat_period = self.get_parameter('heartbeat_period').get_parameter_value().double_value
+        self.stall_multiplier = self.get_parameter('stall_multiplier').get_parameter_value().double_value
 
         btree_locations_param = self.get_parameter('btree_locations').get_parameter_value().string_value
         btree_locations = self.parse_btree_paths(btree_locations_param)
@@ -80,6 +90,7 @@ class GSServer(Node, GSServerBase):
         
         self.tick_pub = self.create_publisher(Tick, '/gs/tick', 10)
         self.tick_sub = self.create_subscription(Tick, '/gs/tick_from_client', self.tick_from_client, 10)
+        self.heartbeat_timer = self.create_timer(self.heartbeat_period, self.heartbeat_callback)
 
         #GUI / Debug screen
         dashboard_position = self.get_parameter('dashboard_position').get_parameter_value().integer_array_value
@@ -134,16 +145,21 @@ class GSServer(Node, GSServerBase):
             vs.x_vel = local_vel_point.x - local_point.x
             vs.y_vel = local_vel_point.y - local_point.y
 
-    def shutdown(self, interrupted=False):
+    def shutdown(self, interrupted=False, from_callback=True):
         """Gracefully shutdown the server.
 
         Args:
             interrupted: True if shutdown due to interruption/error, False for normal completion
+            from_callback: True if called from a ROS2 callback, False if called from main
         """
         if self.shutdown_called:
             return  # Already shut down, avoid double-stop
 
         self.shutdown_called = True
+
+        if self.heartbeat_timer is not None:
+            self.heartbeat_timer.cancel()
+            self.heartbeat_timer = None
 
         if interrupted:
             self.get_logger().warn('Shutting down due to interruption or error')
@@ -160,8 +176,11 @@ class GSServer(Node, GSServerBase):
         if hasattr(self, '_ros2_log_handler'):
             cleanup_ros2_logging(self._ros2_log_handler)
 
-        self.destroy_node()
-        rclpy.try_shutdown()
+        if from_callback:
+            # Don't call rclpy.shutdown() from callback - it causes deadlock
+            # (see https://github.com/ros2/rclpy/issues/944)
+            # Raise SystemExit to break out of spin() loop
+            raise SystemExit(0)
 
     def publish_server_state(self):
         # Read state directly from self.traffic instead of shared memory
@@ -219,10 +238,42 @@ class GSServer(Node, GSServerBase):
             tick_msg.pedestrians.append(msg)
 
         self.tick_pub.publish(tick_msg)
+        self.last_tick_sent_time = self.get_clock().now()
 
+    def heartbeat_callback(self):
+        if self.shutdown_called:
+            return
+
+        now = self.get_clock().now()
+
+        # No tick ever received - check initial connection timeout
+        if self.last_tick_received_time is None:
+            if self.last_tick_sent_time is not None:
+                elapsed = (now - self.last_tick_sent_time).nanoseconds / 1e9
+                if self.sim_config.timeout and elapsed >= self.sim_config.timeout:
+                    self.get_logger().error(
+                        f'No tick received from co-simulator after {elapsed:.1f}s'
+                    )
+                    self.shutdown(interrupted=True)
+            return
+
+        # Check for stall: tick sent after last receive with no response
+        if self.last_tick_sent_time > self.last_tick_received_time and self.last_tick_sent_time is not None:
+            elapsed = (now - self.last_tick_sent_time).nanoseconds / 1e9
+            threshold = self.last_round_trip_time * self.stall_multiplier if self.last_round_trip_time else self.heartbeat_period
+
+            if elapsed > threshold:
+                self.get_logger().error(
+                    f'Co-simulator stalled: no response for {elapsed:.1f}s (threshold: {threshold:.1f}s)'
+                )
+                self.shutdown(interrupted=True)
 
     def tick_from_client(self, msg):
-        # Process incoming tick - only EV/EP types are updated from client messages
+        # Track round-trip time for heartbeat stall detection
+        now = self.get_clock().now()
+        self.last_round_trip_time = (now - self.last_tick_sent_time).nanoseconds / 1e9
+        self.last_tick_received_time = now
+
         if msg.tick_count != self.tick_count + 1:
             self.get_logger().error(
                 f'Tick count mismatch: expected {self.tick_count + 1}, '
@@ -326,11 +377,16 @@ def main(args=None):
         gs_server.get_logger().info('Shutdown keyboard interrupt (SIGINT)')
     except ExternalShutdownException:
         gs_server.get_logger().info('External shutdown (SIGTERM)')
+    except SystemExit:
+        # Raised by shutdown() when called from a callback to break out of spin()
+        gs_server.get_logger().info('Shutdown requested from callback (SystemExit)')
     except ScenarioCompletion as e:
         gs_server.get_logger().info(f'Scenario completed successfully: {e}')
-        gs_server.shutdown(interrupted=False)
     finally:
-        gs_server.shutdown(interrupted=False)
+        # Ensure application cleanup is done (no-op if already called from callback)
+        if not gs_server.shutdown_called:
+            gs_server.shutdown(interrupted=False, from_callback=False)
+        rclpy.try_shutdown()
         
 
 

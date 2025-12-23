@@ -1,5 +1,19 @@
 # Native ROS2 GeoScenarioServer
 
+## Folder Structure
+
+```
+ros2/src/
+├── geoscenario_msgs/      # ROS2 message definitions (Tick, Vehicle, Pedestrian)
+├── geoscenario_server/    # Native ROS2 server node
+├── geoscenario_client/    # Shared memory client and mock co-simulator
+└── geoscenario_bringup/   # Launch files and integration tests
+    ├── launch/            # Launch files
+    └── test/              # Integration tests (launch_testing)
+```
+
+## geoscenario_server
+
 The `ros2/geoscenario_server` wraps GSServer into a ROS2 node
 1. publishes server state to `/tick`
 2. subscribes to `/tick_from_client` and updates server state for external vehicles. 
@@ -36,3 +50,22 @@ A ROS2 subscriber to `/tick` can determine that WGS84 coordinates are used if `/
 
 The client can execute a round-trip test: store values from server shared memory, convert to WGS84, send to mock co-simulator, receive, convert from WGS84, compare with stored.
 The argument `roundtriptest:=true` (`false` by default) enables this round-trip test.
+
+## Testing
+
+Run all bringup tests:
+```bash
+pixi run ros_test_bringup
+```
+
+Or using colcon directly:
+```bash
+cd ros2
+colcon test --packages-select geoscenario_bringup --event-handlers console_direct+
+```
+
+Run a single test file:
+```bash
+cd ros2
+launch_test src/geoscenario_bringup/test/test_heartbeat_timeout.py
+```
