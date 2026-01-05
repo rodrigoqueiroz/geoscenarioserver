@@ -29,7 +29,7 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 - matplotlib
 - numpy
 - scipy
-- [py_trees==0.7.6](https://github.com/splintered-reality/py_trees)
+- py-trees
 - sysv-ipc
 - tk
 - pydot

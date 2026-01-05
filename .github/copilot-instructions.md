@@ -17,7 +17,7 @@ GeoScenario Server works with scenario files defined according to [GeoScenario2]
 
 ### Planning Architecture (SDV vehicles only)
 1. **SVPlanner** (multiprocess): Spawns separate process per SDV vehicle
-2. **Behavior Layer**: Either `btree` (behavior trees via py_trees==0.7.6) or `ruleEngine` (external rule engine)
+2. **Behavior Layer**: Either `btree` (behavior trees via `py-trees`) or `ruleEngine` (external rule engine)
 3. **Maneuver Planning**: Frenet frame trajectory generation (`sv/maneuvers/FrenetTrajectory.py`)
 4. **Requirements Checking**: Hard/soft requirements validated per tick (`requirements/RequirementsChecker.py`)
 
@@ -217,7 +217,6 @@ Parsed by `gsc/GSParser.py`. Key elements:
 2. **Don't** use `python -c` for quick Python checks - use the Pylance MCP tool `pylanceRunCodeSnippet` instead
 3. **Don't** modify `Actor.state` directly - use motion plan application or trajectory following
 4. **Don't** forget coordinate frame conversions - use `frenet_to_sim_frame` and `sim_to_frenet_frame` from `util/Transformations.py`
-5. **py_trees version locked at 0.7.6** - API incompatible with newer versions
 
 ## Testing
 - Regression tests: Outputs compared with `outputs/regressions/` baselines

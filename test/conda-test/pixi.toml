@@ -18,4 +18,4 @@ tk = { build = "xft*" }  # to have true type fonts on linux
 
 [pypi-dependencies]
 antlr-denter = "*"
-py-trees = "==0.7.6"
+py-trees = ">=2.2"

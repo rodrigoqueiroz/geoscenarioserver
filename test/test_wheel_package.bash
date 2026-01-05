@@ -4,7 +4,7 @@ TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WHEEL_TEST_DIR=${TEST_DIR}/wheel-test
 REPO_DIR=$(dirname "$TEST_DIR")
 
-sudo apt-get install -y python3-dev python3-venv
+sudo apt-get install -y python3-dev python3-venv python3-tk
 
 cd ${REPO_DIR}
 # build the wheel package

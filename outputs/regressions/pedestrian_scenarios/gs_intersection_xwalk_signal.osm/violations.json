@@ -1,1 +1,1 @@
-{"1": {"375": {"ScenarioTimeout": {"message": "v1 did not reach its target location during the 75.0 seconds allowed by this scenario."}}}}
+{"1": {"111": {"CollisionWithPedestrian": {"angle": 38.76, "collections": {"pedestrians": {"alias": "p_3", "id": 3}}, "message": "v_1 bounding box overlapped with the pedestrian agent p_3 on the vehicle left side at 38.76 degrees", "zone": "left"}}, "374": {"ScenarioTimeout": {"message": "v1 did not reach its target location during the 75.0 seconds allowed by this scenario."}}}}
