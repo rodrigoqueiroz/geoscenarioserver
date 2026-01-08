@@ -305,13 +305,9 @@ class Dashboard(object):
             self.tab.delete(*current_set)
         for vid in vehicles:
             vehicle = vehicles[vid]
-            if vehicle.type == Vehicle.SDV_TYPE:
-                # Check if vehicle is inactive first
-                if vehicle.sim_state == ActorSimState.INACTIVE:
-                    status = self.print_sim_state(vehicle.sim_state)
-                else:
-                    status = self.get_maneuver(vid)
-            else: # PV, TV, EV
+            if vehicle.type == Vehicle.SDV_TYPE and vehicle.sim_state == ActorSimState.ACTIVE:
+                status = self.get_maneuver(vid)
+            else: # PV, TV, EV, inactive SDV
                 status = self.print_sim_state(vehicle.sim_state)
             agent_type = Dashboard.vehicle_types[vehicle.type]
             sv = vehicle.state.get_state_vector()
