@@ -7,6 +7,7 @@ outputs/*.json
 outputs/*.png
 outputs/*.csv
 outputs/*.log
+outputs/osm_cache/
 
 # ROS folders
 ros2/build/**
