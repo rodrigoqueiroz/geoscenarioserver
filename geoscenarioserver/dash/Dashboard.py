@@ -306,7 +306,11 @@ class Dashboard(object):
         for vid in vehicles:
             vehicle = vehicles[vid]
             if vehicle.type == Vehicle.SDV_TYPE:
-                status = self.get_maneuver(vid)
+                # Check if vehicle is inactive first
+                if vehicle.sim_state == ActorSimState.INACTIVE:
+                    status = self.print_sim_state(vehicle.sim_state)
+                else:
+                    status = self.get_maneuver(vid)
             else: # PV, TV, EV
                 status = self.print_sim_state(vehicle.sim_state)
             agent_type = Dashboard.vehicle_types[vehicle.type]
@@ -555,11 +559,12 @@ class Dashboard(object):
                         plt.arrow(x, y, vx/2, vy/2, head_width=0.5, head_length=0.5, color=colorcode, zorder=10)
 
                 if pedestrian.type == Pedestrian.SP_TYPE:
-                    # show pedestrians' goals on map
-                    x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
-                    y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
-                    plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
-                    plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
+                    # show pedestrians' goals on map (only if goal points exist)
+                    if pid in self.sim_traffic.sim_config.pedestrian_goal_points:
+                        x_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][0]
+                        y_goal = self.sim_traffic.sim_config.pedestrian_goal_points[pid][-1][1]
+                        plt.plot(x_goal, y_goal, 'r.' ,markersize=2, zorder=10)
+                        plt.gca().text(x_goal+1, y_goal+1, "p{} goal".format(pid), style='italic', zorder=10)
 
     def plot_frenet_chart(self, center_id, traffic_state:TrafficState, debug_ref_path, traj, cand, unf, traj_s_shift):
         #Frenet Frame plot

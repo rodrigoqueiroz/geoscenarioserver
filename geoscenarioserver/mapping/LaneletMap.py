@@ -29,6 +29,10 @@ class LaneletMap(object):
         self.stop_signs = None
         self.all_way_stops = None
 
+    def is_loaded(self):
+        """Check if a lanelet map has been loaded."""
+        return self.lanelet_map is not None
+
     @staticmethod
     def verify_map(map_file):
         try:
@@ -292,9 +296,13 @@ class LaneletMap(object):
         return x, y, linepoints
 
     def get_crosswalks(self):
+        if self.lanelet_map is None:
+            return []
         return [ll for ll in self.lanelet_map.laneletLayer if ll.attributes["subtype"] == "crosswalk"]
 
     def get_stop_lines(self):
+        if self.lanelet_map is None:
+            return []
         if self.stop_lines is None:
             self.stop_lines = []
             for ls in self.lanelet_map.lineStringLayer:
@@ -305,6 +313,8 @@ class LaneletMap(object):
         return self.stop_lines
 
     def get_stop_signs(self):
+        if self.lanelet_map is None:
+            return []
         if self.stop_signs is None:
             self.stop_signs = []
             for ls in self.lanelet_map.lineStringLayer:
@@ -659,7 +669,8 @@ class LaneletMap(object):
         return data
 
     def get_lines(self, x_min=0, y_min=0, x_max=0, y_max=0):
-        data = []
+        if self.lanelet_map is None:
+            return []
 
         if (x_min == x_max == y_min == y_max):
             lines = self.lanelet_map.lineStringLayer
@@ -668,6 +679,7 @@ class LaneletMap(object):
                 x_min, y_min), BasicPoint2d(x_max, y_max))
             lines = self.lanelet_map.lineStringLayer.search(searchBox)
 
+        data = []
         for line in lines:
             xs = [pt.x for pt in line]
             ys = [pt.y for pt in line]

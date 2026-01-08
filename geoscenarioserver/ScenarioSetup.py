@@ -49,7 +49,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 full_scenario_paths.append(gsfile)
                 log.info(f"Loading scenario from absolute path {gsfile}")
             else:
-                log.error("Skipping scenario file not found: {}".format(gsfile))
+                log.error(f"Skipping scenario file not found: {gsfile}")
                 continue   
         else:
             # try relative to the current working directory
@@ -64,7 +64,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     full_scenario_paths.append(root_path)
                     log.info(f"Loading a built-in scenario {root_path}")
                 else:
-                    log.error("Skipping scenario file not found: {}".format(gsfile))
+                    log.error(f"Skipping scenario file not found: {gsfile}")
                     continue
 
     if len(full_scenario_paths) == 0:
@@ -87,10 +87,15 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_config.plot_id = parser.globalconfig.tags['plotid']
 
     #========= Map
-    if map_path == "":
-        map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet']) #use default map path
-    else:
-        map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
+    # Check if lanelet map is specified
+    has_map = 'lanelet' in parser.globalconfig.tags
+
+    if has_map:
+        if map_path == "":
+            map_file = os.path.join(ROOT_DIR, 'scenarios', parser.globalconfig.tags['lanelet']) #use default map path
+        else:
+            map_file = os.path.join(map_path, parser.globalconfig.tags['lanelet']) #use parameter map path
+
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
     area = parser.origin.tags['area'] if 'area' in parser.origin.tags else MPLOT_SIZE
@@ -121,8 +126,15 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         log.info("Using UTMProjector")
 
     parser.project_nodes(projector,altitude)
-    lanelet_map.load_lanelet_map(map_file, projector)
-    sim_config.map_name = parser.globalconfig.tags['lanelet']
+
+    # Load map only if specified
+    if has_map:
+        lanelet_map.load_lanelet_map(map_file, projector)
+        sim_config.map_name = parser.globalconfig.tags['lanelet']
+        log.info(f"Loaded lanelet map: {sim_config.map_name}")
+    else:
+        sim_config.map_name = "(no map)"
+        log.info("Running in map-less mode: SDV and SP agents will be inactive")
 
     #========= Traffic lights
     for name, tnode in parser.tlights.items():
@@ -142,7 +154,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_traffic.add_traffic_light(tl)
 
     #========= crosswalks
-    sim_traffic.crosswalks = lanelet_map.get_crosswalks()
+    if has_map:
+        sim_traffic.crosswalks = lanelet_map.get_crosswalks()
+    else:
+        sim_traffic.crosswalks = []
 
     #=========  Ego (External Vehicle)
     if parser.egostart is not None:
@@ -179,7 +194,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
         log.debug(f"Initializing vehicle VID:{vid} with behavior type: {btype}...")
 
-        #SDV Model (dynamic vehicle)
+        #SDV Model (simulated driver vehicle)
         if btype == 'sdv':
             #start state
             if 'start_cartesian' in vnode.tags:
@@ -226,29 +241,38 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             #a behavior tree file (.btree) inside the btype's folder, defaulted in btrees
             root_btree_name = vnode.tags['btree'] if 'btree' in vnode.tags else "st_standard_driver.btree"
             try:
-                vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
-                                lanelet_map, route_nodes,
-                                start_state_in_frenet=start_in_frenet,
-                                btree_locations=btree_locations,
-                                btype=btype, goal_ends_simulation=goal_ends_simulation,
-                                rule_engine_port=rule_engine_port,
-                                length=length, width=width
-                            )
-                #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
-                #                lanelet_map, sim_config.lanelet_routes[vid],
-                #                route_nodes,
-                #                start_state_in_frenet=start_in_frenet,
-                #                btree_locations=btree_locations,
-                #                btype=btype
-                #            )
-                #reconfig btree
-                if 'btconfig' in vnode.tags:
-                    vehicle.btree_reconfig = vnode.tags['btconfig']
-                vehicle.model = model
-                sim_traffic.add_vehicle(vehicle)
-                log.info("Vehicle {} initialized with SDV behavior".format(vid))
+                if not has_map:
+                    # Create SDV without route when no map is loaded
+                    vehicle = Vehicle(vid, name, start_state, yaw=yaw, length=length, width=width)
+                    vehicle.type = Vehicle.SDV_TYPE
+                    vehicle.model = model
+                    vehicle.sim_state = ActorSimState.INACTIVE
+                    sim_traffic.add_vehicle(vehicle)
+                    log.info(f"Vehicle {vid} initialized with SDV behavior but set to INACTIVE (no map)")
+                else:
+                    vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
+                                    lanelet_map, route_nodes,
+                                    start_state_in_frenet=start_in_frenet,
+                                    btree_locations=btree_locations,
+                                    btype=btype, goal_ends_simulation=goal_ends_simulation,
+                                    rule_engine_port=rule_engine_port,
+                                    length=length, width=width
+                                )
+                    #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
+                    #                lanelet_map, sim_config.lanelet_routes[vid],
+                    #                route_nodes,
+                    #                start_state_in_frenet=start_in_frenet,
+                    #                btree_locations=btree_locations,
+                    #                btype=btype
+                    #            )
+                    #reconfig btree
+                    if 'btconfig' in vnode.tags:
+                        vehicle.btree_reconfig = vnode.tags['btconfig']
+                    vehicle.model = model
+                    sim_traffic.add_vehicle(vehicle)
+                    log.info(f"Vehicle {vid} initialized with SDV behavior")
             except Exception as e:
-                log.error("Failed to initialize vehicle {}".format(vid))
+                log.error(f"Failed to initialize vehicle {vid}")
                 raise e
 
         # Trajectory Vehicle (TV)
@@ -393,7 +417,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         # Trajectory Pedestrian (TP)
         if btype == 'tp':
             if 'trajectory' not in pnode.tags:
-                log.error("PV {} requires a trajectory .".format(pid))
+                log.error(f"PV {pid} requires a trajectory .")
                 continue
             try:
                 t_name = pnode.tags['trajectory']
@@ -419,44 +443,53 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     prev_node = nd
                 pedestrian = TP(pid, name, start_state, yaw, trajectory, length=length, width=width)
                 sim_traffic.add_pedestrian(pedestrian)
-                log.info("Pedestrian {} initialized with TP behavior".format(pid))
+                log.info(f"Pedestrian {pid} initialized with TP behavior")
             except Exception as e:
-                log.error("Failed to initialize pedestrian {}".format(pid))
+                log.error(f"Failed to initialize pedestrian {pid}")
                 raise e
 
         # Simulated pedestrian
         elif btype == 'sp':
             if 'destination' not in pnode.tags and 'route' not in pnode.tags:
-                log.error("SP {} requires either a destination or route.".format(pid))
-                continue
+                if has_map:
+                    log.error(f"SP {pid} requires either a destination or route.")
+                    continue
             try:
-                if 'route' in pnode.tags:
-                    p_route = pnode.tags['route']
-                    route_nodes = parser.routes[p_route].nodes
-                    sim_config.pedestrian_goal_points[pid] = [(node.x, node.y) for node in route_nodes]
-                    #pedestrian_lanelet_routes = [lanelet_map.get_occupying_lanelet_by_participant(node.x, node.y, "pedestrian") for node in route_nodes]   # a valid lanelet route
-                    #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(pedestrian_lanelet_routes)
+                if not has_map:
+                    # Create SP without planner when no map is loaded
+                    pedestrian = Pedestrian(pid, name, start_state, yaw=yaw, length=length, width=width)
+                    pedestrian.type = Pedestrian.SP_TYPE
+                    pedestrian.sim_state = ActorSimState.INACTIVE
+                    sim_traffic.add_pedestrian(pedestrian)
+                    log.info(f"Pedestrian {pid} initialized with SP behavior but set to INACTIVE (no map)")
                 else:
-                    p_dest = pnode.tags['destination']
-                    dest_node = parser.locations[p_dest]
-                    sim_config.pedestrian_goal_points[pid] = [(dest_node.x, dest_node.y)]
+                    if 'route' in pnode.tags:
+                        p_route = pnode.tags['route']
+                        route_nodes = parser.routes[p_route].nodes
+                        sim_config.pedestrian_goal_points[pid] = [(node.x, node.y) for node in route_nodes]
+                        #pedestrian_lanelet_routes = [lanelet_map.get_occupying_lanelet_by_participant(node.x, node.y, "pedestrian") for node in route_nodes]   # a valid lanelet route
+                        #sim_config.lanelet_routes[pid] = lanelet_map.get_route_via(pedestrian_lanelet_routes)
+                    else:
+                        p_dest = pnode.tags['destination']
+                        dest_node = parser.locations[p_dest]
+                        sim_config.pedestrian_goal_points[pid] = [(dest_node.x, dest_node.y)]
 
-                root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk.btree" # a behavior tree file (.btree) inside btrees/sp
+                    root_btree_name = pnode.tags['btree'] if 'btree' in pnode.tags else "walk.btree" # a behavior tree file (.btree) inside btrees/sp
 
-                pedestrian = SP(pid,
-                                name,
-                                start_state,
-                                yaw,
-                                list(sim_config.pedestrian_goal_points[pid]),
-                                root_btree_name,
-                                btree_locations=btree_locations,
-                                btype=btype,
-                                length=length, width=width)
+                    pedestrian = SP(pid,
+                                    name,
+                                    start_state,
+                                    yaw,
+                                    list(sim_config.pedestrian_goal_points[pid]),
+                                    root_btree_name,
+                                    btree_locations=btree_locations,
+                                    btype=btype,
+                                    length=length, width=width)
 
-                sim_traffic.add_pedestrian(pedestrian)
-                log.info("Pedestrian {} initialized with SP behavior".format(pid))
+                    sim_traffic.add_pedestrian(pedestrian)
+                    log.info(f"Pedestrian {pid} initialized with SP behavior")
             except Exception as e:
-                log.error("Failed to initialize pedestrian {}".format(pid))
+                log.error(f"Failed to initialize pedestrian {pid}")
                 raise e
             
         # Path pedestrian    
