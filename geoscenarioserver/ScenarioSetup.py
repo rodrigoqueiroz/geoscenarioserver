@@ -133,6 +133,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         sim_config.map_name = parser.globalconfig.tags['lanelet']
         log.info(f"Loaded lanelet map: {sim_config.map_name}")
     else:
+        # Store projector even in map-less mode (needed for OSM background images)
+        lanelet_map.projector = projector
         sim_config.map_name = "(no map)"
         log.info("Running in map-less mode: SDV and SP agents will be inactive")
 

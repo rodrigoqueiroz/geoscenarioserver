@@ -16,7 +16,7 @@ source ${SCRIPT_DIR}/scenario_suite_utilities.bash
 _slaunch()
 {
     local opts
-    gss_opts="--no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid --ros --mock-co-sim"
+    gss_opts="--no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid --overlay-osm --ros --mock-co-sim"
     opts=""
     case $COMP_CWORD in
         1)

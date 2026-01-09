@@ -61,7 +61,7 @@ Arguments:
                           launch mock_co_simulator with delta_time=0.025 and the given real_time_factor (only valid with --ros)
                           real_time_factor: 0: max speed, (0..1): faster than real time, 1: real time, >1 = slower than real time
      [<gss_options>*]     additional options for the GeoScenarioServer (optional list):
-                          --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid
+                          --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid --overlay-osm
 ...
 ```
 for example, launch a standalone simulation
@@ -87,7 +87,9 @@ slaunch colliding_pedestrians \         # base secenario
         front-pp1.osm \                 # another part
         --ros \                         # start the native ROS2 server
         --no-dash                       # other GSS options
-        --origin-from-vid 1             # override origin from the starting position of vehicle with ID 1
+        --origin-from-vid 1 \           # override origin from the starting position of vehicle with ID 1
+        --mock-co-sim 1.0 \             # launch mock co-simulator with real_time_factor=1.0
+        --overlay-osm                   # overlay OSM background in plots
 ```
 
 Each scenario may optionally contain a subfolder `parts`, which contains the available scenario fragments. 

@@ -44,6 +44,7 @@ class GSServer(Node, GSServerBase):
             Parameter(name='wgs84', type=ParameterType.PARAMETER_BOOL, description='Use WGS84+origin(0,0,0) coordinates instead of local+origin=(lat,lon,alt) coordinates', default_value=False),
             Parameter(name='write_trajectories', type=ParameterType.PARAMETER_BOOL, description='Write all agent trajectories to CSV files inside $GSS_OUTPUTS', default_value=False),
             Parameter(name='origin_from_vid', type=ParameterType.PARAMETER_INTEGER, description='Set the origin to the starting position of the vehicle with the specified vid (0 = use scenario origin)', default_value=0),
+            Parameter(name='overlay_osm', type=ParameterType.PARAMETER_BOOL, description='Overlay OSM background in plots', default_value=False),
             Parameter(name='heartbeat_period', type=ParameterType.PARAMETER_DOUBLE, description='Heartbeat check period in seconds', default_value=5.0),
             Parameter(name='stall_multiplier', type=ParameterType.PARAMETER_DOUBLE, description='Trigger shutdown if elapsed time > stall_multiplier * previous delta_time', default_value=5.0),
         ]
@@ -68,6 +69,7 @@ class GSServer(Node, GSServerBase):
         self.wgs84 = self.get_parameter('wgs84').get_parameter_value().bool_value
         self.sim_config.show_dashboard = not self.get_parameter('no_dashboard').get_parameter_value().bool_value
         self.sim_config.write_trajectories = self.get_parameter('write_trajectories').get_parameter_value().bool_value
+        self.sim_config.overlay_osm = self.get_parameter('overlay_osm').get_parameter_value().bool_value
         self.sim_config.client_shm = False # always false for server side with ros
         self.heartbeat_period = self.get_parameter('heartbeat_period').get_parameter_value().double_value
         self.stall_multiplier = self.get_parameter('stall_multiplier').get_parameter_value().double_value
