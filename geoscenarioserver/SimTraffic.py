@@ -116,12 +116,12 @@ class SimTraffic(object):
 
         #Start SDV Planners
         for vehicle in self.vehicles.values():
-            if vehicle.type == Vehicle.SDV_TYPE:
+            if vehicle.type == Vehicle.SDV_TYPE and vehicle.sim_state == ActorSimState.ACTIVE:
                 vehicle.start_planner()
 
         #Start SP Planners
         for pedestrian in self.pedestrians.values():
-            if pedestrian.type == Pedestrian.SP_TYPE:
+            if pedestrian.type == Pedestrian.SP_TYPE and pedestrian.sim_state == ActorSimState.ACTIVE:
                 pedestrian.start_planner()
 
     def stop_all(self, interrupted = False):
@@ -131,22 +131,24 @@ class SimTraffic(object):
 
         self.write_log_trajectories()
         for vehicle in self.vehicles.values():
-            if vehicle.type == Vehicle.SDV_TYPE:
+            if vehicle.type == Vehicle.SDV_TYPE and vehicle.sim_state == ActorSimState.ACTIVE:
                 vehicle.stop(interrupted)
-            else:
+            elif vehicle.sim_state == ActorSimState.ACTIVE:
                 vehicle.stop()
         for pedestrian in self.pedestrians.values():
-            pedestrian.stop()
+            if pedestrian.sim_state == ActorSimState.ACTIVE:
+                pedestrian.stop()
 
         for vid, vehicle in self.vehicles.items():
-            if vehicle.type == Vehicle.SDV_TYPE:
-                log.info(
-                    "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
-                        int(vid),
-                        int(vehicle.jump_back_count),
-                        float(vehicle.max_jump_back_dist)
+            if vehicle.type == Vehicle.SDV_TYPE and vehicle.sim_state == ActorSimState.ACTIVE:
+                if hasattr(vehicle, 'jump_back_count'):  # Only for actual SDV objects, not base Vehicle
+                    log.info(
+                        "|VID: {:3d}|Jump Back Count: {:3d}|Max Jump Back Dist: {:9.6f}|".format(
+                            int(vid),
+                            int(vehicle.jump_back_count),
+                            float(vehicle.max_jump_back_dist)
+                        )
                     )
-                )
 
     def tick(self, tick_count, delta_time, sim_time):
         nv = len(self.vehicles)

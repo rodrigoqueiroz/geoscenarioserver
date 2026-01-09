@@ -321,8 +321,8 @@ class GSParser(object):
         self.locations[n.tags["name"]] = n
 
     def check_global_config(self, n):
-        mandatory = {"gs","version","name","lanelet","timeout",}
-        optional = {"collision","notes","metric","mutate","optimize","optmetric","plotid",}
+        mandatory = {"gs","version","name","timeout",}
+        optional = {"lanelet","collision","notes","metric","mutate","optimize","optmetric","plotid",}
         self.check_tags(n, mandatory, optional)
         if self.globalconfig is not None:
             self.report.log_error("Element " + n.id + ": Duplicate Global Config node. Must be unique")
