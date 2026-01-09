@@ -42,7 +42,7 @@ print_help() {
     echo "                           launch mock_co_simulator with delta_time=0.025 and the given real_time_factor (only valid with --ros)"
     echo "                           real_time_factor: 0: max speed, (0..1): faster than real time, 1: real time, >1 = slower than real time"
     echo "     [<gss_options>*]      additional options for the GeoScenarioServer (optional list):"
-    echo "                           --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid"
+    echo "                           --no-dash --wait-for-input --wait-for-client --dash-pos --debug --file-log --write-trajectories --origin-from-vid --overlay-osm"
     echo ""
     echo "The following scenarios are available in the suite ${suite_dir}:"
     echo ""
@@ -111,6 +111,10 @@ for arg in ${args[@]}; do
             --dash-pos)
                 gss_options="${gss_options} ${arg}"
                 number_is_for="dash-pos"
+                ;;
+            --overlay-osm)
+                gss_options="${gss_options} ${arg}"
+                ros_gss_options+=("overlay_osm: true")
                 ;;
             --wait-for-input|--wait-for-client|--debug|--file-log)
                 gss_options="${gss_options} ${arg}"
@@ -183,6 +187,7 @@ mkdir -p "$suite_dir/logs/$timestamp"
 #       - /<GSS_path>/scenario_suite/scenarios/colliding_pedestrians/parts/vut_sdv1-reverse.osm
 #     write_trajectories: true
 #     origin_from_vid: 1
+#     overlay_osm: true
 #     dashboard_position: [100, 200, 800, 900]
 
 gss_scenario_dir="${scenarios_dir}/${scenario_name}"

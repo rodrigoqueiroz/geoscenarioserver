@@ -42,6 +42,7 @@ class GSServer(GSServerBase):
         self.sim_config.wait_for_input = args.wait_for_input
         self.sim_config.wait_for_client = args.wait_for_client
         self.sim_config.write_trajectories = args.write_trajectories
+        self.sim_config.overlay_osm = args.overlay_osm
 
         # use sim_config after all modifications
         self.traffic = SimTraffic(self.lanelet_map, self.sim_config)
@@ -120,6 +121,7 @@ def main():
     parser.add_argument("-fl", "--file-log", dest="file_log", action="store_true", help="Log to $GSS_OUTPUTS/GSServer.log instead of stdout")
     parser.add_argument("-wt", "--write-trajectories", dest="write_trajectories", action="store_true", help="Write all agent trajectories to CSV files inside $GSS_OUTPUTS")
     parser.add_argument("-ofv", "--origin-from-vid", dest="origin_from_vid", type=int, default=0, help="Set the origin to the starting position of the vehicle with the specified vid (e.g., --origin-from-vid=10)")
+    parser.add_argument("-os", "--overlay-osm", dest="overlay_osm", action="store_true", help="Overlay OSM background in plots")
     args = parser.parse_args()
 
     log_level = logging.DEBUG if args.debug else logging.INFO

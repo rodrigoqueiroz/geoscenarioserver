@@ -85,7 +85,6 @@ WRITE_TRAJECTORIES = False     #If True, all agent trajectories will be saved in
 
 #OSM Background Images (for map-less scenarios)
 USE_OSM_BACKGROUND = True      #If True, fetches OpenStreetMap background images when no lanelet map is loaded
-OSM_OVERLAY_MODE = True       #If True, show OSM background even when Lanelet2 map is loaded (for verification/alignment checking)
 OSM_IMAGE_ALPHA = 0.5          #Transparency of OSM background image (0.0=invisible, 1.0=opaque)
 
 #Client (Unreal or similar)
@@ -125,3 +124,4 @@ class SimConfig:
     wait_for_client:bool = WAIT_FOR_CLIENT
     client_shm:bool = CLIENT_SHM
     write_trajectories:bool = WRITE_TRAJECTORIES
+    overlay_osm:bool = False
