@@ -229,9 +229,8 @@ def fetch_osm_image(
     figure_width_inches: float = 8.0,
     dpi: float = 100.0,
     cache_dir: Optional[str] = None,
-    timeout: int = 10,
-    user_agent: str = "GeoScenarioServer/2.0 (educational research tool)"
-) -> Optional[Image.Image]:
+    timeout: int = 10
+) -> Optional[tuple]:
     """
     Fetch OpenStreetMap rendered image for the given area using direct tile stitching.
     
@@ -241,7 +240,7 @@ def fetch_osm_image(
     3. Checks cache for existing stitched image
     4. Downloads and stitches OSM tiles if not cached
     5. Saves to cache for future use
-    6. Returns PIL Image object
+    6. Returns PIL Image object and GPS bounding box
     
     Args:
         lat: Origin latitude (WGS84)
@@ -252,10 +251,9 @@ def fetch_osm_image(
         dpi: Dots per inch of the display
         cache_dir: Directory to store cached images (created if doesn't exist)
         timeout: HTTP request timeout in seconds
-        user_agent: Unused (kept for API compatibility)
     
     Returns:
-        PIL Image object if successful, None if failed
+        Tuple of (PIL Image, (min_lon, min_lat, max_lon, max_lat)) if successful, None if failed
     """
     try:
         # Calculate bounding box
@@ -283,7 +281,7 @@ def fetch_osm_image(
             
             if os.path.exists(cache_filepath):
                 log.info(f"Using cached OSM image: {os.path.basename(cache_filepath)}")
-                return Image.open(cache_filepath)
+                return (Image.open(cache_filepath), (min_lon, min_lat, max_lon, max_lat))
         
         # Determine appropriate zoom level
         zoom = get_zoom_for_bbox(min_lat, min_lon, max_lat, max_lon, target_pixels)
@@ -351,7 +349,7 @@ def fetch_osm_image(
             log.info(f"Saved OSM image to cache: {os.path.basename(cache_filepath)}")
         
         log.info(f"Successfully created {final_image.size[0]}x{final_image.size[1]} OSM map")
-        return final_image
+        return (final_image, (min_lon, min_lat, max_lon, max_lat))
         
     except Exception as e:
         log.error(f"Error fetching OSM image: {str(e)}", exc_info=True)
