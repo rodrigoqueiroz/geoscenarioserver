@@ -29,6 +29,7 @@ from geoscenarioserver.Actor import *
 from geoscenarioserver.TrafficLight import *
 from geoscenarioserver.sp.Pedestrian import *
 from geoscenarioserver.mapping.LaneletMap import get_line_format
+from geoscenarioserver.dash.OSMImageFetcher import fetch_osm_image
 
 import logging
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
@@ -119,6 +120,8 @@ class Dashboard(object):
         self.center_pedestrian = False
         self.lanelet_map:LaneletMap = None
         self.screen_param = screen_param
+        self.osm_background_image = None  # Cache for OSM background image
+        self.osm_image_extent = None      # Extent for imshow (xmin, xmax, ymin, ymax)
         
 
     def start(self):
@@ -426,6 +429,62 @@ class Dashboard(object):
         plt.subplots_adjust(bottom=0.05,top=0.95,left=0.05,right=0.95,hspace=0,wspace=0)
 
     def plot_road(self,x_min,x_max,y_min,y_max,traffic_light_states = None):
+        # Display OSM background image if:
+        # - Map-less mode (no lanelet map loaded), OR
+        # - Overlay mode enabled (for verification/alignment checking)
+        if OSM_BACKGROUND_ENABLED and (not self.lanelet_map.is_loaded() or self.sim_config.overlay_osm):
+            if self.osm_background_image is None:
+                # Fetch OSM image on first call
+                try:
+                    # Calculate area from plot bounds (full width/height of the square plot)
+                    area_x = x_max - x_min
+                    area_y = y_max - y_min
+                    area_meters = max(area_x, area_y)  # Full plot size (OSMImageFetcher will calculate half_area internally)
+
+                    # Get origin from sim_traffic (tuple: lat, lon, alt, area)
+                    # and projector from lanelet_map
+                    if self.sim_traffic.origin and self.lanelet_map.projector:
+                        origin_lat, origin_lon, origin_alt = self.sim_traffic.origin[:3]
+                        projector = self.lanelet_map.projector
+
+                        log.info(f"Fetching OSM background image for origin ({origin_lat:.6f}, {origin_lon:.6f})")
+
+                        # Fetch image with appropriate figure size
+                        from matplotlib import rcParams
+                        fig_width = rcParams['figure.figsize'][0]
+                        fig_dpi = rcParams['figure.dpi']
+
+                        result = fetch_osm_image(
+                            origin_lat, origin_lon, area_meters, projector,
+                            figure_width_inches=fig_width, dpi=fig_dpi
+                        )
+
+                        if result:
+                            self.osm_background_image, (min_lon, min_lat, max_lon, max_lat) = result
+
+                            # Convert GPS bbox back to local coordinates for proper matplotlib extent
+                            from lanelet2.core import GPSPoint
+                            bl_local = projector.forward(GPSPoint(min_lat, min_lon, 0))
+                            tr_local = projector.forward(GPSPoint(max_lat, max_lon, 0))
+
+                            # matplotlib extent: [left, right, bottom, top]
+                            self.osm_image_extent = [bl_local.x, tr_local.x, bl_local.y, tr_local.y]
+                            log.info(f"OSM background image loaded successfully (extent: {self.osm_image_extent})")
+                        else:
+                            log.warning("Failed to fetch OSM background image")
+                    else:
+                        log.warning("No origin or projector available, cannot fetch OSM background")
+
+                except Exception as e:
+                    log.error(f"Error fetching OSM background: {e}")
+
+            # Display cached OSM image
+            if self.osm_background_image and self.osm_image_extent:
+                plt.imshow(self.osm_background_image,
+                          extent=self.osm_image_extent,
+                          aspect='auto',
+                          alpha=OSM_IMAGE_ALPHA,
+                          zorder=-1)  # Draw behind everything else
 
         #road lines:
         #self.lanelet_map.plot_all_lanelets( x_min,y_min, x_max,y_max , True)

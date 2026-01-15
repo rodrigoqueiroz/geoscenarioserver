@@ -34,8 +34,7 @@ FFPLOT_ASPECT = True  		#frenet frame plot: keep S and D aspect ratio (same scal
 FFPLOT_LENGTH = 60			#frenet frame plot: road length (s) in meters
 FFPLOT_LITE = False         #frenet frame plot: if true, plots a simplified version with onlye self vehicle. If false, plots all vehicles, trajectories and candidates
 #Cartesian
-SHOW_CPLOT = True           #whether to show the cartesian plot
-CPLOT_SIZE = 100            #cartesian plot: road length in meters (shorter=better performance)
+SHOW_CPLOT = True           #whether to show the cartesian plot, the size is origin.area or, by default, MPLOT_SIZE
 REFERENCE_PATH = True       #reference path indicating the frenet frame for the vehicle
 SHOW_VEHICLE_SHAPE = True   #vehicle plot with rectangle shape.
 SHOW_VEHICLE_RADIUS = False #vehicle plot with radius.
@@ -83,6 +82,10 @@ MAX_NVEHICLES = math.inf       #Limit max number of active vehicles (math.inf if
 EVALUATION_MODE = False
 WRITE_TRAJECTORIES = False     #If True, all agent trajectories will be saved inside $GSS_OUTPUTS as csv files
 
+#OSM Background Images (for map-less scenarios)
+OSM_BACKGROUND_ENABLED = True  #If True, allow fetching OpenStreetMap background images when no lanelet map is loaded
+OSM_IMAGE_ALPHA = 0.5          #Transparency of OSM background image (0.0=invisible, 1.0=opaque)
+
 #Client (Unreal or similar)
 
 #Carla
@@ -120,3 +123,4 @@ class SimConfig:
     wait_for_client:bool = WAIT_FOR_CLIENT
     client_shm:bool = CLIENT_SHM
     write_trajectories:bool = WRITE_TRAJECTORIES
+    overlay_osm:bool = False
