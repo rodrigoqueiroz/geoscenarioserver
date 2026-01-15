@@ -12,20 +12,12 @@
 #   - Stitched images cached in `outputs/osm_cache/`
 # - Coordinate transformation from local Cartesian to WGS84 GPS using Lanelet2 projectors
 # - Configurable image size and resolution
-
-# **Main Functions:**
-# - `fetch_osm_image(origin_lat, origin_lon, area_meters, projector, ...)`: Main API - returns (image, GPS_bbox)
-# - `deg2num(lat, lon, zoom)`: GPS → tile coordinate conversion
-# - `get_zoom_for_bbox(bbox, target_pixels)`: Automatic zoom calculation
-# - `download_tile(z, x, y, cache_dir)`: Download with caching
-# - `calculate_bbox_from_origin(lat, lon, area_meters, projector)`: Calculate GPS bbox from local area
-# - `clear_cache(cache_dir, max_age_days)`: Cache management
-
+#
 # **Performance:**
 # - First fetch: ~5ms (download + stitch)
 # - Cached retrieval: ~0.1ms (80x speedup)
 # - Typical image size: 640x640 to 800x800 pixels (~450KB PNG)
-
+#
 # **Technical Details:**
 # - **Tile Servers**: Standard OSM tile servers at zoom levels 1-19
 # - **Coordinate Systems**: 
@@ -36,7 +28,7 @@
 #   - This ensures OSM tiles align perfectly with Lanelet2 maps despite different projections
 # - **Caching Strategy**: MD5 hash of (lat, lon, area) for cache keys
 # - **Image Processing**: PIL for tile download, stitching, cropping, resizing
-# - **Extent Calculation**: Full plot size (CPLOT_SIZE) used; OSMImageFetcher handles half-area internally
+# - **Extent Calculation**: Full plot size (MPLOT_SIZE) used; OSMImageFetcher handles half-area internally
 # --------------------------------------------
 
 import os

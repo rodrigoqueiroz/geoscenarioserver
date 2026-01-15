@@ -432,7 +432,7 @@ class Dashboard(object):
         # Display OSM background image if:
         # - Map-less mode (no lanelet map loaded), OR
         # - Overlay mode enabled (for verification/alignment checking)
-        if USE_OSM_BACKGROUND and (not self.lanelet_map.is_loaded() or self.sim_config.overlay_osm):
+        if OSM_BACKGROUND_ENABLED and (not self.lanelet_map.is_loaded() or self.sim_config.overlay_osm):
             if self.osm_background_image is None:
                 # Fetch OSM image on first call
                 try:

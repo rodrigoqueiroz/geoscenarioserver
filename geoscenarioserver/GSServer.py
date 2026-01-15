@@ -42,7 +42,10 @@ class GSServer(GSServerBase):
         self.sim_config.wait_for_input = args.wait_for_input
         self.sim_config.wait_for_client = args.wait_for_client
         self.sim_config.write_trajectories = args.write_trajectories
-        self.sim_config.overlay_osm = args.overlay_osm
+        if OSM_BACKGROUND_ENABLED:
+            self.sim_config.overlay_osm = args.overlay_osm
+        elif args.overlay_osm:
+            log.warning("OSM overlay requested but the OSM_BACKGROUND_ENABLED=False: the option --osm-overlay has no effect.")
 
         # use sim_config after all modifications
         self.traffic = SimTraffic(self.lanelet_map, self.sim_config)
