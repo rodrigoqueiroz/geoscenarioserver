@@ -25,6 +25,7 @@ _slaunch()
                 opts="$opts $(get_scenarios_from_cwd) $gss_opts"
             fi
             ;;
+
         *)
             # autocomplete part names
             SCENARIO_NAME="${COMP_WORDS[1]}"
@@ -46,6 +47,12 @@ _slaunch()
             ;;
     esac
     COMPREPLY=( $(compgen -W "${opts}" -- "${COMP_WORDS[COMP_CWORD]}") )
+    # check if a scenario alias has been selected and expand it
+    if [[ ${#COMPREPLY[@]} -eq 1 ]] && [[ -f "${SUITE_DIR}/scenarios/${COMPREPLY[0]}" ]]; then
+        expanded_alias=$(cat "${SUITE_DIR}/scenarios/${COMPREPLY[0]}")
+        # echo "Alias scenario detected, expanding to: ${expanded_alias}"
+        COMPREPLY=("${expanded_alias}")
+    fi
     return 0
 }
 alias slaunch="bash ${SUITE_DIR}/scripts/launch.bash"
