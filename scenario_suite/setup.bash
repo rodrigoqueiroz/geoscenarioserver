@@ -25,7 +25,6 @@ _slaunch()
                 opts="$opts $(get_scenarios_from_cwd) $gss_opts"
             fi
             ;;
-
         *)
             # autocomplete part names
             SCENARIO_NAME="${COMP_WORDS[1]}"

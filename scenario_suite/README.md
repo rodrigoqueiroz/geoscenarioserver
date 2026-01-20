@@ -6,17 +6,18 @@ The suite is supported by convenience scripts.
 The scenario suite contains the following folders:
 ```
 scenario_suite/
-├── geoscenarioserver/        # symlink to or submodule of [geoscenarioserver](https://github.com/rodrigoqueiroz/geoscenarioserver/)
-├── maps/                     # map files used by scenarios (or symlinks)
-├── scenarios/                # scenario definitions
-│   ├── <scenario_name>/      # base scenario folder
-│   │   ├── <scenario_name>.osm   # base scenario file
-│   │   └── parts/                # optional scenario parts folder
-│   │       ├── <part_name>.osm    # scenario part file
+├── geoscenarioserver/           # symlink to or submodule of [geoscenarioserver](https://github.com/rodrigoqueiroz/geoscenarioserver/)
+├── maps/                        # map files used by scenarios (or symlinks)
+├── scenarios/                   # scenario definitions
+│   ├── <scenario_name>/         # base scenario folder
+│   │   ├── <scenario_name>.osm  # base scenario file
+│   │   └── parts/               # optional scenario parts folder
+│   │       ├── <part_name>.osm  # scenario part file
 │   │       └── ...
-├── logs/                     # scenario execution logs
-├── scripts/                  # scenario launch scripts
-└── setup.bash                # script to make the command 'slaunch' available
+│   └── <scenario_alias>         # file containing arguments to 'slaunch' that define a scenario variant
+├── logs/                        # scenario execution logs
+├── scripts/                     # scenario launch scripts
+└── setup.bash                   # script to make the command 'slaunch' available
 ```
 
 ## Installation
@@ -48,13 +49,14 @@ By default, the GeoScenarioServer is launched in standalone mode but the native 
 ```bash
 $ slaunch
 
-Usage: slaunch <scenario_name> [<part_name>.osm*] [--ros] [<gss_options>*]
+Usage: slaunch <scenario_name>|<scenario_alias> [<part_name>.osm*] [--ros] [<gss_options>*]
 
 Launches the specified scenario with the GeoScenarioServer traffic simulator
 located at /.../scenario_suite/geoscenarioserver.
 
 Arguments:
-     <scenario_name>      name of the folder 'scenarios/<scenario_name>' (mandatory)
+     <scenario_name>      name of the folder 'scenarios/<scenario_name>'
+     <scenario_alias>     name of the file 'scenarios/<scenario_alias>', which contains <scenario_name> and parts
      [<part_name>.osm*]   names of the files in the folder 'scenarios/<scenario_name>/parts' (optional list)
      [--ros]              launch ROS2 node geoscenario_server (launch standalone by default)
      [--mock-co-sim <real_time_factor>]
@@ -90,6 +92,23 @@ slaunch colliding_pedestrians \         # base secenario
         --origin-from-vid 1 \           # override origin from the starting position of vehicle with ID 1
         --mock-co-sim 1.0 \             # launch mock co-simulator with real_time_factor=1.0
         --overlay-osm                   # overlay OSM background in plots
+```
+for example, to launch a scenario variant defined in an alias file
+```bash
+slaunch occluded_pedestrians <tab>
+```
+where the scenario alias file `scenarios/occluded_pedestrians` contains
+```bash
+colliding_pedestrians occluding-pv10-pv20.osm occluding-pv30-pv40.osm right-sp2.osm jaywalker-pp4-const.osm
+```
+pressing `<tab>` after typing the alias name expands the alias to the full command and more parts can be selected (e.g., for VUT).
+```bash
+slaunch colliding_pedestrians occluding-pv10-pv20.osm occluding-pv30-pv40.osm right-sp2.osm jaywalker-pp4-const.osm vut_sdv1-forward.osm
+```
+
+For non-interactive use, the scenario alias can be used directly without expanding it, for example,
+```bash
+slaunch jaywalking_pedestrians vut_sdv1-forward-stop.osm
 ```
 
 Each scenario may optionally contain a subfolder `parts`, which contains the available scenario fragments. 
