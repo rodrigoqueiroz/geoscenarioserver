@@ -23,7 +23,7 @@ fi
 
 print_help() {
     echo ""
-    echo "Usage: slaunch <scenario_name> [<part_name>.osm*] [--ros] [--mock-co-sim] [<gss_options>*]"
+    echo "Usage: slaunch <scenario_name>|<scenario_alias> [<part_name>.osm*] [--ros] [--mock-co-sim] [<gss_options>*]"
     echo ""
     echo "Launches the specified scenario with the GeoScenarioServer traffic simulator"
     if [[ -L ${suite_dir}/geoscenarioserver ]]; then
@@ -35,7 +35,8 @@ print_help() {
     fi
     echo ""
     echo "Arguments:"
-    echo "     <scenario_name>       name of the folder 'scenarios/<scenario_name>' (mandatory)"
+    echo "     <scenario_name>      name of the folder 'scenarios/<scenario_name>'"
+    echo "     <scenario_alias>     name of the file 'scenarios/<scenario_alias>', which contains <scenario_name> and parts"
     echo "     [<part_name>.osm*]    names of the files in the folder 'scenarios/<scenario_name>/parts' (optional list)"
     echo "     [--ros]               launch ROS2 node geoscenario_server (launch standalone by default)"
     echo "     [--mock-co-sim <real_time_factor>]"
@@ -66,12 +67,12 @@ if [[ $# = 0 ]]; then
     exit 1
 fi
 
-# by default, assume the first argument is the scenario name
+# by default, assume the first argument is the scenario name or scenario alias
 scenario_name=$1
 shift
 
 # the remaining arguments are the part names or gss options
-args=("$@")
+original_args=($@)
 full_parts_list=""
 gss_options=""
 ros=
@@ -82,6 +83,24 @@ number_is_for=
 dash_pos_x=
 dash_pos_y=
 dash_pos_w=
+
+if [[ -f "${suite_dir}/scenarios/${scenario_name}" ]]; then
+    # scenario alias: read the scenario name and parts from the file
+    scenario_alias=$(cat "${suite_dir}/scenarios/${scenario_name}")
+    alias_args=()
+    for word in $scenario_alias; do
+        alias_args+=("${word}")
+    done
+    # the first argument in the alias file is the scenario name
+    scenario_name=${alias_args[0]}
+    # the remaining arguments in the alias file are the parts or options
+    args=(${alias_args[@]:1})
+    # add the original arguments after the parts from the alias file
+    args+=(${original_args[@]})
+else
+    # regular scenario, use the original arguments
+    args=(${original_args[@]})
+fi
 
 for arg in ${args[@]}; do
     part_path="${suite_dir}/scenarios/${scenario_name}/parts/${arg}"
@@ -146,7 +165,6 @@ for arg in ${args[@]}; do
                 ;;
         esac
     fi
-    shift
 done
 scenarios_dir="$suite_dir/scenarios"
 

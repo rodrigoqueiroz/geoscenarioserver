@@ -46,6 +46,13 @@ _slaunch()
             ;;
     esac
     COMPREPLY=( $(compgen -W "${opts}" -- "${COMP_WORDS[COMP_CWORD]}") )
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        # check if a unique scenario alias has been selected and expand it
+        if [[ ${#COMPREPLY[@]} -eq 1 ]] && [[ -f "${SUITE_DIR}/scenarios/${COMPREPLY[0]}" ]]; then
+            expanded_alias=$(cat "${SUITE_DIR}/scenarios/${COMPREPLY[0]}")
+            COMPREPLY=("${expanded_alias}")
+        fi
+    fi
     return 0
 }
 alias slaunch="bash ${SUITE_DIR}/scripts/launch.bash"
