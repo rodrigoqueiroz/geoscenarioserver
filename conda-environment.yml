@@ -18,5 +18,5 @@ dependencies:
   - pip:
     - antlr-denter
     - lanelet2
-    - py_trees==0.7.6
+    - py_trees>=2.2
     - sysv-ipc

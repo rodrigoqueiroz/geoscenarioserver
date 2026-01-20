@@ -1,5 +1,6 @@
 tk
 antlr4-python3-runtime>=4.13
+graphviz
 matplotlib
 numpy
 scipy
@@ -10,5 +11,5 @@ jq
 pydot
 antlr-denter
 lanelet2
-py_trees==0.7.6
+py_trees>=2.2
 sysv-ipc
