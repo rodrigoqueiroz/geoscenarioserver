@@ -93,23 +93,6 @@ slaunch colliding_pedestrians \         # base secenario
         --mock-co-sim 1.0 \             # launch mock co-simulator with real_time_factor=1.0
         --overlay-osm                   # overlay OSM background in plots
 ```
-for example, to launch a scenario variant defined in an alias file
-```bash
-slaunch occluded_pedestrians <tab>
-```
-where the scenario alias file `scenarios/occluded_pedestrians` contains
-```bash
-colliding_pedestrians occluding-pv10-pv20.osm occluding-pv30-pv40.osm right-sp2.osm jaywalker-pp4-const.osm
-```
-pressing `<tab>` after typing the alias name expands the alias to the full command and more parts can be selected (e.g., for VUT).
-```bash
-slaunch colliding_pedestrians occluding-pv10-pv20.osm occluding-pv30-pv40.osm right-sp2.osm jaywalker-pp4-const.osm vut_sdv1-forward.osm
-```
-
-For non-interactive use, the scenario alias can be used directly without expanding it, for example,
-```bash
-slaunch jaywalking_pedestrians vut_sdv1-forward-stop.osm
-```
 
 Each scenario may optionally contain a subfolder `parts`, which contains the available scenario fragments. 
 For example ('VUT': vehicle under test):, 
@@ -132,6 +115,26 @@ scenarios/colliding_pedestrians/
 ```
 
 NOTE: scenario fragments cannot be run individually without a base scenario because they are missing the required elements `origin` and `globalconfig`.
+
+Scenario aliases are files that contain a list of arguments to `slaunch`, allowing to define and reuse scenario variants conveniently.
+
+For example, to launch a scenario variant defined in an alias file `scenarios/occluded_pedestrians`, which contains
+```bash
+colliding_pedestrians occluding-pv10-pv20.osm occluding-pv30-pv40.osm right-sp2.osm jaywalker-pp4-const.osm
+```
+type the alias name (or part of it that uniquely identifies it) and press `<tab>`, for example,
+```bash
+slaunch occluded<tab>
+```
+pressing `<tab>` expands the alias to the full command and more parts can be selected (e.g., for VUT).
+```bash
+slaunch colliding_pedestrians occluding-pv10-pv20.osm occluding-pv30-pv40.osm right-sp2.osm jaywalker-pp4-const.osm vut_sdv1-forward.osm
+```
+
+For non-interactive use, the scenario alias can be used directly without expanding it, for example,
+```bash
+slaunch jaywalking_pedestrians vut_sdv1-forward-stop.osm
+```
 
 3. Review the scenario execution outputs
 
