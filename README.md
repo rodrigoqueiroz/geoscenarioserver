@@ -5,7 +5,7 @@ Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees a
 ## Dependencies
 
 - Linux or Windows 10/11 + WSL2
-- Python >= 3.11
+- Python >= 3.11,<3.13
 
 GeoScenario Server can run on Linux natively or in WSL2 on Windows within a [conda](https://conda-forge.org/) environment.
 
@@ -24,15 +24,20 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 ### Python packages
 
 - antlr4-python3-runtime >= 4.13
-- antlr-denter
-- lanelet2
+- graphviz
 - matplotlib
 - numpy
 - scipy
-- py-trees
-- sysv-ipc
-- tk
+- requests
+- pynput
+- screeninfo
+- jq
 - pydot
+- antlr-denter
+- lanelet2
+- py-trees>=2.2
+- sysv-ipc
+
 
 #### Ubuntu native or Windows WSL2 installation
 
