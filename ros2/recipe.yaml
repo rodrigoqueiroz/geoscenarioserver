@@ -1,0 +1,42 @@
+package:
+  name: geoscenario-ros2
+  version: "0.1.0"
+
+source:
+  path: .
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - cmake
+    - ninja
+  host:
+    - python >=3.11,<3.13
+    - ros-humble-ros-core
+    - ros-humble-ament-cmake
+    - ros-humble-rosidl-default-generators
+    - ros-humble-rosidl-default-runtime
+    - ros-humble-std-msgs
+    - ros-humble-geometry-msgs
+    - ros-humble-geographic-msgs
+    - colcon-common-extensions
+  run:
+    - python >=3.11,<3.13
+    - geoscenarioserver >=0.1.0
+    - ros-humble-ros-core
+    - ros-humble-rosidl-default-runtime
+    - ros-humble-std-msgs
+    - ros-humble-geometry-msgs
+    - ros-humble-geographic-msgs
+
+about:
+  homepage: https://github.com/rodrigoqueiroz/geoscenarioserver
+  summary: GeoScenario ROS2 nodes for autonomous vehicle simulation
+  description: |
+    ROS2 integration for GeoScenario Server including message definitions,
+    native ROS2 server node, and launch files.
+  license: MIT
