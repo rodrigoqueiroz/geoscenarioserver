@@ -10,10 +10,10 @@ version = "0.1.0"
 preview = ["pixi-build"]
 
 [tasks]
-gss = "gsserver"
-test_scenarios_ci = "bash scripts/run_scenarios.bash --no-dash --non-interactive"
-test_scenario = "bash scripts/run_scenarios.bash --no-dash --single"
-build_wheel = "python -m build"
+gss = { cmd = "gsserver", description = "Run GeoScenario Server" }
+test_scenarios_ci = { cmd = "bash scripts/run_scenarios.bash --no-dash --non-interactive", description = "Run all scenario tests (CI)" }
+test_scenario = { cmd = "bash scripts/run_scenarios.bash --no-dash --single", description = "Run a single scenario test" }
+build_wheel = { cmd = "python -m build", description = "Build Python wheel package" }
 
 [dependencies]
 jq = "*"                              # used by run_scenarios.bash
@@ -94,20 +94,20 @@ ros-humble-geographic-msgs = "*"
 scripts = ["ros2/install/setup.bash"]
 
 [feature.humble.tasks]
-ros_gss = "gsserver"
-ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", depends-on = ["ros_build_release"] }
-ros_build = { cmd = "colcon build --symlink-install", cwd="ros2", outputs = ["ros2/install/setup.bash"] }
-ros_build_release = { cmd = "colcon build", cwd="ros2", outputs = ["ros2/install/setup.bash"] }
-ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_build_release"] }
-ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", depends-on = ["ros_build_release"] }
-ros_client_wgs84_roundtriptest = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", depends-on = ["ros_build_release"] }
-ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_build_release"] }
-ros_test_bringup = { cmd = "colcon test --packages-select geoscenario_bringup --event-handlers console_direct+", cwd = "ros2", depends-on = ["ros_build_release"] }
-rqt = { cmd = "rqt", depends-on = ["ros_build_release"] }
-rqt_topic = { cmd = "rqt -s rqt_topic.topic.Topic", depends-on = ["ros_build_release"] }
+ros_gss = { cmd = "gsserver", description = "Run GeoScenario Server with ROS2" }
+ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", depends-on = ["ros_build_release"], description = "Run native ROS2 server node" }
+ros_build = { cmd = "colcon build --symlink-install", cwd = "ros2", outputs = ["ros2/install/setup.bash"], description = "Build ROS2 packages (debug)" }
+ros_build_release = { cmd = "colcon build", cwd = "ros2", outputs = ["ros2/install/setup.bash"], description = "Build ROS2 packages (release)" }
+ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_build_release"], description = "Run ROS2 shared memory client" }
+ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", depends-on = ["ros_build_release"], description = "Run ROS2 client with WGS84 coordinates" }
+ros_client_wgs84_roundtriptest = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", depends-on = ["ros_build_release"], description = "Run ROS2 client with WGS84 + round-trip test" }
+ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_build_release"], description = "Run mock co-simulator for testing" }
+ros_test_bringup = { cmd = "colcon test --packages-select geoscenario_bringup --event-handlers console_direct+", cwd = "ros2", depends-on = ["ros_build_release"], description = "Run ROS2 bringup integration tests" }
+rqt = { cmd = "rqt", depends-on = ["ros_build_release"], description = "Launch RQt GUI" }
+rqt_topic = { cmd = "rqt -s rqt_topic.topic.Topic", depends-on = ["ros_build_release"], description = "Launch RQt topic viewer" }
 
 [feature.antlr.dependencies]
 antlr4-tools = "*"
 
 [feature.antlr.tasks]
-regenerate = "antlr4 -Dlanguage=Python3 geoscenarioserver/sv/planners/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 geoscenarioserver/sp/btree/parser/BTreeDSL.g4"
+regenerate = { cmd = "antlr4 -Dlanguage=Python3 geoscenarioserver/sv/planners/btree/parser/BTreeDSL.g4; antlr4 -Dlanguage=Python3 geoscenarioserver/sp/btree/parser/BTreeDSL.g4", description = "Regenerate ANTLR parsers" }
