@@ -8,7 +8,7 @@ from lanelet2.io import Origin
 from lanelet2.projection import LocalCartesianProjector
 from lanelet2.core import BasicPoint3d, GPSPoint
 
-from .SimSharedMemoryClient import *
+from geoscenarioserver.shm.SimSharedMemoryClient import *
 
 from deepdiff import DeepDiff
 

@@ -1,0 +1,28 @@
+# GeoScenario ROS2 Conda Package
+#
+# This creates a single conda package containing all ROS2 nodes.
+
+[workspace]
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+name = "ros-humble-geoscenarioserver"
+platforms = ["linux-64"]
+version = "0.1.0"
+preview = ["pixi-build"]
+
+[dependencies]
+# Build tools for development
+colcon-common-extensions = "*"
+compilers = "*"
+cmake = "*"
+ninja = "*"
+ros-humble-ros-core = "*"
+
+[package]
+name = "ros-humble-geoscenarioserver"
+version = "0.1.0"
+
+[package.build]
+backend = { name = "pixi-build-rattler-build", version = "*" }
