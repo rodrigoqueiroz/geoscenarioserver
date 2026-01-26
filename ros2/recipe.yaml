@@ -1,5 +1,5 @@
 package:
-  name: geoscenario-ros2
+  name: ros-humble-geoscenarioserver
   version: "0.1.0"
 
 source:

@@ -7,7 +7,7 @@ channels = [
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]
-name = "geoscenario-ros2"
+name = "ros-humble-geoscenarioserver"
 platforms = ["linux-64"]
 version = "0.1.0"
 preview = ["pixi-build"]
@@ -21,7 +21,7 @@ ninja = "*"
 ros-humble-ros-core = "*"
 
 [package]
-name = "geoscenario-ros2"
+name = "ros-humble-geoscenarioserver"
 version = "0.1.0"
 
 [package.build]
