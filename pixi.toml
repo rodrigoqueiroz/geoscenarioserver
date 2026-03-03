@@ -1,6 +1,7 @@
 [workspace]
 authors = [ "See CONTRIBUTORS" ]
 channels = [
+  "https://prefix.dev/pixi-build-backends",
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]
@@ -71,6 +72,7 @@ antlr = { features = ["antlr"], no-default-feature = true }
 
 [feature.humble]
 channels = [
+  "https://prefix.dev/pixi-build-backends",
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]
@@ -89,7 +91,11 @@ deepdiff = "*"
 ros-humble-ros-core = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
-ros-humble-geoscenarioserver = { path = "./ros2/" }
+ros-humble-geoscenario-msgs = { path = "ros2/geoscenario_msgs/package.xml" }
+ros-humble-geoscenario-server = { path = "ros2/geoscenario_server/package.xml" }
+ros-humble-geoscenario-client = { path = "ros2/geoscenario_client/package.xml" }
+ros-humble-geoscenario-bringup = { path = "ros2/geoscenario_bringup/package.xml" }
+
 
 [feature.humble.tasks]
 ros_gss = { cmd = "gsserver", description = "Run GeoScenario Server within ROS2 humble" }

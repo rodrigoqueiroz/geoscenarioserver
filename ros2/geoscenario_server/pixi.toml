@@ -1,0 +1,13 @@
+[package.build.backend]
+channels = [
+  "https://prefix.dev/pixi-build-backends",
+  "https://prefix.dev/conda-forge",
+]
+name = "pixi-build-ros"
+version = "*"
+
+[package.build.config]
+distro = "humble"
+
+[package.run-dependencies]
+ros-humble-geoscenario-msgs = "*"

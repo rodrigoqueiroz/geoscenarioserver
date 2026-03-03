@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>geoscenario_client</name>
+  <name>geoscenario_server</name>
   <version>0.1.0</version>
-  <description>Python client for GeoScenarioServer</description>
-  <maintainer email="ian.colwell@hexagon.com">Ian Colwell</maintainer>
+  <description>ROS2 wrapper for GeoScenarioServer</description>
   <maintainer email="michal.antkiewicz@uwaterloo.ca">Michal Antkiewicz</maintainer>
+  <maintainer email="sdelcore@uwaterloo.ca">Spencer Delcore</maintainer>
   <license>MIT</license>
 
   <test_depend>python3-pytest</test_depend>
 
-  <depend>geoscenario_msgs</depend>
+  <!-- <depend>geoscenario_msgs</depend> -->
   <depend>geographic_msgs</depend>
 
   <export>

@@ -2,6 +2,7 @@ version: 6
 environments:
   antlr:
     channels:
+    - url: https://prefix.dev/pixi-build-backends/
     - url: https://prefix.dev/robostack-humble/
     - url: https://prefix.dev/conda-forge/
     options:
@@ -80,6 +81,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_6.conda
   default:
     channels:
+    - url: https://prefix.dev/pixi-build-backends/
     - url: https://prefix.dev/robostack-humble/
     - url: https://prefix.dev/conda-forge/
     indexes:
@@ -457,6 +459,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/7d/0a/2e0c30342586dabb0b4b7946393a7aeb725fca7b4549fb02e128a1a0fe87/py_trees-2.4.0-py3-none-any.whl
   humble:
     channels:
+    - url: https://prefix.dev/pixi-build-backends/
     - url: https://prefix.dev/robostack-humble/
     - url: https://prefix.dev/conda-forge/
     indexes:
@@ -1248,7 +1251,10 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_6.conda
       - conda: https://prefix.dev/conda-forge/linux-64/zziplib-0.13.69-he45264a_2.conda
       - conda: .
-      - conda: ./ros2/
+      - conda: ros2/geoscenario_bringup/package.xml
+      - conda: ros2/geoscenario_client/package.xml
+      - conda: ros2/geoscenario_msgs/package.xml
+      - conda: ros2/geoscenario_server/package.xml
       - pypi: https://files.pythonhosted.org/packages/0b/7d/90b9b27e51099deff45ae426157332c8d29448c62df0036efaa28ef3c27b/antlr_denter-1.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7d/0a/2e0c30342586dabb0b4b7946393a7aeb725fca7b4549fb02e128a1a0fe87/py_trees-2.4.0-py3-none-any.whl
 packages:
@@ -8909,26 +8915,77 @@ packages:
   license: BSD-3-Clause
   size: 22363
   timestamp: 1753314318559
-- conda: ./ros2/
-  name: ros-humble-geoscenarioserver
+- conda: ros2/geoscenario_bringup/package.xml
+  name: ros-humble-geoscenario-bringup
   version: 0.1.0
   build: hb0f4dca_0
   subdir: linux-64
   variants:
     target_platform: linux-64
   depends:
-  - python >=3.11,<3.13
-  - geoscenarioserver >=0.1.0
-  - ros-humble-ros-core
-  - ros-humble-rosidl-default-runtime
-  - ros-humble-std-msgs
-  - ros-humble-geometry-msgs
-  - ros-humble-geographic-msgs
+  - ros-humble-geoscenario-server
+  - ros-humble-geoscenario-client
+  - ros2-distro-mutex
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
   - libgcc >=15
   - libgcc >=15
   - libstdcxx >=15
   - python_abi 3.11.* *_cp311
-  license: MIT
+  - numpy >=1.26.4,<2.0a0
+  license: LicenseRef-MIT
+- conda: ros2/geoscenario_client/package.xml
+  name: ros-humble-geoscenario-client
+  version: 0.1.0
+  build: hb0f4dca_0
+  subdir: linux-64
+  variants:
+    target_platform: linux-64
+  depends:
+  - ros-humble-geographic-msgs
+  - ros2-distro-mutex
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - libgcc >=15
+  - libgcc >=15
+  - libstdcxx >=15
+  - python_abi 3.11.* *_cp311
+  - numpy >=1.26.4,<2.0a0
+  license: LicenseRef-MIT
+- conda: ros2/geoscenario_msgs/package.xml
+  name: ros-humble-geoscenario-msgs
+  version: 0.1.0
+  build: hb0f4dca_0
+  subdir: linux-64
+  variants:
+    target_platform: linux-64
+  depends:
+  - ros-humble-std-msgs
+  - ros-humble-geometry-msgs
+  - ros-humble-geographic-msgs
+  - ros-humble-rosidl-default-generators
+  - ros2-distro-mutex
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - libgcc >=15
+  - libgcc >=15
+  - libstdcxx >=15
+  - python_abi 3.11.* *_cp311
+  - numpy >=1.26.4,<2.0a0
+- conda: ros2/geoscenario_server/package.xml
+  name: ros-humble-geoscenario-server
+  version: 0.1.0
+  build: hb0f4dca_0
+  subdir: linux-64
+  variants:
+    target_platform: linux-64
+  depends:
+  - ros-humble-geographic-msgs
+  - ros2-distro-mutex
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - libgcc >=15
+  - libgcc >=15
+  - libstdcxx >=15
+  - python_abi 3.11.* *_cp311
+  - numpy >=1.26.4,<2.0a0
+  license: LicenseRef-MIT
 - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-gmock-vendor-1.10.9006-np126py311hbc2a38a_13.conda
   sha256: a203ca16a1f236265451d373c5f1c5e2731a263507d58c4b03b3e5c72b4d07db
   md5: 0b255e45bea39b318451818a47d04f73

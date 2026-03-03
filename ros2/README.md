@@ -121,14 +121,16 @@ bash geoscenarioserver/scripts/pixi_test_ros2_client.bash [--wgs84|--roundtripte
 
 ## Building Conda Package
 
-To build a single `ros-humble-geoscenarioserver` conda package containing all ROS2 nodes (msgs, server, client, bringup):
+To build a single `ros-humble-geoscenario-*` conda package:
 
 ```bash
-cd ros2
-pixi build
+pixi build --path ros2/geoscenario_msgs/package.xml
+pixi build --path ros2/geoscenario_server/package.xml
+pixi build --path ros2/geoscenario_client/package.xml
+pixi build --path ros2/geoscenario_bringup/package.xml
 ```
 
-The package is output to `ros2/ros-humble-geoscenarioserver-*.conda`.
+The package is output to `ros-humble-geoscenario-*.conda`.
 
 ### Using in Another Project
 
@@ -139,10 +141,13 @@ Add to your `pixi.toml`:
 channels = ["./local-channel", "https://prefix.dev/robostack-humble", "https://prefix.dev/conda-forge"]
 
 [dependencies]
-ros-humble-geoscenarioserver = "*"
+ros-humble-geoscenario-msgs = "*"
+ros-humble-geoscenario-server = "*"
+ros-humble-geoscenario-client = "*"
+ros-humble-geoscenario-bringup = "*"
 ```
 
-Copy the `.conda` file to `local-channel/linux-64/`, index, and install:
+Copy the `.conda` files to `local-channel/linux-64/`, index, and install:
 
 ```bash
 pixi exec rattler-index fs local-channel
