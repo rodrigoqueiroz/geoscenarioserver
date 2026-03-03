@@ -62,7 +62,7 @@ fi
 
 if [[ ${ARG_ROS2} == "true" ]]; then
     echo "Installing ROS2 into the environment 'gss'..."
-    $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-staging ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
+    $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-humble ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
     if [[ $? == 0 ]]; then
         echo "ROS2 installed successfully. Building the GSS ROS2 client..."
         echo ""
@@ -70,10 +70,10 @@ if [[ ${ARG_ROS2} == "true" ]]; then
         $MAMBA_EXE -n gss run colcon build
         echo ""
         echo "-------------------------------"
-        echo "To run the ROS2 client, execute"
-        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/ros2/install/setup.bash && ros2 run geoscenario_client geoscenario_client'"
+        echo "To run the ROS2 server, execute"
+        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/ros2/install/setup.bash && ros2 run geoscenario_server geoscenario_server'"
     else
-        echo "Failed to install ROS2 and build the GSS ROS2 client."
+        echo "Failed to install ROS2 and build the GSS ROS2 server."
     fi
 fi
 
