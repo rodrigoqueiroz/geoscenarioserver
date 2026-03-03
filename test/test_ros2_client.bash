@@ -11,7 +11,6 @@ elif [[ "$1" == "--roundtriptest" ]]; then
 fi
 
 cd ${REPO_DIR}
-pixi run ros_build_release
 pixi run rqt_topic &
 pixi run ${ROS_CLIENT} &
 pixi run ros_mock_co_simulator &

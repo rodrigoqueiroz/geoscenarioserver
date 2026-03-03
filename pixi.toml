@@ -91,11 +91,8 @@ ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
 ros-humble-geoscenarioserver = { path = "./ros2/" }
 
-[feature.humble.target.unix.activation]
-scripts = ["ros2/install/setup.bash"]
-
 [feature.humble.tasks]
-ros_gss = { cmd = "gsserver", description = "Run GeoScenario Server with ROS2" }
+ros_gss = { cmd = "gsserver", description = "Run GeoScenario Server within ROS2 humble" }
 ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", description = "Run native ROS2 server node" }
 ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", description = "Run ROS2 shared memory client" }
 ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", description = "Run ROS2 client with WGS84 coordinates" }

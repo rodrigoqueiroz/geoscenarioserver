@@ -46,8 +46,6 @@ case "$1" in
 esac
 
 cd ${REPO_DIR}
-pixi run ros_build_release
-
 pixi run rqt_topic &
 
 pixi run ros_mock_co_simulator --ros-args \
