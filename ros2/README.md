@@ -6,27 +6,19 @@ Native ROS2 server for GeoScenario Server, providing event-driven simulation con
 
 All pixi commands must be executed from the `geoscenarioserver/` directory.
 
-```bash
-cd geoscenarioserver
-```
+## Run Native Server with Mock Co-Simulator
 
-### Build ROS2 Packages
+The first run will build the native GSS server as well as the ROS2 package.
 
 ```bash
-pixi run ros_build          # Debug build
-pixi run ros_build_release  # Release build
-```
-
-### Run Native Server with Mock Co-Simulator
-
-```bash
-pixi run ros2 launch geoscenario_bringup test_server.launch.py
+cd geoscenarioserver/
+pixi run -e humble ros2 launch geoscenario_bringup test_server.launch.py
 ```
 
 With options:
 ```bash
-pixi run ros2 launch geoscenario_bringup test_server.launch.py time_mode:=fastest
-pixi run ros2 launch geoscenario_bringup test_server.launch.py scenario_files:="['path/to/scenario.osm']"
+pixi run -e humble ros2 launch geoscenario_bringup test_server.launch.py time_mode:=fastest
+pixi run -e humble ros2 launch geoscenario_bringup test_server.launch.py scenario_files:="['path/to/scenario.osm']"
 ```
 
 ### Interactive Shell
@@ -160,5 +152,5 @@ pixi install
 Run the server with the mock co-simulator:
 
 ```bash
-pixi run ros2 launch geoscenario_bringup test_server.launch.py
+pixi run -e humble ros2 launch geoscenario_bringup test_server.launch.py
 ```
