@@ -23,7 +23,7 @@ if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: pip wheel install failed"
     exit 1
 fi
-gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm
+gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
 if [[ $? == 0 ]]; then
     echo "$0: INFO: gsserver run succeeded"
     # cleanup

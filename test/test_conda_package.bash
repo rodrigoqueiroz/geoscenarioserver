@@ -19,7 +19,7 @@ if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: pixi install failed"
     exit 1
 fi
-pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm
+pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
 if [[ $? == 0 ]]; then
     echo "$0: INFO: pixi run succeeded"
     # cleanup
