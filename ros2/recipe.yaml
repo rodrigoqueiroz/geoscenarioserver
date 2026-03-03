@@ -6,7 +6,13 @@ source:
   path: .
 
 build:
-  script: build.sh
+  script: "colcon build \
+             --base-paths src \
+             --packages-select geoscenario_msgs geoscenario_server geoscenario_client geoscenario_bringup \
+             --build-base conda_build \
+             --install-base $PREFIX \
+             --merge-install \
+             --cmake-args -DCMAKE_BUILD_TYPE=Release"
 
 requirements:
   build:
