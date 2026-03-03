@@ -10,15 +10,21 @@ if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: pixi build failed"
     exit 1
 fi
-mv geoscenarioserver-0.*.conda test/conda-test/geoscenarioserver.conda
+
+# for pixi
+cp -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/geoscenarioserver.conda
+# for micromamba
+mv -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/repo/linux-64/
 
 # run the server in the test environment
-cd test/conda-test
+cd ${TEST_DIR}/conda-test
+# pixi
 pixi install
 if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: pixi install failed"
     exit 1
 fi
+
 pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
 if [[ $? == 0 ]]; then
     echo "$0: INFO: pixi run succeeded"
@@ -26,10 +32,36 @@ if [[ $? == 0 ]]; then
     echo "$0: INFO: cleaning up"
     rm -rf .pixi/ outputs/
     rm -f geoscenarioserver.conda pixi.lock
-    exit 0
 else
     echo "$0: ERROR: pixi run failed"
     exit 1
 fi
 
-
+# micromamba
+if [[ -z ${MAMBA_EXE} ]]; then
+    echo "$0: micromamba not found, skipping micromamba test"
+    exit 0
+fi
+cd ${TEST_DIR}/conda-test
+# ensure uv
+${MAMBA_EXE} -n base install uv conda-build -y
+conda index ${TEST_DIR}/conda-test/repo
+${MAMBA_EXE} env create -yq --use-uv -f conda-environment.yml 
+if [[ $? -ne 0 ]]; then
+    echo "$0: ERROR: micromamba create failed"
+    exit 1
+fi
+${MAMBA_EXE} run -n gss gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
+if [[ $? == 0 ]]; then
+    echo "$0: INFO: micromamba run succeeded"
+    # cleanup
+    echo "$0: INFO: cleaning up"
+    rm -rf outputs/
+    micromamba env remove -n gss -yq
+    rm -f ${TEST_DIR}/conda-test/repo/linux-64/*
+    rm -rf ${TEST_DIR}/conda-test/repo/linux-64/.cache/
+    rm -rf ${TEST_DIR}/conda-test/repo/noarch/
+else
+    echo "$0: ERROR: micromamba run failed"
+    exit 1
+fi
