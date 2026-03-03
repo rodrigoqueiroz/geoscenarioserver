@@ -125,10 +125,10 @@ To build a single `ros-humble-geoscenarioserver` conda package containing all RO
 
 ```bash
 cd ros2
-pixi build -o dist/
+pixi build
 ```
 
-The package is output to `ros2/dist/ros-humble-geoscenarioserver-*.conda`.
+The package is output to `ros2/ros-humble-geoscenarioserver-*.conda`.
 
 ### Using in Another Project
 
@@ -142,7 +142,7 @@ channels = ["./local-channel", "https://prefix.dev/robostack-humble", "https://p
 ros-humble-geoscenarioserver = "*"
 ```
 
-Copy the `.conda` file to `local-channel/linux-64/` and index:
+Copy the `.conda` file to `local-channel/linux-64/`, index, and install:
 
 ```bash
 pixi exec rattler-index fs local-channel
