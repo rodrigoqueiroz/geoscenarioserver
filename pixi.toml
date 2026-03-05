@@ -1,7 +1,6 @@
 [workspace]
 authors = [ "See CONTRIBUTORS" ]
 channels = [
-  "https://prefix.dev/pixi-build-backends",
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]
@@ -11,13 +10,12 @@ version = "0.1.0"
 preview = ["pixi-build"]
 
 [tasks]
-gss = { cmd = "gsserver", description = "Run GeoScenario Server" }
 test_scenarios_ci = { cmd = "bash scripts/run_scenarios.bash --no-dash --non-interactive", description = "Run all scenario tests (CI)" }
 test_scenario = { cmd = "bash scripts/run_scenarios.bash --no-dash --single", description = "Run a single scenario test" }
 build_wheel = { cmd = "python -m build", description = "Build Python wheel package" }
 
 [dependencies]
-jq = "*"                              # used by run_scenarios.bash
+jq = "*"  # used by run_scenarios.bash
 geoscenarioserver = { path = "." }
 
 [pypi-dependencies]
@@ -34,6 +32,7 @@ version = "0.1.0"
 [package.build.backend]
 channels = [
   "https://prefix.dev/pixi-build-backends",
+  "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge",
 ]
 name = "pixi-build-python"
@@ -67,7 +66,10 @@ qt6-wayland = "*"
 
 [environments]
 default = { solve-group = "common" }
+# release environment containing geoscenario_* conda packages built using pixi-build-ros
 humble = { features = ["humble"], solve-group = "common" }
+# dev environment for building with colcon
+humble-dev = { features = ["humble-dev"], solve-group = "common" }
 antlr = { features = ["antlr"], no-default-feature = true }
 
 [feature.humble]
@@ -79,8 +81,34 @@ channels = [
 
 [feature.humble.dependencies]
 python = ">=3.11"
+cmake = "<4"
+deepdiff = "*"
+ros-humble-desktop = "*"
+ros-humble-geographic-msgs = "*"
+ros-humble-geoscenario-msgs = { path = "ros2/src/geoscenario_msgs/package.xml" }
+ros-humble-geoscenario-server = { path = "ros2/src/geoscenario_server/package.xml" }
+ros-humble-geoscenario-client = { path = "ros2/src/geoscenario_client/package.xml" }
+ros-humble-geoscenario-bringup = { path = "ros2/src/geoscenario_bringup/package.xml" }
+
+[feature.humble.tasks]
+ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", description = "Run native ROS2 server node" }
+ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", description = "Run ROS2 shared memory client" }
+ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", description = "Run ROS2 client with WGS84 coordinates" }
+ros_client_wgs84_roundtriptest = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", description = "Run ROS2 client with WGS84 + round-trip test" }
+ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", description = "Run mock co-simulator for testing" }
+rqt = { cmd = "rqt", description = "Launch RQt GUI" }
+rqt_topic = { cmd = "rqt -s rqt_topic.topic.Topic", description = "Launch RQt topic viewer" }
+
+[feature.humble-dev]
+channels = [
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+
+[feature.humble-dev.dependencies]
+python = ">=3.11"
 compilers = "*"
-cmake = "*"
+cmake = "<4"
 pkg-config = "*"
 make = "*"
 ninja = "*"
@@ -91,22 +119,20 @@ deepdiff = "*"
 ros-humble-ros-core = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
-ros-humble-geoscenario-msgs = { path = "ros2/geoscenario_msgs/package.xml" }
-ros-humble-geoscenario-server = { path = "ros2/geoscenario_server/package.xml" }
-ros-humble-geoscenario-client = { path = "ros2/geoscenario_client/package.xml" }
-ros-humble-geoscenario-bringup = { path = "ros2/geoscenario_bringup/package.xml" }
 
+[feature.humble-dev.target.unix.activation]
+scripts = ["ros2/install/setup.bash"]
 
-[feature.humble.tasks]
-ros_gss = { cmd = "gsserver", description = "Run GeoScenario Server within ROS2 humble" }
-ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", description = "Run native ROS2 server node" }
-ros_client = { cmd = "ros2 run geoscenario_client geoscenario_client", description = "Run ROS2 shared memory client" }
-ros_client_wgs84 = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", description = "Run ROS2 client with WGS84 coordinates" }
-ros_client_wgs84_roundtriptest = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", description = "Run ROS2 client with WGS84 + round-trip test" }
-ros_mock_co_simulator = { cmd = "ros2 run geoscenario_client mock_co_simulator", description = "Run mock co-simulator for testing" }
-ros_test_bringup = { cmd = "colcon test --packages-select geoscenario_bringup --event-handlers console_direct+", cwd = "ros2", description = "Run ROS2 bringup integration tests" }
-rqt = { cmd = "rqt", description = "Launch RQt GUI" }
-rqt_topic = { cmd = "rqt -s rqt_topic.topic.Topic", description = "Launch RQt topic viewer" }
+[feature.humble-dev.tasks]
+ros_build = { cmd = "colcon build --symlink-install", cwd="ros2", outputs = ["ros2/install/setup.bash"], description = "Build ROS2 packages using colcon" }
+ros_server_dev = { cmd = "ros2 run geoscenario_server geoscenario_server", depends-on = ["ros_build"], description = "Run native ROS2 server node" }
+ros_client_dev = { cmd = "ros2 run geoscenario_client geoscenario_client", depends-on = ["ros_build"], description = "Run ROS2 shared memory client" }
+ros_client_wgs84_dev = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true", depends-on = ["ros_build"], description = "Run ROS2 client with WGS84 coordinates" }
+ros_client_wgs84_roundtriptest_dev = { cmd = "ros2 run geoscenario_client geoscenario_client --ros-args -p wgs84:=true -p roundtriptest:=true", depends-on = ["ros_build"], description = "Run ROS2 client with WGS84 + round-trip test" }
+ros_mock_co_simulator_dev = { cmd = "ros2 run geoscenario_client mock_co_simulator", depends-on = ["ros_build"], description = "Run mock co-simulator for testing" }
+ros_test_bringup = { cmd = "colcon test --packages-select geoscenario_bringup --event-handlers console_direct+", cwd = "ros2", depends-on = ["ros_build"], description = "Run ROS2 bringup integration tests" }
+rqt_dev = { cmd = "rqt", depends-on = ["ros_build"], description = "Launch RQt GUI" }
+rqt_topic_dev = { cmd = "rqt -s rqt_topic.topic.Topic", depends-on = ["ros_build"], description = "Launch RQt topic viewer" }
 
 [feature.antlr.dependencies]
 antlr4-tools = "*"

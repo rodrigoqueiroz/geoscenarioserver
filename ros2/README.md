@@ -47,7 +47,7 @@ Native ROS2 server that wraps GSServer into a ROS2 node:
 #### Usage
 
 ```bash
-ros2 run geoscenario_server geoscenario_server --ros-args \
+ros2 run -e humble geoscenario_server geoscenario_server --ros-args \
         -p scenario_files:=[<path>, ...] \
         -p no_dashboard:=true \
         -p map_path:=<path> \
@@ -80,19 +80,22 @@ Contains utilities for ROS2 co-simulation:
 - `mock_co_simulator` - Test driver that responds to `/gs/tick` and publishes to `/gs/tick_from_client`
 - `geoscenario_client` - Shared memory bridge for use with the standalone Python server (advanced use case)
 
-## Testing
+## Development and Testing
+
+For development, we use an environment `humble-dev`, which is set up for `colcon` symlinked build workflow.
 
 ### Bringup Tests
 
 Run all bringup integration tests:
 
 ```bash
-pixi run ros_test_bringup
+pixi run -e humble-dev ros_test_bringup
 ```
 
 Or using colcon directly:
 
 ```bash
+pixi shell -e humble-dev
 cd ros2
 colcon test --packages-select geoscenario_bringup --event-handlers console_direct+
 ```
@@ -107,8 +110,11 @@ launch_test src/geoscenario_bringup/test/test_heartbeat_timeout.py
 ### Manual Server Test
 
 ```bash
-bash test/test_ros2_server.bash [--fastest|--realtime|--2xrealtime]
+bash test/test_ros2_server.bash [--fastest|--10xrealtime|--2xrealtime] [--dev] [scenario_file]
 ```
+
+Without any arguments, the test runs in realtime with a default scenario.
+The `--dev` options runs the test in `humble-dev`, otherwise, the test runs in `humble`.
 
 ### Shared Memory Client Test
 
@@ -124,10 +130,10 @@ bash geoscenarioserver/scripts/pixi_test_ros2_client.bash [--wgs84|--roundtripte
 To build a single `ros-humble-geoscenario-*` conda package:
 
 ```bash
-pixi build --path ros2/geoscenario_msgs/package.xml
-pixi build --path ros2/geoscenario_server/package.xml
-pixi build --path ros2/geoscenario_client/package.xml
-pixi build --path ros2/geoscenario_bringup/package.xml
+pixi build --path ros2/src/geoscenario_msgs/package.xml
+pixi build --path ros2/src/geoscenario_server/package.xml
+pixi build --path ros2/src/geoscenario_client/package.xml
+pixi build --path ros2/src/geoscenario_bringup/package.xml
 ```
 
 The package is output to `ros-humble-geoscenario-*.conda`.
@@ -147,7 +153,7 @@ ros-humble-geoscenario-client = "*"
 ros-humble-geoscenario-bringup = "*"
 ```
 
-Copy the `.conda` files to `local-channel/linux-64/`, index, and install:
+Copy the `.conda` files to `local-channel/linux-64/`, index the channel, and install:
 
 ```bash
 pixi exec rattler-index fs local-channel

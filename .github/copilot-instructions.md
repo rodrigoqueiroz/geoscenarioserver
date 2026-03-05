@@ -48,7 +48,7 @@ GeoScenario Server has **two implementations**:
    - Suitable for standalone simulations and legacy co-sim workflows
 
 2. **Native ROS2 Server** (`geoscenario_server.py`)
-   - Command: `pixi run -e humble ros_gss` or `ros2 run geoscenario_server geoscenario_server`
+   - Command: `pixi run -e humble gsserver` or `ros2 run geoscenario_server geoscenario_server`
    - Event-driven simulation controlled by ROS2 topics `/gs/tick` and `/gs/tick_from_client`
    - No shared memory - direct ROS2 topic communication
    - Suitable for ROS2-integrated systems and co-simulation
@@ -101,7 +101,7 @@ bash scripts/run_scenarios.bash --no-dash --non-interactive
 pixi run -e humble ros_build
 
 # Basic ROS2 server
-pixi run -e humble ros_gss --scenario <file.osm>
+pixi run -e humble gsserver --scenario <file.osm>
 
 # With ROS2 parameters
 ros2 run geoscenario_server geoscenario_server --ros-args \
