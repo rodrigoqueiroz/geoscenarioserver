@@ -42,13 +42,13 @@ Behavior trees are parsed from `.btree` files using custom ANTLR4 DSL (`sv/plann
 GeoScenario Server has **two implementations**:
 
 1. **Standalone Python Server** (`GSServer.py`)
-   - Command: `pixi run gss` or `gsserver`
+   - Command: `pixi run gsserver` or `gsserver`
    - Timer-based simulation loop at fixed rate (default 40Hz)
    - Uses shared memory for co-simulation with external clients
    - Suitable for standalone simulations and legacy co-sim workflows
 
 2. **Native ROS2 Server** (`geoscenario_server.py`)
-   - Command: `pixi run -e humble ros_gss` or `ros2 run geoscenario_server geoscenario_server`
+   - Command: `pixi run -e humble gsserver` or `ros2 run geoscenario_server geoscenario_server`
    - Event-driven simulation controlled by ROS2 topics `/gs/tick` and `/gs/tick_from_client`
    - No shared memory - direct ROS2 topic communication
    - Suitable for ROS2-integrated systems and co-simulation
@@ -60,34 +60,34 @@ Both implementations support the same core features (scenario loading, behavior 
 **Standalone Python Server:**
 ```bash
 # Basic scenario execution
-pixi run gss --scenario scenarios/test_scenarios/gs_all_vehicles_peds.osm
+pixi run gsserver --scenario scenarios/test_scenarios/gs_all_vehicles_peds.osm
 
 # Multiple scenario files (merged at runtime)
-pixi run gss -s scenario1.osm scenario2.osm scenario3.osm
+pixi run gsserver -s scenario1.osm scenario2.osm scenario3.osm
 
 # Set origin to vehicle starting position (VUT-relative coordinates)
-pixi run gss -s <file.osm> --origin-from-vid 10
+pixi run gsserver -s <file.osm> --origin-from-vid 10
 
 # Run without dashboard
-pixi run gss -s <file.osm> --no-dash
+pixi run gsserver -s <file.osm> --no-dash
 
 # Write trajectory CSV files
-pixi run gss -s <file.osm> --write-trajectories
+pixi run gsserver -s <file.osm> --write-trajectories
 
 # Debug mode with file logging
-pixi run gss -s <file.osm> --debug --file-log
+pixi run gsserver -s <file.osm> --debug --file-log
 
 # Wait for user input before starting
-pixi run gss -s <file.osm> --wait-for-input
+pixi run gsserver -s <file.osm> --wait-for-input
 
 # Custom dashboard position (x y width height)
-pixi run gss -s <file.osm> --dash-pos 100 100 1200 800
+pixi run gsserver -s <file.osm> --dash-pos 100 100 1200 800
 
 # Custom map path prefix
-pixi run gss -s <file.osm> --map-path /custom/maps/
+pixi run gsserver -s <file.osm> --map-path /custom/maps/
 
 # Custom behavior tree locations (colon-separated)
-pixi run gss -s <file.osm> --btree-locations /path/to/btrees:/another/path
+pixi run gsserver -s <file.osm> --btree-locations /path/to/btrees:/another/path
 
 # Run test suite
 pixi run test_scenarios_ci
@@ -96,26 +96,59 @@ bash scripts/run_scenarios.bash --no-dash --non-interactive
 ```
 
 **Native ROS2 Server:**
+
+The `humble` environment contains prebuilt ROS2 packages. For development with colcon, use `humble-dev`.
+
 ```bash
-# Build ROS2 packages first
-pixi run -e humble ros_build
+# Run server using prebuilt packages (humble environment)
+pixi run -e humble ros_server
 
-# Basic ROS2 server
-pixi run -e humble ros_gss --scenario <file.osm>
+# Launch server with mock co-simulator
+pixi run -e humble ros2 launch geoscenario_bringup test_server.launch.py
 
-# With ROS2 parameters
+# With launch parameters
+pixi run -e humble ros2 launch geoscenario_bringup test_server.launch.py \
+  time_mode:=fastest \
+  scenario_files:="['path/to/scenario.osm']"
+
+# Run ROS2 client (shared memory bridge, in separate terminal)
+pixi run -e humble ros_client
+
+# Run ROS2 client with WGS84 coordinates
+pixi run -e humble ros_client_wgs84
+
+# Run ROS2 client with WGS84 + round-trip test
+pixi run -e humble ros_client_wgs84_roundtriptest
+
+# Run mock co-simulator for testing
+pixi run -e humble ros_mock_co_simulator
+
+# Direct ros2 run command (after activating environment)
 ros2 run geoscenario_server geoscenario_server --ros-args \
   -p scenario_files:="['/path/to/scenario.osm']" \
   -p origin_from_vid:=10 \
   -p no_dashboard:=true \
   -p write_trajectories:=true \
   -p wgs84:=true
+```
 
-# Run ROS2 client (in separate terminal)
-pixi run -e humble ros_client
+**Development with colcon (humble-dev environment):**
 
-# Run mock co-simulator for testing
-pixi run -e humble ros_mock_co_simulator
+```bash
+# Build ROS2 packages with colcon
+pixi run -e humble-dev ros_build
+
+# Run server (rebuilds automatically if needed)
+pixi run -e humble-dev ros_server_dev
+
+# Run client variants
+pixi run -e humble-dev ros_client_dev
+pixi run -e humble-dev ros_client_wgs84_dev
+pixi run -e humble-dev ros_client_wgs84_roundtriptest_dev
+pixi run -e humble-dev ros_mock_co_simulator_dev
+
+# Run bringup integration tests
+pixi run -e humble-dev ros_test_bringup
 ```
 
 ### Command-Line Parameters
@@ -152,9 +185,48 @@ pixi run -e humble ros_mock_co_simulator
 | `origin_from_vid` | int | 0 | Set origin to vehicle's starting position (0 = use scenario origin) |
 
 ### Environment Setup
-- **Pixi (recommended)**: `pixi shell` (default env) or `pixi shell -e humble` (with ROS2)
-- **Alternative using micromamba**: `bash scripts/setup-conda-forge-env.bash --ros2` defined in `scripts/conda-environment.yml`
-- **Native setup using apt-get and pip**: `bash scripts/install_dependencies.bash --ros2` defined in `requirements.txt`.
+
+**Pixi (recommended)**: Available environments are:
+- `default`: Standalone Python server (activate with `pixi shell`)
+- `humble`: ROS2 with prebuilt conda packages (activate with `pixi shell -e humble`)
+- `humble-dev`: ROS2 development with colcon build (activate with `pixi shell -e humble-dev`)
+- `antlr`: For regenerating ANTLR parsers (activate with `pixi shell -e antlr`)
+
+**Alternative setups:**
+- **Micromamba**: `bash scripts/setup-conda-forge-env.bash --ros2` defined in `scripts/conda-environment.yml`
+- **Native**: `bash scripts/install_dependencies.bash --ros2` defined in `requirements.txt`
+
+### Available Pixi Tasks
+
+To see all available tasks: `pixi task list`
+
+**Default environment tasks:**
+- `test_scenarios_ci` - Run all scenario tests (CI mode)
+- `test_scenario` - Run a single scenario test
+- `build_wheel` - Build Python wheel package
+
+**Humble environment tasks (prebuilt packages):**
+- `ros_server` - Run native ROS2 server node
+- `ros_client` - Run ROS2 shared memory client
+- `ros_client_wgs84` - Run ROS2 client with WGS84 coordinates
+- `ros_client_wgs84_roundtriptest` - Run ROS2 client with WGS84 + round-trip test
+- `ros_mock_co_simulator` - Run mock co-simulator for testing
+- `rqt` - Launch RQt GUI
+- `rqt_topic` - Launch RQt topic viewer
+
+**Humble-dev environment tasks (development with colcon):**
+- `ros_build` - Build ROS2 packages using colcon
+- `ros_server_dev` - Run native ROS2 server node (with auto-rebuild)
+- `ros_client_dev` - Run ROS2 shared memory client (with auto-rebuild)
+- `ros_client_wgs84_dev` - Run ROS2 client with WGS84 coordinates (with auto-rebuild)
+- `ros_client_wgs84_roundtriptest_dev` - Run ROS2 client with WGS84 + round-trip test (with auto-rebuild)
+- `ros_mock_co_simulator_dev` - Run mock co-simulator for testing (with auto-rebuild)
+- `ros_test_bringup` - Run ROS2 bringup integration tests
+- `rqt_dev` - Launch RQt GUI (with auto-rebuild)
+- `rqt_topic_dev` - Launch RQt topic viewer (with auto-rebuild)
+
+**Antlr environment tasks:**
+- `regenerate` - Regenerate ANTLR parsers for behavior trees
 
 ### Regenerating ANTLR Parsers
 ```bash
@@ -220,10 +292,13 @@ Parsed by `gsc/GSParser.py`. Key elements:
 
 ## Testing
 - Regression tests: Outputs compared with `outputs/regressions/` baselines
-- Run single scenario: `pixi run gss --scenario <file.osm> --single`
-- ROS2 client roundtrip test: `bash scripts/pixi_test_ros2_client.bash --roundtriptest`
+- Run all scenario tests: `pixi run test_scenarios_ci`
+- Run single scenario test: `pixi run test_scenario`
+- ROS2 bringup tests: `pixi run -e humble-dev ros_test_bringup`
+- ROS2 server roundtrip test: `bash test/test_ros2_server.bash` (in `humble` by default or `humble-dev` with `--dev` flag)
+- ROS2 client roundtrip test: `bash test/test_ros2_client.bash` or `bash scripts/pixi_test_ros2_client.bash --roundtriptest`
 
 ## External Integrations
 - **Lanelet2 maps**: Required for all scenarios, stored in `scenarios/maps/`
-- **ROS2 client**: `clients/ros2_client/` - reads server ShM, publishes `/tick` topic
+- **ROS2 client**: `ros2/src/geoscenario_client/` - reads server ShM, publishes `/tick` topic
 - **Unreal/Carla**: Optional co-sim via ShM or CarlaSync (`shm/CarlaSync.py`)

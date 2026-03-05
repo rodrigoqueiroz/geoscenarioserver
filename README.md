@@ -55,49 +55,6 @@ curl -fsSL https://pixi.sh/install.sh | bash
 ```
 Re-open the terminal or source your `.bashrc` to make `pixi` available.
 
-All pixi commands must be executed in geoscenarioserver as the working directory.
-```bash
-cd geoscenarioserver
-```
-
-Pixi project provides the following tasks:
-```bash
-cd geoscenarioserver
-pixi run gss <parameters>
-pixi run test_scenarios_ci
-pixi run rqt
-pixi run rqt_topic
-pixi run ros_gss <parameters>
-pixi run ros_build
-pixi run ros_build_release
-pixi run ros_server <ros parameters>
-pixi run ros_client
-pixi run ros_client_wgs84
-pixi run ros_client_wgs84_roundtriptest
-pixi run ros_mock_co_simulator
-pixi run regenerate
-```
-
-The task `gss` runs in the environment `default` whereas `ros_gss` runs in `humble`.
-
-To run automated test of ROS2 client using the mock co-simulator, execute:
-```bash
-bash geoscenarioserver/scripts/pixi_test_ros2_client.bash [--wgs84|--roundtriptest]
-```
-By default, the client will use local coordinates.
-Use `--wgs84` flag to convert to and from WGS84 coordinates.
-Use `--roundtriptest` flag to enable round-trip testing in addition to WGS84 conversion.
-
-Finally, to activate the environment and execute arbitrary commands without ROS2, execute
-```bash
-cd geoscenarioserver
-pixi shell
-```
-or with ROS2, execute
-```bash
-cd geoscenarioserver
-pixi shell -e humble
-```
 
 #### Conda-forge and robostack (ROS) using micromamba
 
@@ -117,7 +74,26 @@ Usage:
 
 ## Running
 
-- run `gsserver -s scenarios/<geoscenario_file>` to start the Server.
+All pixi commands must be executed in geoscenarioserver as the working directory. The pixi project provides a number of tasks, to see run the following:
+```bash
+cd geoscenarioserver
+pixi task list
+```
+
+Tasks prefixed with `ros_` run in the `humble` environment, while others run in the `default` environment.
+
+For ROS2 tasks/shell information see [ros2/README.md](ros2/README.md).
+
+To activate the environment and execute arbitrary commands:
+```bash
+cd geoscenarioserver
+pixi shell
+```
+
+To start the geoscenario server run the following:
+```bash
+gsserver -s scenarios/<geoscenario_file>`
+```
 
 ```
 usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [-dp DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl] [-wt]
@@ -204,22 +180,9 @@ bash test/test_wheel_package.bash
 
 ## Co-Simulation:
 
-### Native ROS2 server
-
-To test the native ROS2 serever with a mock co-simulator, execute
-```bash
-bash test/test_ros2_server.bash [--fastest|--realtime|--2xrealtime]
-```
-
-### Via shared memory and ROS2 client
-
-- Use the shared memory keys inside SimConfig to read/write the server shared memory blocks.
-- We provide a GeoScenario Client for Unreal in `clients/unreal`.
-- We provide a ROS2 Client for Humble in `ros2/geoscenario_client`.
-To test the ROS2 client with a mock co-simulator, execute
-```bash
-bash test/test_ros2_client.bash
-```
+- Use the shared memory keys inside `SimConfig` to read/write the server shared memory blocks
+- We provide a GeoScenario Client for Unreal in `clients/unreal`
+- For ROS2 co-simulation (native server or shared memory client), see [ros2/README.md](ros2/README.md)
 
 ## Documentation:
 
