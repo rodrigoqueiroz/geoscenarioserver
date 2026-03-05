@@ -30,6 +30,8 @@ for arg in "$@"; do
     case "$arg" in
         --dev)
             DEV="_dev"
+            echo "Running in humble-dev environment with colcon build."
+            pixi run ros_build
             ;;
         --fastest)
             TIME_FACTOR=0.0
