@@ -1,5 +1,6 @@
 name: gss
 channels:
+  - robostack-humble
   - conda-forge
 dependencies:
   - python=3.11
@@ -15,8 +16,8 @@ dependencies:
   - screeninfo
   - jq
   - pydot
+  - sysv_ipc
+  - ros-humble-lanelet2
   - pip:
     - antlr-denter
-    - lanelet2
     - py_trees>=2.2
-    - sysv-ipc

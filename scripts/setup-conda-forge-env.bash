@@ -52,6 +52,8 @@ if ! $MAMBA_EXE env list | grep -q gss; then
     $MAMBA_EXE env create --yes --quiet --file ${REPO_DIR}/conda-environment.yml
     if [[ $? == 0 ]]; then
         echo "The environment created successfully."
+        echo "Installing GeoScenarioServer into the environment 'gss'..."
+        $MAMBA_EXE -n gss run pip install .
     else 
         echo "Environment not created. Exiting..."
         exit 1
@@ -82,12 +84,12 @@ if [[ ${ARG_TEST_RUN} == "true" ]]; then
 
     cd $REPO_DIR
     (set -x;
-        $MAMBA_EXE -n gss run python3 GSServer.py -s scenarios/coretest_scenarios/straightdrive.gs.osm
+        $MAMBA_EXE -n gss run gsserver -s scenarios/coretest_scenarios/straightdrive.gs.osm
     )
 fi
 
 echo ""
 echo "---------------------------------"
 echo "To run GeoScenarioServer, execute"
-echo "  $ $(basename $MAMBA_EXE) -n gss run python3 GSServer.py -s <scenario_file_path>.osm"
+echo "  $ $(basename $MAMBA_EXE) -n gss run gsserver -s <scenario_file_path>.osm"
 echo ""
