@@ -12,9 +12,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # for pixi
-cp -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/geoscenarioserver.conda
-# for micromamba
-mv -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/channel/linux-64/
+cp -f ${REPO_DIR}/geoscenarioserver-*.conda ${TEST_DIR}/conda-test/geoscenarioserver.conda
 
 # run the server in the test environment
 cd ${TEST_DIR}/conda-test
@@ -30,8 +28,7 @@ if [[ $? == 0 ]]; then
     echo "$0: INFO: pixi run succeeded"
     # cleanup
     echo "$0: INFO: cleaning up"
-    rm -rf .pixi/ outputs/
-    rm -f geoscenarioserver.conda pixi.lock
+    git clean -fdx
 else
     echo "$0: ERROR: pixi run failed"
     exit 1
@@ -39,12 +36,15 @@ fi
 
 # micromamba
 if [[ -z ${MAMBA_EXE} ]]; then
-    echo "$0: micromamba not found, skipping micromamba test"
+    echo "$0: micromamba not found, skipping the micromamba test"
+    rm ${REPO_DIR}/geoscenarioserver-*.conda
     exit 0
 fi
+
 cd ${TEST_DIR}/conda-test
 # ensure uv
 ${MAMBA_EXE} -n base install uv -y
+mv -f ${REPO_DIR}/geoscenarioserver-*.conda ${TEST_DIR}/conda-test/channel/linux-64/
 pixi exec rattler-index fs ${TEST_DIR}/conda-test/channel
 ${MAMBA_EXE} env create -yq --use-uv -f conda-environment.yml 
 if [[ $? -ne 0 ]]; then
@@ -56,12 +56,8 @@ if [[ $? == 0 ]]; then
     echo "$0: INFO: micromamba run succeeded"
     # cleanup
     echo "$0: INFO: cleaning up"
-    rm -rf outputs/
-    micromamba env remove -n gss -yq
-    rm -rf ${TEST_DIR}/conda-test/channel/linux-64/.cache/
-    rm -rf ${TEST_DIR}/conda-test/channel/linux-64/shards/
-    rm -f ${TEST_DIR}/conda-test/channel/linux-64/*
-    rm -rf ${TEST_DIR}/conda-test/channel/noarch/
+    git clean -fdx
+    micromamba env remove -n gss -yq  
 else
     echo "$0: ERROR: micromamba run failed"
     exit 1
