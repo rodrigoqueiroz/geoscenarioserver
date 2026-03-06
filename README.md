@@ -2,6 +2,74 @@
 
 Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees and Maneuver Models.
 
+# Installation and usage from pre-built packages
+
+## Conda
+
+We provide a channel containing binary conda packages `https://wiselab.uwaterloo.ca/conda-packages`.
+
+### Using Pixi (recommended)
+
+Add to your `pixi.toml` file:
+```toml
+[workspace]
+channels = [
+  "https://wiselab.uwaterloo.ca/conda-packages",
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+platforms = ["linux-64"]
+
+[dependencies]
+geoscenarioserver = "*"
+# optional ROS2 packages
+ros-humble-geoscenario-msgs = "*" 
+ros-humble-geoscenario-server = "*"
+ros-humble-geoscenario-client = "*"
+
+[target.linux.dependencies]
+tk = { build = "xft*" }  # to have true type fonts on linux
+```
+
+Execute `pixi run gsserver --help`.
+
+### Using micromamba
+
+Create the following `conda-environment.yaml` file:
+```yaml
+name: gss
+channels:
+  - https://wiselab.uwaterloo.ca/conda-packages
+  - robostack-humble
+  - conda-forge
+dependencies:
+  - tk=*=xft_* # use the TrueType variant
+  - geoscenarioserver = "*"
+# optional ROS2 packages
+  - ros-humble-geoscenario-msgs = "*"
+  - ros-humble-geoscenario-server = "*"
+  - ros-humble-geoscenario-client = "*"
+```
+Create the environment and install the packages using micromamba:
+```bash
+micromamba env create -f conda-environment.yml
+```
+Execute `micromamba run -n gss gsserver --help`.
+
+### Using pip
+
+Install the package from GitHub release:
+```bash
+pip install https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v0.1.0/geoscenarioserver-0.1.0-py3-none-any.whl
+```
+Execute `gsserver --help`.
+
+NOTE: ROS2 packages are not available for pip installation.
+
+# Installation and usage from source code
+
+Clone this repository and choose between Linux native, Python, or Conda installation methods (using `pixi` or `micromamba`).
+
 ## Dependencies
 
 - Linux or Windows 10/11 + WSL2
@@ -95,7 +163,7 @@ gsserver -s scenarios/<geoscenario_file>`
 ```
 
 ```
-usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [-dp DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl] [-wt]
+usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [-dp DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl] [-wt] [-ofv ORIGIN_FROM_VID] [-os]
 
 Starts the GeoScenario Server simulation
 
@@ -138,13 +206,13 @@ GSServer creates various files on the folder `./outputs`, which can also be over
 - The `--scenario` option can take more than one `.osm` file as its arguments
 - For example,
 ```bash
-python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
+gsserver --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
 ```
 - With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
 - The `globalconfig` and `origin` are used from the first `.osm` file that is specified (which is `gs_straight_obstacles.osm` in the example)
 - Multiple scenarios can define vehicles and pedestrians with the same `vid`s and `pid`s
 - If these scenarios are passed to the `--scenario` option, then an error will be reported
-- All `vid` and `pid` conflicts must be resolved before running `GSServer.py`
+- All `vid` and `pid` conflicts must be resolved before running `gsserver`
 - Scenarios can contain vehicles with no `vid` and pedestrians with no `pid`
 - These vehicles and pedestrians will be auto-assigned `vid`s and `pid`s
 - Auto-assigned `vid`s and `pids` will start from 1 and won't conflict with the other `vid`s and `pid`s
