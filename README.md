@@ -1,6 +1,33 @@
 #   GeoScenario Server
 
-Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees and Maneuver Models.
+[GeoScenario Server](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/geoscenario-server) is a traffic simulator for executing scenarios defined in the [GeoScenario 2.0](https://geoscenario2.readthedocs.io/) format.
+
+There are two variants of the server: *standalone* and *ROS2*.
+
+## *Standalone* server for real-time simulation
+
+It supports co-simulation through shared memory or via ROS2 client, where the simulation time is controlled by the server.
+The server and the co-simulator run independently.
+
+For standalone operation use `geoscenarioserver`.
+
+For ROS2 co-simulation use `geoscenarioserver` and `ros-humble-geoscenario-client`, and a co-simulator.
+
+For other co-simulation use `geoscenarioserver` and a co-simulator, such as [WiseSim](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/wise-sim) via shared memory or [Carla](https://carla.org/) via Carla API.
+
+## *ROS2* server for co-simulation where the simulation time is controlled by the co-simulator
+The server only executes a simulation step in response to the state and delta time published by the co-simulator. 
+The server can run faster than real time. 
+
+For ROS2 operation use `ros-humble-geoscenario-server` and a co-simulator.
+
+## Mock co-simulator for reference and testing
+
+Refer to the example mock co-simulator in `ros2/geoscenario_client` for an example of a co-simulator that can work with either a standalone server or control the simulation time.
+
+## Unreal Engine co-simulator
+
+Refer to `clients/unreal` for integration with Unreal Engine 4 code.
 
 # Installation and usage from pre-built packages
 
