@@ -8,7 +8,7 @@ else:
     from typing.io import TextIO
 
 
-from antlr_denter.DenterHelper import DenterHelper
+from geoscenarioserver.util.DenterHelper import DenterHelper
 from geoscenarioserver.sv.planners.btree.parser.BTreeDSLParser import BTreeDSLParser
 
 

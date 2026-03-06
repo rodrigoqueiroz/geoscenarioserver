@@ -6,4 +6,4 @@ The workspace definition in `pixi.yaml` contains pypi-dependencies that cannot b
 
 # micromamba
 
-For micromamba, we create a local channel from which the package can be installed in `repo/`.
+For micromamba, we create a local channel from which the package can be installed in `channel/`.

@@ -1,12 +1,9 @@
 name: gss
 channels:
-  - ./repo/linux-64
-  - conda-forge
+  - ./channel/linux-64
   - robostack-humble
+  - conda-forge
 dependencies:
   - python=3.11
   - tk=*=xft_* # use the TrueType variant
-  - geoscenarioserver # from ./repo/linux-64
-  - pip:
-    - antlr-denter
-    - py_trees>=2.2
+  - geoscenarioserver # from ./channel/linux-64

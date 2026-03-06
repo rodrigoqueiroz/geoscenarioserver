@@ -78,7 +78,7 @@ kill_python3()
 run_scenario_save_regression()
 {
     scenario=$1
-    pixi run gss ${ARG_NO_DASH} ${ARG_FASTEST} ${ARG_INTERACTIVE} --scenario ${scenario}
+    pixi run gsserver ${ARG_NO_DASH} ${ARG_FASTEST} ${ARG_INTERACTIVE} --scenario ${scenario}
     # save and compare with regression
     scenario_relative=${scenario#$GSS_DIR/scenarios/}
     regression_folder=${REPO_DIR}/outputs/regressions/${scenario_relative}/

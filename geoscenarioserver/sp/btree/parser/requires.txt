@@ -1,3 +1,4 @@
 python3
 antlr4-python3-runtime
-antlr-denter (https://github.com/yshavit/antlr-denter)
+DenterHelper (vendored in geoscenarioserver/util/DenterHelper.py)
+  Original source: https://github.com/yshavit/antlr-denter (MIT License)

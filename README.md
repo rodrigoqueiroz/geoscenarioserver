@@ -33,7 +33,6 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 - screeninfo
 - jq
 - pydot
-- antlr-denter
 - lanelet2
 - py-trees>=2.2
 - sysv-ipc

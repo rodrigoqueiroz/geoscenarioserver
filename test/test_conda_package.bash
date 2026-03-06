@@ -14,7 +14,7 @@ fi
 # for pixi
 cp -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/geoscenarioserver.conda
 # for micromamba
-mv -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/repo/linux-64/
+mv -f geoscenarioserver-*.conda ${TEST_DIR}/conda-test/channel/linux-64/
 
 # run the server in the test environment
 cd ${TEST_DIR}/conda-test
@@ -44,8 +44,8 @@ if [[ -z ${MAMBA_EXE} ]]; then
 fi
 cd ${TEST_DIR}/conda-test
 # ensure uv
-${MAMBA_EXE} -n base install uv conda-build -y
-conda index ${TEST_DIR}/conda-test/repo
+${MAMBA_EXE} -n base install uv -y
+pixi exec rattler-index fs ${TEST_DIR}/conda-test/channel
 ${MAMBA_EXE} env create -yq --use-uv -f conda-environment.yml 
 if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: micromamba create failed"
@@ -58,9 +58,10 @@ if [[ $? == 0 ]]; then
     echo "$0: INFO: cleaning up"
     rm -rf outputs/
     micromamba env remove -n gss -yq
-    rm -f ${TEST_DIR}/conda-test/repo/linux-64/*
-    rm -rf ${TEST_DIR}/conda-test/repo/linux-64/.cache/
-    rm -rf ${TEST_DIR}/conda-test/repo/noarch/
+    rm -rf ${TEST_DIR}/conda-test/channel/linux-64/.cache/
+    rm -rf ${TEST_DIR}/conda-test/channel/linux-64/shards/
+    rm -f ${TEST_DIR}/conda-test/channel/linux-64/*
+    rm -rf ${TEST_DIR}/conda-test/channel/noarch/
 else
     echo "$0: ERROR: micromamba run failed"
     exit 1
