@@ -3,6 +3,7 @@ from geoscenarioserver.Actor import *
 from geoscenarioserver.SimConfig import *
 
 import logging
+
 log = logging.getLogger(__name__)
 
 # Class defining shared memory structure used to sync with
@@ -133,6 +134,9 @@ class SimSharedMemoryServer(object):
             # memory is garbage
             return header, vstates, pstates, disabled_vehicles, disabled_pedestrians
 
+        # assume the client sends the same number of vehicles and pedestrians as the server
+        nclient_vehicles = nvehicles
+        nclient_pedestrians = npedestrians
         try:
             header_str = data_arr[0].split(' ')
             header = [int(header_str[0]), float(header_str[1]), int(header_str[2]), int(header_str[3])]
@@ -144,55 +148,48 @@ class SimSharedMemoryServer(object):
             log.error(e)
             pass
 
+        ri = 1
         try:
-            # the client must see the same number of vehicles as server
-            if nclient_vehicles == nvehicles:
-                for ri in range(1, nvehicles + 1):
-                    vid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
-                    vs = VehicleState()
-                    vid = int(vid)
-                    vs.x = float(x)
-                    vs.y = float(y)
-                    vs.z = float(z)
-                    vs.x_vel = float(x_vel)
-                    vs.y_vel = float(y_vel)
-                    #Estimating yaw because it is not being published by client.
-                    #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
-                    if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01):
-                        vs.yaw = math.degrees(math.atan2(vs.y_vel,vs.x_vel))
-                    vstates[vid] = vs
-                    if not int(active):
-                        disabled_vehicles.append(vid)
-            else:
-                log.warning("Client state error: No. client vehicles ({}) not the same as server vehicles ({}).".format(
-                    nclient_vehicles,
-                    nvehicles
-                ))
-                log.warning(data_str)
+            # try parsing however many vehicles the client sends
+            for _ in range(nclient_vehicles):
+                vid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
+                vs = VehicleState()
+                vid = int(vid)
+                vs.x = float(x)
+                vs.y = float(y)
+                vs.z = float(z)
+                vs.x_vel = float(x_vel)
+                vs.y_vel = float(y_vel)
+                #Estimating yaw because it is not being published by client.
+                #We use the velocity vectors and only if vehicle is moving at least 10cm/s to avoid noise
+                if (abs(vs.y_vel) > 0.01) or (abs(vs.x_vel) > 0.01):
+                    vs.yaw = math.degrees(math.atan2(vs.y_vel,vs.x_vel))
+                vstates[vid] = vs
+                if not int(active):
+                    disabled_vehicles.append(vid)
+                ri += 1
         except Exception as e:
-            log.error("VehicleState parsing exception")
+            log.error(f"Vehicle at index {ri} state parsing exception")
             log.error(e)
             pass
 
         try:
-            if nclient_pedestrians == npedestrians:
-                for ri in range(nvehicles + 1, nvehicles + 1 + npedestrians):
-                    pid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
-                    ps = PedestrianState()
-                    pid = int(pid)
-                    ps.x = float(x)
-                    ps.y = float(y)
-                    ps.z = float(z)
-                    ps.x_vel = float(x_vel)
-                    ps.y_vel = float(y_vel)
-                    pstates[pid] = ps
-                    if not int(active):
-                        disabled_pedestrians.append(pid)
-            else:
-                log.warning(f"Client state error: No. client pedestrians ({nclient_pedestrians}) not the same as server pedestrians ({npedestrians}).")
-                log.warning(data_str)
+            # try try parsing however many pedestrians the client sends
+            for _ in range(nclient_pedestrians):
+                pid, x, y, z, x_vel, y_vel, active = data_arr[ri].split()
+                ps = PedestrianState()
+                pid = int(pid)
+                ps.x = float(x)
+                ps.y = float(y)
+                ps.z = float(z)
+                ps.x_vel = float(x_vel)
+                ps.y_vel = float(y_vel)
+                pstates[pid] = ps
+                if not int(active):
+                    disabled_pedestrians.append(pid)
+                ri += 1
         except Exception as e:
-            log.error("PedestrianState parsing exception")
+            log.error(f"Pedestrian at index {ri} state parsing exception")
             log.error(e)
             pass
 

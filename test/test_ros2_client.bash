@@ -22,4 +22,4 @@ shutdown_nodes() {
 }
 trap shutdown_nodes SIGINT SIGTERM EXIT
 
-pixi run ros_gss --dash-pos 0 0 960 1080 -wi -s scenarios/long_test_scenarios/gs_ringroad_stress_loop.osm
+pixi run gsserver --dash-pos 0 0 960 1080 -wi -s scenarios/long_test_scenarios/gs_ringroad_stress_loop.osm
