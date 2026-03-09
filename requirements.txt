@@ -9,7 +9,6 @@ pynput
 screeninfo
 jq
 pydot
-antlr-denter
 lanelet2
 py_trees>=2.2
 sysv-ipc

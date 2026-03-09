@@ -52,6 +52,8 @@ if ! $MAMBA_EXE env list | grep -q gss; then
     $MAMBA_EXE env create --yes --quiet --file ${REPO_DIR}/conda-environment.yml
     if [[ $? == 0 ]]; then
         echo "The environment created successfully."
+        echo "Installing GeoScenarioServer into the environment 'gss'..."
+        $MAMBA_EXE -n gss run pip install .
     else 
         echo "Environment not created. Exiting..."
         exit 1
@@ -62,7 +64,7 @@ fi
 
 if [[ ${ARG_ROS2} == "true" ]]; then
     echo "Installing ROS2 into the environment 'gss'..."
-    $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-staging ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
+    $MAMBA_EXE -n gss install --yes --quiet -c conda-forge -c robostack-humble ros-humble-desktop ros-humble-geographic-msgs compilers cmake pkg-config make ninja colcon-common-extensions catkin_tools rosdep
     if [[ $? == 0 ]]; then
         echo "ROS2 installed successfully. Building the GSS ROS2 client..."
         echo ""
@@ -70,10 +72,10 @@ if [[ ${ARG_ROS2} == "true" ]]; then
         $MAMBA_EXE -n gss run colcon build
         echo ""
         echo "-------------------------------"
-        echo "To run the ROS2 client, execute"
-        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/ros2/install/setup.bash && ros2 run geoscenario_client geoscenario_client'"
+        echo "To run the ROS2 server, execute"
+        echo "  $ $(basename $MAMBA_EXE) -n gss run bash -c 'source ${REPO_DIR}/ros2/install/setup.bash && ros2 run geoscenario_server geoscenario_server'"
     else
-        echo "Failed to install ROS2 and build the GSS ROS2 client."
+        echo "Failed to install ROS2 and build the GSS ROS2 server."
     fi
 fi
 
@@ -82,12 +84,12 @@ if [[ ${ARG_TEST_RUN} == "true" ]]; then
 
     cd $REPO_DIR
     (set -x;
-        $MAMBA_EXE -n gss run python3 GSServer.py -s scenarios/coretest_scenarios/straightdrive.gs.osm
+        $MAMBA_EXE -n gss run gsserver -s scenarios/coretest_scenarios/straightdrive.gs.osm
     )
 fi
 
 echo ""
 echo "---------------------------------"
 echo "To run GeoScenarioServer, execute"
-echo "  $ $(basename $MAMBA_EXE) -n gss run python3 GSServer.py -s <scenario_file_path>.osm"
+echo "  $ $(basename $MAMBA_EXE) -n gss run gsserver -s <scenario_file_path>.osm"
 echo ""

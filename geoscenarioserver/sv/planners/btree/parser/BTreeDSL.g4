@@ -5,7 +5,7 @@ grammar BTreeDSL;
 tokens { INDENT, DEDENT }
 
 @lexer::header{
-from antlr_denter.DenterHelper import DenterHelper
+from geoscenarioserver.util.DenterHelper import DenterHelper
 from geoscenarioserver.sv.planners.btree.parser.BTreeDSLParser import BTreeDSLParser
 
 }
@@ -64,6 +64,7 @@ FLOAT               : [+-]?([0-9]*[.])?[0-9]+;
 WORD                : ([a-z] | [A-Z] | '_')+ ;
 WS                  : (' ' | '\t') -> skip;
 /*
- * From antlr-denter to help with INDENT and DEDENT tokens
+ * Vendored DenterHelper for INDENT and DEDENT tokens
+ * Original source: https://github.com/yshavit/antlr-denter (MIT License)
  */
 NL: ('\r'? '\n' ' '*); //For tabs just switch out ' '* with '\t'*

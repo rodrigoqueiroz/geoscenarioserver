@@ -1,6 +1,101 @@
 #   GeoScenario Server
 
-Includes: GeoScenario Parser, Checker, Sim Vehicle Planner with Behavior Trees and Maneuver Models.
+[GeoScenario Server](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/geoscenario-server) is a traffic simulator for executing scenarios defined in the [GeoScenario 2.0](https://geoscenario2.readthedocs.io/) format.
+
+There are two variants of the server: *standalone* and *ROS2*.
+
+## *Standalone* server for real-time simulation
+
+It supports co-simulation through shared memory or via ROS2 client, where the simulation time is controlled by the server.
+The server and the co-simulator run independently.
+
+For standalone operation use `geoscenarioserver`.
+
+For ROS2 co-simulation use `geoscenarioserver` and `ros-humble-geoscenario-client`, and a co-simulator.
+
+For other co-simulation use `geoscenarioserver` and a co-simulator, such as [WiseSim](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/wise-sim) via shared memory or [Carla](https://carla.org/) via Carla API.
+
+## *ROS2* server for co-simulation where the simulation time is controlled by the co-simulator
+The server only executes a simulation step in response to the state and delta time published by the co-simulator. 
+The server can run faster than real time. 
+
+For ROS2 operation use `ros-humble-geoscenario-server` and a co-simulator.
+
+## Mock co-simulator for reference and testing
+
+Refer to the example mock co-simulator in `ros2/geoscenario_client` for an example of a co-simulator that can work with either a standalone server or control the simulation time.
+
+## Unreal Engine co-simulator
+
+Refer to `clients/unreal` for integration with Unreal Engine 4 code.
+
+# Installation and usage from pre-built packages
+
+## Conda
+
+We provide a channel containing binary conda packages `https://wiselab.uwaterloo.ca/conda-packages`.
+
+### Using Pixi (recommended)
+
+Add to your `pixi.toml` file:
+```toml
+[workspace]
+channels = [
+  "https://wiselab.uwaterloo.ca/conda-packages",
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+platforms = ["linux-64"]
+
+[dependencies]
+geoscenarioserver = "*"
+# optional ROS2 packages
+ros-humble-geoscenario-msgs = "*" 
+ros-humble-geoscenario-server = "*"
+ros-humble-geoscenario-client = "*"
+
+[target.linux.dependencies]
+tk = { build = "xft*" }  # to have true type fonts on linux
+```
+
+Execute `pixi run gsserver --help`.
+
+### Using micromamba
+
+Create the following `conda-environment.yaml` file:
+```yaml
+name: gss
+channels:
+  - https://wiselab.uwaterloo.ca/conda-packages
+  - robostack-humble
+  - conda-forge
+dependencies:
+  - tk=*=xft_* # use the TrueType variant
+  - geoscenarioserver = "*"
+# optional ROS2 packages
+  - ros-humble-geoscenario-msgs = "*"
+  - ros-humble-geoscenario-server = "*"
+  - ros-humble-geoscenario-client = "*"
+```
+Create the environment and install the packages using micromamba:
+```bash
+micromamba env create -f conda-environment.yml
+```
+Execute `micromamba run -n gss gsserver --help`.
+
+### Using pip
+
+Install the package from GitHub release:
+```bash
+pip install https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v0.1.0/geoscenarioserver-0.1.0-py3-none-any.whl
+```
+Execute `gsserver --help`.
+
+NOTE: ROS2 packages are not available for pip installation.
+
+# Installation and usage from source code
+
+Clone this repository and choose between Linux native, Python, or Conda installation methods (using `pixi` or `micromamba`).
 
 ## Dependencies
 
@@ -33,7 +128,6 @@ Tested on native Ubuntu 20.04, 22.04, 24.04 and within Windows 10/11 WSL2 (See `
 - screeninfo
 - jq
 - pydot
-- antlr-denter
 - lanelet2
 - py-trees>=2.2
 - sysv-ipc
@@ -96,7 +190,7 @@ gsserver -s scenarios/<geoscenario_file>`
 ```
 
 ```
-usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [-dp DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl] [-wt]
+usage: gsserver [-h] [-s [FILE ...]] [--verify_map FILE] [-q VERBOSE] [-n] [-m MAP_PATH] [-b BTREE_LOCATIONS] [-wi] [-wc] [-dp DASH_POS DASH_POS DASH_POS DASH_POS] [-d] [-fl] [-wt] [-ofv ORIGIN_FROM_VID] [-os]
 
 Starts the GeoScenario Server simulation
 
@@ -139,13 +233,13 @@ GSServer creates various files on the folder `./outputs`, which can also be over
 - The `--scenario` option can take more than one `.osm` file as its arguments
 - For example,
 ```bash
-python3 GSServer.py --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
+gsserver --scenario scenarios/test_scenarios/gs_straight_obstacles.osm scenarios/test_scenarios/gs_straight_pedestrian.osm
 ```
 - With the exception of `globalconfig` and `origin`, the elements from each scenario are loaded and combined at runtime
 - The `globalconfig` and `origin` are used from the first `.osm` file that is specified (which is `gs_straight_obstacles.osm` in the example)
 - Multiple scenarios can define vehicles and pedestrians with the same `vid`s and `pid`s
 - If these scenarios are passed to the `--scenario` option, then an error will be reported
-- All `vid` and `pid` conflicts must be resolved before running `GSServer.py`
+- All `vid` and `pid` conflicts must be resolved before running `gsserver`
 - Scenarios can contain vehicles with no `vid` and pedestrians with no `pid`
 - These vehicles and pedestrians will be auto-assigned `vid`s and `pid`s
 - Auto-assigned `vid`s and `pids` will start from 1 and won't conflict with the other `vid`s and `pid`s

@@ -18,10 +18,6 @@ build_wheel = { cmd = "python -m build", description = "Build Python wheel packa
 jq = "*"  # used by run_scenarios.bash
 geoscenarioserver = { path = "." }
 
-[pypi-dependencies]
-antlr-denter = "*"
-py-trees = ">=2.2"
-
 [target.linux.dependencies]
 tk = { build = "xft*" }  # to have true type fonts on linux
 
@@ -54,6 +50,7 @@ pynput = "*"
 screeninfo = "*"
 pydot = "*"
 ros-humble-lanelet2 = "*"
+ros-humble-py-trees = ">=2.2"
 
 [package.target.unix.run-dependencies]
 sysv_ipc = "*"
@@ -62,9 +59,9 @@ xorg-libxft = "*"
 [package.target.linux.run-dependencies]
 libgl-devel = "*"
 qt6-wayland = "*"
-#tk = { build = "xft*" }  # we want this instead of in [target.linux.dependencies] but pixi has a bug and it's not found
 
 [environments]
+# environment for running the standalone server without ROS2
 default = { solve-group = "common" }
 # release environment containing geoscenario_* conda packages built using pixi-build-ros
 humble = { features = ["humble"], solve-group = "common" }
@@ -81,7 +78,7 @@ channels = [
 
 [feature.humble.dependencies]
 python = ">=3.11"
-cmake = "<4"
+cmake = "*"
 deepdiff = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
@@ -107,8 +104,8 @@ channels = [
 
 [feature.humble-dev.dependencies]
 python = ">=3.11"
+cmake = "*"
 compilers = "*"
-cmake = "<4"
 pkg-config = "*"
 make = "*"
 ninja = "*"

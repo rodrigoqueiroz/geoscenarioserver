@@ -259,7 +259,7 @@ END_YAML
         ${ros_gss_command} 2>&1 | tee "${gss_output_log}"
     else
         echo "Launching standalone GeoScenario server..."
-        gss_command="pixi run gss ${scenario} ${map_path} ${btree_locations} ${gss_options}"
+        gss_command="pixi run gsserver ${scenario} ${map_path} ${btree_locations} ${gss_options}"
         # log the command for debugging
         echo "${gss_command}" > "${gss_command_log}"
         ${gss_command} 2>&1 | tee "${gss_output_log}"

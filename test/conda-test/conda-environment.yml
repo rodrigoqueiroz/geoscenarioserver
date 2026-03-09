@@ -1,0 +1,9 @@
+name: gss
+channels:
+  - ./channel/linux-64
+  - robostack-humble
+  - conda-forge
+dependencies:
+  - python=3.11
+  - tk=*=xft_* # use the TrueType variant
+  - geoscenarioserver # from ./channel/linux-64
