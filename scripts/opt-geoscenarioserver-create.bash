@@ -2,6 +2,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname ${SCRIPT_DIR})
 CHANNEL_TEST_DIR=${REPO_DIR}/test/conda-channel-test
+VERSION=${1:-"0.1.0"}
 
 cd ${CHANNEL_TEST_DIR}
 set -x
@@ -10,6 +11,6 @@ pixi install
 pixi pack -p linux-64
 pixi unpack ${CHANNEL_TEST_DIR}/environment.tar -o /opt/geoscenarioserver/
 rm ${CHANNEL_TEST_DIR}/environment.tar
-tar -I 'zstd -T$(nproc) -19' -cpf opt-geoscenarioserver-0.1.0.tar.zstd /opt/geoscenarioserver/
+tar -I 'zstd -T$(nproc) -19' -cpf opt-geoscenarioserver-${VERSION}.tar.zstd /opt/geoscenarioserver/
 
-echo "opt-geoscenarioserver-0.1.0.tar.zstd is ready for upload"
+echo "opt-geoscenarioserver-${VERSION}.tar.zstd is ready for upload"
