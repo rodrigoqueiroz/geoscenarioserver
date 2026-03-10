@@ -46,11 +46,14 @@ print_help() {
     echo ""
 }
 
-if [[ -f source /opt/geoscenarioserver/activate.sh]]; then
+if [[ -f /opt/geoscenarioserver/activate.sh ]]; then
     source /opt/geoscenarioserver/activate.sh
 else
     echo "GeoScenarioServer not installed to /opt/geoscenarioserver"
-    echo "Run the script opt-install.bash"
+    echo "To install, execute"
+    echo ""
+    echo "  curl -fsSL https://github.com/rodrigoqueiroz/geoscenarioserver/blob/master/scripts/opt-install.bash | bash "
+    echo ""
     exit 1
 fi
 
@@ -205,7 +208,6 @@ gss_scenario_dir="${scenarios_dir}/${scenario_name}"
 gss_scenario_file="${gss_scenario_dir}/${scenario_name}.osm"
 if [[ -f "${gss_scenario_file}" ]]; then
     echo "Starting GeoScenario server for ${gss_scenario_file}..."
-    cd ${suite_dir}/geoscenarioserver/
     scenario="--scenario ${gss_scenario_file} ${full_parts_list}"
     map_path="--map-path ${suite_dir}"
     if [[ -d "${suite_dir}/btrees" ]]; then
