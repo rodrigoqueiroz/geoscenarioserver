@@ -36,6 +36,7 @@ version = ">=0.4.5"
 
 [package.host-dependencies] 
 hatchling = "*"
+pip = "*"
 
 [package.run-dependencies]
 python = "3.11.*"
