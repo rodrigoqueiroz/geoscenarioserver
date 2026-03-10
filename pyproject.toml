@@ -88,7 +88,9 @@ exclude = [
 
 [tool.hatch.build.targets.sdist]
 include = [
+    "/clients",
     "/geoscenarioserver",
+    "/scenario_suite/scripts",
     "/README.md",
     "/LICENSE",
     "/CONTRIBUTORS",
