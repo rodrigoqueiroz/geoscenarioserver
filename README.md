@@ -50,6 +50,7 @@ platforms = ["linux-64"]
 [dependencies]
 geoscenarioserver = "*"
 # optional ROS2 packages
+ros-humble-ros-base = "*"
 ros-humble-geoscenario-msgs = "*" 
 ros-humble-geoscenario-server = "*"
 ros-humble-geoscenario-client = "*"
@@ -71,11 +72,12 @@ channels:
   - conda-forge
 dependencies:
   - tk=*=xft_* # use the TrueType variant
-  - geoscenarioserver = "*"
-# optional ROS2 packages
-  - ros-humble-geoscenario-msgs = "*"
-  - ros-humble-geoscenario-server = "*"
-  - ros-humble-geoscenario-client = "*"
+  - geoscenarioserver
+  # optional ROS2 packages
+  - ros-humble-ros-base
+  - ros-humble-geoscenario-msgs
+  - ros-humble-geoscenario-server
+  - ros-humble-geoscenario-client
 ```
 Create the environment and install the packages using micromamba:
 ```bash

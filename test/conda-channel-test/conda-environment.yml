@@ -1,0 +1,14 @@
+name: gss
+channels:
+  - https://wiselab.uwaterloo.ca/conda-packages
+  - robostack-humble
+  - conda-forge
+dependencies:
+  - python=3.11
+  - tk=*=xft_* # use the TrueType variant
+  - geoscenarioserver
+    # optional ROS2 packages
+  - ros-humble-ros-base
+  - ros-humble-geoscenario-msgs
+  - ros-humble-geoscenario-server
+  - ros-humble-geoscenario-client
