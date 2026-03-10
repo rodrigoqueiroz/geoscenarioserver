@@ -22,6 +22,7 @@ if [[ $? == 0 ]]; then
     pixi run ros2 run geoscenario_server geoscenario_server --ros-args \
                       -p heartbeat_period:=1.0 \
                       -p stall_muliplier:=1.0 \
+                      -p overlay_osm:=true \
                       -p scenario_files:=[scenarios/test_scenarios/gs_all_vehicles_peds.osm]
     # cleanup
     echo "$0: INFO: cleaning up"
@@ -41,7 +42,7 @@ echo "| micromamba |"
 echo "--------------"
 cd ${TEST_DIR}/conda-channel-test
 # ensure uv
-${MAMBA_EXE} -n base install uv -y
+${MAMBA_EXE} -n base install uv -yq
 ${MAMBA_EXE} env create -yq --use-uv -f conda-environment.yml 
 if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: micromamba create failed"
@@ -55,11 +56,12 @@ if [[ $? == 0 ]]; then
     ${MAMBA_EXE} run -n gss ros2 run geoscenario_server geoscenario_server --ros-args  \
                                      -p heartbeat_period:=1.0 \
                                      -p stall_muliplier:=1.0 \
-                                     -p scenario_files:=[scenarios/test_scen
+                                     -p overlay_osm:=true \
+                                     -p scenario_files:=[scenarios/test_scenarios/gs_all_vehicles_peds.osm]
     # cleanup
     echo "$0: INFO: cleaning up"
     git clean -fdx
-    micromamba env remove -n gss -yq  
+    ${MAMBA_EXE} env remove -n gss -yq
 else
     echo "$0: ERROR: micromamba run failed"
     exit 1
