@@ -38,7 +38,7 @@ version = ">=0.4.5"
 hatchling = "*"
 
 [package.run-dependencies]
-python = ">=3.11,<3.13"
+python = "3.11.*"
 tk = "*"
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
@@ -77,8 +77,7 @@ channels = [
 ]
 
 [feature.humble.dependencies]
-python = ">=3.11"
-cmake = "*"
+python = "3.11.*"
 deepdiff = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
@@ -103,7 +102,7 @@ channels = [
 ]
 
 [feature.humble-dev.dependencies]
-python = ">=3.11"
+python = "3.11.*"
 cmake = "*"
 compilers = "*"
 pkg-config = "*"
