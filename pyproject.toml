@@ -89,6 +89,7 @@ exclude = [
 
 [tool.hatch.build.targets.wheel.force-include]
 "clients" = "geoscenarioserver/clients"
+"scenario_suite/README.md" = "geoscenarioserver/scenario_suite/README.md"
 "scenario_suite/setup.bash" = "geoscenarioserver/scenario_suite/setup.bash"
 "scenario_suite/scripts" = "geoscenarioserver/scenario_suite/scripts"
 

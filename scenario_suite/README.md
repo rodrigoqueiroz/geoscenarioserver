@@ -6,7 +6,6 @@ The suite is supported by convenience scripts.
 The scenario suite contains the following folders:
 ```
 scenario_suite/
-├── geoscenarioserver/           # symlink to or submodule of [geoscenarioserver](https://github.com/rodrigoqueiroz/geoscenarioserver/)
 ├── maps/                        # map files used by scenarios (or symlinks)
 ├── scenarios/                   # scenario definitions
 │   ├── <scenario_name>/         # base scenario folder
@@ -24,21 +23,18 @@ scenario_suite/
 
 Running natively on any linux OS and `bash` shell
 
-Execute
+To install GeoScenarioServer to `/opt/geoscenarioserver`, execute:
+
 ```bash
-$ cd scenario_suite
-$ source setup.bash
-$ slaunch
+curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | bash
 ```
-Follow the instructions to install `pixi`.
-The script lists the available scenarios.
 
 ## Usage
 
 1. source the environment (provides the alias `slaunch` and allows launching scenarios from any working directory):
 ```bash
-$ cd scenario_suite
-$ source setup.bash
+cd scenario_suite
+source setup.bash
 ```
 
 2. Launch a scenario called `<scenario_name>` and, optionally, a number of scenario parts `<part_name>.osm*`.
@@ -52,7 +48,6 @@ $ slaunch
 Usage: slaunch <scenario_name>|<scenario_alias> [<part_name>.osm*] [--ros] [<gss_options>*]
 
 Launches the specified scenario with the GeoScenarioServer traffic simulator
-located at /.../scenario_suite/geoscenarioserver.
 
 Arguments:
      <scenario_name>      name of the folder 'scenarios/<scenario_name>'
