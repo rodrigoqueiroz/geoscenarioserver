@@ -23,11 +23,13 @@ scenario_suite/
 
 Running natively on any linux OS and `bash` shell
 
-To install GeoScenarioServer to `/opt/geoscenarioserver`, execute:
+To install GeoScenario Server to `/opt/geoscenarioserver`, execute:
 
 ```bash
-curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | bash
+curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | sudo bash
 ```
+
+NOTE: if you have write access to `/opt`, you can omit `sudo`.
 
 ## Usage
 

@@ -31,6 +31,26 @@ Refer to `clients/unreal` for integration with Unreal Engine 4 code.
 
 # Installation and usage from pre-built packages
 
+## Self-contained binary environment archive for Linux
+
+We provide a fully self-contained conda environment archive for Linux that can be extracted and used without installing conda or any dependencies.
+It contains both the standalone and ROS2 server versions.
+This is the recommended installation method for Linux users who don't want to use conda tools (pixi, (micro)mamba, ...).
+
+To install GeoScenario Server to `/opt/geoscenarioserver`, execute:
+
+```bash
+curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | sudo bash
+```
+
+**NOTE**: if you have write access to `/opt`, you can omit `sudo`.
+
+The script simply downloads (using `curl`) and extracts (using `tar` and `zstd`) the archive to `/opt/geoscenarioserver`.
+To activate the environment, execute
+```bash
+source /opt/geoscenarioserver/activate.bash
+```
+
 ## Conda
 
 We provide a channel containing binary conda packages `https://wiselab.uwaterloo.ca/conda-packages`.

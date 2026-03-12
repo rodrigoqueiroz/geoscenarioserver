@@ -52,7 +52,7 @@ else
     echo "GeoScenarioServer not installed to /opt/geoscenarioserver"
     echo "To install, execute"
     echo ""
-    echo "  curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | bash "
+    echo "  curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | sudo bash "
     echo ""
     exit 1
 fi
