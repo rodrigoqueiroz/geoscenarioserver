@@ -13,26 +13,11 @@ else
     suite_dir=${BASE_SUITE_DIR}
 fi
 
-if ! which -s pixi; then
-    echo "Pixi not installed or not activated."
-    echo "Follow the instructions for installing pixi at https://pixi.sh/latest/#installation"
-    echo "or execute the following and re-open the terminal:"
-    echo "   curl -fsSL https://pixi.sh/install.sh | bash"
-    exit 1
-fi
-
 print_help() {
     echo ""
     echo "Usage: slaunch <scenario_name>|<scenario_alias> [<part_name>.osm*] [--ros] [--mock-co-sim] [<gss_options>*]"
     echo ""
     echo "Launches the specified scenario with the GeoScenarioServer traffic simulator"
-    if [[ -L ${suite_dir}/geoscenarioserver ]]; then
-        echo "located via a symlink ${suite_dir}/geoscenarioserver, currently set to"
-        echo ""
-        readlink -e "${suite_dir}/geoscenarioserver"
-    else
-        echo "located at ${suite_dir}/geoscenarioserver."
-    fi
     echo ""
     echo "Arguments:"
     echo "     <scenario_name>      name of the folder 'scenarios/<scenario_name>'"
@@ -60,6 +45,17 @@ print_help() {
     echo "source <suite_dir>/setup.bash"
     echo ""
 }
+
+if [[ -f /opt/geoscenarioserver/activate.sh ]]; then
+    source /opt/geoscenarioserver/activate.sh
+else
+    echo "GeoScenarioServer not installed to /opt/geoscenarioserver"
+    echo "To install, execute"
+    echo ""
+    echo "  curl -fsSL https://wiselab.uwaterloo.ca/wise-sim/opt-geoscenarioserver-install.bash | sudo bash "
+    echo ""
+    exit 1
+fi
 
 # if no arguments were provided, print the help (without showing the scenarios) and exit
 if [[ $# = 0 ]]; then
@@ -186,7 +182,7 @@ mkdir -p "$suite_dir/logs/$timestamp"
 
 # Example ROS2 server launch_command.log:
 
-# pixi run ros_server --ros-args --params-file /<GSS_path>/scenario_suite/logs/2025-12-18-084927/launch_params.yaml
+# ros2 run geoscenario_server geoscenario_server --ros-args --params-file /<GSS_path>/scenario_suite/logs/2025-12-18-084927/launch_params.yaml
 
 # Example launch_params.yaml:
 
@@ -212,7 +208,6 @@ gss_scenario_dir="${scenarios_dir}/${scenario_name}"
 gss_scenario_file="${gss_scenario_dir}/${scenario_name}.osm"
 if [[ -f "${gss_scenario_file}" ]]; then
     echo "Starting GeoScenario server for ${gss_scenario_file}..."
-    cd ${suite_dir}/geoscenarioserver/
     scenario="--scenario ${gss_scenario_file} ${full_parts_list}"
     map_path="--map-path ${suite_dir}"
     if [[ -d "${suite_dir}/btrees" ]]; then
@@ -248,9 +243,9 @@ END_YAML
                 echo "    ${option}" >> ${gss_launch_params}
             done
         fi
-        ros_gss_command="pixi run ros_server --ros-args --params-file ${gss_launch_params}"
+        ros_gss_command="ros2 run geoscenario_server geoscenario_server --ros-args --params-file ${gss_launch_params}"
         if [[ -n ${mock_co_sim} ]]; then
-            mock_co_sim_command="pixi run ros_mock_co_simulator --ros-args -p target_delta_time:=0.025 ${mock_co_sim}"
+            mock_co_sim_command="ros2 run geoscenario_client mock_co_simulator --ros-args -p target_delta_time:=0.025 ${mock_co_sim}"
             echo "${mock_co_sim_command}" > "${mock_co_sim_command_log}"
             ${mock_co_sim_command} 2>&1 | tee "${mock_co_sim_output_log}" &
         fi
@@ -259,7 +254,7 @@ END_YAML
         ${ros_gss_command} 2>&1 | tee "${gss_output_log}"
     else
         echo "Launching standalone GeoScenario server..."
-        gss_command="pixi run gsserver ${scenario} ${map_path} ${btree_locations} ${gss_options}"
+        gss_command="gsserver ${scenario} ${map_path} ${btree_locations} ${gss_options}"
         # log the command for debugging
         echo "${gss_command}" > "${gss_command_log}"
         ${gss_command} 2>&1 | tee "${gss_output_log}"

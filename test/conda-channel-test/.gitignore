@@ -1,0 +1,6 @@
+.pixi/
+outputs/
+pixi.lock
+geoscenarioserver.conda
+*.tar
+*.tar.zstd

@@ -11,8 +11,7 @@ is_suite_dir() {
     # $1 - absolute directory path
     [ -d "$1" ] && \
     [ -f "$1/setup.bash" ] && \
-    [ -d "$1/scenarios" ] && \
-    [ -d "$1/geoscenarioserver" ]
+    [ -d "$1/scenarios" ]
     return $?
 }
 

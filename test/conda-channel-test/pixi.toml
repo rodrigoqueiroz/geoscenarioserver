@@ -1,0 +1,21 @@
+[workspace]
+authors = ["Michał Antkiewicz <michal.antkiewicz@uwaterloo.ca>"]
+channels = [
+  "https://wiselab.uwaterloo.ca/conda-packages",
+  "https://prefix.dev/robostack-humble",
+  "https://prefix.dev/conda-forge"
+]
+name = "conda-test"
+platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
+
+[dependencies]
+geoscenarioserver = "*"
+# optional ROS2 packages
+ros-humble-ros-base = "*"
+ros-humble-geoscenario-msgs = "*" 
+ros-humble-geoscenario-server = "*"
+ros-humble-geoscenario-client = "*"
+
+[target.linux.dependencies]
+tk = { build = "xft*" }  # to have true type fonts on linux
+

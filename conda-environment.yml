@@ -19,5 +19,3 @@ dependencies:
   - sysv_ipc
   - ros-humble-lanelet2
   - ros-humble-py-trees>=2.2
-  # Removed antlr-denter - now vendored in geoscenarioserver/util/DenterHelper.py
-    
