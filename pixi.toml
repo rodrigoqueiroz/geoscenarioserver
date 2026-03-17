@@ -5,7 +5,7 @@ channels = [
   "https://prefix.dev/conda-forge"
 ]
 name = "geoscenarioserver"
-platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
+platforms = ["linux-64", "linux-aarch64"] #, "win-64", "osx-64", "osx-arm64"]
 version = "0.1.0"
 preview = ["pixi-build"]
 
@@ -39,7 +39,7 @@ hatchling = "*"
 pip = "*"
 
 [package.run-dependencies]
-python = "3.11.*"
+python = "<3.13"
 tk = "*"
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
@@ -78,7 +78,7 @@ channels = [
 ]
 
 [feature.humble.dependencies]
-python = "3.11.*"
+python = "<3.13"
 deepdiff = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
@@ -103,7 +103,7 @@ channels = [
 ]
 
 [feature.humble-dev.dependencies]
-python = "3.11.*"
+python = "<3.13"
 cmake = "*"
 compilers = "*"
 pkg-config = "*"
