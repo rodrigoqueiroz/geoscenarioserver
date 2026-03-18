@@ -98,6 +98,7 @@ include = [
     "/clients",
     "/geoscenarioserver",
     "/scenario_suite/setup.bash",
+    "/scenario_suite/README.md",
     "/scenario_suite/scripts",
     "/README.md",
     "/LICENSE",
