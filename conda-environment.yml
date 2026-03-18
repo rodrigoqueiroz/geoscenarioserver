@@ -3,7 +3,7 @@ channels:
   - robostack-humble
   - conda-forge
 dependencies:
-  - python=3.11
+  - python
   - pip
   - tk=*=xft_* # use the TrueType variant
   - antlr4-python3-runtime>=4.13

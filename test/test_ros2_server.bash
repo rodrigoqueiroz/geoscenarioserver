@@ -66,6 +66,7 @@ pixi run ros_mock_co_simulator${DEV} --ros-args \
 pixi run ros_server${DEV} --ros-args \
     --log-level INFO \
     -p dashboard_position:="[0, 0, 1920, 1080]" \
+    -p overlay_osm:="true" \
     -p scenario_files:="['$SCENARIO_FILE']"
 
 
