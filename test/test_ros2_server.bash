@@ -74,7 +74,10 @@ pixi run ros_server${DEV} --ros-args \
     -p $ROS_DISPLAY_OPTIONS \
     -p scenario_files:="['$SCENARIO_FILE']"
 
+EXIT_CODE=$?
 
 echo "Sleeping 5s to allow the nodes to shutdown..."
 sleep 5
 echo "Shutdown complete."
+
+exit $EXIT_CODE
