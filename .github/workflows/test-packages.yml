@@ -1,13 +1,13 @@
-name: Test Conda Package
+name: Test Conda and Wheel Packages
 
-on:
-  pull_request:
+on: pull_request
 
 jobs:
-  test-conda-package:
+  test-packages:
     strategy:
-      matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
+      matrix:  
+        # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+        os: [ubuntu-slim, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -23,6 +23,7 @@ jobs:
         run: bash test/test_conda_package.bash
 
       - name: Run wheel package test script
-        if: matrix.os == 'ubuntu-24.04'
+        # Lanelet2 wheels only built for x86_64
+        if: matrix.os == 'ubuntu-slim'
         run: bash test/test_wheel_package.bash
 
