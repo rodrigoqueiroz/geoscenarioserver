@@ -17,7 +17,9 @@ shutdown_nodes() {
     pkill --signal SIGTERM mock_co_simulat
     pkill --signal SIGTERM geoscenario_ser
 }
-trap shutdown_nodes SIGINT SIGTERM EXIT
+if [[ -z $CI ]]; then 
+    trap shutdown_nodes SIGINT SIGTERM EXIT
+fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
