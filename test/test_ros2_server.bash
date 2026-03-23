@@ -56,10 +56,8 @@ fi
 cd ${REPO_DIR}
 set -x
 
-DISPLAY_OPTIONS="--overlay-osm"
 ROS_DISPLAY_OPTIONS="overlay_osm:=true"
 if [[ -z ${DISPLAY} ]]; then
-    DISPLAY_OPTIONS="--no-dash"
     ROS_DISPLAY_OPTIONS="no_dashboard:=true"
 else
     pixi run rqt_topic${DEV} &
