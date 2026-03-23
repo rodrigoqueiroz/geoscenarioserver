@@ -56,7 +56,14 @@ fi
 cd ${REPO_DIR}
 set -x
 
-pixi run rqt_topic${DEV} &
+DISPLAY_OPTIONS="--overlay-osm"
+ROS_DISPLAY_OPTIONS="overlay_osm:=true"
+if [[ -z ${DISPLAY} ]]; then
+    DISPLAY_OPTIONS="--no-dash"
+    ROS_DISPLAY_OPTIONS="no_dashboard:=true"
+else
+    pixi run rqt_topic${DEV} &
+fi
 
 pixi run ros_mock_co_simulator${DEV} --ros-args \
         -p target_delta_time:=0.025 \
@@ -66,7 +73,7 @@ pixi run ros_mock_co_simulator${DEV} --ros-args \
 pixi run ros_server${DEV} --ros-args \
     --log-level INFO \
     -p dashboard_position:="[0, 0, 1920, 1080]" \
-    -p overlay_osm:="true" \
+    -p $ROS_DISPLAY_OPTIONS \
     -p scenario_files:="['$SCENARIO_FILE']"
 
 

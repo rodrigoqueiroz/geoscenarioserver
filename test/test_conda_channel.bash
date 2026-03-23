@@ -13,16 +13,21 @@ if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: pixi install failed"
     exit 1
 fi
-
+DISPLAY_OPTIONS="--overlay-osm"
+ROS_DISPLAY_OPTIONS="overlay_osm:=true"
+if [[ -z ${DISPLAY} ]]; then
+    DISPLAY_OPTIONS="--no-dash"
+    ROS_DISPLAY_OPTIONS="no_dashboard:=true"
+fi
 # standalone
-pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
+pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm $DISPLAY_OPTIONS
 if [[ $? == 0 ]]; then
     echo "$0: INFO: pixi run succeeded"
     # ROS2
     pixi run ros2 run geoscenario_server geoscenario_server --ros-args \
                       -p heartbeat_period:=1.0 \
                       -p stall_muliplier:=1.0 \
-                      -p overlay_osm:=true \
+                      -p $ROS_DISPLAY_OPTIONS \
                       -p scenario_files:=[scenarios/test_scenarios/gs_all_vehicles_peds.osm]
     # cleanup
     echo "$0: INFO: cleaning up"
@@ -49,14 +54,14 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 # standalone
-${MAMBA_EXE} run -n gss gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
+${MAMBA_EXE} run -n gss gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm $DISPLAY_OPTIONS
 if [[ $? == 0 ]]; then
     echo "$0: INFO: micromamba run succeeded"
     # ROS2
     ${MAMBA_EXE} run -n gss ros2 run geoscenario_server geoscenario_server --ros-args  \
                                      -p heartbeat_period:=1.0 \
                                      -p stall_muliplier:=1.0 \
-                                     -p overlay_osm:=true \
+                                     -p $ROS_DISPLAY_OPTIONS \
                                      -p scenario_files:=[scenarios/test_scenarios/gs_all_vehicles_peds.osm]
     # cleanup
     echo "$0: INFO: cleaning up"

@@ -11,7 +11,12 @@ elif [[ "$1" == "--roundtriptest" ]]; then
 fi
 
 cd ${REPO_DIR}
-pixi run rqt_topic &
+DISPLAY_OPTIONS="--dash-pos 0 0 960 1080 -wi"
+if [[ -z ${DISPLAY} ]]; then
+    DISPLAY_OPTIONS="--no-dash"
+else 
+    pixi run rqt_topic &
+fi
 pixi run ${ROS_CLIENT} &
 pixi run ros_mock_co_simulator &
 
@@ -22,4 +27,4 @@ shutdown_nodes() {
 }
 trap shutdown_nodes SIGINT SIGTERM EXIT
 
-pixi run gsserver --dash-pos 0 0 960 1080 -wi -s scenarios/long_test_scenarios/gs_ringroad_stress_loop.osm
+pixi run gsserver $DISPLAY_OPTIONS -s scenarios/test_scenarios/gs_all_vehicles_peds.osm
