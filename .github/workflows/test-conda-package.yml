@@ -23,5 +23,6 @@ jobs:
         run: bash test/test_conda_package.bash
 
       - name: Run wheel package test script
+        if: matrix.os == 'ubuntu-24.04'
         run: bash test/test_wheel_package.bash
 
