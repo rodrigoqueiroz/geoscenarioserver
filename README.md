@@ -109,7 +109,7 @@ Execute `micromamba run -n gss gsserver --help`.
 
 Install the package from GitHub release:
 ```bash
-pip install https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v0.1.0/geoscenarioserver-0.1.0-py3-none-any.whl
+pip install https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v0.1.1/geoscenarioserver-0.1.1-py3-none-any.whl
 ```
 Execute `gsserver --help`.
 
