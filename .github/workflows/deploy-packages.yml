@@ -8,7 +8,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   build-and-deploy:
@@ -39,6 +38,7 @@ jobs:
           for file in *.conda; do
             rattler-build upload prefix -c geoscenarioserver "$file"
           done
+
       - name: Print package names
         if: github.event_name == 'pull_request'
         run: |
