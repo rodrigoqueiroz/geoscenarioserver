@@ -53,7 +53,7 @@ source /opt/geoscenarioserver/activate.bash
 
 ## Conda
 
-We provide a channel containing binary conda packages `https://wiselab.uwaterloo.ca/conda-packages`.
+We provide a channel containing binary conda packages `https://prefix.dev/geoscenarioserver`.
 
 ### Using Pixi (recommended)
 
@@ -61,7 +61,7 @@ Add to your `pixi.toml` file:
 ```toml
 [workspace]
 channels = [
-  "https://wiselab.uwaterloo.ca/conda-packages",
+  "https://prefix.dev/geoscenarioserver",
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]
@@ -87,7 +87,7 @@ Create the following `conda-environment.yaml` file:
 ```yaml
 name: gss
 channels:
-  - https://wiselab.uwaterloo.ca/conda-packages
+  - https://prefix.dev/geoscenarioserver
   - robostack-humble
   - conda-forge
 dependencies:
