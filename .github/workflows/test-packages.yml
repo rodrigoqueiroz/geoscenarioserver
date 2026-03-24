@@ -1,4 +1,4 @@
-name: Test Conda and Wheel Packages
+name: Test Packages
 
 on: pull_request
 

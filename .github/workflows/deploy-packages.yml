@@ -1,0 +1,48 @@
+name: Deploy Packages
+
+# this is important for trusted publishing
+permissions:
+  id-token: write
+
+on: 
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    strategy:
+      matrix:  
+        # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: true
+          frozen: true
+
+      - name: Run build all conda packages script
+        run: bash scripts/build_all_conda_packages.bash
+
+      - name: Upload all packages
+        shell: bash
+        # do not upload on PR
+        if: github.event_name == 'push'
+        run: |
+          # uses trusted publishers for the upload
+          for file in *.conda; do
+            rattler-build upload prefix -c geoscenarioserver "$file"
+          done
+      - name: Print package names
+        if: github.event_name == 'pull_request'
+        run: |
+          rattler-build --version
+          for file in *.conda; do
+            echo "$file"
+          done

@@ -8,11 +8,11 @@ cd ${REPO_DIR}
 pixi build
 # creates geoscenarioserver-<version>-<build>.conda
 
-pixi build --path ros2/src/geoscenario_msgs/package.xml
+pixi build --path ros2/src/geoscenario_msgs
 # Creates ros-humble-geoscenario-msgs-<version>-<build>.conda
 
-pixi build --path ros2/src/geoscenario_server/package.xml
+pixi build --path ros2/src/geoscenario_server
 # Creates ros-humble-geoscenario-server-<version>-<build>.conda
 
-pixi build --path ros2/src/geoscenario_client/package.xml
+pixi build --path ros2/src/geoscenario_client
 # Creates ros-humble-geoscenario-client-<version>-<build>.conda
