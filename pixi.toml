@@ -34,6 +34,9 @@ channels = [
 name = "pixi-build-python"
 version = ">=0.4.5"
 
+[package.build.config]
+noarch = false  # Build platform-specific package
+
 [package.host-dependencies] 
 hatchling = "*"
 pip = "*"
