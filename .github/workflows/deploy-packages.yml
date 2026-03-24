@@ -29,6 +29,11 @@ jobs:
       - name: Run build all conda packages script
         run: bash scripts/build_all_conda_packages.bash
 
+      - name: Setup rattler-build
+        uses: prefix-dev/rattler-build-action@v0.2.36
+        with:
+          setup-only: true
+
       - name: Upload all packages
         shell: bash
         # do not upload on PR
