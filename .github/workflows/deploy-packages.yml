@@ -1,0 +1,86 @@
+name: Deploy Packages
+
+# this is important for trusted publishing
+permissions:
+  id-token: write
+  contents: write
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*.*.*"
+  pull_request:
+
+jobs:
+  build-and-deploy-conda-packages:
+    if: github.repository == 'rodrigoqueiroz/geoscenarioserver'  # not on forks
+    strategy:
+      matrix:  
+        # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: true
+          frozen: true
+
+      - name: Build all conda packages
+        run: bash scripts/build_all_conda_packages.bash
+
+      - name: Setup rattler-build
+        uses: prefix-dev/rattler-build-action@v0.2.36
+        with:
+          setup-only: true
+
+      - name: Upload all conda packages
+        shell: bash
+        # do not upload on PR
+        if: github.ref_type == 'tag'
+        run: |
+          # uses trusted publishers for the upload
+          for file in *.conda; do
+            rattler-build upload prefix -c geoscenarioserver "$file"
+          done
+
+      - name: Print conda package names
+        if: github.event_name == 'pull_request'
+        run: ls -al *.conda
+
+  build-and-deploy-wheel-package:
+    if: github.repository == 'rodrigoqueiroz/geoscenarioserver'  # not on forks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: true
+          frozen: true
+
+      - name: Build a wheel
+        run: pixi run build_wheel
+
+      - name: Upload the wheel to a new release
+        uses: softprops/action-gh-release@v2
+        # do not upload on PR
+        if: github.ref_type == 'tag'
+        with:
+          working_directory: dist
+          files: |
+            *.whl
+            *.tar.gz
+
+      - name: Print wheel and source package names
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          ls -al dist/*.whl
+          ls -al dist/*.tar.gz

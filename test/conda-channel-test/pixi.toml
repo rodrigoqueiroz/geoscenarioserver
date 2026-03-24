@@ -1,7 +1,7 @@
 [workspace]
 authors = ["Michał Antkiewicz <michal.antkiewicz@uwaterloo.ca>"]
 channels = [
-  "https://wiselab.uwaterloo.ca/conda-packages",
+  "https://prefix.dev/geoscenarioserver",
   "https://prefix.dev/robostack-humble",
   "https://prefix.dev/conda-forge"
 ]

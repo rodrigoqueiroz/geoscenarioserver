@@ -17,7 +17,9 @@ shutdown_nodes() {
     pkill --signal SIGTERM mock_co_simulat
     pkill --signal SIGTERM geoscenario_ser
 }
-trap shutdown_nodes SIGINT SIGTERM EXIT
+if [[ -z $CI ]]; then 
+    trap shutdown_nodes SIGINT SIGTERM EXIT
+fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname "$SCRIPT_DIR")
@@ -56,7 +58,12 @@ fi
 cd ${REPO_DIR}
 set -x
 
-pixi run rqt_topic${DEV} &
+ROS_DISPLAY_OPTIONS="overlay_osm:=true"
+if [[ -z ${DISPLAY} ]]; then
+    ROS_DISPLAY_OPTIONS="no_dashboard:=true"
+else
+    pixi run rqt_topic${DEV} &
+fi
 
 pixi run ros_mock_co_simulator${DEV} --ros-args \
         -p target_delta_time:=0.025 \
@@ -66,9 +73,13 @@ pixi run ros_mock_co_simulator${DEV} --ros-args \
 pixi run ros_server${DEV} --ros-args \
     --log-level INFO \
     -p dashboard_position:="[0, 0, 1920, 1080]" \
+    -p $ROS_DISPLAY_OPTIONS \
     -p scenario_files:="['$SCENARIO_FILE']"
 
+EXIT_CODE=$?
 
 echo "Sleeping 5s to allow the nodes to shutdown..."
 sleep 5
 echo "Shutdown complete."
+
+exit $EXIT_CODE

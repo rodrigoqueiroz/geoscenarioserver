@@ -23,7 +23,11 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
+DISPLAY_OPTIONS="--overlay-osm"
+if [[ -z ${DISPLAY} ]]; then
+    DISPLAY_OPTIONS="--no-dash"
+fi
+pixi run gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm $DISPLAY_OPTIONS
 if [[ $? == 0 ]]; then
     echo "$0: INFO: pixi run succeeded"
     # cleanup
@@ -51,7 +55,7 @@ if [[ $? -ne 0 ]]; then
     echo "$0: ERROR: micromamba create failed"
     exit 1
 fi
-${MAMBA_EXE} run -n gss gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm --overlay-osm
+${MAMBA_EXE} run -n gss gsserver -s scenarios/test_scenarios/gs_all_vehicles_peds.osm $DISPLAY_OPTIONS
 if [[ $? == 0 ]]; then
     echo "$0: INFO: micromamba run succeeded"
     # cleanup

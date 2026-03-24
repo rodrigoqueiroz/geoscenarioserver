@@ -1,0 +1,59 @@
+name: Test Packages
+
+on: pull_request
+
+jobs:
+  test-conda-standalone:
+    strategy:
+      matrix:  
+        # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: true
+          frozen: true
+
+      - name: Run conda package test script
+        run: bash test/test_conda_package.bash
+
+  test-conda-ros2-server:
+    strategy:
+      matrix:  
+        # https://docs.github.com/en/actions/reference/runners/github-hosted-runners
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: true
+          frozen: true
+
+      - name: Run ROS2 server test script
+        run: bash test/test_ros2_server.bash --2xrealtime
+
+
+  test-wheel-standalone:
+    # Lanelet2 wheels only built for x86_64
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: true
+          frozen: true
+
+      - name: Run wheel package test script
+        run: bash test/test_wheel_package.bash

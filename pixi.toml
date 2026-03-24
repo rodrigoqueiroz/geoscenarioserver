@@ -5,8 +5,8 @@ channels = [
   "https://prefix.dev/conda-forge"
 ]
 name = "geoscenarioserver"
-platforms = ["linux-64"] #, "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
-version = "0.1.0"
+platforms = ["linux-64", "linux-aarch64"] #, "win-64", "osx-64", "osx-arm64"]
+version = "0.1.1"
 preview = ["pixi-build"]
 
 [tasks]
@@ -23,7 +23,7 @@ tk = { build = "xft*" }  # to have true type fonts on linux
 
 [package]
 name = { workspace = true }
-version = "0.1.0"
+version = "0.1.1"
 
 [package.build.backend]
 channels = [
@@ -34,12 +34,15 @@ channels = [
 name = "pixi-build-python"
 version = ">=0.4.5"
 
+[package.build.config]
+noarch = false  # Build platform-specific package
+
 [package.host-dependencies] 
 hatchling = "*"
 pip = "*"
 
 [package.run-dependencies]
-python = "3.11.*"
+python = ">=3.11,<3.13"
 tk = "*"
 antlr4-python3-runtime = ">=4.13"
 graphviz = "*"
@@ -78,14 +81,14 @@ channels = [
 ]
 
 [feature.humble.dependencies]
-python = "3.11.*"
+python = ">=3.11,<3.13"
 deepdiff = "*"
 ros-humble-desktop = "*"
 ros-humble-geographic-msgs = "*"
-ros-humble-geoscenario-msgs = { path = "ros2/src/geoscenario_msgs/package.xml" }
-ros-humble-geoscenario-server = { path = "ros2/src/geoscenario_server/package.xml" }
-ros-humble-geoscenario-client = { path = "ros2/src/geoscenario_client/package.xml" }
-ros-humble-geoscenario-bringup = { path = "ros2/src/geoscenario_bringup/package.xml" }
+ros-humble-geoscenario-msgs = { path = "ros2/src/geoscenario_msgs/" }
+ros-humble-geoscenario-server = { path = "ros2/src/geoscenario_server/" }
+ros-humble-geoscenario-client = { path = "ros2/src/geoscenario_client/" }
+ros-humble-geoscenario-bringup = { path = "ros2/src/geoscenario_bringup/" }
 
 [feature.humble.tasks]
 ros_server = { cmd = "ros2 run geoscenario_server geoscenario_server", description = "Run native ROS2 server node" }
@@ -103,7 +106,7 @@ channels = [
 ]
 
 [feature.humble-dev.dependencies]
-python = "3.11.*"
+python = ">=3.11,<3.13"
 cmake = "*"
 compilers = "*"
 pkg-config = "*"
