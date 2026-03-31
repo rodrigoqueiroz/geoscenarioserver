@@ -297,6 +297,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
+		// skip EVs
 		if (gsv.v_type != 2) {
 			continue;
 		}
@@ -324,7 +325,8 @@ void AGSClient::UpdateRemotePedestrianStates(float deltaTime)
 	for (auto& elem : pedestrians)
 	{
 		GSPedestrian &gsp = elem.Value;
-		if (gsp.p_type != 1 && gsp.p_type != 4) {
+		// skip EPs
+		if (gsp.p_type != 3) {
 			continue;
 		}
 
@@ -353,7 +355,7 @@ void AGSClient::CreateVehicle(int vid, int v_type, FVector &dim, FVector &loc, F
 	gsv.vid = vid;
 	gsv.v_type = v_type;
 	gsv.vehicle_state =  VehicleState();
-	if (v_type == 1 || v_type == 3) // SDV or TV
+	if (v_type != 2)  // SDV(1), TV(3), or PV(4)
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
@@ -402,7 +404,7 @@ void AGSClient::CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc
 	gsp.pid = pid;
 	gsp.p_type = p_type;
 	gsp.pedestrian_state =  PedestrianState();
-	if (p_type == 4 || p_type == 1) // SP or TP
+	if (p_type != 3)  // TP(1), PP(2) or SP(4) 
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Pedestrian"));
