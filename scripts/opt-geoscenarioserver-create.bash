@@ -4,8 +4,8 @@ REPO_DIR=$(dirname ${SCRIPT_DIR})
 CHANNEL_TEST_DIR=${REPO_DIR}/test/conda-channel-test
 VERSION=${1:-"0.1.2"}
 
-# ensure pixi pack is available
-pixi global install pixi-pack
+# ensure pixi pack and unpack are available
+pixi global install pixi-pack pixi-unpack
 
 cd ${CHANNEL_TEST_DIR}
 set -x
