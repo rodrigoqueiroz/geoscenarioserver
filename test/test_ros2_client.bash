@@ -14,7 +14,7 @@ cd ${REPO_DIR}
 DISPLAY_OPTIONS="--dash-pos 0 0 960 1080 -wi"
 if [[ -z ${DISPLAY} ]]; then
     DISPLAY_OPTIONS="--no-dash"
-else 
+else
     pixi run rqt_topic &
 fi
 pixi run ${ROS_CLIENT} &
@@ -27,4 +27,5 @@ shutdown_nodes() {
 }
 trap shutdown_nodes SIGINT SIGTERM EXIT
 
+# pixi run gsserver $DISPLAY_OPTIONS --wait-for-client -s scenarios/test_scenarios/gs_all_vehicles_peds.osm
 pixi run gsserver $DISPLAY_OPTIONS -s scenarios/test_scenarios/gs_all_vehicles_peds.osm

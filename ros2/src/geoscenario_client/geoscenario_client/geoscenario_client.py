@@ -192,7 +192,7 @@ class GSClient(Node):
             pedestrian["h"] = msg_pedestrian.dimensions.z
             self.set_agent_pos_vel_from_msg(pedestrian, msg_pedestrian)
             pedestrian["yaw"] = msg_pedestrian.yaw # not used
-            pedestrian["active"] = msg_vehicle.active
+            pedestrian["active"] = msg_pedestrian.active
             pedestrians.append(pedestrian)
 
         self.sim_client_shm.write_client_state(msg.tick_count, msg.delta_time, vehicles, pedestrians)

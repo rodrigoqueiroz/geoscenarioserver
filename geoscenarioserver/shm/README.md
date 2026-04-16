@@ -11,7 +11,7 @@ The shared memory written by the server is one large space-separated UTF8-encode
 
 ```
 tick_count simulation_time delta_time n_vehicles n_pedestrians
-origin_lat origin_lon origin_alt
+origin_lat origin_lon origin_alt area
 vid v_type x y z vx vy yaw steering_angle
 ...
 pid p_type x y z vx vy yaw

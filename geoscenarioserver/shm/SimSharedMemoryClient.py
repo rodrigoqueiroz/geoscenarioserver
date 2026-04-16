@@ -66,7 +66,7 @@ class SimSharedMemoryClient(object):
         """ Reads from shared memory pose data for each agent.
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
-                origin_lat origin_lon origin_alt
+                origin_lat origin_lon origin_alt area
                 vid v_type l w h x y z vx vy yaw steering_angle
                 pid p_type l w h x y z vx vy yaw
                 ...
@@ -190,7 +190,7 @@ class SimSharedMemoryClient(object):
         # write vehicle states, rounding the numerical data to reasonable significant figures
         for vehicle in vehicles:
             write_str += "{} {} {} {} {} {} {}\n".format(
-                vehicle["id"], 
+                vehicle["id"],
                 round(vehicle["x"], 4),
                 round(vehicle["y"], 4),
                 round(vehicle["z"], 4),
@@ -202,13 +202,13 @@ class SimSharedMemoryClient(object):
         # write pedestrian states, rounding the numerical data to reasonable significant figures
         for pedestrian in pedestrians:
             write_str += "{} {} {} {} {} {} {}\n".format(
-                pedestrian["id"], 
+                pedestrian["id"],
                 round(pedestrian["x"], 4),
                 round(pedestrian["y"], 4),
                 round(pedestrian["z"], 4),
                 round(pedestrian["vx"], 4),
                 round(pedestrian["vy"], 4),
-                int(vehicle["active"])
+                int(pedestrian["active"])
             )
 
         # sysv_ipc.BusyError needs to be caught

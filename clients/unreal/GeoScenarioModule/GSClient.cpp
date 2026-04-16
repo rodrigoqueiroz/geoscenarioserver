@@ -154,10 +154,11 @@ void AGSClient::ReadServerState(float deltaTime)
 	int server_tick_count, nvehicles{0}, npedestrians{0}, vid{0}, pid{0};
 	iss >> server_tick_count >> server_simulation_time >> server_delta_time >> nvehicles >> npedestrians;
 	// parse origin
-	float origin_lat, origin_lon, origin_alt;
-	iss >> origin_lat >> origin_lon >> origin_alt;
+	float origin_lat, origin_lon, origin_alt, area;
+	iss >> origin_lat >> origin_lon >> origin_alt >> area;
 	// parse vehicles
 	int vehicles_read{0};
+	// vid v_type l w h x y z vx vy yaw steering_angle
 	while (vehicles_read < nvehicles)
 	{
 		iss >> vid;
@@ -224,6 +225,7 @@ void AGSClient::ReadServerState(float deltaTime)
 
 	// parse pedestrians
 	int pedestrians_read{0};
+	// pid p_type l w h x y z vx vy yaw
 	while (pedestrians_read < npedestrians)
 	{
 		iss >> pid;
@@ -404,7 +406,7 @@ void AGSClient::CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc
 	gsp.pid = pid;
 	gsp.p_type = p_type;
 	gsp.pedestrian_state =  PedestrianState();
-	if (p_type != 3)  // TP(1), PP(2) or SP(4) 
+	if (p_type != 3)  // TP(1), PP(2) or SP(4)
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Pedestrian"));

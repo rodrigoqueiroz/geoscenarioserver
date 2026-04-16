@@ -40,7 +40,7 @@ class SimSharedMemoryServer(object):
             @param pedestrians:   dictionary of type <int, Pedestrian>
             Shared memory format:
                 tick_count simulation_time delta_time n_vehicles n_pedestrians
-                origin_lat origin_lon origin_alt
+                origin_lat origin_lon origin_alt area
                 vid v_type l w h x y z vx vy yaw steering_angle
                 pid p_type l w h x y z vx vy yaw
                 ...
