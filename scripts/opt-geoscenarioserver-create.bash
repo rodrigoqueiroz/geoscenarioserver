@@ -2,7 +2,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR=$(dirname ${SCRIPT_DIR})
 CHANNEL_TEST_DIR=${REPO_DIR}/test/conda-channel-test
-VERSION=${1:-"0.1.1"}
+VERSION=${1:-"0.1.2"}
 
 # ensure pixi pack is available
 pixi global install pixi-pack

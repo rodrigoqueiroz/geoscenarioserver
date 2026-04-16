@@ -16,8 +16,8 @@ For ROS2 co-simulation use `geoscenarioserver` and `ros-humble-geoscenario-clien
 For other co-simulation use `geoscenarioserver` and a co-simulator, such as [WiseSim](https://uwaterloo.ca/waterloo-intelligent-systems-engineering-lab/projects/wise-sim) via shared memory or [Carla](https://carla.org/) via Carla API.
 
 ## *ROS2* server for co-simulation where the simulation time is controlled by the co-simulator
-The server only executes a simulation step in response to the state and delta time published by the co-simulator. 
-The server can run faster than real time. 
+The server only executes a simulation step in response to the state and delta time published by the co-simulator.
+The server can run faster than real time.
 
 For ROS2 operation use `ros-humble-geoscenario-server` and a co-simulator.
 
@@ -71,7 +71,7 @@ platforms = ["linux-64"]
 geoscenarioserver = "*"
 # optional ROS2 packages
 ros-humble-ros-base = "*"
-ros-humble-geoscenario-msgs = "*" 
+ros-humble-geoscenario-msgs = "*"
 ros-humble-geoscenario-server = "*"
 ros-humble-geoscenario-client = "*"
 
@@ -109,7 +109,7 @@ Execute `micromamba run -n gss gsserver --help`.
 
 Install the package from GitHub release:
 ```bash
-pip install https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v0.1.1/geoscenarioserver-0.1.1-py3-none-any.whl
+pip install https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v0.1.2/geoscenarioserver-0.1.2-py3-none-any.whl
 ```
 Execute `gsserver --help`.
 

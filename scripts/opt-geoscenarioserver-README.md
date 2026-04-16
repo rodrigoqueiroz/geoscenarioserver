@@ -16,8 +16,8 @@ pixi global install rattler-index
 rattler-index fs conda-packages/
 ```
 
-3. Create the `opt-geoscenarioserver-<version>.tar.zstd` and upload to the server. 
-Execute locally (`<version>` is optional, defaults to `0.1.1`):
+3. Create the `opt-geoscenarioserver-<version>.tar.zstd` and upload to the server.
+Execute locally (`<version>` is optional, defaults to `0.1.2`):
 
 ```bash
 bash scripts/opt-geoscenarioserver-create.bash [<version>]
@@ -26,5 +26,5 @@ Warning: this will also install the environment to `/opt/geoscenarioserver` loca
 
 4. On the server, symlink the `opt-geoscenarioserver-latest.tar.zstd` to the uploaded `opt-geoscenarioserver-<version>.tar.zstd`:
 
-Now users can use `opt-geoscenarioserver-install.bash` to install the environment on their local machine. 
+Now users can use `opt-geoscenarioserver-install.bash` to install the environment on their local machine.
 The script will download the `opt-geoscenarioserver-latest.tar.zstd` from the server and install it to `/opt/geoscenarioserver`.
