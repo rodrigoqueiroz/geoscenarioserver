@@ -199,7 +199,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		if (v_type == 1)
+		if (v_type != 2)
 		{
 			if (server_framestat.tick_count == server_tick_count)
 			{
@@ -266,7 +266,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		if (p_type == 4)
+		if (p_type != 3)
 		{
 			if (server_framestat.tick_count == server_tick_count)
 			{
@@ -426,7 +426,14 @@ void AGSClient::CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc
 		FName BboxTag = FName(*PubBbox);
 		gsp.actor->Tags.Add(BboxTag);
 	}
-
+	else if (p_type == 3) // EP
+	{
+		//Find actor with tag
+		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Pedestrian"));
+		gsp.actor = FindPedestrianActor(pid);
+		loc = gsp.actor->GetActorLocation();
+		rot = gsp.actor->GetActorRotation();
+	}
 	//check if success
 	if (gsp.actor != nullptr)
 	{

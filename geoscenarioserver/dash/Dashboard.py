@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#rqueiroz@gsd.uwaterloo.ca
+#rqueiroz@uwaterloo.ca
 #d43sharm@uwaterloo.ca
 # ---------------------------------------------
 # Simulation Dashboard and Trajectory Plots
@@ -91,7 +91,7 @@ def get_screen_parameters(dashboard_position):
     if dashboard_position and len(dashboard_position) == 4:
         screen_param = dashboard_position
     else:
-        #find screen info 
+        #find screen info
         monitors = screeninfo.get_monitors()
         # ensure we do have a monitor, even if it is not primary (on Windows WSL2)
         primary_monitor = monitors[0]
@@ -107,7 +107,7 @@ class Dashboard(object):
     CART_FIG_ID = 2
     FRE_FIG_ID = 3
     TRAJ_FIG_ID = 4
-    
+
     maneuver_map = {"M_VELKEEP":"VelKeep", "M_FOLLOW":"Follow", "M_LANESWERVE":"LaneSwerve", "M_CUTIN":"CutIn", "M_STOP":"Stop", "M_REVERSE":"Reverse"}
     vehicle_types = {0:"N", 1:"SDV", 2:"EV", 3:"TV", 4:"PV"}
     ped_types = {0:"N", 1:"TP", 2:"PP", 3:"EP", 4:"SP"}
@@ -122,7 +122,7 @@ class Dashboard(object):
         self.screen_param = screen_param
         self.osm_background_image = None  # Cache for OSM background image
         self.osm_image_extent = None      # Extent for imshow (xmin, xmax, ymin, ymax)
-        
+
 
     def start(self):
         """ Start the dashboard in a subprocess when sim_config.show_dashboard=True
@@ -136,7 +136,7 @@ class Dashboard(object):
         if not (self.sim_traffic.traffic_state_sharr):
             log.error("Dashboard can not start before traffic")
             return
-        
+
         #get new data
         _, vehicles, pedestrians, _, _  = self.sim_traffic.read_traffic_state(self.sim_traffic.traffic_state_sharr, False)
         if len(vehicles) == 0 and len(pedestrians) == 0:
@@ -213,7 +213,9 @@ class Dashboard(object):
             #find valid vehicle to focus plots and btree (if available)
             vid = None
 
-            if (type(self.center_id) == str):
+            if (vehicles.get(99)): #if ego exists, focus on ego
+                self.center_id = 99
+            elif (type(self.center_id) == str):
                 if self.center_id[0] == 'p':
                     self.center_pedestrian = True
                 else:
@@ -221,13 +223,13 @@ class Dashboard(object):
                 self.center_id = int(self.center_id[1:]) #remove first letter
 
             # if at least one agent is present in the scenario
-            if len(vehicles) != 0 or len(pedestrians) != 0:    
+            if len(vehicles) != 0 or len(pedestrians) != 0:
                 if self.center_pedestrian == False and self.center_id in vehicles:
                     if vehicles[self.center_id].sim_state is not ActorSimState.INACTIVE:
                         vid = int(self.center_id)
-                        
+
                         v_string_id = f"v{vid}"  # 'v' prefix helps differentiate vehicles and pedestrian with same ids to print proper path styles
-                        
+
                         #vehicles with planner: cartesian, frenet chart and behavior tree
                         try:
                             if v_string_id in debug_shdata:
@@ -280,7 +282,7 @@ class Dashboard(object):
         if (focus):
             self.center_id = focus #sets center_id to an int or string
             #log.info("Changed focus to {}".format(self.center_id))
-    
+
     def get_maneuver(self, id):
         v_string_id = f"v{id}"
         try:
@@ -368,7 +370,7 @@ class Dashboard(object):
         plt.cla()
 
         c_plot_area = self.sim_traffic.origin[3]
-        
+
         #boundaries
         x_min = pedestrians[center_id].state.x - (c_plot_area/2)
         x_max = pedestrians[center_id].state.x + (c_plot_area/2)
@@ -377,11 +379,11 @@ class Dashboard(object):
 
         self.plot_road(x_min,x_max,y_min,y_max,traffic_lights)
         self.plot_static_objects(static_objects, x_min,x_max,y_min,y_max)
-        
+
         if REFERENCE_PATH and reference_path is not None:
             path_x, path_y = zip(*reference_path)
             plt.plot(path_x, path_y, linestyle='-', color='r', linewidth = 1.2, alpha=0.6, zorder=0)
-            
+
         self.plot_vehicles(vehicles,x_min,x_max,y_min,y_max, True)
         self.plot_pedestrians(pedestrians,x_min,x_max,y_min,y_max)
 
@@ -933,7 +935,7 @@ class Dashboard(object):
         x, y, w, h = self.screen_param[0], self.screen_param[1], self.screen_param[2], self.screen_param[3]
 
         window.geometry("%dx%d+%d+%d" % (w, h, x, y))
-        
+
         vis_scaling = 1
         txt_scaling = 1
 
@@ -943,7 +945,7 @@ class Dashboard(object):
         elif h >= 1080 and w >= 1920:
             vis_scaling = 2
             txt_scaling = 1.2
-    
+
         # Configure row and column weights for dynamic resizing
         window.columnconfigure(0, weight=1)  # Left section (70% width)
         window.columnconfigure(1, weight=1)  # Right section (30% width)
@@ -1063,7 +1065,7 @@ class Dashboard(object):
         fig_traj.set_size_inches(2*vis_scaling,2*vis_scaling,forward=True) # needs to be scaled
         self.traj_canvas = FigureCanvasTkAgg(fig_traj, traj_frame)
         self.traj_canvas.get_tk_widget().pack(expand=True, fill="both")
-        
+
         tree_msg = tk.Text(bt_frame, height=int(65*txt_scaling), width=int(60*txt_scaling), spacing2=1, bg="white", fg="black", wrap="word", font=("TkDefaultFont", int(12*txt_scaling)))
         self.tree_msg = tree_msg
         tree_msg.grid(row=0,column=0, sticky='nsew')
@@ -1077,5 +1079,5 @@ class Dashboard(object):
         matplotlib.rc('ytick', labelsize=6*vis_scaling)
         matplotlib.rc('legend', fontsize=8*vis_scaling)
         matplotlib.rc('figure', titlesize=8*vis_scaling)
-        
+
         return window
