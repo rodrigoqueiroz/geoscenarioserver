@@ -6348,7 +6348,7 @@ packages:
   timestamp: 1762553044644
 - conda: .
   name: geoscenarioserver
-  version: 0.1.1
+  version: 0.1.2
   build: hb0f4dca_0
   subdir: linux-64
   variants:
@@ -6375,7 +6375,7 @@ packages:
   license: MIT
 - conda: .
   name: geoscenarioserver
-  version: 0.1.1
+  version: 0.1.2
   build: he8cfe8b_0
   subdir: linux-aarch64
   variants:
@@ -16626,7 +16626,7 @@ packages:
   timestamp: 1773688104356
 - conda: ros2/src/geoscenario_bringup/
   name: ros-humble-geoscenario-bringup
-  version: 0.1.1
+  version: 0.1.2
   build: hb0f4dca_0
   subdir: linux-64
   variants:
@@ -16645,7 +16645,7 @@ packages:
   license: LicenseRef-MIT
 - conda: ros2/src/geoscenario_bringup/
   name: ros-humble-geoscenario-bringup
-  version: 0.1.1
+  version: 0.1.2
   build: he8cfe8b_0
   subdir: linux-aarch64
   variants:
@@ -16664,7 +16664,7 @@ packages:
   license: LicenseRef-MIT
 - conda: ros2/src/geoscenario_client/
   name: ros-humble-geoscenario-client
-  version: 0.1.1
+  version: 0.1.2
   build: hb0f4dca_0
   subdir: linux-64
   variants:
@@ -16682,7 +16682,7 @@ packages:
   license: LicenseRef-MIT
 - conda: ros2/src/geoscenario_client/
   name: ros-humble-geoscenario-client
-  version: 0.1.1
+  version: 0.1.2
   build: he8cfe8b_0
   subdir: linux-aarch64
   variants:
@@ -16700,7 +16700,7 @@ packages:
   license: LicenseRef-MIT
 - conda: ros2/src/geoscenario_msgs/
   name: ros-humble-geoscenario-msgs
-  version: 0.1.1
+  version: 0.1.2
   build: hb0f4dca_0
   subdir: linux-64
   variants:
@@ -16719,7 +16719,7 @@ packages:
   - numpy >=1.23,<3
 - conda: ros2/src/geoscenario_msgs/
   name: ros-humble-geoscenario-msgs
-  version: 0.1.1
+  version: 0.1.2
   build: he8cfe8b_0
   subdir: linux-aarch64
   variants:
@@ -16738,7 +16738,7 @@ packages:
   - numpy >=1.23,<3
 - conda: ros2/src/geoscenario_server/
   name: ros-humble-geoscenario-server
-  version: 0.1.1
+  version: 0.1.2
   build: hb0f4dca_0
   subdir: linux-64
   variants:
@@ -16756,7 +16756,7 @@ packages:
   license: LicenseRef-MIT
 - conda: ros2/src/geoscenario_server/
   name: ros-humble-geoscenario-server
-  version: 0.1.1
+  version: 0.1.2
   build: he8cfe8b_0
   subdir: linux-aarch64
   variants:
