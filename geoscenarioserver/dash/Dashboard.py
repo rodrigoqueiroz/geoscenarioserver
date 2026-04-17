@@ -213,7 +213,7 @@ class Dashboard(object):
             #find valid vehicle to focus plots and btree (if available)
             vid = None
 
-            if (vehicles.get(99)): #if ego exists, focus on ego
+            if (99 in vehicles):  # if ego exists, focus on ego
                 self.center_id = 99
             elif (type(self.center_id) == str):
                 if self.center_id[0] == 'p':

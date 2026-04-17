@@ -199,7 +199,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		if (v_type != 2)
+		if (v_type != 2) // Skip EV(2) only; process SDV(1), TV(3), and PV(4)
 		{
 			if (server_framestat.tick_count == server_tick_count)
 			{
@@ -266,7 +266,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		if (p_type != 3)
+		if (p_type != 3) // skip EP(3) only; process TP(1), PP(2) and SP(4)
 		{
 			if (server_framestat.tick_count == server_tick_count)
 			{
@@ -299,7 +299,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
-		// skip EVs
+		// Process EV(2) only; skip SDV(1), TV(3), and PV(4)
 		if (gsv.v_type != 2) {
 			continue;
 		}
@@ -327,11 +327,10 @@ void AGSClient::UpdateRemotePedestrianStates(float deltaTime)
 	for (auto& elem : pedestrians)
 	{
 		GSPedestrian &gsp = elem.Value;
-		// skip EPs
+		// process EP(3) only; skip TP(1), PP(2) and SP(4)
 		if (gsp.p_type != 3) {
 			continue;
 		}
-
 		// Update the pedestrian's pedestrian_state based on its actor's location.
 		// Actual movement of the pedestrian is updated in another class.
 		// Need to ensure remote movement is finished before reading its state
