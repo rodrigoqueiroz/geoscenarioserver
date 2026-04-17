@@ -35,7 +35,7 @@ def extract_bool_tag(node, name, default_value=False) -> bool:
             return False
         else:
             return default_value
-    log.warning(f"Boolean tag '{name}' does not exist a GS node {node.tags["gs"]}'. Using default: {default_value}")
+    log.warning(f"Boolean tag '{name}' does not exist a node")
     return False
 
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations, origin_from_vid=0):
