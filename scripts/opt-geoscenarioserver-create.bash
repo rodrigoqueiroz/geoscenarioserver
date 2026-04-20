@@ -14,6 +14,6 @@ pixi install
 pixi pack -p linux-64
 pixi unpack ${CHANNEL_TEST_DIR}/environment.tar -o /opt/geoscenarioserver/
 rm ${CHANNEL_TEST_DIR}/environment.tar
-tar -I 'zstd -T$(nproc) -19' -cpf opt-geoscenarioserver-${VERSION}.tar.zstd /opt/geoscenarioserver/
+tar -caf opt-geoscenarioserver-${VERSION}.tar.zst /opt/geoscenarioserver/
 
-echo "opt-geoscenarioserver-${VERSION}.tar.zstd is ready for upload"
+echo "${CHANNEL_TEST_DIR}/opt-geoscenarioserver-${VERSION}.tar.zst is ready for upload"
