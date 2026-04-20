@@ -154,10 +154,11 @@ void AGSClient::ReadServerState(float deltaTime)
 	int server_tick_count, nvehicles{0}, npedestrians{0}, vid{0}, pid{0};
 	iss >> server_tick_count >> server_simulation_time >> server_delta_time >> nvehicles >> npedestrians;
 	// parse origin
-	float origin_lat, origin_lon, origin_alt;
-	iss >> origin_lat >> origin_lon >> origin_alt;
+	float origin_lat, origin_lon, origin_alt, area;
+	iss >> origin_lat >> origin_lon >> origin_alt >> area;
 	// parse vehicles
 	int vehicles_read{0};
+	// vid v_type l w h x y z vx vy yaw steering_angle
 	while (vehicles_read < nvehicles)
 	{
 		iss >> vid;
@@ -198,7 +199,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		if (v_type == 1)
+		if (v_type != 2) // Skip EV(2) only; process SDV(1), TV(3), and PV(4)
 		{
 			if (server_framestat.tick_count == server_tick_count)
 			{
@@ -224,6 +225,7 @@ void AGSClient::ReadServerState(float deltaTime)
 
 	// parse pedestrians
 	int pedestrians_read{0};
+	// pid p_type l w h x y z vx vy yaw
 	while (pedestrians_read < npedestrians)
 	{
 		iss >> pid;
@@ -264,7 +266,7 @@ void AGSClient::ReadServerState(float deltaTime)
 			continue;
 		}
 
-		if (p_type == 4)
+		if (p_type != 3) // skip EP(3) only; process TP(1), PP(2) and SP(4)
 		{
 			if (server_framestat.tick_count == server_tick_count)
 			{
@@ -297,6 +299,7 @@ void AGSClient::UpdateRemoteVehicleStates(float deltaTime)
 	for (auto& elem : vehicles)
 	{
 		GSVehicle &gsv = elem.Value;
+		// Process EV(2) only; skip SDV(1), TV(3), and PV(4)
 		if (gsv.v_type != 2) {
 			continue;
 		}
@@ -324,10 +327,10 @@ void AGSClient::UpdateRemotePedestrianStates(float deltaTime)
 	for (auto& elem : pedestrians)
 	{
 		GSPedestrian &gsp = elem.Value;
-		if (gsp.p_type != 1 && gsp.p_type != 4) {
+		// process EP(3) only; skip TP(1), PP(2) and SP(4)
+		if (gsp.p_type != 3) {
 			continue;
 		}
-
 		// Update the pedestrian's pedestrian_state based on its actor's location.
 		// Actual movement of the pedestrian is updated in another class.
 		// Need to ensure remote movement is finished before reading its state
@@ -353,7 +356,7 @@ void AGSClient::CreateVehicle(int vid, int v_type, FVector &dim, FVector &loc, F
 	gsv.vid = vid;
 	gsv.v_type = v_type;
 	gsv.vehicle_state =  VehicleState();
-	if (v_type == 1 || v_type == 3) // SDV or TV
+	if (v_type != 2)  // SDV(1), TV(3), or PV(4)
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Vehicle"));
@@ -402,7 +405,7 @@ void AGSClient::CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc
 	gsp.pid = pid;
 	gsp.p_type = p_type;
 	gsp.pedestrian_state =  PedestrianState();
-	if (p_type == 4 || p_type == 1) // SP or TP
+	if (p_type != 3)  // TP(1), PP(2) or SP(4)
 	{
 		// spawn actor
 		UE_LOG(GeoScenarioModule, Log, TEXT("Spawning Sim Pedestrian"));
@@ -422,7 +425,14 @@ void AGSClient::CreatePedestrian(int pid, int p_type, FVector &dim, FVector &loc
 		FName BboxTag = FName(*PubBbox);
 		gsp.actor->Tags.Add(BboxTag);
 	}
-
+	else if (p_type == 3) // EP
+	{
+		//Find actor with tag
+		UE_LOG(GeoScenarioModule, Log, TEXT("Finding Remote Pedestrian"));
+		gsp.actor = FindPedestrianActor(pid);
+		loc = gsp.actor->GetActorLocation();
+		rot = gsp.actor->GetActorRotation();
+	}
 	//check if success
 	if (gsp.actor != nullptr)
 	{

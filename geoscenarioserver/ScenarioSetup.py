@@ -23,18 +23,20 @@ from geoscenarioserver.sp.Pedestrian import *
 from geoscenarioserver.gsc.GSParser import GSParser
 from geoscenarioserver.Actor import *
 
-def extract_tag(vnode, name, default_value, parser_fn):
-    return parser_fn(vnode.tags[name]) if name in vnode.tags else default_value
+def extract_tag(node, name, default_value, parser_fn):
+    return parser_fn(node.tags[name]) if name in node.tags else default_value
 
-def extract_bool_tag(vnode, name, default_value=False):
-    if name in vnode.tags:
-        val = vnode.tags[name].strip().lower()
+def extract_bool_tag(node, name, default_value=False) -> bool:
+    if name in node.tags:
+        val = node.tags[name].strip().lower()
         if val in ['yes', 'true', 'on']:
             return True
         elif val in ['no', 'false', 'off']:
             return False
         else:
             return default_value
+    log.warning(f"Boolean tag '{name}' does not exist a node")
+    return False
 
 def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimConfig, lanelet_map:LaneletMap, map_path, btree_locations, origin_from_vid=0):
     """ Setup scenario from GeoScenario files
@@ -50,7 +52,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.info(f"Loading scenario from absolute path {gsfile}")
             else:
                 log.error(f"Skipping scenario file not found: {gsfile}")
-                continue   
+                continue
         else:
             # try relative to the current working directory
             cwd_path = os.path.join(os.getcwd(), gsfile)
@@ -99,12 +101,12 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
     # use origin from gsc file to project nodes to sim frame
     altitude  = parser.origin.tags['altitude'] if 'altitude' in parser.origin.tags else 0.0
     area = parser.origin.tags['area'] if 'area' in parser.origin.tags else MPLOT_SIZE
-    
+
     # Check for origin-from-vid
     origin_lat = parser.origin.lat
     origin_lon = parser.origin.lon
     origin_alt = altitude
-    
+
     if origin_from_vid > 0:
         # Find the vehicle with the specified vid
         if origin_from_vid in parser.vehicles:
@@ -115,7 +117,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             log.info(f"Origin set from vehicle vid={origin_from_vid}: lat={origin_lat}, lon={origin_lon}, alt={origin_alt}")
         else:
             log.error(f"Vehicle with vid={origin_from_vid} not found in scenario. Using scenario origin.")
-    
+
     # preserve the origin
     sim_traffic.set_origin(origin_lat, origin_lon, origin_alt, area)
     if use_local_cartesian:
@@ -323,7 +325,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             if 'path' not in vnode.tags:
                 log.error(f"PV {vid} requires a path")
                 continue
-        
+
             p_name = vnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
             set_speed = extract_tag(vnode, "speed", None, float)
@@ -339,7 +341,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             collision_vid = extract_tag(vnode, "collision_vehicle_vid", None, int)
             use_speed_profile = extract_bool_tag(vnode, "usespeedprofile", False)
             collision_point = None
-            
+
             path = []
             path_length = 0.0
 
@@ -373,7 +375,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             else:
                 log.error("PV {} has no initial speed".format(vid))
                 continue
-            
+
             vehicle = PV(vid, name, start_state, frenet_state, yaw, path, sim_traffic.debug_shdata, sim_traffic.vehicles, length=length, width=width, set_speed=set_speed, speed_qualifier=speed_qualifier, collision_vid=collision_vid, collision_point=collision_point, use_speed_profile=use_speed_profile)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
@@ -493,13 +495,13 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             except Exception as e:
                 log.error(f"Failed to initialize pedestrian {pid}")
                 raise e
-            
-        # Path pedestrian    
+
+        # Path pedestrian
         else:
             if 'path' not in pnode.tags:
                 log.error(f"Path Pedestrian {pid} requires a path")
                 continue
-            
+
             p_name = pnode.tags['path']
             p_nodes = parser.paths[p_name].nodes
 
@@ -567,7 +569,10 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 use_speed_profile=use_speed_profile
             )
             sim_traffic.add_pedestrian(pedestrian)
-            log.info(f"Pedestrian {pid} initialized with PP behavior")
+            if collision_vid is not None:
+                log.info(f"Pedestrian {pid} initialized with PP behavior; collision_vid: {collision_vid}")
+            else:
+                log.info(f"Pedestrian {pid} initialized with PP behavior")
             continue
 
     #========= Static Objects

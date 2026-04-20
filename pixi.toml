@@ -6,7 +6,7 @@ channels = [
 ]
 name = "geoscenarioserver"
 platforms = ["linux-64", "linux-aarch64"] #, "win-64", "osx-64", "osx-arm64"]
-version = "0.1.1"
+version = "0.1.2"
 preview = ["pixi-build"]
 
 [tasks]
@@ -23,7 +23,7 @@ tk = { build = "xft*" }  # to have true type fonts on linux
 
 [package]
 name = { workspace = true }
-version = "0.1.1"
+version = "0.1.2"
 
 [package.build.backend]
 channels = [
@@ -37,7 +37,7 @@ version = ">=0.4.5"
 [package.build.config]
 noarch = false  # Build platform-specific package
 
-[package.host-dependencies] 
+[package.host-dependencies]
 hatchling = "*"
 pip = "*"
 

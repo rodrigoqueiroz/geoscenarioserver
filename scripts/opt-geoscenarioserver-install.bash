@@ -6,8 +6,8 @@ if [ -f /opt/geoscenarioserver/activate.sh ]; then
     echo "Remove and re-run the script to download and install the latest version"
 else
     echo "Downloading and installing GeoScenarioServer to /opt/geoscenarioserver"
-    NAME=opt-geoscenarioserver-latest.tar.zstd
+    NAME=opt-geoscenarioserver-latest.tar.zst
     curl -L https://wiselab.uwaterloo.ca/wise-sim/${NAME} -o ${SCRIPT_DIR}/${NAME}
-    tar -I zstdmt -xf ${SCRIPT_DIR}/${NAME} -C /
+    tar -xaf ${SCRIPT_DIR}/${NAME} -C /
     rm ${SCRIPT_DIR}/${NAME}
 fi

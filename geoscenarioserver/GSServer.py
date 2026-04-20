@@ -41,6 +41,8 @@ class GSServer(GSServerBase):
         self.sim_config.show_dashboard = not args.no_dash
         self.sim_config.wait_for_input = args.wait_for_input
         self.sim_config.wait_for_client = args.wait_for_client
+        if args.wait_for_client:
+            self.sim_config.client_shm = True
         self.sim_config.write_trajectories = args.write_trajectories
         if OSM_BACKGROUND_ENABLED:
             self.sim_config.overlay_osm = args.overlay_osm
@@ -135,7 +137,7 @@ def main():
         logging.basicConfig(filename=filename, filemode="w", level=log_level)
     else:
         logging.basicConfig(level=log_level)
-    
+
     if args.verify_map != "":
         LaneletMap.verify_map(args.verify_map)
         return

@@ -41,8 +41,8 @@ In order to sync vehicles spawned and controlled by the client (e.g., Ego), add 
 gsvehicle
 vid:x
 ```
-the vehicle id must matche a remote id in the Server.
+the vehicle id must match a remote id in the Server.
 
 
-rqueiroz@gsd.uwaterloo.ca
+rqueiroz@uwaterloo.ca
 d43sharm@uwaterloo.ca
