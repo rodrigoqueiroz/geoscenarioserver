@@ -42,7 +42,7 @@ class Pedestrian(Actor):
 
 
     def get_sim_state(self):
-        dimensions = [self.length, self.width, 0.0]
+        dimensions = [self.length, self.width, PEDESTRIAN_HEIGHT]
         position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, dimensions, position, velocity, self.state.yaw
@@ -269,13 +269,13 @@ class SP(Pedestrian):
 
         # angle btw ped's position and vehicle's velocity vector
         dot_product = np.dot(curr_pos-veh_pos, veh_heading)
-    
+
         theta = np.degrees(np.arccos((dot_product) / (np.linalg.norm(curr_pos-veh_pos)*np.linalg.norm(veh_heading))))
 
         ri = self.radius
 
-        #bounding box of the vehicle 
-        theta_max = np.degrees(np.arcsin(w/l)) 
+        #bounding box of the vehicle
+        theta_max = np.degrees(np.arcsin(w/l))
         if (-theta_max <= theta <= theta_max):
             rv = l
         elif 180 - theta_max <= theta or theta <= -180 + theta_max:
@@ -284,16 +284,16 @@ class SP(Pedestrian):
             #the collision is in the side
             boundary_length = abs(w/np.cos(np.radians(90-abs(theta))))
             rv = boundary_length
-    
+
         riv = ri + rv
-        
+
         div = np.linalg.norm(curr_pos - veh_pos)
         niv = normalize(curr_pos - veh_pos)
 
         fiv = A*np.exp((riv-div)/B)*niv * (lambda_i + ((1 - lambda_i)*((1+np.cos(np.radians(theta))) / 2)))
 
         return fiv
-    
+
 class PP(Pedestrian):
     """
     A path following pedestrian.
@@ -306,8 +306,8 @@ class PP(Pedestrian):
         self.reference_speed = reference_speed
         self.scenario_vehicles = scenario_vehicles
         self.current_waypoint = 0.0
-    
-    def tick(self, tick_count, delta_time, sim_time):  
+
+    def tick(self, tick_count, delta_time, sim_time):
         self.follow_path(delta_time)
         self.sim_traffic.debug_shdata[f"p{self.id}"] = (
             None,
