@@ -7,7 +7,7 @@ import xml.etree.ElementTree
 import re
 import geoscenarioserver.gsc.Utils as Utils
 from geoscenarioserver.gsc.Report import Report
-from geoscenarioserver.SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO
+from geoscenarioserver.SimConfig import UNIQUE_GS_TAGS_PER_SCENARIO, PEDESTRIAN_HEIGHT, CHILD_PEDESTRIAN_HEIGHT
 
 # do we want the projection dependency here?
 from lanelet2.core import GPSPoint
@@ -189,6 +189,9 @@ class GSParser(object):
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
 
+        model = str(n.tags.get("model", "")).strip().lower()
+        n.tags["height"] = CHILD_PEDESTRIAN_HEIGHT if model == "child" else PEDESTRIAN_HEIGHT
+
         #  Validate collision_vehicle_vid if present
         if "collision_vehicle_vid" in n.tags:
             try:
@@ -211,7 +214,7 @@ class GSParser(object):
 
     def check_vehicle(self, n):
         mandatory = {"gs","vid","name"}
-        optional = { "yaw","model","btype","trajectory","route","btree", "bsource", "eid",
+        optional = { "yaw","model","height","btype","trajectory","route","btree", "bsource", "eid",
                     "speed","path","cycles","usespeedprofile","start","group",}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)

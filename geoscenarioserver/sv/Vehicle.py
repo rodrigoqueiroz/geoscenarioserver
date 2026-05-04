@@ -34,7 +34,7 @@ class SDV(Vehicle):
             yaw:float, lanelet_map:LaneletMap, route_nodes:List[Node],
             start_state_in_frenet:bool=False, btree_locations:List[str]=[], btype:str="",
             goal_ends_simulation:bool=False, rule_engine_port:int=None,
-            length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
+            length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, height:float=VEHICLE_HEIGHT):
         self.btype = btype
         self.btree_locations = btree_locations
         self.goal_ends_simulation    = goal_ends_simulation
@@ -49,7 +49,7 @@ class SDV(Vehicle):
             )
             self.sdv_route.update_reference_path(start_state[0])
             start_state[0] = 0.0
-            super().__init__(vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw, length=length, width=width)
+            super().__init__(vid, name, start_state=(x_vector+y_vector), frenet_state=start_state, yaw=yaw, length=length, width=width, height=height)
         else:
             self.sdv_route = SDVRoute(lanelet_map, start_state[0], start_state[3], route_nodes = route_nodes)
             s_vector, d_vector = sim_to_frenet_frame(
@@ -57,7 +57,7 @@ class SDV(Vehicle):
             )
             self.sdv_route.update_reference_path(s_vector[0])
             s_vector[0] = 0.0
-            super().__init__(vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw, length=length, width=width)
+            super().__init__(vid, name, start_state=start_state, frenet_state=(s_vector + d_vector), yaw=yaw, length=length, width=width, height=height)
 
         self.type = Vehicle.SDV_TYPE
 
@@ -229,8 +229,8 @@ class EV(Vehicle):
     """
     An external vehicle (remote simulation)
     """
-    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, bsource='', length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
-        super().__init__(vid, name, start_state, yaw=yaw, length=length, width=width)
+    def __init__(self, vid, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, bsource='', length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, height:float=VEHICLE_HEIGHT):
+        super().__init__(vid, name, start_state, yaw=yaw, length=length, width=width, height=height)
         self.type = Vehicle.EV_TYPE
         self.P = np.identity(2) * 0.5 # some large error
         self.bsource = bsource
@@ -296,8 +296,8 @@ class TV(Vehicle):
     A trajectory following vehicle.
     @param keep_active: If True, vehicle stays in simulation even when is not following a trajectory
     """
-    def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH):
-        super().__init__(vid, name, start_state, yaw=yaw, length=length, width=width)
+    def __init__(self, vid, name, start_state, yaw, trajectory, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, height:float=VEHICLE_HEIGHT):
+        super().__init__(vid, name, start_state, yaw=yaw, length=length, width=width, height=height)
         self.type = Vehicle.TV_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -324,8 +324,8 @@ class PV(Vehicle):
     - agentacceleration (not implemented)
     - timetoacceleration (not implemented)
     """
-    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None, use_speed_profile=False):
-        super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
+    def __init__(self, vid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length:float=VEHICLE_LENGTH, width:float=VEHICLE_WIDTH, height:float=VEHICLE_HEIGHT, set_speed=None, speed_qualifier=SpeedQualifier.INITIAL, collision_vid=None, collision_point=None, use_speed_profile=False):
+        super().__init__(vid, name, start_state, frenet_state, yaw=yaw, length=length, width=width, height=height)
         self.type = Vehicle.PV_TYPE
         self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active, use_speed_profile)
         self._debug_shdata = debug_shdata

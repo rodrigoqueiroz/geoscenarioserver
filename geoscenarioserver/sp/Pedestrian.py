@@ -31,8 +31,8 @@ class Pedestrian(Actor):
 
     VEHICLES_POS = {}
 
-    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
+    def __init__(self, id:int, name:str='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw:float=0.0, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH, height:float=PEDESTRIAN_HEIGHT):
+        super().__init__(id, name, start_state, frenet_state, yaw=yaw, length=length, width=width, height=height)
         self.type = Pedestrian.N_TYPE
 
     def update_sim_state(self, new_state, delta_time):
@@ -42,7 +42,7 @@ class Pedestrian(Actor):
 
 
     def get_sim_state(self):
-        dimensions = [self.length, self.width, PEDESTRIAN_HEIGHT]
+        dimensions = [self.length, self.width, self.height]
         position = [self.state.x, self.state.y, 0.0]
         velocity = [self.state.x_vel, self.state.y_vel]
         return self.id, self.type, dimensions, position, velocity, self.state.yaw
@@ -52,8 +52,8 @@ class TP(Pedestrian):
     A trajectory following pedestrian.
     @param keep_active: If True, pedestrian stays in simulation even when is not following a trajectory
     """
-    def __init__(self, id:int, name:str, start_state, yaw:float, trajectory, keep_active:bool = True, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
+    def __init__(self, id:int, name:str, start_state, yaw:float, trajectory, keep_active:bool = True, length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH, height:float=PEDESTRIAN_HEIGHT):
+        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width, height=height)
         self.type = Pedestrian.TP_TYPE
         self.trajectory = trajectory
         self.keep_active = keep_active
@@ -75,8 +75,8 @@ class SP(Pedestrian):
     of the Social Force Model (SFM) are informed by behaviour trees
     """
 
-    def __init__(self, id:int, name:str, start_state, yaw:float, goal_points, root_btree_name, btree_locations=[], btype="", length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH):
-        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width)
+    def __init__(self, id:int, name:str, start_state, yaw:float, goal_points, root_btree_name, btree_locations=[], btype="", length:float=PEDESTRIAN_LENGTH, width:float=PEDESTRIAN_WIDTH, height:float=PEDESTRIAN_HEIGHT):
+        super().__init__(id, name, start_state, yaw=yaw, length=length, width=width, height=height)
         self.btype = btype
         self.btree_locations = btree_locations
         self.root_btree_name = root_btree_name
@@ -298,8 +298,8 @@ class PP(Pedestrian):
     """
     A path following pedestrian.
     """
-    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, set_speed = None, speed_qualifier = SpeedQualifier.INITIAL, collision_vid = None, collision_point = None, reference_speed = None, use_speed_profile=False):
-        super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width)
+    def __init__(self, pid, name, start_state, frenet_state, yaw, path, debug_shdata, scenario_vehicles, keep_active = True, length = PEDESTRIAN_LENGTH, width = PEDESTRIAN_WIDTH, height:float=PEDESTRIAN_HEIGHT, set_speed = None, speed_qualifier = SpeedQualifier.INITIAL, collision_vid = None, collision_point = None, reference_speed = None, use_speed_profile=False):
+        super().__init__(pid, name, start_state, frenet_state, yaw=yaw, length=length, width=width, height=height)
         self.type = Pedestrian.PP_TYPE
         self.configure_path_following(path, set_speed, speed_qualifier, collision_vid, collision_point, keep_active, use_speed_profile)
         self._debug_shdata = debug_shdata

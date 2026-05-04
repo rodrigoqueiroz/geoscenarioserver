@@ -177,6 +177,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         start_in_frenet = False
         length = extract_tag(vnode, 'length', VEHICLE_LENGTH, float)
         width = extract_tag(vnode, 'width', VEHICLE_WIDTH, float)
+        height = extract_tag(vnode, 'height', VEHICLE_HEIGHT, float)
 
         #yaw = 90.0
         #if 'yaw' in vnode.tags:
@@ -244,7 +245,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             try:
                 if not has_map:
                     # Create SDV without route when no map is loaded
-                    vehicle = Vehicle(vid, name, start_state, yaw=yaw, length=length, width=width)
+                    vehicle = Vehicle(vid, name, start_state, yaw=yaw, length=length, width=width, height=height)
                     vehicle.type = Vehicle.SDV_TYPE
                     vehicle.model = model
                     vehicle.sim_state = ActorSimState.INACTIVE
@@ -257,7 +258,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                     btree_locations=btree_locations,
                                     btype=btype, goal_ends_simulation=goal_ends_simulation,
                                     rule_engine_port=rule_engine_port,
-                                    length=length, width=width
+                                    length=length, width=width, height=height
                                 )
                     #vehicle = SDV(  vid, name, root_btree_name, start_state, yaw,
                     #                lanelet_map, sim_config.lanelet_routes[vid],
@@ -309,7 +310,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                             start_state = start_state,                      #vehicle start state in cartesian frame [x,x_vel,x_acc, y,y_vel,y_acc]
                             yaw = yaw,
                             trajectory = trajectory,                        #a valid trajectory with at least x,y,time per node
-                            length=length, width=width)
+                            length=length, width=width, height=height)
                 sim_traffic.add_vehicle(vehicle)
                 log.info("Vehicle {} initialized with TV behavior".format(vid))
 
@@ -373,7 +374,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 log.error("PV {} has no initial speed".format(vid))
                 continue
 
-            vehicle = PV(vid, name, start_state, frenet_state, yaw, path, sim_traffic.debug_shdata, sim_traffic.vehicles, length=length, width=width, set_speed=set_speed, speed_qualifier=speed_qualifier, collision_vid=collision_vid, collision_point=collision_point, use_speed_profile=use_speed_profile)
+            vehicle = PV(vid, name, start_state, frenet_state, yaw, path, sim_traffic.debug_shdata, sim_traffic.vehicles, length=length, width=width, height=height, set_speed=set_speed, speed_qualifier=speed_qualifier, collision_vid=collision_vid, collision_point=collision_point, use_speed_profile=use_speed_profile)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info(f"Vehicle {vid} initialized with PV behavior")
@@ -389,7 +390,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
 
         # Neutral Vehicle
         else:
-            vehicle = Vehicle(vid, name, start_state, yaw=yaw)
+            vehicle = Vehicle(vid, name, start_state, yaw=yaw, height=height)
             vehicle.model = model
             sim_traffic.add_vehicle(vehicle)
             log.info(f"Vehicle {vid} initialized as a motionless vehicle")
@@ -414,6 +415,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
         btype = pnode.tags['btype'].lower() if 'btype' in pnode.tags else ''
         length = extract_tag(pnode, 'length', PEDESTRIAN_LENGTH, float)
         width = extract_tag(pnode, 'width', PEDESTRIAN_WIDTH, float)
+        height = extract_tag(pnode, 'height', PEDESTRIAN_HEIGHT, float)
 
         # Trajectory Pedestrian (TP)
         if btype == 'tp':
@@ -442,7 +444,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                     nd.speed = float(node.tags['speed']) if 'speed' in node.tags else None
                     trajectory.append(nd)
                     prev_node = nd
-                pedestrian = TP(pid, name, start_state, yaw, trajectory, length=length, width=width)
+                pedestrian = TP(pid, name, start_state, yaw, trajectory, length=length, width=width, height=height)
                 sim_traffic.add_pedestrian(pedestrian)
                 log.info(f"Pedestrian {pid} initialized with TP behavior")
             except Exception as e:
@@ -458,7 +460,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
             try:
                 if not has_map:
                     # Create SP without planner when no map is loaded
-                    pedestrian = Pedestrian(pid, name, start_state, yaw=yaw, length=length, width=width)
+                    pedestrian = Pedestrian(pid, name, start_state, yaw=yaw, length=length, width=width, height=height)
                     pedestrian.type = Pedestrian.SP_TYPE
                     pedestrian.sim_state = ActorSimState.INACTIVE
                     sim_traffic.add_pedestrian(pedestrian)
@@ -485,7 +487,8 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                                     root_btree_name,
                                     btree_locations=btree_locations,
                                     btype=btype,
-                                    length=length, width=width)
+                                    length=length, width=width,
+                                    height=height)
 
                     sim_traffic.add_pedestrian(pedestrian)
                     log.info(f"Pedestrian {pid} initialized with SP behavior")
@@ -558,6 +561,7 @@ def load_geoscenario_from_file(gsfiles, sim_traffic:SimTraffic, sim_config:SimCo
                 path=path,
                 scenario_vehicles=sim_traffic.vehicles,
                 debug_shdata=sim_traffic.debug_shdata,
+                height=height,
                 set_speed=set_speed,
                 reference_speed=frenet_state[1],
                 speed_qualifier=speed_qualifier,
