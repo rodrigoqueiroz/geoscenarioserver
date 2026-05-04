@@ -64,7 +64,8 @@ VEHICLE_HEIGHT = 1.5        #vehicle height in [m]
 PEDESTRIAN_RADIUS = 0.27
 PEDESTRIAN_LENGTH = 0.6
 PEDESTRIAN_WIDTH = 0.5
-PEDESTRIAN_HEIGHT = 1.8     #height is set to 1.8m for all pedestrians
+PEDESTRIAN_HEIGHT = 1.8        #height is set to 1.8m for all adult pedestrians
+CHILD_PEDESTRIAN_HEIGHT = 1.2  #height is set to 1.2m for all child pedestrians
 
 #Planning
 PLANNER_RATE = 5                 #Planner tick rate

@@ -194,6 +194,27 @@
     <tag k='time' v='1' />
     <tag k='yaw' v='0' />
   </node>
+  <node id='-5403257' action='modify' lat='43.47118297156' lon='-80.53906433855'>
+    <tag k='btype' v='PP' />
+    <tag k='collision_vehicle_vid' v='1' />
+    <tag k='cycles' v='1' />
+    <tag k='gs' v='pedestrian' />
+    <tag k='model' v='child' />
+    <tag k='name' v='Timmy' />
+    <tag k='path' v='p4p' />
+    <tag k='pid' v='4' />
+    <tag k='speed' v='3' />
+    <tag k='speed_qualifier' v='constant' />
+  </node>
+  <node id='-5403258' action='modify' lat='43.47128956351' lon='-80.53891518384' />
+  <node id='-5403319' action='modify' lat='43.47121354447' lon='-80.5390529527' />
+  <node id='-5403334' action='modify' lat='43.47124081218' lon='-80.53896755878' />
+  <node id='-5403349' action='modify' lat='43.47127386393' lon='-80.53897211312' />
+  <node id='-5403372' action='modify' lat='43.47127634282' lon='-80.53892201535' />
+  <node id='-5403457' action='modify' lat='43.47122759147' lon='-80.53903131957' />
+  <node id='-5403469' action='modify' lat='43.47122593888' lon='-80.538997162' />
+  <node id='-5403502' action='modify' lat='43.47125816435' lon='-80.53897439029' />
+  <node id='-5403510' action='modify' lat='43.47127716911' lon='-80.53895047999' />
   <way id='-1958163' action='modify'>
     <nd ref='-5399635' />
     <nd ref='-5399629' />
@@ -256,5 +277,20 @@
     <nd ref='-5399654' />
     <tag k='gs' v='trajectory' />
     <tag k='name' v='traj_1' />
+  </way>
+  <way id='-1958171' action='modify'>
+    <nd ref='-5403257' />
+    <nd ref='-5403319' />
+    <nd ref='-5403457' />
+    <nd ref='-5403469' />
+    <nd ref='-5403334' />
+    <nd ref='-5403502' />
+    <nd ref='-5403349' />
+    <nd ref='-5403510' />
+    <nd ref='-5403372' />
+    <nd ref='-5403258' />
+    <tag k='abstract' v='no' />
+    <tag k='gs' v='path' />
+    <tag k='name' v='p4p' />
   </way>
 </osm>

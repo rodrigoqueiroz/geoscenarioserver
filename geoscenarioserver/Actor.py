@@ -24,11 +24,12 @@ class ActorSimState(IntEnum):
     INVISIBLE = 2         #in simulation but NOT visible to other agents (for reference)
 
 class Actor(object):
-    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0):
+    def __init__(self, id, name='', start_state=[0.0,0.0,0.0, 0.0,0.0,0.0], frenet_state=[0.0,0.0,0.0, 0.0,0.0,0.0], yaw=0.0, state=None, length=0.0, width=0.0, height=0.0):
         self.id = id
         self.name = name
         self.length = length
         self.width = width
+        self.height = height
         self.radius = min(length, width) / 2.0
         self.sim_state = ActorSimState.ACTIVE
         self.type = None
