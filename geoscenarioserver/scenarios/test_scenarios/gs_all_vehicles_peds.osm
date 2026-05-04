@@ -27,6 +27,7 @@
     <tag k='speed' v='10' />
     <tag k='vid' v='2' />
     <tag k='yaw' v='320' />
+    <tag k='height' v='2' />
   </node>
   <node id='-5399636' action='modify' lat='43.47076127669' lon='-80.53842310773'>
     <tag k='btree' v='st_standard_driver.btree' />

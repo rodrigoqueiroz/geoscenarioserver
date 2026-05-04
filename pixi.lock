@@ -40,7 +40,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libfreetype6-2.14.3-h73754d4_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgcc-15.2.0-he0feb66_18.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgcc-ng-15.2.0-h69a702a_18.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h6705ce6_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h0d30a3d_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgomp-15.2.0-he0feb66_18.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libiconv-1.18-h3b78370_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libjpeg-turbo-3.1.4.1-hb03c661_0.conda
@@ -111,7 +111,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-aarch64/libfreetype6-2.14.3-hdae7a39_0.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/libgcc-15.2.0-h8acb6b2_18.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/libgcc-ng-15.2.0-he9431aa_18.conda
-      - conda: https://prefix.dev/conda-forge/linux-aarch64/libglib-2.88.1-h957473f_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libglib-2.88.1-h96a7f82_1.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/libgomp-15.2.0-h8acb6b2_18.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/libiconv-1.18-h90929bb_2.conda
       - conda: https://prefix.dev/conda-forge/linux-aarch64/libjpeg-turbo-3.1.4.1-he30d5cf_0.conda
@@ -220,7 +220,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/fribidi-1.0.16-hb03c661_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gdk-pixbuf-2.44.6-h2b0a6b4_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/geographiclib-cpp-2.7-hb700be7_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-h040f060_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-hcfc306f_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gmock-1.17.0-ha770c72_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/graphite2-1.3.14-hecca717_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/graphviz-14.1.2-h8b86629_0.conda
@@ -287,7 +287,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libgfortran5-15.2.0-h68bc16d_18.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgl-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgl-devel-1.7.0-ha4b6fd6_2.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h6705ce6_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h0d30a3d_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglvnd-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglx-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglx-devel-1.7.0-ha4b6fd6_2.conda
@@ -1000,8 +1000,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/gettext-tools-0.25.1-h3f43e3d_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gl2ps-1.4.2-h36e74d4_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/glew-2.3.0-h71661d4_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/glib-2.88.1-h5110415_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-h040f060_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/glib-2.88.1-h435ced3_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-hcfc306f_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/glslang-16.3.0-h96af755_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gmock-1.17.0-ha770c72_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gmp-6.3.0-hac33072_2.conda
@@ -1094,7 +1094,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libgfortran5-15.2.0-h68bc16d_18.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgl-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgl-devel-1.7.0-ha4b6fd6_2.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h6705ce6_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h0d30a3d_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglu-9.0.3-h5888daf_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglvnd-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglx-1.7.0-ha4b6fd6_2.conda
@@ -2555,8 +2555,8 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/gfortran_linux-64-14.3.0-h6b77fdb_24.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gl2ps-1.4.2-h36e74d4_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/glew-2.3.0-h71661d4_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/glib-2.88.1-h5110415_0.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-h040f060_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/glib-2.88.1-h435ced3_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-hcfc306f_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/glslang-16.3.0-h96af755_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gmock-1.17.0-ha770c72_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/gmp-6.3.0-hac33072_2.conda
@@ -2655,7 +2655,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libgfortran5-15.2.0-h68bc16d_18.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgl-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libgl-devel-1.7.0-ha4b6fd6_2.conda
-      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h6705ce6_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h0d30a3d_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglu-9.0.3-h5888daf_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglvnd-1.7.0-ha4b6fd6_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libglx-1.7.0-ha4b6fd6_2.conda
@@ -6608,17 +6608,17 @@ packages:
   license_family: BSD
   size: 484212
   timestamp: 1766373411104
-- conda: https://prefix.dev/conda-forge/linux-64/glib-2.88.1-h5110415_0.conda
-  sha256: c5126215e644dc1358d53153477b054c95bea72b1c72b8a7940224e51cd21855
-  md5: 2ec5e3e179440179c28c974c8c3fe984
+- conda: https://prefix.dev/conda-forge/linux-64/glib-2.88.1-h435ced3_1.conda
+  sha256: 3afa29fc042f3c6c6b54165ed085f3e5516b5fac37b429b2b7c01913e5604412
+  md5: 7d844a122c6cf1d8d2fb024f85757225
   depends:
   - python *
   - packaging
-  - libglib ==2.88.1 h6705ce6_0
-  - glib-tools ==2.88.1 h040f060_0
+  - libglib ==2.88.1 h0d30a3d_1
+  - glib-tools ==2.88.1 hcfc306f_1
   license: LGPL-2.1-or-later
-  size: 85524
-  timestamp: 1777848149975
+  size: 85466
+  timestamp: 1777904907738
 - conda: https://prefix.dev/conda-forge/linux-aarch64/glib-2.86.4-hc66a092_1.conda
   sha256: 5a5d7cc6e687ef619ff9d652f142308ac3a826c37284050c5d6632638cfd4bdc
   md5: b234a527dc6734518a19a17331c11825
@@ -6630,17 +6630,17 @@ packages:
   license: LGPL-2.1-or-later
   size: 88045
   timestamp: 1771863290314
-- conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-h040f060_0.conda
-  sha256: edeabb898f3ab893473f9eb6ec0a072337f6e81a5bc4f91ac1387aae40698058
-  md5: 55e7cea32f68a173635bcd4ea3d6e02c
+- conda: https://prefix.dev/conda-forge/linux-64/glib-tools-2.88.1-hcfc306f_1.conda
+  sha256: 628015696c106665ae0043f7e9f51298ec9e8f11573734ad67a849c8279cbe33
+  md5: ff216b19c24f3a46e9d17ebcf2f96390
   depends:
-  - libglib ==2.88.1 h6705ce6_0
+  - libglib ==2.88.1 h0d30a3d_1
   - libffi
-  - __glibc >=2.17,<3.0.a0
   - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
   license: LGPL-2.1-or-later
-  size: 237210
-  timestamp: 1777848149975
+  size: 237141
+  timestamp: 1777904907738
 - conda: https://prefix.dev/conda-forge/linux-aarch64/glib-tools-2.86.4-hc87f4d4_1.conda
   sha256: bdb36755b6a9751ca26bc5a6fcd36747c1e2301a7aacdf08780da6338d7d09ad
   md5: 78005b6876d48531ed75c8986a6de7ad
@@ -8850,21 +8850,21 @@ packages:
   license: LicenseRef-libglvnd
   size: 113925
   timestamp: 1731331014056
-- conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h6705ce6_0.conda
-  sha256: d81bb2fd3b339009ddbf642c0569be1459ee0b9e5829d47651c0c0003c0e1ec8
-  md5: 42c424ab163c576c7fb5981f7fb379cf
+- conda: https://prefix.dev/conda-forge/linux-64/libglib-2.88.1-h0d30a3d_1.conda
+  sha256: a0899efbae2a6a9102c796c0b11ac371a3190da5afa28512eeb2879c65d1419c
+  md5: 6016ea5ee9e986bc683879408cc87529
   depends:
   - __glibc >=2.17,<3.0.a0
   - libgcc >=14
-  - libzlib >=1.3.2,<2.0a0
+  - pcre2 >=10.47,<10.48.0a0
   - libffi >=3.5.2,<3.6.0a0
   - libiconv >=1.18,<2.0a0
-  - pcre2 >=10.47,<10.48.0a0
+  - libzlib >=1.3.2,<2.0a0
   constrains:
   - glib >2.66
   license: LGPL-2.1-or-later
-  size: 4754361
-  timestamp: 1777848149975
+  size: 4754370
+  timestamp: 1777904907738
 - conda: https://prefix.dev/conda-forge/linux-aarch64/libglib-2.86.4-hf53f6bf_1.conda
   sha256: afc503dbd04a5bf2709aa9d8318a03a8c4edb389f661ff280c3494bfef4341ec
   md5: 4ac4372fc4d7f20630a91314cdac8afd
@@ -8879,21 +8879,21 @@ packages:
   license: LGPL-2.1-or-later
   size: 4512186
   timestamp: 1771863220969
-- conda: https://prefix.dev/conda-forge/linux-aarch64/libglib-2.88.1-h957473f_0.conda
-  sha256: 7d2c07c43f5003e838b2eb3c270d2230a6a909e8f05100db580b6f11f527f44a
-  md5: b4f447af90e8fc91fd2939bbe8a5f5db
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libglib-2.88.1-h96a7f82_1.conda
+  sha256: a02050346680c86f3f7ab0963d17508cf804a6eed2e451624f645173ceac7879
+  md5: dd38b87359ae701b4aa1ef74311edb59
   depends:
   - python 3.14.* *_cp314
   - libgcc >=14
   - libffi >=3.5.2,<3.6.0a0
+  - libiconv >=1.18,<2.0a0
   - libzlib >=1.3.2,<2.0a0
   - pcre2 >=10.47,<10.48.0a0
-  - libiconv >=1.18,<2.0a0
   constrains:
   - glib >2.66
   license: LGPL-2.1-or-later
-  size: 4946773
-  timestamp: 1777848150657
+  size: 4946786
+  timestamp: 1777904911994
 - conda: https://prefix.dev/conda-forge/linux-64/libglu-9.0.3-h5888daf_1.conda
   sha256: a0105eb88f76073bbb30169312e797ed5449ebb4e964a756104d6e54633d17ef
   md5: 8422fcc9e5e172c91e99aef703b3ce65

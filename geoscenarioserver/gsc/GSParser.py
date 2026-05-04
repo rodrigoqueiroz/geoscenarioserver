@@ -214,7 +214,7 @@ class GSParser(object):
 
     def check_vehicle(self, n):
         mandatory = {"gs","vid","name"}
-        optional = { "yaw","model","btype","trajectory","route","btree", "bsource", "eid",
+        optional = { "yaw","model","height","btype","trajectory","route","btree", "bsource", "eid",
                     "speed","path","cycles","usespeedprofile","start","group",}
         self.check_tags(n, mandatory, optional)
         self.check_uniquename(n)
