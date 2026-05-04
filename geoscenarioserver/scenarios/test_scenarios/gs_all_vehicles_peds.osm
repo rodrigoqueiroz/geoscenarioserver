@@ -205,7 +205,6 @@
     <tag k='path' v='p4p' />
     <tag k='pid' v='4' />
     <tag k='speed' v='3' />
-    <tag k='speed_qualifier' v='constant' />
   </node>
   <node id='-5403258' action='modify' lat='43.47128956351' lon='-80.53891518384' />
   <node id='-5403319' action='modify' lat='43.47121354447' lon='-80.5390529527' />
