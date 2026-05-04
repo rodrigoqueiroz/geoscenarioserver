@@ -276,10 +276,11 @@ class Actor(object):
                         collision_segment_prev_node, collision_segment_next_node = self.get_curr_and_prev_path_nodes()
                         # Euclidean distance between vehicle and collision point
                         collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                        if collision_vehicle.state.s_vel == 0.0:
+                        collision_vehicle_speed = collision_vehicle.state.get_cartesian_speed()
+                        if collision_vehicle_speed == 0.0:
                             time_to_collision = float('inf')
                         else:
-                            time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                            time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle_speed
                     else:
                         #find the point once and save the result
                         collision_pt_result = self.get_collision_pt(vehicle_pos, vehicle_vel)
@@ -287,10 +288,11 @@ class Actor(object):
                             collision_pt, collision_segment_prev_node, collision_segment_next_node = collision_pt_result
                             # Euclidean distance between vehicle and collision point
                             collision_vehicle_dist_to_collision = np.sqrt(np.sum((collision_pt - vehicle_pos) ** 2))
-                            if collision_vehicle.state.s_vel == 0.0:
+                            collision_vehicle_speed = collision_vehicle.state.get_cartesian_speed()
+                            if collision_vehicle_speed == 0.0:
                                 time_to_collision = float('inf')
                             else:
-                                time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle.state.s_vel
+                                time_to_collision = collision_vehicle_dist_to_collision / collision_vehicle_speed
 
 
             for i in range(len(self.path)-1):
