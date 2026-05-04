@@ -17,7 +17,7 @@ rattler-index fs conda-packages/
 ```
 
 3. Create the `opt-geoscenarioserver-<version>.tar.zst` and upload to the server.
-Execute locally (`<version>` is optional, defaults to `0.1.2`):
+Execute locally (`<version>` is optional, defaults to `0.1.3`):
 
 ```bash
 bash scripts/opt-geoscenarioserver-create.bash [<version>]

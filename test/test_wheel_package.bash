@@ -7,7 +7,7 @@ REPO_DIR=$(dirname "$TEST_DIR")
 sudo apt-get install -yq python3-dev python3-venv python3-tk
 
 if [[ $1 == "--release" ]]; then
-    VERSION="0.1.2"
+    VERSION="0.1.3"
     WHEEL=https://github.com/rodrigoqueiroz/geoscenarioserver/releases/download/v${VERSION}/geoscenarioserver-${VERSION}-py3-none-any.whl
 else
     cd ${REPO_DIR}
